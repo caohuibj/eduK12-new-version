@@ -1,0 +1,584 @@
+{
+  "report": {
+    "schemaVersion": 1,
+    "version": "1.1.0",
+    "title": "这次的追踪记录",
+    "headlineMetrics": [
+      "meanTrackedTargets"
+    ],
+    "userMetrics": [
+      "meanTargetsSpeed1",
+      "meanTargetsSpeed4",
+      "meanTargetsSpeed8"
+    ],
+    "detailMetrics": [
+      "trackingAccuracy",
+      "validTrialCount",
+      "excludedTrialCount"
+    ],
+    "practicalTips": [
+      "把设备放稳，关闭通知，让目光能持续留在画面上。"
+    ],
+    "disclaimer": "这里只描述本轮任务，不代表日常最多能同时注意几件事。"
+  },
+  "metrics": {
+    "meanTrackedTargets": {
+      "key": "meanTrackedTargets",
+      "label": "平均找回目标数",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "平均找回目标数",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "headline",
+      "role": "primary",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [
+        "unreliableSpeed1",
+        "unreliableSpeed4",
+        "unreliableSpeed8"
+      ],
+      "export": {
+        "summary": true,
+        "label": "平均找回目标数"
+      }
+    },
+    "trackingAccuracy": {
+      "key": "trackingAccuracy",
+      "label": "正确追踪比例",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "正确追踪比例",
+      "unit": "ratio",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "secondary",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [
+        "unreliableSpeed1",
+        "unreliableSpeed4",
+        "unreliableSpeed8"
+      ],
+      "export": {
+        "summary": true,
+        "label": "正确追踪比例"
+      }
+    },
+    "expectedTrialCount": {
+      "key": "expectedTrialCount",
+      "label": "计划正式次数",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "计划正式次数",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "计划正式次数"
+      }
+    },
+    "receivedTrialCount": {
+      "key": "receivedTrialCount",
+      "label": "已收到正式次数",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "已收到正式次数",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "已收到正式次数"
+      }
+    },
+    "validTrialCount": {
+      "key": "validTrialCount",
+      "label": "有效正式次数",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "有效正式次数",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "有效正式次数"
+      }
+    },
+    "excludedTrialCount": {
+      "key": "excludedTrialCount",
+      "label": "技术排除次数",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "技术排除次数",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "技术排除次数"
+      }
+    },
+    "excludedTrialReasons": {
+      "key": "excludedTrialReasons",
+      "label": "技术排除原因",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "技术排除原因",
+      "unit": "map",
+      "valueType": "object",
+      "direction": "descriptive",
+      "visibility": "research_only",
+      "role": "research_only",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": false,
+        "label": "技术排除原因"
+      }
+    },
+    "excludedTrialIndices": {
+      "key": "excludedTrialIndices",
+      "label": "技术排除序号",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "技术排除序号",
+      "unit": "map",
+      "valueType": "array",
+      "direction": "descriptive",
+      "visibility": "research_only",
+      "role": "research_only",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": false,
+        "label": "技术排除序号"
+      }
+    },
+    "meanTargetsSpeed1": {
+      "key": "meanTargetsSpeed1",
+      "label": "速度1平均找回目标数",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "速度1平均找回目标数",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "user",
+      "role": "primary",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [
+        "unreliableSpeed1"
+      ],
+      "export": {
+        "summary": true,
+        "label": "速度1平均找回目标数"
+      }
+    },
+    "accuracySpeed1": {
+      "key": "accuracySpeed1",
+      "label": "速度1正确追踪比例",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "速度1正确追踪比例",
+      "unit": "ratio",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "secondary",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [
+        "unreliableSpeed1"
+      ],
+      "export": {
+        "summary": true,
+        "label": "速度1正确追踪比例"
+      }
+    },
+    "validTrialsSpeed1": {
+      "key": "validTrialsSpeed1",
+      "label": "validTrialsSpeed1",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "validTrialsSpeed1",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "validTrialsSpeed1"
+      }
+    },
+    "totalTrialsSpeed1": {
+      "key": "totalTrialsSpeed1",
+      "label": "totalTrialsSpeed1",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "totalTrialsSpeed1",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "totalTrialsSpeed1"
+      }
+    },
+    "observedTrialsSpeed1": {
+      "key": "observedTrialsSpeed1",
+      "label": "observedTrialsSpeed1",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "observedTrialsSpeed1",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "observedTrialsSpeed1"
+      }
+    },
+    "meanTargetsSpeed4": {
+      "key": "meanTargetsSpeed4",
+      "label": "速度4平均找回目标数",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "速度4平均找回目标数",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "user",
+      "role": "primary",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [
+        "unreliableSpeed4"
+      ],
+      "export": {
+        "summary": true,
+        "label": "速度4平均找回目标数"
+      }
+    },
+    "accuracySpeed4": {
+      "key": "accuracySpeed4",
+      "label": "速度4正确追踪比例",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "速度4正确追踪比例",
+      "unit": "ratio",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "secondary",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [
+        "unreliableSpeed4"
+      ],
+      "export": {
+        "summary": true,
+        "label": "速度4正确追踪比例"
+      }
+    },
+    "validTrialsSpeed4": {
+      "key": "validTrialsSpeed4",
+      "label": "validTrialsSpeed4",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "validTrialsSpeed4",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "validTrialsSpeed4"
+      }
+    },
+    "totalTrialsSpeed4": {
+      "key": "totalTrialsSpeed4",
+      "label": "totalTrialsSpeed4",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "totalTrialsSpeed4",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "totalTrialsSpeed4"
+      }
+    },
+    "observedTrialsSpeed4": {
+      "key": "observedTrialsSpeed4",
+      "label": "observedTrialsSpeed4",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "observedTrialsSpeed4",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "observedTrialsSpeed4"
+      }
+    },
+    "meanTargetsSpeed8": {
+      "key": "meanTargetsSpeed8",
+      "label": "速度8平均找回目标数",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "速度8平均找回目标数",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "user",
+      "role": "primary",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [
+        "unreliableSpeed8"
+      ],
+      "export": {
+        "summary": true,
+        "label": "速度8平均找回目标数"
+      }
+    },
+    "accuracySpeed8": {
+      "key": "accuracySpeed8",
+      "label": "速度8正确追踪比例",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "速度8正确追踪比例",
+      "unit": "ratio",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "secondary",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [
+        "unreliableSpeed8"
+      ],
+      "export": {
+        "summary": true,
+        "label": "速度8正确追踪比例"
+      }
+    },
+    "validTrialsSpeed8": {
+      "key": "validTrialsSpeed8",
+      "label": "validTrialsSpeed8",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "validTrialsSpeed8",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "validTrialsSpeed8"
+      }
+    },
+    "totalTrialsSpeed8": {
+      "key": "totalTrialsSpeed8",
+      "label": "totalTrialsSpeed8",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "totalTrialsSpeed8",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "totalTrialsSpeed8"
+      }
+    },
+    "observedTrialsSpeed8": {
+      "key": "observedTrialsSpeed8",
+      "label": "observedTrialsSpeed8",
+      "category": "attention",
+      "construct": "dynamic_tracking",
+      "description": "observedTrialsSpeed8",
+      "unit": "count",
+      "valueType": "number",
+      "direction": "descriptive",
+      "visibility": "detail",
+      "role": "quality",
+      "availableProfiles": [
+        "research",
+        "experience"
+      ],
+      "referenceEligible": false,
+      "requiresQualityFlags": [],
+      "export": {
+        "summary": true,
+        "label": "observedTrialsSpeed8"
+      }
+    }
+  },
+  "quality": {
+    "noInterpretableCondition": {
+      "key": "noInterpretableCondition",
+      "label": "无可解释条件",
+      "description": "所有速度的完整有效记录均不足。",
+      "effect": "invalid"
+    },
+    "incompleteRecords": {
+      "key": "incompleteRecords",
+      "label": "正式记录未完成",
+      "description": "未达到冻结的正式试次数。",
+      "effect": "limited"
+    },
+    "unreliableSpeed1": {
+      "key": "unreliableSpeed1",
+      "label": "速度1记录受限",
+      "description": "该速度的完整有效记录不足，隐藏该速度指标。",
+      "effect": "limited"
+    },
+    "unreliableSpeed4": {
+      "key": "unreliableSpeed4",
+      "label": "速度4记录受限",
+      "description": "该速度的完整有效记录不足，隐藏该速度指标。",
+      "effect": "limited"
+    },
+    "unreliableSpeed8": {
+      "key": "unreliableSpeed8",
+      "label": "速度8记录受限",
+      "description": "该速度的完整有效记录不足，隐藏该速度指标。",
+      "effect": "limited"
+    }
+  }
+}

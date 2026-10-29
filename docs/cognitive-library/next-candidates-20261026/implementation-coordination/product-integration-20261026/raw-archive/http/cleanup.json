@@ -1,0 +1,12 @@
+{
+  "kind": "HTTP_REVIEW_OWNED_FIXTURE_CLEANUP",
+  "loopbackPort": 18855,
+  "serverExitCode": 0,
+  "remainingOwnUsers": 0,
+  "remainingOwnCourses": 0,
+  "remainingOwnAssignments": 0,
+  "remainingMotFixtureConfigs": 0,
+  "remainingArchiveAssets": 0,
+  "schema": "cognitive_http_20261026",
+  "externalCOS": false
+}

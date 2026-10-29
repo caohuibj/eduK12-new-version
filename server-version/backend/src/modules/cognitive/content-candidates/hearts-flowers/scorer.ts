@@ -1,0 +1,25 @@
+import {z} from 'zod'
+import type {AuthoritativeScorerInput,CognitiveScoreResult,TrialEnvelope} from '../../v2/types'
+import {parseSessionConfigSnapshot} from '../../v2/session-snapshot'
+import {parseTrialEnvelope} from '../../v2/trial-envelope'
+import {HF_IDENTITY,HF_PROTOCOL,hfPlan,same,type HFConfig,type HFRaw,type Input} from './protocol'
+import {hfConfigSchema,hfRawSchema} from './schema'
+import {reviewHF} from './analysis'
+import {HF_GROUPS,HF_INPUTS,hfPlanned,hfDifferences,type HFGroup,type GroupKey} from './report'
+export const hfEnvelope=(raw:HFRaw):TrialEnvelope<HFRaw>=>({schemaVersion:1,trialIndex:raw.plan.index,phase:'test',condition:raw.plan.mode,startedAtPerfMs:raw.startedAtPerfMs,endedAtPerfMs:raw.endedAtPerfMs,durationMs:raw.endedAtPerfMs-raw.startedAtPerfMs,flags:{timeout:false,premature:false},qualityEvents:raw.status==='interrupted'?['resume']:[],payload:raw})
+/** Candidate FINAL adapters may pass the frozen termination claim; aborted only lowers interpretation, never creates valid trials. */
+export function scoreHF(input:AuthoritativeScorerInput<HFConfig,HFRaw>,termination?:'completed'|'aborted'):CognitiveScoreResult {if(termination!==undefined&&!['completed','aborted'].includes(termination))throw Error('Unknown termination');const call=z.object({session:z.unknown(),config:z.unknown(),randomSeed:z.string().min(1).max(256),trials:z.array(z.unknown()).max(57)}).strict().parse(input),s=parseSessionConfigSnapshot<HFConfig>(call.session)
+ if(s.testType!==HF_IDENTITY.testType||s.engineVersion!==HF_IDENTITY.engineVersion||s.scoringVersion!==HF_IDENTITY.scoringVersion||s.configVersion!==HF_IDENTITY.configVersion||!same(s.protocol,HF_PROTOCOL)||(s.referenceBindings?.length??0)>0)throw Error('Unsupported exact hearts-flowers identity')
+ const c=hfConfigSchema.parse(s.config);if(!same(c,hfConfigSchema.parse(call.config)))throw Error('Config differs from snapshot');const plan=hfPlan(c,call.randomSeed);if(call.trials.length>plan.length)throw Error('Formal budget exceeded')
+ const planned=hfPlanned(c.profile),groups=Object.fromEntries(HF_GROUPS.map((key):[GroupKey,HFGroup&{times:Record<Input,number[]>}]=>[key,{planned:planned[key],valid:0,answered:0,correct:0,missed:0,accuracy:null,inputs:Object.fromEntries(HF_INPUTS.map(input=>[input,{answered:0,correct:0,correctRTCount:0,sumCorrectMs:0,meanCorrectMs:null}])) as HFGroup['inputs'],times:{keyboard:[],touch:[],mouse:[],pen:[],assistive:[]}}])) as Record<GroupKey,HFGroup&{times:Record<Input,number[]>}>
+ let valid=0,interrupted=false,previousEnd:number|null=null
+ for(const [index,value] of call.trials.entries()){const e=parseTrialEnvelope<HFRaw>(value),raw=hfRawSchema.parse(e.payload)
+  if(e.phase!=='test'||e.trialIndex!==index||e.condition!==plan[index].mode||e.startedAtPerfMs!==raw.startedAtPerfMs||e.endedAtPerfMs!==raw.endedAtPerfMs||e.durationMs!==raw.endedAtPerfMs-raw.startedAtPerfMs||(previousEnd!==null&&raw.startedAtPerfMs<previousEnd)||interrupted)throw Error('Envelope, sequence or clock mismatch');previousEnd=raw.endedAtPerfMs
+  const row=reviewHF(raw,plan[index],c);interrupted=raw.status==='interrupted'||raw.overflow||e.flags.timeout||e.flags.premature||e.qualityEvents.length>0
+  if(row.valid){valid++;const keys:GroupKey[]=[raw.plan.mode];if(raw.plan.mode==='mixed')keys.push(raw.plan.transition==='switch'?'mixedSwitch':raw.plan.transition==='repeat'?'mixedRepeat':'mixedFirst')
+   for(const key of keys){const g=groups[key];g.valid++;if(row.answered){g.answered++;g.inputs[row.input!].answered++}else g.missed++;if(row.correct){g.correct++;g.inputs[row.input!].correct++;g.times[row.input!].push(row.rtMs!)}}}
+ }
+ if(termination==='completed'&&(call.trials.length!==c.totalTrials||interrupted||valid!==c.totalTrials))throw Error('Completed FINAL lacks actual complete execution');interrupted=interrupted||termination==='aborted'
+ const projected=Object.fromEntries(HF_GROUPS.map(key=>{const {times,...g}=groups[key];g.accuracy=g.valid?g.correct/g.valid:null;for(const input of HF_INPUTS){g.inputs[input].correctRTCount=g.inputs[input].correct;g.inputs[input].sumCorrectMs=times[input].reduce((sum,value)=>sum+value,0);g.inputs[input].meanCorrectMs=g.inputs[input].correct?g.inputs[input].sumCorrectMs/g.inputs[input].correct:null}return [key,g]})) as Record<GroupKey,HFGroup>,flags={noValidTrials:valid===0,incompleteRecords:valid!==c.totalTrials,technicalInterruption:interrupted}
+ return {metrics:{expectedTrialCount:c.totalTrials,receivedTrialCount:call.trials.length,validTrialCount:valid,technicalInterruptionCount:interrupted?1:0,groups:projected,differences:hfDifferences(projected),reportBinding:{...HF_IDENTITY,profile:c.profile,configHash:s.configHash,protocolSignature:s.protocolSignature,reportDefinitionVersion:c.reportDefinitionVersion}},quality:{state:valid===0?'invalid':valid<c.totalTrials||interrupted?'limited':'interpretable',flags,reasons:Object.entries(flags).filter(([,v])=>v).map(([k])=>k)},audit:{trialCount:call.trials.length,scorerVersion:HF_IDENTITY.scoringVersion}}
+}

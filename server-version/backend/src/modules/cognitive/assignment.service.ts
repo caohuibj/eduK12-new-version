@@ -2,8 +2,9 @@ import { assertCognitiveProductEligible, isCognitiveProductEligible, isCognitive
 import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { readCognitiveQuota } from './attempt-quota'
-import { getCognitiveRegistryEntry, hasCognitiveProfile } from './cognitive.registry'
-import { freezeAssignmentProfile, freezeDataForWrite, hashResolvedConfig, readFrozenReport } from './profile-freeze'
+import { publishAssignmentMeasurementRelease } from './assignment-measurement-release'
+import { getCognitiveTaskResource, hasResourceProfile, assertResourceConfigVersion, assertNativeDeliverySupported } from './task-resource'
+import { freezeTaskResource, freezeDataForWrite, hashResolvedConfig, readFrozenReport } from './profile-freeze'
 import type { CognitiveProfile } from './cognitive.types'
 import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } from './cognitive.schema'
 import {
@@ -43,13 +44,16 @@ const validateConfigForAssignment = async (courseId: string, configId: string, r
   assertCognitiveProductEligible(config.testType)
   if (config.status !== 'PUBLISHED') throw BAD_REQUEST('CognitiveTestConfig must be PUBLISHED')
 
-  const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
+  const entry = getCognitiveTaskResource(config.testType, config.engineVersion, config.scoringVersion)
   if (!entry) {
     throw BAD_REQUEST(
       `No registry implementation for ${config.testType}/${config.engineVersion}/${config.scoringVersion}`
     )
   }
 
+  assertResourceConfigVersion(entry, config.configVersion)
+  assertNativeDeliverySupported(entry, 'authenticated')
+  if (entry.kind === 'native' && course.isLibrary) throw BAD_REQUEST('Native Cognitive library delivery is not enabled')
   const parsed = entry.configSchema.safeParse(config.config)
   if (!parsed.success) {
     throw BAD_REQUEST('CognitiveTestConfig config does not match its registry schema')
@@ -59,10 +63,11 @@ const validateConfigForAssignment = async (courseId: string, configId: string, r
 }
 
 /** Fail visibly for a permitted published resource; never disclose config contents. */
-export const assertCognitiveCatalogConfiguration = (row: CognitiveConfigIdentity & { config: unknown }): void => {
+export const assertCognitiveCatalogConfiguration = (row: CognitiveConfigIdentity & { config: unknown; configVersion?: string }): void => {
   try {
     requireReadyCognitiveV2Definition(row)
-    const entry = getCognitiveRegistryEntry(row.testType, row.engineVersion, row.scoringVersion)
+    const entry = getCognitiveTaskResource(row.testType, row.engineVersion, row.scoringVersion)
+    if (entry) assertResourceConfigVersion(entry, row.configVersion)
     if (!entry || !entry.configSchema.safeParse(row.config).success) throw new Error('Invalid config')
   } catch {
     throw BAD_REQUEST('认知资源目录配置不可用，请联系管理员检查已发布配置')
@@ -120,7 +125,7 @@ export const createAssignment = async (
   if (!(await canInstantiateConfig(userId, role, config))) {
     throw FORBIDDEN('无权限使用此认知任务类型')
   }
-  if (!hasCognitiveProfile(entry, input.profile)) {
+  if (!hasResourceProfile(entry, input.profile)) {
     throw BAD_REQUEST('只能从该任务已声明的 Profile 中选择')
   }
 
@@ -440,8 +445,8 @@ export const updateDraftAssignment = async (
   if (input.profile !== undefined) {
     const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: existing.configId } })
     if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
-    const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
-    if (!entry || !hasCognitiveProfile(entry, input.profile)) {
+    const entry = getCognitiveTaskResource(config.testType, config.engineVersion, config.scoringVersion)
+    if (!entry || !hasResourceProfile(entry, input.profile)) {
       throw BAD_REQUEST('只能从该任务已声明的 Profile 中选择')
     }
     data.profile = input.profile
@@ -474,11 +479,23 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
   if (!existing.profile) {
     throw BAD_REQUEST('发布前必须选择 Profile')
   }
-  const freeze = freezeAssignmentProfile({
-    entry,
+  const freeze = freezeTaskResource({
+    resource: entry,
     baseConfig: config.config,
     profile: existing.profile as CognitiveProfile,
   })
+  if (entry.kind === 'native') {
+    // Same owned publication transaction freezes both the profile and its real measurement source.
+    return prisma.$transaction(async tx => {
+      const updated = await tx.cognitiveAssignment.updateMany({ where: { id, status: 'DRAFT' }, data: {
+        status: 'PUBLISHED', publishedAt: new Date(),
+        courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode }, ...freezeDataForWrite(freeze),
+      } })
+      if (updated.count !== 1) throw CONFLICT('Assignment changed while publishing')
+      await publishAssignmentMeasurementRelease(tx, userId, id)
+      return tx.cognitiveAssignment.findUnique({ where: { id } })
+    })
+  }
   // 单次条件写：DRAFT -> PUBLISHED + publishedAt + 最小 courseSnapshot + resolved snapshot。
   const { count } = await prisma.cognitiveAssignment.updateMany({
     where: { id, status: 'DRAFT' },
@@ -563,10 +580,12 @@ export const prepareTeacherPublishedAssignment = async (
   assertCognitiveProductEligible(config.testType)
   if (config.status !== 'PUBLISHED') throw BAD_REQUEST('CognitiveTestConfig must be PUBLISHED')
 
-  const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
+  const entry = getCognitiveTaskResource(config.testType, config.engineVersion, config.scoringVersion)
   if (!entry) {
     throw BAD_REQUEST(`No registry implementation for ${config.testType}/${config.engineVersion}/${config.scoringVersion}`)
   }
+  assertResourceConfigVersion(entry, config.configVersion)
+  if (entry.kind === 'native') throw BAD_REQUEST('Native Cognitive composite/library copying is not enabled')
   const parsed = entry.configSchema.safeParse(config.config)
   if (!parsed.success) throw BAD_REQUEST('CognitiveTestConfig config does not match its registry schema')
 
@@ -585,7 +604,7 @@ export const prepareTeacherPublishedAssignment = async (
   }
   const hasCopiedFreeze = presentCount === freezeFields.length
   const generatedFreeze = input.profile
-    ? freezeDataForWrite(freezeAssignmentProfile({ entry, baseConfig: parsed.data, profile: input.profile }))
+    ? freezeDataForWrite(freezeTaskResource({ resource: entry, baseConfig: parsed.data, profile: input.profile }))
     : null
   const copiedProfile = source?.profile ?? generatedFreeze?.profile ?? null
   const copiedHash = source?.resolvedConfigHash ?? generatedFreeze?.resolvedConfigHash ?? null

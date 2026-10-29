@@ -1,0 +1,672 @@
+{
+  "scope": "Nine completion/save-confirmation paragraphs; existing operation examples, estimated ranges, practice, timing and rules unchanged. Same component appears on permitted practice retries.",
+  "sources": {
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/BlinkInstructions.tsx": "9e943a1dd4a95e3855725fe44dba91870bb4da4a887e466af12cedf914a8a147",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualInstructions.tsx": "66a65012ba070ab348b2851daea9983d50f6224a0495a47802070194c3bb8acc",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradInstructions.tsx": "f8e3547964026fcede8a0f7029e3c257a6ecd153ca6ca6424dcc8e89731571f9",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFInstructions.tsx": "af14330299c63f3b1e44c2d9ed8cb18c8635297e041ef017738c6b081db19c85",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonInstructions.tsx": "103f374c5f9fd8988fe42e46a95eb3e385937ace72e14ab48e81e322e13bd1ad",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/SpatialInstructions.tsx": "19b13711f79795c0810236c790fdb5889dd82e779550ee7e6ff6171e6cf900c5",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/SearchInstructions.tsx": "e1a1b3deb1d33f066c1cd718fc676fb96a6a05c3fed5e65ab32f24941d2a717a",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntGuidedInstructions.tsx": "57ed09183abf81ae4e74a3e1f857bc97d5c4d841d48248ff57597cf03a026b21",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionGuidedInstructions.tsx": "c5641fffb67311dd35aa3a4edb2acf6a2cea5fa7edbb8de4be57707b5a454993"
+  },
+  "screens": [
+    {
+      "key": "blink",
+      "name": "blink-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "记住两个带圆环的字母，按出现顺序回答",
+          "一个慢速例子",
+          "先做6轮较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-intro-phone-zh.png",
+      "sha256": "eb41d3f70f639e428117d12afa71048afc4781d7e1c3d43c0d79ab80f5115ecd"
+    },
+    {
+      "key": "blink",
+      "name": "blink-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Remember the two circled letters, in order",
+          "A slow example",
+          "Six easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-intro-tablet-en.png",
+      "sha256": "c054a829b0cc7b76525c6735236d7834079f352b6f3df355ab6c958c8c2eb26b"
+    },
+    {
+      "key": "blink",
+      "name": "blink-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Remember the two circled letters, in order",
+          "A slow example",
+          "Six easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-intro-en-200pct.png",
+      "sha256": "8156068dc4f43e68656f98c88a8ac69be452c16ded04275de07c624dce024413"
+    },
+    {
+      "key": "dual",
+      "name": "dual-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "先看本块要求，再回答箭头朝左还是朝右",
+          "同一幅图，三种规则",
+          "只做3轮较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-intro-phone-zh.png",
+      "sha256": "6530a67673d76d4de8b74a8d634fea84760f8756ed05d4639d4d369e32fe48f3"
+    },
+    {
+      "key": "dual",
+      "name": "dual-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Read the block rule, then report left or right",
+          "One picture, three rules",
+          "Only three easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-intro-tablet-en.png",
+      "sha256": "6c328453ac468bc88b5f8ed0d10ecca78896d48383ca481947c36a9f4a475e2d"
+    },
+    {
+      "key": "dual",
+      "name": "dual-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Read the block rule, then report left or right",
+          "One picture, three rules",
+          "Only three easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-intro-en-200pct.png",
+      "sha256": "95521b13e1d35f2bb909e2cbe7c24c51448bdc8daa1675ff9b11844f37a9533b"
+    },
+    {
+      "key": "grad",
+      "name": "grad-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "看到城市按一下，看到山景等它过去",
+          "先看两个例子",
+          "先做8张较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-intro-phone-zh.png",
+      "sha256": "72e40ade98346a96ad9e5c2133241631a4e06c2ab2ed9531b9d39f82a0f0f4a1"
+    },
+    {
+      "key": "grad",
+      "name": "grad-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Press for cities; wait for mountains",
+          "Two examples",
+          "Eight easier practice pictures",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-intro-tablet-en.png",
+      "sha256": "c412fc257626fda4a49f9946cf472529bb7ba06c84005c541dd20cbe8973c2c6"
+    },
+    {
+      "key": "grad",
+      "name": "grad-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Press for cities; wait for mountains",
+          "Two examples",
+          "Eight easier practice pictures",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-intro-en-200pct.png",
+      "sha256": "c977b81e48f0fcafd02cc6051e277b34c1a24e385200c2d3f1398dcde4fca8be"
+    },
+    {
+      "key": "hf",
+      "name": "hf-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "先看图形，再看它在哪一边",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-intro-phone-zh.png",
+      "sha256": "782cebca4c6fdd34e104070d1e4ed8d0991e25b1426634a242382a9c1351586e"
+    },
+    {
+      "key": "hf",
+      "name": "hf-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Look at the shape, then its side",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-intro-tablet-en.png",
+      "sha256": "c17a7181611050c9a5d88798fe17e55a39e9e7eee8872f3b8063d1f062e81685"
+    },
+    {
+      "key": "hf",
+      "name": "hf-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Look at the shape, then its side",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-intro-en-200pct.png",
+      "sha256": "29081f218e9b8a4a7d58794da8bc0413cf7c4d9233ace6123b0e103c2551db6c"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "两台机器：拿点数，也决定要了解什么",
+          "一整局，按这三个步骤进行",
+          "例子一：两边了解得不一样多",
+          "例子二：两边了解得一样多",
+          "操作方式与练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-intro-phone-zh.png",
+      "sha256": "58ca4dbf428a400724facf8d3b9ebe60b559977db0f363f6065806b0664d956b"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Two machines: earn points and decide what to learn",
+          "One complete game, step by step",
+          "Example 1: unequal information",
+          "Example 2: equal information",
+          "Controls and practice",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-intro-tablet-en.png",
+      "sha256": "77829544a43ee877e25f3ae91511b2ae1246c1e7d12eae920fa93964dd72f5d5"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Two machines: earn points and decide what to learn",
+          "One complete game, step by step",
+          "Example 1: unequal information",
+          "Example 2: equal information",
+          "Controls and practice",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-intro-en-200pct.png",
+      "sha256": "773c400e0c841c52a28551b724abe8ec56e35133810d9205d0e42b6a0d55df67"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "记住颜色，找回它的位置",
+          "怎样操作",
+          "举例",
+          "先做较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-intro-phone-zh.png",
+      "sha256": "2c6d83f2fedc5a3b7aa0fb06df752e92d8db04e9c3d27818fa1d50c3338920e1"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Remember the colour and its position",
+          "How to respond",
+          "Examples",
+          "Easier practice",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-intro-tablet-en.png",
+      "sha256": "6a63a87180fda10cf8406f858dfb22de69b57766dfaba155cff201c0154773f2"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Remember the colour and its position",
+          "How to respond",
+          "Examples",
+          "Easier practice",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-intro-en-200pct.png",
+      "sha256": "1cefc6220cf66d29db6eb89f3264b60ab550e9fcadaf50674468cb8b306deaf5"
+    },
+    {
+      "key": "search",
+      "name": "search-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "先搜索，再指出刚才的位置",
+          "例1：有目标",
+          "例2：没有目标",
+          "先做3轮较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-intro-phone-zh.png",
+      "sha256": "2edb3c30a3525457c12b451b1818ccd5dca76a3eb3f1b44c9233fcb6775bba94"
+    },
+    {
+      "key": "search",
+      "name": "search-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "First search, then point to the remembered location",
+          "Example 1: a target is present",
+          "Example 2: there is no target",
+          "Only three easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-intro-tablet-en.png",
+      "sha256": "4dda542b5758ef4f6a358747a333dbebd21a6738f3d37bb6cd8def429b7cfccb"
+    },
+    {
+      "key": "search",
+      "name": "search-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "First search, then point to the remembered location",
+          "Example 1: a target is present",
+          "Example 2: there is no target",
+          "Only three easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-intro-en-200pct.png",
+      "sha256": "4fa947b22c27662da63b0b4620e28e9ed02900184424cf32358b6ac740429753"
+    },
+    {
+      "key": "ant",
+      "name": "ant-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "只判断中间箭头朝向",
+          "怎样操作",
+          "先练习，再正式作答",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/ant-intro-phone-zh.png",
+      "sha256": "e4c4db636643058da99b26c979e4faba40b78684cb71a64b0abc005d59d0ec86"
+    },
+    {
+      "key": "ant",
+      "name": "ant-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Judge the middle arrow only",
+          "How to respond",
+          "Practice first, then the task",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/ant-intro-tablet-en.png",
+      "sha256": "2b03f9d3a88ae27907502ade24a024b47a0d6338f25c645f32a72c9d3442f8c4"
+    },
+    {
+      "key": "ant",
+      "name": "ant-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Judge the middle arrow only",
+          "How to respond",
+          "Practice first, then the task",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/ant-intro-en-200pct.png",
+      "sha256": "c1b999eac223c375a35a5c0428a046d0db59958d56bfcabd9404ae0be901909d"
+    },
+    {
+      "key": "recognition",
+      "name": "recognition-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "这张图，在本轮见过吗？",
+          "举例",
+          "先做较易练习，再正式作答",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/recognition-intro-phone-zh.png",
+      "sha256": "18d9550eb71d0f430f43628dc22f1eb4b854ce61f4880e2889637a964e86bafb"
+    },
+    {
+      "key": "recognition",
+      "name": "recognition-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Have you seen this picture in this round?",
+          "Examples",
+          "Easier practice, then the formal stream",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/recognition-intro-tablet-en.png",
+      "sha256": "1dcc704c9c288a686f57a769a066e42ed37c8c63fa67a65be150d587eacbd398"
+    },
+    {
+      "key": "recognition",
+      "name": "recognition-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Have you seen this picture in this round?",
+          "Examples",
+          "Easier practice, then the formal stream",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/recognition-intro-en-200pct.png",
+      "sha256": "577e47bd7c08ae5a3de116465b79931ea2670664c6cae0ea263554cfe4030cb1"
+    }
+  ],
+  "checks": "actual 390px Chinese / 820px English / 780px CSS zoom200%; no overflow or page errors",
+  "limits": "detached instruction components, not four-entry identity or native-device proof. ANT title belongs to enclosing task; screenshot fixture waits for h1 or h2."
+}

@@ -9,7 +9,7 @@ import type {
 import { metricIsQualityGated } from './quality'
 import { resolveLegacyCognitiveProtocolPresentation } from '../legacy-protocol-presentation'
 import { legacyExperienceHeadline, legacyMetricAllowed, legacySuppressTips } from '../legacy-report-policy'
-import type { CognitiveParticipantPresentationV1 } from '../participant-presentation.types'
+import type { CognitiveMetricRowsFormat, CognitiveMetricQuantityFormat, CognitiveParticipantPresentationV1 } from '../participant-presentation.types'
 import { buildReadingVisual, finiteMetric, readingMetricAllowed, type ReportReading } from './report-reading'
 
 export interface ReportMetricView {
@@ -26,6 +26,7 @@ export interface ReportMetricView {
 }
 
 export interface ThreeLayerReport {
+  nativeReport?: import('../content-candidates/native-registry/public-report').NativePublicReportSnapshot
   schemaVersion?: 2
   reading?: ReportReading
   title: string
@@ -66,8 +67,36 @@ const formatMapValue = (metricKey: string, value: unknown): string => {
   return String(Math.round(number * 100) / 100)
 }
 
-const formatMetric = (definition: MetricDefinition, value: unknown): string => {
+const cellText = (value: unknown, suffix?: string): string | null => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null
+  return `${Math.round(value * 100) / 100}${suffix ?? ''}`
+}
+
+/** Only runs when a frozen presentation opted in; returns null so the caller keeps its historical rendering. */
+const formatRows = (value: unknown[], format: CognitiveMetricRowsFormat): string | null => {
+  const rows = value.map(row => (row !== null && typeof row === 'object' && !Array.isArray(row)
+    ? row as Record<string, unknown> : null))
+  if (rows.some(row => row === null || typeof row[format.targetKey] !== 'number')) return null
+  const lines: string[] = []
+  for (const row of rows) {
+    const cells = format.columns.map(column => {
+      const text = cellText(row![column.key], column.suffix)
+      return text === null ? null : `${column.label} ${text}`
+    })
+    if (cells.some(cell => cell === null)) return null
+    lines.push(`${format.targetLabel} ${cellText(row![format.targetKey])}${format.targetSuffix ?? ''}：${cells.join('，')}`)
+  }
+  return lines.length > 0 ? lines.join('；') : null
+}
+
+const formatMetric = (definition: MetricDefinition, value: unknown, format?: CognitiveMetricRowsFormat | CognitiveMetricQuantityFormat): string => {
   if (value === null || value === undefined || value === '') return '—'
+  if (format?.kind === 'quantity') {
+    if (definition.valueType !== 'object' || !value || typeof value !== 'object' || Array.isArray(value)) return '—'
+    const quantity = value as Record<string, unknown>
+    if (Object.keys(quantity).length !== 2 || quantity.unit !== format.unit || typeof quantity.value !== 'number' || !Number.isFinite(quantity.value)) return '—'
+    return cellText(quantity.value, format.suffix) ?? '—'
+  }
   if (definition.valueType === 'object') {
     if (typeof value !== 'object' || Array.isArray(value)) return '—'
     const entries = Object.entries(value as Record<string, unknown>)
@@ -75,7 +104,10 @@ const formatMetric = (definition: MetricDefinition, value: unknown): string => {
       .map(([level, item]) => `${level}-back：${formatMapValue(definition.key, item)}`)
     return entries.length > 0 ? entries.join('；') : '—'
   }
-  if (definition.valueType === 'array') return JSON.stringify(value)
+  if (definition.valueType === 'array') {
+    const readable = format?.kind === 'rows' && Array.isArray(value) ? formatRows(value, format) : null
+    return readable ?? JSON.stringify(value)
+  }
   const number = Number(value)
   if (!Number.isFinite(number)) return String(value)
   const rounded = definition.precision === undefined
@@ -102,7 +134,7 @@ const metricView = (
     direction: definition.direction,
     unit: definition.unit,
     value: metrics[key],
-    formatted: formatMetric(definition, metrics[key]),
+    formatted: formatMetric(definition, metrics[key], presentation?.metricFormats?.[key]),
   }
 }
 

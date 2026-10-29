@@ -1,0 +1,15 @@
+{
+  "command": [
+    "node_modules/.bin/tsx",
+    "src/scripts/install-cognitive-configs.ts",
+    "--input",
+    "../../docs/cognitive-library/onboarding-content-20261028/native-selection.json",
+    "--actor",
+    "<synthetic actor created by isolated test>"
+  ],
+  "exitCode": 2,
+  "expectedExitCode": 2,
+  "database": "new disposable loopback cognitive_onboarding_test",
+  "purpose": "Actual unchanged CLI consumes native source and retains intentionally conflicting enum row from PostgreSQL fixture; no writes",
+  "stdoutSHA256": "76a82f7b657c41c34f66002a8809b38c45b570250be0c455a6bbaee151502f90"
+}

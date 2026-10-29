@@ -1,3 +1,4 @@
+import { createCognitiveRawArchiveRouter } from './raw-archive.routes'
 import { assertCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { sharedControlRequestContext } from '../assessment-runtime/shared-control-records'
 import { assessmentExportHttp } from '../../services/assessmentExportHttp'
@@ -76,6 +77,7 @@ router.post('/assignments/:id/export', authenticate, requireTeacher, cognitiveCo
 // D4 — Session / Attempt
 router.post('/sessions', authenticate, requireRole(UserRole.STUDENT), cognitiveController.createSession)
 router.get('/sessions/:id', authenticate, cognitiveController.getSession)
+router.use('/sessions/:id/raw-archive',createCognitiveRawArchiveRouter())
 router.get('/sessions/:id/assets/:assetId/content', authenticate, cognitiveImageController.content)
 router.post('/sessions/:id/video-capabilities', authenticate, cognitiveVideoController.issue)
 router.post('/sessions/:id/restart', authenticate, requireRole(UserRole.STUDENT), cognitiveController.restartSession)

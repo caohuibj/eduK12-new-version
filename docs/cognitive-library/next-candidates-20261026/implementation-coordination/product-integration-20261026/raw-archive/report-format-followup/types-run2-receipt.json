@@ -1,0 +1,43 @@
+{
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "/workspace/eduK12-new-version/server-version/backend/node_modules/typescript/bin/tsc",
+    "--project",
+    "/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/report-format-followup/types-tsconfig.json",
+    "--pretty",
+    "false"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "exitCode": 2,
+  "durationSeconds": 17.051189481993788,
+  "executedAt": "2026-10-26T11:33:58.474469+00:00",
+  "roots": [
+    "src/modules/cognitive/content-candidates/mot/package.ts",
+    "src/modules/cognitive/content-candidates/mot/metadata.ts",
+    "src/modules/cognitive/task-resource.ts",
+    "src/modules/cognitive/profile-freeze.ts",
+    "src/modules/cognitive/session.service.ts",
+    "src/__tests__/cognitive/mot-report-format.test.ts",
+    "src/middleware/auth.ts"
+  ],
+  "rootSha256Before": {
+    "src/modules/cognitive/content-candidates/mot/package.ts": "ff636396ec5c322a4d0b37812d33fd149884410d503aa5241402f6a7cc635367",
+    "src/modules/cognitive/content-candidates/mot/metadata.ts": "475524e15543dfbd152978bbb51cf9a277327fa2daae3c7848bd993c8cd0a0f9",
+    "src/modules/cognitive/task-resource.ts": "913b652e2e7991d9ace145fcf0e5f592ddc4f1e244018d68fa655ea5b7c94e49",
+    "src/modules/cognitive/profile-freeze.ts": "46346c6abb9b1d07000a91ff539831109290d37b5c353be8e38a898ecd2423e5",
+    "src/modules/cognitive/session.service.ts": "2e491483e05bf9d1e6b7526b120e44fe8ecb37bca708a7f01a83d0346f3040eb",
+    "src/__tests__/cognitive/mot-report-format.test.ts": "0923182063e0281b291a3ae92d42cfa3ab3bf5a5f010f501f8f92124cc881361",
+    "src/middleware/auth.ts": "63a53c9e448f7b171a0139d9ae9491694bbf3b94cfe07bfc586c37242901b214"
+  },
+  "rootSha256After": {
+    "src/modules/cognitive/content-candidates/mot/package.ts": "ff636396ec5c322a4d0b37812d33fd149884410d503aa5241402f6a7cc635367",
+    "src/modules/cognitive/content-candidates/mot/metadata.ts": "475524e15543dfbd152978bbb51cf9a277327fa2daae3c7848bd993c8cd0a0f9",
+    "src/modules/cognitive/task-resource.ts": "913b652e2e7991d9ace145fcf0e5f592ddc4f1e244018d68fa655ea5b7c94e49",
+    "src/modules/cognitive/profile-freeze.ts": "46346c6abb9b1d07000a91ff539831109290d37b5c353be8e38a898ecd2423e5",
+    "src/modules/cognitive/session.service.ts": "2e491483e05bf9d1e6b7526b120e44fe8ecb37bca708a7f01a83d0346f3040eb",
+    "src/__tests__/cognitive/mot-report-format.test.ts": "0923182063e0281b291a3ae92d42cfa3ab3bf5a5f010f501f8f92124cc881361",
+    "src/middleware/auth.ts": "63a53c9e448f7b171a0139d9ae9491694bbf3b94cfe07bfc586c37242901b214"
+  },
+  "rootsStable": true,
+  "ciExecuted": false
+}

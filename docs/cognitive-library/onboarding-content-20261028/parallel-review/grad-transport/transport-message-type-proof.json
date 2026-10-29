@@ -1,0 +1,8 @@
+{
+  "change": "fresh:true → fresh:true as const in new mock only",
+  "beforeSourceSHA256": "770321fb4f7afe84bf94e1408c553b6fca8ab8f612984fd0d6d6d5565167855b",
+  "afterSourceSHA256": "f85bfae7ff4ff9f824b9094af00ed1383a2aa72e4217c62202a7b7c654422ca9",
+  "sameRuntimeTranspile": true,
+  "runtimeSHA256": "79f804e3d1442530e00e4a7498bb36f81be908f3012d322f7dde6d83e8e8f261",
+  "decision": "Keep the actual passing runtime case; only rerun the affected type closure."
+}

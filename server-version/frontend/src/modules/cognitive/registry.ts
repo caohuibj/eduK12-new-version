@@ -1,3 +1,4 @@
+import { nativeCognitiveRunnerEntries } from './native-runners'
 import { cognitiveRunnerEntries } from './generated/runners'
 import type { CognitiveTaskProps } from './core/runner.types'
 
@@ -47,6 +48,7 @@ export interface CognitiveFrontendRegistryEntry {
   /** 与后端 registry key 对齐；前端不权威评分，仅透传。 */
   scoringVersion: string
   RunnerComponent: React.ComponentType<CognitiveTaskProps>
+  NativeReportComponent?: React.ComponentType<{snapshot:import('./types').NativePublicReportSnapshot}>
   /** Exact task implementation only; prepared before starting its frozen trials. */
   prepareRunner?: () => Promise<React.ComponentType<CognitiveTaskProps> | void>
   metricDefinitions: MetricDefinition[]
@@ -72,4 +74,4 @@ export const resolveRunner = (
   engineVersion: string
 ): CognitiveFrontendRegistryEntry | undefined => REGISTRY.get(keyOf(testType, engineVersion))
 
-for (const entry of cognitiveRunnerEntries) registerCognitiveRunner(entry)
+for (const entry of [...cognitiveRunnerEntries, ...nativeCognitiveRunnerEntries]) registerCognitiveRunner(entry)

@@ -1,0 +1,20 @@
+{
+  "main": "aa774983db8edd85b3c1617aef7218f71664746d",
+  "previousMain": "642fda7ab754790686d6626efac62b73a332e663",
+  "preMergeContentHead": "c02b5a36eb3fcdd64071f8225560baa2a222e953",
+  "mergeCommit": "c9f89e6c541e89f8eb439f291d6868c9e7d4d145",
+  "merge": "conflict-free normal merge, original cognitive commits retained",
+  "upstreamChange": "PR369 education report SET LOCAL join_collapse_limit=1 and its existing CI admission/control/evidence; no cognitive package, frontend, dependency, schema or consumed direct-type input changed",
+  "sourceManifests": {
+    "backend-direct-types.json": {
+      "sourceCount": 311,
+      "drift": []
+    },
+    "frontend-direct-types.json": {
+      "sourceCount": 48,
+      "drift": []
+    }
+  },
+  "reuse": "no application tests/types/build/scoring/browser reexecuted after merge; original evidence identities retained",
+  "ci": "Inherited PR369/PR365 exact bindings do not qualify PR368; no activation/Ready/merge/deployment performed by this node"
+}

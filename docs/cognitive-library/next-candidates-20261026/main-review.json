@@ -1,0 +1,54 @@
+{
+  "artifactKind": "MAIN_AGENT_STATIC_DESIGN_REVIEW_NOT_RELEASE_QUALIFICATION",
+  "dateUtc": "2026-10-26T06:12:25.918560+00:00",
+  "baselineCommit": "e393f730a7b0832534a181df1f3fbbc6b9575f8c",
+  "review": [
+    {
+      "candidateId": "attention-enumeration-flower",
+      "directory": "enumeration",
+      "inheritedTagDimensions": 18,
+      "pendingDecisions": 6,
+      "hashBindingsVerified": 24,
+      "reviewMontageSha256": "65b63eeaa6045ce0554a5e6c197e6752480aba7bd36b7db3f83bc6f4624fe538",
+      "evidenceSha256": "1be3ffafc519fa4070b222df636718157d8c96cbb579a7038d1be28e19fbe1a9",
+      "mainAgentViewedMontage": true
+    },
+    {
+      "candidateId": "continuous-recognition",
+      "directory": "recognition",
+      "inheritedTagDimensions": 18,
+      "pendingDecisions": 8,
+      "hashBindingsVerified": 28,
+      "reviewMontageSha256": "4daf10ce00a91735a46e3ca732ebb1d212760179cde84274b0617995627876d9",
+      "evidenceSha256": "84582e42add8d3db76f42784a69c2600773b7940cb0361b057684c541bad7419",
+      "mainAgentViewedMontage": true
+    },
+    {
+      "candidateId": "attention-ant-pebl",
+      "directory": "ant",
+      "inheritedTagDimensions": 18,
+      "pendingDecisions": 7,
+      "hashBindingsVerified": 18,
+      "reviewMontageSha256": "bf20483844cbd45f2bbe5f87298bbfb3486ba722efadbeca1d0655700c6ede73",
+      "evidenceSha256": "b0887e15ec1e56c05732afebc7c3dcb484e4fc9ee8145a0f09ec2b12596726c3",
+      "mainAgentViewedMontage": true
+    }
+  ],
+  "verifiedScope": "Source/denominator/proposal review; manual montage review; final referenced-file hash consistency; targeted phase positions recorded by owning agents.",
+  "reusedEvidence": "Unchanged static reading/report checks retain their original source bindings and failure history; no full repetition.",
+  "reviewCheckerNote": "Initial main-agent hash helper wrongly resolved README.md at repository root; corrected owner-directory resolution before accepting any result. No artifact mismatch on corrected check.",
+  "notVerified": [
+    "real-device presentation timing",
+    "product four-entry consistency",
+    "native registration or import",
+    "production stimulus asset rights",
+    "population or age validity",
+    "short-form equivalence",
+    "DB/COS/API persistence",
+    "CI or deployment qualification"
+  ],
+  "productCodeChanged": false,
+  "ciActivated": false,
+  "merged": false,
+  "deployed": false
+}

@@ -1,0 +1,292 @@
+{
+  "limits": {
+    "canonical": 1572864,
+    "jsonHTTP": 2097152,
+    "archiveDetail": 8388608,
+    "archiveHTTP": 12582912,
+    "archivePackage": 12582912
+  },
+  "prefixChecks": [
+    {
+      "profile": "experience",
+      "hz": 60,
+      "actualCaptureFrames": 97,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-experience-60.json"
+    },
+    {
+      "profile": "experience",
+      "hz": 120,
+      "actualCaptureFrames": 193,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-experience-120.json"
+    },
+    {
+      "profile": "experience",
+      "hz": 144,
+      "actualCaptureFrames": 233,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-experience-144.json"
+    },
+    {
+      "profile": "experience",
+      "hz": 240,
+      "actualCaptureFrames": 385,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-experience-240.json"
+    },
+    {
+      "profile": "research",
+      "hz": 60,
+      "actualCaptureFrames": 97,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-research-60.json"
+    },
+    {
+      "profile": "research",
+      "hz": 120,
+      "actualCaptureFrames": 193,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-research-120.json"
+    },
+    {
+      "profile": "research",
+      "hz": 144,
+      "actualCaptureFrames": 233,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-research-144.json"
+    },
+    {
+      "profile": "research",
+      "hz": 240,
+      "actualCaptureFrames": 385,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-research-240.json"
+    }
+  ],
+  "results": [
+    {
+      "profile": "experience",
+      "hz": 60,
+      "frames": 4897,
+      "events": 180,
+      "canonicalBytes": 331155,
+      "framesOnlyCanonicalBytes": 305636,
+      "httpJSONBytes": 331393,
+      "archiveDetailBytes": 462987,
+      "archiveHTTPBytes": 463230,
+      "archiveFullPackageLowerBoundBytes": 794285,
+      "overBytes": {
+        "canonical": -1241709,
+        "jsonHTTP": -1765759,
+        "archiveDetail": -7925621,
+        "archiveHTTP": -12119682,
+        "archiveFullPackageLowerBound": -11788627
+      },
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 189142,
+        "gzipBytes": 29623,
+        "base64JSONBytes": 39663,
+        "roundtripBytesIdentical": true
+      }
+    },
+    {
+      "profile": "experience",
+      "hz": 120,
+      "frames": 9793,
+      "events": 180,
+      "canonicalBytes": 626362,
+      "framesOnlyCanonicalBytes": 600841,
+      "httpJSONBytes": 626600,
+      "archiveDetailBytes": 862568,
+      "archiveHTTPBytes": 862811,
+      "archiveFullPackageLowerBoundBytes": 1489073,
+      "overBytes": {
+        "canonical": -946502,
+        "jsonHTTP": -1470552,
+        "archiveDetail": -7526040,
+        "archiveHTTP": -11720101,
+        "archiveFullPackageLowerBound": -11093839
+      },
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 342365,
+        "gzipBytes": 57740,
+        "base64JSONBytes": 77151,
+        "roundtripBytesIdentical": true
+      }
+    },
+    {
+      "profile": "experience",
+      "hz": 144,
+      "frames": 11833,
+      "events": 180,
+      "canonicalBytes": 760242,
+      "framesOnlyCanonicalBytes": 734765,
+      "httpJSONBytes": 760480,
+      "archiveDetailBytes": 1040572,
+      "archiveHTTPBytes": 1040815,
+      "archiveFullPackageLowerBoundBytes": 1800957,
+      "overBytes": {
+        "canonical": -812622,
+        "jsonHTTP": -1336672,
+        "archiveDetail": -7348036,
+        "archiveHTTP": -11542097,
+        "archiveFullPackageLowerBound": -10781955
+      },
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 417085,
+        "gzipBytes": 72919,
+        "base64JSONBytes": 97391,
+        "roundtripBytesIdentical": true
+      }
+    },
+    {
+      "profile": "experience",
+      "hz": 240,
+      "frames": 19585,
+      "events": 180,
+      "canonicalBytes": 1218867,
+      "framesOnlyCanonicalBytes": 1193348,
+      "httpJSONBytes": 1219105,
+      "archiveDetailBytes": 1660745,
+      "archiveHTTPBytes": 1660988,
+      "archiveFullPackageLowerBoundBytes": 2879755,
+      "overBytes": {
+        "canonical": -353997,
+        "jsonHTTP": -878047,
+        "archiveDetail": -6727863,
+        "archiveHTTP": -10921924,
+        "archiveFullPackageLowerBound": -9703157
+      },
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 650902,
+        "gzipBytes": 114948,
+        "base64JSONBytes": 153428,
+        "roundtripBytesIdentical": true
+      }
+    },
+    {
+      "profile": "research",
+      "hz": 60,
+      "frames": 14499,
+      "events": 536,
+      "canonicalBytes": 995066,
+      "framesOnlyCanonicalBytes": 918781,
+      "httpJSONBytes": 995304,
+      "archiveDetailBytes": 1140084,
+      "archiveHTTPBytes": 1140327,
+      "archiveFullPackageLowerBoundBytes": 2135293,
+      "overBytes": {
+        "canonical": -577798,
+        "jsonHTTP": -1101848,
+        "archiveDetail": -7248524,
+        "archiveHTTP": -11442585,
+        "archiveFullPackageLowerBound": -10447619
+      },
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 574595,
+        "gzipBytes": 85495,
+        "base64JSONBytes": 114159,
+        "roundtripBytesIdentical": true
+      }
+    },
+    {
+      "profile": "research",
+      "hz": 120,
+      "frames": 28994,
+      "events": 536,
+      "canonicalBytes": 1887830,
+      "framesOnlyCanonicalBytes": 1811256,
+      "httpJSONBytes": 1888068,
+      "archiveDetailBytes": 2137221,
+      "archiveHTTPBytes": 2137464,
+      "archiveFullPackageLowerBoundBytes": 4025194,
+      "overBytes": {
+        "canonical": 314966,
+        "jsonHTTP": -209084,
+        "archiveDetail": -6251387,
+        "archiveHTTP": -10445448,
+        "archiveFullPackageLowerBound": -8557718
+      },
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 1047004,
+        "gzipBytes": 166260,
+        "base64JSONBytes": 221844,
+        "roundtripBytesIdentical": true
+      }
+    },
+    {
+      "profile": "research",
+      "hz": 144,
+      "frames": 35033,
+      "events": 536,
+      "canonicalBytes": 2287088,
+      "framesOnlyCanonicalBytes": 2210674,
+      "httpJSONBytes": 2287326,
+      "archiveDetailBytes": 2580614,
+      "archiveHTTPBytes": 2580857,
+      "archiveFullPackageLowerBoundBytes": 4867845,
+      "overBytes": {
+        "canonical": 714224,
+        "jsonHTTP": 190174,
+        "archiveDetail": -5807994,
+        "archiveHTTP": -10002055,
+        "archiveFullPackageLowerBound": -7715067
+      },
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 1271131,
+        "gzipBytes": 210225,
+        "base64JSONBytes": 280464,
+        "roundtripBytesIdentical": true
+      }
+    },
+    {
+      "profile": "research",
+      "hz": 240,
+      "frames": 57987,
+      "events": 536,
+      "canonicalBytes": 3667529,
+      "framesOnlyCanonicalBytes": 3591244,
+      "httpJSONBytes": 3667767,
+      "archiveDetailBytes": 4122593,
+      "archiveHTTPBytes": 4122836,
+      "archiveFullPackageLowerBoundBytes": 7790265,
+      "overBytes": {
+        "canonical": 2094665,
+        "jsonHTTP": 1570615,
+        "archiveDetail": -4266015,
+        "archiveHTTP": -8460076,
+        "archiveFullPackageLowerBound": -4792647
+      },
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 1985906,
+        "gzipBytes": 333986,
+        "base64JSONBytes": 445480,
+        "roundtripBytesIdentical": true
+      }
+    }
+  ],
+  "schemaBound": {
+    "description": "Schema-admitted 120000-frame/8192-event raw only; not a practice-qualified session or refreshed physical-device run.",
+    "frames": 120000,
+    "events": 8192,
+    "rawBytes": 8596833,
+    "canonicalBytes": 8597213,
+    "proposalOnly": {
+      "gzipBytes": 540849,
+      "base64JSONBytes": 721296,
+      "roundtripBytesIdentical": true
+    },
+    "file": "schema-max-raw.json.gz",
+    "canonicalRawSHA256": "0b1c7c8fa5b1d6d67126b5a3679ccfc1c8f0668cfe8db5efe5d0ff1353b34b29",
+    "gzipSHA256": "55bf048faaa0c990af3a6901662096391e602c6865af15e6d6aa46a520c8413a"
+  }
+}

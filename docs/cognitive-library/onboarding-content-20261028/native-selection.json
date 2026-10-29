@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {"testType":"mot","configVersion":"1.0.0","engineVersion":"1.1.1","scoringVersion":"1.1.0"},
+    {"testType":"enumeration","configVersion":"0.3.0","engineVersion":"0.2.0","scoringVersion":"0.2.0"}
+  ]
+}

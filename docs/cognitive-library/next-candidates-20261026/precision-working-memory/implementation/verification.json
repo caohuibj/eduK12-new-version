@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-27",
+  "execution": "cloud; Node24.21.0; existing dependencies",
+  "scope": "Content-only spatial working memory candidate. Product integration and final tests deferred by user.",
+  "tests": {
+    "backend-original": {
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "frontend-original": {
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "backend-affected": {
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 1,
+      "success": true
+    },
+    "frontend-affected": {
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    }
+  },
+  "types": {
+    "backend": {
+      "config": "tsconfig.json",
+      "roots": [
+        "src/modules/cognitive/content-candidates/precision-working-memory/package.ts",
+        "src/modules/cognitive/content-candidates/precision-working-memory/participant-presentation.ts",
+        "src/__tests__/cognitive/spatial-memory-content.test.ts"
+      ],
+      "sourceCount": 48,
+      "diagnostics": []
+    },
+    "frontend": {
+      "config": "tsconfig.app.json",
+      "roots": [
+        "src/modules/cognitive/tasks/precision-working-memory/SpatialMemoryTask.tsx",
+        "src/modules/cognitive/tasks/precision-working-memory/content.test.tsx",
+        "src/test/setup.ts",
+        "src/vite-env.d.ts"
+      ],
+      "sourceCount": 55,
+      "diagnostics": []
+    }
+  },
+  "firstTypeFailure": {
+    "diagnostics": [
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/precision-working-memory/scorer.ts",
+        "line": 36,
+        "message": "Property 'at' does not exist on type '{ kind: \"keyboard\" | \"select\" | \"release\" | \"confirm\"; atMs: number; angleDeg: number; input: \"touch\" | \"mouse\" | \"pen\" | \"keyboard\"; }[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later."
+      }
+    ],
+    "note": "Original tsconfig.app does not support Array.at in the backend scorer imported by the synthetic receipt fixture. Replaced by equivalent array indexing; no compiler option weakened."
+  },
+  "sourceSha256": {
+    "server-version/backend/src/__tests__/cognitive/spatial-memory-content.test.ts": "4f789e4d9579d243f4a7f32c59ad33981ecddbc18a7ece3844ba2349b0139492",
+    "server-version/backend/src/modules/cognitive/content-candidates/precision-working-memory/metadata.ts": "85e91e1c04371756bed304a6b3c103db019cfc8ac41f2bf719ef3e2e2f2a8f18",
+    "server-version/backend/src/modules/cognitive/content-candidates/precision-working-memory/package.ts": "3fb960b537c10df76ccb8c65e0b5ac6d6b6f3489115af2adcb3cf7566ad72f04",
+    "server-version/backend/src/modules/cognitive/content-candidates/precision-working-memory/participant-presentation.ts": "6ec3a29af2259096918ff243ddff831ddc0f941bfdabc2d16ff727edc4ab9e63",
+    "server-version/backend/src/modules/cognitive/content-candidates/precision-working-memory/protocol.ts": "c492bbcf4b7f0d3a609ede6cee034ef17d18ba08352005d144d2e847fd6ba464",
+    "server-version/backend/src/modules/cognitive/content-candidates/precision-working-memory/report.ts": "c94aff14594f7c53d7cd0bde356e18bf273ce47ae1414a6cdac3c6a2c345cef4",
+    "server-version/backend/src/modules/cognitive/content-candidates/precision-working-memory/schema.ts": "1b4a9f5d7508abc34324243e2cde4f76111b8903a47f9e48bd26851862ef63d1",
+    "server-version/backend/src/modules/cognitive/content-candidates/precision-working-memory/scorer.ts": "0c9725fd2904aa9fa585a619421478c490aac75548d53c47e4ab526485d9c6ab",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/SpatialInstructions.tsx": "c8fab1a7a18d8c4fd874857d2676548febfb3aba0889f20a9b974128ae469eda",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/SpatialMemoryTask.tsx": "8aba512eb6b8aeef6941024d48348d2a55f4b5a2c685a92a60c65c4fffa56b5b",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/SpatialReport.tsx": "cafecb09414bcb01d8af5364e3e9395c3036056a6b5a0369ae7dd9f4490b423a",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/capture.ts": "0a533a57971120755a55ac54de318c0980404dd218da5378bb64a43a8f2432c2",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/content.test.tsx": "ca4f01c7ecb42c7f02852599706a74292f09716a196d1db2b9a480417c49e0ea",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/contracts.ts": "71c2d23f627422fd3c7c6ba0c441704f9f3edf06b26d265343a5c5564df4317d",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/generated/protocol.ts": "a1d25f9f88de4802e9fa5110a6272058ecddac685b4af2a124025c30e74f4aa2",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/generated/report.ts": "37faebd0425a11d34380e8bcd255dc46e427382c3a650368790b8d4c3f8aa3a3",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/session.ts": "7fcd9e189df140db6e95e9012e0c9e2db58c7d35410b8fbeccaed9b077609ed1",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/spatial.css": "267f51db2d2bc5ed0df504074fb4cb6a6b5fb50610b2ed81ec7392a81421cab7",
+    "server-version/scripts/cognitive/spatial-content.cjs": "4d0ee5926b9ddb0cd901b9900b28d60be119b52ea8cc078bb9f5e3b016a6cb3d"
+  },
+  "notRun": [
+    "product admission/registry",
+    "database/seed",
+    "real IndexedDB durability",
+    "real HTTP/final/report readback",
+    "COS",
+    "full App/browser/physical devices",
+    "research400 browser journey",
+    "formal CI",
+    "deployment"
+  ],
+  "approvedDesignPngSha256": "f78f07fed70b7c2d731dd8419a39a476ff330fb42c446d4f12ab9d267bdb2991",
+  "distinctRuntimeTargets": 6,
+  "verificationNotes": [
+    "Initial six runtime targets passed. Added explicit signed error and termination reason before final candidate freeze. Rechecked only two affected backend scoring/report targets and three frontend capture/receipt/component targets; counts are not added as new targets.",
+    "The first backend manifest contract is reused: only the SpatialRaw interface changed in protocol.ts, not the plan or configuration implementation.",
+    "No old ANT/recognition checks or complete integration tests were run. Synthetic in-memory ports and jsdom touch events are not evidence of real IndexedDB, physical display or a product journey."
+  ]
+}

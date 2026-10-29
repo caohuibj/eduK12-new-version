@@ -1,0 +1,68 @@
+{
+  "base": "e4b1ba0c7cf9fa520e046571c8c68fc4fdf6ce23",
+  "inputs": {
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/config-seeds.ts": "a48ff1a612fccd93f8040a2a794b3b48e1350a0bef957dbc7619aaeda8efb6df",
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts": "e670b288509ed390c6082e7361d33974d4bd1bb739494d61da44c3809b0133c4",
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/participant-presentations.ts": "56353a1389b94826522421f0472c0ba3f4a919fe660fff5d062c39a01184bef6",
+    "server-version/backend/src/modules/cognitive/task-resource.ts": "ca55114163a8f61bfd94859619b25546c65fe0bfc38af80430093fd1c5bdd642"
+  },
+  "commands": [
+    {
+      "command": "COGNITIVE_MODULE_ENABLED=true DATA_ENCRYPTION_KEY=<synthetic> vitest run src/__tests__/cognitive/remaining-native-registration.test.ts --reporter=json",
+      "cwd": "server-version/backend",
+      "exit": 1,
+      "report": "registration-original.json",
+      "passed": 1,
+      "failed": 1
+    },
+    {
+      "command": "same environment: vitest run src/__tests__/cognitive/remaining-native-registration.test.ts -t 'freezes both profiles' --reporter=json",
+      "cwd": "server-version/backend",
+      "exit": 0,
+      "report": "registration-freeze.json",
+      "passed": 1,
+      "filtered": 1
+    },
+    {
+      "command": "DATABASE_URL=<fresh tmpfs loopback cognitive_remaining_test> prisma migrate deploy",
+      "cwd": "server-version/backend",
+      "exit": 0,
+      "log": "migrations-log.json"
+    },
+    {
+      "command": "COGNITIVE_MODULE_ENABLED=true DATABASE_URL=<same isolated> COGNITIVE_REMAINING_INSTALL_TEST_DATABASE_URL=<same isolated> vitest run src/__tests__/cognitive/remaining-native-install.postgres.integration.test.ts --reporter=json",
+      "cwd": "server-version/backend",
+      "exit": 1,
+      "report": "installation-original.json",
+      "partialResult": "preview and create completed; seed metadata comparison failed. Original DB retained."
+    },
+    {
+      "command": "NODE_ENV=test COGNITIVE_MODULE_ENABLED=true DATABASE_URL=<same isolated> node docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/continue-install.cjs",
+      "cwd": "repository root",
+      "exit": 0,
+      "report": "installation-continued.json",
+      "noReplay": "original successful preview/create not repeated"
+    },
+    {
+      "command": "node docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/check-direct-types.cjs backend",
+      "exit": 1,
+      "report": "backend-direct-types-original.json"
+    },
+    {
+      "command": "same targeted command after config object type correction",
+      "exit": 0,
+      "report": "backend-direct-types.json"
+    }
+  ],
+  "limits": [
+    "Nine source configurations installed only in fresh isolated DB",
+    "Authenticated/public/native raw-archive scopes remain unchanged and blocked for these new identities",
+    "No formal library release, assignment, grant, production DB, CI, Ready, merge or deployment",
+    "Recognition image pools/rights binding not fabricated"
+  ],
+  "preliminaryReadinessProbe": {
+    "exit": 0,
+    "command": "tsx -e <read each candidate package and evaluateCognitiveProductReadiness against experience configPatch>",
+    "result": "All direct candidates except Recognition configPatch alone ready; Recognition requires real base asset pools. This was a read-only structural probe, not scoring or entry validation. Six unchanged report descriptor checks were redundantly consumed; no new evidence qualification claimed."
+  }
+}

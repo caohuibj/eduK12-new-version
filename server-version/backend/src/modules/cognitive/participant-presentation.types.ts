@@ -39,6 +39,18 @@ export interface CognitiveReportReadingPolicy {
   chart?: { kind: 'reaction_trials' | 'memory_lengths' | 'metrics'; metricKeys: string[]; pointUnit?: 'd-prime' | 'ratio' | 'ms' }
 }
 
+/** Serializable, display-only row layout for array-valued metrics. Never read by a scorer or compiler. */
+export interface CognitiveMetricRowsFormat {
+  kind: 'rows'
+  targetKey: string
+  targetLabel: string
+  targetSuffix?: string
+  columns: Array<{ key: string; label: string; suffix?: string }>
+}
+
+/** Opt-in display of an existing natural-unit scalar wrapper; never unwrap arbitrary research maps. */
+export interface CognitiveMetricQuantityFormat {kind:'quantity';unit:'deg';suffix:'°'}
+
 /** Display-only sidecar, deliberately absent from compiler/runtime definitions. */
 export interface CognitiveParticipantPresentationV1 {
   schemaVersion: 1
@@ -48,6 +60,8 @@ export interface CognitiveParticipantPresentationV1 {
   scoringVersion: string
   title: string
   metrics: Record<string, { label: string; explanation?: string; singleExplanation?: string; displayUnit?: string; valueUnit?: 'ratio' | 'count' | 'ms'; valueLabels?: Record<string, string> }>
+  /** Opt-in only: an array metric without a rule keeps its historical rendering. */
+  metricFormats?: Record<string, CognitiveMetricRowsFormat | CognitiveMetricQuantityFormat>
   experienceHeadline?: string
   hiddenMetrics: string[]
   singleHiddenMetrics: string[]

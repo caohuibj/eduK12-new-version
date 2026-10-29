@@ -1,0 +1,244 @@
+{
+  "success": true,
+  "node": "v24.21.0",
+  "randomSeed": "independent-grad-44",
+  "firstKinds": [
+    "boundary",
+    "city",
+    "city",
+    "mountain",
+    "city",
+    "city"
+  ],
+  "cases": [
+    {
+      "name": "only-boundary-closed",
+      "presented": 0,
+      "settled": 0,
+      "statistics": {
+        "city": 0,
+        "mountain": 0,
+        "hits": 0,
+        "omissions": 0,
+        "falseAlarms": 0,
+        "correctRejections": 0,
+        "rtCount": 0,
+        "meanMs": null,
+        "medianMs": null,
+        "sdMs": null,
+        "cv": null,
+        "correctedHitRate": null,
+        "correctedFalseAlarmRate": null,
+        "dPrime": null,
+        "criterion": null
+      },
+      "inputResponses": {},
+      "assigned": {}
+    },
+    {
+      "name": "first-picture-closed-successor-open",
+      "presented": 1,
+      "settled": 0,
+      "statistics": {
+        "city": 0,
+        "mountain": 0,
+        "hits": 0,
+        "omissions": 0,
+        "falseAlarms": 0,
+        "correctRejections": 0,
+        "rtCount": 0,
+        "meanMs": null,
+        "medianMs": null,
+        "sdMs": null,
+        "cv": null,
+        "correctedHitRate": null,
+        "correctedFalseAlarmRate": null,
+        "dPrime": null,
+        "criterion": null
+      },
+      "inputResponses": {
+        "keyboard": 1
+      },
+      "assigned": {
+        "1": {
+          "eventIndex": 0,
+          "atMs": 1621,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        }
+      }
+    },
+    {
+      "name": "first-picture-settled-open-response",
+      "presented": 2,
+      "settled": 1,
+      "statistics": {
+        "city": 1,
+        "mountain": 0,
+        "hits": 1,
+        "omissions": 0,
+        "falseAlarms": 0,
+        "correctRejections": 0,
+        "rtCount": 1,
+        "meanMs": 721,
+        "medianMs": 721,
+        "sdMs": null,
+        "cv": null,
+        "correctedHitRate": 0.5,
+        "correctedFalseAlarmRate": null,
+        "dPrime": null,
+        "criterion": null
+      },
+      "inputResponses": {
+        "keyboard": 2
+      },
+      "assigned": {
+        "1": {
+          "eventIndex": 0,
+          "atMs": 1621,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        },
+        "3": {
+          "eventIndex": 2,
+          "atMs": 3221,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        }
+      }
+    },
+    {
+      "name": "negative-dprime",
+      "presented": 4,
+      "settled": 3,
+      "statistics": {
+        "city": 2,
+        "mountain": 1,
+        "hits": 0,
+        "omissions": 2,
+        "falseAlarms": 1,
+        "correctRejections": 0,
+        "rtCount": 0,
+        "meanMs": null,
+        "medianMs": null,
+        "sdMs": null,
+        "cv": null,
+        "correctedHitRate": 0.25,
+        "correctedFalseAlarmRate": 0.5,
+        "dPrime": -0.6744897502234195,
+        "criterion": 0.33724487511170975
+      },
+      "inputResponses": {
+        "keyboard": 1
+      },
+      "assigned": {
+        "3": {
+          "eventIndex": 0,
+          "atMs": 3221,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        }
+      }
+    },
+    {
+      "name": "negative-criterion-zero-omissions",
+      "presented": 4,
+      "settled": 3,
+      "statistics": {
+        "city": 2,
+        "mountain": 1,
+        "hits": 2,
+        "omissions": 0,
+        "falseAlarms": 1,
+        "correctRejections": 0,
+        "rtCount": 2,
+        "meanMs": 721,
+        "medianMs": 721,
+        "sdMs": 0,
+        "cv": 0,
+        "correctedHitRate": 0.75,
+        "correctedFalseAlarmRate": 0.5,
+        "dPrime": 0.6744897502234195,
+        "criterion": -0.33724487511170975
+      },
+      "inputResponses": {
+        "keyboard": 3
+      },
+      "assigned": {
+        "1": {
+          "eventIndex": 0,
+          "atMs": 1621,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        },
+        "2": {
+          "eventIndex": 2,
+          "atMs": 2421,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        },
+        "3": {
+          "eventIndex": 4,
+          "atMs": 3221,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        }
+      }
+    },
+    {
+      "name": "one-frame-late",
+      "presented": 4,
+      "settled": 3,
+      "statistics": {
+        "city": 2,
+        "mountain": 1,
+        "hits": 2,
+        "omissions": 0,
+        "falseAlarms": 1,
+        "correctRejections": 0,
+        "rtCount": 2,
+        "meanMs": 721,
+        "medianMs": 721,
+        "sdMs": 0,
+        "cv": 0,
+        "correctedHitRate": 0.75,
+        "correctedFalseAlarmRate": 0.5,
+        "dPrime": 0.6744897502234195,
+        "criterion": -0.33724487511170975
+      },
+      "inputResponses": {
+        "keyboard": 3
+      },
+      "assigned": {
+        "1": {
+          "eventIndex": 0,
+          "atMs": 1621,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        },
+        "2": {
+          "eventIndex": 2,
+          "atMs": 2421,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        },
+        "3": {
+          "eventIndex": 4,
+          "atMs": 3221,
+          "rtMs": 721,
+          "opacity": 0.9,
+          "code": 2
+        }
+      }
+    }
+  ]
+}

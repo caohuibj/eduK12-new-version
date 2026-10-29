@@ -1,0 +1,250 @@
+{
+  "config": "tsconfig.app.json",
+  "roots": [
+    "src/modules/cognitive/tasks/hearts-flowers/HeartsFlowersTask.tsx",
+    "src/modules/cognitive/tasks/hearts-flowers/content.test.tsx",
+    "src/test/setup.ts",
+    "src/vite-env.d.ts"
+  ],
+  "sources": [
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/generated/protocol.ts",
+      "sha256": "c08eef7f9fcd1cab02a2b97add5301f3ddf9e6d28e2c985102b250ca94476938"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/capture.ts",
+      "sha256": "b66efd62621b2ccaa906203cfb015680e3b6857b5107aa3d64ff9c0619808eaf"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/generated/report.ts",
+      "sha256": "76e3a55d34e0b754f0e3f0252351f79a50bc575dde24734aeb83508e2eb23974"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/contracts.ts",
+      "sha256": "732421b614eb698d1bdd20a71fe04db2f744d47223f93a9ba5616d2d0589207b"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/session.ts",
+      "sha256": "4ec838fa9e6a46181d88d1548048d99a897b9db931befe27a6d53bd68124e9f9"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/HFShape.tsx",
+      "sha256": "694546f02d874515a4e30bcd44bd429ac14ad51a741f2e14c5bf6c5296c1e9c9"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/HFInstructions.tsx",
+      "sha256": "706d692f214956a0650101ae9f891aa3d6ba9c61a459fbc6243e25fea0f4bea2"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/HFReport.tsx",
+      "sha256": "c8f9bd8ee520e3fed4d92a213aa770b307308b7af3a46ac6ccd4a8f2d8fa90f2"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/HeartsFlowersTask.tsx",
+      "sha256": "a3eb89b9554549678ec62ffc894802e41cf3fb18eda2e524f7c4e5971160a6da"
+    },
+    {
+      "path": "../backend/src/modules/assessment-reference/governance.ts",
+      "sha256": "6487175a5e4f4905264938e4e6ebe99db645e3c40e72a92d9796090fe9fa0930"
+    },
+    {
+      "path": "../backend/src/modules/assessment-media/material.ts",
+      "sha256": "2d12c58d222991ab4136a682c1281e6ac11e3e87911ca7e23d57aa9de0488a92"
+    },
+    {
+      "path": "../backend/src/modules/assessment-media/assessment-asset-identity.ts",
+      "sha256": "1fc3935d4b329989280dcb8e8464e8791e1134fcbb98951662d18378b5dd44c1"
+    },
+    {
+      "path": "../backend/src/modules/assessment-media/assessment-image.ts",
+      "sha256": "00acb1f2aaaffb4dbfbf990f82042834a63830418aa68a026ae0aba3dbf74fe1"
+    },
+    {
+      "path": "../backend/src/modules/assessment-media/assessment-image-presentation.ts",
+      "sha256": "69e686e9fb501950d928f4b074acdd07f28a603ef817921b95e02f8671829a38"
+    },
+    {
+      "path": "../backend/src/modules/scale/raw-score-feedback.ts",
+      "sha256": "3a9d99d7086c1659ea6d212c3a6277d08c64d28f5873138b62521b3d5234fbe4"
+    },
+    {
+      "path": "../backend/src/modules/scale/library/audience-report-gate.ts",
+      "sha256": "eae74de499e5710826bf9d65b203cbae6e3d9795652148a8a87136a371813ed6"
+    },
+    {
+      "path": "../backend/src/modules/assessment-media/assessment-video.ts",
+      "sha256": "46aab4aa9395d27a4f5cf14e01c175323422712ebbf656d30f50c198ab71edd5"
+    },
+    {
+      "path": "../backend/src/modules/scale/scale-definition.ts",
+      "sha256": "35d9e51e53dc9fa5d1e2ff5539a82ec803a31b042a23e7cee952f8d24d3e0642"
+    },
+    {
+      "path": "../backend/src/modules/scale/scale-scoring.ts",
+      "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba"
+    },
+    {
+      "path": "../backend/src/modules/assessment-context/context.ts",
+      "sha256": "2e2785f7e38edc4a3ffcf867f171243a9e36151a1cd8668da6604662cb349b6d"
+    },
+    {
+      "path": "../backend/src/modules/assessment-runtime/control-reference-codec.ts",
+      "sha256": "e57e4e7366e800947bd06cc81851ef5d45b32abc7b50cf6abf450900ef7f7e38"
+    },
+    {
+      "path": "../backend/src/modules/assessment-runtime/compact-field-codec.ts",
+      "sha256": "61fede51c449e1f2a84a2bcc5485ec5fdd149cc72e70f5ecd0d0c2c24bfb24c7"
+    },
+    {
+      "path": "../backend/src/utils/logger.ts",
+      "sha256": "a133aa7b8be98cb6a567bc8af648f7267817c92ff72cab821a582743db013e15"
+    },
+    {
+      "path": "../backend/src/utils/encryption.ts",
+      "sha256": "2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e"
+    },
+    {
+      "path": "../backend/src/modules/assessment-context/form-answer.ts",
+      "sha256": "ef06de2e9d183aacb1ef61ebbb0ad60df4cc57e716db9883e54c93d4388f032a"
+    },
+    {
+      "path": "../backend/src/modules/assessment-context/security.ts",
+      "sha256": "56524add610fe2f1d00b1e48e7205ec23b25cb945e6e8cd17b141dafefb7824d"
+    },
+    {
+      "path": "../backend/src/modules/assessment-context/index.ts",
+      "sha256": "47da8cffe79e8dd9b1e64b722d62c8361472c56afdb8cd49abec5dede4ecf44d"
+    },
+    {
+      "path": "../backend/src/modules/assessment-reference/reference.ts",
+      "sha256": "179da23a71ca2f972a69b49f9c2a775d0fdd5aa6c93c65f520e82be01b4f2e02"
+    },
+    {
+      "path": "../backend/src/modules/assessment-runtime/canonical.ts",
+      "sha256": "e469eb794eadd6596cb0c4531dd6b6b256c8c176eac657ee20d5982f8e217066"
+    },
+    {
+      "path": "../backend/src/modules/assessment-runtime/types.ts",
+      "sha256": "d5e2393f0317013edf3cf6b349c2b3b625af393ea55045740f10718327423d55"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/task-package.types.ts",
+      "sha256": "ab1e4e3d040190162b46008a1f6d3e4d72a92d19034232a462d22631e41db25a"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/v2/presentation.ts",
+      "sha256": "95841697a6ce8afdc241c567d63602b8a9c2043f1b7bb02d151b550ba77e1b7d"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/cognitive.types.ts",
+      "sha256": "c1983d53cb88a1ed220fc8a3349b536cfd713a7187e292cc30c861bc14a71e46"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/v2/types.ts",
+      "sha256": "ca6740c52cf7aafa8e09640abe608708af043c228ea82f9a290358bd0c8ba656"
+    },
+    {
+      "path": "../backend/src/services/runtimeObservability.ts",
+      "sha256": "fad3be33a8f6851565143fb1b91081e237f7cc760ac5e7165d8459ee40392f5d"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/v2/canonical.ts",
+      "sha256": "6688d12144fcd63f143429390cedb90332721cde57dbb0e9c14aab9b1e5caaaa"
+    },
+    {
+      "path": "../backend/src/modules/situational/situation-scientific-contract.ts",
+      "sha256": "c2010f48c3ba35c3c4c3adf6976598f6e7d83cb3051afb556562892a030149e2"
+    },
+    {
+      "path": "../backend/src/modules/situational/situation-definition.ts",
+      "sha256": "7b6a0d7667ac7850d5b8a1b4c2dad7d6ad3f58e54398b3c2250c2856e44c0ba9"
+    },
+    {
+      "path": "../backend/src/modules/situational/situation-scientific-validation.ts",
+      "sha256": "29716bdd0a5eb380e84370edb7b8ddec3dd7485b7d2047ad97e2c669790de09f"
+    },
+    {
+      "path": "../backend/src/modules/situational/situation-branching.ts",
+      "sha256": "3ee11726c8d26e2290c43a0317531d7a17803e02707eb1320cf7cb7139253cd2"
+    },
+    {
+      "path": "../backend/src/modules/situational/situation-runtime-definition.ts",
+      "sha256": "4d852a9fbf1b77c7c21e1e38d22a451911461f3e53c115f381c2a825be1dd99a"
+    },
+    {
+      "path": "../backend/src/modules/assessment-runtime/compiler.ts",
+      "sha256": "37f7cc4cf3fa68dafcddab2a889a4b3dddf5b6c5c43f97915d89412d8fbf2877"
+    },
+    {
+      "path": "../backend/src/modules/assessment-governance/operational-hold.ts",
+      "sha256": "425f53d9b1b5e2dc68446580e85106a89ea39c8adb2c0106ebb1d2112e7dd7d6"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/v2/final-submission-budget.ts",
+      "sha256": "9bf9ba2bb7e4bafdc4c437c881bb979b3790c9775ee24eeda4ab27fe98e3e774"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/cognitive.errors.ts",
+      "sha256": "ad18c4c83881e2c39c6e3cc176be6454626d093ddfb15ef47873dd77aa657a8a"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/v2/session-snapshot.ts",
+      "sha256": "ef885828b8f0dc097ac38e17701f789e82e12036eb71bacdc8a859c43209ecb3"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/content-candidates/hearts-flowers/protocol.ts",
+      "sha256": "872c811cd63d60e932710907ffee777e29e75b2ec35b9aced1d2d31915aa1d4a"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/content-candidates/hearts-flowers/schema.ts",
+      "sha256": "0ea40a91a9037dee197565fa6abc12c652ba2e59345ea78d473b9ff86735b3d8"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/v2/trial-envelope.ts",
+      "sha256": "9a6cd24c06876b82557ec6159c713519c13bb401693ae75ddb53218c24f3ba78"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/content-candidates/hearts-flowers/analysis.ts",
+      "sha256": "f5760e2743a992dbe6fd027a6ed7d796f0975bca7a7a157fa73ec661d9053732"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/content-candidates/hearts-flowers/report.ts",
+      "sha256": "81058a17652c157af55fe5bbcc3ee37295345e89bee1ffefc711b57b99a1e95e"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/content-candidates/hearts-flowers/scorer.ts",
+      "sha256": "33e7c78517cc7cd029489d59cb7cdb8b887ea8b312c131acb3a18f45bc6dc680"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/content-candidates/hearts-flowers/metadata.ts",
+      "sha256": "d87fb8216982d9af8c561f35cca1cac7fca8a7b6bbe115d3a626e1cd7d11f00f"
+    },
+    {
+      "path": "../backend/src/modules/cognitive/content-candidates/hearts-flowers/package.ts",
+      "sha256": "d0f9ee9f355535549450ec8242191ae2e1e629c8fb2f60da66843605121dd91a"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/generated/analysis.ts",
+      "sha256": "d674840eb75627462c6fc7e8321ea3cb206302f45cc10ae9e3cff2be5d6add69"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/hearts-flowers/content.test.tsx",
+      "sha256": "45237d2e579e69fb2e2f05f3b96d7ab8dfa390871ee43d2d418928f0bcd00255"
+    },
+    {
+      "path": "src/test/setup.ts",
+      "sha256": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    }
+  ],
+  "diagnostics": [
+    {
+      "file": "../backend/src/modules/cognitive/content-candidates/hearts-flowers/scorer.ts",
+      "line": 14,
+      "message": "Conversion of type '{ [k: string]: never[]; }' to type 'Record<Input, number[]>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.   Type '{ [k: string]: never[]; }' is missing the following properties from type 'Record<Input, number[]>': keyboard, touch, mouse, pen, assistive"
+    }
+  ]
+}

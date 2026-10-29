@@ -1,0 +1,1517 @@
+{
+  "success": true,
+  "originalInvocationExit": 1,
+  "continuedInvocationExit": 0,
+  "reuse": "56 actual successful cases in failed original invocation + six missing cases; no replay",
+  "results": [
+    {
+      "key": "blink",
+      "name": "blink-report-phone-zh",
+      "width": 390,
+      "height": 844,
+      "state": "complete",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "先认对第一个时，第二个认对了多少？",
+          "第一个认对后，第二个记住了多少",
+          "一个可用的提醒"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-report-phone-zh.png",
+      "sha256": "d1268b42deb074ffa654e44d0f2f1243819d1c01dda96b9372ab989f330e365b"
+    },
+    {
+      "key": "blink",
+      "name": "blink-report-limited-en",
+      "width": 390,
+      "height": 844,
+      "state": "limited",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "After the first target was right, how often was the second right?",
+          "Second letters remembered after the first was correct",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-report-limited-en.png",
+      "sha256": "dba4daccb5aeecd4088041650a91759f9bb9e75a1ab4bbaf65b448cb0a9daca7"
+    },
+    {
+      "key": "blink",
+      "name": "blink-report-invalid-zh",
+      "width": 390,
+      "height": 844,
+      "state": "invalid",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "本次暂时无法形成表现结论"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-report-invalid-zh.png",
+      "sha256": "e7e98d2f22511f6f0e9c98a86af0432194aefaf90d2659599a336e6b2bfdc85c"
+    },
+    {
+      "key": "blink",
+      "name": "blink-report-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "After the first target was right, how often was the second right?",
+          "Second letters remembered after the first was correct",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-report-tablet-en.png",
+      "sha256": "50c31884bd569ad224032d8c440d322ccba047fee92834dcad91035d614604c1"
+    },
+    {
+      "key": "blink",
+      "name": "blink-report-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 2,
+      "intro": false,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "After the first target was right, how often was the second right?",
+          "Second letters remembered after the first was correct",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-report-en-200pct.png",
+      "sha256": "a13828155775f22dd7e6cca772b33d8aff0f3b2c5415281c2d53337ffbb2b154"
+    },
+    {
+      "key": "dual",
+      "name": "dual-report-phone-zh",
+      "width": 390,
+      "height": 844,
+      "state": "complete",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "多答一个通道时，各自的记录怎样变化？",
+          "分别看看各条规则下的回应",
+          "一个可用的提醒"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-report-phone-zh.png",
+      "sha256": "1b5123b8806a0136b2b5405bb2e093439fb62136e9c62a15814320fb92294d27"
+    },
+    {
+      "key": "dual",
+      "name": "dual-report-limited-en",
+      "width": 390,
+      "height": 844,
+      "state": "limited",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "How did each channel change when answering both?",
+          "Correct responses under each rule",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-report-limited-en.png",
+      "sha256": "2106c43c50eb770406909033211fba46a1fcfc9e1ed73fc3504123cd8bcfac92"
+    },
+    {
+      "key": "dual",
+      "name": "dual-report-invalid-zh",
+      "width": 390,
+      "height": 844,
+      "state": "invalid",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "本次暂时无法形成表现结论"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-report-invalid-zh.png",
+      "sha256": "0f380ec355949e70cb26b743af3f963683e46bbc4fa21c8769989e26d165f32f"
+    },
+    {
+      "key": "dual",
+      "name": "dual-report-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "How did each channel change when answering both?",
+          "Correct responses under each rule",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-report-tablet-en.png",
+      "sha256": "7876adb103ad613e0ad9c4d06503f122d63d9cd7b1a9a1c6852bb986873b51a2"
+    },
+    {
+      "key": "dual",
+      "name": "dual-report-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 2,
+      "intro": false,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "How did each channel change when answering both?",
+          "Correct responses under each rule",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-report-en-200pct.png",
+      "sha256": "63a2bb05a06e9a15ed939919f5dd8a87f6e5eba4252767c385840cecf08724c9"
+    },
+    {
+      "key": "grad",
+      "name": "grad-report-phone-zh",
+      "width": 390,
+      "height": 844,
+      "state": "complete",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "这次，你怎样跟上连续图片？",
+          "两类情况，分开看",
+          "一个可用的提醒"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-report-phone-zh.png",
+      "sha256": "7e88f2916335210ef9725efc7a504811380e8799e7ca426bc1f3bdd9718b38a6"
+    },
+    {
+      "key": "grad",
+      "name": "grad-report-limited-en",
+      "width": 390,
+      "height": 844,
+      "state": "limited",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "How did you follow the continuous pictures?",
+          "Cities and mountains, separately",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-report-limited-en.png",
+      "sha256": "4bf349642c238733577ab7195f837ca2ce5d96e6343cf9cb32db6dbdc754ae76"
+    },
+    {
+      "key": "grad",
+      "name": "grad-report-invalid-zh",
+      "width": 390,
+      "height": 844,
+      "state": "invalid",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "本次暂时无法形成表现结论"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-report-invalid-zh.png",
+      "sha256": "e17917f1fc1a0226538dca4df248c6309de7e85d54a38cc43c9137f46d09c6ca"
+    },
+    {
+      "key": "grad",
+      "name": "grad-report-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "How did you follow the continuous pictures?",
+          "Cities and mountains, separately",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-report-tablet-en.png",
+      "sha256": "1b7ea6a1414fd6c798a79a8ae7fe2f514f6f37934c278bb738f677c257651a9a"
+    },
+    {
+      "key": "grad",
+      "name": "grad-report-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 2,
+      "intro": false,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "How did you follow the continuous pictures?",
+          "Cities and mountains, separately",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-report-en-200pct.png",
+      "sha256": "1cca545d55c2cc843593df9307a08fd8a8bad7347bd2757f3bf24f065547090a"
+    },
+    {
+      "key": "hf",
+      "name": "hf-report-phone-zh",
+      "width": 390,
+      "height": 844,
+      "state": "complete",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "心与花：这次怎样运用两条规则",
+          "三条规则下的这次记录",
+          "键盘",
+          "触屏"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-report-phone-zh.png",
+      "sha256": "8ea814ea8e46dbdff95bb1e8962380480eca94dbec7f10d21c8338f5282dd2ec"
+    },
+    {
+      "key": "hf",
+      "name": "hf-report-limited-en",
+      "width": 390,
+      "height": 844,
+      "state": "limited",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "Hearts and flowers: using two rules this time",
+          "Your record under three rules",
+          "keyboard"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-report-limited-en.png",
+      "sha256": "5ddf9249f2b1b52f86bbee0db37fdb2a5f71bb8f28fc898c9454880f6736f3fc"
+    },
+    {
+      "key": "hf",
+      "name": "hf-report-invalid-zh",
+      "width": 390,
+      "height": 844,
+      "state": "invalid",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "心与花：这次怎样运用两条规则"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-report-invalid-zh.png",
+      "sha256": "3ee961d4cb3e5888f17d88120983f6cc2cb66fe27d34a9ef4bfa9ff0ab79dc4a"
+    },
+    {
+      "key": "hf",
+      "name": "hf-report-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Hearts and flowers: using two rules this time",
+          "Your record under three rules",
+          "keyboard",
+          "touch"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-report-tablet-en.png",
+      "sha256": "723ae3043da281e8859a691cb26bad238c6186320b77d496a67a73c3d209d6c5"
+    },
+    {
+      "key": "hf",
+      "name": "hf-report-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 2,
+      "intro": false,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Hearts and flowers: using two rules this time",
+          "Your record under three rules",
+          "keyboard",
+          "touch"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-report-en-200pct.png",
+      "sha256": "1544983b16fd0b55e8cd3b6fdd03bbea5e4f2fb1d7fda0f23d0c62e76dbdea64"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-report-phone-zh",
+      "width": 390,
+      "height": 844,
+      "state": "complete",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "你如何权衡眼前点数与更多了解？",
+          "这次何时选了了解较少的一侧",
+          "只剩1次自由选择",
+          "还可自由选6次",
+          "一个可用的提醒",
+          "信息相等 · 自由1次",
+          "信息相等 · 自由6次",
+          "信息不等 · 自由1次",
+          "信息不等 · 自由6次"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-report-phone-zh.png",
+      "sha256": "ca4afd3d80065f3f77b1c7db00bd5bb9075c6e65ef0d71894b406a623494ef31"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-report-limited-en",
+      "width": 390,
+      "height": 844,
+      "state": "limited",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "How did you weigh current points against learning more?",
+          "Choosing the less sampled side",
+          "Only 1 free choice left",
+          "6 free choices left",
+          "A useful reminder",
+          "Equal information · 1 free choice",
+          "Equal information · 6 free choices",
+          "Unequal information · 1 free choice",
+          "Unequal information · 6 free choices"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-report-limited-en.png",
+      "sha256": "2bb83fafef2eed3167adfa25c5cd2d00c204b8f3cdc4c44698b9a3331a0788c4"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-report-invalid-zh",
+      "width": 390,
+      "height": 844,
+      "state": "invalid",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "本次暂时无法形成选择结论"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-report-invalid-zh.png",
+      "sha256": "ae3823eb1c7bf1d8f56661c4aba07250bcf01c0a2c5ba61b7b159ee5bd7c0d69"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-report-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "How did you weigh current points against learning more?",
+          "Choosing the less sampled side",
+          "Only 1 free choice left",
+          "6 free choices left",
+          "A useful reminder",
+          "Equal information · 1 free choice",
+          "Equal information · 6 free choices",
+          "Unequal information · 1 free choice",
+          "Unequal information · 6 free choices"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-report-tablet-en.png",
+      "sha256": "ee5a85e05608d9c1e20d9b31a5cd9d4df35a7d69786c6011c104c272776df494"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-report-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 2,
+      "intro": false,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "How did you weigh current points against learning more?",
+          "Choosing the less sampled side",
+          "Only 1 free choice left",
+          "6 free choices left",
+          "A useful reminder",
+          "Equal information · 1 free choice",
+          "Equal information · 6 free choices",
+          "Unequal information · 1 free choice",
+          "Unequal information · 6 free choices"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-report-en-200pct.png",
+      "sha256": "b2651bf2caebf61c186e36678bf884e193b59e188957a42049c9d70613ab6efd"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-report-phone-zh",
+      "width": 390,
+      "height": 844,
+      "state": "complete",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "这次，你把位置记在了哪里？",
+          "这次落点离目标多远？",
+          "一个可尝试的小建议"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-report-phone-zh.png",
+      "sha256": "a4a98f957b18b4f6e56103d5cabb909f892da6f830df640af413b65bb6be30f7"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-report-limited-en",
+      "width": 390,
+      "height": 844,
+      "state": "limited",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "Where did you remember the positions this time?",
+          "How close were your selections?",
+          "One thing to try"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-report-limited-en.png",
+      "sha256": "d4557651750f33c29fc617b7f3101839f424d35e111ac8a00776f51cb6120f15"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-report-invalid-zh",
+      "width": 390,
+      "height": 844,
+      "state": "invalid",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "本次记录暂时无法解读"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-report-invalid-zh.png",
+      "sha256": "a8c1f0476dcd8dda0f2cddc7ec5eea869d50dd74f9acc36124b1aaeccc2c27bc"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-report-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Where did you remember the positions this time?",
+          "How close were your selections?",
+          "One thing to try"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-report-tablet-en.png",
+      "sha256": "8d225e19fd4941f559a65ee34fcb72ec718238b7f156cd9f12c29fd416b18603"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-report-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 2,
+      "intro": false,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Where did you remember the positions this time?",
+          "How close were your selections?",
+          "One thing to try"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-report-en-200pct.png",
+      "sha256": "662e0879f0b4ccebc181ecd01d05eec1894c184db02518dcddb863467614ebe7"
+    },
+    {
+      "key": "search",
+      "name": "search-report-phone-zh",
+      "width": 390,
+      "height": 844,
+      "state": "complete",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "查找与定位，分开看这次记录",
+          "字母数量不同时，找对了多少",
+          "一个可用的提醒"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-report-phone-zh.png",
+      "sha256": "577900e9949b1463ed5e377f45fc37e95c321c22f278209f4e19ab0cb93aaa2a"
+    },
+    {
+      "key": "search",
+      "name": "search-report-limited-en",
+      "width": 390,
+      "height": 844,
+      "state": "limited",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "Search and location: two parts of this session",
+          "Correct locations with different array sizes",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-report-limited-en.png",
+      "sha256": "6c8113ab351e03bbe15eeee9d3afc1a3314211532942a33df8287ba5647e82af"
+    },
+    {
+      "key": "search",
+      "name": "search-report-invalid-zh",
+      "width": 390,
+      "height": 844,
+      "state": "invalid",
+      "lang": "zh",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "本次暂时无法形成表现结论"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-report-invalid-zh.png",
+      "sha256": "46fe772d2ed1b7011ff36949505368d1064e90f5357ab340ffaa365196439413"
+    },
+    {
+      "key": "search",
+      "name": "search-report-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 1,
+      "intro": false,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Search and location: two parts of this session",
+          "Correct locations with different array sizes",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-report-tablet-en.png",
+      "sha256": "2bd63dfec6cd5db53f9dcf2354d69a575f04a564043ea7baed6fbbdf4e119659"
+    },
+    {
+      "key": "search",
+      "name": "search-report-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "state": "complete",
+      "lang": "en",
+      "zoom": 2,
+      "intro": false,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Search and location: two parts of this session",
+          "Correct locations with different array sizes",
+          "A practical reminder"
+        ],
+        "charts": 1,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-report-en-200pct.png",
+      "sha256": "e80d18061a8b1ebaaf71bf97d0873f52dc7cb96b3701ad950cef8145b7018468"
+    },
+    {
+      "key": "blink",
+      "name": "blink-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "记住两个带圆环的字母，按出现顺序回答",
+          "一个慢速例子",
+          "先做6轮较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-intro-phone-zh.png",
+      "sha256": "eb41d3f70f639e428117d12afa71048afc4781d7e1c3d43c0d79ab80f5115ecd"
+    },
+    {
+      "key": "blink",
+      "name": "blink-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Remember the two circled letters, in order",
+          "A slow example",
+          "Six easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-intro-tablet-en.png",
+      "sha256": "c054a829b0cc7b76525c6735236d7834079f352b6f3df355ab6c958c8c2eb26b"
+    },
+    {
+      "key": "blink",
+      "name": "blink-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Remember the two circled letters, in order",
+          "A slow example",
+          "Six easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/blink-intro-en-200pct.png",
+      "sha256": "8156068dc4f43e68656f98c88a8ac69be452c16ded04275de07c624dce024413"
+    },
+    {
+      "key": "dual",
+      "name": "dual-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "先看本块要求，再回答箭头朝左还是朝右",
+          "同一幅图，三种规则",
+          "只做3轮较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-intro-phone-zh.png",
+      "sha256": "6530a67673d76d4de8b74a8d634fea84760f8756ed05d4639d4d369e32fe48f3"
+    },
+    {
+      "key": "dual",
+      "name": "dual-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Read the block rule, then report left or right",
+          "One picture, three rules",
+          "Only three easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-intro-tablet-en.png",
+      "sha256": "6c328453ac468bc88b5f8ed0d10ecca78896d48383ca481947c36a9f4a475e2d"
+    },
+    {
+      "key": "dual",
+      "name": "dual-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Read the block rule, then report left or right",
+          "One picture, three rules",
+          "Only three easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/dual-intro-en-200pct.png",
+      "sha256": "95521b13e1d35f2bb909e2cbe7c24c51448bdc8daa1675ff9b11844f37a9533b"
+    },
+    {
+      "key": "grad",
+      "name": "grad-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "看到城市按一下，看到山景等它过去",
+          "先看两个例子",
+          "先做8张较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-intro-phone-zh.png",
+      "sha256": "72e40ade98346a96ad9e5c2133241631a4e06c2ab2ed9531b9d39f82a0f0f4a1"
+    },
+    {
+      "key": "grad",
+      "name": "grad-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Press for cities; wait for mountains",
+          "Two examples",
+          "Eight easier practice pictures",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-intro-tablet-en.png",
+      "sha256": "c412fc257626fda4a49f9946cf472529bb7ba06c84005c541dd20cbe8973c2c6"
+    },
+    {
+      "key": "grad",
+      "name": "grad-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Press for cities; wait for mountains",
+          "Two examples",
+          "Eight easier practice pictures",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/grad-intro-en-200pct.png",
+      "sha256": "c977b81e48f0fcafd02cc6051e277b34c1a24e385200c2d3f1398dcde4fca8be"
+    },
+    {
+      "key": "hf",
+      "name": "hf-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "先看图形，再看它在哪一边",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-intro-phone-zh.png",
+      "sha256": "782cebca4c6fdd34e104070d1e4ed8d0991e25b1426634a242382a9c1351586e"
+    },
+    {
+      "key": "hf",
+      "name": "hf-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Look at the shape, then its side",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-intro-tablet-en.png",
+      "sha256": "c17a7181611050c9a5d88798fe17e55a39e9e7eee8872f3b8063d1f062e81685"
+    },
+    {
+      "key": "hf",
+      "name": "hf-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Look at the shape, then its side",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/hf-intro-en-200pct.png",
+      "sha256": "29081f218e9b8a4a7d58794da8bc0413cf7c4d9233ace6123b0e103c2551db6c"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "两台机器：拿点数，也决定要了解什么",
+          "一整局，按这三个步骤进行",
+          "例子一：两边了解得不一样多",
+          "例子二：两边了解得一样多",
+          "操作方式与练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-intro-phone-zh.png",
+      "sha256": "58ca4dbf428a400724facf8d3b9ebe60b559977db0f363f6065806b0664d956b"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Two machines: earn points and decide what to learn",
+          "One complete game, step by step",
+          "Example 1: unequal information",
+          "Example 2: equal information",
+          "Controls and practice",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-intro-tablet-en.png",
+      "sha256": "77829544a43ee877e25f3ae91511b2ae1246c1e7d12eae920fa93964dd72f5d5"
+    },
+    {
+      "key": "horizon",
+      "name": "horizon-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Two machines: earn points and decide what to learn",
+          "One complete game, step by step",
+          "Example 1: unequal information",
+          "Example 2: equal information",
+          "Controls and practice",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/horizon-intro-en-200pct.png",
+      "sha256": "773c400e0c841c52a28551b724abe8ec56e35133810d9205d0e42b6a0d55df67"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "记住颜色，找回它的位置",
+          "怎样操作",
+          "举例",
+          "先做较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-intro-phone-zh.png",
+      "sha256": "2c6d83f2fedc5a3b7aa0fb06df752e92d8db04e9c3d27818fa1d50c3338920e1"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Remember the colour and its position",
+          "How to respond",
+          "Examples",
+          "Easier practice",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-intro-tablet-en.png",
+      "sha256": "6a63a87180fda10cf8406f858dfb22de69b57766dfaba155cff201c0154773f2"
+    },
+    {
+      "key": "spatial",
+      "name": "spatial-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Remember the colour and its position",
+          "How to respond",
+          "Examples",
+          "Easier practice",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/spatial-intro-en-200pct.png",
+      "sha256": "1cefc6220cf66d29db6eb89f3264b60ab550e9fcadaf50674468cb8b306deaf5"
+    },
+    {
+      "key": "search",
+      "name": "search-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "先搜索，再指出刚才的位置",
+          "例1：有目标",
+          "例2：没有目标",
+          "先做3轮较易练习",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-intro-phone-zh.png",
+      "sha256": "2edb3c30a3525457c12b451b1818ccd5dca76a3eb3f1b44c9233fcb6775bba94"
+    },
+    {
+      "key": "search",
+      "name": "search-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "First search, then point to the remembered location",
+          "Example 1: a target is present",
+          "Example 2: there is no target",
+          "Only three easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-intro-tablet-en.png",
+      "sha256": "4dda542b5758ef4f6a358747a333dbebd21a6738f3d37bb6cd8def429b7cfccb"
+    },
+    {
+      "key": "search",
+      "name": "search-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "First search, then point to the remembered location",
+          "Example 1: a target is present",
+          "Example 2: there is no target",
+          "Only three easier practice trials",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/search-intro-en-200pct.png",
+      "sha256": "4fa947b22c27662da63b0b4620e28e9ed02900184424cf32358b6ac740429753"
+    },
+    {
+      "key": "ant",
+      "name": "ant-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "只判断中间箭头朝向",
+          "怎样操作",
+          "先练习，再正式作答",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/ant-intro-phone-zh.png",
+      "sha256": "e4c4db636643058da99b26c979e4faba40b78684cb71a64b0abc005d59d0ec86"
+    },
+    {
+      "key": "ant",
+      "name": "ant-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Judge the middle arrow only",
+          "How to respond",
+          "Practice first, then the task",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/ant-intro-tablet-en.png",
+      "sha256": "2b03f9d3a88ae27907502ade24a024b47a0d6338f25c645f32a72c9d3442f8c4"
+    },
+    {
+      "key": "ant",
+      "name": "ant-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Judge the middle arrow only",
+          "How to respond",
+          "Practice first, then the task",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/ant-intro-en-200pct.png",
+      "sha256": "c1b999eac223c375a35a5c0428a046d0db59958d56bfcabd9404ae0be901909d"
+    },
+    {
+      "key": "recognition",
+      "name": "recognition-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "这张图，在本轮见过吗？",
+          "举例",
+          "先做较易练习，再正式作答",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/recognition-intro-phone-zh.png",
+      "sha256": "18d9550eb71d0f430f43628dc22f1eb4b854ce61f4880e2889637a964e86bafb"
+    },
+    {
+      "key": "recognition",
+      "name": "recognition-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Have you seen this picture in this round?",
+          "Examples",
+          "Easier practice, then the formal stream",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/recognition-intro-tablet-en.png",
+      "sha256": "1dcc704c9c288a686f57a769a066e42ed37c8c63fa67a65be150d587eacbd398"
+    },
+    {
+      "key": "recognition",
+      "name": "recognition-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Have you seen this picture in this round?",
+          "Examples",
+          "Easier practice, then the formal stream",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/recognition-intro-en-200pct.png",
+      "sha256": "577e47bd7c08ae5a3de116465b79931ea2670664c6cae0ea263554cfe4030cb1"
+    }
+  ],
+  "errors": [],
+  "limits": "Component-only synthetic previews; CSS zoom stress check, not native device equivalence"
+}

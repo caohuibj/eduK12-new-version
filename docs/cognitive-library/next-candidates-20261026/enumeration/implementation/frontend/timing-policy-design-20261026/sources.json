@@ -1,0 +1,81 @@
+{
+  "retrievedDateUtc": "2026-10-26",
+  "method": "Targeted connected web open/find and GitHub fixed-file read; no runtime source copied, installed or executed",
+  "externalFactsDoNotValidateProjectNumbers": true,
+  "references": [
+    {
+      "id": "S1",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame",
+      "kind": "MDN browser API documentation",
+      "observedModifiedDate": "2026-08-21",
+      "location": "Description/Parameters/Examples",
+      "supports": "Callbacks precede repaint, may track varying display rates or pause in background; callbacks in one frame share a marker different from callback-entry performance.now.",
+      "notSupported": "Our numeric bands/jitter/cumulative/work budgets, actual pixels or current-device precision."
+    },
+    {
+      "id": "S2",
+      "url": "https://html.spec.whatwg.org/multipage/imagebitmap-and-animations.html#animation-frames",
+      "companion": "https://html.spec.whatwg.org/multipage/webappapis.html#event-loop-processing-model",
+      "kind": "WHATWG Living Standard",
+      "observedStandardDate": "2026-10-26",
+      "supports": "Scheduler invokes callback with its marker; rendering opportunities are subject to scheduling/visibility/hardware policy, not guaranteed fixed60/120.",
+      "notSupported": "Hardware refresh inference or physical50ms guarantee."
+    },
+    {
+      "id": "S3",
+      "url": "https://www.w3.org/TR/2026/WD-hr-time-3-20260901/",
+      "kind": "W3C Working Draft2026-09-01, not final Recommendation",
+      "location": "Time Origin/coarsen time; Security clock resolution",
+      "supports": "Monotonic relative timing may be coarsened/jittered; algorithm allows100microseconds or coarser, isolated5microseconds or coarser.",
+      "notSupported": "A guaranteed timer precision in our Chromium/phones or justification for0.25/0.5/0.75ms thresholds."
+    },
+    {
+      "id": "S4",
+      "url": "https://www.jspsych.org/v8/plugins/browser-check/",
+      "fixedSourceUrl": "https://github.com/jspsych/jsPsych/blob/5887b4a50f71fe4b93254754956ea488b0a0c16e/packages/plugin-browser-check/src/index.ts",
+      "gitCommit": "5887b4a50f71fe4b93254754956ea488b0a0c16e",
+      "gitBlob": "3ccfa3a3a35d3f33d0402e92959888abdbaa751e",
+      "locations": {
+        "defaultCountLine": 46,
+        "meanEstimatorLines": [
+          295,
+          328
+        ],
+        "simulationFallbackLine": 490
+      },
+      "licenseEvidence": "MIT per main independent source notes; license.txt at sameSHA blobbb4e7cacada8236dc89ba4a763c5174c00afc8bc",
+      "supports": "Fixed source uses differences of callback-entry performance.now values and their average, default60; simulation can assign60 without measuring.",
+      "notSupported": "Our rAF-marker estimator is not identical to its entry-time estimator; default60 does not validate our30/240 or quality thresholds. Simulation60 is prohibited as evidence/fallback."
+    },
+    {
+      "id": "S5",
+      "url": "https://www.jspsych.org/latest/overview/timing-accuracy/",
+      "companion": "https://www.jspsych.org/v8/overview/timing-accuracy/",
+      "kind": "Official framework timing guidance",
+      "supports": "Frame-level display precision needs experiment/browser restrictions; prior studies need not apply to current browsers.",
+      "notSupported": "Current project/device timing, individual validity, or using someone else measurements as our own."
+    },
+    {
+      "id": "LOCAL1",
+      "file": "../browser-captured-raw.json",
+      "sha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+      "supports": "25 formal records include7 four-draw66.6ms paths; local within-segment rAF summaries.",
+      "notSupported": "A240-interval preflight, fine-clock probe, callback-entry/draw-time budgets,120Hz/VRR or optical timing."
+    },
+    {
+      "id": "MAIN1",
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/timing-policy-review-20261026/primary-source-notes.json",
+      "kind": "Main-line independent support material, not approval of this draft"
+    },
+    {
+      "id": "MAIN2",
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/timing-policy-review-20261026/existing-raw-statistics.json",
+      "kind": "Main-line read-only statistics; no cross-trial gaps joined"
+    }
+  ],
+  "accessIssue": {
+    "url": "https://www.jspsych.org/v8/overview/timing/",
+    "result": "wrong/inaccessible route in web tool; replaced by actual timing-accuracy page; no claim of reading that route"
+  },
+  "rights": "Only original paraphrases/links/API facts. No third-party runtime/image/font/translated article copied; this is design metadata, not a license clearance or scientific certificate."
+}

@@ -1,0 +1,16 @@
+{
+  "kind": "PARENT_SINGLE_FLIGHT_TYPES_CONTINUATION",
+  "exitCode": 0,
+  "roots": [
+    "server-version/frontend/src/modules/cognitive/core/raw-archive.ts",
+    "server-version/frontend/src/modules/cognitive/core/__tests__/native-mot-archive.test.ts",
+    "server-version/frontend/src/vite-env.d.ts"
+  ],
+  "sourceCount": 20,
+  "diagnostics": [],
+  "reused": "Other UI roots already checked; only changed helper/test closure continued. No HTTP/browser/scorer rerun.",
+  "sourceSha256": {
+    "server-version/frontend/src/modules/cognitive/core/raw-archive.ts": "594b73d9470c23507ba71ccf829aab4d02e74220ade8233b8c3ede1bc89dc5d7",
+    "server-version/frontend/src/modules/cognitive/core/__tests__/native-mot-archive.test.ts": "6ad12f9d94c3cd7c57da6d6c1810690b08ac4d41b48db52c9caba94c63aa99cd"
+  }
+}

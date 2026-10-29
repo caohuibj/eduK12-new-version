@@ -1,0 +1,9 @@
+{
+  "kind": "RAW_ARCHIVE_NEW_SERVICE_ACTUAL_BACKEND_TYPES",
+  "exitCode": 1,
+  "durationSeconds": 19.615650177001953,
+  "script": "const ts=require('typescript'),path=require('node:path');const c=ts.readConfigFile('tsconfig.json',ts.sys.readFile);if(c.error)throw Error('config unavailable');const p=ts.parseJsonConfigFileContent(c.config,ts.sys,process.cwd());const root=path.join(process.cwd(),'src/modules/cognitive/raw-archive.service.ts');const program=ts.createProgram([root],p.options),ds=ts.getPreEmitDiagnostics(program);if(ds.length){process.stdout.write(ts.formatDiagnosticsWithColorAndContext(ds,{getCanonicalFileName:f=>f,getCurrentDirectory:()=>process.cwd(),getNewLine:()=>String.fromCharCode(10)}));process.exitCode=1}",
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "newRoot": "src/modules/cognitive/raw-archive.service.ts",
+  "wholeApplication": false
+}

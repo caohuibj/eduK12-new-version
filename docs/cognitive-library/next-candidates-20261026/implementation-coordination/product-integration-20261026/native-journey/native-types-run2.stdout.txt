@@ -1,0 +1,1 @@
+Native MOT changed-entry closure PASS: 14 roots, actual backend tsconfig plus noEmit/rootDir for Prisma seed

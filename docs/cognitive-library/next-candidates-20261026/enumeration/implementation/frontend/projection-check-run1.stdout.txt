@@ -1,0 +1,1 @@
+Enumeration pure protocol projection: ff2215ae31ae280dbec19d582ab0aead2608445706bf5c4f403a4887472faed4; closed report: f89b3ccc3b3f33afd72bd8c1948a4a220d4ffab30ad039a491b5aa762a0bbd72

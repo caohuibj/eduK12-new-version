@@ -1,0 +1,54 @@
+{
+  "kind": "ENUMERATION_THIN_CONTEXT_ACTUAL_TSCONFIG_AFFECTED_CLOSURE",
+  "roots": [
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-native-context.test.ts",
+    "server-version/frontend/src/vite-env.d.ts"
+  ],
+  "source": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts",
+      "sha256": "4b7ff685b4b899435c2028ff2e9a90f85af569f302ffee53d265c297403502fe"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts",
+      "sha256": "dd6675148fa214c328e6b4f7e24644742175b2fd7fb4eea9183bbec1ba3bc0fb"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts",
+      "sha256": "b74995c7a872811c2bd7fa08f4e7f7bc8a4b09b5def64c03f0df2f6c0bacc373"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationReport.tsx",
+      "sha256": "1c531e18e522ba918a9665430c6537b6c83abf49c0846d1b2c2cf409c40d0628"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts",
+      "sha256": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts",
+      "sha256": "9e9053fac439290201b3a474051a87692e779413d1179d07850238058c0967c4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+      "sha256": "4c925ea9db7fb6f649e0e999cee1da7ffd2b0dc0e2dced866dcf29210bbe0b24"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/fixtures.test-support.ts",
+      "sha256": "335418859e893eaaf5bf01e1dee02d187d5a123ce2e01bbb1427b18f8a70f8d4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-native-context.test.ts",
+      "sha256": "4dd1078bd7436ca0c78ce31ee056cf1d82183972e167f808f1c7ad7b07966b7e"
+    },
+    {
+      "path": "server-version/frontend/src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    }
+  ],
+  "diagnostics": [],
+  "exitCode": 0
+}

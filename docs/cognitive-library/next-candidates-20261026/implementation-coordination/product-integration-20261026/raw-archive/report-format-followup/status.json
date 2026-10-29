@@ -1,0 +1,92 @@
+{
+  "status": "READY_FOR_REVIEW_NOT_COMMITTED",
+  "scope": "MOT report display only",
+  "baseHead": "d52e1a80c39fc935a99f9414926fc4daadd06110",
+  "recordedAt": "2026-10-26T11:36:25.986890+00:00",
+  "versions": {
+    "engine": "1.1.1",
+    "scoring": "1.1.0",
+    "config": "1.0.0",
+    "profileDefinition": "1.0.0",
+    "metricDefinition": "1.1.0",
+    "qualityDefinition": "1.1.0",
+    "reportDefault": "1.1.1",
+    "historicalAllowedReports": [
+      "1.1.0"
+    ]
+  },
+  "sourceSha256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/mot/package.ts": "ff636396ec5c322a4d0b37812d33fd149884410d503aa5241402f6a7cc635367",
+    "server-version/backend/src/modules/cognitive/content-candidates/mot/metadata.ts": "475524e15543dfbd152978bbb51cf9a277327fa2daae3c7848bd993c8cd0a0f9",
+    "server-version/backend/src/modules/cognitive/content-candidates/mot/report-bundle-1.1.0.json": "29b432bc9aa0f9cddf0406a8d6950831c35e58c8c5257e770b4373b6f6b6649e",
+    "server-version/backend/src/modules/cognitive/task-resource.ts": "913b652e2e7991d9ace145fcf0e5f592ddc4f1e244018d68fa655ea5b7c94e49",
+    "server-version/backend/src/modules/cognitive/profile-freeze.ts": "e20b7bc761e82bf9bde419a62da34129ad527b81ce3291b1e97377101b782d2a",
+    "server-version/backend/src/modules/cognitive/session.service.ts": "2e491483e05bf9d1e6b7526b120e44fe8ecb37bca708a7f01a83d0346f3040eb",
+    "server-version/backend/src/__tests__/cognitive/mot-report-format.test.ts": "0923182063e0281b291a3ae92d42cfa3ab3bf5a5f010f501f8f92124cc881361"
+  },
+  "consumerAndToolSha256": {
+    "server-version/backend/src/modules/cognitive/v2/report.ts": "2a3145cfc1a9cf957da4cada84c9a7834bdac6d266f075c350d302a738942792",
+    "server-version/backend/src/modules/cognitive/v2/result-snapshot.ts": "683c21f4a6f0a85dfba5d1802a04cd9f2701798f59129014a3924c05924f6eb1",
+    "server-version/backend/src/modules/assessment-runtime/compiler.ts": "37f7cc4cf3fa68dafcddab2a889a4b3dddf5b6c5c43f97915d89412d8fbf2877",
+    "server-version/backend/src/modules/measurement-content/cognitive.ts": "6dce9bbc42beeefb2007324737e7e20fda18aa8d592836c2aba55c0f9d1246a8",
+    "server-version/backend/src/modules/measurement-content/release.ts": "a725ec0f3eead8d0ab362ca328c0a0d7624e257a49a43edae5cf81e0e6301a4d",
+    "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts": "a94f8aecd929c1aea34b2bfc28eef3d189410480996fd3d59fd0c946a48d7142",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+  },
+  "evidenceSha256": {
+    "README.md": "954809047088066987d97ed294c94cc26fc856cd60fb80e0b22cc547feb20da6",
+    "tests-run1-receipt.json": "ecb35662a768d151743a05a3368ff88eabe9db6225f26d1493ead6906dcb7ae3",
+    "tests-run1-source.ts.txt": "06c91843d07055f6c9194498925209422ada758608f62e06e65ea002d7b0c308",
+    "tests-run1.json": "f40174a1e5a0a7672be37afff6b0633b90825597778d14233e79bab469058f6a",
+    "tests-run1.log": "970852d7369ebe4faddba575f335c477ec113457661d36b044b2743d05546648",
+    "type-only-equivalence.json": "49bf0246fc22be804194e6e6da583b69bfce342db3d2b4104f2e453d933e6815",
+    "types-run1-receipt.json": "1d76a6a39d7c21382bad73fee1492d3178ec3c41cd2583e8a881b05771ffb5b7",
+    "types-run1.log": "dfeda4de309b40dbe3dcb4ad891b0523790edd2a9e82ff705f4fec7a5f8e0b5b",
+    "types-run2-profile-freeze.ts.txt": "46346c6abb9b1d07000a91ff539831109290d37b5c353be8e38a898ecd2423e5",
+    "types-run2-receipt.json": "b2a7d115480a9ad1dd8acbad9553dcdfc096a587d68249881aca34f6736da871",
+    "types-run2.log": "050a873952220323c72263e2da48f1d559dfc4c4bd699ecd37d7abb7b4a5f93b",
+    "types-run3-receipt.json": "bd38199a9aee45fdc8fbeb11207176cdaf33fd8a50dbfbd28795a5e4d8d1324b",
+    "types-run3.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "types-tsconfig.json": "b38330e93f812bccf36090acbd6879e67ed43572b6acf5120dd011e33b0d607d"
+  },
+  "checks": {
+    "behaviorTests": {
+      "passed": 4,
+      "failed": 0,
+      "exitCode": 0,
+      "run": "tests-run1"
+    },
+    "typesAttempts": [
+      {
+        "run": "types-run1",
+        "exitCode": 2
+      },
+      {
+        "run": "types-run2",
+        "exitCode": 2
+      },
+      {
+        "run": "types-run3",
+        "exitCode": 0
+      }
+    ],
+    "typeOnlyRuntimeEquivalence": true
+  },
+  "notExecuted": [
+    "scorer",
+    "old seed/capture tests",
+    "database",
+    "browser/timing",
+    "CI",
+    "production/COS",
+    "deployment"
+  ],
+  "notClaimed": [
+    "independent audit",
+    "merged",
+    "deployed"
+  ]
+}

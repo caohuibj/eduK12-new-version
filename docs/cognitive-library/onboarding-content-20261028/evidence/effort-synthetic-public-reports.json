@@ -1,0 +1,501 @@
+{
+  "synthetic": true,
+  "source": "real capture/scorer/projector; never participant data",
+  "complete": {
+    "testType": "balloon-effort",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+    "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794",
+    "profile": "experience",
+    "incentive": "task-points-only-no-cash-promise",
+    "state": "interpretable",
+    "planned": 18,
+    "received": 18,
+    "valid": 18,
+    "high": 10,
+    "noChoice": 0,
+    "technical": 0,
+    "executionCount": 18,
+    "totalPresses": 1260,
+    "knownTaskPoints": 48,
+    "byEffort": {
+      "50": {
+        "valid": 6,
+        "high": 6,
+        "noChoice": 0
+      },
+      "100": {
+        "valid": 6,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200": {
+        "valid": 6,
+        "high": 4,
+        "noChoice": 0
+      }
+    },
+    "byReward": {
+      "3": {
+        "valid": 6,
+        "high": 4,
+        "noChoice": 0
+      },
+      "5": {
+        "valid": 6,
+        "high": 2,
+        "noChoice": 0
+      },
+      "7": {
+        "valid": 6,
+        "high": 4,
+        "noChoice": 0
+      }
+    },
+    "byProbability": {
+      "1": {
+        "valid": 9,
+        "high": 5,
+        "noChoice": 0
+      },
+      "0.5": {
+        "valid": 9,
+        "high": 5,
+        "noChoice": 0
+      }
+    },
+    "conditions": {
+      "200/3/0.5": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "100/5/0.5": {
+        "valid": 1,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/7/1": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "200/5/1": {
+        "valid": 1,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/7/0.5": {
+        "valid": 1,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/3/1": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "50/7/0.5": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "100/5/1": {
+        "valid": 1,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/3/0.5": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "50/7/1": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "100/7/1": {
+        "valid": 1,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/3/1": {
+        "valid": 1,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/5/0.5": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "50/5/1": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "200/3/1": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "200/5/0.5": {
+        "valid": 1,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/7/0.5": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "100/3/0.5": {
+        "valid": 1,
+        "high": 0,
+        "noChoice": 0
+      }
+    },
+    "executionByInput": {
+      "keyboard": {
+        "trials": 18,
+        "presses": 1260,
+        "seconds": 258.59999999999997,
+        "pressesPerSecond": 4.872389791183295
+      }
+    }
+  },
+  "limited": {
+    "testType": "balloon-effort",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+    "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794",
+    "profile": "experience",
+    "incentive": "task-points-only-no-cash-promise",
+    "state": "limited",
+    "planned": 18,
+    "received": 1,
+    "valid": 1,
+    "high": 1,
+    "noChoice": 0,
+    "technical": 0,
+    "executionCount": 1,
+    "totalPresses": 200,
+    "knownTaskPoints": 3,
+    "byEffort": {
+      "50": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      }
+    },
+    "byReward": {
+      "3": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "7": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      }
+    },
+    "byProbability": {
+      "1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "0.5": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      }
+    },
+    "conditions": {
+      "200/3/0.5": {
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0
+      },
+      "100/5/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/7/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/5/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/7/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/3/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/7/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/5/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/3/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/7/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/7/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/3/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/5/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/5/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/3/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/5/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/7/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/3/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      }
+    },
+    "executionByInput": {
+      "keyboard": {
+        "trials": 1,
+        "presses": 200,
+        "seconds": 25,
+        "pressesPerSecond": 8
+      }
+    }
+  },
+  "invalid": {
+    "testType": "balloon-effort",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+    "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794",
+    "profile": "experience",
+    "incentive": "task-points-only-no-cash-promise",
+    "state": "invalid",
+    "planned": 18,
+    "received": 0,
+    "valid": 0,
+    "high": 0,
+    "noChoice": 0,
+    "technical": 0,
+    "executionCount": 0,
+    "totalPresses": null,
+    "knownTaskPoints": null,
+    "byEffort": {
+      "50": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      }
+    },
+    "byReward": {
+      "3": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "7": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      }
+    },
+    "byProbability": {
+      "1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      }
+    },
+    "conditions": {
+      "200/3/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/5/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/7/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/5/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/7/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/3/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/7/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/5/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/3/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/7/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/7/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/3/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/5/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "50/5/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/3/1": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/5/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "200/7/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      },
+      "100/3/0.5": {
+        "valid": 0,
+        "high": 0,
+        "noChoice": 0
+      }
+    },
+    "executionByInput": {}
+  }
+}

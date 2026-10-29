@@ -1,0 +1,1 @@
+{"received":4,"excluded":1,"state":"limited","conditions":[{"setSize":1,"valid":2,"planned":20,"meanAbsoluteErrorDeg":90,"medianAbsoluteErrorDeg":90},{"setSize":5,"valid":1,"planned":20,"meanAbsoluteErrorDeg":2,"medianAbsoluteErrorDeg":2}],"signedErrors":[0,-2,-180,null],"emptyState":"invalid"}

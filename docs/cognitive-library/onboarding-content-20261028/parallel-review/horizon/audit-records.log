@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "name": "empty",
+      "state": "invalid",
+      "received": 0,
+      "completed": 0,
+      "validFirstChoices": 0,
+      "totalChoices": 0,
+      "zeroRTResponses": 0,
+      "totalReward": 0,
+      "longMinusShortLessSampledRate": null
+    },
+    {
+      "name": "beforeFirst",
+      "state": "invalid",
+      "received": 1,
+      "completed": 0,
+      "validFirstChoices": 0,
+      "totalChoices": 4,
+      "zeroRTResponses": 4,
+      "totalReward": 174,
+      "longMinusShortLessSampledRate": null
+    },
+    {
+      "name": "afterFirst",
+      "state": "limited",
+      "received": 1,
+      "completed": 0,
+      "validFirstChoices": 1,
+      "totalChoices": 5,
+      "zeroRTResponses": 5,
+      "totalReward": 214,
+      "longMinusShortLessSampledRate": null
+    },
+    {
+      "name": "signedComparison",
+      "state": "limited",
+      "received": 12,
+      "completed": 11,
+      "validFirstChoices": 12,
+      "totalChoices": 105,
+      "zeroRTResponses": 105,
+      "totalReward": 5027,
+      "longMinusShortLessSampledRate": -1
+    }
+  ],
+  "identityFinding": {
+    "status": "reproduced-baseline-gap-awaiting-parent-shared-fix",
+    "normalAccepted": true,
+    "unknownOuterPresentationAccepted": true,
+    "outerPresentationVersion": "next",
+    "innerTaskPresentationVersion": "0.1.0",
+    "expectation": "Horizon 0.1.0 task presentation must remain frozen; arbitrary next must not be accepted as its saved native presentation. Parent will resolve generic participantPresentation versus native task presentation semantics in shared code."
+  }
+}

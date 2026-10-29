@@ -1,3 +1,4 @@
+import {nativeCompletionSchema,type NativeCompletion} from './native-completion'
 import { z } from 'zod'
 import type { TrialEnvelope } from './v2/types'
 import { trialEnvelopeSchema } from './v2/trial-envelope'
@@ -13,6 +14,7 @@ const unifiedCognitiveRawSubmissionPayloadSchema = z.object({
   schemaVersion: z.literal(UNIFIED_COGNITIVE_RAW_PAYLOAD_SCHEMA_VERSION),
   attemptEpoch: z.number().int().positive(),
   trials: z.array(trialEnvelopeSchema).min(1).max(1000),
+  nativeCompletion: nativeCompletionSchema.optional(),
   administrationProvenance: administrationProvenanceV1Schema.optional(),
 }).strict()
 
@@ -20,6 +22,7 @@ const normalizedCognitiveRawSubmissionPayloadSchema = z.object({
   schemaVersion: z.literal(UNIFIED_COGNITIVE_RAW_PAYLOAD_SCHEMA_VERSION),
   attemptEpoch: z.number().int().positive(),
   trials: z.array(z.unknown()).min(1).max(1000),
+  nativeCompletion: nativeCompletionSchema.optional(),
   administrationProvenance: administrationProvenanceV1Schema.optional(),
 }).strict()
 
@@ -27,12 +30,14 @@ export type UnifiedCognitiveRawSubmissionPayload = {
   schemaVersion: typeof UNIFIED_COGNITIVE_RAW_PAYLOAD_SCHEMA_VERSION
   attemptEpoch: number
   trials: TrialEnvelope[]
+  nativeCompletion?: NativeCompletion
   administrationProvenance?: AdministrationProvenanceV1
 }
 
 export const createUnifiedCognitiveRawSubmissionPayload = (input: {
   attemptEpoch: number
   trials: TrialEnvelope[]
+  nativeCompletion?: NativeCompletion
   administrationProvenance?: AdministrationProvenanceV1
 }): UnifiedCognitiveRawSubmissionPayload => {
   // The final-submit boundary already parsed and normalized every envelope
@@ -42,6 +47,7 @@ export const createUnifiedCognitiveRawSubmissionPayload = (input: {
     schemaVersion: UNIFIED_COGNITIVE_RAW_PAYLOAD_SCHEMA_VERSION,
     attemptEpoch: input.attemptEpoch,
     trials: input.trials,
+    ...(input.nativeCompletion?{nativeCompletion:input.nativeCompletion}:{}),
     ...(input.administrationProvenance
       ? { administrationProvenance: input.administrationProvenance }
       : {}),
@@ -50,6 +56,7 @@ export const createUnifiedCognitiveRawSubmissionPayload = (input: {
     schemaVersion: UNIFIED_COGNITIVE_RAW_PAYLOAD_SCHEMA_VERSION,
     attemptEpoch: input.attemptEpoch,
     trials: input.trials,
+    ...(input.nativeCompletion?{nativeCompletion:input.nativeCompletion}:{}),
     ...(input.administrationProvenance
       ? { administrationProvenance: input.administrationProvenance }
       : {}),

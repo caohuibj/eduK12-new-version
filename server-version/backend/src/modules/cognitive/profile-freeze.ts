@@ -1,5 +1,8 @@
 import { resolveParticipantPresentation, type CognitiveParticipantPresentationV1 } from './participant-presentation'
+import { resolveNativeParticipantPresentation } from './content-candidates/native-registry/participant-presentations'
+import { getCognitiveTaskResource, resolveNativeReportBundle, type CognitiveTaskResource } from './task-resource'
 import { buildCognitiveV2TaskDefinition } from './v2/registry'
+import { computeProtocolSignature } from './v2/canonical'
 import type { TaskDefinition } from './v2/types'
 import { createHash } from 'crypto'
 import { decryptCognitivePayload, encryptCognitivePayload, encryptCompactCognitivePayload } from './cognitive.security'
@@ -19,6 +22,7 @@ import {
 } from './protocol-presentation'
 
 export interface FrozenReportSnapshot {
+  nativeIdentity?: { testType: string; engineVersion: string; scoringVersion: string; configVersion: string; protocolSignature: string }
   presentationVersion?: string
   participantPresentation?: CognitiveParticipantPresentationV1
   v2ReportDefinition?: TaskDefinition['report']
@@ -130,6 +134,37 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
   }
 }
 
+/** Exact native task freeze; no legacy adapter, synthetic score or implicit standard profile. */
+export function freezeNativeAssignmentProfile(input: {
+  resource: Extract<CognitiveTaskResource, { kind: 'native' }>; baseConfig: unknown; profile: CognitiveProfile;
+}) {
+  const r = input.resource, profile = r.profiles[input.profile]
+  if (!profile) throw BAD_REQUEST(`该原生任务未声明 Profile ${input.profile}`)
+  const resolvedConfig = r.configSchema.parse({ ...(input.baseConfig as Record<string, unknown>), ...profile.configPatch })
+  // Display-only sidecar: frozen with the assignment so an old report never looks up a newer wording.
+  const participantPresentation = resolveNativeParticipantPresentation({ testType: r.testType, engineVersion: r.engineVersion,
+    scoringVersion: r.scoringVersion, configVersion: r.configVersion })
+  const resolvedReport: FrozenReportSnapshot = {
+    nativeIdentity: { testType: r.testType, engineVersion: r.engineVersion, scoringVersion: r.scoringVersion,
+      configVersion: r.configVersion, protocolSignature: computeProtocolSignature(r.definition.protocol) },
+    ...(participantPresentation ? { presentationVersion: participantPresentation.presentationVersion, participantPresentation } : {}),
+    profile: input.profile, randomizationAlgorithmVersion: r.randomizationAlgorithmVersion,
+    profileDefinitionVersion: r.profileDefinitionVersion, metricDefinitionVersion: r.metricDefinitionVersion,
+    qualityDefinitionVersion: r.qualityDefinitionVersion, reportDefinitionVersion: r.reportDefinitionVersion,
+    reportCaveats: [...profile.reportCaveats], metricDefinitions: r.metricDefinitions, qualityDefinitions: r.qualityDefinitions,
+    reportDefinition: r.reportDefinition, v2ReportDefinition: r.definition.report,
+    v2MetricDefinitions: r.definition.metrics, v2QualityDefinitions: r.definition.quality,
+    protocolShowProductIndex: false,
+  }
+  return { profile: input.profile, profileDefinitionVersion: r.profileDefinitionVersion, resolvedConfig,
+    resolvedConfigHash: hashResolvedConfig(resolvedConfig), resolvedConfigSnapshotEncrypted: encryptCognitivePayload(resolvedConfig),
+    resolvedReportSnapshotEncrypted: compactAssessmentStorageEnabled() ? encryptCompactCognitivePayload(resolvedReport) : encryptCognitivePayload(resolvedReport) }
+}
+export function freezeTaskResource(input: { resource: CognitiveTaskResource; baseConfig: unknown; profile: CognitiveProfile }) {
+  return input.resource.kind === 'native' ? freezeNativeAssignmentProfile({ ...input, resource: input.resource })
+    : freezeAssignmentProfile({ entry: input.resource.entry, baseConfig: input.baseConfig, profile: input.profile })
+}
+
 export const readFrozenReport = (encrypted?: string | null): FrozenReportSnapshot | null => {
   if (!encrypted) return null
   const snapshot = measureRequestPhaseSync('cognitive.frozen_report_decrypt', () => (
@@ -140,7 +175,29 @@ export const readFrozenReport = (encrypted?: string | null): FrozenReportSnapsho
     || snapshot.participantPresentation.presentationVersion !== snapshot.presentationVersion
     || !snapshot.v2ReportDefinition || !snapshot.v2MetricDefinitions || !snapshot.v2QualityDefinitions
   )) throw new Error('COG_PRESENTATION_SNAPSHOT_INVALID')
+  assertNativeFrozenReport(snapshot)
   return snapshot
+}
+
+/** Validate the exact persisted descriptor version, including its full bytes, without finding latest. */
+export function assertNativeFrozenReport(snapshot: FrozenReportSnapshot): Extract<CognitiveTaskResource, { kind: 'native' }> | undefined {
+  if (snapshot.nativeIdentity) {
+    const identity = snapshot.nativeIdentity
+    const resource = getCognitiveTaskResource(identity.testType, identity.engineVersion, identity.scoringVersion)
+    const bundle = resource?.kind === 'native' ? resolveNativeReportBundle(resource, snapshot.reportDefinitionVersion) : undefined
+    if (!resource || resource.kind !== 'native' || !bundle || identity.configVersion !== resource.configVersion
+      || identity.protocolSignature !== computeProtocolSignature(resource.definition.protocol)
+      || snapshot.profileDefinitionVersion !== resource.profileDefinitionVersion
+      || snapshot.metricDefinitionVersion !== resource.metricDefinitionVersion
+      || snapshot.qualityDefinitionVersion !== resource.qualityDefinitionVersion
+      || snapshot.v2ReportDefinition?.version !== snapshot.reportDefinitionVersion || !resource.profiles[snapshot.profile]
+      || hashResolvedConfig(snapshot.v2ReportDefinition) !== hashResolvedConfig(bundle.report)
+      || hashResolvedConfig(snapshot.v2MetricDefinitions) !== hashResolvedConfig(bundle.metrics)
+      || hashResolvedConfig(snapshot.v2QualityDefinitions) !== hashResolvedConfig(bundle.quality))
+      throw new Error('COG_NATIVE_FROZEN_REPORT_IDENTITY_INVALID')
+    return resource
+  }
+  return undefined
 }
 
 export interface FrozenMeasurementContext {

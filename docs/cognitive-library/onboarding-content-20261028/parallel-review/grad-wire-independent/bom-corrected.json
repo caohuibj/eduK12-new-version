@@ -1,0 +1,12 @@
+{
+  "node": "v24.21.0",
+  "kind": "MINIMAL_UTF8_BOM_CANONICAL_BOUNDARY_PROBE_NO_SCORER",
+  "sourceSHA256": "d3a108e880b6f3f57c189b024bc1112b255aa02533c60aeae6d0cd6d06df7261",
+  "decodedBytes": 12729,
+  "packedBytes": 1340,
+  "accepted": false,
+  "equalRaw": false,
+  "error": "Grad wire JSON is not canonical",
+  "expected": "reject; UTF-8 BOM-prefixed JSON bytes are not the canonical JSON encoding",
+  "scorerInvocations": 0
+}

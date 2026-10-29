@@ -1,0 +1,10 @@
+const path=require('node:path'),fs=require('node:fs'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'../../../..'),front=path.join(root,'server-version/frontend'),ts=require(path.join(front,'node_modules/typescript'));
+const config=ts.readConfigFile(path.join(front,'tsconfig.app.json'),ts.sys.readFile);
+const parsed=ts.parseJsonConfigFileContent(config.config,ts.sys,front);
+const roots=['src/modules/cognitive/CognitiveReportVisual.tsx','src/modules/cognitive/tasks/balloon-effort/EffortInstructions.tsx','src/modules/cognitive/tasks/balloon-effort/EffortReport.tsx','src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx','src/vite-env.d.ts','src/test/setup.ts'];
+const program=ts.createProgram(roots.map(f=>path.join(front,f)),{...parsed.options,noEmit:true,incremental:false});
+const diagnostics=ts.getPreEmitDiagnostics(program).map(d=>({file:d.file&&path.relative(root,d.file.fileName),start:d.start,code:d.code,message:ts.flattenDiagnosticMessageText(d.messageText,'\n')}));
+const sources=Object.fromEntries(program.getSourceFiles().filter(f=>!f.fileName.includes('node_modules')).map(f=>[path.relative(root,f.fileName),crypto.createHash('sha256').update(f.text).digest('hex')]));
+fs.writeFileSync(path.join(__dirname,'presentation-types.json'),JSON.stringify({roots,configSHA256:crypto.createHash('sha256').update(fs.readFileSync(path.join(front,'tsconfig.app.json'))).digest('hex'),sources,diagnostics},null,2));
+console.log(diagnostics);process.exitCode=diagnostics.length?1:0;

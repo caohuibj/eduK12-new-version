@@ -1,0 +1,86 @@
+{
+  "sourceCommit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+  "historicalResearchTags": {
+    "cognitive_domain": [
+      "attention",
+      "executive_control"
+    ],
+    "target_process": [
+      "sustained_monitoring",
+      "response_withholding"
+    ],
+    "paradigm": [
+      "gradual_cpt"
+    ],
+    "stimulus_form": [
+      "grayscale_scenes_crossfade"
+    ],
+    "input_upstream": [
+      "space_key",
+      "touch_path_observed"
+    ],
+    "input_proposed": [
+      "not_frozen"
+    ],
+    "key_metric": [
+      "condition_accuracy",
+      "omission_commission",
+      "condition_rt",
+      "rt_variability",
+      "signal_detection"
+    ],
+    "intended_use": [
+      "research_protocol_selection"
+    ],
+    "code_license": [
+      "lgpl_3_0_recorded"
+    ],
+    "code_rights_disposition": [
+      "github_public_conditional"
+    ],
+    "asset_rights_disposition": [
+      "authorization_pending"
+    ],
+    "asset_license_review": [
+      "cc_by_sa_default_exceptions_unchecked"
+    ],
+    "implementation_strategy": [
+      "code_adaptation"
+    ],
+    "maturity": [
+      "source_research_only"
+    ],
+    "evidence_limitations": [
+      "timing_device_unverified",
+      "protocol_variant_unvalidated",
+      "protocol_version_decision"
+    ],
+    "baseline_relation": [
+      "protocol_variant"
+    ],
+    "research_priority": [
+      "reserve"
+    ],
+    "rule_type": [
+      "technical_quality",
+      "theoretical_reference",
+      "literature_experience",
+      "project_provisional"
+    ]
+  },
+  "currentStatus": "CONTENT_CANDIDATE_NOT_INTEGRATED",
+  "currentAssetReview": "Official overview explicitly attributes City/Mountain Images to Esterman & DeGutis, CC-BY-SA4.0; 21 originals retained with hashes and attribution.",
+  "ageRange": null,
+  "difficulty": null,
+  "chineseValidation": null,
+  "deviceEquivalence": null,
+  "backendTagSearchConnected": false,
+  "currentProfiles": {
+    "research": 300,
+    "experience": 100
+  },
+  "currentPractice": {
+    "trials": 8,
+    "minimumCorrect": 7
+  }
+}

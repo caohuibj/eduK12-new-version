@@ -1,0 +1,223 @@
+{
+  "kind": "CONTENT_FORMAT_REVIEW_NOT_RELEASE_AUTHORIZATION",
+  "capturedAt": "2026-10-27T00:53:42.036418+00:00",
+  "sourceHead": "0342d1bf4c94876c9edd80e2b709ef8ef185d172",
+  "sourceTree": "65b9f1de49ae53c0ad91e865fbd94b46ea42f157",
+  "main": "04a8d994207d7b831b874d4be4f5c31640466458",
+  "inheritedCognitiveHead": "9dbbfd36a177a1da96a02ab482427147411e7a90",
+  "runtimeSourceChangesInThisStep": false,
+  "administratorDecisionRequiredForActivation": true,
+  "environment": {
+    "os": "Debian GNU/Linux 13.6",
+    "initialCwd": "/workspace",
+    "repository": "/workspace/eduK12-new-version",
+    "logicalCpus": 5,
+    "cpuMax": "400000 100000",
+    "memoryMaxBytes": 17179869184,
+    "execution": "cloud",
+    "node": "24.21.0",
+    "dependencies": "existing cloud node_modules; no reinstall; no full byte-level provenance claimed"
+  },
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "blob": "707b19b16f3de9c1dd54842ea690672825ce4d31",
+      "sha256": "aa8005b01c6acaf6985ba1dfb111338d7a06c57170f348c4f1d31db4b2aa02cd"
+    },
+    {
+      "path": "docs/release/README.md",
+      "blob": "cd7858296514a91a892fdb44e03e1715a1625414",
+      "sha256": "ee8ff99bf6f126992c557020711618e490fbb1f617f489348be38d5fba50c7bb"
+    },
+    {
+      "path": "server-version/backend/prisma/schema.prisma",
+      "blob": "7358a9c42941ec3ccdfcccb4095b8a03a53be2fb",
+      "sha256": "6533527006c1fb08ef30f779d007c5be6e1a5f212dce0fd1e567056b558393a2"
+    },
+    {
+      "path": "server-version/backend/prisma/seeds/native-cognitive.ts",
+      "blob": "8ae0aad2f2ef89b326f6eb89f0c9eadb1eaa2afc",
+      "sha256": "f533b9c2c6e48259101c06ec4fa6411b0853367a594cb9dbaa87831c924003b7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/catalog.service.ts",
+      "blob": "2bd7303a869c25aba7388150eec1b07f163de1ff",
+      "sha256": "86dc6ab61134a7aec657cf36f9169f7b682c649838fa1e1ac440a3cf71e9b075"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.schema.ts",
+      "blob": "41a1c4b129550687f0ec87590a52d6d9b2f49ba6",
+      "sha256": "fc57281b2c7a852eb6b66de0b0a7d735cb37a9dcfa7c2261ded5c621c41ad16d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/task-resource.ts",
+      "blob": "b5bb2a0c49e473b918e3c35bb928e0bc45ae2ede",
+      "sha256": "8636aa5abb8d97d6989d2304ba197771f34299e9dc0b4945430be25988afb9e5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/profile-freeze.ts",
+      "blob": "21133caf94fe0601d8fe0586d446744bacc163a0",
+      "sha256": "ae5ede034afcbc632b1d29c9c7cf5f7168c9fd442cd4dc9dce6185e59b8e2f1e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/raw-archive.service.ts",
+      "blob": "8010064d20395174265a530e1c4035724db5eea3",
+      "sha256": "3c29b8a540e471edf99cf91c8d5fb80a8a323f3206245a77c9977b03a68e4793"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/raw-archive.routes.ts",
+      "blob": "fba52aa72e8f44559ecee998185fc5c0d5c88529",
+      "sha256": "632e43ccfe113dfc2995eb43e3110ea30e63ca942cfea463468c1070a8e5cd8b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/report.ts",
+      "blob": "a8eb94b0be6a8fbd6ed890700bd0511b97d74bc7",
+      "sha256": "7e4115b6303f56467b6c3798c830264810e175dbceda547f0ea95e9b5bad7dc1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
+      "blob": "8c0ed2a612e0a2203eabfffcd8ffb165706a850e",
+      "sha256": "2f0ff974f4be034c88cb47831f63e6768ee7fabd5e8896095ebd56358302daf9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts",
+      "blob": "18237dce88ed210f028bdba5732ed83222359cdd",
+      "sha256": "34eb50e30dbb64b1bd1bd6b4173d07c6c0c86c09bf6785e86f8f26b9d8823f92"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/participant-presentations.ts",
+      "blob": "e313c30c512f3bc2b0dd922f68cca27188265e80",
+      "sha256": "c8640e90b3e73e964eac11a0479f50a26f3e903f38b19388ac2e0441dcb3e202"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts",
+      "blob": "705f5d36c2b5d221d1098ecc3aaefd5a38200350",
+      "sha256": "9edac0ad3044335ee752f867dba5cddaa7f2f840582d105b556c994f1fa82e6a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts",
+      "blob": "4ef20c6bdea4df034452645816c0b8a923a8cdae",
+      "sha256": "6a6f02c6090c60b0e483c34744a0da552904623e370ef45e3d8b5da35535dac0"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/metadata.ts",
+      "blob": "1909818836bc7709889e88f65d85f3c1a5115153",
+      "sha256": "ab0d18d6921cb5563ab6b7a24f9ee10b76dbb1769c79c533526a08067e420797"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/participant-presentation.ts",
+      "blob": "563f3657def3868973f32cd1cc3f5d478a9c3801",
+      "sha256": "7d57f419f1385666a923f8c96815ea9ef56ccdb2b6c3e68f46db8e5eba4d34c6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts",
+      "blob": "172e43b88ac8ece01b2bbf39734483ebbbec68e9",
+      "sha256": "dccf4723f4ea9b66d317b532310fc30768406c74614e7d645aa990939266f56f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts",
+      "blob": "30d606dac96b66c22b64d6dfd9a63932cf13cf67",
+      "sha256": "3c7d56f2bc6bf4ef92d7251e90bedbc94baaa98ad507fca5e255b13be846d974"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts",
+      "blob": "cc4070a09e4aaccecde19a98da5878fdc4d7c1c1",
+      "sha256": "8780ed5a2d7ec90f14a4f5129c97f1a84fd271197c40c32a39148a4b256d0016"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+      "blob": "61c8839db3d369fefe664080e0a0343e7104b136",
+      "sha256": "eaf7c9e3b2d41d95c77546deebb3ce80c0ee9bd12b5b1c235849024fecf7dfc3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/native-runners.tsx",
+      "blob": "169b27c33f13aff9fa71520252c3a700df164e96",
+      "sha256": "9fc09285fba6f532e43ec9769257112955cddf22deeb78e49b7091b922244f8b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/native-port.ts",
+      "blob": "3f6d4bbcf19013961c2f22bdb5a3d710ba50c28f",
+      "sha256": "855f62003a55bb0d6cb8494e3247a02002f04c08f4cc932ed9f21b9e6e45ad55"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/NativeEnumerationRunner.tsx",
+      "blob": "8490562c2536ae722ed358a015e342846749e82c",
+      "sha256": "6bab1951e6b8eb266e71f91966d17025d2eabcdf92bfedf5ea7847f33ff06004"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveV2ReportCard.tsx",
+      "blob": "bc4b88f09a3701375d295cedd33ca140efe5e392",
+      "sha256": "bd7b8356ac3b89489a9f1cdbd18f8ec2dc32d446a6f82f794e99791081e0706e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx",
+      "blob": "c7181f877fee62a45b3df588f58db6ec93e935c2",
+      "sha256": "ef5e970714895db6a37a9b9d9b76a5e98e3d542f06ee37c263f961edc435e712"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/contracts.ts",
+      "blob": "16a904e0b146a8b1421ce5d5bc2533c3df2bdba4",
+      "sha256": "1767b61bbf6f317415a3525908c616cc56deb532ee4317380626acef875547de"
+    },
+    {
+      "path": "server-version/scripts/cognitive/native-enumeration-client-review.cjs",
+      "blob": "e90452ea586dc5dbf02120a8474ae865acc2b41e",
+      "sha256": "e896f4778e2fff5ffe6b286b506d34e88e07dfd79f38bd55fbbefc417193bb6b"
+    },
+    {
+      "path": "server-version/scripts/cognitive/native-enumeration-http-review.cjs",
+      "blob": "27c0af9d0d0880729a7d29af734f36f3ebc5200c",
+      "sha256": "bd9a14fa37d9dddc342efe8fa160ffbb07fa41132f06c227f3d06c18b4a26e51"
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "blob": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    }
+  ],
+  "completedBeforeScopeClarification": {
+    "nativePort": {
+      "passed": 9,
+      "failed": 0,
+      "report": "native-port-cloud-original.json"
+    },
+    "frontendEntryTypes": {
+      "roots": 7,
+      "sourceClosure": 189,
+      "diagnostics": 0,
+      "report": "frontend-types-cloud-original.json"
+    }
+  },
+  "historicalEvidenceComparison": {
+    "sourceFiles": 23,
+    "matching": 22,
+    "changed": [
+      "server-version/frontend/src/modules/cognitive/tasks/enumeration/native-port.ts"
+    ],
+    "meaning": "Historical complete browser journey cannot be re-labelled as current-host/current-presentation acceptance"
+  },
+  "notExecuted": [
+    "New browser journey",
+    "research100 browser journey",
+    "Full App/CSRF browser journey",
+    "External COS",
+    "Physical devices/Safari",
+    "English product entry",
+    "Four product entries",
+    "CI activation",
+    "Merge PR",
+    "Deploy",
+    "Production DB/seed/publish"
+  ],
+  "stoppedPreparation": {
+    "fixtureProposal": "two uncommitted harness changes restored to HEAD; unapplied patch retained only in cloud /tmp",
+    "containers": "only this step own PostgreSQL/Redis synthetic containers removed",
+    "schema": "existing schema copied unchanged into isolated ephemeral test DB; no repository migration or production DB access",
+    "browser": "not started"
+  }
+}

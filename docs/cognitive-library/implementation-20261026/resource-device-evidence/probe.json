@@ -1,0 +1,161 @@
+{
+  "kind": "SYNTHETIC_CPU_AND_PAYLOAD_PROBE_NOT_SERVER_CAPACITY",
+  "node": "v24.21.0",
+  "hardwareContext": "task cloud container; CPU quota equivalent to 4 cores; 16 GiB memory limit",
+  "baseline": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "bodyParserBytes": 2097152,
+  "cognitiveCanonicalBudgetBytes": 1572864,
+  "cases": [
+    {
+      "profile": "experience",
+      "nominalHz": 60,
+      "trialCount": 9,
+      "framesPerTrial": 481,
+      "jsonBytes": 79120,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 11.646413999999993,
+      "warmScorerMedianMs": 1.9655669999999645,
+      "warmScorerP95Ms": 4.574209999999994,
+      "jsonParseP95Ms": 0.3346779999999967,
+      "canonicalizeAndHashP95Ms": 3.228480999999988
+    },
+    {
+      "profile": "experience",
+      "nominalHz": 90,
+      "trialCount": 9,
+      "framesPerTrial": 721,
+      "jsonBytes": 128161,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 3.9538499999999885,
+      "warmScorerMedianMs": 2.376751000000013,
+      "warmScorerP95Ms": 6.936068000000091,
+      "jsonParseP95Ms": 0.42448300000000927,
+      "canonicalizeAndHashP95Ms": 2.009403999999904
+    },
+    {
+      "profile": "experience",
+      "nominalHz": 120,
+      "trialCount": 9,
+      "framesPerTrial": 961,
+      "jsonBytes": 139150,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 3.1614989999999352,
+      "warmScorerMedianMs": 2.7616540000000214,
+      "warmScorerP95Ms": 3.5707089999999653,
+      "jsonParseP95Ms": 0.5198579999999993,
+      "canonicalizeAndHashP95Ms": 1.4717599999999038
+    },
+    {
+      "profile": "experience",
+      "nominalHz": 240,
+      "trialCount": 9,
+      "framesPerTrial": 1921,
+      "jsonBytes": 264979,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 4.9009849999999915,
+      "warmScorerMedianMs": 5.126888000000008,
+      "warmScorerP95Ms": 6.0598999999999705,
+      "jsonParseP95Ms": 1.1045139999999947,
+      "canonicalizeAndHashP95Ms": 2.7379379999999855
+    },
+    {
+      "profile": "research",
+      "nominalHz": 60,
+      "trialCount": 45,
+      "framesPerTrial": 481,
+      "jsonBytes": 395595,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 8.455990000000043,
+      "warmScorerMedianMs": 7.903362999999899,
+      "warmScorerP95Ms": 20.647589999999923,
+      "jsonParseP95Ms": 1.4701869999998962,
+      "canonicalizeAndHashP95Ms": 7.708548000000064
+    },
+    {
+      "profile": "research",
+      "nominalHz": 90,
+      "trialCount": 45,
+      "framesPerTrial": 721,
+      "jsonBytes": 640800,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 10.12504899999999,
+      "warmScorerMedianMs": 10.410200999999915,
+      "warmScorerP95Ms": 11.267229000000043,
+      "jsonParseP95Ms": 1.6549969999998666,
+      "canonicalizeAndHashP95Ms": 5.700956999999789
+    },
+    {
+      "profile": "research",
+      "nominalHz": 120,
+      "trialCount": 45,
+      "framesPerTrial": 961,
+      "jsonBytes": 695745,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 13.667506000000003,
+      "warmScorerMedianMs": 13.249191999999994,
+      "warmScorerP95Ms": 46.49865399999999,
+      "jsonParseP95Ms": 1.8283400000000256,
+      "canonicalizeAndHashP95Ms": 10.730767000000014
+    },
+    {
+      "profile": "research",
+      "nominalHz": 240,
+      "trialCount": 45,
+      "framesPerTrial": 1921,
+      "jsonBytes": 1324890,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 25.326579000000038,
+      "warmScorerMedianMs": 22.65513200000032,
+      "warmScorerP95Ms": 24.96085600000015,
+      "jsonParseP95Ms": 3.0877180000002227,
+      "canonicalizeAndHashP95Ms": 12.382379000000128
+    }
+  ],
+  "schemaFrameBoundary": {
+    "profile": "research",
+    "framesPerTrial": 3000,
+    "jsonBytes": 2555415,
+    "withinCurrentCanonicalBudget": false
+  },
+  "sourceBindings": [
+    {
+      "file": "server-version/scripts/cognitive/mot-resource-probe.ts",
+      "sha256": "99e85f1209462ba5ede8b01efbfc309364c04ddd5059c7130bfce4d45e40450a"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/protocol.ts",
+      "sha256": "f2f717b6d2bd0d64595294a90f1d8a9ee6f0abc86a54de4b97b75c1db13c8893"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/scorer.ts",
+      "sha256": "8b6b10d728e151b719a876c9a07c0d2f91944d44f91408a782ab3f00eaa1e31e"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/schema.ts",
+      "sha256": "fdf448528d2607e82c3e61664677d75870051df99534a0f60bc886955131a587"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/unified-raw-submission.ts",
+      "sha256": "4a76c052ae223b6d4079d34fb66b62762c8be424a2c4232bacd400738ad0f378"
+    },
+    {
+      "file": "server-version/backend/src/services/instrumentFinalSubmit.ts",
+      "sha256": "abdd778dbb2df0883f5b975b240155ca0158fd0cd075b72a7c11c94adf72ce51"
+    }
+  ],
+  "limitations": [
+    "Synthetic exact frame times are not physical-device traces or a payload maximum guarantee.",
+    "The first invocation per case is recorded separately; process module initialization is not measured.",
+    "No actual browser rendering, HTTP/auth/encryption/compression, database, report worker or concurrency capacity was measured.",
+    "Provenance roundtrip checks the current strict raw payload shape in memory, not a new database persistence proof.",
+    "Raw frame retention needs an explicit task payload budget before admission; global limits were not raised."
+  ]
+}

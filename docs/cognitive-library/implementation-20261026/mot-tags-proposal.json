@@ -1,0 +1,207 @@
+{
+  "artifactKind": "TASK_DESIGN_TAG_PROPOSAL_NOT_RUNTIME_IMPORT",
+  "candidateId": "attention-mot-flower",
+  "sourceCommit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+  "inheritedResearchTags": {
+    "cognitive_domain": [
+      "attention"
+    ],
+    "target_process": [
+      "dynamic_tracking"
+    ],
+    "paradigm": [
+      "mot_fixed_five_speed"
+    ],
+    "stimulus_form": [
+      "moving_objects"
+    ],
+    "input_upstream": [
+      "pointer_multiselect"
+    ],
+    "input_proposed": [
+      "not_frozen"
+    ],
+    "key_metric": [
+      "tracked_target_count_rate"
+    ],
+    "intended_use": [
+      "research_protocol_selection"
+    ],
+    "code_license": [
+      "mit_recorded"
+    ],
+    "code_rights_disposition": [
+      "github_public_conditional"
+    ],
+    "asset_rights_disposition": [
+      "authorization_pending"
+    ],
+    "asset_license_review": [
+      "images_fonts_unverified"
+    ],
+    "implementation_strategy": [
+      "literature_reimplementation"
+    ],
+    "maturity": [
+      "source_research_only"
+    ],
+    "evidence_limitations": [
+      "timing_device_unverified",
+      "static_runtime_risk",
+      "protocol_version_decision"
+    ],
+    "baseline_relation": [
+      "new_family_candidate"
+    ],
+    "research_priority": [
+      "priority_finalize"
+    ],
+    "rule_type": [
+      "technical_quality",
+      "theoretical_reference",
+      "literature_experience",
+      "project_provisional"
+    ]
+  },
+  "designTags": {
+    "cognitiveDomain": [
+      {
+        "key": "attention",
+        "labelZh": "注意",
+        "labelEn": "Attention",
+        "status": "intended_construct"
+      }
+    ],
+    "targetProcess": [
+      {
+        "key": "dynamic_tracking",
+        "labelZh": "动态视觉追踪",
+        "labelEn": "Dynamic visual tracking",
+        "status": "intended_process"
+      }
+    ],
+    "applicationScenarios": [
+      {
+        "proposedKey": "research",
+        "labelZh": "认知研究",
+        "evidenceStatus": "paradigm_literature_available_project_variant_unvalidated"
+      },
+      {
+        "proposedKey": "self_exploration",
+        "labelZh": "自我观察与探索",
+        "evidenceStatus": "proposed_descriptive_use"
+      },
+      {
+        "proposedKey": "learning_evaluation_support",
+        "labelZh": "学习困难评估辅助",
+        "evidenceStatus": "proposed_not_validated",
+        "scope": "研究需求；未验证诊断用途"
+      },
+      {
+        "proposedKey": "recruitment_support",
+        "labelZh": "企业招聘辅助",
+        "evidenceStatus": "proposed_not_validated",
+        "scope": "研究需求；未验证录用预测效度"
+      },
+      {
+        "proposedKey": "recreational_exploration",
+        "labelZh": "趣味体验",
+        "evidenceStatus": "proposed_descriptive_use"
+      }
+    ],
+    "ageApplicability": {
+      "minAge": null,
+      "maxAge": null,
+      "status": "unverified",
+      "labelZh": "年龄适用性待核"
+    },
+    "difficulty": {
+      "level": null,
+      "status": "empirical_difficulty_unverified",
+      "taskDemand": "10对象中保持5目标；慢/中/快三个运动条件；两版同难度条件"
+    },
+    "language": [
+      {
+        "key": "zh",
+        "labelZh": "中文",
+        "implementationStatus": "planned",
+        "comprehensionValidation": "pending"
+      },
+      {
+        "key": "en",
+        "labelZh": "英文",
+        "implementationStatus": "planned",
+        "comprehensionValidation": "pending"
+      }
+    ],
+    "input": [
+      {
+        "key": "touch",
+        "priority": 1,
+        "implementationStatus": "planned"
+      },
+      {
+        "key": "pointer",
+        "priority": 2,
+        "implementationStatus": "planned"
+      },
+      {
+        "key": "keyboard",
+        "priority": 3,
+        "implementationStatus": "planned"
+      }
+    ],
+    "device": [
+      {
+        "key": "phone",
+        "priority": 1,
+        "validated": false
+      },
+      {
+        "key": "tablet",
+        "priority": 1,
+        "validated": false
+      },
+      {
+        "key": "desktop",
+        "priority": 2,
+        "validated": false
+      }
+    ],
+    "profiles": [
+      {
+        "key": "research",
+        "labelZh": "文献对照版",
+        "formalTrials": 45,
+        "repetitionsPerSpeed": 15,
+        "blocks": 3,
+        "evidenceStatus": "literature_count_project_variant_not_validated"
+      },
+      {
+        "key": "experience",
+        "labelZh": "体验版",
+        "formalTrials": 9,
+        "repetitionsPerSpeed": 3,
+        "blocks": 1,
+        "evidenceStatus": "project_provisional_short_form"
+      }
+    ],
+    "normStatus": "none",
+    "maturity": "design_only"
+  },
+  "contractBoundary": {
+    "inheritedKeysUnchanged": true,
+    "newDimensionsRequireReviewedConsumerContract": true,
+    "persistedInRuntime": false,
+    "searchConnected": false,
+    "backendImportSchema": false,
+    "domainAggregationAuthorized": false
+  },
+  "admissionRequirements": [
+    "稳定ID与中英文标签",
+    "年龄/难度/场景未知状态可筛选",
+    "多场景组合过滤与搜索真实回读",
+    "发布选择/详情/导出消费",
+    "不得在施测中展示用途暗示"
+  ]
+}

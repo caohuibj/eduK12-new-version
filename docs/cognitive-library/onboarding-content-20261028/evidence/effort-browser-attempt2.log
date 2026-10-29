@@ -1,0 +1,17 @@
+/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/scorer.ts:51
+  if(envelope.phase!=='test'||envelope.trialIndex!==index||envelope.condition!==plan[index].conditionKey||!same(raw.plan,plan[index]))throw Error('Effort trial does not match frozen seeded offer')
+                                                                                                                                      ^
+
+Error: Effort trial does not match frozen seeded offer
+    at scoreBalloonEffort (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/scorer.ts:51:141)
+    at project (/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-fixtures.test-support.ts:25:59)
+    at Object.effortReportFixtures (/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-fixtures.test-support.ts:26:41)
+    at Object.<anonymous> (/workspace/eduK12-new-version/docs/cognitive-library/onboarding-content-20261028/evidence/effort-preview.cjs:5:119)
+    at Module._compile (node:internal/modules/cjs/loader:1872:14)
+    at Object.<anonymous> (node:internal/modules/cjs/loader:2003:10)
+    at Module.load (node:internal/modules/cjs/loader:1594:32)
+    at Module._load (node:internal/modules/cjs/loader:1396:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+
+Node.js v24.19.0

@@ -1,0 +1,173 @@
+{
+  "base": "fdc72a9739df7cafc2b238ae45f7d976b3c985f2",
+  "scoringAndControl": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/protocol.ts",
+      "priorSHA256": "346318b6f4bf234cb6308428b40c147634fecb8df15c21aaf34d8bf68bc85c9c",
+      "currentSHA256": "346318b6f4bf234cb6308428b40c147634fecb8df15c21aaf34d8bf68bc85c9c",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/report.ts",
+      "priorSHA256": "c649dff623d791d09571393e35611297d89dea7b268eb761f43166daab142aff",
+      "currentSHA256": "c649dff623d791d09571393e35611297d89dea7b268eb761f43166daab142aff",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/schema.ts",
+      "priorSHA256": "62d2e31ebaadd310a45e01d2e8690c147ccb3b543d1fadd394e58e8f34a317eb",
+      "currentSHA256": "62d2e31ebaadd310a45e01d2e8690c147ccb3b543d1fadd394e58e8f34a317eb",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/scorer.ts",
+      "priorSHA256": "c639a878eba7f457734a80ab54fe9f479d6c1e058a1204b1e276ed8fcb0bdf3a",
+      "currentSHA256": "c639a878eba7f457734a80ab54fe9f479d6c1e058a1204b1e276ed8fcb0bdf3a",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/capture.ts",
+      "priorSHA256": "228c62b062e86df06d287ab3ca2862de7b7fab21cb9ee97d50a5ae4e5c85d689",
+      "currentSHA256": "228c62b062e86df06d287ab3ca2862de7b7fab21cb9ee97d50a5ae4e5c85d689",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/content.test.tsx",
+      "priorSHA256": "3d543617175dba66f31b8a39a2fd0b5b4e2bc5ba05bf0c084ca974f639f30097",
+      "currentSHA256": "3d543617175dba66f31b8a39a2fd0b5b4e2bc5ba05bf0c084ca974f639f30097",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/contracts.ts",
+      "priorSHA256": "c397e6bcf022cdf065f3a0e12734a24f083f170fb13a8a83a03483c3029b802c",
+      "currentSHA256": "c397e6bcf022cdf065f3a0e12734a24f083f170fb13a8a83a03483c3029b802c",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/generated/protocol.ts",
+      "priorSHA256": "1760cb0f6b2b5a130aed5a3199b45ab0592f6094700d290c4a8de4f7f4b64fb8",
+      "currentSHA256": "1760cb0f6b2b5a130aed5a3199b45ab0592f6094700d290c4a8de4f7f4b64fb8",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/generated/report.ts",
+      "priorSHA256": "c13992f24acf3e1a1856c80ca75c8aeac6d0ee4b7ceb5d65f6a52e5068c1ba7d",
+      "currentSHA256": "c13992f24acf3e1a1856c80ca75c8aeac6d0ee4b7ceb5d65f6a52e5068c1ba7d",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/session.ts",
+      "priorSHA256": "4b8dd708c9edb8725973cd3c3e5110016b3fea8ab3f75f3983961b694ac0987b",
+      "currentSHA256": "4b8dd708c9edb8725973cd3c3e5110016b3fea8ab3f75f3983961b694ac0987b",
+      "identical": true
+    }
+  ],
+  "presentation": [
+    {
+      "file": "server-version/frontend/src/modules/cognitive/CognitiveReportVisual.tsx",
+      "priorSHA256": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+      "currentSHA256": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortReport.tsx",
+      "priorSHA256": "a205bc2e5a96ba56c23e288a35e04ad9945842a9d1523c611fcf7df024367a5e",
+      "currentSHA256": "a205bc2e5a96ba56c23e288a35e04ad9945842a9d1523c611fcf7df024367a5e",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortInstructions.tsx",
+      "priorSHA256": "1b462cf1f7ca9553a97b741d48288d75324454c3b3477d3d2dcc067b754a5b7d",
+      "currentSHA256": "1b462cf1f7ca9553a97b741d48288d75324454c3b3477d3d2dcc067b754a5b7d",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/effort.css",
+      "priorSHA256": "8e24225dcaa60a529dc729c66b7fbacedc2015fecbca0fba683aec8447f4e1fb",
+      "currentSHA256": "8e24225dcaa60a529dc729c66b7fbacedc2015fecbca0fba683aec8447f4e1fb",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-fixtures.test-support.ts",
+      "priorSHA256": "6ed78ec254f3884aeb0900097a7411c499475ce521b07eac0ee126f487b95f1d",
+      "currentSHA256": "6ed78ec254f3884aeb0900097a7411c499475ce521b07eac0ee126f487b95f1d",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx",
+      "priorSHA256": "48ee615b40573d1d4e03640977424d00f27f877689b73fe3d94ca17c01be0e39",
+      "currentSHA256": "48ee615b40573d1d4e03640977424d00f27f877689b73fe3d94ca17c01be0e39",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/package-lock.json",
+      "priorSHA256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+      "currentSHA256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+      "identical": true
+    }
+  ],
+  "priorFormalEvidence": "../../../next-candidates-20261026/balloon-effort/implementation/verification.json",
+  "reusedRaw": [
+    {
+      "source": "/workspace/eduK12-new-version/docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/frontend-port.json",
+      "retained": "reused-originals/frontend-port.json",
+      "sha256": "0da463609c8b60487a134b8a75bb0800e51b8595f3edb88726338395fc0e6702",
+      "success": true,
+      "effortAssertions": [
+        {
+          "fullName": "real native content host adapters 'balloon-effort' persists immutable records, retries the same final and reads the stored public report",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "source": "/workspace/eduK12-new-version/docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/frontend-readiness.json",
+      "retained": "reused-originals/frontend-readiness.json",
+      "sha256": "98b1462393467644a052bba3140c33105467eaff6c9a10aa7a72326f1bc752c9",
+      "success": true,
+      "effortAssertions": [
+        {
+          "fullName": "task-owned native runner readiness 'balloon-effort' mounts the real instructions with the frozen context and its generated envelope matches the backend",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "source": "/workspace/eduK12-new-version/docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/backend-bridge.json",
+      "retained": "reused-originals/backend-bridge.json",
+      "sha256": "eaf08e2e7701108ee83e818de83f0c2a1158cb151391ac68e097a4acdbfd8245",
+      "success": true,
+      "effortAssertions": [
+        {
+          "fullName": "existing native content reaches frozen public reports and archive contracts 'balloon-effort' binds one actual scorer prefix, saves its public projection and validates exact original records",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "source": "/workspace/eduK12-new-version/docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/backend-quiz.json",
+      "retained": "reused-originals/backend-quiz.json",
+      "sha256": "6968b88b450239439aad56e0508f3ae37f67da8771d1ff21e72f00c69f91b855",
+      "success": true,
+      "effortAssertions": [
+        {
+          "fullName": "existing native content reaches frozen public reports and archive contracts 'balloon-effort' binds one actual scorer prefix, saves its public projection and validates exact original records",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "source": "/workspace/eduK12-new-version/docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/backend-journey-corrected.json",
+      "retained": "reused-originals/backend-journey-corrected.json",
+      "sha256": "ea16411118f1fc10167a7a72c225a6f0d2503785993b791050b4f14668c40af6",
+      "success": false,
+      "effortAssertions": [
+        {
+          "fullName": "selected native content real isolated START / FINAL / private archive 'balloon-effort' freezes its exact profile, commits a partial result and archives identical encrypted originals",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "comment": "Hash identity supports reuse; these are prior local results, not fresh CI, browser/device qualification, or formal public-library installation."
+}

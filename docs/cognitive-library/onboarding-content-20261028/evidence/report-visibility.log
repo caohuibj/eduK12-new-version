@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/cognitive-366-integration/server-version/backend
+
+ ✓ src/__tests__/cognitive/candidate-report-visibility.test.ts (6 tests) 12ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  09:34:32
+   Duration  780ms (transform 448ms, setup 0ms, import 617ms, tests 12ms, environment 0ms)
+
+JSON report written to /workspace/scratch/5a77e8bdc1ae/cognitive-366-integration/docs/cognitive-library/onboarding-content-20261028/evidence/report-visibility.json

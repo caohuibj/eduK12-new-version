@@ -1,0 +1,4 @@
+[2026-10-28T02:06:12.921Z] [INFO] [CacheService] Redis缓存服务初始化完成
+{"ready":true,"url":"http://127.0.0.1:18855"}
+[2026-10-28T02:24:24.672Z] [WARN] [CacheService] Redis客户端已断开
+[2026-10-28T02:24:24.672Z] [INFO] [CacheService] Redis连接已关闭

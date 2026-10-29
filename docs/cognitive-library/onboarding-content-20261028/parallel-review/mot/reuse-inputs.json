@@ -1,0 +1,75 @@
+{
+  "node": "v24.21.0",
+  "base": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "checks": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/protocol.ts",
+      "priorSHA256": "59813dd8b4cbde0571ecdad9e87113cb52ab1b9885d506f0273cb8cca34a5612",
+      "currentSHA256": "59813dd8b4cbde0571ecdad9e87113cb52ab1b9885d506f0273cb8cca34a5612",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/scorer.ts",
+      "priorSHA256": "0a6afc6aaabb6a1464b0b957f5a99dea912d49b8ad85d4cf827b7ebfb90e88d4",
+      "currentSHA256": "0a6afc6aaabb6a1464b0b957f5a99dea912d49b8ad85d4cf827b7ebfb90e88d4",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/generated/protocol.ts",
+      "priorSHA256": "7a8fa5c93d3032c86a9156cdc24bde0c019cc4eb4b990f56aaaa9be553c485fb",
+      "currentSHA256": "7a8fa5c93d3032c86a9156cdc24bde0c019cc4eb4b990f56aaaa9be553c485fb",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/draft.ts",
+      "priorSHA256": "c1f48de1bcf08b37d04648e949a71ac1f682178a39fdcedf0b625eba16bff77c",
+      "currentSHA256": "c1f48de1bcf08b37d04648e949a71ac1f682178a39fdcedf0b625eba16bff77c",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/context-retention.ts",
+      "priorSHA256": "6cd4d85f791059f0472a53dd57f5da7597c5e46901697cd799057b4eb1e89ca2",
+      "currentSHA256": "6cd4d85f791059f0472a53dd57f5da7597c5e46901697cd799057b4eb1e89ca2",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/NativeMotRunner.tsx",
+      "priorSHA256": "17ec9da1e5ada6821c094ce4b039c677a5a6d806a49c20d2fff7188951d95e36",
+      "currentSHA256": "17ec9da1e5ada6821c094ce4b039c677a5a6d806a49c20d2fff7188951d95e36",
+      "identical": true
+    }
+  ],
+  "introOnly": {
+    "file": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx",
+    "beforeSHA256": "c662727a6aeab049f751d37ea0d728332ec053bc8d4f791795146b79ab0ba3aa",
+    "afterSHA256": "3863f6c26bd127f4589ce44a27ebc0f9983f9d40703fca99bbea755a28c47d1c",
+    "outsideIntroIdentical": true
+  },
+  "originals": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-practice-repair/mot-practice-policy-after-20261026.json",
+      "sha256": "fa7a74fe7c3ee2cd9699ee136de35d166fa2f537d07cf9247301f8f045f38b58"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run2.json",
+      "sha256": "5687655fc4d3df3697a6941045ef48e0a84b0bf148c3e9d003c1f492e24cfe87"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run3-new-windows.json",
+      "sha256": "e1edb87a1cdff11a05cef6bf8ac82c15a9fb74ca4b9be418279cbe1ead24d749"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/client/browser/review.json",
+      "sha256": "d1deec79c9075345159c74d3fa27b68fd290b99fcc72ad8120b3fd07b2696b48"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/client/unit-evidence.json",
+      "sha256": "034587b2ff7e019b2cdd20f2e125c5bdf48e1b7f7606389e6782a36f9fe7f922"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/report-format-followup/tests-run1.json",
+      "sha256": "f40174a1e5a0a7672be37afff6b0633b90825597778d14233e79bab469058f6a"
+    }
+  ],
+  "scope": "Reused existing practice/ownership/native HTTP/archive/report evidence for unchanged inputs. No new 2+9, research45, timing, server or COS execution."
+}

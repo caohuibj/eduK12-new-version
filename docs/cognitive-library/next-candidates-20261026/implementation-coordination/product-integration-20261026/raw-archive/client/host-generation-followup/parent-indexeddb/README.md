@@ -1,0 +1,7 @@
+# 新增expected身份的真实IndexedDB合同
+
+主线在云端Chromium、全新隔离浏览器上下文中只执行新增存储合同，首次2项PASS/exit0。不使用MemoryStore或IDB替身，没有重跑2+9、计分、时序、业务API/PG/COS。单独esbuild仅编译actual FinalDraftStore及其原有纯状态依赖，产物在内存经loopback HTTP加载；源码及bundle/script SHA保存在actual-indexeddb.json。
+
+当前身份实际putTrial→sealForSubmission→COMPLETED→delete可成功。相同session/key已有epoch2时，传旧epoch1分别调用四个操作均以真实identity conflict拒绝，逐项读回meta/trials字节不变；另验旧submission不能清理新草稿。每次预期身份检查在现有META读写事务内，不新增DB版本/store/index。
+
+这是云端浏览器存储合同，不是新完整产品旅程、真机测试或独立审计。浏览器和临时loopback服务已关闭。此前实际作答/HTTP原件仍保持各自源码身份。

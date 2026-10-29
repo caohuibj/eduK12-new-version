@@ -1,0 +1,124 @@
+{
+  "recordedAt": "2026-10-28T04:02:21.969Z",
+  "node": "v24.21.0",
+  "nodeExecutable": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+  "results": [
+    {
+      "artifact": "backend-wire-original.json",
+      "passed": 4,
+      "failed": 0,
+      "filtered": 0
+    },
+    {
+      "artifact": "backend-wire-bom-original.json",
+      "passed": 0,
+      "failed": 1,
+      "filtered": 3
+    },
+    {
+      "artifact": "backend-wire-bom-fixed.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 3
+    },
+    {
+      "artifact": "frontend-wire-original.json",
+      "passed": 3,
+      "failed": 0,
+      "filtered": 0
+    }
+  ],
+  "commands": [
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/backend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/grad-wire.test.ts --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-wire-original.json",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/backend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/grad-wire.test.ts --maxWorkers=1 -t 'false decoded' --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-wire-bom-original.json",
+      "exit": 1
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/backend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/grad-wire.test.ts --maxWorkers=1 -t 'false decoded' --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-wire-bom-fixed.json",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/frontend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/gradcpt/wire.test.ts --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/frontend-wire-original.json",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/browser-pack.cjs",
+      "sandboxPermissions": "require_escalated",
+      "chromiumSandbox": true,
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node server-version/scripts/cognitive/grad-content.cjs",
+      "exit": 0
+    }
+  ],
+  "sourceSHA256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/package.ts": "f59ae12f0cd119e93557e0fba6a10738039ddfbc0705c673f99cb9baced003bc",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/wire.ts": "d3a108e880b6f3f57c189b024bc1112b255aa02533c60aeae6d0cd6d06df7261",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/wire-format.ts": "fdd9c630199f7377e1268e55c0ce0de81d4b4abc255f0f436f8df7147c6e6125",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/scorer.ts": "a8f1a723de779c6d0b811d2c33d1bb981631371b88f2ce914a33a0b9a7648aab",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/NativeGradRunner.tsx": "d5af344d76878859d76b7e31840595a6370a50c5ede719d089707b8de40631ac",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/wire.ts": "3d637b9395d6f2e1ef1307235be53cea50eb6a9241ce098e2ee12cbf65d3ec32",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/wire-format.ts": "e769e3f3e5e326978865337809c128366fd02e0619f75a19f768d3d1513b5fce",
+    "server-version/backend/src/__tests__/cognitive/grad-wire.test.ts": "e306fda7c7c60d4aa5d41c09c0726ac3356cc499b5c3343c9e6642ebaa8512ce",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/wire.test.ts": "8d9faf6d4d1df6519b981c5514bc513ce7cd6556097f6b593142b92d9f7350ae",
+    "server-version/scripts/cognitive/grad-content.cjs": "6e63b13a8296b02ed3b5909f6aa6ef4ef2748ccb7155f744e4428029f5a2191c",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  },
+  "artifactSHA256": {
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/README.md": "4837ba3938042b5f44a813fdfc861771496a8afb2302c71726a140fef2e8b0f3",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-wire-bom-fixed.json": "c71924a126049aec2c56ab69bd5e4443f0c3e043b27f2fa2fc326e4119e3c333",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-wire-bom-fixed.log": "619513c4eeaa759c06603f57311a292657affc7d4104348432b1275ef1bffc33",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-wire-bom-original.json": "587ab07e4bbd0c7a17ae1346f3d61d1c898e7a4a26640ae5c2ceebcd78e9aba2",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-wire-bom-original.log": "cf8cf9d7af2275d97d7d5a42603f9637427df44f1f7fea96c92ce1e1058b58da",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-wire-original.json": "9a994e0a40ec1c3a086afea5cdbf853d9869feddc4631c62a22c12d90b700355",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-wire-original.log": "eeee1a14e009f414a4aea14a8d831dd8d7e0779ee3677e92aa27d6f4971901a8",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/browser-pack.cjs": "e5e6d56d75fd88aa8fe861f65706da3d37bd3a00a10e848d40d5a8b41ab7bbe3",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/browser-pack.json": "799b639f9673c08c4646ac259bc635c352d00ee47debb6d96205ef289949f37d",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/browser-pack.log": "90749311aef846b3b911b7d299fab69b35ecbac9001fd751cb5ff5947fe20de9",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/browser-wire-envelope.json.gz": "26f82fb1f6b7d0c20b00e518cd642de55e6b8d7ad6e1f83564c5b9a86c5f26e7",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/frontend-wire-original.json": "1f6ac35f4e535afd6b47b43ab285384d6216de497bb8a3e4a7abf5e4ed43cd6d",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/frontend-wire-original.log": "9a15cc8c56510770eafa49c0de561928b85c81b8eda0a954a8d37e717567aa4c",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/research-240-review.json": "6d0e50a8b6ad414eca5a9cacfba5c82d97c42403599f163f863d0fd86881e1a2",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/size-records.cjs": "74eef9ada6104cd8bbf23affa06e7fc557139dcf0fe24f4ee9d4edeb23b6d6a1",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/sizes.json": "80c8fb0565597452e3f5ef908c4b47462cbe10f367d36ce364ee2471f5be6390",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/sizes.log": "ab88025a28f6bdda305e6b90bd62e623943949f0808383df375b3c3c12cee60c",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/capture-prefix-experience-120.json": "7cebb51389ffb24444b43068939bfb84982e4c9b73cb61cda905acb8d2965d13",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/capture-prefix-experience-144.json": "896b672716fe3c4e1dca4403246fca0603086f3a611ffefe00da75581725739a",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/capture-prefix-experience-240.json": "4b5c5c90d17ef24ba72df915138afdb9b144efb12ae7ef683b760c468ed835e8",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/capture-prefix-experience-60.json": "a279a42f21ea2c61d0e6e1cd5875c901720419c0ff079b0ca85dd6d3ea7a4501",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/capture-prefix-research-120.json": "645d33fd8e32c82343179dccd5c3315c6dbbe5c76283ed3a8ef8392b57c91b92",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/capture-prefix-research-144.json": "49e7e8a1ae1f22fcc4c6bcd40c6dd487c55a85d1a662a83a2af7ea17e2d28fac",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/capture-prefix-research-240.json": "f2531bfab0579b9bf88d2f3c8ef094919e291750bca6e5af95e227db5aecca59",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/capture-prefix-research-60.json": "00c09f01d65e5529972b1d2cbccc4aef12ebe005a8680f775dd2c30b88f50ed1",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/experience-120-archive.json.gz": "a77a8bf8006196d7161908b072988b77dfafee5eed66156eaec0de554b7df05d",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/experience-144-archive.json.gz": "fec3f43aa913dc1ca82cb157111a9e17d4af050ba0cac44a33ea88ecb213642e",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/experience-240-archive.json.gz": "1bf390fd09a55253e7a7a808ee950599413df126847ae5783fc748c7c40ffe1e",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/experience-60-archive.json.gz": "93b43cd4978b2956b794027291de04d6fe4d2c4c53fccafd416f8b3621be47f3",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/research-120-archive.json.gz": "1d8937bf225683a723df3b943d02750f9baae53612981b9498f6fed459e3ffde",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/research-144-archive.json.gz": "b58369478da82d112e7ad89bcb2093f9de084bfc62da5cfba86caf29d16091a0",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/research-240-archive.json.gz": "2c6ff2998506e1bcb10f2315720c84b723728b4405934538295468aceb0a4c7b",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/research-60-archive.json.gz": "8659108bd1a6d0c3343802d7a692a014fbf0cd49290da98f123afe7cd67b3933",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/schema-max-raw.json.gz": "55bf048faaa0c990af3a6901662096391e602c6865af15e6d6aa46a520c8413a"
+  },
+  "scoringScope": "Only existing representative limited prefix raw vs wire equality; no full 300/100 scoreGrad by this child. research240 reviewGrad one structural validation, large pack/decode only.",
+  "BOMHistory": "Original decoder compared decoded text, then fixed to byte equality. Parallel independent probe and this child new red crossed in flight, causing one redundant red; retained honestly, no target count inflation.",
+  "remaining": {
+    "status": "pending parent",
+    "action": "Integrate shared async frozen envelope/Grad archive comparison hook, final types and one actual browser-wire→FINAL/DB/archive consumer.",
+    "reason": "Root explicitly owns shared changes and requested immediate child commit; worktree intentionally retains old shared interfaces.",
+    "denied": false,
+    "uncertain": false
+  }
+}

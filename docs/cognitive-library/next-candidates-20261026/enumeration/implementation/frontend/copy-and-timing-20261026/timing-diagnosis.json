@@ -1,0 +1,1249 @@
+{
+  "analysisKind": "DEVELOPER_READ_ONLY_DIAGNOSIS_NOT_INDEPENDENT_SCIENTIFIC_CONCLUSION",
+  "sourceBase": "94152032885d5cbaf149a15ec03d5a0c72ea2c67",
+  "raw": {
+    "file": "docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/browser-captured-raw.json",
+    "sha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+    "unchangedAfterRead": true
+  },
+  "captureSource": {
+    "file": "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts",
+    "sha256": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce",
+    "relevantLines": [
+      {
+        "line": 64,
+        "text": "t.stimulusOnsetPerfMs = now; this.stage = 'stimulus'"
+      },
+      {
+        "line": 65,
+        "text": "} else if (this.stage === 'stimulus' && now - t.stimulusOnsetPerfMs! >= (this.plan.phase === 'practice' ? recipe.practiceExposureMs : recipe.formalExposureMs)) {"
+      },
+      {
+        "line": 66,
+        "text": "t.maskOnsetPerfMs = now; this.stage = 'mask'"
+      },
+      {
+        "line": 70,
+        "text": "this.frames.push({ stage: this.stage, atPerfMs: now })"
+      }
+    ]
+  },
+  "recipe": {
+    "id": "synthetic-approved-layout-nominal-recipe-not-validated",
+    "source": "synthetic_fixture",
+    "nominalFormalExposureMs": 50
+  },
+  "onsetSemantics": "First stimulus rAF callback sets onset and records its stage using the same passed timestamp; EnumerationTask then issues canvas draw commands in that callback. These are callback/draw-command records, not measured physical pixel onset.",
+  "sevenFourDrawRecords": [
+    {
+      "trialIndex": 1,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 12982.6,
+      "firstStimulusFramePerfMs": 12982.6,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        12982.6,
+        12999.2,
+        13015.9,
+        13032.5
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.600000000000364,
+        33.29999999999927,
+        49.899999999999636
+      ],
+      "lastStimulusPerfMs": 13032.5,
+      "lastStimulusElapsedMs": 49.899999999999636,
+      "lastStimulusElapsedPrecision17": "49.899999999999636",
+      "remainingToNominalAtLastStimulusMs": 0.1000000000003638,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 13049.2,
+      "coreMaskOnsetPerfMs": 13049.2,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.60000000000036,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000000728,
+      "stimulusAndBoundaryGapsMs": [
+        16.600000000000364,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 2,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 15182.5,
+      "firstStimulusFramePerfMs": 15182.5,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        15182.5,
+        15199.1,
+        15215.8,
+        15232.4
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.600000000000364,
+        33.29999999999927,
+        49.899999999999636
+      ],
+      "lastStimulusPerfMs": 15232.4,
+      "lastStimulusElapsedMs": 49.899999999999636,
+      "lastStimulusElapsedPrecision17": "49.899999999999636",
+      "remainingToNominalAtLastStimulusMs": 0.1000000000003638,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 15249.1,
+      "coreMaskOnsetPerfMs": 15249.1,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.60000000000036,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000000728,
+      "stimulusAndBoundaryGapsMs": [
+        16.600000000000364,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 11,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 34731.7,
+      "firstStimulusFramePerfMs": 34731.7,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        34731.7,
+        34748.3,
+        34765,
+        34781.6
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.60000000000582,
+        33.30000000000291,
+        49.900000000001455
+      ],
+      "lastStimulusPerfMs": 34781.6,
+      "lastStimulusElapsedMs": 49.900000000001455,
+      "lastStimulusElapsedPrecision17": "49.900000000001455",
+      "remainingToNominalAtLastStimulusMs": 0.09999999999854481,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 34798.3,
+      "coreMaskOnsetPerfMs": 34798.3,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.60000000000582,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.60000000000582,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 12,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 36898.3,
+      "firstStimulusFramePerfMs": 36898.3,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        36898.3,
+        36914.9,
+        36931.5,
+        36948.2
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.19999999999709,
+        49.89999999999418
+      ],
+      "lastStimulusPerfMs": 36948.2,
+      "lastStimulusElapsedMs": 49.89999999999418,
+      "lastStimulusElapsedPrecision17": "49.899999999994179",
+      "remainingToNominalAtLastStimulusMs": 0.10000000000582077,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 36964.9,
+      "coreMaskOnsetPerfMs": 36964.9,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.59999999999854,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 14,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 41264.8,
+      "firstStimulusFramePerfMs": 41264.8,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        41264.8,
+        41281.4,
+        41298.1,
+        41314.7
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.299999999995634,
+        49.89999999999418
+      ],
+      "lastStimulusPerfMs": 41314.7,
+      "lastStimulusElapsedMs": 49.89999999999418,
+      "lastStimulusElapsedPrecision17": "49.899999999994179",
+      "remainingToNominalAtLastStimulusMs": 0.10000000000582077,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 41331.4,
+      "coreMaskOnsetPerfMs": 41331.4,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.59999999999854,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 16,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 45631.3,
+      "firstStimulusFramePerfMs": 45631.3,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        45631.3,
+        45647.9,
+        45664.5,
+        45681.2
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.19999999999709,
+        49.89999999999418
+      ],
+      "lastStimulusPerfMs": 45681.2,
+      "lastStimulusElapsedMs": 49.89999999999418,
+      "lastStimulusElapsedPrecision17": "49.899999999994179",
+      "remainingToNominalAtLastStimulusMs": 0.10000000000582077,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 45697.9,
+      "coreMaskOnsetPerfMs": 45697.9,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.59999999999854,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 22,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 58747.4,
+      "firstStimulusFramePerfMs": 58747.4,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        58747.4,
+        58764,
+        58780.7,
+        58797.3
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.299999999995634,
+        49.900000000001455
+      ],
+      "lastStimulusPerfMs": 58797.3,
+      "lastStimulusElapsedMs": 49.900000000001455,
+      "lastStimulusElapsedPrecision17": "49.900000000001455",
+      "remainingToNominalAtLastStimulusMs": 0.09999999999854481,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 58814,
+      "coreMaskOnsetPerfMs": 58814,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.59999999999854,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.69999999999709,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    }
+  ],
+  "all25FormalRecords": [
+    {
+      "trialIndex": 0,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 10799.3,
+      "firstStimulusFramePerfMs": 10799.3,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        10799.3,
+        10815.9,
+        10832.6
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.600000000000364,
+        33.30000000000109
+      ],
+      "lastStimulusPerfMs": 10832.6,
+      "lastStimulusElapsedMs": 33.30000000000109,
+      "lastStimulusElapsedPrecision17": "33.300000000001091",
+      "remainingToNominalAtLastStimulusMs": 16.69999999999891,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 10849.3,
+      "coreMaskOnsetPerfMs": 10849.3,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.69999999999891,
+      "stimulusAndBoundaryGapsMs": [
+        16.600000000000364,
+        16.700000000000728,
+        16.69999999999891
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 1,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 12982.6,
+      "firstStimulusFramePerfMs": 12982.6,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        12982.6,
+        12999.2,
+        13015.9,
+        13032.5
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.600000000000364,
+        33.29999999999927,
+        49.899999999999636
+      ],
+      "lastStimulusPerfMs": 13032.5,
+      "lastStimulusElapsedMs": 49.899999999999636,
+      "lastStimulusElapsedPrecision17": "49.899999999999636",
+      "remainingToNominalAtLastStimulusMs": 0.1000000000003638,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 13049.2,
+      "coreMaskOnsetPerfMs": 13049.2,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.60000000000036,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000000728,
+      "stimulusAndBoundaryGapsMs": [
+        16.600000000000364,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 2,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 15182.5,
+      "firstStimulusFramePerfMs": 15182.5,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        15182.5,
+        15199.1,
+        15215.8,
+        15232.4
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.600000000000364,
+        33.29999999999927,
+        49.899999999999636
+      ],
+      "lastStimulusPerfMs": 15232.4,
+      "lastStimulusElapsedMs": 49.899999999999636,
+      "lastStimulusElapsedPrecision17": "49.899999999999636",
+      "remainingToNominalAtLastStimulusMs": 0.1000000000003638,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 15249.1,
+      "coreMaskOnsetPerfMs": 15249.1,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.60000000000036,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000000728,
+      "stimulusAndBoundaryGapsMs": [
+        16.600000000000364,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 3,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 17365.6,
+      "firstStimulusFramePerfMs": 17365.6,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        17365.6,
+        17382.3,
+        17399
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.700000000000728,
+        33.400000000001455
+      ],
+      "lastStimulusPerfMs": 17399,
+      "lastStimulusElapsedMs": 33.400000000001455,
+      "lastStimulusElapsedPrecision17": "33.400000000001455",
+      "remainingToNominalAtLastStimulusMs": 16.599999999998545,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 17415.7,
+      "coreMaskOnsetPerfMs": 17415.7,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50.10000000000218,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000000728,
+      "stimulusAndBoundaryGapsMs": [
+        16.700000000000728,
+        16.700000000000728,
+        16.700000000000728
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 4,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 19532.3,
+      "firstStimulusFramePerfMs": 19532.3,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        19532.3,
+        19549,
+        19565.6
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.700000000000728,
+        33.29999999999927
+      ],
+      "lastStimulusPerfMs": 19565.6,
+      "lastStimulusElapsedMs": 33.29999999999927,
+      "lastStimulusElapsedPrecision17": "33.299999999999272",
+      "remainingToNominalAtLastStimulusMs": 16.700000000000728,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 19582.3,
+      "coreMaskOnsetPerfMs": 19582.3,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000000728,
+      "stimulusAndBoundaryGapsMs": [
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 5,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 21698.8,
+      "firstStimulusFramePerfMs": 21698.8,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        21698.8,
+        21715.5,
+        21732.2
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.700000000000728,
+        33.400000000001455
+      ],
+      "lastStimulusPerfMs": 21732.2,
+      "lastStimulusElapsedMs": 33.400000000001455,
+      "lastStimulusElapsedPrecision17": "33.400000000001455",
+      "remainingToNominalAtLastStimulusMs": 16.599999999998545,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 21748.8,
+      "coreMaskOnsetPerfMs": 21748.8,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.599999999998545,
+      "stimulusAndBoundaryGapsMs": [
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 6,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 23865.4,
+      "firstStimulusFramePerfMs": 23865.4,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        23865.4,
+        23882.1,
+        23898.8
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.69999999999709,
+        33.39999999999782
+      ],
+      "lastStimulusPerfMs": 23898.8,
+      "lastStimulusElapsedMs": 33.39999999999782,
+      "lastStimulusElapsedPrecision17": "33.399999999997817",
+      "remainingToNominalAtLastStimulusMs": 16.600000000002183,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 23915.4,
+      "coreMaskOnsetPerfMs": 23915.4,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.600000000002183,
+      "stimulusAndBoundaryGapsMs": [
+        16.69999999999709,
+        16.700000000000728,
+        16.600000000002183
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 7,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 26032,
+      "firstStimulusFramePerfMs": 26032,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        26032,
+        26048.7,
+        26065.3
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.700000000000728,
+        33.29999999999927
+      ],
+      "lastStimulusPerfMs": 26065.3,
+      "lastStimulusElapsedMs": 33.29999999999927,
+      "lastStimulusElapsedPrecision17": "33.299999999999272",
+      "remainingToNominalAtLastStimulusMs": 16.700000000000728,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 26082,
+      "coreMaskOnsetPerfMs": 26082,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000000728,
+      "stimulusAndBoundaryGapsMs": [
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 8,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 28198.6,
+      "firstStimulusFramePerfMs": 28198.6,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        28198.6,
+        28215.2,
+        28232
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.600000000002183,
+        33.400000000001455
+      ],
+      "lastStimulusPerfMs": 28232,
+      "lastStimulusElapsedMs": 33.400000000001455,
+      "lastStimulusElapsedPrecision17": "33.400000000001455",
+      "remainingToNominalAtLastStimulusMs": 16.599999999998545,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 28248.6,
+      "coreMaskOnsetPerfMs": 28248.6,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.599999999998545,
+      "stimulusAndBoundaryGapsMs": [
+        16.600000000002183,
+        16.799999999999272,
+        16.599999999998545
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 9,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 30365.2,
+      "firstStimulusFramePerfMs": 30365.2,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        30365.2,
+        30381.8,
+        30398.5
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.29999999999927
+      ],
+      "lastStimulusPerfMs": 30398.5,
+      "lastStimulusElapsedMs": 33.29999999999927,
+      "lastStimulusElapsedPrecision17": "33.299999999999272",
+      "remainingToNominalAtLastStimulusMs": 16.700000000000728,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 30415.2,
+      "coreMaskOnsetPerfMs": 30415.2,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000000728,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.700000000000728,
+        16.700000000000728
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 10,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 32565.1,
+      "firstStimulusFramePerfMs": 32565.1,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        32565.1,
+        32581.7,
+        32598.4
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.600000000002183,
+        33.30000000000291
+      ],
+      "lastStimulusPerfMs": 32598.4,
+      "lastStimulusElapsedMs": 33.30000000000291,
+      "lastStimulusElapsedPrecision17": "33.300000000002910",
+      "remainingToNominalAtLastStimulusMs": 16.69999999999709,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 32615.1,
+      "coreMaskOnsetPerfMs": 32615.1,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.69999999999709,
+      "stimulusAndBoundaryGapsMs": [
+        16.600000000002183,
+        16.700000000000728,
+        16.69999999999709
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 11,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 34731.7,
+      "firstStimulusFramePerfMs": 34731.7,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        34731.7,
+        34748.3,
+        34765,
+        34781.6
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.60000000000582,
+        33.30000000000291,
+        49.900000000001455
+      ],
+      "lastStimulusPerfMs": 34781.6,
+      "lastStimulusElapsedMs": 49.900000000001455,
+      "lastStimulusElapsedPrecision17": "49.900000000001455",
+      "remainingToNominalAtLastStimulusMs": 0.09999999999854481,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 34798.3,
+      "coreMaskOnsetPerfMs": 34798.3,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.60000000000582,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.60000000000582,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 12,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 36898.3,
+      "firstStimulusFramePerfMs": 36898.3,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        36898.3,
+        36914.9,
+        36931.5,
+        36948.2
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.19999999999709,
+        49.89999999999418
+      ],
+      "lastStimulusPerfMs": 36948.2,
+      "lastStimulusElapsedMs": 49.89999999999418,
+      "lastStimulusElapsedPrecision17": "49.899999999994179",
+      "remainingToNominalAtLastStimulusMs": 0.10000000000582077,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 36964.9,
+      "coreMaskOnsetPerfMs": 36964.9,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.59999999999854,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 13,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 39081.5,
+      "firstStimulusFramePerfMs": 39081.5,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        39081.5,
+        39098.2,
+        39114.8
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.69999999999709,
+        33.30000000000291
+      ],
+      "lastStimulusPerfMs": 39114.8,
+      "lastStimulusElapsedMs": 33.30000000000291,
+      "lastStimulusElapsedPrecision17": "33.300000000002910",
+      "remainingToNominalAtLastStimulusMs": 16.69999999999709,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 39131.5,
+      "coreMaskOnsetPerfMs": 39131.5,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.69999999999709,
+      "stimulusAndBoundaryGapsMs": [
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 14,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 41264.8,
+      "firstStimulusFramePerfMs": 41264.8,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        41264.8,
+        41281.4,
+        41298.1,
+        41314.7
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.299999999995634,
+        49.89999999999418
+      ],
+      "lastStimulusPerfMs": 41314.7,
+      "lastStimulusElapsedMs": 49.89999999999418,
+      "lastStimulusElapsedPrecision17": "49.899999999994179",
+      "remainingToNominalAtLastStimulusMs": 0.10000000000582077,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 41331.4,
+      "coreMaskOnsetPerfMs": 41331.4,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.59999999999854,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 15,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 43464.6,
+      "firstStimulusFramePerfMs": 43464.6,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        43464.6,
+        43481.3,
+        43498
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.700000000004366,
+        33.400000000001455
+      ],
+      "lastStimulusPerfMs": 43498,
+      "lastStimulusElapsedMs": 33.400000000001455,
+      "lastStimulusElapsedPrecision17": "33.400000000001455",
+      "remainingToNominalAtLastStimulusMs": 16.599999999998545,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 43514.6,
+      "coreMaskOnsetPerfMs": 43514.6,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.599999999998545,
+      "stimulusAndBoundaryGapsMs": [
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 16,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 45631.3,
+      "firstStimulusFramePerfMs": 45631.3,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        45631.3,
+        45647.9,
+        45664.5,
+        45681.2
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.19999999999709,
+        49.89999999999418
+      ],
+      "lastStimulusPerfMs": 45681.2,
+      "lastStimulusElapsedMs": 49.89999999999418,
+      "lastStimulusElapsedPrecision17": "49.899999999994179",
+      "remainingToNominalAtLastStimulusMs": 0.10000000000582077,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 45697.9,
+      "coreMaskOnsetPerfMs": 45697.9,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.59999999999854,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 17,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 47831.1,
+      "firstStimulusFramePerfMs": 47831.1,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        47831.1,
+        47847.8,
+        47864.5
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.700000000004366,
+        33.400000000001455
+      ],
+      "lastStimulusPerfMs": 47864.5,
+      "lastStimulusElapsedMs": 33.400000000001455,
+      "lastStimulusElapsedPrecision17": "33.400000000001455",
+      "remainingToNominalAtLastStimulusMs": 16.599999999998545,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 47881.2,
+      "coreMaskOnsetPerfMs": 47881.2,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50.099999999998545,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.69999999999709,
+      "stimulusAndBoundaryGapsMs": [
+        16.700000000004366,
+        16.69999999999709,
+        16.69999999999709
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 18,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 50014.3,
+      "firstStimulusFramePerfMs": 50014.3,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        50014.3,
+        50031,
+        50047.7
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.69999999999709,
+        33.39999999999418
+      ],
+      "lastStimulusPerfMs": 50047.7,
+      "lastStimulusElapsedMs": 33.39999999999418,
+      "lastStimulusElapsedPrecision17": "33.399999999994179",
+      "remainingToNominalAtLastStimulusMs": 16.60000000000582,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 50064.4,
+      "coreMaskOnsetPerfMs": 50064.4,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50.099999999998545,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.69999999999709,
+        16.69999999999709,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 19,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 52197.6,
+      "firstStimulusFramePerfMs": 52197.6,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        52197.6,
+        52214.3,
+        52230.9
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.700000000004366,
+        33.30000000000291
+      ],
+      "lastStimulusPerfMs": 52230.9,
+      "lastStimulusElapsedMs": 33.30000000000291,
+      "lastStimulusElapsedPrecision17": "33.300000000002910",
+      "remainingToNominalAtLastStimulusMs": 16.69999999999709,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 52247.7,
+      "coreMaskOnsetPerfMs": 52247.7,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50.099999999998545,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.799999999995634,
+      "stimulusAndBoundaryGapsMs": [
+        16.700000000004366,
+        16.599999999998545,
+        16.799999999995634
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 20,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 54380.9,
+      "firstStimulusFramePerfMs": 54380.9,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        54380.9,
+        54397.5,
+        54414.2
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.299999999995634
+      ],
+      "lastStimulusPerfMs": 54414.2,
+      "lastStimulusElapsedMs": 33.299999999995634,
+      "lastStimulusElapsedPrecision17": "33.299999999995634",
+      "remainingToNominalAtLastStimulusMs": 16.700000000004366,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 54430.9,
+      "coreMaskOnsetPerfMs": 54430.9,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.700000000004366,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 21,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 56564.1,
+      "firstStimulusFramePerfMs": 56564.1,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        56564.1,
+        56580.8,
+        56597.5
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.700000000004366,
+        33.400000000001455
+      ],
+      "lastStimulusPerfMs": 56597.5,
+      "lastStimulusElapsedMs": 33.400000000001455,
+      "lastStimulusElapsedPrecision17": "33.400000000001455",
+      "remainingToNominalAtLastStimulusMs": 16.599999999998545,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 56614.2,
+      "coreMaskOnsetPerfMs": 56614.2,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50.099999999998545,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.69999999999709,
+      "stimulusAndBoundaryGapsMs": [
+        16.700000000004366,
+        16.69999999999709,
+        16.69999999999709
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 22,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 58747.4,
+      "firstStimulusFramePerfMs": 58747.4,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 4,
+      "stimulusFrameTimesMs": [
+        58747.4,
+        58764,
+        58780.7,
+        58797.3
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.599999999998545,
+        33.299999999995634,
+        49.900000000001455
+      ],
+      "lastStimulusPerfMs": 58797.3,
+      "lastStimulusElapsedMs": 49.900000000001455,
+      "lastStimulusElapsedPrecision17": "49.900000000001455",
+      "remainingToNominalAtLastStimulusMs": 0.09999999999854481,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 58814,
+      "coreMaskOnsetPerfMs": 58814,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 66.59999999999854,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.69999999999709,
+      "stimulusAndBoundaryGapsMs": [
+        16.599999999998545,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 23,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 60930.6,
+      "firstStimulusFramePerfMs": 60930.6,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        60930.6,
+        60947.3,
+        60964
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.700000000004366,
+        33.400000000001455
+      ],
+      "lastStimulusPerfMs": 60964,
+      "lastStimulusElapsedMs": 33.400000000001455,
+      "lastStimulusElapsedPrecision17": "33.400000000001455",
+      "remainingToNominalAtLastStimulusMs": 16.599999999998545,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 60980.6,
+      "coreMaskOnsetPerfMs": 60980.6,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.599999999998545,
+      "stimulusAndBoundaryGapsMs": [
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    },
+    {
+      "trialIndex": 24,
+      "nominalMs": 50,
+      "stimulusOnsetPerfMs": 63097.2,
+      "firstStimulusFramePerfMs": 63097.2,
+      "firstDrawRecordEqualsOnset": true,
+      "stimulusFrameCount": 3,
+      "stimulusFrameTimesMs": [
+        63097.2,
+        63113.8,
+        63130.5
+      ],
+      "stimulusFrameElapsedMs": [
+        0,
+        16.60000000000582,
+        33.30000000000291
+      ],
+      "lastStimulusPerfMs": 63130.5,
+      "lastStimulusElapsedMs": 33.30000000000291,
+      "lastStimulusElapsedPrecision17": "33.300000000002910",
+      "remainingToNominalAtLastStimulusMs": 16.69999999999709,
+      "conditionAtLastStimulus": false,
+      "firstMaskPerfMs": 63147.2,
+      "coreMaskOnsetPerfMs": 63147.2,
+      "firstMaskEqualsCoreMaskOnset": true,
+      "firstMaskElapsedMs": 50,
+      "conditionAtFirstMask": true,
+      "lastStimulusToFirstMaskMs": 16.69999999999709,
+      "stimulusAndBoundaryGapsMs": [
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709
+      ],
+      "rawTimingIncomplete": false,
+      "rawTimingOverflow": false
+    }
+  ],
+  "provedBySavedNumbersAndSource": [
+    "All seven final stimulus callbacks have elapsed about49.9ms, about0.1ms below the nominal50ms comparison, so the existing >= comparison is false there.",
+    "Their next saved callback is about16.7ms later, about66.6ms from onset; the >= comparison is true and this callback is the first mask record.",
+    "In all seven, first stimulus record exactly equals core stimulus onset, and first mask record exactly equals core mask onset; the extra draw is not an onset/count labelling offset in these saved records.",
+    "The saved stimulus/boundary gaps are about16.6–16.7ms with no reported overflow/incomplete flag; these records do not contain a long missing-callback gap explaining the extra draw.",
+    "The difference to the threshold is about0.1ms, not only machine rounding of an otherwise exactly50.0ms subtraction. The stored callback timestamps themselves are below the threshold."
+  ],
+  "notEstablished": [
+    "Why these callback timestamps land at49.9 rather than50.0/50.1: compositor scheduling, timer precision/privacy quantization, timestamp generation and phase alignment were not independently measured.",
+    "Actual pixels displayed, scanout duration, monitor refresh rate/stability or physical stimulus onset/offset.",
+    "Whether a three-refresh-frame policy or another quantization/tolerance policy matches the cited protocol on real target devices; needs independent source review and any necessary user approval.",
+    "Scientific acceptability of66.6ms or individual interpretation; no acceptance threshold was approved."
+  ],
+  "policy": "No epsilon, tolerance, frame-count policy, capture source, frozen raw, scorer or individual report gate changed. Formal administration remains prohibited."
+}

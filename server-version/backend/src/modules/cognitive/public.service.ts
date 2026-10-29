@@ -12,6 +12,7 @@ import {
   hashPublicAccessToken,
 } from '../../services/publicAccessTokenCrypto'
 import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
+import { getCognitiveTaskResource, assertNativeDeliverySupported } from './task-resource'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { hashResolvedConfig } from './profile-freeze'
 import * as sessionService from './session.service'
@@ -58,6 +59,8 @@ const validateAssignment = (assignment: any) => {
   if (assignment.dueAt && assignment.dueAt.getTime() < Date.now()) throw BAD_REQUEST('Cognitive assignment is past due')
   const config = assignment.config
   assertCognitiveProductEligible(config.testType)
+  const resource = getCognitiveTaskResource(config.testType, config.engineVersion, config.scoringVersion)
+  if (resource) assertNativeDeliverySupported(resource, 'public')
   const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
   if (assignment.resolvedConfigSnapshotEncrypted) {
     const thawed = decryptCognitivePayload<unknown>(assignment.resolvedConfigSnapshotEncrypted)
@@ -354,6 +357,8 @@ export const createAccessTokenForAssignment = async (userId: string, role: UserR
   const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: assignment.configId } })
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
   assertCognitiveProductEligible(config.testType)
+  const resource = getCognitiveTaskResource(config.testType, config.engineVersion, config.scoringVersion)
+  if (resource) assertNativeDeliverySupported(resource, 'public')
   const expiry = new Date(expiresAt)
   if (!publicAccessExpiryWithinPolicy(expiry)) throw BAD_REQUEST('expiresAt must be in the future and within one year')
   const rawToken = createAccessToken()

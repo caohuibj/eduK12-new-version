@@ -1,0 +1,22 @@
+{
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/cognitive/mot-report-format.test.ts",
+    "--maxWorkers=1",
+    "--reporter=json",
+    "--outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/report-format-followup/tests-run1.json"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "exitCode": 0,
+  "durationSeconds": 4.754736376002256,
+  "executedAt": "2026-10-26T11:32:24.473704+00:00",
+  "environment": {
+    "NODE_ENV": "test",
+    "COGNITIVE_MODULE_ENABLED": "true",
+    "syntheticKeys": true,
+    "dotenvFileReaderMocked": true
+  },
+  "ciExecuted": false
+}

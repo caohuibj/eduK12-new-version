@@ -1,0 +1,629 @@
+{
+  "candidateId": "attention-enumeration-flower",
+  "status": "DESIGN_PROPOSAL",
+  "proposalRevision": "enumeration-design-r1",
+  "name": {
+    "zh": "短时点数判断",
+    "en": "Brief Numerosity Report"
+  },
+  "ordinaryCatalogAlias": {
+    "zh": "一闪有几个",
+    "en": "How many at a glance",
+    "scope": "目录文案提案，不作为正式施测策略提示"
+  },
+  "sourceEvidence": {
+    "reviewCommit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+    "reviewFile": "docs/cognitive-library/task-selection-20261026/attention-task-cards.json",
+    "jsonPointer": "/cards/2",
+    "upstream": {
+      "repository": "flowersteam/cognitive-testbattery",
+      "sha": "58ba32fa8b582bedac65ef1c037c9974303dbf5c",
+      "task_version": "app_enumeration，正式5–9，slider报告",
+      "path": "js/app_enumeration/config.js",
+      "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_enumeration/config.js"
+    },
+    "literature": [
+      {
+        "citation": "Adolphe et al. (2022), §2.4.2 Enumeration Task；原文追溯 Green & Bavelier (2006b)。",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2022.880375/full",
+        "read": "原作者方法与准确率分析已读；本轮未把Green & Bavelier全文当已核验来源",
+        "relationship": "100正式、每数量20次、50ms相符；ROI论文5°与代码7°不一致。"
+      }
+    ],
+    "readThisSubtask": [
+      {
+        "path": "js/app_enumeration/config.js",
+        "blobSha": "4e275ec895796e5a1e4eecd010b6896dfc555ed2"
+      },
+      {
+        "path": "js/app_enumeration/scene_testtrial.js",
+        "blobSha": "5e4361bde24e60c4b353ae70e8555a8a06fd13fc"
+      }
+    ],
+    "readMethod": "固定SHA静态读取；未执行上游",
+    "parentPaperRecheckThisRound": {
+      "location": "Adolphe et al. 2022 section 2.4.2",
+      "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2022.880375/full",
+      "reviewer": "主agent本轮官网原文复核并回传",
+      "confirmed": [
+        "白色圆点",
+        "中灰背景",
+        "圆点0.5°",
+        "直径5°范围",
+        "50ms",
+        "每个数量20正式试次"
+      ],
+      "notConfirmed": [
+        "具体sRGB或物理亮度",
+        "边界/采样实现细节",
+        "遮罩空间统计"
+      ],
+      "subagentBoundary": "本子任务未自行重读全文；引用主agent的定向复核结论"
+    }
+  },
+  "tags": {
+    "inheritedResearchTags": {
+      "cognitive_domain": [
+        "attention"
+      ],
+      "target_process": [
+        "brief_numerosity_report"
+      ],
+      "paradigm": [
+        "masked_enumeration_5_9"
+      ],
+      "stimulus_form": [
+        "brief_dots_mask"
+      ],
+      "input_upstream": [
+        "slider_and_confirm"
+      ],
+      "input_proposed": [
+        "not_frozen"
+      ],
+      "key_metric": [
+        "numerosity_accuracy_error"
+      ],
+      "intended_use": [
+        "research_protocol_selection"
+      ],
+      "code_license": [
+        "mit_recorded"
+      ],
+      "code_rights_disposition": [
+        "github_public_conditional"
+      ],
+      "asset_rights_disposition": [
+        "authorization_pending"
+      ],
+      "asset_license_review": [
+        "images_fonts_unverified"
+      ],
+      "implementation_strategy": [
+        "literature_reimplementation"
+      ],
+      "maturity": [
+        "source_research_only"
+      ],
+      "evidence_limitations": [
+        "timing_device_unverified",
+        "static_runtime_risk",
+        "protocol_version_decision"
+      ],
+      "baseline_relation": [
+        "new_family_candidate"
+      ],
+      "research_priority": [
+        "priority_finalize"
+      ],
+      "rule_type": [
+        "technical_quality",
+        "theoretical_reference",
+        "literature_experience",
+        "project_provisional"
+      ]
+    },
+    "extensionsProposed": {
+      "applicationScenarios": [
+        {
+          "key": "research",
+          "evidenceStatus": "paradigm_literature_available_project_variant_unvalidated"
+        },
+        {
+          "key": "self_exploration",
+          "evidenceStatus": "proposed_descriptive_use"
+        },
+        {
+          "key": "learning_evaluation_support",
+          "evidenceStatus": "unvalidated_not_diagnostic"
+        },
+        {
+          "key": "recruitment_support",
+          "evidenceStatus": "unvalidated_not_selection_predictor"
+        }
+      ],
+      "language": [
+        "zh",
+        "en"
+      ],
+      "age": {
+        "min": null,
+        "max": null,
+        "status": "unverified"
+      },
+      "population": {
+        "value": null,
+        "status": "unverified"
+      },
+      "difficulty": {
+        "level": null,
+        "status": "empirical_difficulty_unverified",
+        "description": "正式5–9个点，0.5°名义直径，短时编码及掩蔽；不能据分数反推年龄/数学能力"
+      },
+      "devicePriority": [
+        "phone",
+        "tablet",
+        "desktop"
+      ],
+      "inputProposed": "integer_slider_1_to_15_plus_confirm",
+      "validationStatus": "unverified",
+      "maturity": "design_proposal",
+      "backendPersistence": false,
+      "globalSearchConnected": false
+    },
+    "policy": "18维原key原样保留，扩展维为提案，不是后台可导入schema"
+  },
+  "construct": {
+    "intended": [
+      "brief_visual_encoding",
+      "brief_numerosity_report"
+    ],
+    "notInferred": [
+      "mathematical_ability",
+      "IQ",
+      "dyscalculia",
+      "subitizing_span",
+      "age_percentile",
+      "stable_attention_capacity"
+    ]
+  },
+  "observedProtocol": {
+    "practice": "数量[3,4,5]每个1次=3练习；呈现1000 ms；教程可重复。",
+    "formal": "数量[5,6,7,8,9]每个5次=25/块；4块=100正式，每数量20次。max_break=4即3次中途继续，不是4次休息再做5块。",
+    "stimuli": "注视1000 ms → 圆点50 ms → noise.png掩蔽1000 ms → 滑杆报告。点直径0.5°；代码roi_obj=7°并在正方形范围采样且拒绝初始重叠；作者论文描述5°区域，不应合并成同一精确参数。",
+    "response": "1–15整数滑杆，初始值每试次随机；点击OK提交。RT从响应画面出现计时，包含操作滑杆，不是点数感知RT；无已核实响应超时。",
+    "timing": "Date.now + p5 draw轮询；50ms不保证任意刷新率上恰好达到。屏宽34.25cm/视距50cm为默认假设。",
+    "randomization": "每遍shuffle数量；random圆点位置/滑杆初值；未见seed持久记录。",
+    "raw_fields": [
+      "results_responses",
+      "results_rt",
+      "results_targetvalue"
+    ]
+  },
+  "profilesProposed": {
+    "research": {
+      "status": "PENDING_APPROVAL",
+      "formalTrials": 100,
+      "blocks": 4,
+      "trialsPerBlock": 25,
+      "numerosities": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "repetitionsPerNumerosityPerBlock": 5,
+      "totalPerNumerosity": 20,
+      "practiceTrials": 3,
+      "practiceNumerosities": [
+        3,
+        4,
+        5
+      ],
+      "practiceExposureMs": 1000,
+      "evidence": "作者论文/固定配置的次数口径；重实现/输入/刺激不自动等效"
+    },
+    "experience": {
+      "status": "PENDING_APPROVAL_PROJECT_PROVISIONAL",
+      "formalTrials": 25,
+      "blocks": 1,
+      "trialsPerBlock": 25,
+      "numerosities": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "repetitionsPerNumerosityPerBlock": 5,
+      "totalPerNumerosity": 5,
+      "practiceTrials": 3,
+      "practiceNumerosities": [
+        3,
+        4,
+        5
+      ],
+      "practiceExposureMs": 1000,
+      "evidence": "保留原单块条件构成，仅减少正式重复/组间休息；非已验证短版"
+    },
+    "shared": {
+      "fixationMs": 1000,
+      "nominalFormalExposureMs": 50,
+      "maskMs": 1000,
+      "dotDiameterDeg": 0.5,
+      "reportedIntegerRange": [
+        1,
+        15
+      ],
+      "responseTimeoutMs": null,
+      "initialSliderValue": "seeded_random_integer_1_to_15_proposed",
+      "responseEnd": "explicit_confirm",
+      "formalConditionsIdentical": true,
+      "stimulusGeometryAndTimingIdentical": true,
+      "normPooling": false
+    }
+  },
+  "displayProposal": {
+    "geometryOptions": [
+      {
+        "key": "paper_5deg",
+        "nominalFieldDeg": 5,
+        "shape": "diameter_5deg_described; circular_sampling_is_project_proposal",
+        "recommendation": "优先论文白点/中灰、直径5°路线；圆域采样算法/边界细节仍待复核"
+      },
+      {
+        "key": "code_7deg_square",
+        "nominalFieldDeg": 7,
+        "shape": "square",
+        "recommendation": "固定代码几何路线；须标明与论文差异"
+      }
+    ],
+    "preview": {
+      "fieldCssPx": 304,
+      "meaning": "仅排版示意，非5°或7°的实际校准",
+      "stimulusPolarity": {
+        "default": {
+          "key": "paper_described_candidate",
+          "field": "#808080",
+          "dots": "#FFFFFF",
+          "scope": "与原文白点/中灰极性一致的名义sRGB候选；不声称原文规定#808080或50%物理亮度"
+        },
+        "alternative": {
+          "key": "project_dark_on_white",
+          "field": "#FFFFFF",
+          "dots": "#1F2937",
+          "scope": "独立项目改版对照，非论文刺激同版"
+        },
+        "status": "PENDING_APPROVAL_NOT_PHYSICALLY_CALIBRATED"
+      },
+      "noise": {
+        "kind": "original_fixed_seed_binary_grid",
+        "grid": [
+          48,
+          48
+        ],
+        "values": [
+          "#141414",
+          "#EBEBEB"
+        ],
+        "sampling": "LCG fixture binary bits; intended p=0.5, actual realized counts recorded in preview evidence",
+        "scope": "仅原创排版示例，非已核上游noise.png统计或最终正式遮罩"
+      },
+      "actualTimingEmulated": false
+    },
+    "calibrationRequired": true,
+    "autoShrinkAllowed": false,
+    "physicalLuminanceCalibrated": false
+  },
+  "inputProposal": {
+    "priority": "touch_first",
+    "upstream": "1–15整数滑杆、每次随机初值、OK确认",
+    "project": "相同1–15范围、整数滑杆+确认；触屏大触点、鼠标、键盘方向/Home/End及确认兼容",
+    "record": [
+      "inputSource",
+      "sliderInitialValue",
+      "sliderChanges",
+      "responseValue",
+      "responsePhaseOnsetPerfMs",
+      "confirmPerfMs"
+    ],
+    "importantBoundary": "按钮/辅助输入或布局改变都须独立记录，不能把范围收窄到5–9；报告RT含操作时间，不等同知觉速度",
+    "numericButtonAlternative": "未选；若采用需要新的输入/呈现身份及试点"
+  },
+  "metrics": [
+    {
+      "key": "accuracyByNumerosity",
+      "origin": "literature_descriptive",
+      "unit": "ratio",
+      "numerator": "报告整数等于真实数量的有效正式试次",
+      "denominator": "该真实数量条件获准纳入的有效正式试次",
+      "direction": "descriptive",
+      "nullWhen": [
+        "denominator_zero",
+        "condition_quality_gate_not_met",
+        "sequence_or_truth_invalid"
+      ],
+      "gates": [
+        "valid_trial",
+        "authorized_condition"
+      ],
+      "validZeroPreserved": true
+    },
+    {
+      "key": "overallAccuracy",
+      "origin": "project_descriptive_aggregation",
+      "unit": "ratio",
+      "numerator": "各数量条件有效正确次数之和",
+      "denominator": "各数量条件有效正式次数之和",
+      "direction": "descriptive",
+      "nullWhen": [
+        "denominator_zero",
+        "any_required_condition_not_interpretable",
+        "global_quality_invalid"
+      ],
+      "gates": [
+        "all_required_conditions_authorized"
+      ],
+      "note": "仅本次描述，不转化能力分；减少条件覆盖后不展示"
+    },
+    {
+      "key": "signedMeanErrorByNumerosity",
+      "origin": "project_exploratory",
+      "unit": "reported_count_minus_true_count",
+      "formula": "mean(responseValue-targetValue)",
+      "denominator": "该数量有效正式试次",
+      "direction": "signed_descriptive",
+      "nullWhen": [
+        "denominator_zero",
+        "quality_not_authorized"
+      ],
+      "negativeValuesPreserved": true
+    },
+    {
+      "key": "meanAbsoluteErrorByNumerosity",
+      "origin": "project_exploratory",
+      "unit": "count",
+      "formula": "mean(abs(responseValue-targetValue))",
+      "denominator": "该数量有效正式试次",
+      "direction": "descriptive",
+      "nullWhen": [
+        "denominator_zero",
+        "quality_not_authorized"
+      ]
+    },
+    {
+      "key": "medianReportOperationMs",
+      "origin": "project_exploratory",
+      "unit": "ms",
+      "formula": "median(confirmPerfMs-responsePhaseOnsetPerfMs)",
+      "denominator": "计时完整的有效正式试次",
+      "direction": "descriptive",
+      "nullWhen": [
+        "denominator_zero",
+        "clock_or_input_invalid",
+        "quality_not_authorized"
+      ],
+      "notMeaning": "非点数感知时间、经典按键计数斜率或设备校正速度"
+    }
+  ],
+  "qualityProposal": {
+    "status": "PENDING_APPROVAL",
+    "numericCutoffsNotYetFrozen": true,
+    "minValidPerCondition": null,
+    "frameQuantizationToleranceMs": null,
+    "doNotUseAccuracyToInvalidate": true,
+    "trialTechnicalEvents": [
+      "visibility_lost",
+      "viewport_changed",
+      "stimulus_or_mask_timing_incomplete",
+      "missing_frame_evidence",
+      "input_before_response",
+      "clock_order_invalid",
+      "calibration_missing"
+    ],
+    "conditionGate": "需先冻结数量条件所需分母/精度及技术容差；不默认套MOT阈值",
+    "states": {
+      "interpretable": "所有获准解释条件与技术门控满足；不代表科学效度已验证",
+      "limited": "隐藏受影响条件和整体聚合，保留获准条件与原因",
+      "invalid": "不输出表现结论；原始记录与null保留"
+    }
+  },
+  "rules": [
+    {
+      "category": "技术质量规则",
+      "rule": "呈现/遮罩/失焦/几何来源必须记录",
+      "value": null,
+      "unit": "ms/frames/boolean",
+      "operator": "pending",
+      "owner": "认知内容线",
+      "reviewCondition": "真实设备呈现和平台时钟契约确认",
+      "source": "project_provisional_not_upstream_cutoff"
+    },
+    {
+      "category": "理论参照",
+      "rule": "exact-match定义为responseValue===targetValue",
+      "value": "equality",
+      "unit": "integer_count",
+      "operator": "===",
+      "owner": "认知内容线",
+      "source": "exact_accuracy_definition",
+      "reviewCondition": "计分定义变化"
+    },
+    {
+      "category": "文献经验",
+      "rule": "作者协议100正式、50ms等作为协议来源，不作为正常/异常阈值",
+      "source": "Adolphe2022_2.4.2_and_fixed_code",
+      "owner": "认知内容线"
+    },
+    {
+      "category": "项目暂定研究者规则",
+      "rule": "25正式短版、误差指标及条件门控提案",
+      "status": "pending_approval",
+      "owner": "认知内容线",
+      "reviewCondition": "试点精度/负担与设备证据"
+    }
+  ],
+  "rawAndStorageProposal": {
+    "databaseCore": [
+      "frozenProtocolAndConfigIdentity",
+      "profile",
+      "seed",
+      "trialOrder",
+      "targetValue",
+      "responseValue",
+      "sliderInitialValue",
+      "inputEvents",
+      "phaseOnsets",
+      "frameTimingSummary",
+      "interruptions",
+      "calibrationReference",
+      "validityFlags",
+      "authoritativeMetrics",
+      "frozenReport"
+    ],
+    "researchArchive": [
+      "databaseCoreFrozenSnapshot",
+      "fullFrameTimes",
+      "stimulusPositionsAndSeedOrder",
+      "maskRecipeAndHash",
+      "fieldDictionary"
+    ],
+    "frameSummarySource": "client_reported",
+    "perFrameServerRequests": false,
+    "actualCOSImplemented": false,
+    "deviceMetadataPolicy": "复用真实平台provenance；细节另建实际承载契约，不扩写严格V1偷渡字段"
+  },
+  "rights": {
+    "code": {
+      "upstream": "MIT条件公开，保留通知；本项目拟文献自研，不整包移植p5运行器"
+    },
+    "stimuli": {
+      "dots": "项目自制几何",
+      "previewMask": "本项目原创演示噪声",
+      "upstreamNoisePng": "未清权，不使用",
+      "upstreamFontsAndIllustrations": "未清权，不使用",
+      "systemFonts": "系统字体，不打包外部字体"
+    },
+    "implementationRoute": "literature_reimplementation",
+    "rightsDisposition": "proposal_materials_original_upstream_assets_pending",
+    "sourceQualityNotPenalizedByLicense": true
+  },
+  "versionImpact": {
+    "schemaCheck": "正式开发前核真实注册/配置/指标/质量/报告/参照schema",
+    "measurementLayer": [
+      "区域5°/7°、遮罩、极性/亮度、输入装置/布局、练习与停止规则属于协议影响"
+    ],
+    "configAndReferenceLayer": [
+      "两profile分别冻结config/hash与QC规则，不能共享长版常模；当前无常模"
+    ],
+    "reportLayer": [
+      "简短解释和可选take-home独立演进；分母/聚合变化不是纯文案"
+    ],
+    "repositoryVersionNumbers": "尚未分配；不是虚构normVersion或三要素总版本"
+  },
+  "decisionsPending": [
+    {
+      "id": "D1",
+      "question": "采用论文5°路线还是代码7°方形路线？",
+      "recommendation": "原文直径5°已由主agent核对；优先论文路线，圆域采样与边界仍需定稿；304 CSS px仅示意"
+    },
+    {
+      "id": "D2",
+      "question": "接受100正式对照版/25正式体验版吗？",
+      "recommendation": "25为一次原单块；短版与长版不混常模"
+    },
+    {
+      "id": "D3",
+      "question": "确认触屏整数滑杆1–15+确认布局吗？",
+      "recommendation": "保留范围与随机初值，先做可理解性试点"
+    },
+    {
+      "id": "D4",
+      "question": "正式刺激极性/亮度及原创遮罩统计如何冻结？",
+      "recommendation": "默认预览为白点/中灰的名义sRGB候选；#808080非论文指定或物理亮度保证。深点白底仅项目改版对照；遮罩仍待定。"
+    },
+    {
+      "id": "D5",
+      "question": "50ms在目标刷新率上的量化/容差、无法满足时的处理？",
+      "recommendation": "记录真实帧和显示来源，阈值待定；不静默延长"
+    },
+    {
+      "id": "D6",
+      "question": "体验版有效分母与三态规则如何定稿？",
+      "recommendation": "先做描述性数据，不承诺稳定个体能力或诊断用途"
+    }
+  ],
+  "syntheticReportFixtures": {
+    "source": "authored_preview_fixtures_not_participant_data",
+    "research": {
+      "targets": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "correct": [
+        18,
+        16,
+        15,
+        14,
+        13
+      ],
+      "valid": [
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "totalCorrect": 76,
+      "totalValid": 100
+    },
+    "experience": {
+      "targets": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "correct": [
+        5,
+        4,
+        4,
+        3,
+        3
+      ],
+      "valid": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "totalCorrect": 19,
+      "totalValid": 25
+    },
+    "limited": {
+      "hiddenTarget": 8,
+      "reason": "该条件呈现证据缺失；合成演示门控，并非已实现规则",
+      "overallAggregate": null
+    },
+    "invalid": {
+      "allPerformanceMetrics": null
+    }
+  },
+  "verificationBoundary": {
+    "staticPreviewOnly": true,
+    "runtimeImplemented": false,
+    "scorerImplemented": false,
+    "registered": false,
+    "backendTagsConnected": false,
+    "realProductEntrancesTested": false,
+    "physicalDevicesTimingTested": false,
+    "chineseEnglishComprehensionValidated": false,
+    "normsAvailable": false
+  }
+}

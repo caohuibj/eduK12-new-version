@@ -1,0 +1,152 @@
+{
+  "success": true,
+  "componentPreviewOnly": true,
+  "zoom": "CSS zoom=2 at 780px, not native browser/device equivalence",
+  "results": [
+    {
+      "key": "ant",
+      "name": "ant-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "只判断中间箭头朝向",
+          "怎样操作",
+          "先练习，再正式作答",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/ant-intro-phone-zh.png",
+      "sha256": "e4c4db636643058da99b26c979e4faba40b78684cb71a64b0abc005d59d0ec86"
+    },
+    {
+      "key": "ant",
+      "name": "ant-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Judge the middle arrow only",
+          "How to respond",
+          "Practice first, then the task",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/ant-intro-tablet-en.png",
+      "sha256": "2b03f9d3a88ae27907502ade24a024b47a0d6338f25c645f32a72c9d3442f8c4"
+    },
+    {
+      "key": "ant",
+      "name": "ant-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Judge the middle arrow only",
+          "How to respond",
+          "Practice first, then the task",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/ant-intro-en-200pct.png",
+      "sha256": "c1b999eac223c375a35a5c0428a046d0db59958d56bfcabd9404ae0be901909d"
+    },
+    {
+      "key": "recognition",
+      "name": "recognition-intro-phone-zh",
+      "width": 390,
+      "height": 844,
+      "lang": "zh",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "这张图，在本轮见过吗？",
+          "举例",
+          "先做较易练习，再正式作答",
+          "怎样算完成"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/recognition-intro-phone-zh.png",
+      "sha256": "18d9550eb71d0f430f43628dc22f1eb4b854ce61f4880e2889637a964e86bafb"
+    },
+    {
+      "key": "recognition",
+      "name": "recognition-intro-tablet-en",
+      "width": 820,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 1,
+      "intro": true,
+      "layout": {
+        "viewport": 820,
+        "scroll": 820,
+        "headings": [
+          "Have you seen this picture in this round?",
+          "Examples",
+          "Easier practice, then the formal stream",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/recognition-intro-tablet-en.png",
+      "sha256": "1dcc704c9c288a686f57a769a066e42ed37c8c63fa67a65be150d587eacbd398"
+    },
+    {
+      "key": "recognition",
+      "name": "recognition-intro-en-200pct",
+      "width": 780,
+      "height": 1000,
+      "lang": "en",
+      "zoom": 2,
+      "intro": true,
+      "layout": {
+        "viewport": 780,
+        "scroll": 390,
+        "headings": [
+          "Have you seen this picture in this round?",
+          "Examples",
+          "Easier practice, then the formal stream",
+          "When you are finished"
+        ],
+        "charts": 0,
+        "svgOverflow": []
+      },
+      "success": true,
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/screens/recognition-intro-en-200pct.png",
+      "sha256": "577e47bd7c08ae5a3de116465b79931ea2670664c6cae0ea263554cfe4030cb1"
+    }
+  ],
+  "errors": []
+}

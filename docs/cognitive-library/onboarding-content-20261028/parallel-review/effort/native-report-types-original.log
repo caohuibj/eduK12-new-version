@@ -1,0 +1,18 @@
+{
+  "success": false,
+  "sourceCount": 26,
+  "diagnostics": [
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/native-report.test.tsx",
+      "start": 1228,
+      "code": 2345,
+      "message": "Argument of type '{ testType: string; engineVersion: string; scoringVersion: string; configVersion: string; reportDefinitionVersion: string; presentationVersion: string; configHash: string; protocolSignature: string; ... 16 more ...; executionByInput: {}; }' is not assignable to parameter of type '{ testType: string; engineVersion: string; scoringVersion: string; configVersion: string; reportDefinitionVersion: string; presentationVersion: string; configHash: string; protocolSignature: string; ... 16 more ...; executionByInput: { ...; }; }'.\n  Types of property '\"totalPresses\"' are incompatible.\n    Type 'null' is not assignable to type 'number'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/native-report.test.tsx",
+      "start": 1762,
+      "code": 2698,
+      "message": "Spread types may only be created from object types."
+    }
+  ]
+}

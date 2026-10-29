@@ -1,0 +1,70 @@
+{
+  "base": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "node": "v24.21.0",
+  "nodePath": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+  "recordedAt": "2026-10-28T03:59:22.961Z",
+  "recordedAfterChecks": true,
+  "productSources": {
+    "server-version/frontend/src/school/SchoolCompositeRunner.tsx": {
+      "sha256": "6e5147ba549da55e5a7f9947f4dc0d3a833542ae096acbbd78e47cb80db16fc4",
+      "unchangedFromBase": true
+    },
+    "server-version/frontend/src/huiteacher/assessmentRuntime.client.ts": {
+      "sha256": "380b8d8e67da63592370cb70d519886b9e56b6d125adc50b70f92abe427032a9",
+      "unchangedFromBase": true
+    },
+    "server-version/frontend/src/survey/survey-cognitive-api.ts": {
+      "sha256": "f7d19fccb22b67bc500ea4d96aa20d4ef340277b89e67c2859ef74320e2e0852",
+      "unchangedFromBase": true
+    },
+    "server-version/frontend/src/modules/cognitive/api.ts": {
+      "sha256": "dd155a58cbe283bde0cc75ce339cc3404b9791b7c2048f89e061f99b7f411550",
+      "unchangedFromBase": true
+    },
+    "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts": {
+      "sha256": "ff5d6dcf94f4a60438d0fcebf301abd07b069a647fde28fab486a4699220ed09",
+      "unchangedFromBase": true
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx": {
+      "sha256": "9e3151432d9e4073a01bd6fdd8efb0451752a49ac25553849059c70f0dff045c",
+      "unchangedFromBase": true
+    },
+    "server-version/backend/src/modules/cognitive/raw-archive.routes.ts": {
+      "sha256": "632e43ccfe113dfc2995eb43e3110ea30e63ca942cfea463468c1070a8e5cd8b",
+      "unchangedFromBase": true
+    },
+    "server-version/backend/src/modules/cognitive/raw-archive.service.ts": {
+      "sha256": "6177455eaaf01eb566c9aa27ad26f758a5959c1eed08de891af30ddf6e808d2b",
+      "unchangedFromBase": true
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "sha256": "54d41b8fab6409782f42e6b9e4f5a5e9af65f3e9847c709e503bd82a1388b189",
+      "unchangedFromBase": true
+    },
+    "server-version/backend/src/modules/campus/composite.routes.ts": {
+      "sha256": "99bb1f94e25066559d430b8b5942eecd2bbe2c9921470161a8967f3b2173e3fa",
+      "unchangedFromBase": true
+    },
+    "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts": {
+      "sha256": "f426d35d60781f8137bbdcda72fcd418ab608a10256e6420651afb938a97bde2",
+      "unchangedFromBase": true
+    },
+    "server-version/backend/src/modules/survey/cognitive.public.routes.ts": {
+      "sha256": "9c8bbb3cdb4a0c0499a4854e6bf60d2751d9a69e33bdf98131e258bb3dd11962",
+      "unchangedFromBase": true
+    },
+    "server-version/backend/src/modules/survey/cognitive.definition.ts": {
+      "sha256": "978ed4cbae8ba42020f0f3f0e4979cee2d61c03d49f71dac693c512ef8360f9a",
+      "unchangedFromBase": true
+    },
+    "server-version/backend/src/middleware/auth.ts": {
+      "sha256": "63a53c9e448f7b171a0139d9ae9491694bbf3b94cfe07bfc586c37242901b214",
+      "unchangedFromBase": true
+    }
+  },
+  "tests": {
+    "server-version/frontend/src/modules/cognitive/__tests__/education-native-boundaries.test.tsx": "607e7180a87acfc65a331e1c8f7ec613f96a540b0aeb4a5e41e5e04fbe5ca5fa",
+    "server-version/backend/src/__tests__/cognitive/education-native-boundaries.test.ts": "cd1cc2e6f53ce6976b54589a788f2604028ce64c700800d7440ccc2ed4789bd6"
+  },
+  "scope": "source review and synthetic boundary contracts only; no fresh authenticated product execution"
+}

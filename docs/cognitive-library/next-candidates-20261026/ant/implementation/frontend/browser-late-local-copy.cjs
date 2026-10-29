@@ -1,0 +1,26 @@
+const fs=require('node:fs'),path=require('node:path')
+const {chromium}=require('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')
+;(async()=>{const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,chromiumSandbox:true});try{
+ const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true}),errors=[]
+ page.on('pageerror',e=>errors.push(String(e)))
+ await page.goto('http://127.0.0.1:8531/?lateFail=1&context=late-local-copy-'+Date.now())
+ await page.getByRole('button',{name:'开始练习'}).click()
+ await page.locator('[data-ant-paint="fixation"]').waitFor()
+ await page.evaluate(()=>window.dispatchEvent(new Event('blur')))
+ await page.getByRole('button',{name:'重试保存记录'}).waitFor()
+ const copy=await page.evaluate(()=>document.body.innerText)
+ if(/window_blur|宿主|冻结|CSS|COS/.test(copy))throw Error('Technical details visible to participant')
+ const first=await page.evaluate(()=>window.__ANT_REVIEW__.saveCalls[0])
+ await page.screenshot({path:path.join(__dirname,'phone-late-local-failure-copy.png'),fullPage:true})
+ await page.getByRole('button',{name:'重试保存记录'}).click()
+ await page.getByRole('button',{name:'提交已保留的记录'}).waitFor()
+ const retried=await page.evaluate(()=>window.__ANT_REVIEW__.saveCalls[1])
+ if(first.digest!==retried.digest||first.record.core.interruptions[0].kind!=='window_blur'
+   ||retried.record.core.interruptions[0].kind!=='window_blur')throw Error('Interruption/record changed during retry')
+ if(await page.locator('[data-ant-view="running"]').count())throw Error('Retry restarted exposure')
+ await page.screenshot({path:path.join(__dirname,'phone-late-local-retry-copy.png'),fullPage:true})
+ if(errors.length)throw Error('Page errors '+errors.join(';'))
+ fs.writeFileSync(path.join(__dirname,'browser-late-local-copy-result.json'),JSON.stringify({status:'PASS',scope:'Only new terminated-then-local-write-fault state and participant copy',reason:'window_blur',firstDigest:first.digest,retryDigest:retried.digest,
+ screenshots:['phone-late-local-failure-copy.png','phone-late-local-retry-copy.png'],pageErrors:errors,restarted:false},null,2)+'\n')
+ console.log('PASS late local failure: retry visible, original interruption/digest retained, no re-exposure')
+}finally{await browser.close()}})().catch(error=>{fs.writeFileSync(path.join(__dirname,'browser-late-local-copy-failure-'+Date.now()+'.json'),JSON.stringify({status:'FAILED',message:String(error)},null,2)+'\n');console.error(error);process.exitCode=1})

@@ -1,0 +1,17 @@
+/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/gradcpt/analysis.ts:14
+   ||!near(f.opacity,Math.round(Math.min(1,(f.atMs-s.startMs)/plan[f.slotIndex].durationMs)*1e6)/1e6))throw Error('GradCPT paint evidence mismatch');lastAt=f.atMs;lastSlot=f.slotIndex}
+                                                                                                      ^
+
+Error: GradCPT paint evidence mismatch
+    at reviewGrad (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/gradcpt/analysis.ts:14:109)
+    at scoreGrad (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/gradcpt/scorer.ts:15:16)
+    at Object.<anonymous> (/workspace/eduK12-new-version/docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/build-report-fixtures.cjs:28:104)
+    at Module._compile (node:internal/modules/cjs/loader:1872:14)
+    at Object.<anonymous> (node:internal/modules/cjs/loader:2003:10)
+    at Module.load (node:internal/modules/cjs/loader:1594:32)
+    at Module._load (node:internal/modules/cjs/loader:1396:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.19.0

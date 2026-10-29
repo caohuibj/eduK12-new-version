@@ -1,0 +1,172 @@
+{
+  "status": "DESIGN_DEPENDENCIES_NOT_A_PATCH",
+  "hostAdmissionMapperImplemented": false,
+  "currentSharedCoreChangesAuthorized": false,
+  "consumers": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/timing.ts",
+      "actionIfDesignApproved": "PROPOSED_NEW_FILE",
+      "owner": "内容/前端runner线",
+      "requiredChangeOrReview": "Prospective pure metrics/clock/preflight/counter rules only after approval; exact rule identity and evidence source, never simulation60 fallback.",
+      "failurePrevented": "Hidden unversioned gates or broad copied library defaults.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts",
+      "actionIfDesignApproved": "CANDIDATE_CHANGE_AFTER_APPROVAL",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Host-sourced timing artifact/type and source checks; actual realm, explicit client observation; do not infer panel/VRR or add fields to strict V1 provenance.",
+      "failurePrevented": "A client string or synthetic fixture mistaken for a real setting/measurement.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts",
+      "actionIfDesignApproved": "CANDIDATE_CHANGE_AFTER_APPROVAL",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Only formal50ms counter, first-issued/returned group semantics, per-slot marker/command clocks, cumulative guards and proposed gray clear. Other1000ms schedulers unchanged.",
+      "failurePrevented": "Off-by-one, compounded delay, fabricated mask/off or changing1000ms silently.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+      "actionIfDesignApproved": "CANDIDATE_CHANGE_AFTER_APPROVAL",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Preparation actor/max2 before exposure, frozen host-attempt mapper port, all-fixation coverage gate and old-callback cleanup; no additional fixation/trial or N switch.",
+      "failurePrevented": "Lifecycle reset/re-exposure from renamed context or stale ready/response gap.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts",
+      "actionIfDesignApproved": "CANDIDATE_CHANGE_AFTER_APPROVAL",
+      "owner": "内容/平台接合线",
+      "requiredChangeOrReview": "Freeze preparation/rules/family/origin; bind counters and ended state to authoritative admitted attempt; new host-admitted attempt separate; preserve attempted/unknown clocks and original retry records.",
+      "failurePrevented": "Lifetime page lock or arbitrary client new-attempt strings bypassing ended markers.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts",
+      "actionIfDesignApproved": "REGENERATE_ONLY_IF_ACTUAL_SOURCE_CONTRACT_CHANGES",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Generate from reviewed backend via existing projection tool; do not manually edit. Report stays closed until independent interpretation authorization.",
+      "failurePrevented": "Generated drift or technical-fit flag opening personal conclusions.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts",
+      "actionIfDesignApproved": "REGENERATE_ONLY_IF_ACTUAL_SOURCE_CONTRACT_CHANGES",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Generate from reviewed backend via existing projection tool; do not manually edit. Report stays closed until independent interpretation authorization.",
+      "failurePrevented": "Generated drift or technical-fit flag opening personal conclusions.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/scripts/cognitive/enumeration-content.cjs",
+      "actionIfDesignApproved": "CONSUMER_REVIEW_NOT_AUTOMATIC_EDIT",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Check projection boundary/source hashing if raw/protocol definitions change; no third-party runtime code imported.",
+      "failurePrevented": "Frontend/backend frozen contract drift.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts",
+      "actionIfDesignApproved": "CANDIDATE_CONTRACT_CHANGE_AFTER_REVIEW",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Review next exact identity/config/raw contract; explicitly represent timing-policy/family and marker-vs-draw semantics in an approved schema. Preserve approved counts/input.",
+      "failurePrevented": "Old engine/config aliasing a changed measurement.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/schema.ts",
+      "actionIfDesignApproved": "CANDIDATE_CONTRACT_CHANGE_AFTER_REVIEW",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Strictly validate new preflight/draw/neutralization/unknown fields, coverage bounds, origin and policy identity. No missing values coerced to0.",
+      "failurePrevented": "Malformed/under-sampled or fake on/off records accepted.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts",
+      "actionIfDesignApproved": "CANDIDATE_CONTRACT_CHANGE_AFTER_REVIEW",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Authority checks frozen policy applicability and new client technical facts; old25 not upgraded. Technical-fit does not override current global invalid interpretation gate.",
+      "failurePrevented": "Client boolean granting interpretation or retrospective qualification.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts",
+      "actionIfDesignApproved": "CANDIDATE_CONTRACT_CHANGE_AFTER_REVIEW",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Metric/quality/report definitions and compatible profiles/versions reviewed; references remain absent unless actual reference evidence exists.",
+      "failurePrevented": "Fake normal limits or incompatible frozen report.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts",
+      "actionIfDesignApproved": "CANDIDATE_CONTRACT_CHANGE_AFTER_REVIEW",
+      "owner": "内容线",
+      "requiredChangeOrReview": "Preserve actual clock and distinguish intended failed mask, returned mask, neutral-clear and unknown offset. Do not reuse end/deadline as mask onset.",
+      "failurePrevented": "A failed gray clear fabricating mask/off timing.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts",
+      "actionIfDesignApproved": "DEPENDENCY_REVIEW_ONLY_NO_SHARED_EDIT_AUTHORIZED",
+      "owner": "平台线",
+      "requiredChangeOrReview": "Review real start/session fields and host-admitted frozen sessionId+attemptNo mapping into candidate identity; current mapper is NOT implemented. No arbitrary client ID creates a new attempt.",
+      "failurePrevented": "Candidate documents pretending that platform persistence/authority is already wired.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "actionIfDesignApproved": "DEPENDENCY_REVIEW_ONLY_NO_SHARED_EDIT_AUTHORIZED",
+      "owner": "平台线",
+      "requiredChangeOrReview": "Review sealing/idempotency/capacity for new artifact/full raw and ended/preparation state; no cross-realm continuation or silent payload trimming.",
+      "failurePrevented": "Candidate documents pretending that platform persistence/authority is already wired.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+      "actionIfDesignApproved": "DEPENDENCY_REVIEW_ONLY_NO_SHARED_EDIT_AUTHORIZED",
+      "owner": "平台线",
+      "requiredChangeOrReview": "Review actual configHash/protocolSignature/reference frozen tuple; new approved policy must be bound without inventing normVersion.",
+      "failurePrevented": "Candidate documents pretending that platform persistence/authority is already wired.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/authoritative-scorer.ts",
+      "actionIfDesignApproved": "DEPENDENCY_REVIEW_ONLY_NO_SHARED_EDIT_AUTHORIZED",
+      "owner": "平台线",
+      "requiredChangeOrReview": "Consumer review of exact new candidate identity/snapshot/strict parser; shared core need not change if existing generic contract suffices.",
+      "failurePrevented": "Candidate documents pretending that platform persistence/authority is already wired.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/result-snapshot.ts",
+      "actionIfDesignApproved": "DEPENDENCY_REVIEW_ONLY_NO_SHARED_EDIT_AUTHORIZED",
+      "owner": "平台线",
+      "requiredChangeOrReview": "Review immutable result/report export: technical status not personal conclusion; old frozen results remain replayable under their exact identity.",
+      "failurePrevented": "Candidate documents pretending that platform persistence/authority is already wired.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/unified-raw-submission.ts",
+      "actionIfDesignApproved": "DEPENDENCY_REVIEW_ONLY_NO_SHARED_EDIT_AUTHORIZED",
+      "owner": "平台线",
+      "requiredChangeOrReview": "Review actual raw boundary, sidecar references and byte/hash budget; do not tunnel arbitrary new fields into an unrelated strict object.",
+      "failurePrevented": "Candidate documents pretending that platform persistence/authority is already wired.",
+      "changedNow": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts",
+      "actionIfDesignApproved": "DEPENDENCY_REVIEW_ONLY_NO_SHARED_EDIT_AUTHORIZED",
+      "owner": "平台线",
+      "requiredChangeOrReview": "Review real final persistence/ACK/export/archive binding; no COS implementation is asserted by this design.",
+      "failurePrevented": "Candidate documents pretending that platform persistence/authority is already wired.",
+      "changedNow": false
+    }
+  ],
+  "unimplementedPlatformPort": [
+    "Host-authorized frozen attempt mapper and lifecycle authority",
+    "Versioned complete-raw/private archive binding and actual saved/export consumer"
+  ],
+  "versionImpact": "Measurement/raw contract changes require real repository version/freeze compatibility review. No next version number is assigned and no existing normVersion is invented."
+}

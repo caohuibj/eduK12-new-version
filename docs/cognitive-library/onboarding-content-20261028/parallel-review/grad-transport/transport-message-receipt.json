@@ -1,0 +1,70 @@
+{
+  "baseline": "d5d4594bb26ec4ac220d43aecabd3366fb768b4a",
+  "node": "v24.21.0",
+  "recordedAt": "2026-10-28T04:09:15.137Z",
+  "results": [
+    {
+      "artifact": "transport-message-original.json",
+      "passed": 0,
+      "failed": 1
+    },
+    {
+      "artifact": "transport-message-fixed.json",
+      "passed": 1,
+      "failed": 0
+    }
+  ],
+  "commands": [
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/frontend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/gradcpt/transport-error.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-message-original.json",
+      "exit": 1
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/frontend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/gradcpt/transport-error.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-message-fixed.json",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/frontend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/gradcpt/wire.test.ts --maxWorkers=1 -t 'over-8MiB' --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-limit-fixed.json",
+      "exit": 0,
+      "passed": 1,
+      "filtered": 2
+    }
+  ],
+  "types": {
+    "method": "TypeScript API using frontend tsconfig.app options, noEmit/incremental:false, roots new transport-error.test.tsx/vite-env.d.ts/test setup.",
+    "originalExit": 1,
+    "originalDiagnostics": 1,
+    "finalExit": 0,
+    "finalSources": 73,
+    "finalDiagnostics": 0,
+    "note": "Only added fresh:true as const to new mock; identical transpiled JS proof retained; runtime assertion reused. Final DECODED_LIMIT static string values changed afterward by parent request; keys/types/control flow unchanged, original type source hashes retained without claiming a new run."
+  },
+  "sourceSHA256": {
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/transport-error.ts": "3a8942b9cd021288ef557c69b3b32605ec6b18a2181ec046c546c5696797f563",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/transport-error.test.tsx": "f85bfae7ff4ff9f824b9094af00ed1383a2aa72e4217c62202a7b7c654422ca9",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/wire.ts": "38960391284ef3937ae3507ae1185d458b89850c6d768ca3bb10d9e08dbd7a09",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/session.ts": "5f27d489665e31940504549e0b991c0d5d0bfa8adda1a92fda4ecfabc4b77123",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradCptTask.tsx": "2fb64e869866ea00524e0ed83ed028e0d48531325e441e9ed7f2c841554b99f5",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/wire.test.ts": "ff31314b6fea0fb1e00b2966817fdfd587ee6b1a367a166d52a5d298461ec885"
+  },
+  "artifactSHA256": {
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-message-original.json": "116d241f99d1512d72131953054f784157d5de24eb93f569e57913c517e1b51f",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-message-original.log": "dac34cb9f3f5a6341346bfe50634f258f6bfec6d9ada3a32a761fdbf1e12395d",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-message-fixed.json": "835da5c9b406d3862fca48f71c2ce9a98a38932bfaa32ff22b7aac6edbbd5251",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-message-fixed.log": "5a1e04aa7b72ee67ff9a7216e2b4969b7ac4e666035852c524adde986b10b476",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-message-types-original.json": "7fbf3e0e78eb2650760e1be10ee2f076204a909706fb13b753ac096f37990b09",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-message-types.json": "823f80b8f63b35640ec2669349468ae12442621516726e5d232c959f89e701dc",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-message-type-proof.json": "7953881344a814ba90376eb1fa34093780b21fafd1364d10fde869240ee53f03",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-limit-fixed.json": "f0eaabb077b54edcea71f1f9bd633636ce95f36f702b921c1976286660483426",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/transport-limit-fixed.log": "90abd2070085bfcfa8f814b0ecdd520da9440207dcadce47304ed16dce0ca5f2"
+  },
+  "privacy": "Only fixed local GradTransportError codes become public text; error.message is never rendered. Unknown errors retain original generic copy.",
+  "scorerInvocations": 0,
+  "wholeFormalFlows": 0,
+  "wireRetests": 1,
+  "remaining": "Parent independent review/integration; no denied/uncertain action.",
+  "wireRetestScope": "Only directly affected decoded-limit error-code case after removing engineering bytes from public text; other two wire cases not repeated."
+}

@@ -1,0 +1,732 @@
+{
+  "artifactKind": "READ_ONLY_ENGINEERING_STATISTICS_NOT_A_TIMING_QUALIFICATION",
+  "createdUtc": "2026-10-26T08:29:47.712134+00:00",
+  "source": "docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/browser-captured-raw.json",
+  "sourceSha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+  "quantileMethod": "nearest-rank ceil(p*n); no intervals across different records joined",
+  "allWithinTrialCallbackIntervals": {
+    "count": 3660,
+    "minimumMs": 16.5,
+    "meanMs": 16.66590327868852,
+    "medianMs": 16.69999999999709,
+    "p95Ms": 16.700000000004366,
+    "p99Ms": 16.80000000000291,
+    "maximumMs": 16.80000000000291,
+    "nonpositiveCount": 0
+  },
+  "phaseSegments": [
+    {
+      "phase": "practice",
+      "index": 0,
+      "intervalCount": 182,
+      "statistics": {
+        "count": 182,
+        "minimumMs": 16.5,
+        "meanMs": 16.66612087912088,
+        "medianMs": 16.699999999999818,
+        "p95Ms": 16.700000000000273,
+        "p99Ms": 16.800000000000182,
+        "maximumMs": 16.800000000000182,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "practice",
+      "index": 1,
+      "intervalCount": 182,
+      "statistics": {
+        "count": 182,
+        "minimumMs": 16.5,
+        "meanMs": 16.666120879120882,
+        "medianMs": 16.699999999999818,
+        "p95Ms": 16.700000000000728,
+        "p99Ms": 16.800000000000182,
+        "maximumMs": 16.800000000000182,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "practice",
+      "index": 2,
+      "intervalCount": 182,
+      "statistics": {
+        "count": 182,
+        "minimumMs": 16.5,
+        "meanMs": 16.665571428571425,
+        "medianMs": 16.699999999999818,
+        "p95Ms": 16.700000000000728,
+        "p99Ms": 16.800000000000182,
+        "maximumMs": 16.800000000000182,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 0,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.5,
+        "meanMs": 16.66559999999999,
+        "medianMs": 16.69999999999891,
+        "p95Ms": 16.700000000000728,
+        "p99Ms": 16.80000000000109,
+        "maximumMs": 16.80000000000109,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 1,
+      "intervalCount": 126,
+      "statistics": {
+        "count": 126,
+        "minimumMs": 16.53399999999965,
+        "meanMs": 16.66614285714285,
+        "medianMs": 16.69999999999891,
+        "p95Ms": 16.700000000000728,
+        "p99Ms": 16.80000000000109,
+        "maximumMs": 16.80000000000109,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 2,
+      "intervalCount": 124,
+      "statistics": {
+        "count": 124,
+        "minimumMs": 16.5,
+        "meanMs": 16.666129032258066,
+        "medianMs": 16.69999999999891,
+        "p95Ms": 16.799999999999272,
+        "p99Ms": 16.80000000000109,
+        "maximumMs": 16.80000000000109,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 3,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.5,
+        "meanMs": 16.66559999999999,
+        "medianMs": 16.700000000000728,
+        "p95Ms": 16.799999999999272,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 4,
+      "intervalCount": 123,
+      "statistics": {
+        "count": 123,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.666666666666668,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.799999999999272,
+        "p99Ms": 16.799999999999272,
+        "maximumMs": 16.799999999999272,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 5,
+      "intervalCount": 124,
+      "statistics": {
+        "count": 124,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.665596774193546,
+        "medianMs": 16.700000000000728,
+        "p95Ms": 16.700000000000728,
+        "p99Ms": 16.799999999999272,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 6,
+      "intervalCount": 124,
+      "statistics": {
+        "count": 124,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.665596774193546,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000000728,
+        "p99Ms": 16.700000000000728,
+        "maximumMs": 16.799999999999272,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 7,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.666399999999996,
+        "medianMs": 16.700000000000728,
+        "p95Ms": 16.700000000000728,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 8,
+      "intervalCount": 123,
+      "statistics": {
+        "count": 123,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.666666666666668,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000000728,
+        "p99Ms": 16.799999999999272,
+        "maximumMs": 16.799999999999272,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 9,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.665600000000005,
+        "medianMs": 16.700000000000728,
+        "p95Ms": 16.700000000000728,
+        "p99Ms": 16.799999999999272,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 10,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.666400000000024,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.799999999999272,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 11,
+      "intervalCount": 124,
+      "statistics": {
+        "count": 124,
+        "minimumMs": 16.5,
+        "meanMs": 16.666129032258112,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 12,
+      "intervalCount": 124,
+      "statistics": {
+        "count": 124,
+        "minimumMs": 16.5,
+        "meanMs": 16.666129032258052,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 13,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.665599999999976,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 14,
+      "intervalCount": 126,
+      "statistics": {
+        "count": 126,
+        "minimumMs": 16.5,
+        "meanMs": 16.66587301587303,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 15,
+      "intervalCount": 124,
+      "statistics": {
+        "count": 124,
+        "minimumMs": 16.5,
+        "meanMs": 16.66532258064516,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 16,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.5,
+        "meanMs": 16.665599999999976,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 17,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.66479999999999,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 18,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.665871999999975,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.73399999999674,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 19,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.665872000000032,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.799999999995634,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 20,
+      "intervalCount": 124,
+      "statistics": {
+        "count": 124,
+        "minimumMs": 16.5,
+        "meanMs": 16.666129032258052,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 21,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.5,
+        "meanMs": 16.665599999999976,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 22,
+      "intervalCount": 125,
+      "statistics": {
+        "count": 125,
+        "minimumMs": 16.5,
+        "meanMs": 16.665599999999976,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.80000000000291,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 23,
+      "intervalCount": 124,
+      "statistics": {
+        "count": 124,
+        "minimumMs": 16.599999999998545,
+        "meanMs": 16.666129032258052,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.700000000004366,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    },
+    {
+      "phase": "test",
+      "index": 24,
+      "intervalCount": 124,
+      "statistics": {
+        "count": 124,
+        "minimumMs": 16.5,
+        "meanMs": 16.666403225806437,
+        "medianMs": 16.69999999999709,
+        "p95Ms": 16.799999999995634,
+        "p99Ms": 16.80000000000291,
+        "maximumMs": 16.80000000000291,
+        "nonpositiveCount": 0
+      },
+      "has270ContinuousIntervals": false
+    }
+  ],
+  "formalCallbackMarkers": [
+    {
+      "index": 0,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.600000000000364,
+        33.30000000000109
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 1,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.600000000000364,
+        33.29999999999927,
+        49.899999999999636
+      ],
+      "maskCallbackOffsetMs": 66.60000000000036,
+      "stimulusFrameCount": 4
+    },
+    {
+      "index": 2,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.600000000000364,
+        33.29999999999927,
+        49.899999999999636
+      ],
+      "maskCallbackOffsetMs": 66.60000000000036,
+      "stimulusFrameCount": 4
+    },
+    {
+      "index": 3,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.700000000000728,
+        33.400000000001455
+      ],
+      "maskCallbackOffsetMs": 50.10000000000218,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 4,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.700000000000728,
+        33.29999999999927
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 5,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.700000000000728,
+        33.400000000001455
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 6,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.69999999999709,
+        33.39999999999782
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 7,
+      "stimulusCallbackOffsetsMs": [
+        0,
+        16.700000000000728,
+        33.29999999999927
+      ],
+      "maskCallbackOffsetMs": 50,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 8,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.600000000002183,
+        33.400000000001455
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 9,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.599999999998545,
+        33.29999999999927
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 10,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.600000000002183,
+        33.30000000000291
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 11,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.60000000000582,
+        33.30000000000291,
+        49.900000000001455
+      ],
+      "maskCallbackOffsetMs": 66.60000000000582,
+      "stimulusFrameCount": 4
+    },
+    {
+      "index": 12,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.599999999998545,
+        33.19999999999709,
+        49.89999999999418
+      ],
+      "maskCallbackOffsetMs": 66.59999999999854,
+      "stimulusFrameCount": 4
+    },
+    {
+      "index": 13,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.69999999999709,
+        33.30000000000291
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 14,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.599999999998545,
+        33.299999999995634,
+        49.89999999999418
+      ],
+      "maskCallbackOffsetMs": 66.59999999999854,
+      "stimulusFrameCount": 4
+    },
+    {
+      "index": 15,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.700000000004366,
+        33.400000000001455
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 16,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.599999999998545,
+        33.19999999999709,
+        49.89999999999418
+      ],
+      "maskCallbackOffsetMs": 66.59999999999854,
+      "stimulusFrameCount": 4
+    },
+    {
+      "index": 17,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.700000000004366,
+        33.400000000001455
+      ],
+      "maskCallbackOffsetMs": 50.099999999998545,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 18,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.69999999999709,
+        33.39999999999418
+      ],
+      "maskCallbackOffsetMs": 50.099999999998545,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 19,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.700000000004366,
+        33.30000000000291
+      ],
+      "maskCallbackOffsetMs": 50.099999999998545,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 20,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.599999999998545,
+        33.299999999995634
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 21,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.700000000004366,
+        33.400000000001455
+      ],
+      "maskCallbackOffsetMs": 50.099999999998545,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 22,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.599999999998545,
+        33.299999999995634,
+        49.900000000001455
+      ],
+      "maskCallbackOffsetMs": 66.59999999999854,
+      "stimulusFrameCount": 4
+    },
+    {
+      "index": 23,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.700000000004366,
+        33.400000000001455
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    },
+    {
+      "index": 24,
+      "stimulusCallbackOffsetsMs": [
+        0.0,
+        16.60000000000582,
+        33.30000000000291
+      ],
+      "maskCallbackOffsetMs": 50.0,
+      "stimulusFrameCount": 3
+    }
+  ],
+  "limitations": [
+    "Not a preflight recording; no continuous270-interval segment in this dataset",
+    "No120Hz,90Hz,144Hz,VRR,privacy-coarsened clock or actual canvas-command timing evidence",
+    "Callback markers are not physical display timestamps",
+    "No old trial is relabelled valid; no runtime policy or tolerance changed"
+  ]
+}

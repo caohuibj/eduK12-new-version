@@ -1,0 +1,281 @@
+{
+  "kind": "MINIMAL_NATIVE_REGISTRY_ADMISSION",
+  "status": "TARGETED_CONTRACT_PASS_NOT_PRODUCT_IMPORT",
+  "recordedAt": "2026-10-26T10:07:35.907634+00:00",
+  "initialWorktreeHead": "eb5d90274c2f4301c1be93b107eb8c7bb10360ee",
+  "currentHeadForParentReview": "c4cade62369429c5ef704a94ea667740807ce303",
+  "remoteBaseline": "remote-baseline.json",
+  "sources": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/registry.ts",
+      "beforeSha256": "8079f74143d6e9f1d70678465b9a868b3c96e98a80ad85ea6bf4ba245ee4cc4e",
+      "afterSha256": "3097ab3b6b52f8cfb8f73c851db93dc4da09815725e19952431d1e762f166f97",
+      "new": false
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
+      "beforeSha256": "743a3b10babf8602dc21c91ec2b413317959e00dde656f3d01b2afe274c171ae",
+      "afterSha256": "2f0ff974f4be034c88cb47831f63e6768ee7fabd5e8896095ebd56358302daf9",
+      "new": false
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/audit.ts",
+      "beforeSha256": "9df92e8dd264b50586271d6ef04d616b92163d2906e5f6ad8fa49bf4e2657092",
+      "afterSha256": "63183ef391d2cc0d7524be76cd0f38c4b3b187b3354cc28f0e87b2d5df35e8d7",
+      "new": false
+    },
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/v2-registry.test.ts",
+      "beforeSha256": "554b6890adc55f11535256554c9f2d0aa6cb3f5a823ea7a6d221cd179c1359f6",
+      "afterSha256": "de9f094f4336af3278dd9b9a4cee2b70b1f5046e04d691dfef47f35018a908aa",
+      "new": false
+    },
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/mot-native-content.test.ts",
+      "beforeSha256": "d1a82ed87d4ace287e85969e986fde1fa38ad9639b642882c53f45c40b7c3691",
+      "afterSha256": "c9ea0aa0819ef05b4b532cb60e1c9a2ebce9d64f1de9af24daf9ae9c37097c05",
+      "new": false
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterSha256": "d00bcca6851175120c548d7b56c53e658259ab34e33afb51ca803a8cdcfc8a5a",
+      "new": true
+    },
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/v2-native-registry.test.ts",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterSha256": "8d4a60317df919dc4d2392e0ddec917d6fd3574156581e6f6013b2d2b984269a",
+      "new": true
+    }
+  ],
+  "ownedDiff": {
+    "file": "owned-source.diff",
+    "sha256": "ecd628615a23c033a939f0fc76a11e78e615cd87f0a70872969323bf35f2ae97",
+    "includesOtherOwnerCandidateChanges": false,
+    "motBaselineNote": "Only owned first-case admission text reconstructed to original; all parent preexisting version/fixture changes preserved"
+  },
+  "runs": [
+    {
+      "file": "native-contract.json",
+      "sha256": "b458dbece8aa90e6e9529e6f0355022fab5bb19fbe94ba95dec4c1187993fb18",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/v2-native-registry.test.ts --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-registry/native-contract.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 1,
+      "passed": 15,
+      "failed": 1,
+      "skipped": 0,
+      "total": 16,
+      "success": false,
+      "scope": "15 PASS1 FAIL; new test incorrectly expected empty legacy reaction to succeed; original old strict scorer rejected it"
+    },
+    {
+      "file": "native-legacy-compat.json",
+      "sha256": "1e672cde719b5432e1dfd6d9ee3b66feb6b39bae9a0fec95e87466822fb454c7",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/v2-native-registry.test.ts -t 'preserves the existing legacy adapter' --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-registry/native-legacy-compat.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 15,
+      "total": 16,
+      "success": true,
+      "scope": "Only failed legacy case continued; preserved actual strict5-trial rejection,15 passing cases reused"
+    },
+    {
+      "file": "legacy-inventory-consumers.json",
+      "sha256": "a79a2274bcc05ab2c83fe408b2d3b55c75097f3c3e1f1981a02ae608f71a80b8",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/v2-registry.test.ts -t 'preserves every legacy identity|binds FINAL admission|separates product lifecycle' --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-registry/legacy-inventory-consumers.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "total": 0,
+      "success": false,
+      "scope": "SETUP failure0 cases: barrel indirectly required absent generated Prisma client; no business test ran"
+    },
+    {
+      "file": "legacy-inventory-consumers-continued.json",
+      "sha256": "baf48bae2142b186713cf63e5e9a5187edf3b5baed769c339a9ecce8bf441320",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/v2-registry.test.ts -t 'preserves every legacy identity|binds FINAL admission|separates product lifecycle' --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-registry/legacy-inventory-consumers-continued.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 5,
+      "total": 8,
+      "success": true,
+      "scope": "Same3 necessary old inventory contracts via direct real module imports; no mock/install/generate; other5 not selected"
+    }
+  ],
+  "acceptedEvidence": {
+    "nativeDistinctCases": 16,
+    "firstRunPassingCasesReused": 15,
+    "failedCaseTargetedContinuation": 1,
+    "necessaryOldInventoryConsumers": 3,
+    "singleFullGreenInvocationClaimed": false,
+    "oldMotSuiteRerun": false,
+    "oldCandidateArithmeticRerun": false
+  },
+  "types": {
+    "file": "types.json",
+    "sha256": "2145f3afa0f6c9404788b11626bb71490ce21bd17bb086e8e4a27eb5a264c48c",
+    "exitCode": 0,
+    "roots": [
+      "src/modules/cognitive/v2/registry.ts",
+      "src/modules/cognitive/v2/publication-gate.ts",
+      "src/modules/cognitive/v2/audit.ts",
+      "src/modules/cognitive/content-candidates/native-registry/definitions.ts"
+    ],
+    "durationSeconds": 3.369917869567871,
+    "sourceSha256": {
+      "server-version/backend/src/modules/cognitive/v2/registry.ts": "3097ab3b6b52f8cfb8f73c851db93dc4da09815725e19952431d1e762f166f97",
+      "server-version/backend/src/modules/cognitive/v2/publication-gate.ts": "2f0ff974f4be034c88cb47831f63e6768ee7fabd5e8896095ebd56358302daf9",
+      "server-version/backend/src/modules/cognitive/v2/audit.ts": "63183ef391d2cc0d7524be76cd0f38c4b3b187b3354cc28f0e87b2d5df35e8d7",
+      "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts": "d00bcca6851175120c548d7b56c53e658259ab34e33afb51ca803a8cdcfc8a5a",
+      "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts": "2d002b020ed9053ea6d16299ba7edd14afd30a6d1263964a28d600d6b64c2028",
+      "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts": "eaf7c9e3b2d41d95c77546deebb3ce80c0ee9bd12b5b1c235849024fecf7dfc3",
+      "server-version/backend/src/modules/cognitive/content-candidates/mot/package.ts": "709b00610482a2d4014090e9a400728009d5b2e2ad9cdd5468d3bc4cfe73c261",
+      "server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts": "dccf4723f4ea9b66d317b532310fc30768406c74614e7d645aa990939266f56f",
+      "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts": "b7c61565dfc2182327fa8d25368d4435d75669452d30c50240915a5f3080ad69",
+      "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts": "f9b724b0bbca7c172089ae1699b311605e1681845a331f192f9afc4de454804b",
+      "server-version/backend/src/modules/cognitive/content-candidates/mot/protocol.ts": "59813dd8b4cbde0571ecdad9e87113cb52ab1b9885d506f0273cb8cca34a5612",
+      "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts": "3c7d56f2bc6bf4ef92d7251e90bedbc94baaa98ad507fca5e255b13be846d974",
+      "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts": "8780ed5a2d7ec90f14a4f5129c97f1a84fd271197c40c32a39148a4b256d0016"
+    },
+    "inputHashesStable": true,
+    "fullApplication": false
+  },
+  "inventory": {
+    "legacyCount": 29,
+    "native": [
+      {
+        "testType": "mot",
+        "engineVersion": "1.1.1",
+        "scoringVersion": "1.1.0",
+        "profiles": [
+          "research",
+          "experience"
+        ]
+      },
+      {
+        "testType": "enumeration",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.2.0",
+        "profiles": [
+          "research",
+          "experience"
+        ]
+      },
+      {
+        "testType": "continuous-recognition",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.2.0",
+        "profiles": [
+          "research",
+          "experience"
+        ]
+      },
+      {
+        "testType": "ant",
+        "engineVersion": "1.0.0",
+        "scoringVersion": "1.1.0",
+        "profiles": [
+          "research",
+          "experience"
+        ]
+      }
+    ],
+    "combinedCount": 33
+  },
+  "rawArtifactHashes": [
+    {
+      "file": "README.md",
+      "sha256": "ff9bb9bb8d5c465a378050b9ad72e7084dd98d67dc5de19e1e2d3d5a6c144b6a"
+    },
+    {
+      "file": "baseline-audit.ts.txt",
+      "sha256": "9df92e8dd264b50586271d6ef04d616b92163d2906e5f6ad8fa49bf4e2657092"
+    },
+    {
+      "file": "baseline-mot-test-owned-hunk.ts.txt",
+      "sha256": "d1a82ed87d4ace287e85969e986fde1fa38ad9639b642882c53f45c40b7c3691"
+    },
+    {
+      "file": "baseline-publication-gate.ts.txt",
+      "sha256": "743a3b10babf8602dc21c91ec2b413317959e00dde656f3d01b2afe274c171ae"
+    },
+    {
+      "file": "baseline-registry.ts.txt",
+      "sha256": "8079f74143d6e9f1d70678465b9a868b3c96e98a80ad85ea6bf4ba245ee4cc4e"
+    },
+    {
+      "file": "frontend-consumers.md",
+      "sha256": "fb3ed9fe986991f291b34352d40624af23a4e0508c6630dc2f1f57bc62dfa2a1"
+    },
+    {
+      "file": "legacy-inventory-consumers-continued.json",
+      "sha256": "baf48bae2142b186713cf63e5e9a5187edf3b5baed769c339a9ecce8bf441320"
+    },
+    {
+      "file": "legacy-inventory-consumers.json",
+      "sha256": "a79a2274bcc05ab2c83fe408b2d3b55c75097f3c3e1f1981a02ae608f71a80b8"
+    },
+    {
+      "file": "native-contract.json",
+      "sha256": "b458dbece8aa90e6e9529e6f0355022fab5bb19fbe94ba95dec4c1187993fb18"
+    },
+    {
+      "file": "native-legacy-compat.json",
+      "sha256": "1e672cde719b5432e1dfd6d9ee3b66feb6b39bae9a0fec95e87466822fb454c7"
+    },
+    {
+      "file": "owned-source.diff",
+      "sha256": "ecd628615a23c033a939f0fc76a11e78e615cd87f0a70872969323bf35f2ae97"
+    },
+    {
+      "file": "recognition-preexisting-readiness.json",
+      "sha256": "a6cb2a8229badaec779e2dcaf559e0b49f8b7a42d3b3b6053df0a2ac7e978bcc"
+    },
+    {
+      "file": "remote-baseline.json",
+      "sha256": "fe1487419593ff13b73c305ea467840fe10debbf5808f97b56b8400099cd7ff2"
+    },
+    {
+      "file": "types.json",
+      "sha256": "2145f3afa0f6c9404788b11626bb71490ce21bd17bb086e8e4a27eb5a264c48c"
+    },
+    {
+      "file": "types.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "types.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "recognitionVisibilityOwnerRepair": {
+    "before": "recognition-preexisting-readiness.json",
+    "modifiedByThisAgent": false,
+    "currentPackageSha256": "eaf7c9e3b2d41d95c77546deebb3ce80c0ee9bd12b5b1c235849024fecf7dfc3",
+    "newNativeGateCasePassed": true
+  },
+  "scope": [
+    "v2 resolver direct authoritative native objects, no fake legacy numeric score",
+    "Exact native research/experience gate and strict combined audit",
+    "Unknown/version mismatch never latest fallback",
+    "Legacy adapter and reference eligibility remain strict",
+    "Business catalog/assignment/session/trial/completion and data save consumers not adapted",
+    "No API/DB/COS/CI/merge/deploy/commit/push by this agent"
+  ],
+  "failureBoundary": "Prisma barrel import setup0 remains recorded; direct module pure contracts do not claim production barrel or DB startup validated",
+  "consumerDependencies": "README.md and frontend-consumers.md",
+  "environment": {
+    "cloudOnly": true,
+    "node": "24.21.0",
+    "workers": 1,
+    "dependenciesInstalledOrGenerated": false,
+    "macUsed": false
+  }
+}

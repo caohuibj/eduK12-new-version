@@ -1,0 +1,491 @@
+{
+  "artifactKind": "STATIC_DESIGN_REVIEW_NOT_RUNTIME_OR_SCIENTIFIC_VALIDATION",
+  "candidateId": "continuous-recognition",
+  "status": "DESIGN_PROPOSAL",
+  "createdUtc": "2026-10-26T06:00:41.048Z",
+  "baselineCommit": "e393f730a7b0832534a181df1f3fbbc6b9575f8c",
+  "sourceResearchCommit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+  "node": "v24.21.0",
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": true,
+  "cloudOnly": true,
+  "networkRequestsBlocked": true,
+  "checks": [
+    {
+      "kind": "phone",
+      "view": "intro",
+      "width": 390,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "kind": "phone",
+      "view": "image",
+      "width": 390,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "kind": "phone",
+      "view": "isi",
+      "width": 390,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "kind": "phone",
+      "view": "interpretable",
+      "width": 390,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "kind": "phone",
+      "view": "limited",
+      "width": 390,
+      "horizontalOverflow": false,
+      "qualityGated": true
+    },
+    {
+      "kind": "phone",
+      "view": "invalid",
+      "width": 390,
+      "horizontalOverflow": false,
+      "qualityGated": true
+    },
+    {
+      "kind": "phone",
+      "view": "parameters",
+      "width": 390,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "kind": "tablet",
+      "view": "intro",
+      "width": 820,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "kind": "tablet",
+      "view": "image",
+      "width": 820,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "kind": "tablet",
+      "view": "isi",
+      "width": 820,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "kind": "tablet",
+      "view": "interpretable",
+      "width": 820,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "kind": "tablet",
+      "view": "limited",
+      "width": 820,
+      "horizontalOverflow": false,
+      "qualityGated": true
+    },
+    {
+      "kind": "tablet",
+      "view": "invalid",
+      "width": 820,
+      "horizontalOverflow": false,
+      "qualityGated": true
+    },
+    {
+      "kind": "tablet",
+      "view": "parameters",
+      "width": 820,
+      "horizontalOverflow": false,
+      "qualityGated": false
+    },
+    {
+      "case": "optional_takehome",
+      "passed": true
+    }
+  ],
+  "zoom": [
+    {
+      "lang": "zh",
+      "view": "intro",
+      "horizontalOverflow": false
+    },
+    {
+      "lang": "zh",
+      "view": "interpretable",
+      "horizontalOverflow": false
+    },
+    {
+      "lang": "zh",
+      "view": "limited",
+      "horizontalOverflow": false
+    },
+    {
+      "lang": "zh",
+      "view": "invalid",
+      "horizontalOverflow": false
+    },
+    {
+      "lang": "en",
+      "view": "intro",
+      "horizontalOverflow": false
+    },
+    {
+      "lang": "en",
+      "view": "interpretable",
+      "horizontalOverflow": false
+    },
+    {
+      "lang": "en",
+      "view": "limited",
+      "horizontalOverflow": false
+    },
+    {
+      "lang": "en",
+      "view": "invalid",
+      "horizontalOverflow": false
+    }
+  ],
+  "geometry": [
+    {
+      "kind": "phone",
+      "view": "image",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "board": {
+        "x": 45,
+        "y": 358.15625,
+        "width": 300,
+        "height": 300
+      },
+      "seen": {
+        "x": 45,
+        "y": 690.15625,
+        "width": 300,
+        "height": 64
+      },
+      "responseRegion": {
+        "x": 45,
+        "y": 690.15625,
+        "width": 300,
+        "height": 144
+      },
+      "overflow": false
+    },
+    {
+      "kind": "phone",
+      "view": "isi",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "board": {
+        "x": 45,
+        "y": 358.15625,
+        "width": 300,
+        "height": 300
+      },
+      "seen": {
+        "x": 45,
+        "y": 690.15625,
+        "width": 300,
+        "height": 64
+      },
+      "responseRegion": {
+        "x": 45,
+        "y": 690.15625,
+        "width": 300,
+        "height": 144
+      },
+      "overflow": false
+    },
+    {
+      "kind": "tablet",
+      "view": "image",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "board": {
+        "x": 260,
+        "y": 263.765625,
+        "width": 300,
+        "height": 300
+      },
+      "seen": {
+        "x": 260,
+        "y": 607.765625,
+        "width": 300,
+        "height": 64
+      },
+      "responseRegion": {
+        "x": 260,
+        "y": 607.765625,
+        "width": 300,
+        "height": 144
+      },
+      "overflow": false
+    },
+    {
+      "kind": "tablet",
+      "view": "isi",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "board": {
+        "x": 260,
+        "y": 263.765625,
+        "width": 300,
+        "height": 300
+      },
+      "seen": {
+        "x": 260,
+        "y": 607.765625,
+        "width": 300,
+        "height": 64
+      },
+      "responseRegion": {
+        "x": 260,
+        "y": 607.765625,
+        "width": 300,
+        "height": 144
+      },
+      "overflow": false
+    }
+  ],
+  "syntheticMetrics": {
+    "experience": {
+      "targetRepeatSeen": 16,
+      "targetRepeat": 20,
+      "targetFirstSeen": 5,
+      "targetFirst": 20,
+      "hitRate": 0.8,
+      "falseAlarmRate": 0.25,
+      "crr": 0.55
+    },
+    "research": {
+      "targetRepeatSeen": 48,
+      "targetRepeat": 60,
+      "targetFirstSeen": 15,
+      "targetFirst": 60
+    },
+    "negativeCRR": -0.2
+  },
+  "proposalArithmeticVerified": true,
+  "assetsCleared": false,
+  "productFourEntrancesVerified": false,
+  "hardwareTimingValidated": false,
+  "thirdPartyCodeExecuted": false,
+  "runnerImplemented": false,
+  "scorerImplemented": false,
+  "registered": false,
+  "dbOrCosTested": false,
+  "errors": [],
+  "sourceFiles": [
+    {
+      "file": "README.md",
+      "sha256": "0e0393150d7aa9ee8d46b0d9b991a9f8f4b74a7a766444b9fb640745bef57bf7"
+    },
+    {
+      "file": "design.json",
+      "sha256": "27d9868879ea1c7f1d2322b8adddc8c85dc90950a37cda4143418aadd7968f6d"
+    },
+    {
+      "file": "preview.html",
+      "sha256": "51d0d4930dc33e20ccdcce719a9a9d5090795f2f1728327c0b3d39af6928be19"
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "phone-intro",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/phone-intro.png",
+      "sha256": "a5065d13db25ef0b7b9ffc8058de0e3182543132314b80b9318f577bd2c4326e"
+    },
+    {
+      "name": "phone-image",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/phone-image.png",
+      "sha256": "5351cdf75cbffd9e123ec61381c90c2755986872d1e4e9d2ca38238290e314fc"
+    },
+    {
+      "name": "phone-isi",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/phone-isi.png",
+      "sha256": "01997a7850605ccc7f2a98f6bfacff4fb56665444dd68288944a32080f942605"
+    },
+    {
+      "name": "phone-interpretable",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/phone-interpretable.png",
+      "sha256": "df41bcd2e14db7628c25030fa460bc8d9cc14ec14dd07390fccddabe7f5c64e7"
+    },
+    {
+      "name": "phone-limited",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/phone-limited.png",
+      "sha256": "a780e93ed3ae057d0712c6be0b3f381ef1d82ace3093b3cfa7a4d3a8bd724beb"
+    },
+    {
+      "name": "phone-invalid",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/phone-invalid.png",
+      "sha256": "1a3097263f4636afc3a340b9d96b53bbf7d7ae4dc1425550477c6f313ba4bd3b"
+    },
+    {
+      "name": "phone-parameters",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/phone-parameters.png",
+      "sha256": "2eb35c926d9942adfc2904481b6fcc19ad82f019b04f3c21412b6d087571af29"
+    },
+    {
+      "name": "tablet-intro",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/tablet-intro.png",
+      "sha256": "60cfa69465393fb7f0c8cc5f6775b4e79b5b2b46af029a30b572249a770c4075"
+    },
+    {
+      "name": "tablet-image",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/tablet-image.png",
+      "sha256": "dd90b76464422ff13fa1ca0f6f041d7443b3aa9d4cc77a8cebd9e9c478122162"
+    },
+    {
+      "name": "tablet-isi",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/tablet-isi.png",
+      "sha256": "d132f7ae2af6b4f03f56c6b3a8d6eb833ab45d2655dc0357d44bd1289a7d59f7"
+    },
+    {
+      "name": "tablet-interpretable",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/tablet-interpretable.png",
+      "sha256": "9f20bf109b0effc0e50f396926976a58fde309110ea4d20d1a459f4954447796"
+    },
+    {
+      "name": "tablet-limited",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/tablet-limited.png",
+      "sha256": "37f060ebc62b4bf0ed409d61382fc0cb446038fe435415c8084878aa6277a4c6"
+    },
+    {
+      "name": "tablet-invalid",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/tablet-invalid.png",
+      "sha256": "d07f12868679a6d2a860a6d5c2c84611773e4be6c4dac5811eedd3244783e2ad"
+    },
+    {
+      "name": "tablet-parameters",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/tablet-parameters.png",
+      "sha256": "41b042b4ba40490c3db78e7c7cb2fd4ef93543f2a346b5f2d68e19e23ce83a58"
+    },
+    {
+      "name": "phone-report-en-research",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/phone-report-en-research.png",
+      "sha256": "0d5111baca737b7f35791084d1f2b80ad1bccc7ce681e0488ad56c48922a1e2e"
+    },
+    {
+      "name": "phone-report-negative",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/phone-report-negative.png",
+      "sha256": "8809525cf75140fdf053ad5fc4f38914ce80a49d22446f907dad3ea3e3729752"
+    },
+    {
+      "name": "zoom-zh-intro",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/zoom-zh-intro.png",
+      "sha256": "0631880db81b477f6c77398922ed61380c700fdb3ac33151b6a55f265cd01c68"
+    },
+    {
+      "name": "zoom-zh-interpretable",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/zoom-zh-interpretable.png",
+      "sha256": "9edcce925c89dca8ec512fa1bebddaf3656920aefb4e531cbde3c2511846d6d3"
+    },
+    {
+      "name": "zoom-zh-limited",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/zoom-zh-limited.png",
+      "sha256": "62bc330afbefee2e7f90a2a3470017ba99d751783966b2c3071267db86318c63"
+    },
+    {
+      "name": "zoom-zh-invalid",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/zoom-zh-invalid.png",
+      "sha256": "0be108999cef65f772ff6f4e5a858f75905cbfed2e8a5e87d2c910ee677962f3"
+    },
+    {
+      "name": "zoom-en-intro",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/zoom-en-intro.png",
+      "sha256": "ac7834e46ec40d95cd53ce0b728a2268bfc4715c277e22bc0e4839715dd29d51"
+    },
+    {
+      "name": "zoom-en-interpretable",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/zoom-en-interpretable.png",
+      "sha256": "3773505fb9d07378bbc5d454915585fe6bee793bf4e49b5117b54cd251254082"
+    },
+    {
+      "name": "zoom-en-limited",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/zoom-en-limited.png",
+      "sha256": "c75870cb847a8317cd092f9228db320496e2e625d59dcb59a724f5c66a971bbe"
+    },
+    {
+      "name": "zoom-en-invalid",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/zoom-en-invalid.png",
+      "sha256": "a86b89c92e609fa5a8df502afdbe4e475f043e2c86abc26b03b6b69082a7209b"
+    },
+    {
+      "name": "review",
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/review.png",
+      "sha256": "4daf10ce00a91735a46e3ca732ebb1d212760179cde84274b0617995627876d9"
+    }
+  ],
+  "limitations": [
+    "CSS geometry proposal is fixed300px at supported viewport, not upstream512px or calibrated physical angle.",
+    "8-view practice is a project proposal, with shorter lags/different prevalence than formal trials.",
+    "100-view short profile changes target prevalence and lag distribution; it is not an equivalent validated short form.",
+    "SVG is an original layout placeholder, not production stimulus material.",
+    "200% checks cover instructions and reports, not stimulus administration at arbitrary zoom.",
+    "Montage uses cropped static iframe review panes; full state screenshots remain separate."
+  ],
+  "initialCaptureSourceFiles": [
+    {
+      "file": "README.md",
+      "sha256": "d4df27843e6e083e2f00c530d04e69b8df8f55cdb1567986414d62cc137d8863"
+    },
+    {
+      "file": "design.json",
+      "sha256": "043cded352b3a3b96a48aa1dee9703241fed5f08e863cc989bd15faea5c59eb8"
+    },
+    {
+      "file": "preview.html",
+      "sha256": "b5d0e273ac0e986d3fa1b5235489d958769c66aa57ba1946c599b23dd27f82bc"
+    }
+  ],
+  "geometryFollowup": {
+    "kind": "TARGETED_POSITIONS_AND_CHANGED_COPY_ONLY",
+    "createdUtc": "2026-10-26T06:08:26.712Z",
+    "sourceHtmlSha256": "51d0d4930dc33e20ccdcce719a9a9d5090795f2f1728327c0b3d39af6928be19",
+    "imageIsiPositionsEqualWithinEachViewport": true,
+    "sourceGeometry": "300 CSS proposal; not physical-angle equivalence",
+    "checksRepeated": false,
+    "notRepeated": [
+      "200% reading",
+      "HR/FAR/CRR quality gates",
+      "negative CRR",
+      "optional image gate"
+    ],
+    "changesSinceInitial": "Research label and static-derivation parameter wording only; original initial capture source hashes retained.",
+    "errors": []
+  },
+  "inheritedControlledTags": {
+    "dimensions": 18,
+    "allKeysAndValuesCheckedAgainstFixedTaxonomy": true,
+    "issues": []
+  },
+  "defaultParameterStaticDerivation": {
+    "thirdPartyGeneratorExecuted": false,
+    "readyPoolBeforeEachRepeat": 1,
+    "pairBlockDifference": 5,
+    "imageLagRange": [
+      17,
+      23
+    ],
+    "argument": "At block>5, one eligible target is pushed and one repeat is popped; pool initially empty. Within-block permutation changes image-level lag."
+  }
+}

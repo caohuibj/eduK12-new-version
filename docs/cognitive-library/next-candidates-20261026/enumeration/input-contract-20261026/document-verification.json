@@ -1,0 +1,10 @@
+{
+  "status": "DOCUMENTS_ONLY_STATIC_CONSISTENCY_CONFIRMED",
+  "recipeId": "enumeration-square5deg-circle-white-grey-mask48-r1",
+  "recipeCanonicalSha256": "1aee9b741bbdd8d8ca64cded52bed2bcc294f78be1415ebe1fcd5b4a3130acf1",
+  "canonicalBytes": 512,
+  "definitionMatchesCanonical": true,
+  "sourceUntouched": true,
+  "noRuntimeTestsExecuted": true,
+  "checks": "Only JSON/byte/hash/source-scope consistency; not validity, timing, product, CI or independent approval."
+}

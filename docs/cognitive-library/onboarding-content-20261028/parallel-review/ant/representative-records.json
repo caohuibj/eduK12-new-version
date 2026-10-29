@@ -1,0 +1,2097 @@
+{
+  "synthetic": true,
+  "scope": "six software-clock capture records, not a completed attempt; original 48-trial bytes read arithmetically without recapture/rescore",
+  "originalSource": {
+    "path": "batch-3/ant-browser/archived-fixture.json",
+    "sha256": "3fd58d07acc6189142f15e5983927a7351734d9b1baee5ba0ff263f2d4afaba4"
+  },
+  "originalArithmetic": {
+    "cue": {
+      "double": {
+        "correct": 12,
+        "total": 12,
+        "sum": 3183,
+        "mean": 265.25
+      },
+      "spatial_valid": {
+        "correct": 12,
+        "total": 12,
+        "sum": 3215,
+        "mean": 267.9166666666667
+      },
+      "central": {
+        "correct": 12,
+        "total": 12,
+        "sum": 3223,
+        "mean": 268.5833333333333
+      },
+      "none": {
+        "correct": 12,
+        "total": 12,
+        "sum": 3174,
+        "mean": 264.5
+      }
+    },
+    "flanker": {
+      "incongruent": {
+        "correct": 16,
+        "total": 16,
+        "sum": 4270,
+        "mean": 266.875
+      },
+      "congruent": {
+        "correct": 16,
+        "total": 16,
+        "sum": 4303,
+        "mean": 268.9375
+      },
+      "neutral": {
+        "correct": 16,
+        "total": 16,
+        "sum": 4222,
+        "mean": 263.875
+      }
+    },
+    "differences": {
+      "alerting": -0.75,
+      "orienting": 0.6666666666666288,
+      "conflict": -2.0625
+    },
+    "displayHash": "80d64b64994bf496a68a20919b96958d10b9c8c1b2c26f0facbcec3bceaf7c42",
+    "formalCount": 48,
+    "practiceCount": 8,
+    "selfReportedCalibrationNotPhysicalAccuracyProof": true
+  },
+  "input": {
+    "session": {
+      "schemaVersion": 1,
+      "frozenAt": "2026-10-28T02:28:33.364Z",
+      "testType": "ant",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "config": {
+        "profile": "experience",
+        "totalTrials": 48,
+        "blocks": 1,
+        "repetitionsPerCellPerBlock": 1,
+        "practiceTrials": 8,
+        "cueMs": 100,
+        "postCueMs": 400,
+        "responseWindowMs": 1700,
+        "trialIntervalMs": 4000,
+        "preCueMinMs": 400,
+        "preCueMaxExclusiveMs": 1600,
+        "neutralVariant": "absent",
+        "phaseToleranceMs": 20,
+        "practicePolicy": {
+          "version": "ant-guided-practice-v1",
+          "trials": 8,
+          "minimumCorrect": 7,
+          "maxRounds": 3,
+          "responseWindowMs": 3500,
+          "trialIntervalMs": 6000,
+          "feedback": "per_trial",
+          "repeatInstructionsBeforeRetry": true,
+          "randomizationAlgorithmVersion": "ant-guided-balanced-eight-v1"
+        }
+      },
+      "configHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+      "hashScheme": "CANONICAL_JSON_SHA256_V1",
+      "runtimeGeneration": "UNIFIED_V1",
+      "compiledRuntime": {
+        "schemaVersion": 1,
+        "compilerVersion": "unified-runtime-v32-unit-1",
+        "instrumentType": "COGNITIVE",
+        "instrumentKey": "ant",
+        "instrumentVersion": "1.1.0",
+        "sourceDefinitionHash": "5b57bbcec1e40df43b3f822c91379eb23c280f565fc0f75fb9e4676211f6865e",
+        "scorerKey": "ant",
+        "scorerVersion": "1.1.0",
+        "metricDefinitions": {
+          "accuracy": {
+            "key": "accuracy",
+            "label": "本轮正式试次正确比例",
+            "unit": "ratio",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "primary"
+          },
+          "expectedTrialCount": {
+            "key": "expectedTrialCount",
+            "label": "计划正式次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "receivedTrialCount": {
+            "key": "receivedTrialCount",
+            "label": "已收到正式次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "validTrialCount": {
+            "key": "validTrialCount",
+            "label": "技术合格正式次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "excludedTrialCount": {
+            "key": "excludedTrialCount",
+            "label": "技术排除次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueRecords": {
+            "key": "cueRecords",
+            "label": "线索条件原始汇总",
+            "unit": "map",
+            "valueType": "object",
+            "direction": "descriptive",
+            "role": "research_only"
+          },
+          "flankerRecords": {
+            "key": "flankerRecords",
+            "label": "侧翼条件原始汇总",
+            "unit": "map",
+            "valueType": "object",
+            "direction": "descriptive",
+            "role": "research_only"
+          },
+          "inputSourcesObserved": {
+            "key": "inputSourcesObserved",
+            "label": "实际响应输入来源",
+            "unit": "map",
+            "valueType": "array",
+            "direction": "descriptive",
+            "role": "research_only"
+          },
+          "correctRtByInput": {
+            "key": "correctRtByInput",
+            "label": "按输入分开的正确反应均值",
+            "unit": "map",
+            "valueType": "object",
+            "direction": "descriptive",
+            "role": "research_only"
+          },
+          "differencesByInput": {
+            "key": "differencesByInput",
+            "label": "按输入分开的有符号条件差值",
+            "unit": "map",
+            "valueType": "object",
+            "direction": "descriptive",
+            "role": "research_only"
+          },
+          "excludedTrialReasons": {
+            "key": "excludedTrialReasons",
+            "label": "技术排除原因",
+            "unit": "map",
+            "valueType": "object",
+            "direction": "descriptive",
+            "role": "research_only"
+          },
+          "cueAccuracy_none": {
+            "key": "cueAccuracy_none",
+            "label": "无提示：正确比例",
+            "unit": "ratio",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "cueCorrectMeanRtMs_none": {
+            "key": "cueCorrectMeanRtMs_none",
+            "label": "无提示：答对时平均用时",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "cueCorrectCount_none": {
+            "key": "cueCorrectCount_none",
+            "label": "无提示：答对次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueValidCount_none": {
+            "key": "cueValidCount_none",
+            "label": "无提示：有效次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueExpectedCount_none": {
+            "key": "cueExpectedCount_none",
+            "label": "无提示：计划次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueCorrectRtCount_none": {
+            "key": "cueCorrectRtCount_none",
+            "label": "无提示：用于平均用时的正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueAccuracy_central": {
+            "key": "cueAccuracy_central",
+            "label": "中央提示：正确比例",
+            "unit": "ratio",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "cueCorrectMeanRtMs_central": {
+            "key": "cueCorrectMeanRtMs_central",
+            "label": "中央提示：答对时平均用时",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "cueCorrectCount_central": {
+            "key": "cueCorrectCount_central",
+            "label": "中央提示：答对次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueValidCount_central": {
+            "key": "cueValidCount_central",
+            "label": "中央提示：有效次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueExpectedCount_central": {
+            "key": "cueExpectedCount_central",
+            "label": "中央提示：计划次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueCorrectRtCount_central": {
+            "key": "cueCorrectRtCount_central",
+            "label": "中央提示：用于平均用时的正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueAccuracy_double": {
+            "key": "cueAccuracy_double",
+            "label": "双位置提示：正确比例",
+            "unit": "ratio",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "cueCorrectMeanRtMs_double": {
+            "key": "cueCorrectMeanRtMs_double",
+            "label": "双位置提示：答对时平均用时",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "cueCorrectCount_double": {
+            "key": "cueCorrectCount_double",
+            "label": "双位置提示：答对次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueValidCount_double": {
+            "key": "cueValidCount_double",
+            "label": "双位置提示：有效次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueExpectedCount_double": {
+            "key": "cueExpectedCount_double",
+            "label": "双位置提示：计划次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueCorrectRtCount_double": {
+            "key": "cueCorrectRtCount_double",
+            "label": "双位置提示：用于平均用时的正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueAccuracy_spatial_valid": {
+            "key": "cueAccuracy_spatial_valid",
+            "label": "空间提示：正确比例",
+            "unit": "ratio",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "cueCorrectMeanRtMs_spatial_valid": {
+            "key": "cueCorrectMeanRtMs_spatial_valid",
+            "label": "空间提示：答对时平均用时",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "cueCorrectCount_spatial_valid": {
+            "key": "cueCorrectCount_spatial_valid",
+            "label": "空间提示：答对次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueValidCount_spatial_valid": {
+            "key": "cueValidCount_spatial_valid",
+            "label": "空间提示：有效次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueExpectedCount_spatial_valid": {
+            "key": "cueExpectedCount_spatial_valid",
+            "label": "空间提示：计划次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "cueCorrectRtCount_spatial_valid": {
+            "key": "cueCorrectRtCount_spatial_valid",
+            "label": "空间提示：用于平均用时的正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerAccuracy_congruent": {
+            "key": "flankerAccuracy_congruent",
+            "label": "两侧方向相同：正确比例",
+            "unit": "ratio",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "flankerCorrectMeanRtMs_congruent": {
+            "key": "flankerCorrectMeanRtMs_congruent",
+            "label": "两侧方向相同：答对时平均用时",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "flankerCorrectCount_congruent": {
+            "key": "flankerCorrectCount_congruent",
+            "label": "两侧方向相同：答对次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerValidCount_congruent": {
+            "key": "flankerValidCount_congruent",
+            "label": "两侧方向相同：有效次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerExpectedCount_congruent": {
+            "key": "flankerExpectedCount_congruent",
+            "label": "两侧方向相同：计划次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerCorrectRtCount_congruent": {
+            "key": "flankerCorrectRtCount_congruent",
+            "label": "两侧方向相同：用于平均用时的正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerAccuracy_incongruent": {
+            "key": "flankerAccuracy_incongruent",
+            "label": "两侧方向相反：正确比例",
+            "unit": "ratio",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "flankerCorrectMeanRtMs_incongruent": {
+            "key": "flankerCorrectMeanRtMs_incongruent",
+            "label": "两侧方向相反：答对时平均用时",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "flankerCorrectCount_incongruent": {
+            "key": "flankerCorrectCount_incongruent",
+            "label": "两侧方向相反：答对次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerValidCount_incongruent": {
+            "key": "flankerValidCount_incongruent",
+            "label": "两侧方向相反：有效次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerExpectedCount_incongruent": {
+            "key": "flankerExpectedCount_incongruent",
+            "label": "两侧方向相反：计划次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerCorrectRtCount_incongruent": {
+            "key": "flankerCorrectRtCount_incongruent",
+            "label": "两侧方向相反：用于平均用时的正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerAccuracy_neutral": {
+            "key": "flankerAccuracy_neutral",
+            "label": "两侧无方向提示：正确比例",
+            "unit": "ratio",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "flankerCorrectMeanRtMs_neutral": {
+            "key": "flankerCorrectMeanRtMs_neutral",
+            "label": "两侧无方向提示：答对时平均用时",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "secondary"
+          },
+          "flankerCorrectCount_neutral": {
+            "key": "flankerCorrectCount_neutral",
+            "label": "两侧无方向提示：答对次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerValidCount_neutral": {
+            "key": "flankerValidCount_neutral",
+            "label": "两侧无方向提示：有效次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerExpectedCount_neutral": {
+            "key": "flankerExpectedCount_neutral",
+            "label": "两侧无方向提示：计划次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "flankerCorrectRtCount_neutral": {
+            "key": "flankerCorrectRtCount_neutral",
+            "label": "两侧无方向提示：用于平均用时的正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "alertingMeanRtDifferenceMs": {
+            "key": "alertingMeanRtDifferenceMs",
+            "label": "无提示−双位置提示：正确反应平均用时差",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "signed",
+            "role": "secondary"
+          },
+          "alertingFirstCorrectCount": {
+            "key": "alertingFirstCorrectCount",
+            "label": "无提示−双位置提示：前项正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "alertingSecondCorrectCount": {
+            "key": "alertingSecondCorrectCount",
+            "label": "无提示−双位置提示：后项正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "orientingMeanRtDifferenceMs": {
+            "key": "orientingMeanRtDifferenceMs",
+            "label": "中央−空间提示：正确反应平均用时差",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "signed",
+            "role": "secondary"
+          },
+          "orientingFirstCorrectCount": {
+            "key": "orientingFirstCorrectCount",
+            "label": "中央−空间提示：前项正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "orientingSecondCorrectCount": {
+            "key": "orientingSecondCorrectCount",
+            "label": "中央−空间提示：后项正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "conflictMeanRtDifferenceMs": {
+            "key": "conflictMeanRtDifferenceMs",
+            "label": "两侧方向相反−相同：正确反应平均用时差",
+            "unit": "ms",
+            "valueType": "number",
+            "direction": "signed",
+            "role": "secondary"
+          },
+          "conflictFirstCorrectCount": {
+            "key": "conflictFirstCorrectCount",
+            "label": "两侧方向相反−相同：前项正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          },
+          "conflictSecondCorrectCount": {
+            "key": "conflictSecondCorrectCount",
+            "label": "两侧方向相反−相同：后项正确回应次数",
+            "unit": "count",
+            "valueType": "number",
+            "direction": "descriptive",
+            "role": "quality"
+          }
+        },
+        "qualityDefinitions": {
+          "noInterpretableCondition": {
+            "key": "noInterpretableCondition",
+            "label": "无完整线索条件",
+            "description": "至少一个线索条件须达到冻结计划中的全部有效次数；这是项目保守完整性规则。"
+          },
+          "incompleteRecords": {
+            "key": "incompleteRecords",
+            "label": "正式记录不完整",
+            "description": "收到的正式次数不足计划。"
+          },
+          "incompleteAccuracy": {
+            "key": "incompleteAccuracy",
+            "label": "全局准确率受限",
+            "description": "全局分母未达到完整冻结计划，隐藏全局准确率。"
+          },
+          "mixedInput": {
+            "key": "mixedInput",
+            "label": "输入来源混用",
+            "description": "触控、鼠标与键盘RT不合并；本轮隐藏条件RT比较。"
+          },
+          "incompleteCue_none": {
+            "key": "incompleteCue_none",
+            "label": "条件记录不足",
+            "description": "该条件未达到冻结计划的技术有效次数，隐藏相关指标。"
+          },
+          "incompleteCue_central": {
+            "key": "incompleteCue_central",
+            "label": "条件记录不足",
+            "description": "该条件未达到冻结计划的技术有效次数，隐藏相关指标。"
+          },
+          "incompleteCue_double": {
+            "key": "incompleteCue_double",
+            "label": "条件记录不足",
+            "description": "该条件未达到冻结计划的技术有效次数，隐藏相关指标。"
+          },
+          "incompleteCue_spatial_valid": {
+            "key": "incompleteCue_spatial_valid",
+            "label": "条件记录不足",
+            "description": "该条件未达到冻结计划的技术有效次数，隐藏相关指标。"
+          },
+          "incompleteFlanker_congruent": {
+            "key": "incompleteFlanker_congruent",
+            "label": "条件记录不足",
+            "description": "该条件未达到冻结计划的技术有效次数，隐藏相关指标。"
+          },
+          "incompleteFlanker_incongruent": {
+            "key": "incompleteFlanker_incongruent",
+            "label": "条件记录不足",
+            "description": "该条件未达到冻结计划的技术有效次数，隐藏相关指标。"
+          },
+          "incompleteFlanker_neutral": {
+            "key": "incompleteFlanker_neutral",
+            "label": "条件记录不足",
+            "description": "该条件未达到冻结计划的技术有效次数，隐藏相关指标。"
+          },
+          "unavailable_alerting": {
+            "key": "unavailable_alerting",
+            "label": "差值不可用",
+            "description": "组成条件不完整、无正确响应或混合输入，隐藏有符号差值。"
+          },
+          "unavailable_orienting": {
+            "key": "unavailable_orienting",
+            "label": "差值不可用",
+            "description": "组成条件不完整、无正确响应或混合输入，隐藏有符号差值。"
+          },
+          "unavailable_conflict": {
+            "key": "unavailable_conflict",
+            "label": "差值不可用",
+            "description": "组成条件不完整、无正确响应或混合输入，隐藏有符号差值。"
+          }
+        },
+        "reportDefinition": {
+          "schemaVersion": 1,
+          "version": "1.1.0",
+          "title": "这次的线索与箭头记录",
+          "headlineMetrics": [
+            "accuracy"
+          ],
+          "userMetrics": [
+            "cueAccuracy_none",
+            "cueCorrectMeanRtMs_none",
+            "cueAccuracy_central",
+            "cueCorrectMeanRtMs_central",
+            "cueAccuracy_double",
+            "cueCorrectMeanRtMs_double",
+            "cueAccuracy_spatial_valid",
+            "cueCorrectMeanRtMs_spatial_valid",
+            "flankerAccuracy_congruent",
+            "flankerCorrectMeanRtMs_congruent",
+            "flankerAccuracy_incongruent",
+            "flankerCorrectMeanRtMs_incongruent",
+            "flankerAccuracy_neutral",
+            "flankerCorrectMeanRtMs_neutral",
+            "alertingMeanRtDifferenceMs",
+            "orientingMeanRtDifferenceMs",
+            "conflictMeanRtDifferenceMs"
+          ],
+          "detailMetrics": [
+            "validTrialCount",
+            "excludedTrialCount",
+            "cueCorrectCount_none",
+            "cueValidCount_none",
+            "cueExpectedCount_none",
+            "cueCorrectRtCount_none",
+            "cueCorrectCount_central",
+            "cueValidCount_central",
+            "cueExpectedCount_central",
+            "cueCorrectRtCount_central",
+            "cueCorrectCount_double",
+            "cueValidCount_double",
+            "cueExpectedCount_double",
+            "cueCorrectRtCount_double",
+            "cueCorrectCount_spatial_valid",
+            "cueValidCount_spatial_valid",
+            "cueExpectedCount_spatial_valid",
+            "cueCorrectRtCount_spatial_valid",
+            "flankerCorrectCount_congruent",
+            "flankerValidCount_congruent",
+            "flankerExpectedCount_congruent",
+            "flankerCorrectRtCount_congruent",
+            "flankerCorrectCount_incongruent",
+            "flankerValidCount_incongruent",
+            "flankerExpectedCount_incongruent",
+            "flankerCorrectRtCount_incongruent",
+            "flankerCorrectCount_neutral",
+            "flankerValidCount_neutral",
+            "flankerExpectedCount_neutral",
+            "flankerCorrectRtCount_neutral",
+            "alertingFirstCorrectCount",
+            "alertingSecondCorrectCount",
+            "orientingFirstCorrectCount",
+            "orientingSecondCorrectCount",
+            "conflictFirstCorrectCount",
+            "conflictSecondCorrectCount"
+          ],
+          "disclaimer": "记录描述本轮操作，不代表日常注意能力或诊断；体验版没有稳定性或招聘预测证据。",
+          "practicalTips": [
+            "把设备放稳，关闭通知，让视线留在中央注视点。"
+          ]
+        },
+        "aggregateProjection": {
+          "allowedMetricKeys": [
+            "accuracy",
+            "expectedTrialCount",
+            "receivedTrialCount",
+            "validTrialCount",
+            "excludedTrialCount",
+            "cueRecords",
+            "flankerRecords",
+            "inputSourcesObserved",
+            "correctRtByInput",
+            "differencesByInput",
+            "excludedTrialReasons",
+            "cueAccuracy_none",
+            "cueCorrectMeanRtMs_none",
+            "cueCorrectCount_none",
+            "cueValidCount_none",
+            "cueExpectedCount_none",
+            "cueCorrectRtCount_none",
+            "cueAccuracy_central",
+            "cueCorrectMeanRtMs_central",
+            "cueCorrectCount_central",
+            "cueValidCount_central",
+            "cueExpectedCount_central",
+            "cueCorrectRtCount_central",
+            "cueAccuracy_double",
+            "cueCorrectMeanRtMs_double",
+            "cueCorrectCount_double",
+            "cueValidCount_double",
+            "cueExpectedCount_double",
+            "cueCorrectRtCount_double",
+            "cueAccuracy_spatial_valid",
+            "cueCorrectMeanRtMs_spatial_valid",
+            "cueCorrectCount_spatial_valid",
+            "cueValidCount_spatial_valid",
+            "cueExpectedCount_spatial_valid",
+            "cueCorrectRtCount_spatial_valid",
+            "flankerAccuracy_congruent",
+            "flankerCorrectMeanRtMs_congruent",
+            "flankerCorrectCount_congruent",
+            "flankerValidCount_congruent",
+            "flankerExpectedCount_congruent",
+            "flankerCorrectRtCount_congruent",
+            "flankerAccuracy_incongruent",
+            "flankerCorrectMeanRtMs_incongruent",
+            "flankerCorrectCount_incongruent",
+            "flankerValidCount_incongruent",
+            "flankerExpectedCount_incongruent",
+            "flankerCorrectRtCount_incongruent",
+            "flankerAccuracy_neutral",
+            "flankerCorrectMeanRtMs_neutral",
+            "flankerCorrectCount_neutral",
+            "flankerValidCount_neutral",
+            "flankerExpectedCount_neutral",
+            "flankerCorrectRtCount_neutral",
+            "alertingMeanRtDifferenceMs",
+            "alertingFirstCorrectCount",
+            "alertingSecondCorrectCount",
+            "orientingMeanRtDifferenceMs",
+            "orientingFirstCorrectCount",
+            "orientingSecondCorrectCount",
+            "conflictMeanRtDifferenceMs",
+            "conflictFirstCorrectCount",
+            "conflictSecondCorrectCount"
+          ],
+          "allowedFactKeys": [
+            "quality.status",
+            "quality.flag.*"
+          ],
+          "allowedReferenceClassifications": []
+        },
+        "referenceBindingDefinition": {
+          "required": false,
+          "selections": []
+        },
+        "runtimeCapabilities": {
+          "standalone": true,
+          "embedded": true,
+          "aggregateEligible": true,
+          "collectionFacts": false,
+          "supported": true
+        },
+        "compiledRuntimeHash": "7adb8cf0f2c94258d8a03104a57555c4dabbb35903db97e504ba636390500be6",
+        "hashScheme": "CANONICAL_JSON_SHA256_V1"
+      },
+      "referenceBindings": [],
+      "protocol": {
+        "schemaVersion": 1,
+        "key": "ant/1.1.0/1.1.0",
+        "version": "1.1.0",
+        "clock": "performance",
+        "randomizationAlgorithmVersion": "ant-fnv1a-mulberry32-v1",
+        "trialEnvelopeVersion": 1,
+        "phases": [
+          {
+            "key": "test",
+            "persists": true,
+            "required": true
+          }
+        ],
+        "measurementCriticalConfigPaths": [
+          "*"
+        ]
+      },
+      "protocolSignature": "d7a62cbbccb38f9983bbd860838c3f0843a2aef91c96a3ea120faea5d149c3d4"
+    },
+    "config": {
+      "profile": "experience",
+      "totalTrials": 48,
+      "blocks": 1,
+      "repetitionsPerCellPerBlock": 1,
+      "practiceTrials": 8,
+      "cueMs": 100,
+      "postCueMs": 400,
+      "responseWindowMs": 1700,
+      "trialIntervalMs": 4000,
+      "preCueMinMs": 400,
+      "preCueMaxExclusiveMs": 1600,
+      "neutralVariant": "absent",
+      "phaseToleranceMs": 20,
+      "practicePolicy": {
+        "version": "ant-guided-practice-v1",
+        "trials": 8,
+        "minimumCorrect": 7,
+        "maxRounds": 3,
+        "responseWindowMs": 3500,
+        "trialIntervalMs": 6000,
+        "feedback": "per_trial",
+        "repeatInstructionsBeforeRetry": true,
+        "randomizationAlgorithmVersion": "ant-guided-balanced-eight-v1"
+      }
+    },
+    "randomSeed": "052a9adbc512726a375a4612383f7afd",
+    "trials": [
+      {
+        "schemaVersion": 1,
+        "trialIndex": 0,
+        "phase": "test",
+        "startedAtPerfMs": 0,
+        "endedAtPerfMs": 4000,
+        "durationMs": 4000,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "cue": "double",
+          "location": "top",
+          "direction": "left",
+          "flanker": "incongruent",
+          "phase": "test",
+          "trialIndex": 0,
+          "blockIndex": 0,
+          "neutralVariant": "absent",
+          "plannedPreCueMs": 1495,
+          "recordOrigin": "live",
+          "clock": {
+            "source": "performance",
+            "timeOriginUnixMs": 1793154513546
+          },
+          "startedAtPerfMs": 0,
+          "cueOnsetPerfMs": 1495,
+          "cueOffsetPerfMs": 1595,
+          "targetOnsetPerfMs": 1995,
+          "targetOffsetPerfMs": 1995,
+          "endedAtPerfMs": 4000,
+          "events": [
+            {
+              "direction": "left",
+              "input": "touch",
+              "atPerfMs": 10,
+              "repeat": true,
+              "held": false
+            },
+            {
+              "direction": "left",
+              "input": "touch",
+              "atPerfMs": 20,
+              "repeat": false,
+              "held": true
+            },
+            {
+              "direction": "left",
+              "input": "touch",
+              "atPerfMs": 1995,
+              "repeat": false,
+              "held": false
+            }
+          ],
+          "responseIndex": 2,
+          "timedOut": false,
+          "eventOverflow": false,
+          "interruptions": [],
+          "presentationBinding": {
+            "schemaVersion": 1,
+            "geometryVersion": "ant-calibrated-geometry-v1",
+            "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+            "displayHash": "80d64b64994bf496a68a20919b96958d10b9c8c1b2c26f0facbcec3bceaf7c42"
+          }
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 1,
+        "phase": "test",
+        "startedAtPerfMs": 4000,
+        "endedAtPerfMs": 8000,
+        "durationMs": 4000,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "cue": "spatial_valid",
+          "location": "bottom",
+          "direction": "right",
+          "flanker": "congruent",
+          "phase": "test",
+          "trialIndex": 1,
+          "blockIndex": 0,
+          "neutralVariant": "absent",
+          "plannedPreCueMs": 1280,
+          "recordOrigin": "live",
+          "clock": {
+            "source": "performance",
+            "timeOriginUnixMs": 1793154513546
+          },
+          "startedAtPerfMs": 4000,
+          "cueOnsetPerfMs": 5280,
+          "cueOffsetPerfMs": 5380,
+          "targetOnsetPerfMs": 5780,
+          "targetOffsetPerfMs": 6030,
+          "endedAtPerfMs": 8000,
+          "events": [
+            {
+              "direction": "left",
+              "input": "touch",
+              "atPerfMs": 6030,
+              "repeat": false,
+              "held": false
+            },
+            {
+              "direction": "right",
+              "input": "touch",
+              "atPerfMs": 6080,
+              "repeat": false,
+              "held": false
+            }
+          ],
+          "responseIndex": 0,
+          "timedOut": false,
+          "eventOverflow": false,
+          "interruptions": [],
+          "presentationBinding": {
+            "schemaVersion": 1,
+            "geometryVersion": "ant-calibrated-geometry-v1",
+            "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+            "displayHash": "80d64b64994bf496a68a20919b96958d10b9c8c1b2c26f0facbcec3bceaf7c42"
+          }
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 2,
+        "phase": "test",
+        "startedAtPerfMs": 8000,
+        "endedAtPerfMs": 12000,
+        "durationMs": 4000,
+        "flags": {
+          "timeout": true,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "cue": "central",
+          "location": "bottom",
+          "direction": "left",
+          "flanker": "congruent",
+          "phase": "test",
+          "trialIndex": 2,
+          "blockIndex": 0,
+          "neutralVariant": "absent",
+          "plannedPreCueMs": 972,
+          "recordOrigin": "live",
+          "clock": {
+            "source": "performance",
+            "timeOriginUnixMs": 1793154513546
+          },
+          "startedAtPerfMs": 8000,
+          "cueOnsetPerfMs": 8972,
+          "cueOffsetPerfMs": 9072,
+          "targetOnsetPerfMs": 9472,
+          "targetOffsetPerfMs": 11172,
+          "endedAtPerfMs": 12000,
+          "events": [
+            {
+              "direction": "left",
+              "input": "keyboard",
+              "atPerfMs": 11172,
+              "repeat": false,
+              "held": false
+            }
+          ],
+          "responseIndex": null,
+          "timedOut": true,
+          "eventOverflow": false,
+          "interruptions": [],
+          "presentationBinding": {
+            "schemaVersion": 1,
+            "geometryVersion": "ant-calibrated-geometry-v1",
+            "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+            "displayHash": "80d64b64994bf496a68a20919b96958d10b9c8c1b2c26f0facbcec3bceaf7c42"
+          }
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 3,
+        "phase": "test",
+        "startedAtPerfMs": 12000,
+        "endedAtPerfMs": 13708,
+        "durationMs": 1708,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [
+          "window_blur"
+        ],
+        "payload": {
+          "cue": "spatial_valid",
+          "location": "top",
+          "direction": "left",
+          "flanker": "congruent",
+          "phase": "test",
+          "trialIndex": 3,
+          "blockIndex": 0,
+          "neutralVariant": "absent",
+          "plannedPreCueMs": 1108,
+          "recordOrigin": "live",
+          "clock": {
+            "source": "performance",
+            "timeOriginUnixMs": 1793154513546
+          },
+          "startedAtPerfMs": 12000,
+          "cueOnsetPerfMs": 13108,
+          "cueOffsetPerfMs": 13208,
+          "targetOnsetPerfMs": 13608,
+          "targetOffsetPerfMs": 13708,
+          "endedAtPerfMs": 13708,
+          "events": [],
+          "responseIndex": null,
+          "timedOut": false,
+          "eventOverflow": false,
+          "interruptions": [
+            {
+              "kind": "window_blur",
+              "atPerfMs": 13708
+            }
+          ],
+          "presentationBinding": {
+            "schemaVersion": 1,
+            "geometryVersion": "ant-calibrated-geometry-v1",
+            "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+            "displayHash": "80d64b64994bf496a68a20919b96958d10b9c8c1b2c26f0facbcec3bceaf7c42"
+          }
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 4,
+        "phase": "test",
+        "startedAtPerfMs": 16000,
+        "endedAtPerfMs": 20000,
+        "durationMs": 4000,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "cue": "double",
+          "location": "bottom",
+          "direction": "right",
+          "flanker": "congruent",
+          "phase": "test",
+          "trialIndex": 4,
+          "blockIndex": 0,
+          "neutralVariant": "absent",
+          "plannedPreCueMs": 645,
+          "recordOrigin": "live",
+          "clock": {
+            "source": "performance",
+            "timeOriginUnixMs": 1793154513546
+          },
+          "startedAtPerfMs": 16000,
+          "cueOnsetPerfMs": 16645,
+          "cueOffsetPerfMs": 16745,
+          "targetOnsetPerfMs": 17145,
+          "targetOffsetPerfMs": 17495,
+          "endedAtPerfMs": 20000,
+          "events": [
+            {
+              "direction": "right",
+              "input": "keyboard",
+              "atPerfMs": 17495,
+              "repeat": false,
+              "held": false
+            }
+          ],
+          "responseIndex": 0,
+          "timedOut": false,
+          "eventOverflow": false,
+          "interruptions": [],
+          "presentationBinding": {
+            "schemaVersion": 1,
+            "geometryVersion": "ant-calibrated-geometry-v1",
+            "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+            "displayHash": "80d64b64994bf496a68a20919b96958d10b9c8c1b2c26f0facbcec3bceaf7c42"
+          }
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 5,
+        "phase": "test",
+        "startedAtPerfMs": 20000,
+        "endedAtPerfMs": 24000,
+        "durationMs": 4000,
+        "flags": {
+          "timeout": false,
+          "premature": true
+        },
+        "qualityEvents": [],
+        "payload": {
+          "cue": "none",
+          "location": "top",
+          "direction": "right",
+          "flanker": "congruent",
+          "phase": "test",
+          "trialIndex": 5,
+          "blockIndex": 0,
+          "neutralVariant": "absent",
+          "plannedPreCueMs": 1382,
+          "recordOrigin": "live",
+          "clock": {
+            "source": "performance",
+            "timeOriginUnixMs": 1793154513546
+          },
+          "startedAtPerfMs": 20000,
+          "cueOnsetPerfMs": 21382,
+          "cueOffsetPerfMs": 21482,
+          "targetOnsetPerfMs": 21882,
+          "targetOffsetPerfMs": 21982,
+          "endedAtPerfMs": 24000,
+          "events": [
+            {
+              "direction": "right",
+              "input": "pointer",
+              "atPerfMs": 21832,
+              "repeat": false,
+              "held": false
+            },
+            {
+              "direction": "right",
+              "input": "pointer",
+              "atPerfMs": 21982,
+              "repeat": false,
+              "held": false
+            }
+          ],
+          "responseIndex": 1,
+          "timedOut": false,
+          "eventOverflow": false,
+          "interruptions": [],
+          "presentationBinding": {
+            "schemaVersion": 1,
+            "geometryVersion": "ant-calibrated-geometry-v1",
+            "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+            "displayHash": "80d64b64994bf496a68a20919b96958d10b9c8c1b2c26f0facbcec3bceaf7c42"
+          }
+        }
+      }
+    ]
+  },
+  "records": [
+    {
+      "schemaVersion": 1,
+      "contextId": "[\"a4627309-523a-4873-8a6c-1cca38086ad5\",1,\"9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b\"]",
+      "phase": "test",
+      "key": "test:0",
+      "core": {
+        "cue": "double",
+        "location": "top",
+        "direction": "left",
+        "flanker": "incongruent",
+        "phase": "test",
+        "trialIndex": 0,
+        "blockIndex": 0,
+        "neutralVariant": "absent",
+        "plannedPreCueMs": 1495,
+        "recordOrigin": "live",
+        "clock": {
+          "source": "performance",
+          "timeOriginUnixMs": 1793154513546
+        },
+        "startedAtPerfMs": 0,
+        "cueOnsetPerfMs": 1495,
+        "cueOffsetPerfMs": 1595,
+        "targetOnsetPerfMs": 1995,
+        "targetOffsetPerfMs": 1995,
+        "endedAtPerfMs": 4000,
+        "events": [
+          {
+            "direction": "left",
+            "input": "touch",
+            "atPerfMs": 10,
+            "repeat": true,
+            "held": false
+          },
+          {
+            "direction": "left",
+            "input": "touch",
+            "atPerfMs": 20,
+            "repeat": false,
+            "held": true
+          },
+          {
+            "direction": "left",
+            "input": "touch",
+            "atPerfMs": 1995,
+            "repeat": false,
+            "held": false
+          }
+        ],
+        "responseIndex": 2,
+        "timedOut": false,
+        "eventOverflow": false,
+        "interruptions": []
+      },
+      "raw": {
+        "display": {
+          "schemaVersion": 1,
+          "calibrationId": "c3e9df0d-4d6e-4e5e-bfea-f8ea4ec9680a",
+          "geometryVersion": "ant-calibrated-geometry-v1",
+          "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+          "configHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+          "protocolSignature": "d7a62cbbccb38f9983bbd860838c3f0843a2aef91c96a3ea120faea5d149c3d4",
+          "origin": "host_physical_calibration",
+          "referenceMm": 50,
+          "referenceCssPx": 190,
+          "viewingDistanceMm": 350,
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "devicePixelRatio": 1,
+            "visualScale": 1
+          },
+          "geometry": {
+            "fieldWidthCssPx": 186.0053197697377,
+            "fieldHeightCssPx": 139.40469289288959,
+            "eccentricityCssPx": 34.821307445661326,
+            "arrowWidthCssPx": 23.21346832341838,
+            "arrowHeightCssPx": 11.606513183066168,
+            "arrowSpacingCssPx": 29.017249755794992,
+            "cueDiameterCssPx": 13.927854711162338,
+            "strokeCssPx": 1.3927728703703406,
+            "responseWidthCssPx": 130,
+            "responseHeightCssPx": 78,
+            "responseGapCssPx": 18
+          },
+          "inputMap": {
+            "leftKey": "ArrowLeft",
+            "rightKey": "ArrowRight"
+          }
+        },
+        "frameTimesPerfMs": [
+          1495,
+          1595,
+          1995,
+          1995,
+          4000
+        ],
+        "frameOverflow": false,
+        "diagnostics": [],
+        "fixture": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "contextId": "[\"a4627309-523a-4873-8a6c-1cca38086ad5\",1,\"9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b\"]",
+      "phase": "test",
+      "key": "test:1",
+      "core": {
+        "cue": "spatial_valid",
+        "location": "bottom",
+        "direction": "right",
+        "flanker": "congruent",
+        "phase": "test",
+        "trialIndex": 1,
+        "blockIndex": 0,
+        "neutralVariant": "absent",
+        "plannedPreCueMs": 1280,
+        "recordOrigin": "live",
+        "clock": {
+          "source": "performance",
+          "timeOriginUnixMs": 1793154513546
+        },
+        "startedAtPerfMs": 4000,
+        "cueOnsetPerfMs": 5280,
+        "cueOffsetPerfMs": 5380,
+        "targetOnsetPerfMs": 5780,
+        "targetOffsetPerfMs": 6030,
+        "endedAtPerfMs": 8000,
+        "events": [
+          {
+            "direction": "left",
+            "input": "touch",
+            "atPerfMs": 6030,
+            "repeat": false,
+            "held": false
+          },
+          {
+            "direction": "right",
+            "input": "touch",
+            "atPerfMs": 6080,
+            "repeat": false,
+            "held": false
+          }
+        ],
+        "responseIndex": 0,
+        "timedOut": false,
+        "eventOverflow": false,
+        "interruptions": []
+      },
+      "raw": {
+        "display": {
+          "schemaVersion": 1,
+          "calibrationId": "c3e9df0d-4d6e-4e5e-bfea-f8ea4ec9680a",
+          "geometryVersion": "ant-calibrated-geometry-v1",
+          "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+          "configHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+          "protocolSignature": "d7a62cbbccb38f9983bbd860838c3f0843a2aef91c96a3ea120faea5d149c3d4",
+          "origin": "host_physical_calibration",
+          "referenceMm": 50,
+          "referenceCssPx": 190,
+          "viewingDistanceMm": 350,
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "devicePixelRatio": 1,
+            "visualScale": 1
+          },
+          "geometry": {
+            "fieldWidthCssPx": 186.0053197697377,
+            "fieldHeightCssPx": 139.40469289288959,
+            "eccentricityCssPx": 34.821307445661326,
+            "arrowWidthCssPx": 23.21346832341838,
+            "arrowHeightCssPx": 11.606513183066168,
+            "arrowSpacingCssPx": 29.017249755794992,
+            "cueDiameterCssPx": 13.927854711162338,
+            "strokeCssPx": 1.3927728703703406,
+            "responseWidthCssPx": 130,
+            "responseHeightCssPx": 78,
+            "responseGapCssPx": 18
+          },
+          "inputMap": {
+            "leftKey": "ArrowLeft",
+            "rightKey": "ArrowRight"
+          }
+        },
+        "frameTimesPerfMs": [
+          5280,
+          5380,
+          5780,
+          6030,
+          8000
+        ],
+        "frameOverflow": false,
+        "diagnostics": [],
+        "fixture": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "contextId": "[\"a4627309-523a-4873-8a6c-1cca38086ad5\",1,\"9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b\"]",
+      "phase": "test",
+      "key": "test:2",
+      "core": {
+        "cue": "central",
+        "location": "bottom",
+        "direction": "left",
+        "flanker": "congruent",
+        "phase": "test",
+        "trialIndex": 2,
+        "blockIndex": 0,
+        "neutralVariant": "absent",
+        "plannedPreCueMs": 972,
+        "recordOrigin": "live",
+        "clock": {
+          "source": "performance",
+          "timeOriginUnixMs": 1793154513546
+        },
+        "startedAtPerfMs": 8000,
+        "cueOnsetPerfMs": 8972,
+        "cueOffsetPerfMs": 9072,
+        "targetOnsetPerfMs": 9472,
+        "targetOffsetPerfMs": 11172,
+        "endedAtPerfMs": 12000,
+        "events": [
+          {
+            "direction": "left",
+            "input": "keyboard",
+            "atPerfMs": 11172,
+            "repeat": false,
+            "held": false
+          }
+        ],
+        "responseIndex": null,
+        "timedOut": true,
+        "eventOverflow": false,
+        "interruptions": []
+      },
+      "raw": {
+        "display": {
+          "schemaVersion": 1,
+          "calibrationId": "c3e9df0d-4d6e-4e5e-bfea-f8ea4ec9680a",
+          "geometryVersion": "ant-calibrated-geometry-v1",
+          "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+          "configHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+          "protocolSignature": "d7a62cbbccb38f9983bbd860838c3f0843a2aef91c96a3ea120faea5d149c3d4",
+          "origin": "host_physical_calibration",
+          "referenceMm": 50,
+          "referenceCssPx": 190,
+          "viewingDistanceMm": 350,
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "devicePixelRatio": 1,
+            "visualScale": 1
+          },
+          "geometry": {
+            "fieldWidthCssPx": 186.0053197697377,
+            "fieldHeightCssPx": 139.40469289288959,
+            "eccentricityCssPx": 34.821307445661326,
+            "arrowWidthCssPx": 23.21346832341838,
+            "arrowHeightCssPx": 11.606513183066168,
+            "arrowSpacingCssPx": 29.017249755794992,
+            "cueDiameterCssPx": 13.927854711162338,
+            "strokeCssPx": 1.3927728703703406,
+            "responseWidthCssPx": 130,
+            "responseHeightCssPx": 78,
+            "responseGapCssPx": 18
+          },
+          "inputMap": {
+            "leftKey": "ArrowLeft",
+            "rightKey": "ArrowRight"
+          }
+        },
+        "frameTimesPerfMs": [
+          8972,
+          9072,
+          9472,
+          11172,
+          12000
+        ],
+        "frameOverflow": false,
+        "diagnostics": [],
+        "fixture": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "contextId": "[\"a4627309-523a-4873-8a6c-1cca38086ad5\",1,\"9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b\"]",
+      "phase": "test",
+      "key": "test:3",
+      "core": {
+        "cue": "spatial_valid",
+        "location": "top",
+        "direction": "left",
+        "flanker": "congruent",
+        "phase": "test",
+        "trialIndex": 3,
+        "blockIndex": 0,
+        "neutralVariant": "absent",
+        "plannedPreCueMs": 1108,
+        "recordOrigin": "live",
+        "clock": {
+          "source": "performance",
+          "timeOriginUnixMs": 1793154513546
+        },
+        "startedAtPerfMs": 12000,
+        "cueOnsetPerfMs": 13108,
+        "cueOffsetPerfMs": 13208,
+        "targetOnsetPerfMs": 13608,
+        "targetOffsetPerfMs": 13708,
+        "endedAtPerfMs": 13708,
+        "events": [],
+        "responseIndex": null,
+        "timedOut": false,
+        "eventOverflow": false,
+        "interruptions": [
+          {
+            "kind": "window_blur",
+            "atPerfMs": 13708
+          }
+        ]
+      },
+      "raw": {
+        "display": {
+          "schemaVersion": 1,
+          "calibrationId": "c3e9df0d-4d6e-4e5e-bfea-f8ea4ec9680a",
+          "geometryVersion": "ant-calibrated-geometry-v1",
+          "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+          "configHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+          "protocolSignature": "d7a62cbbccb38f9983bbd860838c3f0843a2aef91c96a3ea120faea5d149c3d4",
+          "origin": "host_physical_calibration",
+          "referenceMm": 50,
+          "referenceCssPx": 190,
+          "viewingDistanceMm": 350,
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "devicePixelRatio": 1,
+            "visualScale": 1
+          },
+          "geometry": {
+            "fieldWidthCssPx": 186.0053197697377,
+            "fieldHeightCssPx": 139.40469289288959,
+            "eccentricityCssPx": 34.821307445661326,
+            "arrowWidthCssPx": 23.21346832341838,
+            "arrowHeightCssPx": 11.606513183066168,
+            "arrowSpacingCssPx": 29.017249755794992,
+            "cueDiameterCssPx": 13.927854711162338,
+            "strokeCssPx": 1.3927728703703406,
+            "responseWidthCssPx": 130,
+            "responseHeightCssPx": 78,
+            "responseGapCssPx": 18
+          },
+          "inputMap": {
+            "leftKey": "ArrowLeft",
+            "rightKey": "ArrowRight"
+          }
+        },
+        "frameTimesPerfMs": [
+          13108,
+          13208,
+          13608
+        ],
+        "frameOverflow": false,
+        "diagnostics": [],
+        "fixture": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "contextId": "[\"a4627309-523a-4873-8a6c-1cca38086ad5\",1,\"9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b\"]",
+      "phase": "test",
+      "key": "test:4",
+      "core": {
+        "cue": "double",
+        "location": "bottom",
+        "direction": "right",
+        "flanker": "congruent",
+        "phase": "test",
+        "trialIndex": 4,
+        "blockIndex": 0,
+        "neutralVariant": "absent",
+        "plannedPreCueMs": 645,
+        "recordOrigin": "live",
+        "clock": {
+          "source": "performance",
+          "timeOriginUnixMs": 1793154513546
+        },
+        "startedAtPerfMs": 16000,
+        "cueOnsetPerfMs": 16645,
+        "cueOffsetPerfMs": 16745,
+        "targetOnsetPerfMs": 17145,
+        "targetOffsetPerfMs": 17495,
+        "endedAtPerfMs": 20000,
+        "events": [
+          {
+            "direction": "right",
+            "input": "keyboard",
+            "atPerfMs": 17495,
+            "repeat": false,
+            "held": false
+          }
+        ],
+        "responseIndex": 0,
+        "timedOut": false,
+        "eventOverflow": false,
+        "interruptions": []
+      },
+      "raw": {
+        "display": {
+          "schemaVersion": 1,
+          "calibrationId": "c3e9df0d-4d6e-4e5e-bfea-f8ea4ec9680a",
+          "geometryVersion": "ant-calibrated-geometry-v1",
+          "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+          "configHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+          "protocolSignature": "d7a62cbbccb38f9983bbd860838c3f0843a2aef91c96a3ea120faea5d149c3d4",
+          "origin": "host_physical_calibration",
+          "referenceMm": 50,
+          "referenceCssPx": 190,
+          "viewingDistanceMm": 350,
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "devicePixelRatio": 1,
+            "visualScale": 1
+          },
+          "geometry": {
+            "fieldWidthCssPx": 186.0053197697377,
+            "fieldHeightCssPx": 139.40469289288959,
+            "eccentricityCssPx": 34.821307445661326,
+            "arrowWidthCssPx": 23.21346832341838,
+            "arrowHeightCssPx": 11.606513183066168,
+            "arrowSpacingCssPx": 29.017249755794992,
+            "cueDiameterCssPx": 13.927854711162338,
+            "strokeCssPx": 1.3927728703703406,
+            "responseWidthCssPx": 130,
+            "responseHeightCssPx": 78,
+            "responseGapCssPx": 18
+          },
+          "inputMap": {
+            "leftKey": "ArrowLeft",
+            "rightKey": "ArrowRight"
+          }
+        },
+        "frameTimesPerfMs": [
+          16645,
+          16745,
+          17145,
+          17495,
+          20000
+        ],
+        "frameOverflow": false,
+        "diagnostics": [],
+        "fixture": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "contextId": "[\"a4627309-523a-4873-8a6c-1cca38086ad5\",1,\"9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b\"]",
+      "phase": "test",
+      "key": "test:5",
+      "core": {
+        "cue": "none",
+        "location": "top",
+        "direction": "right",
+        "flanker": "congruent",
+        "phase": "test",
+        "trialIndex": 5,
+        "blockIndex": 0,
+        "neutralVariant": "absent",
+        "plannedPreCueMs": 1382,
+        "recordOrigin": "live",
+        "clock": {
+          "source": "performance",
+          "timeOriginUnixMs": 1793154513546
+        },
+        "startedAtPerfMs": 20000,
+        "cueOnsetPerfMs": 21382,
+        "cueOffsetPerfMs": 21482,
+        "targetOnsetPerfMs": 21882,
+        "targetOffsetPerfMs": 21982,
+        "endedAtPerfMs": 24000,
+        "events": [
+          {
+            "direction": "right",
+            "input": "pointer",
+            "atPerfMs": 21832,
+            "repeat": false,
+            "held": false
+          },
+          {
+            "direction": "right",
+            "input": "pointer",
+            "atPerfMs": 21982,
+            "repeat": false,
+            "held": false
+          }
+        ],
+        "responseIndex": 1,
+        "timedOut": false,
+        "eventOverflow": false,
+        "interruptions": []
+      },
+      "raw": {
+        "display": {
+          "schemaVersion": 1,
+          "calibrationId": "c3e9df0d-4d6e-4e5e-bfea-f8ea4ec9680a",
+          "geometryVersion": "ant-calibrated-geometry-v1",
+          "geometryHash": "b7de30d105d6f7bd3d40b1217f1025e8a701b49928f4c9395aec420d32c12a70",
+          "configHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+          "protocolSignature": "d7a62cbbccb38f9983bbd860838c3f0843a2aef91c96a3ea120faea5d149c3d4",
+          "origin": "host_physical_calibration",
+          "referenceMm": 50,
+          "referenceCssPx": 190,
+          "viewingDistanceMm": 350,
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "devicePixelRatio": 1,
+            "visualScale": 1
+          },
+          "geometry": {
+            "fieldWidthCssPx": 186.0053197697377,
+            "fieldHeightCssPx": 139.40469289288959,
+            "eccentricityCssPx": 34.821307445661326,
+            "arrowWidthCssPx": 23.21346832341838,
+            "arrowHeightCssPx": 11.606513183066168,
+            "arrowSpacingCssPx": 29.017249755794992,
+            "cueDiameterCssPx": 13.927854711162338,
+            "strokeCssPx": 1.3927728703703406,
+            "responseWidthCssPx": 130,
+            "responseHeightCssPx": 78,
+            "responseGapCssPx": 18
+          },
+          "inputMap": {
+            "leftKey": "ArrowLeft",
+            "rightKey": "ArrowRight"
+          }
+        },
+        "frameTimesPerfMs": [
+          21382,
+          21482,
+          21882,
+          21982,
+          24000
+        ],
+        "frameOverflow": false,
+        "diagnostics": [],
+        "fixture": false
+      }
+    }
+  ],
+  "score": {
+    "metrics": {
+      "expectedTrialCount": 48,
+      "receivedTrialCount": 6,
+      "validTrialCount": 4,
+      "excludedTrialCount": 2,
+      "excludedTrialReasons": {
+        "3": [
+          "interruption",
+          "incomplete_stages"
+        ],
+        "5": [
+          "premature_input"
+        ]
+      },
+      "accuracy": 0.5,
+      "cueRecords": {
+        "none": {
+          "observed": 1,
+          "valid": 0,
+          "correct": 0,
+          "expected": 12,
+          "accuracy": null
+        },
+        "central": {
+          "observed": 1,
+          "valid": 1,
+          "correct": 0,
+          "expected": 12,
+          "accuracy": 0
+        },
+        "double": {
+          "observed": 2,
+          "valid": 2,
+          "correct": 2,
+          "expected": 12,
+          "accuracy": 1
+        },
+        "spatial_valid": {
+          "observed": 2,
+          "valid": 1,
+          "correct": 0,
+          "expected": 12,
+          "accuracy": 0
+        }
+      },
+      "flankerRecords": {
+        "congruent": {
+          "observed": 5,
+          "valid": 3,
+          "correct": 1,
+          "expected": 16,
+          "accuracy": 0.3333333333333333
+        },
+        "incongruent": {
+          "observed": 1,
+          "valid": 1,
+          "correct": 1,
+          "expected": 16,
+          "accuracy": 1
+        },
+        "neutral": {
+          "observed": 0,
+          "valid": 0,
+          "correct": 0,
+          "expected": 16,
+          "accuracy": null
+        }
+      },
+      "inputSourcesObserved": [
+        "touch",
+        "pointer",
+        "keyboard"
+      ],
+      "correctRtByInput": {
+        "touch": {
+          "cue": {
+            "none": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "central": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "double": {
+              "count": 1,
+              "sumMs": 0,
+              "meanMs": 0
+            },
+            "spatial_valid": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            }
+          },
+          "flanker": {
+            "congruent": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "incongruent": {
+              "count": 1,
+              "sumMs": 0,
+              "meanMs": 0
+            },
+            "neutral": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            }
+          }
+        },
+        "pointer": {
+          "cue": {
+            "none": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "central": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "double": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "spatial_valid": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            }
+          },
+          "flanker": {
+            "congruent": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "incongruent": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "neutral": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            }
+          }
+        },
+        "keyboard": {
+          "cue": {
+            "none": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "central": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "double": {
+              "count": 1,
+              "sumMs": 350,
+              "meanMs": 350
+            },
+            "spatial_valid": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            }
+          },
+          "flanker": {
+            "congruent": {
+              "count": 1,
+              "sumMs": 350,
+              "meanMs": 350
+            },
+            "incongruent": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            },
+            "neutral": {
+              "count": 0,
+              "sumMs": 0,
+              "meanMs": null
+            }
+          }
+        }
+      },
+      "differencesByInput": {
+        "touch": {
+          "alerting": null,
+          "orienting": null,
+          "conflict": null
+        },
+        "pointer": {
+          "alerting": null,
+          "orienting": null,
+          "conflict": null
+        },
+        "keyboard": {
+          "alerting": null,
+          "orienting": null,
+          "conflict": null
+        }
+      },
+      "cueAccuracy_none": null,
+      "cueCorrectMeanRtMs_none": null,
+      "cueCorrectRtCount_none": null,
+      "cueCorrectCount_none": 0,
+      "cueValidCount_none": 0,
+      "cueExpectedCount_none": 12,
+      "cueAccuracy_central": null,
+      "cueCorrectMeanRtMs_central": null,
+      "cueCorrectRtCount_central": null,
+      "cueCorrectCount_central": 0,
+      "cueValidCount_central": 1,
+      "cueExpectedCount_central": 12,
+      "cueAccuracy_double": null,
+      "cueCorrectMeanRtMs_double": null,
+      "cueCorrectRtCount_double": null,
+      "cueCorrectCount_double": 2,
+      "cueValidCount_double": 2,
+      "cueExpectedCount_double": 12,
+      "cueAccuracy_spatial_valid": null,
+      "cueCorrectMeanRtMs_spatial_valid": null,
+      "cueCorrectRtCount_spatial_valid": null,
+      "cueCorrectCount_spatial_valid": 0,
+      "cueValidCount_spatial_valid": 1,
+      "cueExpectedCount_spatial_valid": 12,
+      "flankerAccuracy_congruent": null,
+      "flankerCorrectMeanRtMs_congruent": null,
+      "flankerCorrectRtCount_congruent": null,
+      "flankerCorrectCount_congruent": 1,
+      "flankerValidCount_congruent": 3,
+      "flankerExpectedCount_congruent": 16,
+      "flankerAccuracy_incongruent": null,
+      "flankerCorrectMeanRtMs_incongruent": null,
+      "flankerCorrectRtCount_incongruent": null,
+      "flankerCorrectCount_incongruent": 1,
+      "flankerValidCount_incongruent": 1,
+      "flankerExpectedCount_incongruent": 16,
+      "flankerAccuracy_neutral": null,
+      "flankerCorrectMeanRtMs_neutral": null,
+      "flankerCorrectRtCount_neutral": null,
+      "flankerCorrectCount_neutral": 0,
+      "flankerValidCount_neutral": 0,
+      "flankerExpectedCount_neutral": 16,
+      "alertingMeanRtDifferenceMs": null,
+      "alertingFirstCorrectCount": null,
+      "alertingSecondCorrectCount": null,
+      "orientingMeanRtDifferenceMs": null,
+      "orientingFirstCorrectCount": null,
+      "orientingSecondCorrectCount": null,
+      "conflictMeanRtDifferenceMs": null,
+      "conflictFirstCorrectCount": null,
+      "conflictSecondCorrectCount": null
+    },
+    "quality": {
+      "state": "invalid",
+      "flags": {
+        "incompleteRecords": true,
+        "mixedInput": true,
+        "incompleteAccuracy": true,
+        "incompleteCue_none": true,
+        "incompleteCue_central": true,
+        "incompleteCue_double": true,
+        "incompleteCue_spatial_valid": true,
+        "incompleteFlanker_congruent": true,
+        "incompleteFlanker_incongruent": true,
+        "incompleteFlanker_neutral": true,
+        "unavailable_alerting": true,
+        "unavailable_orienting": true,
+        "unavailable_conflict": true,
+        "noInterpretableCondition": true
+      },
+      "reasons": [
+        "完整条件记录不足，本轮不提供表现结论。"
+      ]
+    },
+    "audit": {
+      "trialCount": 6,
+      "scorerVersion": "1.1.0"
+    }
+  },
+  "projection": {
+    "state": "invalid",
+    "accuracy": null,
+    "cueRows": [],
+    "flankerRows": [],
+    "differences": [],
+    "reasons": [
+      "完整条件记录不足，本轮不提供表现结论。"
+    ],
+    "description": "只描述本轮记录；条件差值不是能力等级，体验版不代表稳定网络能力。",
+    "practicalTip": "把设备放稳，关闭通知，让视线留在中央注视点。"
+  }
+}

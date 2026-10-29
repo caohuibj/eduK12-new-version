@@ -1,0 +1,14 @@
+{
+  "oldTestSHA256": "ae39fe0a983e2f829f44e325bb80aeef643dc4a82adb9d40458aebba429d7178",
+  "currentTestSHA256": "980973b17bd2f21f5839b6421c9d8804beb3b6003cf86004692aa2bb7acfc663",
+  "snapshotBeforeDigest": "04eb6df93f81bf615be6f181a96be5b3cb784a87d294919426c2d2a6bed24e1d",
+  "snapshotAfterDigest": "04eb6df93f81bf615be6f181a96be5b3cb784a87d294919426c2d2a6bed24e1d",
+  "sameSerializedContext": true,
+  "onlyEdits": [
+    "Use identical frozen HF_PROTOCOL with its task-specific TypeScript type",
+    "Remove ignored unsupported exact option from getByRole"
+  ],
+  "queryImplementationSHA256": "b84766f4caa2005fca0968aa353e213ce7ae70ed1fad009f59f3fa96cdf496cc",
+  "querySignature": "const queryAllByRole = (container, role, {\n  hidden = (0, _allUtils.getConfig)().defaultHidden,\n  name,\n  description,\n  queryFallbacks = false,\n  selected,\n  busy,\n  checked,\n  pressed,\n  current,\n  level,\n  expanded,\n  value: {\n    now: valueNow,\n    min: valueMin,\n    max: valueMax,\n    text: valueText\n  } = {}\n} = {}) => {\n  ",
+  "decision": "Reuse the two actual UI assertions; only this affected frontend type closure was rerun, not the same runtime observations."
+}

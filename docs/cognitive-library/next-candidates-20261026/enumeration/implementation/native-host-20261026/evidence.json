@@ -1,0 +1,92 @@
+{
+  "status": "NATIVE_ENUMERATION_FRONTEND_CANDIDATE_NOT_HTTP_BROWSER_ACCEPTANCE",
+  "sealedAt": "2026-10-26T14:22:05.108342+00:00",
+  "newCasesPassed": 9,
+  "runs": [
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/enumeration/native-port.test.tsx --maxWorkers=1 --reporter=json --outputFile=/tmp/enumeration-native-port-tests.json",
+      "exitCode": 0,
+      "passed": 7
+    },
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/enumeration/native-port.test.tsx -t 'full-looking package' --maxWorkers=1 --reporter=json --outputFile=/tmp/enumeration-native-port-pending-tests.json",
+      "exitCode": 0,
+      "passed": 1,
+      "skipped": 7
+    },
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/enumeration/native-port.test.tsx -t 'before immediate disposal' --maxWorkers=1 --reporter=json --outputFile=/tmp/enumeration-native-port-dispose-tests.json",
+      "exitCode": 0,
+      "passed": 1,
+      "skipped": 8
+    }
+  ],
+  "typeChecks": {
+    "status": "All four affected-entry actual tsconfig closures exited0/diagnostics0",
+    "latest": "types-dispose-followup.json",
+    "notFullProjectBuild": true,
+    "lastChangeAfterTypeCheck": "persistence.ts jsdoc only: native complete confirmation means core saved, separate from archive. No runtime/type change."
+  },
+  "contracts": {
+    "identity": "Only authenticated enumeration engine0.2.0/scoring0.2.0/config0.3.0; protocol key remains exact enumeration/0.1.0/0.1.0. Runtime config comes from host/server snapshot.",
+    "draftKey": "Parent-owned nativeEnumerationDraftKey(sessionId,epoch); no draft metadata/submission created or guessed. No Training/composite/public/Survey extension.",
+    "artifact": "Original Artifact/Record v1 and candidate-json-stringify-sha256-v1 property order retained. Actual session/epoch/definition association remains local META.",
+    "reservation": "Existing immutable META primitive returns transaction-created bool; only created true grants new exposure. Same ordinal duplicate is unresolved. End/realm changes stop exposure; no replay or partial automatic FINAL.",
+    "recordRetention": "Host retains captured original synchronously before first await. Record slots immutable and CAS-bound. Local failures keep pending originals; stopped/disposed candidate cannot issue stale core callback.",
+    "final": "Full sidecar {schemaVersion:1,artifact,formal:[SavedRecord],practice:[SavedRecord]} retained/sealed before last formal local ACK. Native complete receipt must match coreSaved identity. Report uses outer actual server result; COS remains independent.",
+    "calibration": "Neutral 5cm ruler/explicit positive self-reported distance and checkbox; actual existing seven numeric fields/source/id, enum5degree fit, no silent shrink, no MOT100..2000 distance gate. Default zh; English product path unverified.",
+    "restart": "readiness restart-required; partial formal reload is not trial-boundary continuation. Existing all-formal-local-ACK branch may submit original sealed package without exposure."
+  },
+  "notRun": [
+    "Actual HTTP/start/profile/FINAL/browser for enumeration (parent next stage)",
+    "Real IndexedDB created receipt transaction test for new bool (parent browser next stage)",
+    "Mobile/tablet screenshot/200% for new calibration/native wrapper",
+    "External COS",
+    "Physical presentation/refresh/participant validity",
+    "Old MOT/18/27 or old enumeration full browser/scorer suites"
+  ],
+  "sourceFiles": [
+    {
+      "path": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "sha256": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/native-port.ts",
+      "sha256": "adb17d66a35516cbefc1e0fb8c7544ab9e906e5d6599ce212d3f557271d341bc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/native-port.test.tsx",
+      "sha256": "612007d85d992ceb29784c56bdf1f5aba992d2da6db7684d2ccfb7cbca4e0615"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/NativeEnumerationRunner.tsx",
+      "sha256": "6bab1951e6b8eb266e71f91966d17025d2eabcdf92bfedf5ea7847f33ff06004"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationCalibration.tsx",
+      "sha256": "646649ef9f86ba2fd122c1069314a1737fa16972add435f16a3a6b14bd28b48e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+      "sha256": "aa3d6cc2aff6fc1b678fa64becf6e7f9222211ef4e1d42beae0de4d9b0543ab8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts",
+      "sha256": "c90a8067cefdcc291ded4262db050dd9bf6eba23d189713dbb3330b9325eb579"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/native-runners.tsx",
+      "sha256": "9fc09285fba6f532e43ec9769257112955cddf22deeb78e49b7091b922244f8b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/readiness.ts",
+      "sha256": "0efc5f94d1ce240788492cbeb3ab36d5b9db252f0302a711e34494523ed6829a"
+    }
+  ],
+  "parentDependency": {
+    "path": "server-version/frontend/src/modules/cognitive/core/native-enumeration-draft-key.ts",
+    "sha256": "71fd11c0e3a75476cb6f0cdc564892df8fa686d86507e55a6656b047cb710b96"
+  },
+  "sourceReuse": "Tests recorded in phases. Old successful HTTP/browser artifacts and their original source hashes are not overwritten or claimed to include this stage.",
+  "licensing": "No new upstream code/assets/dependencies/fonts imported; project existing capture/protocol/palette and ruler setup reused."
+}

@@ -1,0 +1,33 @@
+
+ RUN  v4.1.11 /workspace/cognitive-review-spatial/server-version/frontend
+
+ ❯ src/modules/cognitive/core/__tests__/grad-freeze-independent.test.tsx (3 tests | 1 failed) 81ms
+   × two reconstructed ports reuse the first frozen exact wire for the same record digest 37ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/modules/cognitive/core/__tests__/grad-freeze-independent.test.tsx > two reconstructed ports reuse the first frozen exact wire for the same record digest
+AssertionError: expected 'FinalDraftStorageError: 本次冻结原件不允许替换' to be null
+
+- Expected:
+null
+
++ Received:
+"FinalDraftStorageError: 本次冻结原件不允许替换"
+
+ ❯ src/modules/cognitive/core/__tests__/grad-freeze-independent.test.tsx:32:23
+     30|  b.resolve({trialIndex:0,payload:{originalHash:rawHash,wire:'represent…
+     31|  const result=await observed
+     32|  expect(result.error).toBeNull()
+       |                       ^
+     33|  expect(result.value).toMatchObject({finalSaved:true})
+     34|  expect(f.appendEnvelope.mock.calls.map(args=>args[0])).toEqual([winne…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  04:04:51
+   Duration  2.14s (transform 1.14s, setup 136ms, import 1.36s, tests 81ms, environment 349ms)
+

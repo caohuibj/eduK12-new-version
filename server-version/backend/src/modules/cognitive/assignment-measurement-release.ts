@@ -3,7 +3,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {cognitiveMeasurementRelease} from '../measurement-content/cognitive'
 import {ContentReleaseError,prepareRelease} from '../measurement-content/release'
 import {getContentRelease,publishContentRelease} from '../measurement-content/repository'
-import {requireCognitiveRegistryEntry} from './cognitive.registry'
+import {requireCognitiveTaskResource,assertResourceConfigVersion} from './task-resource'
 import {decryptCognitivePayload} from './cognitive.security'
 import {hashResolvedConfig} from './profile-freeze'
 
@@ -30,7 +30,8 @@ export async function publishAssignmentMeasurementRelease(tx:Prisma.TransactionC
  if(!config||config.status!=='PUBLISHED')fail('CONFIG_NOT_PUBLISHED')
  let effective:unknown
  try{
-  const entry=requireCognitiveRegistryEntry(config.test_type,config.engine_version,config.scoring_version)
+  const entry=requireCognitiveTaskResource(config.test_type,config.engine_version,config.scoring_version)
+  assertResourceConfigVersion(entry,config.config_version)
   const fields=[assignment.profile,assignment.profile_definition_version,assignment.resolved_config_snapshot_encrypted,assignment.resolved_config_hash]
   const count=fields.filter(value=>value!==null&&value!=='').length
   if(count!==0&&count!==fields.length)fail('PROFILE_INVALID')

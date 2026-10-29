@@ -1,0 +1,335 @@
+--- a/server-version/backend/src/modules/cognitive/v2/registry.ts
++++ b/server-version/backend/src/modules/cognitive/v2/registry.ts
+@@ -1,3 +1,4 @@
++import { getNativeCognitiveTaskDefinition,listNativeCognitiveTaskDefinitions } from '../content-candidates/native-registry/definitions'
+ import {
+   getCognitiveRegistryEntry,
+   listCognitiveRegistryEntries,
+@@ -183,14 +184,21 @@
+   }
+ }
+ 
+-export const listCognitiveV2TaskDefinitions = (): TaskDefinition<unknown, unknown>[] =>
+-  listCognitiveRegistryEntries().map((entry) => buildCognitiveV2TaskDefinition(entry))
++export const listCognitiveV2TaskDefinitions = (): TaskDefinition<unknown, unknown>[] => {
++  const native = listNativeCognitiveTaskDefinitions()
++  const legacy = listCognitiveRegistryEntries().filter(entry => !getNativeCognitiveTaskDefinition(
++    entry.testType, entry.engineVersion, entry.scoringVersion,
++  )).map(entry => buildCognitiveV2TaskDefinition(entry))
++  return [...legacy, ...native]
++}
+ 
+ export const getCognitiveV2TaskDefinition = (
+   testType: string,
+   engineVersion: string,
+   scoringVersion: string,
+ ): TaskDefinition<unknown, unknown> | undefined => {
++  const native = getNativeCognitiveTaskDefinition(testType, engineVersion, scoringVersion)
++  if (native) return native
+   const entry = getCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
+   return entry ? buildCognitiveV2TaskDefinition(entry) : undefined
+ }
+--- a/server-version/backend/src/modules/cognitive/v2/publication-gate.ts
++++ b/server-version/backend/src/modules/cognitive/v2/publication-gate.ts
+@@ -1,3 +1,4 @@
++import { getNativeCognitiveTaskDefinition } from '../content-candidates/native-registry/definitions'
+ import { computeProtocolSignature } from './canonical'
+ import type { MetricDefinition, TaskDefinition } from './types'
+ 
+@@ -40,7 +41,18 @@
+   if (definition.protocol.phases.length === 0 || !definition.protocol.phases.some((phase) => phase.persists && phase.required)) {
+     issues.push(issue('protocol.phases', 'at least one required persisted phase is needed'))
+   }
+-  if (definition.profiles.standard === undefined) {
++  const native = getNativeCognitiveTaskDefinition(definition.testType, definition.engineVersion, definition.scoringVersion)
++  if (native) {
++    // These exact native tuples implement two real profiles; a standard alias would invent a third contract.
++    for (const profile of ['research', 'experience'] as const) {
++      if (!definition.profiles[profile]) issues.push(issue(`profiles.${profile}`, `native ${profile} profile is required`))
++    }
++    for (const profile of Object.keys(definition.profiles)) {
++      if (profile !== 'research' && profile !== 'experience') {
++        issues.push(issue(`profiles.${profile}`, 'native task profiles must be exactly research and experience'))
++      }
++    }
++  } else if (definition.profiles.standard === undefined) {
+     issues.push(issue('profiles', 'standard profile is required'))
+   }
+ 
+--- a/server-version/backend/src/modules/cognitive/v2/audit.ts
++++ b/server-version/backend/src/modules/cognitive/v2/audit.ts
+@@ -1,3 +1,4 @@
++import { getNativeCognitiveTaskDefinition,listNativeCognitiveTaskDefinitions } from '../content-candidates/native-registry/definitions'
+ import { computeProtocolSignature } from './canonical'
+ import {
+   listCognitiveV2TaskDefinitions,
+@@ -49,13 +50,19 @@
+   const issues: PublicationIssue[] = []
+   const seen = new Set<string>()
+   const registryEntries = listCognitiveRegistryEntries()
++  const nativeDefinitions = listNativeCognitiveTaskDefinitions()
+   const entries = definitions.map((definition) => {
+     const key = taskKey(definition)
+     const entryIssues = validateTaskDefinition(definition)
+     const registryEntry = registryEntries.find((candidate) => registryKey(candidate) === key)
+-    if (!registryEntry) {
+-      entryIssues.push({ path: `registry.${key}`, message: 'task definition is not backed by an exact RegistryEntry', severity: 'error' })
+-    } else {
++    const native = getNativeCognitiveTaskDefinition(definition.testType, definition.engineVersion, definition.scoringVersion)
++    if (!registryEntry && native !== definition) {
++      entryIssues.push({ path: `registry.${key}`, message: 'task definition is not backed by an exact RegistryEntry or authoritative native object', severity: 'error' })
++    }
++    if (registryEntry && native) {
++      entryIssues.push({ path: `registry.${key}`, message: 'task identity has conflicting legacy and native backing', severity: 'error' })
++    }
++    if (registryEntry) {
+       entryIssues.push(...validateRegistryReferenceEligibility(registryEntry).map((candidate) => ({
+         path: `registry.${key}.${candidate.path}`,
+         message: candidate.message,
+@@ -94,16 +101,21 @@
+   })
+ 
+   const definitionKeys = new Set(definitions.map(taskKey))
+-  if (definitions.length !== registryEntries.length) {
++  if (definitions.length !== registryEntries.length + nativeDefinitions.length) {
+     issues.push({
+       path: 'registry',
+-      message: `registry/definition cardinality mismatch: ${registryEntries.length} RegistryEntry identities vs ${definitions.length} task definitions`,
++      message: `registry/definition cardinality mismatch: ${registryEntries.length} RegistryEntry identities + ${nativeDefinitions.length} native identities vs ${definitions.length} task definitions`,
+       severity: 'error',
+     })
+   }
+   for (const registryEntry of registryEntries) {
+     const key = registryKey(registryEntry)
+     if (!definitionKeys.has(key)) issues.push({ path: `registry.${key}`, message: 'exact RegistryEntry is missing from the v2 audit', severity: 'error' })
++  }
++
++  for (const native of nativeDefinitions) {
++    const key = taskKey(native)
++    if (!definitions.includes(native)) issues.push({ path: `registry.${key}`, message: 'authoritative native object is missing from the v2 audit', severity: 'error' })
+   }
+ 
+   const compatibilityPublishedCount = entries.filter((entry) => entry.compatibilityStatus === 'PUBLISHED').length
+--- a/server-version/backend/src/__tests__/cognitive/v2-registry.test.ts
++++ b/server-version/backend/src/__tests__/cognitive/v2-registry.test.ts
+@@ -1,26 +1,23 @@
++import { listNativeCognitiveTaskDefinitions } from '../../modules/cognitive/content-candidates/native-registry/definitions'
+ import { describe, expect, it } from 'vitest'
+-import {
+-  buildCognitiveV2TaskDefinition,
+-  getCognitiveV2TaskDefinition,
+-  listCognitiveV2TaskDefinitions,
+-  auditCognitiveV2Registry,
+-  validateTaskDefinition,
+-  computeConfigSnapshotHash,
+-  computeProtocolSignature,
+-  createTrialEnvelope,
+-  resolveCognitiveFinalMaxTrials,
+-  runAuthoritativeScorer,
+-  validateRegistryReferenceEligibility,
+-} from '../../modules/cognitive/v2'
++import { buildCognitiveV2TaskDefinition,getCognitiveV2TaskDefinition,listCognitiveV2TaskDefinitions,
++  validateRegistryReferenceEligibility } from '../../modules/cognitive/v2/registry'
++import { auditCognitiveV2Registry } from '../../modules/cognitive/v2/audit'
++import { validateTaskDefinition } from '../../modules/cognitive/v2/publication-gate'
++import { computeConfigSnapshotHash,computeProtocolSignature } from '../../modules/cognitive/v2/canonical'
++import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
++import { resolveCognitiveFinalMaxTrials } from '../../modules/cognitive/v2/final-submission-budget'
++import { runAuthoritativeScorer } from '../../modules/cognitive/v2/authoritative-scorer'
+ import { listCognitiveRegistryEntries } from '../../modules/cognitive/cognitive.registry'
+ 
+ describe('Cognitive v2 registry adapter', () => {
+-  it('migrates every static cognitive registry entry without changing task inventory', () => {
++  it('preserves every legacy identity and adds only the explicit native task inventory', () => {
+     const legacy = listCognitiveRegistryEntries()
+     const definitions = listCognitiveV2TaskDefinitions()
+-    expect(definitions).toHaveLength(legacy.length)
++    const native = listNativeCognitiveTaskDefinitions()
++    expect(definitions).toHaveLength(legacy.length + native.length)
+     expect(new Set(definitions.map((definition) => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`)).size)
+-      .toBe(legacy.length)
++      .toBe(legacy.length + native.length)
+     for (const definition of definitions) {
+       const errors = validateTaskDefinition(definition).filter((candidate) => candidate.severity === 'error')
+       expect(errors, `${definition.testType}/${definition.scoringVersion}`).toEqual([])
+@@ -36,17 +33,22 @@
+       entry,
+     ]))
+ 
+-    expect(definitions).toHaveLength(legacy.length)
++    const native = listNativeCognitiveTaskDefinitions()
++    expect(definitions).toHaveLength(legacy.length + native.length)
+     for (const definition of definitions) {
+       const entry = legacyByKey.get(`${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`)
+-      expect(entry, `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).toBeDefined()
+-      expect(typeof entry?.finalSubmission.maxTrials).toBe('function')
+-      expect(definition.finalSubmission).toBe(entry?.finalSubmission)
++      if (entry) {
++        expect(typeof entry.finalSubmission.maxTrials).toBe('function')
++        expect(definition.finalSubmission).toBe(entry.finalSubmission)
++      } else {
++        expect(native).toContain(definition)
++        expect(typeof definition.finalSubmission.maxTrials).toBe('function')
++      }
+     }
+ 
+     const audit = auditCognitiveV2Registry(definitions)
+-    expect(audit.registryCount).toBe(legacy.length)
+-    expect(audit.entries).toHaveLength(legacy.length)
++    expect(audit.registryCount).toBe(legacy.length + native.length)
++    expect(audit.entries).toHaveLength(legacy.length + native.length)
+     expect(audit.entries.every((entry) => entry.issues.every((issue) => issue.severity !== 'error'))).toBe(true)
+   })
+ 
+@@ -57,7 +59,9 @@
+     const compatibilityDrafts = definitions.filter((definition) => definition.publication.status === 'DRAFT')
+     const compatibilityRetired = definitions.filter((definition) => definition.publication.status === 'RETIRED')
+ 
+-    expect(compatibilityDrafts.map((definition) => definition.testType)).toEqual(['fake'])
++    expect(compatibilityDrafts.map((definition) => definition.testType).sort()).toEqual([
++      'fake', ...listNativeCognitiveTaskDefinitions().filter(definition => definition.publication.status === 'DRAFT').map(definition => definition.testType),
++    ].sort())
+     expect(compatibilityRetired.map((definition) => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).sort()).toEqual([
+       'memory/1.0.0/1.0.0',
+       'reaction/1.0.0/1.0.0',
+--- a/server-version/backend/src/__tests__/cognitive/mot-native-content.test.ts
++++ b/server-version/backend/src/__tests__/cognitive/mot-native-content.test.ts
+@@ -37,8 +37,10 @@
+  runAuthoritativeScorer({definition:motDefinition,session:createMotSnapshot(profile),trials,randomSeed})
+ 
+ describe('MOT native content candidate',()=>{
+- it('preserves the real platform rejection of a two-profile candidate without manufacturing a standard profile',()=>{
+-  expect(validateTaskDefinition(motDefinition).filter(i=>i.severity==='error')).toEqual([{path:'profiles',message:'standard profile is required',severity:'error'}])
++ it('accepts the real native two-profile contract without manufacturing a standard profile',()=>{
++  expect(validateTaskDefinition(motDefinition).filter(i=>i.severity==='error')).toEqual([])
++  expect(Object.keys(motDefinition.profiles).sort()).toEqual(['experience','research'])
++  expect(motDefinition.profiles.standard).toBeUndefined()
+   const trials=records(),core=trials[0].payload,envelope=motTrialEnvelope(core)
+   expect(envelope.startedAtPerfMs).toBe(core.startedAtPerfMs)
+   expect(envelope.endedAtPerfMs).toBe(core.endedAtPerfMs)
+--- /dev/null
++++ b/server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts
+@@ -0,0 +1,17 @@
++import type { TaskDefinition } from '../../v2/types'
++import { motDefinition } from '../mot/package'
++import { enumerationDefinition } from '../enumeration/package'
++import { recognitionDefinition } from '../continuous-recognition/package'
++import { antDefinition } from '../ant/package'
++
++/** Explicit native implementations, not RegistryEntry adapters or publication/lifecycle authority. */
++const nativeDefinitions:readonly TaskDefinition<unknown,unknown>[]=[
++  motDefinition,enumerationDefinition,recognitionDefinition,antDefinition,
++] as unknown as readonly TaskDefinition<unknown,unknown>[]
++
++export const listNativeCognitiveTaskDefinitions=():TaskDefinition<unknown,unknown>[]=>[...nativeDefinitions]
++
++/** Exact tuple only. Never substitute another version or select a latest definition. */
++export const getNativeCognitiveTaskDefinition=(testType:string,engineVersion:string,scoringVersion:string):TaskDefinition<unknown,unknown>|undefined=>
++  nativeDefinitions.find(definition=>definition.testType===testType&&definition.engineVersion===engineVersion
++    &&definition.scoringVersion===scoringVersion)
+--- /dev/null
++++ b/server-version/backend/src/__tests__/cognitive/v2-native-registry.test.ts
+@@ -0,0 +1,103 @@
++import { afterEach,describe,it,expect,vi } from 'vitest'
++import { getCognitiveV2TaskDefinition,listCognitiveV2TaskDefinitions,buildCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registry'
++import { listNativeCognitiveTaskDefinitions } from '../../modules/cognitive/content-candidates/native-registry/definitions'
++import { validateTaskDefinition,assertTaskContractValid } from '../../modules/cognitive/v2/publication-gate'
++import { auditCognitiveV2Registry } from '../../modules/cognitive/v2/audit'
++import { getCognitiveRegistryEntry,listCognitiveRegistryEntries } from '../../modules/cognitive/cognitive.registry'
++import { runAuthoritativeScorer } from '../../modules/cognitive/v2/authoritative-scorer'
++import { projectThreeLayerReport } from '../../modules/cognitive/v2/report'
++import { createMotSnapshot,motDefinition } from '../../modules/cognitive/content-candidates/mot/package'
++import { createEnumerationSnapshot,enumerationDefinition } from '../../modules/cognitive/content-candidates/enumeration/package'
++import { createRecognitionSnapshot,recognitionDefinition } from '../../modules/cognitive/content-candidates/continuous-recognition/package'
++import { createAntSnapshot,antDefinition } from '../../modules/cognitive/content-candidates/ant/package'
++import { antPlan,antTrialEnvelope,type AntTrial } from '../../modules/cognitive/content-candidates/ant/protocol'
++import { createSessionConfigSnapshot } from '../../modules/cognitive/v2/session-snapshot'
++import type { TaskDefinition } from '../../modules/cognitive/v2/types'
++const native=[motDefinition,enumerationDefinition,recognitionDefinition,antDefinition] as unknown as TaskDefinition<unknown,unknown>[]
++const key=(d:{testType:string;engineVersion:string;scoringVersion:string})=>`${d.testType}/${d.engineVersion}/${d.scoringVersion}`
++const snapshot=(type:string)=>type==='mot'?createMotSnapshot('experience'):type==='enumeration'?createEnumerationSnapshot('experience'):
++ type==='continuous-recognition'?createRecognitionSnapshot('experience',Array.from({length:80},(_,i)=>'registry-asset-'+i),Array.from({length:6},(_,i)=>'registry-practice-'+i)):
++ createAntSnapshot('experience')
++afterEach(()=>vi.restoreAllMocks())
++describe('Explicit native v2 registry admission',()=>{
++ it.each(native)('production resolver returns the same authoritative $testType object without legacy adaptation',definition=>{
++  const resolved=getCognitiveV2TaskDefinition(definition.testType,definition.engineVersion,definition.scoringVersion)
++  expect(resolved).toBe(definition);expect(resolved?.scorer).toBe(definition.scorer)
++  expect(getCognitiveRegistryEntry(definition.testType,definition.engineVersion,definition.scoringVersion)).toBeUndefined()
++  expect(Object.keys(resolved!.profiles).sort()).toEqual(['experience','research'])
++  expect(resolved!.profiles.standard).toBeUndefined();expect(Object.prototype.hasOwnProperty.call(resolved,'score')).toBe(false)
++ })
++ it.each(native)('$testType native FINAL scorer runs without any legacy score invocation',definition=>{
++  const legacySpies=listCognitiveRegistryEntries().map(entry=>vi.spyOn(entry,'score'))
++  const resolved=getCognitiveV2TaskDefinition(definition.testType,definition.engineVersion,definition.scoringVersion)!
++  const result=runAuthoritativeScorer({definition:resolved,session:snapshot(definition.testType),trials:[],randomSeed:'native-registry-test'})
++  expect(result.audit.trialCount).toBe(0);expect(result.audit.scorerVersion).toBe(definition.scoringVersion)
++  expect(result).not.toHaveProperty('score');expect(result.metrics).not.toHaveProperty('score')
++  expect(result.quality.state).toBe('invalid');expect(result.quality.flags).not.toHaveProperty('legacyUninterpretable')
++  for(const spy of legacySpies)expect(spy).not.toHaveBeenCalled()
++ })
++ it.each(native)('$testType accepts exactly its two real profiles and keeps all report visibility checks',definition=>{
++  expect(validateTaskDefinition(definition).filter(i=>i.severity==='error')).toEqual([])
++  expect(()=>assertTaskContractValid(definition)).not.toThrow()
++  for(const profile of ['research','experience'] as const){
++   const missing={...definition,profiles:{...definition.profiles}};delete missing.profiles[profile]
++   expect(validateTaskDefinition(missing)).toEqual(expect.arrayContaining([expect.objectContaining({path:'profiles.'+profile,severity:'error'})]))
++  }
++  const alias={...definition,profiles:{...definition.profiles,standard:definition.profiles.experience}}
++  expect(validateTaskDefinition(alias)).toEqual(expect.arrayContaining([expect.objectContaining({path:'profiles.standard',severity:'error'})]))
++  for(const metric of definition.report.headlineMetrics)expect(definition.metrics[metric].visibility).toBe('headline')
++  for(const metric of definition.report.userMetrics)expect(definition.metrics[metric].visibility).toBe('user')
++ })
++ it('rejects unknown exact native tuples without choosing latest or crossing scorer versions',()=>{
++  for(const d of native){
++   expect(getCognitiveV2TaskDefinition(d.testType,d.engineVersion,'unknown')).toBeUndefined()
++   expect(getCognitiveV2TaskDefinition(d.testType,'unknown',d.scoringVersion)).toBeUndefined()
++  }
++  expect(getCognitiveV2TaskDefinition('ant','1.0.0','1.0.0')).toBeUndefined()
++  expect(getCognitiveV2TaskDefinition('unknown-task','1.0.0','1.0.0')).toBeUndefined()
++ })
++ it('covers the exact combined inventory and rejects missing, duplicate or cloned native backing',()=>{
++  const definitions=listCognitiveV2TaskDefinitions(),legacy=listCognitiveRegistryEntries(),expected=[...legacy,...native].map(key).sort()
++  expect(definitions.map(key).sort()).toEqual(expected);expect(new Set(expected).size).toBe(expected.length)
++  expect(listNativeCognitiveTaskDefinitions()).toEqual(native)
++  expect(auditCognitiveV2Registry(definitions).status).toBe('PASS')
++  expect(auditCognitiveV2Registry(definitions.filter(d=>d!==antDefinition)).status).toBe('FAIL')
++  expect(auditCognitiveV2Registry([...definitions,antDefinition as unknown as TaskDefinition<unknown,unknown>]).status).toBe('FAIL')
++  const forged=definitions.map(d=>d===antDefinition?{...d}:d)
++  const audit=auditCognitiveV2Registry(forged)
++  expect(audit.status).toBe('FAIL')
++  expect(audit.entries.find(e=>e.key===key(antDefinition))!.issues.some(i=>i.message.includes('authoritative native object'))).toBe(true)
++ })
++ it('preserves the existing legacy adapter and its exact standard requirement',()=>{
++  const legacy=getCognitiveRegistryEntry('reaction','1.0.0','1.1.0')!,definition=getCognitiveV2TaskDefinition('reaction','1.0.0','1.1.0')!
++  expect(definition.scorer).not.toBe(legacy.score);expect(definition.finalSubmission).toBe(legacy.finalSubmission)
++  expect(definition.metrics).toEqual(buildCognitiveV2TaskDefinition(legacy).metrics)
++  const missing={...definition,profiles:{...definition.profiles}};delete missing.profiles.standard
++  expect(validateTaskDefinition(missing)).toEqual(expect.arrayContaining([expect.objectContaining({path:'profiles',message:'standard profile is required'})]))
++  const config={totalTrials:5,foreperiodMinMs:700,foreperiodMaxMs:1500,timeoutMs:2000,readyDurationMs:1000,report:{reportVersion:'1.0.0',referenceMode:'none'}}
++  const session=createSessionConfigSnapshot({definition,configVersion:'1.0.0',config}),spy=vi.spyOn(legacy,'score')
++  expect(()=>runAuthoritativeScorer({definition,session,trials:[],randomSeed:'legacy-registry-test'})).toThrow('expects exactly 5 trials, got 0')
++  expect(spy).toHaveBeenCalledOnce()
++  const structurallyValidUnknown={...definition,testType:'unknown-definition'}
++  expect(validateTaskDefinition(structurallyValidUnknown).filter(i=>i.severity==='error')).toEqual([])
++  expect(getCognitiveV2TaskDefinition('unknown-definition',definition.engineVersion,definition.scoringVersion)).toBeUndefined()
++ })
++ it('normal ANT uses resolved native scorer and report rather than a numeric compatibility score',()=>{
++  const session=createAntSnapshot('experience'),seed='native-registry-normal-ant'
++  const trials:AntTrial[]=antPlan(session.config,seed).map(p=>{
++   const start=p.trialIndex*4000,cue=start+p.plannedPreCueMs,target=cue+500,rt=p.flanker==='incongruent'?450:400
++   return {...p,phase:'test',recordOrigin:'live',clock:{source:'performance',timeOriginUnixMs:1700000000000},startedAtPerfMs:start,
++    cueOnsetPerfMs:cue,cueOffsetPerfMs:cue+100,targetOnsetPerfMs:target,targetOffsetPerfMs:target+rt,endedAtPerfMs:start+4000,
++    events:[{direction:p.direction,input:'touch',atPerfMs:target+rt,repeat:false,held:false}],responseIndex:0,timedOut:false,eventOverflow:false,interruptions:[]}
++  })
++  const definition=getCognitiveV2TaskDefinition(session.testType,session.engineVersion,session.scoringVersion)!
++  const result=runAuthoritativeScorer({definition,session,trials:trials.map(antTrialEnvelope),randomSeed:seed})
++  const report=projectThreeLayerReport({testType:'ant',engineVersion:session.engineVersion,scoringVersion:session.scoringVersion,
++   configVersion:session.configVersion,protocolSignature:session.protocolSignature,profile:'experience',definition:definition.report,
++   metricDefinitions:definition.metrics,qualityDefinitions:definition.quality,metrics:result.metrics,score:result})
++  expect(result.quality.state).toBe('interpretable');expect(result.metrics.accuracy).toBe(1)
++  expect(report.user.find(r=>r.key==='conflictMeanRtDifferenceMs')!.value).toBe(50)
++  expect(report.detail.find(r=>r.key==='conflictFirstCorrectCount')!.value).toBe(16)
++  expect(result).not.toHaveProperty('score');expect(result.metrics).not.toHaveProperty('score')
++ })
++})

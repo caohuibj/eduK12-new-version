@@ -1,0 +1,126 @@
+{
+  "candidateId": "continuous-recognition",
+  "status": "UNREGISTERED_DRAFT_NATIVE_V2_CANDIDATE",
+  "createdUtc": "2026-10-26T06:36:51.737712+00:00",
+  "environment": {
+    "cloudOnly": true,
+    "node": "v24.21.0",
+    "noMacResourcesUsed": true,
+    "installedNewDependencies": false
+  },
+  "checks": [
+    {
+      "kind": "new-native-tests-only",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/continuous-recognition-candidate.test.ts --maxWorkers=1 -t 'continuous recognition native adapter' --reporter=json --outputFile=../../docs/cognitive-library/next-candidates-20261026/recognition/implementation/native-adapter/vitest.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "passedTests": 41,
+      "failedTests": 0,
+      "skippedOriginalTests": 43,
+      "report": "vitest.json"
+    },
+    {
+      "kind": "new-native-entry-type-closure",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit --strict --target ES2020 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck src/modules/cognitive/content-candidates/continuous-recognition/native.ts src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0
+    }
+  ],
+  "failedPreparation": {
+    "report": "vitest-no-selected-tests.json",
+    "description": "Wrong cwd for copy/append; no new tests selected, old43 skipped. Not qualified despite final shell exit0. Corrected before successful targeted run."
+  },
+  "firstRoundEvidencePreserved": {
+    "report": "../vitest.json",
+    "originalPassed": 43,
+    "notRerun": true,
+    "originalTestSha256": "5a718f6af774b0177ee91b371a50b97aadced1b3d808cd968e68ae51997f72a6",
+    "retainedSource": "first-round-test-source.txt"
+  },
+  "sourceAndEvidenceFiles": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/native-adapter/README.md",
+      "sha256": "efade1c0cd1c3ae78c8d54dfdd086882df62baf3cd50d92685e110134cfd87fa"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/native-adapter/first-round-test-source.txt",
+      "sha256": "5a718f6af774b0177ee91b371a50b97aadced1b3d808cd968e68ae51997f72a6"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/native-adapter/preparation-failure.txt",
+      "sha256": "f47442406b777f0797e3cb4f42530199361e1bd1fccf9019bc739754d6bcdfca"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/native-adapter/vitest-no-selected-tests.json",
+      "sha256": "b61359119e9528a84f7874a86fcf3501c0f886b9e262b4c5fd38fcf411b9d6da"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/native-adapter/vitest.json",
+      "sha256": "a6f1da7dc60b4e23cadf5f89c466844f5afad800832f289bd9eba2083369f99d"
+    },
+    {
+      "file": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "file": "server-version/backend/package.json",
+      "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/continuous-recognition-candidate.test.ts",
+      "sha256": "46cf9e2849d9d33679ee8ed26ff189fae6ac350ba4a22e1728089d9ce7a0295f"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/metadata.ts",
+      "sha256": "a272a4761cfbf77743dc131309dbcd0c0fe3a01f8a0c229729666afb4d5a6e90"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts",
+      "sha256": "a032299978cb2aeabf5f6c28b591994fb858159e6310f742c06aa667adc83f80"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+      "sha256": "755904d328f9141384d5203fd1a40c76866c13042a7fdd4e6dd17accaba07826"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts",
+      "sha256": "f9b724b0bbca7c172089ae1699b311605e1681845a331f192f9afc4de454804b"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/scorer.ts",
+      "sha256": "cd3f53ad81d127da6342fe62f91ed7aa52b6c9a665c1484d0895ed7bbb7272ff"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/canonical.ts",
+      "sha256": "6688d12144fcd63f143429390cedb90332721cde57dbb0e9c14aab9b1e5caaaa"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+      "sha256": "ef885828b8f0dc097ac38e17701f789e82e12036eb71bacdc8a859c43209ecb3"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/trial-envelope.ts",
+      "sha256": "9a6cd24c06876b82557ec6159c713519c13bb401693ae75ddb53218c24f3ba78"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/types.ts",
+      "sha256": "ca6740c52cf7aafa8e09640abe608708af043c228ea82f9a290358bd0c8ba656"
+    },
+    {
+      "file": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    }
+  ],
+  "completeTransitiveDependencyByteInventoryRecorded": false,
+  "nativeAuthority": "actual SessionConfigSnapshot parsed and exact identity/config/protocol validated; internal FrozenCandidate derived only",
+  "reviewAuthority": "disabled; no client ResearchReview accepted; future server review must bind actual raw/result digest",
+  "notRun": [
+    "CI/full build/full typecheck",
+    "formal image runner or asset clearance",
+    "native registration or lifecycle",
+    "real hardware timing or scientific validity",
+    "API/DB/COS/device readback/export",
+    "four entry integration",
+    "commit/push/Notion/deploy"
+  ]
+}

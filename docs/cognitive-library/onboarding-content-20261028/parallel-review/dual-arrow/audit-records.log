@@ -1,0 +1,392 @@
+[
+  {
+    "name": "firstResponseNoise",
+    "state": "limited",
+    "received": 1,
+    "valid": 1,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {
+          "touch": 1
+        }
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 100,
+        "inputs": {
+          "touch": 1
+        }
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    },
+    "firstIgnored": {
+      "early": 1,
+      "inactive": 0,
+      "held": 1,
+      "answered": 1,
+      "late": 0
+    },
+    "firstIgnoredRepeatCount": 3
+  },
+  {
+    "name": "atDeadlineMissing",
+    "state": "limited",
+    "received": 1,
+    "valid": 1,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 0,
+        "correct": 0,
+        "missed": 1,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 0,
+        "correct": 0,
+        "missed": 1,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    },
+    "firstIgnored": {
+      "early": 0,
+      "inactive": 0,
+      "held": 0,
+      "answered": 0,
+      "late": 1
+    },
+    "firstIgnoredRepeatCount": 0
+  },
+  {
+    "name": "inactiveSingle",
+    "state": "limited",
+    "received": 1,
+    "valid": 1,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 0,
+        "inputs": {
+          "touch": 1
+        }
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    },
+    "firstIgnored": {
+      "early": 0,
+      "inactive": 1,
+      "held": 0,
+      "answered": 0,
+      "late": 0
+    },
+    "firstIgnoredRepeatCount": 0
+  },
+  {
+    "name": "unclosedInterruption",
+    "state": "invalid",
+    "received": 1,
+    "valid": 0,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    },
+    "firstIgnored": {
+      "early": 0,
+      "inactive": 0,
+      "held": 0,
+      "answered": 0,
+      "late": 0
+    },
+    "firstIgnoredRepeatCount": 0
+  },
+  {
+    "name": "closedInterruption",
+    "state": "limited",
+    "received": 1,
+    "valid": 1,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 0,
+        "inputs": {
+          "touch": 1
+        }
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 10,
+        "inputs": {
+          "touch": 1
+        }
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    },
+    "firstIgnored": {
+      "early": 0,
+      "inactive": 0,
+      "held": 0,
+      "answered": 0,
+      "late": 0
+    },
+    "firstIgnoredRepeatCount": 0
+  },
+  {
+    "name": "signedPrefix",
+    "state": "limited",
+    "received": 21,
+    "valid": 21,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 300,
+        "inputs": {
+          "touch": 1
+        }
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 10,
+        "answered": 10,
+        "correct": 10,
+        "missed": 0,
+        "correctRTCount": 10,
+        "medianCorrectMs": 200,
+        "inputs": {
+          "touch": 10
+        }
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 10,
+        "answered": 10,
+        "correct": 9,
+        "missed": 0,
+        "correctRTCount": 9,
+        "medianCorrectMs": 0,
+        "inputs": {
+          "touch": 10
+        }
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 10,
+        "answered": 9,
+        "correct": 9,
+        "missed": 1,
+        "correctRTCount": 9,
+        "medianCorrectMs": 700,
+        "inputs": {
+          "touch": 9
+        }
+      }
+    },
+    "differences": {
+      "blueLatencyMs": -300,
+      "redLatencyMs": 500,
+      "blueAccuracy": -0.09999999999999998,
+      "redAccuracy": -0.09999999999999998
+    },
+    "firstIgnored": {
+      "early": 0,
+      "inactive": 0,
+      "held": 0,
+      "answered": 1,
+      "late": 0
+    },
+    "firstIgnoredRepeatCount": 0
+  }
+]

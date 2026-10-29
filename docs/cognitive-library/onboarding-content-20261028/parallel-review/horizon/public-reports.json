@@ -1,0 +1,401 @@
+{
+  "empty": {
+    "testType": "horizon-exploration",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+    "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18",
+    "profile": "experience",
+    "state": "invalid",
+    "planned": 40,
+    "received": 0,
+    "completed": 0,
+    "validFirstChoices": 0,
+    "totalChoices": 0,
+    "laterFreeChoices": 0,
+    "totalReward": 0,
+    "groups": {
+      "equalShort": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": null,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      },
+      "equalLong": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": null,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      },
+      "unequalShort": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": 0,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      },
+      "unequalLong": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": 0,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      }
+    },
+    "longMinusShortLessSampledRate": null
+  },
+  "beforeFirst": {
+    "testType": "horizon-exploration",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+    "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18",
+    "profile": "experience",
+    "state": "invalid",
+    "planned": 40,
+    "received": 1,
+    "completed": 0,
+    "validFirstChoices": 0,
+    "totalChoices": 4,
+    "laterFreeChoices": 0,
+    "totalReward": 174,
+    "groups": {
+      "equalShort": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": null,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      },
+      "equalLong": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": null,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      },
+      "unequalShort": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": 0,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      },
+      "unequalLong": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": 0,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      }
+    },
+    "longMinusShortLessSampledRate": null
+  },
+  "afterFirst": {
+    "testType": "horizon-exploration",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+    "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 40,
+    "received": 1,
+    "completed": 0,
+    "validFirstChoices": 1,
+    "totalChoices": 5,
+    "laterFreeChoices": 0,
+    "totalReward": 214,
+    "groups": {
+      "equalShort": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": null,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      },
+      "equalLong": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": null,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      },
+      "unequalShort": {
+        "planned": 10,
+        "validFirstChoices": 0,
+        "lessSampledChoices": 0,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": []
+      },
+      "unequalLong": {
+        "planned": 10,
+        "validFirstChoices": 1,
+        "lessSampledChoices": 0,
+        "higherObservedChoices": 0,
+        "tiedObservedMeans": 0,
+        "rows": [
+          {
+            "gameIndex": 0,
+            "seenLeft": 3,
+            "seenRight": 1,
+            "observedMeanLeft": 41,
+            "observedMeanRight": 51,
+            "observedMeanDifference": -10,
+            "choice": "left",
+            "lessSide": "right",
+            "chosenLess": false,
+            "observedHigherSide": "right",
+            "chosenHigher": false,
+            "input": "keyboard"
+          }
+        ]
+      }
+    },
+    "longMinusShortLessSampledRate": null
+  },
+  "signedComparison": {
+    "testType": "horizon-exploration",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+    "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 40,
+    "received": 12,
+    "completed": 11,
+    "validFirstChoices": 12,
+    "totalChoices": 105,
+    "laterFreeChoices": 45,
+    "totalReward": 5027,
+    "groups": {
+      "equalShort": {
+        "planned": 10,
+        "validFirstChoices": 2,
+        "lessSampledChoices": null,
+        "higherObservedChoices": 1,
+        "tiedObservedMeans": 0,
+        "rows": [
+          {
+            "gameIndex": 2,
+            "seenLeft": 2,
+            "seenRight": 2,
+            "observedMeanLeft": 41.5,
+            "observedMeanRight": 51,
+            "observedMeanDifference": -9.5,
+            "choice": "left",
+            "lessSide": null,
+            "chosenLess": null,
+            "observedHigherSide": "right",
+            "chosenHigher": false,
+            "input": "keyboard"
+          },
+          {
+            "gameIndex": 8,
+            "seenLeft": 2,
+            "seenRight": 2,
+            "observedMeanLeft": 57,
+            "observedMeanRight": 39,
+            "observedMeanDifference": 18,
+            "choice": "left",
+            "lessSide": null,
+            "chosenLess": null,
+            "observedHigherSide": "left",
+            "chosenHigher": true,
+            "input": "keyboard"
+          }
+        ]
+      },
+      "equalLong": {
+        "planned": 10,
+        "validFirstChoices": 4,
+        "lessSampledChoices": null,
+        "higherObservedChoices": 1,
+        "tiedObservedMeans": 0,
+        "rows": [
+          {
+            "gameIndex": 1,
+            "seenLeft": 2,
+            "seenRight": 2,
+            "observedMeanLeft": 44,
+            "observedMeanRight": 46,
+            "observedMeanDifference": -2,
+            "choice": "left",
+            "lessSide": null,
+            "chosenLess": null,
+            "observedHigherSide": "right",
+            "chosenHigher": false,
+            "input": "keyboard"
+          },
+          {
+            "gameIndex": 4,
+            "seenLeft": 2,
+            "seenRight": 2,
+            "observedMeanLeft": 56.5,
+            "observedMeanRight": 88.5,
+            "observedMeanDifference": -32,
+            "choice": "left",
+            "lessSide": null,
+            "chosenLess": null,
+            "observedHigherSide": "right",
+            "chosenHigher": false,
+            "input": "keyboard"
+          },
+          {
+            "gameIndex": 7,
+            "seenLeft": 2,
+            "seenRight": 2,
+            "observedMeanLeft": 65,
+            "observedMeanRight": 52,
+            "observedMeanDifference": 13,
+            "choice": "left",
+            "lessSide": null,
+            "chosenLess": null,
+            "observedHigherSide": "left",
+            "chosenHigher": true,
+            "input": "keyboard"
+          },
+          {
+            "gameIndex": 10,
+            "seenLeft": 2,
+            "seenRight": 2,
+            "observedMeanLeft": 22,
+            "observedMeanRight": 51.5,
+            "observedMeanDifference": -29.5,
+            "choice": "left",
+            "lessSide": null,
+            "chosenLess": null,
+            "observedHigherSide": "right",
+            "chosenHigher": false,
+            "input": "keyboard"
+          }
+        ]
+      },
+      "unequalShort": {
+        "planned": 10,
+        "validFirstChoices": 1,
+        "lessSampledChoices": 1,
+        "higherObservedChoices": 1,
+        "tiedObservedMeans": 0,
+        "rows": [
+          {
+            "gameIndex": 11,
+            "seenLeft": 1,
+            "seenRight": 3,
+            "observedMeanLeft": 70,
+            "observedMeanRight": 59.666666666666664,
+            "observedMeanDifference": 10.333333333333336,
+            "choice": "left",
+            "lessSide": "left",
+            "chosenLess": true,
+            "observedHigherSide": "left",
+            "chosenHigher": true,
+            "input": "keyboard"
+          }
+        ]
+      },
+      "unequalLong": {
+        "planned": 10,
+        "validFirstChoices": 5,
+        "lessSampledChoices": 0,
+        "higherObservedChoices": 3,
+        "tiedObservedMeans": 0,
+        "rows": [
+          {
+            "gameIndex": 0,
+            "seenLeft": 3,
+            "seenRight": 1,
+            "observedMeanLeft": 41,
+            "observedMeanRight": 51,
+            "observedMeanDifference": -10,
+            "choice": "left",
+            "lessSide": "right",
+            "chosenLess": false,
+            "observedHigherSide": "right",
+            "chosenHigher": false,
+            "input": "keyboard"
+          },
+          {
+            "gameIndex": 3,
+            "seenLeft": 1,
+            "seenRight": 3,
+            "observedMeanLeft": 28,
+            "observedMeanRight": 56.666666666666664,
+            "observedMeanDifference": -28.666666666666664,
+            "choice": "right",
+            "lessSide": "left",
+            "chosenLess": false,
+            "observedHigherSide": "right",
+            "chosenHigher": true,
+            "input": "keyboard"
+          },
+          {
+            "gameIndex": 5,
+            "seenLeft": 1,
+            "seenRight": 3,
+            "observedMeanLeft": 81,
+            "observedMeanRight": 60.666666666666664,
+            "observedMeanDifference": 20.333333333333336,
+            "choice": "right",
+            "lessSide": "left",
+            "chosenLess": false,
+            "observedHigherSide": "left",
+            "chosenHigher": false,
+            "input": "keyboard"
+          },
+          {
+            "gameIndex": 6,
+            "seenLeft": 1,
+            "seenRight": 3,
+            "observedMeanLeft": 6,
+            "observedMeanRight": 29.666666666666668,
+            "observedMeanDifference": -23.666666666666668,
+            "choice": "right",
+            "lessSide": "left",
+            "chosenLess": false,
+            "observedHigherSide": "right",
+            "chosenHigher": true,
+            "input": "keyboard"
+          },
+          {
+            "gameIndex": 9,
+            "seenLeft": 1,
+            "seenRight": 3,
+            "observedMeanLeft": 29,
+            "observedMeanRight": 38.666666666666664,
+            "observedMeanDifference": -9.666666666666664,
+            "choice": "right",
+            "lessSide": "left",
+            "chosenLess": false,
+            "observedHigherSide": "right",
+            "chosenHigher": true,
+            "input": "keyboard"
+          }
+        ]
+      }
+    },
+    "longMinusShortLessSampledRate": -1
+  }
+}

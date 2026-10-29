@@ -1,0 +1,36 @@
+{
+  "kind": "REAL_NATIVE_FRONTEND_HTTP_SLICE_SYNTHETIC_CLOCK_AND_COS_UPLOADER",
+  "startedAt": "2026-10-28T02:06:32.861Z",
+  "api": [
+    {
+      "method": "GET",
+      "path": "/src/api/client.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cognitive/sessions/ba1d5b7d-018b-479c-881b-2bba6c96afb2",
+      "status": 200
+    }
+  ],
+  "pageErrors": [],
+  "checks": [],
+  "notVerified": [
+    "External COS credentials/upload",
+    "Physical timing/refresh validity",
+    "Full product auth shell",
+    "Public/Survey/composite native delivery"
+  ],
+  "identity": {
+    "sessionId": "ba1d5b7d-018b-479c-881b-2bba6c96afb2",
+    "attemptEpoch": 1,
+    "definitionHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+    "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f",
+    "profile": "experience"
+  },
+  "status": "FAIL",
+  "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '开始测评', exact: true })\u001b[22m\n\n    at /workspace/eduK12-new-version/server-version/scripts/cognitive/native-content-client-review.cjs:31:58",
+  "failurePageText": "测评\n\n认知测评\n!\n暂时无法继续\n该冻结任务类型或 engineVersion 没有可用的前端支持契约。\n\n该测评类型或版本暂不支持，请联系老师处理。\n\n返回我的课程",
+  "finishedAt": "2026-10-28T02:07:07.400Z",
+  "scriptSha256": "508114d740e953574615aed32de4884cbfcbede84dea30f72b4474de6f667600"
+}

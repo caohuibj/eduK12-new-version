@@ -1,0 +1,48 @@
+{
+  "base": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "node": "v24.21.0",
+  "nodePath": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+  "recordedAt": "2026-10-28T03:47:40.699Z",
+  "recordedAfterChecks": true,
+  "protocolSignature": "2270d03dda92065ee3f408fd420d65151c25c59812df8d6d1e74a95de589f6b2",
+  "protocolJSON": {
+    "schemaVersion": 1,
+    "key": "enumeration/0.1.0/0.1.0",
+    "version": "0.1.0",
+    "clock": "performance",
+    "randomizationAlgorithmVersion": "enumeration-fnv1a-utf16-mulberry32-fisher-yates-v1",
+    "trialEnvelopeVersion": 1,
+    "phases": [
+      {
+        "key": "test",
+        "persists": true,
+        "required": true
+      }
+    ],
+    "measurementCriticalConfigPaths": [
+      "*"
+    ]
+  },
+  "scorerArithmeticBodyUnchanged": true,
+  "beforeSHA256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts": "9edac0ad3044335ee752f867dba5cddaa7f2f840582d105b556c994f1fa82e6a",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts": "2eec4bce079bd62b02c7d28216e0ba037cf609ffc36044af7bd29c445a732380",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/NativeEnumerationRunner.tsx": "6bab1951e6b8eb266e71f91966d17025d2eabcdf92bfedf5ea7847f33ff06004",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "aa3d6cc2aff6fc1b678fa64becf6e7f9222211ef4e1d42beae0de4d9b0543ab8"
+  },
+  "sha256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts": "4b3a678b8dd59bc346acb4af222ebb5cc4fdfe04f60a95d071e675909e9f80f9",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts": "d3ca963de8498f7cfe54982e626bd8feee64ce05300200f7d7863d1d58db4859",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/NativeEnumerationRunner.tsx": "bd67d3411fe25bd28ddde73a27ff136e98551a20e759c4b098e8411dc2099262",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "fcf55e29e6786224c97e9ec8520cc9f756ef45fd60d0cd005af9702539039892",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationInstructions.tsx": "d2f00c97545d7d8b5700cc7b6a1a433b3e8268ce7adf8d27fdeb68085b027961",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/native-frozen-config.test.ts": "72c1fb6a777951567ceec09c3ac4cca66fa509317b256baf5095f7f420cec677",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/incomplete-practice.test.tsx": "c15b07dbc480eb929741ed8b93c2aeec7462c44ebb92e12eac428e8b7db934ce",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/native-port.test.tsx": "3552c181ff05dbdc2f443e56435a2feac5edaef3d617fb94906da8d829867f18",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/representative-records.ts": "21812dfa7457af5ec2b05d9a7b63972bfb332ed6a9bbad0446fb354e822200f7",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/check-types.cjs": "918adef82cc69e6dea9a017b354c986a93184f25efa31605be87a534505c1bfd",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/preview-instructions.cjs": "a56e63837db89d5127f493fc9bffe0752b9bc8a1812e2852f4a7751fc2ab2d5f"
+  }
+}

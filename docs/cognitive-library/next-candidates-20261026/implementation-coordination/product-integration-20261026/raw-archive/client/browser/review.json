@@ -1,0 +1,129 @@
+{
+  "kind": "REAL_NATIVE_FRONTEND_HTTP_SLICE_SYNTHETIC_CLOCK_AND_COS_UPLOADER",
+  "startedAt": "2026-10-26T11:09:47.133Z",
+  "api": [
+    {
+      "method": "GET",
+      "path": "/src/api/client.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cognitive/sessions/a560e4f4-7f57-424a-9014-643613eefe40",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "path": "/api/cognitive/sessions/a560e4f4-7f57-424a-9014-643613eefe40/submit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cognitive/sessions/a560e4f4-7f57-424a-9014-643613eefe40",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "path": "/api/cognitive/sessions/a560e4f4-7f57-424a-9014-643613eefe40/raw-archive",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "path": "/api/cognitive/sessions/a560e4f4-7f57-424a-9014-643613eefe40/raw-archive",
+      "status": 200
+    }
+  ],
+  "pageErrors": [],
+  "checks": [
+    {
+      "name": "actual_ui_calibration",
+      "syntheticSelfReport": true,
+      "viewport": "390x844",
+      "referenceCssPx": 190,
+      "distanceMm": 350
+    },
+    {
+      "name": "2_practice_9_formal_software_clock_actual_UI_keyboard_real_START_FINAL_report",
+      "passed": true
+    },
+    {
+      "name": "core_report_visible_before_fake_COS_confirmation_raw_retained_then_retry_confirmed",
+      "passed": true
+    }
+  ],
+  "notVerified": [
+    "External COS credentials/upload",
+    "Physical timing/refresh validity",
+    "Full product auth shell",
+    "Public/Survey/composite native delivery"
+  ],
+  "identity": {
+    "sessionId": "a560e4f4-7f57-424a-9014-643613eefe40",
+    "attemptEpoch": 1,
+    "definitionHash": "ac18eb0d0ee10f354a6ae9dd9d8bdec4587f991c6e19676eb0f45041154eaf13",
+    "protocolSignature": "ec21f1319091f8f3fe46a3861e7a385ea9a82211607e1da7bbe1df8b036a34c2",
+    "profile": "experience"
+  },
+  "afterFailedArchive": {
+    "status": "COMPLETED",
+    "submissionId": "0d5fe4bb-0ba5-4957-b497-e6724735f8d8",
+    "coreSealed": true,
+    "raw": {
+      "coreSaved": true,
+      "archiveConfirmed": false,
+      "rawSha256": "f850d96b027cc7171e49a0da5f77f7a747f433f00615b2e13d1bba4f5e4b9d2f",
+      "formal": 9,
+      "practice": 2,
+      "formalFrameCounts": [
+        500,
+        500,
+        501,
+        500,
+        500,
+        500,
+        500,
+        500,
+        472
+      ],
+      "inputs": [
+        "keyboard"
+      ]
+    }
+  },
+  "archiveAfterFailure": {
+    "calls": 1,
+    "successes": 0,
+    "failUploads": 0,
+    "ownedAssetCount": 0
+  },
+  "reportBeforeArchive": "合成联调示例：软件时钟；COS为测试替身，未访问外部存储\n\n返回我的课程\n\n作答已提交，报告已保存。\n\n完整记录仍保留在本设备，归档尚未确认。请保留本设备的浏览器数据；关闭页面后不会自动上传。\n\n完整记录归档尚未确认\n\n保存完整记录\n这次的追踪记录\n\n尝试 #1（体验版 · 2026/10/26 11:11:46）\n\n体验版 · 短程协议\n\n指标由正式评分器计算，但试次数较少，更适合描述本次体验，不用于人口百分位、年龄等级或稳定能力等级。\n\n结果结论\n\n本次结果存在质量限制，请结合展开详情谨慎阅读。\n\n数据质量：受限解释\n\n速度8记录受限\n\n主要指标\n\n任务表现\n速度1平均找回目标数\n2.6666666666666665\n该指标用于描述本次任务中的一个具体表现维度，请结合任务说明与其他指标共同阅读。\n速度4平均找回目标数\n3\n该指标用于描述本次任务中的一个具体表现维度，请结合任务说明与其他指标共同阅读。\n详细指标、参考与方法\n\n这里只描述本轮任务，不代表日常最多能同时注意几件事。",
+  "afterConfirmedArchive": null,
+  "archiveAfterRetry": {
+    "calls": 2,
+    "successes": 1,
+    "failUploads": 0,
+    "ownedAssetCount": 1
+  },
+  "reportOverflow200": {
+    "scroll": 820,
+    "client": 820
+  },
+  "status": "PASS",
+  "finishedAt": "2026-10-26T11:11:48.637Z",
+  "scriptSha256": "a256c77b410b8f80f00ac4d95e27530236337fa3875d39b1ae68e10cb7715ad9"
+}

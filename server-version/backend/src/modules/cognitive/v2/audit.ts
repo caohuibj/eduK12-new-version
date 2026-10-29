@@ -1,3 +1,4 @@
+import { getNativeCognitiveTaskDefinition,listNativeCognitiveTaskDefinitions } from '../content-candidates/native-registry/definitions'
 import { computeProtocolSignature } from './canonical'
 import {
   listCognitiveV2TaskDefinitions,
@@ -49,13 +50,19 @@ export const auditCognitiveV2Registry = (
   const issues: PublicationIssue[] = []
   const seen = new Set<string>()
   const registryEntries = listCognitiveRegistryEntries()
+  const nativeDefinitions = listNativeCognitiveTaskDefinitions()
   const entries = definitions.map((definition) => {
     const key = taskKey(definition)
     const entryIssues = validateTaskDefinition(definition)
     const registryEntry = registryEntries.find((candidate) => registryKey(candidate) === key)
-    if (!registryEntry) {
-      entryIssues.push({ path: `registry.${key}`, message: 'task definition is not backed by an exact RegistryEntry', severity: 'error' })
-    } else {
+    const native = getNativeCognitiveTaskDefinition(definition.testType, definition.engineVersion, definition.scoringVersion)
+    if (!registryEntry && native !== definition) {
+      entryIssues.push({ path: `registry.${key}`, message: 'task definition is not backed by an exact RegistryEntry or authoritative native object', severity: 'error' })
+    }
+    if (registryEntry && native) {
+      entryIssues.push({ path: `registry.${key}`, message: 'task identity has conflicting legacy and native backing', severity: 'error' })
+    }
+    if (registryEntry) {
       entryIssues.push(...validateRegistryReferenceEligibility(registryEntry).map((candidate) => ({
         path: `registry.${key}.${candidate.path}`,
         message: candidate.message,
@@ -94,16 +101,21 @@ export const auditCognitiveV2Registry = (
   })
 
   const definitionKeys = new Set(definitions.map(taskKey))
-  if (definitions.length !== registryEntries.length) {
+  if (definitions.length !== registryEntries.length + nativeDefinitions.length) {
     issues.push({
       path: 'registry',
-      message: `registry/definition cardinality mismatch: ${registryEntries.length} RegistryEntry identities vs ${definitions.length} task definitions`,
+      message: `registry/definition cardinality mismatch: ${registryEntries.length} RegistryEntry identities + ${nativeDefinitions.length} native identities vs ${definitions.length} task definitions`,
       severity: 'error',
     })
   }
   for (const registryEntry of registryEntries) {
     const key = registryKey(registryEntry)
     if (!definitionKeys.has(key)) issues.push({ path: `registry.${key}`, message: 'exact RegistryEntry is missing from the v2 audit', severity: 'error' })
+  }
+
+  for (const native of nativeDefinitions) {
+    const key = taskKey(native)
+    if (!definitions.includes(native)) issues.push({ path: `registry.${key}`, message: 'authoritative native object is missing from the v2 audit', severity: 'error' })
   }
 
   const compatibilityPublishedCount = entries.filter((entry) => entry.compatibilityStatus === 'PUBLISHED').length

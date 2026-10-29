@@ -1,0 +1,455 @@
+{
+  "kind": "READ_ONLY_COS_REUSE_CONTRACT_REVIEW",
+  "createdUtc": "2026-10-26T09:59:47.062027+00:00",
+  "checkedOutCommit": "eb5d90274c2f4301c1be93b107eb8c7bb10360ee",
+  "branch": "cognitive-next-three-core-20261026",
+  "policySource": {
+    "url": "https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3",
+    "providerReturnedAsOf": "2026-10-26T09:22:25.456Z",
+    "effectivePolicyUtc": "2026-10-26T09:20:00Z",
+    "readAgainInThisTask": true,
+    "principle": "User reports use existing core scoring once; raw COS not automatic timing recalculation."
+  },
+  "recommendedReuse": [
+    "assetStorage.storeAsset explicit cos+PRIVATE",
+    "StoredAsset/AssetReference and assetStorageKey",
+    "existing authoritative FINAL and resultSnapshot replay",
+    "IndexedDbFinalDraftStore immutable seal/local retry semantics"
+  ],
+  "notClaimedAvailable": [
+    "cognitive archive upload endpoint/business receipt",
+    "generic reliable raw COS archive queue",
+    "cross-client-close automatic archival guarantee",
+    "Bucket/Region/VersionId-bound immutable object reference",
+    "native registration/API/DB/COS candidate integration"
+  ],
+  "proposedReceiptConceptsOnly": {
+    "core": "saved/report available",
+    "archive": [
+      "pending",
+      "retry",
+      "confirmed"
+    ],
+    "notExistingSchemaFields": true
+  },
+  "sources": [
+    {
+      "id": "asset-store",
+      "file": "server-version/backend/src/services/assetStorage.ts",
+      "sha256": "1669cfbf2635d6af1ce46b21ac1df761f458dc839ec1948c55c9249be8226728",
+      "references": [
+        {
+          "startLine": 39,
+          "endLine": 50,
+          "fact": "StoreAssetInput: buffer/owner/accessScope/provider/initialReference"
+        },
+        {
+          "startLine": 105,
+          "endLine": 138,
+          "fact": "storeAsset: SHA256, private COS helper, DB registration and failure cleanup"
+        },
+        {
+          "startLine": 151,
+          "endLine": 190,
+          "fact": "storeAssetFromFile: streamed source and source-size/digest check"
+        },
+        {
+          "startLine": 361,
+          "endLine": 386,
+          "fact": "syncAssetReferences: caller transaction, active asset locks, replace binding"
+        },
+        {
+          "startLine": 478,
+          "endLine": 495,
+          "fact": "application signed path; signKnownAsset assumes caller authorization"
+        },
+        {
+          "startLine": 575,
+          "endLine": 590,
+          "fact": "parentAccess plus AssetReference required before hydration"
+        },
+        {
+          "startLine": 650,
+          "endLine": 695,
+          "fact": "private read authorization is domain-sensitive"
+        },
+        {
+          "startLine": 770,
+          "endLine": 791,
+          "fact": "serveStoredAssetContent: authorized bytes/short COS URL"
+        }
+      ],
+      "boundary": "Storage library reusable; no cognitive archive business route/status/idempotency supplied."
+    },
+    {
+      "id": "cos-helpers",
+      "file": "server-version/backend/src/utils/cos.ts",
+      "sha256": "137e73d5376ebd9d1ca84c8dd12893e81bb50ca2f0d00bbe4d289bed80bcbf55",
+      "references": [
+        {
+          "startLine": 57,
+          "endLine": 83,
+          "fact": "uploadBufferToCOS accepts MIME/SHA metadata and private ACL; returns URL"
+        },
+        {
+          "startLine": 88,
+          "endLine": 105,
+          "fact": "getCOSSignedUrl expiry bounded to600s"
+        },
+        {
+          "startLine": 155,
+          "endLine": 180,
+          "fact": "uploadAssetFileToCOS checks actual streamed size/digest"
+        }
+      ],
+      "boundary": "No upload VersionId is returned or persisted; credentials/config values were not read."
+    },
+    {
+      "id": "asset-dedup",
+      "file": "server-version/backend/src/services/assetUploadDeduplication.ts",
+      "sha256": "03dbe09686604a2ab110b809f6aab30427c082889437b3d439d8072fc23d9d78",
+      "references": [
+        {
+          "startLine": 7,
+          "endLine": 20,
+          "fact": "HEAD content length/optional hash/type metadata check"
+        },
+        {
+          "startLine": 27,
+          "endLine": 54,
+          "fact": "registerCOSAssetUpload gets a new logical identity per call and may reuse physical key"
+        },
+        {
+          "startLine": 57,
+          "endLine": 83,
+          "fact": "duplicate cleanup retry marker, not upload-outbox"
+        }
+      ],
+      "boundary": "Not domain idempotency and not a generic archive upload retry job."
+    },
+    {
+      "id": "asset-key",
+      "file": "server-version/backend/src/services/assetStorageKey.ts",
+      "sha256": "d53ca978f193ed4f5be8f85714a584996083f4e53b1e393a58d21394ca4a64d2",
+      "references": [
+        {
+          "startLine": 1,
+          "endLine": 5,
+          "fact": "assetStorageKey selects shared physical key, rejects invalid local sharing"
+        }
+      ],
+      "boundary": "Stable logical asset authorization stays separate from physical byte sharing."
+    },
+    {
+      "id": "schema",
+      "file": "server-version/backend/prisma/schema.prisma",
+      "sha256": "6533527006c1fb08ef30f779d007c5be6e1a5f212dce0fd1e567056b558393a2",
+      "references": [
+        {
+          "startLine": 1658,
+          "endLine": 1702,
+          "fact": "StoredAsset metadata and AssetReference uniqueness"
+        },
+        {
+          "startLine": 1952,
+          "endLine": 2004,
+          "fact": "CognitiveSession identity/config/result/submission fields"
+        },
+        {
+          "startLine": 2058,
+          "endLine": 2072,
+          "fact": "CognitiveRawSubmission core encrypted trials unique per session epoch"
+        },
+        {
+          "startLine": 3812,
+          "endLine": 3852,
+          "fact": "CompositeReportJob is bound to composite attempt/epoch/slot/context"
+        }
+      ],
+      "boundary": "No Cognitive raw archive model/state/VersionId field found in checked schema."
+    },
+    {
+      "id": "final",
+      "file": "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts",
+      "sha256": "a94f8aecd929c1aea34b2bfc28eef3d189410480996fd3d59fd0c946a48d7142",
+      "references": [
+        {
+          "startLine": 63,
+          "endLine": 73,
+          "fact": "current FINAL input has trials/provenance, no archive payload/ref"
+        },
+        {
+          "startLine": 302,
+          "endLine": 330,
+          "fact": "completed exact replay reads frozen result"
+        },
+        {
+          "startLine": 339,
+          "endLine": 358,
+          "fact": "one authoritative scoring path per new call"
+        },
+        {
+          "startLine": 382,
+          "endLine": 413,
+          "fact": "report projection and frozen result from scored core"
+        },
+        {
+          "startLine": 427,
+          "endLine": 435,
+          "fact": "encrypt core raw and result"
+        },
+        {
+          "startLine": 479,
+          "endLine": 559,
+          "fact": "transaction replay and unique raw/session completion"
+        }
+      ],
+      "boundary": "Score occurs before commit lock; no extra scorer is recommended for archival, no strict CPU exactly-once claim."
+    },
+    {
+      "id": "raw-contract",
+      "file": "server-version/backend/src/modules/cognitive/unified-raw-submission.ts",
+      "sha256": "4a76c052ae223b6d4079d34fb66b62762c8be424a2c4232bacd400738ad0f378",
+      "references": [
+        {
+          "startLine": 12,
+          "endLine": 31,
+          "fact": "core raw envelope contains epoch/trials/provenance"
+        },
+        {
+          "startLine": 33,
+          "endLine": 56,
+          "fact": "persist normalized core without second trial parse"
+        }
+      ],
+      "boundary": "Full sidecar/frame archive not present in this schema."
+    },
+    {
+      "id": "result",
+      "file": "server-version/backend/src/modules/cognitive/v2/result-snapshot.ts",
+      "sha256": "683c21f4a6f0a85dfba5d1802a04cd9f2701798f59129014a3924c05924f6eb1",
+      "references": [
+        {
+          "startLine": 6,
+          "endLine": 31,
+          "fact": "frozen metrics/quality/report/profile/version snapshot"
+        },
+        {
+          "startLine": 33,
+          "endLine": 36,
+          "fact": "invalid reference hiding"
+        }
+      ],
+      "boundary": "Reuse stored snapshot for read/report, not COS rescore."
+    },
+    {
+      "id": "raw-encryption",
+      "file": "server-version/backend/src/modules/assessment-runtime/security.ts",
+      "sha256": "a260a76f743828b3e5c752a719e8a146b1e60269febeb32b6c3f999efaa78f83",
+      "references": [
+        {
+          "startLine": 12,
+          "endLine": 27,
+          "fact": "strict versioned runtime encryption/decryption helpers"
+        }
+      ],
+      "boundary": "Encryption facility exists; no credentials read or encryption operation invoked."
+    },
+    {
+      "id": "limits",
+      "file": "server-version/backend/src/services/instrumentFinalSubmit.ts",
+      "sha256": "abdd778dbb2df0883f5b975b240155ca0158fd0cd075b72a7c11c94adf72ce51",
+      "references": [
+        {
+          "startLine": 16,
+          "endLine": 21,
+          "fact": "current cognitive core FINAL limit1536KiB"
+        },
+        {
+          "startLine": 41,
+          "endLine": 54,
+          "fact": "stable hash preserves meaningful array order"
+        }
+      ],
+      "boundary": "Do not enlarge global FINAL limit to smuggle frame archives; separate bounded business upload contract needed."
+    },
+    {
+      "id": "local-draft",
+      "file": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "sha256": "f359ed8d0c87be804e7b379bf88659313da5d0c43050c9f00489c7a9fc007de4",
+      "references": [
+        {
+          "startLine": 18,
+          "endLine": 28,
+          "fact": "DRAFT/SUBMITTING/RETRY_PENDING/COMPLETED and sealed payload"
+        },
+        {
+          "startLine": 378,
+          "endLine": 401,
+          "fact": "put/list/seal/delete API"
+        },
+        {
+          "startLine": 872,
+          "endLine": 885,
+          "fact": "same trial identity rejects different payload"
+        },
+        {
+          "startLine": 917,
+          "endLine": 940,
+          "fact": "immutable sealed submission under IDB transaction"
+        },
+        {
+          "startLine": 960,
+          "endLine": 964,
+          "fact": "factory can fallback to memory"
+        }
+      ],
+      "boundary": "Existing durable primitive reusable, but archive-specific sidecar adapter/retention not implemented."
+    },
+    {
+      "id": "core-client",
+      "file": "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts",
+      "sha256": "0022c613c5b22dcb6e96d2f20a5deb4e6513a9410b1b2c7dae8d24532e406bf7",
+      "references": [
+        {
+          "startLine": 370,
+          "endLine": 389,
+          "fact": "FINAL_ONLY puts trial to local draft, no per-trial HTTP"
+        },
+        {
+          "startLine": 443,
+          "endLine": 468,
+          "fact": "seal core and retry same FINAL"
+        },
+        {
+          "startLine": 470,
+          "endLine": 495,
+          "fact": "successful core completion deletes local draft"
+        }
+      ],
+      "boundary": "Existing delete lifecycle must not delete archive-only original before independent COS confirmation."
+    },
+    {
+      "id": "candidate-ports",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/contracts.ts",
+      "sha256": "1767b61bbf6f317415a3525908c616cc56deb532ee4317380626acef875547de",
+      "references": [
+        {
+          "startLine": 11,
+          "endLine": 34,
+          "fact": "context, sealed raw, local/final receipts and host ports"
+        }
+      ],
+      "boundary": "Ports are not a production durable archive implementation; finalSaved has no pending archive split."
+    },
+    {
+      "id": "report-outbox",
+      "file": "server-version/backend/src/modules/assessment-runtime/report-outbox.service.ts",
+      "sha256": "0987e3bad56b06725edb80bb3880014f5eae016796b15ece8b8090769203f18b",
+      "references": [
+        {
+          "startLine": 33,
+          "endLine": 49,
+          "fact": "attemptEpoch/slotSetHash/contextHash identity"
+        },
+        {
+          "startLine": 88,
+          "endLine": 110,
+          "fact": "composite report enqueue with parent-bound receipt"
+        },
+        {
+          "startLine": 168,
+          "endLine": 202,
+          "fact": "bound composite report insert/upsert"
+        },
+        {
+          "startLine": 258,
+          "endLine": 282,
+          "fact": "DB lease and SKIP LOCKED claim"
+        },
+        {
+          "startLine": 304,
+          "endLine": 309,
+          "fact": "report outcomes including retry"
+        }
+      ],
+      "boundary": "Reliable pattern exists for composite reports, not generic COS raw upload."
+    },
+    {
+      "id": "report-worker",
+      "file": "server-version/backend/src/workers/compositeReportWorker.ts",
+      "sha256": "a6b4e5bf2129010630731edfc6af577960131f7969b3b11dd73c57790cfd3600",
+      "references": [
+        {
+          "startLine": 26,
+          "endLine": 60,
+          "fact": "processes whole questionnaire and aggregate materialization"
+        },
+        {
+          "startLine": 61,
+          "endLine": 81,
+          "fact": "bounded retry preserving accepted receipt"
+        }
+      ],
+      "boundary": "Do not route raw archive jobs through report scoring/materialization."
+    },
+    {
+      "id": "bull",
+      "file": "server-version/backend/src/config/queue.ts",
+      "sha256": "35217ec956dfd043b5d5243e50f3f628449478a142d6d6d4af79a4f186663419",
+      "references": [
+        {
+          "startLine": 22,
+          "endLine": 74,
+          "fact": "video/image/export queue names and bounded retries"
+        }
+      ],
+      "boundary": "No raw cognitive archive queue/consumer found."
+    },
+    {
+      "id": "upload-route",
+      "file": "server-version/backend/src/routes/uploads.ts",
+      "sha256": "c843d41d8eb3ce57b8ae7b53c49c74ceb4ab7ef84e12c473bdd3cfbaae8d9866",
+      "references": [
+        {
+          "startLine": 329,
+          "endLine": 364,
+          "fact": "bounded image route validates image content and returns StoredAsset"
+        }
+      ],
+      "boundary": "Cannot use image endpoint for JSON/binary scientific raw."
+    },
+    {
+      "id": "upload-admission",
+      "file": "server-version/backend/src/middleware/uploadAdmission.ts",
+      "sha256": "79cb8f1315ac617ad37f76419739dda8f98eabfff5cce7ca80ea5d90a53a2313",
+      "references": [
+        {
+          "startLine": 12,
+          "endLine": 31,
+          "fact": "resource/principal/byte admission functions"
+        },
+        {
+          "startLine": 44,
+          "endLine": 57,
+          "fact": "temporary upload content detector"
+        },
+        {
+          "startLine": 60,
+          "endLine": 85,
+          "fact": "bounded admission wrapper"
+        }
+      ],
+      "boundary": "Reuse capacity/byte admission, not image MIME assumptions for archive format."
+    }
+  ],
+  "verification": {
+    "mode": "static source read only",
+    "testsRun": false,
+    "cosRequests": false,
+    "credentialsOrConfigValuesRead": false,
+    "codeMigrationsOrArchitectureChanged": false,
+    "candidateSealedCodeOrEvidenceChanged": false
+  },
+  "readmeSha256": "a8911f2a6663b1e25bd28dc439216d6216e658309080489f0dd4d3c996b1686a"
+}

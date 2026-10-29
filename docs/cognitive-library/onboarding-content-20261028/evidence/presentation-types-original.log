@@ -1,0 +1,68 @@
+[
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 710,
+    code: 2339,
+    message: "Property 'toHaveAccessibleDescription' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 772,
+    code: 2339,
+    message: "Property 'toHaveAccessibleDescription' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 859,
+    code: 2339,
+    message: "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 1060,
+    code: 2339,
+    message: "Property 'toHaveTextContent' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 1228,
+    code: 2339,
+    message: "Property 'toHaveAccessibleDescription' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 1639,
+    code: 2339,
+    message: "Property 'toHaveTextContent' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 2122,
+    code: 2339,
+    message: "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 2176,
+    code: 2339,
+    message: "Property 'toHaveAccessibleDescription' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 2290,
+    code: 2339,
+    message: "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 2423,
+    code: 2339,
+    message: "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+  },
+  {
+    file: 'server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx',
+    start: 2477,
+    code: 2339,
+    message: "Property 'toHaveAccessibleDescription' does not exist on type 'Assertion<HTMLElement>'."
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "kind": "ACTUAL_CHROMIUM_IDB_GUARD_ONLY_RECEIPT",
+  "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/scripts/cognitive/native-mot-idb-ownership-review.cjs /tmp/native-mot-idb-ownership-review-20261026.json",
+  "cwd": "/workspace/eduK12-new-version",
+  "exitCode": 0,
+  "passed": 2,
+  "sourceStable": true,
+  "reportSha256": "f70fc12e5f724337c6b9cae8e54654c923a067a95fef8f575cd2628f2080e1d5",
+  "notRepeated": [
+    "2 practice + 9 formal browser",
+    "scorer",
+    "timing",
+    "database/HTTP/COS workflow"
+  ]
+}

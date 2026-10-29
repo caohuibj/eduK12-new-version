@@ -1,0 +1,6 @@
+{
+  "exitCode": 2,
+  "toolSessionId": 16095,
+  "diagnostic": "test line130 old session passed to new scorer needs explicit unknown type bridge; production patch Record errors already fixed.",
+  "note": "Wrong second negative case had received an unnecessary erased bridge; corrected first case and restored second. No behavior assertions changed."
+}

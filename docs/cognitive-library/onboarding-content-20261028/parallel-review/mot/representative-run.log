@@ -1,0 +1,58 @@
+{
+  "success": true,
+  "node": "v24.21.0",
+  "cases": [
+    {
+      "name": "two-targets-plus-duplicate",
+      "selected": [
+        1,
+        3,
+        0,
+        2,
+        6
+      ],
+      "valid": 1,
+      "mean": 2,
+      "accuracy": 0.4,
+      "publicState": "invalid"
+    },
+    {
+      "name": "true-zero",
+      "selected": [
+        0,
+        2,
+        6,
+        7,
+        9
+      ],
+      "valid": 1,
+      "mean": 0,
+      "accuracy": 0,
+      "publicState": "invalid"
+    },
+    {
+      "name": "interrupted-after-first",
+      "selected": [
+        1
+      ],
+      "valid": 0,
+      "mean": null,
+      "accuracy": null,
+      "publicState": "invalid"
+    },
+    {
+      "name": "one-frame-late",
+      "selected": [
+        1,
+        3,
+        0,
+        2,
+        6
+      ],
+      "valid": 1,
+      "mean": 2,
+      "accuracy": 0.4,
+      "publicState": "invalid"
+    }
+  ]
+}

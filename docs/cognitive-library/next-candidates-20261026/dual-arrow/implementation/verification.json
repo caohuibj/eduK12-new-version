@@ -1,0 +1,345 @@
+{
+  "date": "2026-10-27",
+  "execution": "cloud; Node24.21.0; existing dependencies",
+  "scope": "Content-only dual arrows research300 / experience60, practice3 pass3. Integration/main sync/final tests deferred by user.",
+  "mainReadback": "dff80f0604163a04e2f5a8119d7d4295116eeb41",
+  "contentBranchMainBaseline": "04a8d994207d7b831b874d4be4f5c31640466458",
+  "mainMerged": false,
+  "distinctRuntimeTargets": 6,
+  "tests": {
+    "backend-original": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "frontend-original": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    }
+  },
+  "types": {
+    "backend": {
+      "config": "tsconfig.json",
+      "roots": [
+        "src/modules/cognitive/content-candidates/dual-arrow/package.ts",
+        "src/modules/cognitive/content-candidates/dual-arrow/participant-presentation.ts",
+        "src/__tests__/cognitive/dual-arrow-content.test.ts"
+      ],
+      "sourceCount": 49,
+      "diagnostics": []
+    },
+    "frontend": {
+      "config": "tsconfig.app.json",
+      "roots": [
+        "src/modules/cognitive/tasks/dual-arrow/DualArrowTask.tsx",
+        "src/modules/cognitive/tasks/dual-arrow/content.test.tsx",
+        "src/test/setup.ts",
+        "src/vite-env.d.ts"
+      ],
+      "sourceCount": 58,
+      "diagnostics": []
+    }
+  },
+  "firstTypeDiagnostics": {
+    "backend": [
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'input' does not exist on type 'DualEvent'.   Property 'input' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'channel' does not exist on type 'DualEvent'.   Property 'channel' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'direction' does not exist on type 'DualEvent'.   Property 'direction' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 42,
+        "message": "Property 'repeat' does not exist on type 'DualEvent'.   Property 'repeat' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 42,
+        "message": "Property 'token' does not exist on type 'DualEvent'.   Property 'token' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 45,
+        "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<Channel, DualResponse>'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 45,
+        "message": "Property 'channel' does not exist on type 'DualEvent'.   Property 'channel' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<Channel, DualResponse>'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'channel' does not exist on type 'DualEvent'.   Property 'channel' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'direction' does not exist on type 'DualEvent'.   Property 'direction' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'input' does not exist on type 'DualEvent'.   Property 'input' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'token' does not exist on type 'DualEvent'.   Property 'token' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"finish\" | \"timeout\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/content-candidates/dual-arrow/scorer.ts",
+        "line": 13,
+        "message": "Conversion of type '{ [k: string]: { plannedRequired: number; presentedRequired: number; answered: number; correct: number; missed: number; correctRTCount: number; medianCorrectMs: null; inputs: {}; times: never[]; }; }' to type 'Record<\"blueSingle\" | \"redSingle\" | \"blueDual\" | \"redDual\", DualGroup & { times: number[]; }>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.   Type '{ [k: string]: { plannedRequired: number; presentedRequired: number; answered: number; correct: number; missed: number; correctRTCount: number; medianCorrectMs: null; inputs: {}; times: never[]; }; }' is missing the following properties from type 'Record<\"blueSingle\" | \"redSingle\" | \"blueDual\" | \"redDual\", DualGroup & { times: number[]; }>': blueSingle, redSingle, blueDual, redDual"
+      }
+    ],
+    "frontend": [
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'input' does not exist on type 'DualEvent'.   Property 'input' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'channel' does not exist on type 'DualEvent'.   Property 'channel' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'direction' does not exist on type 'DualEvent'.   Property 'direction' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 39,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 42,
+        "message": "Property 'repeat' does not exist on type 'DualEvent'.   Property 'repeat' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 42,
+        "message": "Property 'token' does not exist on type 'DualEvent'.   Property 'token' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 45,
+        "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<Channel, DualResponse>'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 45,
+        "message": "Property 'channel' does not exist on type 'DualEvent'.   Property 'channel' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<Channel, DualResponse>'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'channel' does not exist on type 'DualEvent'.   Property 'channel' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'direction' does not exist on type 'DualEvent'.   Property 'direction' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'input' does not exist on type 'DualEvent'.   Property 'input' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'token' does not exist on type 'DualEvent'.   Property 'token' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+        "line": 46,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/dual-arrow/scorer.ts",
+        "line": 13,
+        "message": "Conversion of type '{ [k: string]: { plannedRequired: number; presentedRequired: number; answered: number; correct: number; missed: number; correctRTCount: number; medianCorrectMs: null; inputs: {}; times: never[]; }; }' to type 'Record<\"blueSingle\" | \"redSingle\" | \"blueDual\" | \"redDual\", DualGroup & { times: number[]; }>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.   Type '{ [k: string]: { plannedRequired: number; presentedRequired: number; answered: number; correct: number; missed: number; correctRTCount: number; medianCorrectMs: null; inputs: {}; times: never[]; }; }' is missing the following properties from type 'Record<\"blueSingle\" | \"redSingle\" | \"blueDual\" | \"redDual\", DualGroup & { times: number[]; }>': blueSingle, redSingle, blueDual, redDual"
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 40,
+        "message": "Property 'input' does not exist on type 'DualEvent'.   Property 'input' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 40,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 40,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 40,
+        "message": "Property 'channel' does not exist on type 'DualEvent'.   Property 'channel' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 40,
+        "message": "Property 'direction' does not exist on type 'DualEvent'.   Property 'direction' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 40,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 43,
+        "message": "Property 'repeat' does not exist on type 'DualEvent'.   Property 'repeat' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 43,
+        "message": "Property 'token' does not exist on type 'DualEvent'.   Property 'token' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 46,
+        "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<Channel, DualResponse>'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 46,
+        "message": "Property 'channel' does not exist on type 'DualEvent'.   Property 'channel' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 47,
+        "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<Channel, DualResponse>'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 47,
+        "message": "Property 'channel' does not exist on type 'DualEvent'.   Property 'channel' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 47,
+        "message": "Property 'direction' does not exist on type 'DualEvent'.   Property 'direction' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 47,
+        "message": "Property 'input' does not exist on type 'DualEvent'.   Property 'input' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 47,
+        "message": "Property 'token' does not exist on type 'DualEvent'.   Property 'token' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+        "line": 47,
+        "message": "Property 'key' does not exist on type 'DualEvent'.   Property 'key' does not exist on type '{ kind: \"stimulus\" | \"timeout\" | \"finish\"; atMs: number; }'."
+      }
+    ]
+  },
+  "sourceSha256": {
+    "server-version/backend/src/__tests__/cognitive/dual-arrow-content.test.ts": "137df2ee3ab4836a92b7db9ec7f8094260af02358ce5ed5b59ebb3f38345091c",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/analysis.ts": "ac0284e5be786c84ab509f1d3a0513397d5cfa88f26e7a790f70da45db73aeaa",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/metadata.ts": "4f6e1ed745252587614a1df9dd2c9593317ec1b2310556904a8b13f73a34b1fa",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/package.ts": "01c29deceec43d7c631734cbba2b2849e7de4a093f385d4a45e834ff37ca6cc3",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/participant-presentation.ts": "4bedbe559b0a7d9eb2cbe5cb67962e2620a65bf9ef851ca473eba80a7a18ec99",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts": "0147eff1d935434710f847ff741f52437f2afcb5c6d8e109bccfcaabd96f7467",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/report.ts": "7d6d61722a2ac32155df18f7c7bf0ce68b86772fc8c9e44eabafebd61ee7c96d",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/schema.ts": "3e551d39c1295448b10bd466b000d4d26b48e23537708551d0018086b3be3981",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/scorer.ts": "0410a08b2c155b6d78e2804400f656c47b7c5c4c9d8e74c042e9ca1e7fa5be2b",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualArrowTask.tsx": "cf5fb09acc407c464993f346f2ffa3be60234458580b727226e4f470e56a9124",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualArrows.tsx": "85cc4893dd430c37025080351c74ac941d878914f6674a6d132b42e90a474ede",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualInstructions.tsx": "a482a471589fe9beaa8e14596c36544121a09ead831dac3baa13722cd6366883",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualReport.tsx": "18793f5181ca7679f49320dedf0575eb2e48494dfba531b31918c6f56dec4298",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/capture.ts": "71a33d69af4e18ae58dcca84decaf869ead1f6819559e5d51e215d1b6c9a7c16",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/content.test.tsx": "464602a2e96bca032c64ec70e7235c5d734cde3d06f800d8321fb8040d2130fd",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/contracts.ts": "8dc624debf95119a05092e0be4a3e5274a28d8a9d66c01ccc1ebf9b85e2fa285",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/dual.css": "aa3082c3bccc0ff978336a6fc2ac59262c0991359d503701de929afe9a2f4f41",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/generated/analysis.ts": "822f8d792e0383ded927da285fdeffa30df2e5c8ea63ed004615c4cd40b7634a",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts": "921fb934d684a9a52685a00e81f2b05b1be13b8b6c22c2b7ced77f70b274865e",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/generated/report.ts": "6b7b8afbed98ade26dab0533a801dc28bfb06cd6f54d9cf5990d74101752b18a",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/session.ts": "f6cea53286f7cf358c0472674657729cf73492f66c3d430cabd18e4aa4f548f6",
+    "server-version/scripts/cognitive/dual-content.cjs": "d9e487ee39be67edb280204c1ffeac97c6ee56f4fc39e0878785b69c69fa14fa"
+  },
+  "notRun": [
+    "registry/admission/seed",
+    "physical mobile/multi-pointer timing",
+    "real IndexedDB durability",
+    "real HTTP/core/report readback",
+    "COS",
+    "full App",
+    "research300 browser journey",
+    "new main merge validation",
+    "CI",
+    "deployment"
+  ],
+  "runtimeReuseProof": "type-only-runtime-proof.json",
+  "approvedDesignPngSha256": "06efaa5e419165ab6309e2040b8ffe42555aac6c1471ef37fc2a1e0c98ab639e",
+  "verificationNotes": [
+    "Six first-run runtime targets passed. First actual-config type closures failed on grouped event discriminants and inferred tuple construction, not runtime assertions.",
+    "Only type declarations were corrected. protocol/scorer emitted ES2022 CommonJS runtime ASTs matched before/after; no runtime target was repeated. Generated protocol is an exact pure copy.",
+    "Final type inputs verified by source SHA256; no compiler options weakened. Input events/3-mode teaching/60 trials use synthetic clocks/jsdom/in-memory ports, not durable product or physical device proof."
+  ]
+}

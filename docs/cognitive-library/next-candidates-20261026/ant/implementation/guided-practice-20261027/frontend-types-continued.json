@@ -1,0 +1,119 @@
+{
+  "kind": "AFFECTED_ANT_ENTRY_CLOSURE",
+  "config": "tsconfig.app.json",
+  "roots": [
+    "src/modules/cognitive/tasks/ant/AntTask.tsx",
+    "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+    "src/test/setup.ts",
+    "src/modules/cognitive/CognitiveV2ReportCard.tsx",
+    "src/vite-env.d.ts"
+  ],
+  "sources": [
+    {
+      "path": "src/modules/cognitive/tasks/ant/generated/protocol.ts",
+      "sha256": "fbe53bd18a8fbcfba54c3d11c7a330c3154c3cb06b193328cf8ba8fd017627a8"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/display.ts",
+      "sha256": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/capture.ts",
+      "sha256": "5dcf90ce5e2c5618cca2b705c25ae6fd49f8e5a5594e3de52113c54e2a4839bd"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/seal.ts",
+      "sha256": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/local-save.ts",
+      "sha256": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/session.ts",
+      "sha256": "cc5395484bc65b64675bca52502965f491e0dea3a3511d2576a6fbe822637a37"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/paint.ts",
+      "sha256": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/AntGuidedInstructions.tsx",
+      "sha256": "ba04806867fd8999d9e08826dc39012db47576be5e5d108bc06d5e5331c1ad2b"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/AntTask.tsx",
+      "sha256": "546175653a862ec89336ffb06f5208f2b8fb0d3e2e25232fd35ca3028fc1419a"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/test-fixtures.ts",
+      "sha256": "5f727f76b8249281d282354d6a913faab33ee173b01b9f54b01b077c9897acb4"
+    },
+    {
+      "path": "src/modules/cognitive/legacy-v2-presentation.ts",
+      "sha256": "28a9cb4a3a40e47d0880376a0f4be74c42d82a37a7c1af584d95edfbce0bb23d"
+    },
+    {
+      "path": "src/modules/reporting/ReportPrimitives.tsx",
+      "sha256": "da85f924d440dee5bcab93b1e053c8bdaeeb1f76aa83708e74db12f90419426b"
+    },
+    {
+      "path": "src/modules/assessment-media/types.ts",
+      "sha256": "518c50706279c5e1569a442cee8b5a747844ab1e134413c6ed8adf1e2adafb70"
+    },
+    {
+      "path": "src/services/persistence/cognitiveRawArchiveState.ts",
+      "sha256": "8403ffab818df9743e50a76ae3f32745b7120f5adf840d5472f8cf681514f908"
+    },
+    {
+      "path": "src/services/persistence/finalDraftStore.ts",
+      "sha256": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca"
+    },
+    {
+      "path": "src/training/training-cognitive-retention.ts",
+      "sha256": "b76e750e2d1c5526c1f8fce2e88762c3b14700597082b501c9718428700f679e"
+    },
+    {
+      "path": "src/modules/cognitive/types.ts",
+      "sha256": "07e70b71fc4f479e89056ea5004cfd20006dda7d5dc5445536b193ca17014df7"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveReportVisual.tsx",
+      "sha256": "40d69d9a352d6b90ce19edb41be901e534d29d3c03f771ab7a79f512bcc76dd8"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveReportReadingCard.tsx",
+      "sha256": "6fc4d32eee9651beeb7100154e33ed23bd852bb557dc466992fa77f5a0d66c4a"
+    },
+    {
+      "path": "src/modules/cognitive/report-record.ts",
+      "sha256": "da1dc38fa71d196ba4d8fe4c06b4497996694cd3e987eebb6f405448f67ecf59"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveReportRecord.tsx",
+      "sha256": "74c032455bc1189ccf43a22fdf4214c59ff2ceeb7b60c63088fba168a6924784"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveMagazineReport.tsx",
+      "sha256": "ff03d3c0a40cf629dd5194e81db4cbd9cc4efe1098bb41bbd092483ff01ba2bc"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveV2ReportCard.tsx",
+      "sha256": "b418c0a0ad859576ce89b3b237338a0c3c317e840c71002638986d1b519777cc"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "sha256": "690c4f523eea45ee91ff2be0e4f092caeb229a9cf8cd9ed33b5407eb8a5454f0"
+    },
+    {
+      "path": "src/test/setup.ts",
+      "sha256": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    }
+  ],
+  "diagnostics": [],
+  "exitCode": 0
+}

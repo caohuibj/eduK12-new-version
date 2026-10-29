@@ -1,0 +1,46 @@
+{
+  "kind": "AFFECTED_ENTRY_CLOSURE",
+  "config": "tsconfig.app.json",
+  "roots": [
+    "src/modules/cognitive/tasks/enumeration/local-artifact.ts",
+    "src/modules/cognitive/tasks/enumeration/local-artifact.test.ts",
+    "src/services/persistence/finalDraftStore.ts",
+    "src/vite-env.d.ts"
+  ],
+  "sourceClosure": [
+    {
+      "path": "src/services/persistence/cognitiveRawArchiveState.ts",
+      "sha256": "8403ffab818df9743e50a76ae3f32745b7120f5adf840d5472f8cf681514f908"
+    },
+    {
+      "path": "src/services/persistence/finalDraftStore.ts",
+      "sha256": "eeb0cc3a752de92e44ad1ba9d1989b58a6214bf0a72902c0935b4178f52cbdc1"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/generated/protocol.ts",
+      "sha256": "4b7ff685b4b899435c2028ff2e9a90f85af569f302ffee53d265c297403502fe"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/display.ts",
+      "sha256": "dd6675148fa214c328e6b4f7e24644742175b2fd7fb4eea9183bbec1ba3bc0fb"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/local-artifact.ts",
+      "sha256": "0a724c5699c487545c12769e6da4890cfd4e7aed9efd99eef5390ce242843569"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/fixtures.test-support.ts",
+      "sha256": "335418859e893eaaf5bf01e1dee02d187d5a123ce2e01bbb1427b18f8a70f8d4"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/local-artifact.test.ts",
+      "sha256": "d4d49db6a369005b9fa76aae5653196505a7e281f50783753ed04fb3768be2f3"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    }
+  ],
+  "diagnostics": [],
+  "exitCode": 0
+}

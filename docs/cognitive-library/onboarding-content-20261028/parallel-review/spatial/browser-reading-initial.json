@@ -1,0 +1,77 @@
+{
+  "syntheticComponentPreviews": true,
+  "sandbox": true,
+  "cssZoomNotNativeDeviceEquivalence": true,
+  "results": [
+    {
+      "name": "intro-zh-phone",
+      "intro": true,
+      "lang": "zh",
+      "width": 390,
+      "height": 844,
+      "zoom": 1,
+      "layout": {
+        "scrollWidth": 390,
+        "viewport": 390,
+        "containsUnitExplanation": true,
+        "chartCount": 0
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/spatial/screens/intro-zh-phone.png",
+      "sha256": "308e419340d4a1aa99739391877130c45dd839df509945dc02f0080f6816ea76",
+      "success": true
+    },
+    {
+      "name": "intro-en-tablet",
+      "intro": true,
+      "lang": "en",
+      "width": 820,
+      "height": 1000,
+      "zoom": 1,
+      "layout": {
+        "scrollWidth": 820,
+        "viewport": 820,
+        "containsUnitExplanation": true,
+        "chartCount": 0
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/spatial/screens/intro-en-tablet.png",
+      "sha256": "5df09112e4083fab79148ada47357f3171fe33938970b5070bc28b32132cddc1",
+      "success": true
+    },
+    {
+      "name": "report-zh-phone",
+      "intro": false,
+      "lang": "zh",
+      "width": 390,
+      "height": 844,
+      "zoom": 1,
+      "layout": {
+        "scrollWidth": 390,
+        "viewport": 390,
+        "containsUnitExplanation": true,
+        "chartCount": 1
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/spatial/screens/report-zh-phone.png",
+      "sha256": "314ab0dbc0b2f5c49d551bfd74684891996d6763e8e24b55ff969ba8393117b6",
+      "success": true
+    },
+    {
+      "name": "report-en-200pct",
+      "intro": false,
+      "lang": "en",
+      "width": 780,
+      "height": 1000,
+      "zoom": 2,
+      "layout": {
+        "scrollWidth": 390,
+        "viewport": 780,
+        "containsUnitExplanation": true,
+        "chartCount": 1
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/spatial/screens/report-en-200pct.png",
+      "sha256": "05e8a296edbe4ef5090be2867039c323bdaa60c3d15e3736f93972b172a6725d",
+      "success": true
+    }
+  ],
+  "errors": [],
+  "success": true
+}

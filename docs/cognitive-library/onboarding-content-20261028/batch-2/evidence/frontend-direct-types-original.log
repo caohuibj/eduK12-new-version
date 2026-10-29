@@ -1,0 +1,8 @@
+[
+  {
+    file: 'server-version/frontend/src/modules/cognitive/__tests__/remaining-reports.presentation.test.tsx',
+    start: 159,
+    code: 2307,
+    message: "Cannot find module '../../../../../../docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/report-public-fixtures.json' or its corresponding type declarations."
+  }
+]

@@ -1,0 +1,62 @@
+{
+  "newMain": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "mergeHead": "870a9d2f1dfbbff1fb7bf7ed6342bbdfd4bf7f3c",
+  "mergeTree": "360ff0a1c62eb2ba1c23bcce781ce087474273e4",
+  "incomingFiles": [
+    ".github/scripts/onboarding-bindings.json",
+    ".github/scripts/onboarding-checks.mjs",
+    ".github/scripts/onboarding-controls.test.mjs",
+    ".github/scripts/onboarding-evidence.json",
+    ".github/scripts/onboarding-scope.mjs",
+    ".github/workflows/ci.yml",
+    "docs/performance/first-feedback-20261028/PLAN.md",
+    "docs/performance/first-feedback-20261028/evidence-index.json",
+    "docs/performance/first-feedback-20261028/evidence/ack-after.json",
+    "docs/performance/first-feedback-20261028/evidence/ack-after.log",
+    "docs/performance/first-feedback-20261028/evidence/ack-before-red.json",
+    "docs/performance/first-feedback-20261028/evidence/ack-before-red.log",
+    "docs/performance/first-feedback-20261028/evidence/backend-types-r2-receipt.json",
+    "docs/performance/first-feedback-20261028/evidence/backend-types-r2.log",
+    "docs/performance/first-feedback-20261028/evidence/backend-types-r3-receipt.json",
+    "docs/performance/first-feedback-20261028/evidence/backend-types-r3.log",
+    "docs/performance/first-feedback-20261028/evidence/backend-types-receipt.json",
+    "docs/performance/first-feedback-20261028/evidence/backend-types.log",
+    "docs/performance/first-feedback-20261028/evidence/frontend-types-r1-receipt.json",
+    "docs/performance/first-feedback-20261028/evidence/frontend-types-r1.log",
+    "docs/performance/first-feedback-20261028/evidence/inline-pg-r1-execution.json",
+    "docs/performance/first-feedback-20261028/evidence/inline-pg-r1.json",
+    "docs/performance/first-feedback-20261028/evidence/inline-pg-r1.log",
+    "docs/performance/first-feedback-20261028/evidence/survey-commit-failure.json",
+    "docs/performance/first-feedback-20261028/evidence/survey-commit-failure.log",
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-backend-r1.json",
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-backend-r1.log",
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-backend-r2.json",
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-backend-r2.log",
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-frontend-r1.json",
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-frontend-r1.log",
+    "server-version/backend/src/__tests__/survey/research-request-local-final.contract.test.ts",
+    "server-version/backend/src/__tests__/survey/situational-native-staged.postgres.integration.test.ts",
+    "server-version/backend/src/modules/survey/final.service.ts",
+    "server-version/backend/src/modules/survey/participant-feedback-response.ts",
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx",
+    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx",
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx",
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx"
+  ],
+  "components": {
+    "backend": {
+      "sourceCount": 1100,
+      "diagnostics": 0,
+      "changedClosureInputs": [],
+      "lockSha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+      "decision": "reuse unchanged checked inputs; no rerun"
+    },
+    "frontend": {
+      "sourceCount": 294,
+      "diagnostics": 0,
+      "changedClosureInputs": [],
+      "lockSha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+      "decision": "reuse unchanged checked inputs; no rerun"
+    }
+  }
+}

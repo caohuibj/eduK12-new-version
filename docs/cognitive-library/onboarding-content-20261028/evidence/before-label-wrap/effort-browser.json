@@ -1,0 +1,213 @@
+{
+  "success": true,
+  "synthetic": true,
+  "build": "single esbuild component preview, not deployable application artifact",
+  "zoomNote": "200% screenshots use CSS zoom=2 at 780px viewport; not native browser/device equivalence",
+  "shots": [
+    {
+      "name": "intro-zh-phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "cssZoom": 1,
+      "measurements": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390,
+        "images": [],
+        "headings": [
+          "这轮，你愿意按多少次？",
+          "每轮照这三步做",
+          "先看懂怎样计点",
+          "操作和时间",
+          "先熟悉规则，不评价偏好"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/intro-zh-phone.png",
+      "sha256": "a977e00cf256b6f637ab85b47c410adc3649c6e543ccad0a1b500a370ccc3dbe"
+    },
+    {
+      "name": "intro-en-tablet",
+      "viewport": {
+        "width": 820,
+        "height": 1000
+      },
+      "cssZoom": 1,
+      "measurements": {
+        "viewport": 820,
+        "scroll": 820,
+        "body": 820,
+        "images": [],
+        "headings": [
+          "How many presses would you choose this round?",
+          "Your route through each round",
+          "Understand the points",
+          "Controls and timing",
+          "Easier practice, without judging your preference"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/intro-en-tablet.png",
+      "sha256": "5ec711d9c21eb45f044f5c4f46bd51323e8de63af77939c3ea72378e2962266e"
+    },
+    {
+      "name": "report-zh-phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "cssZoom": 1,
+      "measurements": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390,
+        "images": [
+          {
+            "width": 316,
+            "height": 154.984375,
+            "label": ":r0:-title"
+          }
+        ],
+        "headings": [
+          "哪些条件下，你愿意多按一些？",
+          "把这次的选择放在一起看",
+          "不同按压基准下，选择较多的比例",
+          "实际执行另看",
+          "一个可用的提醒"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/report-zh-phone.png",
+      "sha256": "28593dba5fa60e93592e6af07e4c95c97f168e6effde8547a2918e93763a77d7"
+    },
+    {
+      "name": "report-en-tablet",
+      "viewport": {
+        "width": 820,
+        "height": 1000
+      },
+      "cssZoom": 1,
+      "measurements": {
+        "viewport": 820,
+        "scroll": 820,
+        "body": 820,
+        "images": [
+          {
+            "width": 638,
+            "height": 211.96875,
+            "label": ":r0:-title"
+          }
+        ],
+        "headings": [
+          "Under which offers did you choose more presses?",
+          "A closer look at your choices",
+          "Choosing more presses, by baseline",
+          "Execution, separately",
+          "A practical reminder"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/report-en-tablet.png",
+      "sha256": "e7e6cf8b7240feb591a0ec8a03e63890ec5875fb0055529d8a14e14f72ab1471"
+    },
+    {
+      "name": "report-limited-en-phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "cssZoom": 1,
+      "measurements": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390,
+        "images": [
+          {
+            "width": 316,
+            "height": 154.984375,
+            "label": ":r0:-title"
+          }
+        ],
+        "headings": [
+          "Under which offers did you choose more presses?",
+          "A closer look at your choices",
+          "Choosing more presses, by baseline",
+          "Execution, separately",
+          "A practical reminder"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/report-limited-en-phone.png",
+      "sha256": "c95dd9d4e1f92803ff4f6bdbe0676b2a11177c7f5055b613517d1b395a44092f"
+    },
+    {
+      "name": "report-invalid-zh-phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "cssZoom": 1,
+      "measurements": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390,
+        "images": [],
+        "headings": [
+          "本次暂时无法形成选择结论"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/report-invalid-zh-phone.png",
+      "sha256": "c7158082e95b28a293fe5228b7b856eeb9ee26665ae9ae44d96d032597f92023"
+    },
+    {
+      "name": "intro-en-200pct",
+      "viewport": {
+        "width": 780,
+        "height": 1000
+      },
+      "cssZoom": 2,
+      "measurements": {
+        "viewport": 780,
+        "scroll": 390,
+        "body": 780,
+        "images": [],
+        "headings": [
+          "How many presses would you choose this round?",
+          "Your route through each round",
+          "Understand the points",
+          "Controls and timing",
+          "Easier practice, without judging your preference"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/intro-en-200pct.png",
+      "sha256": "0285408229213a6530214e66abb82e861a48fea24444fefc5921bcbdfc656915"
+    },
+    {
+      "name": "report-en-200pct",
+      "viewport": {
+        "width": 780,
+        "height": 1000
+      },
+      "cssZoom": 2,
+      "measurements": {
+        "viewport": 780,
+        "scroll": 390,
+        "body": 780,
+        "images": [
+          {
+            "width": 584,
+            "height": 286.4375,
+            "label": ":r0:-title"
+          }
+        ],
+        "headings": [
+          "Under which offers did you choose more presses?",
+          "A closer look at your choices",
+          "Choosing more presses, by baseline",
+          "Execution, separately",
+          "A practical reminder"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/report-en-200pct.png",
+      "sha256": "ce8539fae73f0be4619a6984f2fdbb898ae2b8e3f0a9648ddd085a1085135576"
+    }
+  ],
+  "errors": []
+}

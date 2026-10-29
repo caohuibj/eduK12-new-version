@@ -1,0 +1,186 @@
+{
+  "base": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "unchangedOriginalScoringAndControl": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/analysis.ts",
+      "priorSHA256": "03467b41eb9fedf18b9f68c103beef73110f7b97fd15ed370bfd729c0b1a1733",
+      "currentSHA256": "03467b41eb9fedf18b9f68c103beef73110f7b97fd15ed370bfd729c0b1a1733",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/assignment.ts",
+      "priorSHA256": "0d6261afbe42d9fb0c111a5d719cb604ed10ac66366f90af708eeccecd2789df",
+      "currentSHA256": "0d6261afbe42d9fb0c111a5d719cb604ed10ac66366f90af708eeccecd2789df",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/protocol.ts",
+      "priorSHA256": "6e4b4f8d8ee7e9c347778dffae60f599745594102f399886e3ab32b85ac837ce",
+      "currentSHA256": "6e4b4f8d8ee7e9c347778dffae60f599745594102f399886e3ab32b85ac837ce",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/report.ts",
+      "priorSHA256": "9fdace21d50d71c3b0884ca2133c243b1cce593e915ae6e39ac10651f3bc2e2e",
+      "currentSHA256": "9fdace21d50d71c3b0884ca2133c243b1cce593e915ae6e39ac10651f3bc2e2e",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/schema.ts",
+      "priorSHA256": "03c17f1e00e84298dee31814799a0376e0f7f3b59624357cd5d35eaf16ce2bae",
+      "currentSHA256": "03c17f1e00e84298dee31814799a0376e0f7f3b59624357cd5d35eaf16ce2bae",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/scorer.ts",
+      "priorSHA256": "a8f1a723de779c6d0b811d2c33d1bb981631371b88f2ce914a33a0b9a7648aab",
+      "currentSHA256": "a8f1a723de779c6d0b811d2c33d1bb981631371b88f2ce914a33a0b9a7648aab",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/capture.ts",
+      "priorSHA256": "e3a253cabff7a645d8c07dcff8ecbc3f3a437086ae28dbc1da4f42014698f402",
+      "currentSHA256": "e3a253cabff7a645d8c07dcff8ecbc3f3a437086ae28dbc1da4f42014698f402",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/content.test.tsx",
+      "priorSHA256": "0f21e2ea5008eb32d40d5d784535a4843f3ea6afb57d78e537857222fd6cf14b",
+      "currentSHA256": "0f21e2ea5008eb32d40d5d784535a4843f3ea6afb57d78e537857222fd6cf14b",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/contracts.ts",
+      "priorSHA256": "ada7b5aa23d907146627808ee76c4dd054443f678c42df902f58dcdb477582d8",
+      "currentSHA256": "ada7b5aa23d907146627808ee76c4dd054443f678c42df902f58dcdb477582d8",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/analysis.ts",
+      "priorSHA256": "3ac923a5d1f0170d32cae4b88c3795e2e298070424dc98b80fea51e2b520faad",
+      "currentSHA256": "3ac923a5d1f0170d32cae4b88c3795e2e298070424dc98b80fea51e2b520faad",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/assignment.ts",
+      "priorSHA256": "1b4add6f39a38b3b4028b15b6d8ec187eeb9a52257aec37057632dd74ba62e4f",
+      "currentSHA256": "1b4add6f39a38b3b4028b15b6d8ec187eeb9a52257aec37057632dd74ba62e4f",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/protocol.ts",
+      "priorSHA256": "7139c4067fafe8d5307bb8ae1d9445d4b3bc2002cfb347787f0f62c765bd6957",
+      "currentSHA256": "7139c4067fafe8d5307bb8ae1d9445d4b3bc2002cfb347787f0f62c765bd6957",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/report.ts",
+      "priorSHA256": "be58264c9af34f5facf591c05c310a2becf9440816558a000ad4f53b42aa8d04",
+      "currentSHA256": "be58264c9af34f5facf591c05c310a2becf9440816558a000ad4f53b42aa8d04",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/session.ts",
+      "priorSHA256": "c46837b165dd7f9804d3a00a982f74920154a47bdf3ae95479eacb6028f22e6d",
+      "currentSHA256": "c46837b165dd7f9804d3a00a982f74920154a47bdf3ae95479eacb6028f22e6d",
+      "identical": true
+    }
+  ],
+  "originals": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/gradcpt/implementation/backend-corrected.json",
+      "sha256": "eae0abbd6666677ac4dedc6c718c25a59b82b687400fc9293762ac55a07f6cc9",
+      "success": true,
+      "gradAssertions": [
+        {
+          "fullName": "gradCPT minimal content contracts freezes 300/100 real image plans, exact 90/10 short balance, eight easier practice pictures and true versions",
+          "status": "passed"
+        },
+        {
+          "fullName": "gradCPT minimal content contracts preserves exact opacity boundaries, late ownership and code4 chronological reassignment with known signed statistics",
+          "status": "passed"
+        },
+        {
+          "fullName": "gradCPT minimal content contracts keeps only actually exposed settled windows, rejects forged plans/paint/versions and gates empty records",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/gradcpt/implementation/frontend-corrected.json",
+      "sha256": "877ce549505de2e9dc29fb561c7fb816a42e42cf219f3011136286f29167ed89",
+      "success": true,
+      "gradAssertions": [
+        {
+          "fullName": "gradCPT minimal candidate flows logs actual paints, counts fresh inputs once, rejects hold/repeat/multiple contacts and never catches up unshown pictures",
+          "status": "passed"
+        },
+        {
+          "fullName": "gradCPT minimal candidate flows completes 8 practice and 100 formal images, requires a genuine saved report and retries the identical final claim",
+          "status": "passed"
+        },
+        {
+          "fullName": "gradCPT minimal candidate flows runs actual React touch practice, re-presents the full guide after failure, and preserves a failed write without re-exposure",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/frontend-port.json",
+      "sha256": "0da463609c8b60487a134b8a75bb0800e51b8595f3edb88726338395fc0e6702",
+      "success": true,
+      "gradAssertions": [
+        {
+          "fullName": "real native content host adapters 'gradcpt' persists immutable records, retries the same final and reads the stored public report",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/frontend-readiness.json",
+      "sha256": "98b1462393467644a052bba3140c33105467eaff6c9a10aa7a72326f1bc752c9",
+      "success": true,
+      "gradAssertions": [
+        {
+          "fullName": "task-owned native runner readiness 'gradcpt' mounts the real instructions with the frozen context and its generated envelope matches the backend",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/backend-bridge.json",
+      "sha256": "eaf08e2e7701108ee83e818de83f0c2a1158cb151391ac68e097a4acdbfd8245",
+      "success": true,
+      "gradAssertions": [
+        {
+          "fullName": "existing native content reaches frozen public reports and archive contracts 'gradcpt' binds one actual scorer prefix, saves its public projection and validates exact original records",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "currentSource": [
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradReport.tsx",
+      "sha256": "40cbbac360b62bee66d248998e1353332625ece329bb90093e46276ecf3815dc"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/review-report.test.tsx",
+      "sha256": "42a9c00ec0344e66b7d424d80274f51aec015bf4805d72bbf4da27e9794056e9"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradInstructions.tsx",
+      "sha256": "f8e3547964026fcede8a0f7029e3c257a6ecd153ca6ca6424dcc8e89731571f9"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/NativeGradRunner.tsx",
+      "sha256": "ad8ab3f3a10b0b1480fdc431a66be998dec9dc671f0768fef87c4d8f548b405d"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/asset-loader.ts",
+      "sha256": "56455637cceb82883118a9cf224453f2ce7390d65b132cc7d8b338c5ac323319"
+    }
+  ],
+  "indexNode": "v24.21.0",
+  "note": "Index initially assembled with the system Node24.19.0; all hashes re-read with Node24.21.0 here. Runtime and type checks used Node24.21.0 throughout."
+}

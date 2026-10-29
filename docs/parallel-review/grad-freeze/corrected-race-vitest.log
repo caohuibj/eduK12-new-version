@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/cognitive-review-spatial/server-version/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 2 skipped (3)
+   Start at  04:05:34
+   Duration  1.73s (transform 823ms, setup 142ms, import 1.05s, tests 30ms, environment 372ms)
+

@@ -1,0 +1,131 @@
+{
+  "status": "READ_ONLY_SOURCE_SNAPSHOT_NOT_TEST_OR_APPROVAL",
+  "baseHead": "162db124919801532c2b08e9b55d911f8e1e8652",
+  "baseTree": "106af824852fa788a65514f89f35af27eac985bd",
+  "recordedAt": "2026-10-26T12:43:47.327857+00:00",
+  "approval": {
+    "event": "User: 三个都通过，图片保存notion",
+    "notion": "https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3",
+    "section": 9,
+    "sourceCommit": "9969583b2c95fa87ff44a4f2b3aa68cbd7471390",
+    "image": "docs/cognitive-library/next-candidates-20261026/enumeration/review.png",
+    "imageSha256": "65b63eeaa6045ce0554a5e6c197e6752480aba7bd36b7db3f83bc6f4624fe538",
+    "boundary": "Design approval only; does not prove physical timing/geometry or scientific validation."
+  },
+  "source": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts",
+      "gitBlob": "76e580d7c2c024ac072aac0843316e3014c301d4",
+      "sha256": "27b4f2fd796a7be570d6b313dc2254cc4da31ffd83ad7ada9d73953951cf4990"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts",
+      "gitBlob": "5db44af4500328cae7de6018b3ef256e1f319557",
+      "sha256": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts",
+      "gitBlob": "92e89be1fa399520121c368cc0c7c183986531e9",
+      "sha256": "57954df32232655d91521a464d0bc0e21a0ce5de443eb6683380fedb9c9e01a4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+      "gitBlob": "9a32e5712c7314702affde471c57eb240ac4a38b",
+      "sha256": "5cabfd159dd4c344ae724d206643b2b5735b4435bf5db8c97a28bb3150a87c6e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration.css",
+      "gitBlob": "84f1ea46d9cd476aa370001d3e2f2afe1cde4e2d",
+      "sha256": "08587111a926937b2f63bf6c5c7ecb346002adb31401a28e890211efe10a1999"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/fixtures.test-support.ts",
+      "gitBlob": "160337bdcfd97386c599c59095904449dfacaad1",
+      "sha256": "335418859e893eaaf5bf01e1dee02d187d5a123ce2e01bbb1427b18f8a70f8d4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts",
+      "gitBlob": "ba3b9cec10be12de68d8a0565e41d50de4086f0e",
+      "sha256": "b7c61565dfc2182327fa8d25368d4435d75669452d30c50240915a5f3080ad69"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/schema.ts",
+      "gitBlob": "587d08931e9542f7f315de4b620bd44920ff648f",
+      "sha256": "3e4fc5221eb4733ad9557f4559ee18d65773ce2c062325c63821e362f4b3a345"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts",
+      "gitBlob": "c7ea82f729a5b67dfd15b3d3fea60ec04f5c0625",
+      "sha256": "33e7e771f11d5c99e75db92f26df3d2dd1e6de1b9b1367f102ac6fd143974e88"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts",
+      "gitBlob": "a5ec1fbd646603f8e03aa3b929900ce3940142d4",
+      "sha256": "2d002b020ed9053ea6d16299ba7edd14afd30a6d1263964a28d600d6b64c2028"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/types.ts",
+      "gitBlob": "3fa44df674e253c6a889debee2063910636b9f30",
+      "sha256": "ca6740c52cf7aafa8e09640abe608708af043c228ea82f9a290358bd0c8ba656"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+      "gitBlob": "92bed80104cf3c4541888d031be13572c580198d",
+      "sha256": "ef885828b8f0dc097ac38e17701f789e82e12036eb71bacdc8a859c43209ecb3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/task-resource.ts",
+      "gitBlob": "1160f9570694dcb4aa9b256d601ff3717294671b",
+      "sha256": "913b652e2e7991d9ace145fcf0e5f592ddc4f1e244018d68fa655ea5b7c94e49"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts",
+      "gitBlob": "4b944e96a41b24cadf22eabb39ed1be4a00024f1",
+      "sha256": "a94f8aecd929c1aea34b2bfc28eef3d189410480996fd3d59fd0c946a48d7142"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/unified-raw-submission.ts",
+      "gitBlob": "3dcd8039cbb894ca66dc411ea45f724a2b21c204",
+      "sha256": "4a76c052ae223b6d4079d34fb66b62762c8be424a2c4232bacd400738ad0f378"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "gitBlob": "44658a80067c4fde666a7f02053c59ea5f2bc467",
+      "sha256": "df1664b17c7e6ab9fe6e7d97a241a584190539bbe2ac2db2895a16cb226dec99"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/canonical.ts",
+      "gitBlob": "a115b41386a6a6eb9baba9e158611dfd5d3ed425",
+      "sha256": "e469eb794eadd6596cb0c4531dd6b6b256c8c176eac657ee20d5982f8e217066"
+    },
+    {
+      "path": "server-version/scripts/cognitive/enumeration-content.cjs",
+      "gitBlob": "bdabda25759a3f135b614297e199079419199600",
+      "sha256": "c9806f75062559136640fd3e0cc93a7e8598b57c461b3b77eebf9538d4b438ed"
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/enumeration/design.json",
+      "gitBlob": "e84beaa88f8f99e7b418cdceb4f560db07acd713",
+      "sha256": "46aa28f0b5075283f4844f106ea4a1f0ad787310b39b56bc650d56c58aa7486b"
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/enumeration/review.png",
+      "gitBlob": "ac4e8a43f9ca9e2323697cbc855ae7730097522a",
+      "sha256": "65b63eeaa6045ce0554a5e6c197e6752480aba7bd36b7db3f83bc6f4624fe538"
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/README.md",
+      "gitBlob": "66513d5ccfb2bb35a7595c58b953b2353add70e6",
+      "sha256": "9a457996b2a97624838f601bc8fc033695628b23ba34a60ec076828892f77806"
+    }
+  ],
+  "executed": {
+    "staticCanonicalRecipeHash": true,
+    "runtimeTask": false,
+    "tests": false,
+    "browser": false,
+    "newSamplingOrTimingAnalysis": false,
+    "COS": false,
+    "CI": false
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "reason": "Inventory fixture added a name without importing it; module setup failed. Freeze case passed with synthetic encryption environment and is retained; only inventory is continued. Inventory expectations localized to preserve existing old-tuple fixtures.",
+  "oldReport": "freeze-and-inventory-followup.json"
+}

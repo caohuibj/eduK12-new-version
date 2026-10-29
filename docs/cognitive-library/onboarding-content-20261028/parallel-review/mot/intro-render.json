@@ -1,0 +1,40 @@
+{
+  "node": "v24.21.0",
+  "kind": "ACTUAL_COMPONENT_STATIC_RENDER_NOT_BROWSER_OR_CALIBRATION_EVIDENCE",
+  "files": [
+    {
+      "file": "intro-experience-zh.html",
+      "profile": "experience",
+      "language": "zh",
+      "text": "   跟住这5个目标  画面会出现10个圆点。记住其中5个红色圆点；全部变成深色并移动后，请继续追踪这5个目标。停止后，选出最初的5个目标。  点击或轻触圆点，每个只能选一次，不能撤销；选满5个后本轮自动结束。重叠圆点需点到可以明确区分的位置。   键盘操作  进入作答阶段后，用Tab进入区域，方向键移动到相应方向的圆点，空格或回车选中。   先校准屏幕，再练习2次。正式作答不提示选择是否正确。  体验版正式9次，每种速度3次；含校准和练习，预计2–5分钟。以上是设计估计；阅读、校准或重练可能需要更久。  正常完成需做完9次正式任务，并等待服务器确认报告已保存；练习另计。完整原件归档另行确认；若保存尚未确认，请保留页面，重试保存原记录，不重复正式作答。  校准屏幕   "
+    },
+    {
+      "file": "intro-research-zh.html",
+      "profile": "research",
+      "language": "zh",
+      "text": "   跟住这5个目标  画面会出现10个圆点。记住其中5个红色圆点；全部变成深色并移动后，请继续追踪这5个目标。停止后，选出最初的5个目标。  点击或轻触圆点，每个只能选一次，不能撤销；选满5个后本轮自动结束。重叠圆点需点到可以明确区分的位置。   键盘操作  进入作答阶段后，用Tab进入区域，方向键移动到相应方向的圆点，空格或回车选中。   先校准屏幕，再练习2次。正式作答不提示选择是否正确。  文献对照版正式45次，每种速度15次；含校准和练习，预计9–15分钟。以上是设计估计；阅读、校准或重练可能需要更久。  正常完成需做完45次正式任务，并等待服务器确认报告已保存；练习另计。完整原件归档另行确认；若保存尚未确认，请保留页面，重试保存原记录，不重复正式作答。  校准屏幕   "
+    },
+    {
+      "file": "intro-experience-en.html",
+      "profile": "experience",
+      "language": "en",
+      "text": "   Follow the five targets  Ten circles appear. Remember the five red circles. When they all turn dark and move, keep track of those five. After they stop, select the five original targets.  Tap or click each circle once. Selections cannot be undone; the fifth selection ends the trial. Overlapping circles require a clear, unambiguous point.   Keyboard controls  In the response phase, Tab into the display. Arrow keys move focus to a circle in that direction; Space or Enter selects it.   First calibrate the screen and try two practice trials. Formal trials do not tell you which choices were correct.  Experience version: 9 formal trials, 3 per speed; about 2–5 minutes including setup and practice.These are design estimates; reading, calibration or practice retries may take longer.  To finish, complete all 9 formal trials and wait for confirmation that the server saved your report. Practice is separate. Full raw archival is confirmed separately; if saving is pending, keep the page open and retry saving the retained record without repeating a formal trial.  Set up the screen   "
+    },
+    {
+      "file": "intro-research-en.html",
+      "profile": "research",
+      "language": "en",
+      "text": "   Follow the five targets  Ten circles appear. Remember the five red circles. When they all turn dark and move, keep track of those five. After they stop, select the five original targets.  Tap or click each circle once. Selections cannot be undone; the fifth selection ends the trial. Overlapping circles require a clear, unambiguous point.   Keyboard controls  In the response phase, Tab into the display. Arrow keys move focus to a circle in that direction; Space or Enter selects it.   First calibrate the screen and try two practice trials. Formal trials do not tell you which choices were correct.  Literature-aligned version: 45 formal trials, 15 per speed; about 9–15 minutes including setup and practice.These are design estimates; reading, calibration or practice retries may take longer.  To finish, complete all 45 formal trials and wait for confirmation that the server saved your report. Practice is separate. Full raw archival is confirmed separately; if saving is pending, keep the page open and retry saving the retained record without repeating a formal trial.  Set up the screen   "
+    },
+    {
+      "file": "calibration-zh.html",
+      "language": "zh",
+      "text": "   确认屏幕尺寸和观看距离  请把设备放稳。用实体尺子测量下方线段，调到正好5厘米，再测量眼睛到屏幕的距离。    调整5厘米线段   眼睛到屏幕的距离（毫米）    我已实际测量，并会保持这个观看距离。  这是自行测量的校准。任务中请保持设备、方向、浏览器缩放和观看距离不变。  确认校准   "
+    },
+    {
+      "file": "calibration-en.html",
+      "language": "en",
+      "text": "   Set up your viewing distance  Place the device on a stable surface. Use a physical ruler to adjust the line to exactly 5 cm. Then measure the distance from your eyes to the screen.    Adjust the 5 cm line   Eye-to-screen distance (mm)    I measured both values and will keep this distance.  This is a self-reported calibration. Keep the device, orientation, browser zoom and viewing distance unchanged during the task.  Confirm setup   "
+    }
+  ]
+}

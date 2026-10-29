@@ -1,0 +1,46 @@
+{
+  "base": "94152032885d5cbaf149a15ec03d5a0c72ea2c67",
+  "checks": {
+    "taskNonRenderCodeUnchanged": true,
+    "formalStimulusInputJsxUnchanged": true,
+    "formalGuidanceUnchanged": true,
+    "reportProjectionConsumptionUnchanged": true
+  },
+  "unchangedCoreFiles": [
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/contracts.ts",
+      "sha256": "1767b61bbf6f317415a3525908c616cc56deb532ee4317380626acef875547de",
+      "unchangedFromBaseline": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/assets.ts",
+      "sha256": "2f8a79262e49859ad5ff5a4758e8dd7004d231f33fda85a74a6ca68500534dc3",
+      "unchangedFromBaseline": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/capture.ts",
+      "sha256": "5a15054ae89d8766462e13f3f0efb8d010ee8a20609ca9cf7deac27c9567f1c5",
+      "unchangedFromBaseline": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/digest.ts",
+      "sha256": "0c5c254b9777ab57ddc29cc12b52beced70457b944ba47aa97a96d23984079eb",
+      "unchangedFromBaseline": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/save-queue.ts",
+      "sha256": "633026e45619a8ec5a59d7be78de669be8b8da1671044517e7bcc25580bb573f",
+      "unchangedFromBaseline": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/session.ts",
+      "sha256": "5fcbee5659a0f5443d496881853fbfdf3e6a5e681a78e237ceb57beaa152b4a5",
+      "unchangedFromBaseline": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.css",
+      "sha256": "3f5ba7495fe4048f73b398a966a10155c9462110c4d2f747242d20af3cea2891",
+      "unchangedFromBaseline": true
+    }
+  ]
+}

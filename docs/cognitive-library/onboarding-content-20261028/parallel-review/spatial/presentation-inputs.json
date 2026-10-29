@@ -1,0 +1,11 @@
+{
+  "recordedAt": "2026-10-28T02:45:17.428Z",
+  "node": "v24.19.0",
+  "sha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/SpatialInstructions.tsx": "dde950767656864004e507c866c7ab53ad75596934afd6b4631f7d9630389c86",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/SpatialReport.tsx": "c28123c086194092b671bcd79b56afabe9bf25bd213c424ac21cb1fa578438ac",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/quantity-reading.test.tsx": "2d4f50cf818eeb9a282ca4bb628ad728860ed263739909da6aedbe8406a32456",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/spatial/check-types.cjs": "e6012575897ebc43c95da180417394c302c49e5cdcd174247610c2425b40e2ed",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/spatial/preview-reading.cjs": "ff1e7875ae18e41a3b738264646f817c5490a134081093247e4e05d14eebb1af"
+  }
+}

@@ -1,0 +1,2570 @@
+{
+  "synthetic": true,
+  "sessionJourney": false,
+  "inputs": {
+    "heldWrongFirst": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "hearts-flowers",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 32,
+          "heartTrials": 8,
+          "flowerTrials": 8,
+          "mixedTrials": 16,
+          "deadlineMs": 2500,
+          "blankMs": 1000,
+          "practice": {
+            "trials": 8,
+            "deadlineMs": 3500,
+            "minimumCorrect": 7,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "stimulus": {
+            "background": "#fbfdff",
+            "heart": "#da5c71",
+            "flower": "#7357aa",
+            "fieldMaxWidth": 600,
+            "fieldHeight": 205,
+            "sideFraction": 0.25,
+            "size": 78
+          },
+          "inputPolicy": "fresh-first-down-half-open-v1",
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "hearts-flowers/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "hf-fnv1a-utf16-xorshift32-euler-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 32,
+        "heartTrials": 8,
+        "flowerTrials": 8,
+        "mixedTrials": 16,
+        "deadlineMs": 2500,
+        "blankMs": 1000,
+        "practice": {
+          "trials": 8,
+          "deadlineMs": 3500,
+          "minimumCorrect": 7,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "stimulus": {
+          "background": "#fbfdff",
+          "heart": "#da5c71",
+          "flower": "#7357aa",
+          "fieldMaxWidth": 600,
+          "fieldHeight": 205,
+          "sideFraction": 0.25,
+          "size": 78
+        },
+        "inputPolicy": "fresh-first-down-half-open-v1",
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-hf-review-20261028",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 1114,
+          "durationMs": 1014,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 1114,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [
+              "key:ArrowLeft"
+            ],
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 101,
+                "side": "left",
+                "token": "pointer:early",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "onset",
+                "atMs": 110
+              },
+              {
+                "kind": "down",
+                "atMs": 110,
+                "side": "left",
+                "token": "pointer:early",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 113,
+                "side": "left",
+                "token": "pointer:early",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "down",
+                "atMs": 114,
+                "side": "right",
+                "token": "pointer:wrong",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "down",
+                "atMs": 115,
+                "side": "left",
+                "token": "pointer:correction",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 1114
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 110,
+              "closedMs": 114,
+              "completeMs": 1114,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 114,
+                "input": "touch",
+                "token": "pointer:wrong",
+                "key": null
+              },
+              "held": [
+                "key:ArrowLeft",
+                "pointer:wrong",
+                "pointer:correction"
+              ],
+              "ignored": {
+                "early": 1,
+                "held": 1,
+                "late": 1
+              }
+            },
+            "ignoredRepeatCount": 3,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "assistiveZero": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "hearts-flowers",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 32,
+          "heartTrials": 8,
+          "flowerTrials": 8,
+          "mixedTrials": 16,
+          "deadlineMs": 2500,
+          "blankMs": 1000,
+          "practice": {
+            "trials": 8,
+            "deadlineMs": 3500,
+            "minimumCorrect": 7,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "stimulus": {
+            "background": "#fbfdff",
+            "heart": "#da5c71",
+            "flower": "#7357aa",
+            "fieldMaxWidth": 600,
+            "fieldHeight": 205,
+            "sideFraction": 0.25,
+            "size": 78
+          },
+          "inputPolicy": "fresh-first-down-half-open-v1",
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "hearts-flowers/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "hf-fnv1a-utf16-xorshift32-euler-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 32,
+        "heartTrials": 8,
+        "flowerTrials": 8,
+        "mixedTrials": 16,
+        "deadlineMs": 2500,
+        "blankMs": 1000,
+        "practice": {
+          "trials": 8,
+          "deadlineMs": 3500,
+          "minimumCorrect": 7,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "stimulus": {
+          "background": "#fbfdff",
+          "heart": "#da5c71",
+          "flower": "#7357aa",
+          "fieldMaxWidth": 600,
+          "fieldHeight": 205,
+          "sideFraction": 0.25,
+          "size": 78
+        },
+        "inputPolicy": "fresh-first-down-half-open-v1",
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-hf-review-20261028",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 1110,
+          "durationMs": 1010,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 1110,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 110
+              },
+              {
+                "kind": "activate",
+                "atMs": 110,
+                "side": "left",
+                "token": "assistive:left",
+                "input": "assistive",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 1110
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 110,
+              "closedMs": 110,
+              "completeMs": 1110,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 110,
+                "input": "assistive",
+                "token": "assistive:left",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "deadlineMissing": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "hearts-flowers",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 32,
+          "heartTrials": 8,
+          "flowerTrials": 8,
+          "mixedTrials": 16,
+          "deadlineMs": 2500,
+          "blankMs": 1000,
+          "practice": {
+            "trials": 8,
+            "deadlineMs": 3500,
+            "minimumCorrect": 7,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "stimulus": {
+            "background": "#fbfdff",
+            "heart": "#da5c71",
+            "flower": "#7357aa",
+            "fieldMaxWidth": 600,
+            "fieldHeight": 205,
+            "sideFraction": 0.25,
+            "size": 78
+          },
+          "inputPolicy": "fresh-first-down-half-open-v1",
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "hearts-flowers/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "hf-fnv1a-utf16-xorshift32-euler-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 32,
+        "heartTrials": 8,
+        "flowerTrials": 8,
+        "mixedTrials": 16,
+        "deadlineMs": 2500,
+        "blankMs": 1000,
+        "practice": {
+          "trials": 8,
+          "deadlineMs": 3500,
+          "minimumCorrect": 7,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "stimulus": {
+          "background": "#fbfdff",
+          "heart": "#da5c71",
+          "flower": "#7357aa",
+          "fieldMaxWidth": 600,
+          "fieldHeight": 205,
+          "sideFraction": 0.25,
+          "size": 78
+        },
+        "inputPolicy": "fresh-first-down-half-open-v1",
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-hf-review-20261028",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 3610,
+          "durationMs": 3510,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 3610,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 110
+              },
+              {
+                "kind": "timeout",
+                "atMs": 2610
+              },
+              {
+                "kind": "down",
+                "atMs": 2610,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 3610
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 110,
+              "closedMs": 2610,
+              "completeMs": 3610,
+              "endReason": "deadline",
+              "response": null,
+              "held": [
+                "pointer:1"
+              ],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 1
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "unclosedInterruption": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "hearts-flowers",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 32,
+          "heartTrials": 8,
+          "flowerTrials": 8,
+          "mixedTrials": 16,
+          "deadlineMs": 2500,
+          "blankMs": 1000,
+          "practice": {
+            "trials": 8,
+            "deadlineMs": 3500,
+            "minimumCorrect": 7,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "stimulus": {
+            "background": "#fbfdff",
+            "heart": "#da5c71",
+            "flower": "#7357aa",
+            "fieldMaxWidth": 600,
+            "fieldHeight": 205,
+            "sideFraction": 0.25,
+            "size": 78
+          },
+          "inputPolicy": "fresh-first-down-half-open-v1",
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "hearts-flowers/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "hf-fnv1a-utf16-xorshift32-euler-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 32,
+        "heartTrials": 8,
+        "flowerTrials": 8,
+        "mixedTrials": 16,
+        "deadlineMs": 2500,
+        "blankMs": 1000,
+        "practice": {
+          "trials": 8,
+          "deadlineMs": 3500,
+          "minimumCorrect": 7,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "stimulus": {
+          "background": "#fbfdff",
+          "heart": "#da5c71",
+          "flower": "#7357aa",
+          "fieldMaxWidth": 600,
+          "fieldHeight": 205,
+          "sideFraction": 0.25,
+          "size": 78
+        },
+        "inputPolicy": "fresh-first-down-half-open-v1",
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-hf-review-20261028",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 111,
+          "durationMs": 11,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [
+            "resume"
+          ],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 111,
+            "status": "interrupted",
+            "stopReason": "hidden",
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 110
+              }
+            ],
+            "state": {
+              "stage": "stimulus",
+              "onsetMs": 110,
+              "closedMs": null,
+              "completeMs": null,
+              "endReason": null,
+              "response": null,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "closedInterruption": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "hearts-flowers",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 32,
+          "heartTrials": 8,
+          "flowerTrials": 8,
+          "mixedTrials": 16,
+          "deadlineMs": 2500,
+          "blankMs": 1000,
+          "practice": {
+            "trials": 8,
+            "deadlineMs": 3500,
+            "minimumCorrect": 7,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "stimulus": {
+            "background": "#fbfdff",
+            "heart": "#da5c71",
+            "flower": "#7357aa",
+            "fieldMaxWidth": 600,
+            "fieldHeight": 205,
+            "sideFraction": 0.25,
+            "size": 78
+          },
+          "inputPolicy": "fresh-first-down-half-open-v1",
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "hearts-flowers/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "hf-fnv1a-utf16-xorshift32-euler-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 32,
+        "heartTrials": 8,
+        "flowerTrials": 8,
+        "mixedTrials": 16,
+        "deadlineMs": 2500,
+        "blankMs": 1000,
+        "practice": {
+          "trials": 8,
+          "deadlineMs": 3500,
+          "minimumCorrect": 7,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "stimulus": {
+          "background": "#fbfdff",
+          "heart": "#da5c71",
+          "flower": "#7357aa",
+          "fieldMaxWidth": 600,
+          "fieldHeight": 205,
+          "sideFraction": 0.25,
+          "size": 78
+        },
+        "inputPolicy": "fresh-first-down-half-open-v1",
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-hf-review-20261028",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 212,
+          "durationMs": 112,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [
+            "resume"
+          ],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 212,
+            "status": "interrupted",
+            "stopReason": "hidden",
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 110
+              },
+              {
+                "kind": "down",
+                "atMs": 210,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 211,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              }
+            ],
+            "state": {
+              "stage": "blank",
+              "onsetMs": 110,
+              "closedMs": 210,
+              "completeMs": null,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 210,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "signedPrefix": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "hearts-flowers",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 32,
+          "heartTrials": 8,
+          "flowerTrials": 8,
+          "mixedTrials": 16,
+          "deadlineMs": 2500,
+          "blankMs": 1000,
+          "practice": {
+            "trials": 8,
+            "deadlineMs": 3500,
+            "minimumCorrect": 7,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "stimulus": {
+            "background": "#fbfdff",
+            "heart": "#da5c71",
+            "flower": "#7357aa",
+            "fieldMaxWidth": 600,
+            "fieldHeight": 205,
+            "sideFraction": 0.25,
+            "size": 78
+          },
+          "inputPolicy": "fresh-first-down-half-open-v1",
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "hearts-flowers/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "hf-fnv1a-utf16-xorshift32-euler-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 32,
+        "heartTrials": 8,
+        "flowerTrials": 8,
+        "mixedTrials": 16,
+        "deadlineMs": 2500,
+        "blankMs": 1000,
+        "practice": {
+          "trials": 8,
+          "deadlineMs": 3500,
+          "minimumCorrect": 7,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "stimulus": {
+          "background": "#fbfdff",
+          "heart": "#da5c71",
+          "flower": "#7357aa",
+          "fieldMaxWidth": 600,
+          "fieldHeight": 205,
+          "sideFraction": 0.25,
+          "size": 78
+        },
+        "inputPolicy": "fresh-first-down-half-open-v1",
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-hf-review-20261028",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 3610,
+          "durationMs": 3510,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 3610,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 110
+              },
+              {
+                "kind": "timeout",
+                "atMs": 2610
+              },
+              {
+                "kind": "down",
+                "atMs": 2610,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 3610
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 110,
+              "closedMs": 2610,
+              "completeMs": 3610,
+              "endReason": "deadline",
+              "response": null,
+              "held": [
+                "pointer:1"
+              ],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 1
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 1,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 3611,
+          "endedAtPerfMs": 4821,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 1,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "right",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 3611,
+            "endedAtPerfMs": 4821,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 3621
+              },
+              {
+                "kind": "down",
+                "atMs": 3821,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 3822,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 4821
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 3621,
+              "closedMs": 3821,
+              "completeMs": 4821,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 3821,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 2,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 4822,
+          "endedAtPerfMs": 5832,
+          "durationMs": 1010,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 2,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 4822,
+            "endedAtPerfMs": 5832,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 4832
+              },
+              {
+                "kind": "activate",
+                "atMs": 4832,
+                "side": "left",
+                "token": "assistive:left",
+                "input": "assistive",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 5832
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 4832,
+              "closedMs": 4832,
+              "completeMs": 5832,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 4832,
+                "input": "assistive",
+                "token": "assistive:left",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 3,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 5833,
+          "endedAtPerfMs": 7043,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 3,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "right",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 5833,
+            "endedAtPerfMs": 7043,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 5843
+              },
+              {
+                "kind": "down",
+                "atMs": 6043,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 6044,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 7043
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 5843,
+              "closedMs": 6043,
+              "completeMs": 7043,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 6043,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 4,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 7044,
+          "endedAtPerfMs": 8254,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 4,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 7044,
+            "endedAtPerfMs": 8254,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 7054
+              },
+              {
+                "kind": "down",
+                "atMs": 7254,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 7255,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 8254
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 7054,
+              "closedMs": 7254,
+              "completeMs": 8254,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 7254,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 5,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 8255,
+          "endedAtPerfMs": 9465,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 5,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "right",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 8255,
+            "endedAtPerfMs": 9465,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 8265
+              },
+              {
+                "kind": "down",
+                "atMs": 8465,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 8466,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 9465
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 8265,
+              "closedMs": 8465,
+              "completeMs": 9465,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 8465,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 6,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 9466,
+          "endedAtPerfMs": 10676,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 6,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 9466,
+            "endedAtPerfMs": 10676,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 9476
+              },
+              {
+                "kind": "down",
+                "atMs": 9676,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 9677,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 10676
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 9476,
+              "closedMs": 9676,
+              "completeMs": 10676,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 9676,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 7,
+          "phase": "test",
+          "condition": "heartOnly",
+          "startedAtPerfMs": 10677,
+          "endedAtPerfMs": 11887,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 7,
+              "phase": "test",
+              "round": 0,
+              "mode": "heartOnly",
+              "shape": "heart",
+              "side": "right",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 10677,
+            "endedAtPerfMs": 11887,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 10687
+              },
+              {
+                "kind": "down",
+                "atMs": 10887,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 10888,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 11887
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 10687,
+              "closedMs": 10887,
+              "completeMs": 11887,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 10887,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 8,
+          "phase": "test",
+          "condition": "flowerOnly",
+          "startedAtPerfMs": 11888,
+          "endedAtPerfMs": 13098,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 8,
+              "phase": "test",
+              "round": 0,
+              "mode": "flowerOnly",
+              "shape": "flower",
+              "side": "right",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 11888,
+            "endedAtPerfMs": 13098,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 11898
+              },
+              {
+                "kind": "down",
+                "atMs": 12098,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 12099,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 13098
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 11898,
+              "closedMs": 12098,
+              "completeMs": 13098,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 12098,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 9,
+          "phase": "test",
+          "condition": "flowerOnly",
+          "startedAtPerfMs": 13099,
+          "endedAtPerfMs": 14309,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 9,
+              "phase": "test",
+              "round": 0,
+              "mode": "flowerOnly",
+              "shape": "flower",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 13099,
+            "endedAtPerfMs": 14309,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 13109
+              },
+              {
+                "kind": "down",
+                "atMs": 13309,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 13310,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 14309
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 13109,
+              "closedMs": 13309,
+              "completeMs": 14309,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 13309,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 10,
+          "phase": "test",
+          "condition": "flowerOnly",
+          "startedAtPerfMs": 14310,
+          "endedAtPerfMs": 15520,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 10,
+              "phase": "test",
+              "round": 0,
+              "mode": "flowerOnly",
+              "shape": "flower",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 14310,
+            "endedAtPerfMs": 15520,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 14320
+              },
+              {
+                "kind": "down",
+                "atMs": 14520,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 14521,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 15520
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 14320,
+              "closedMs": 14520,
+              "completeMs": 15520,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 14520,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 11,
+          "phase": "test",
+          "condition": "flowerOnly",
+          "startedAtPerfMs": 15521,
+          "endedAtPerfMs": 16731,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 11,
+              "phase": "test",
+              "round": 0,
+              "mode": "flowerOnly",
+              "shape": "flower",
+              "side": "right",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 15521,
+            "endedAtPerfMs": 16731,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 15531
+              },
+              {
+                "kind": "down",
+                "atMs": 15731,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 15732,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 16731
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 15531,
+              "closedMs": 15731,
+              "completeMs": 16731,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 15731,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 12,
+          "phase": "test",
+          "condition": "flowerOnly",
+          "startedAtPerfMs": 16732,
+          "endedAtPerfMs": 17942,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 12,
+              "phase": "test",
+              "round": 0,
+              "mode": "flowerOnly",
+              "shape": "flower",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 16732,
+            "endedAtPerfMs": 17942,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 16742
+              },
+              {
+                "kind": "down",
+                "atMs": 16942,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 16943,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 17942
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 16742,
+              "closedMs": 16942,
+              "completeMs": 17942,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 16942,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 13,
+          "phase": "test",
+          "condition": "flowerOnly",
+          "startedAtPerfMs": 17943,
+          "endedAtPerfMs": 19153,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 13,
+              "phase": "test",
+              "round": 0,
+              "mode": "flowerOnly",
+              "shape": "flower",
+              "side": "left",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 17943,
+            "endedAtPerfMs": 19153,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 17953
+              },
+              {
+                "kind": "down",
+                "atMs": 18153,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 18154,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 19153
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 17953,
+              "closedMs": 18153,
+              "completeMs": 19153,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 18153,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 14,
+          "phase": "test",
+          "condition": "flowerOnly",
+          "startedAtPerfMs": 19154,
+          "endedAtPerfMs": 20364,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 14,
+              "phase": "test",
+              "round": 0,
+              "mode": "flowerOnly",
+              "shape": "flower",
+              "side": "right",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 19154,
+            "endedAtPerfMs": 20364,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 19164
+              },
+              {
+                "kind": "down",
+                "atMs": 19364,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 19365,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 20364
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 19164,
+              "closedMs": 19364,
+              "completeMs": 20364,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 19364,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 15,
+          "phase": "test",
+          "condition": "flowerOnly",
+          "startedAtPerfMs": 20365,
+          "endedAtPerfMs": 21575,
+          "durationMs": 1210,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 15,
+              "phase": "test",
+              "round": 0,
+              "mode": "flowerOnly",
+              "shape": "flower",
+              "side": "right",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 20365,
+            "endedAtPerfMs": 21575,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 20375
+              },
+              {
+                "kind": "down",
+                "atMs": 20575,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 20576,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 21575
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 20375,
+              "closedMs": 20575,
+              "completeMs": 21575,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 20575,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 16,
+          "phase": "test",
+          "condition": "mixed",
+          "startedAtPerfMs": 21576,
+          "endedAtPerfMs": 23586,
+          "durationMs": 2010,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 16,
+              "phase": "test",
+              "round": 0,
+              "mode": "mixed",
+              "shape": "heart",
+              "side": "right",
+              "transition": null,
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 21576,
+            "endedAtPerfMs": 23586,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 21586
+              },
+              {
+                "kind": "down",
+                "atMs": 22586,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 22587,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 23586
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 21586,
+              "closedMs": 22586,
+              "completeMs": 23586,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 22586,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 17,
+          "phase": "test",
+          "condition": "mixed",
+          "startedAtPerfMs": 23587,
+          "endedAtPerfMs": 24897,
+          "durationMs": 1310,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 17,
+              "phase": "test",
+              "round": 0,
+              "mode": "mixed",
+              "shape": "heart",
+              "side": "right",
+              "transition": "repeat",
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 23587,
+            "endedAtPerfMs": 24897,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 23597
+              },
+              {
+                "kind": "down",
+                "atMs": 23897,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 23898,
+                "side": "right",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 24897
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 23597,
+              "closedMs": 23897,
+              "completeMs": 24897,
+              "endReason": "response",
+              "response": {
+                "side": "right",
+                "atMs": 23897,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 18,
+          "phase": "test",
+          "condition": "mixed",
+          "startedAtPerfMs": 24898,
+          "endedAtPerfMs": 26208,
+          "durationMs": 1310,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 18,
+              "phase": "test",
+              "round": 0,
+              "mode": "mixed",
+              "shape": "heart",
+              "side": "left",
+              "transition": "repeat",
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 24898,
+            "endedAtPerfMs": 26208,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 24908
+              },
+              {
+                "kind": "down",
+                "atMs": 25208,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 25209,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 26208
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 24908,
+              "closedMs": 25208,
+              "completeMs": 26208,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 25208,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 19,
+          "phase": "test",
+          "condition": "mixed",
+          "startedAtPerfMs": 26209,
+          "endedAtPerfMs": 27319,
+          "durationMs": 1110,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 19,
+              "phase": "test",
+              "round": 0,
+              "mode": "mixed",
+              "shape": "flower",
+              "side": "right",
+              "transition": "switch",
+              "deadlineMs": 2500
+            },
+            "startedAtPerfMs": 26209,
+            "endedAtPerfMs": 27319,
+            "status": "complete",
+            "stopReason": null,
+            "initialHeld": [],
+            "events": [
+              {
+                "kind": "onset",
+                "atMs": 26219
+              },
+              {
+                "kind": "down",
+                "atMs": 26319,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 26320,
+                "side": "left",
+                "token": "pointer:1",
+                "input": "touch",
+                "key": null,
+                "repeat": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 27319
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "onsetMs": 26219,
+              "closedMs": 26319,
+              "completeMs": 27319,
+              "endReason": "response",
+              "response": {
+                "side": "left",
+                "atMs": 26319,
+                "input": "touch",
+                "token": "pointer:1",
+                "key": null
+              },
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    }
+  }
+}

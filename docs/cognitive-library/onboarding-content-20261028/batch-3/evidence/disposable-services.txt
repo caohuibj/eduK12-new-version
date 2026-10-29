@@ -1,0 +1,1 @@
+20d9c7a9b90e2e1ad6803de15accea2bae8a3f13129af67c899267e9a356f979 postgres:16.15-bookworm {"/var/lib/postgresql/data":"rw"} []

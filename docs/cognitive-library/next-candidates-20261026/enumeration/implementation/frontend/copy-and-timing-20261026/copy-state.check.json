@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/copy-and-timing-20261026/copy-state-check.cjs"
+  ],
+  "cwd": "/workspace/eduK12-new-version",
+  "exitCode": 0,
+  "elapsedSeconds": 10.583563327789307,
+  "scriptSha256": "1c50a2ec356918a74448a2d97b5db00f0e737cfbec21b825e4ebe85c83c30e40",
+  "full3Plus25Repeated": false,
+  "backendChecksRepeated": false,
+  "typecheck": "delegated to main per instruction"
+}

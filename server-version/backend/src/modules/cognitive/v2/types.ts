@@ -155,7 +155,7 @@ export interface AuthoritativeScorerInput<TConfig, TTrial> {
   randomSeed: string
 }
 
-export type AuthoritativeScorer<TConfig, TTrial> = (input: AuthoritativeScorerInput<TConfig, TTrial>) => CognitiveScoreResult
+export type AuthoritativeScorer<TConfig, TTrial> = (input: AuthoritativeScorerInput<TConfig, TTrial>, termination?: 'completed'|'aborted') => CognitiveScoreResult
 
 export interface ReferenceApplicability {
   metricKey: string

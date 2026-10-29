@@ -1,0 +1,212 @@
+{
+  "config": {
+    "profile": "experience",
+    "totalTrials": 48,
+    "blocks": 1,
+    "repetitionsPerCellPerBlock": 1,
+    "practiceTrials": 24,
+    "cueMs": 100,
+    "postCueMs": 400,
+    "responseWindowMs": 1700,
+    "trialIntervalMs": 4000,
+    "preCueMinMs": 400,
+    "preCueMaxExclusiveMs": 1600,
+    "neutralVariant": "absent",
+    "phaseToleranceMs": 20
+  },
+  "seed": "ant-cloud-preview-v1",
+  "configHash": "6b623c236c31134cc5b59cff505b0d77d4b8cfa25868d832290c787140683a02",
+  "protocolSignature": "f0bc738e1886a29b6b8fe5d2dfcf62b716f30c4ea67d538c8facd2a478c3cc71",
+  "reports": {
+    "interpretable": {
+      "contextId": "ant-synthetic-report",
+      "configHash": "6b623c236c31134cc5b59cff505b0d77d4b8cfa25868d832290c787140683a02",
+      "protocolSignature": "f0bc738e1886a29b6b8fe5d2dfcf62b716f30c4ea67d538c8facd2a478c3cc71",
+      "projection": {
+        "state": "interpretable",
+        "accuracy": 1,
+        "cueRows": [
+          {
+            "cue": "none",
+            "correct": 12,
+            "total": 12,
+            "accuracy": 1,
+            "correctMeanRtMs": 463.3333333333333,
+            "correctRtCount": 12,
+            "input": "touch"
+          },
+          {
+            "cue": "central",
+            "correct": 12,
+            "total": 12,
+            "accuracy": 1,
+            "correctMeanRtMs": 433.3333333333333,
+            "correctRtCount": 12,
+            "input": "touch"
+          },
+          {
+            "cue": "double",
+            "correct": 12,
+            "total": 12,
+            "accuracy": 1,
+            "correctMeanRtMs": 403.3333333333333,
+            "correctRtCount": 12,
+            "input": "touch"
+          },
+          {
+            "cue": "spatial_valid",
+            "correct": 12,
+            "total": 12,
+            "accuracy": 1,
+            "correctMeanRtMs": 413.3333333333333,
+            "correctRtCount": 12,
+            "input": "touch"
+          }
+        ],
+        "differences": [
+          {
+            "key": "alerting",
+            "valueMs": 60,
+            "input": "touch",
+            "firstCorrectCount": 12,
+            "secondCorrectCount": 12
+          },
+          {
+            "key": "orienting",
+            "valueMs": 20,
+            "input": "touch",
+            "firstCorrectCount": 12,
+            "secondCorrectCount": 12
+          },
+          {
+            "key": "conflict",
+            "valueMs": 50,
+            "input": "touch",
+            "firstCorrectCount": 16,
+            "secondCorrectCount": 16
+          }
+        ],
+        "reasons": [],
+        "description": "只描述本轮记录；条件差值不是能力等级，体验版不代表稳定网络能力。",
+        "practicalTip": "把设备放稳，关闭通知，让视线留在中央注视点。"
+      },
+      "qualityFlags": {
+        "incompleteRecords": false,
+        "mixedInput": false,
+        "incompleteAccuracy": false,
+        "incompleteCue_none": false,
+        "incompleteCue_central": false,
+        "incompleteCue_double": false,
+        "incompleteCue_spatial_valid": false,
+        "incompleteFlanker_congruent": false,
+        "incompleteFlanker_incongruent": false,
+        "incompleteFlanker_neutral": false,
+        "unavailable_alerting": false,
+        "unavailable_orienting": false,
+        "unavailable_conflict": false,
+        "noInterpretableCondition": false
+      }
+    },
+    "limited": {
+      "contextId": "ant-synthetic-report",
+      "configHash": "6b623c236c31134cc5b59cff505b0d77d4b8cfa25868d832290c787140683a02",
+      "protocolSignature": "f0bc738e1886a29b6b8fe5d2dfcf62b716f30c4ea67d538c8facd2a478c3cc71",
+      "projection": {
+        "state": "limited",
+        "accuracy": null,
+        "cueRows": [
+          {
+            "cue": "none",
+            "correct": 12,
+            "total": 12,
+            "accuracy": 1,
+            "correctMeanRtMs": 463.3333333333333,
+            "correctRtCount": 12,
+            "input": "touch"
+          },
+          {
+            "cue": "central",
+            "correct": 12,
+            "total": 12,
+            "accuracy": 1,
+            "correctMeanRtMs": 433.3333333333333,
+            "correctRtCount": 12,
+            "input": "touch"
+          },
+          {
+            "cue": "double",
+            "correct": 12,
+            "total": 12,
+            "accuracy": 1,
+            "correctMeanRtMs": 403.3333333333333,
+            "correctRtCount": 12,
+            "input": "touch"
+          }
+        ],
+        "differences": [
+          {
+            "key": "alerting",
+            "valueMs": 60,
+            "input": "touch",
+            "firstCorrectCount": 12,
+            "secondCorrectCount": 12
+          }
+        ],
+        "reasons": [
+          "部分条件、正确反应或输入来源不足以支持比较，受影响指标暂不展示。"
+        ],
+        "description": "只描述本轮记录；条件差值不是能力等级，体验版不代表稳定网络能力。",
+        "practicalTip": "把设备放稳，关闭通知，让视线留在中央注视点。"
+      },
+      "qualityFlags": {
+        "incompleteRecords": false,
+        "mixedInput": false,
+        "incompleteAccuracy": true,
+        "incompleteCue_none": false,
+        "incompleteCue_central": false,
+        "incompleteCue_double": false,
+        "incompleteCue_spatial_valid": true,
+        "incompleteFlanker_congruent": false,
+        "incompleteFlanker_incongruent": true,
+        "incompleteFlanker_neutral": false,
+        "unavailable_alerting": false,
+        "unavailable_orienting": true,
+        "unavailable_conflict": true,
+        "noInterpretableCondition": false
+      }
+    },
+    "invalid": {
+      "contextId": "ant-synthetic-report",
+      "configHash": "6b623c236c31134cc5b59cff505b0d77d4b8cfa25868d832290c787140683a02",
+      "protocolSignature": "f0bc738e1886a29b6b8fe5d2dfcf62b716f30c4ea67d538c8facd2a478c3cc71",
+      "projection": {
+        "state": "invalid",
+        "accuracy": null,
+        "cueRows": [],
+        "differences": [],
+        "reasons": [
+          "完整条件记录不足，本轮不提供表现结论。"
+        ],
+        "description": "只描述本轮记录；条件差值不是能力等级，体验版不代表稳定网络能力。",
+        "practicalTip": "把设备放稳，关闭通知，让视线留在中央注视点。"
+      },
+      "qualityFlags": {
+        "incompleteRecords": true,
+        "mixedInput": false,
+        "incompleteAccuracy": true,
+        "incompleteCue_none": true,
+        "incompleteCue_central": true,
+        "incompleteCue_double": true,
+        "incompleteCue_spatial_valid": true,
+        "incompleteFlanker_congruent": true,
+        "incompleteFlanker_incongruent": true,
+        "incompleteFlanker_neutral": true,
+        "unavailable_alerting": true,
+        "unavailable_orienting": true,
+        "unavailable_conflict": true,
+        "noInterpretableCondition": true
+      }
+    }
+  },
+  "fixture": true
+}

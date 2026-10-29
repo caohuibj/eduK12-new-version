@@ -1,0 +1,126 @@
+{
+  "synthetic": true,
+  "fixture": "raw/research-240-archive.json.gz",
+  "fixtureSha256": "2c6ff2998506e1bcb10f2315720c84b723728b4405934538295468aceb0a4c7b",
+  "rawHash": "4b785da9e22fafafa9cf8a03dd4caa5736fc526295280b00a7d01a697cec0e3f",
+  "frameCount": 57987,
+  "oldBytes": 3668003,
+  "wireBytes": 284415,
+  "archivedBytes": 4420645,
+  "coreHash": "86e56bd0fb848038a451498cb6c2ec5d0360b7737764e0854b4b38fb97249a00",
+  "nativeCompletion": {
+    "schemaVersion": 1,
+    "contextKey": "[\"18df6ce8-b2f3-4659-8e82-3373d04b47e2\",1,\"1eea7e00cd6dc1b17547248db5bc44e814bb5a0d6fbdbbd0491c01da035a168e\"]",
+    "configHash": "1eea7e00cd6dc1b17547248db5bc44e814bb5a0d6fbdbbd0491c01da035a168e",
+    "protocolSignature": "1831c3ebf8facc354b33d029674cf30cd47ddf601c60370fd83a3567e683deb6",
+    "manifestHash": "12ea5d34db39fe8a7167a7dc319d432b13709d05957377781b708c927df133df",
+    "formalCount": 1,
+    "practiceCount": 8,
+    "termination": "completed",
+    "terminationReason": null,
+    "finalPayloadDigest": "f92639f3c2e37550ffddc159ea7bbef2ac371aae26d1d012666da069c01c3d9a"
+  },
+  "quality": {
+    "state": "interpretable",
+    "flags": {
+      "noSettledImages": false,
+      "incompleteSequence": false,
+      "technicalRecord": false
+    },
+    "reasons": []
+  },
+  "metrics": {
+    "statistics": {
+      "city": 268,
+      "mountain": 32,
+      "hits": 268,
+      "omissions": 0,
+      "falseAlarms": 0,
+      "correctRejections": 32,
+      "rtCount": 268,
+      "meanMs": 500,
+      "medianMs": 500,
+      "sdMs": 9.179710704572028e-13,
+      "cv": 1.8359421409144058e-15,
+      "correctedHitRate": 0.9981343283582089,
+      "correctedFalseAlarmRate": 0.015625,
+      "dPrime": 5.053898491416487,
+      "criterion": -0.3730745539145368
+    },
+    "cityOmissions": 0,
+    "mountainFalseAlarms": 0,
+    "medianCorrectRT": 500,
+    "presentedImageCount": 300,
+    "expectedImageCount": 300,
+    "inputResponses": {
+      "keyboard": 268
+    },
+    "ignoredInput": {
+      "held": 0,
+      "repeat": 0,
+      "multiple": 0,
+      "debounce": 0,
+      "unassigned": 0,
+      "wrongKey": 0
+    },
+    "reportBinding": {
+      "testType": "gradcpt",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "profile": "research",
+      "configHash": "1eea7e00cd6dc1b17547248db5bc44e814bb5a0d6fbdbbd0491c01da035a168e",
+      "protocolSignature": "1831c3ebf8facc354b33d029674cf30cd47ddf601c60370fd83a3567e683deb6",
+      "reportDefinitionVersion": "0.1.0"
+    }
+  },
+  "publicReport": {
+    "schemaVersion": 1,
+    "testType": "gradcpt",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "configHash": "1eea7e00cd6dc1b17547248db5bc44e814bb5a0d6fbdbbd0491c01da035a168e",
+    "protocolSignature": "1831c3ebf8facc354b33d029674cf30cd47ddf601c60370fd83a3567e683deb6",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "participantPresentationVersion": "0.1.0",
+    "profile": "research",
+    "state": "interpretable",
+    "report": {
+      "testType": "gradcpt",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "1eea7e00cd6dc1b17547248db5bc44e814bb5a0d6fbdbbd0491c01da035a168e",
+      "protocolSignature": "1831c3ebf8facc354b33d029674cf30cd47ddf601c60370fd83a3567e683deb6",
+      "profile": "research",
+      "state": "interpretable",
+      "planned": 300,
+      "presented": 300,
+      "statistics": {
+        "city": 268,
+        "mountain": 32,
+        "hits": 268,
+        "omissions": 0,
+        "falseAlarms": 0,
+        "correctRejections": 32,
+        "rtCount": 268,
+        "meanMs": 500,
+        "medianMs": 500,
+        "sdMs": 9.179710704572028e-13,
+        "cv": 1.8359421409144058e-15,
+        "correctedHitRate": 0.9981343283582089,
+        "correctedFalseAlarmRate": 0.015625,
+        "dPrime": 5.053898491416487,
+        "criterion": -0.3730745539145368
+      },
+      "inputResponses": {
+        "keyboard": 268
+      }
+    }
+  },
+  "scope": "one new affected wire FINAL/DB/private-store consumer; no original task replay, physical timing claim or COS re-score"
+}

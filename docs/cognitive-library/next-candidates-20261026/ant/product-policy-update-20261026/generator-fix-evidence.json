@@ -1,0 +1,41 @@
+{
+  "kind": "ANT_GENERATED_REPORT_IMPORT_FIX",
+  "status": "ONE_TARGETED_RUNTIME_PASS_TYPES_DELEGATED",
+  "originalTypeFailure": {
+    "path": "/tmp/cognitive-product-types-frontend-20261026.json",
+    "sha256": "805c8f8729fa40dd02a7668380a7cc6be2c751e76fca763dfa9f45f1ec0e00fc",
+    "modified": false
+  },
+  "cause": "Generator copied the new FLANKERS reference from backend projection but imported only CUES/INPUTS. Generated consistency check only proved equality to generator output; previous UI tests used fixture projections and the Card import was type-only, so no generated function execution occurred. Actual frontend type closure correctly caught missing name and downstream inference errors.",
+  "change": "Only add FLANKERS to generator imports and regenerate; generated file not hand edited.",
+  "sourceBindings": [
+    {
+      "file": "server-version/scripts/cognitive/ant-content.cjs",
+      "beforeSha256": "0cc449ba248cc9a241d3a4cfe2bf2e29b7cad012979782582a6366f04b92b2fe",
+      "afterSha256": "121417e4cf98a0bde213814b388023e0a9d97c44a93eac6b00fb28d5e7b389b0"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "beforeSha256": "8364a0abaff2826fddde21345ca08c719b8d571cf7a76234b752c0f14af6df32",
+      "afterSha256": "7e1e1317c583fd809c68a1d36e9f2945a39a9b72d0637d66aabb5a7f0aa228d7"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/projection.product-policy.test.ts",
+      "beforeSha256": null,
+      "afterSha256": "52f0cac8a27baf21cd4d5b3ffb713219a07efe628d111ff15e1c0c755b719c15"
+    }
+  ],
+  "runtimeRegression": {
+    "file": "generated-projection-runtime.json",
+    "sha256": "53f21e2d4aee82efd9648a2c1adafad3012c2735fe7756eb813561ef448911c0",
+    "exitCode": 0,
+    "passed": 1,
+    "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/projection.product-policy.test.ts --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/product-policy-update-20261026/generated-projection-runtime.json"
+  },
+  "projectionCheck": {
+    "exitCode": 0,
+    "command": "node server-version/scripts/cognitive/ant-content.cjs --check"
+  },
+  "reuse": "No rerun of backend7/frontend4/backend types; only generated runtime case executed. Main owns ANT-only frontend type continuation.",
+  "priorEvidence": "evidence.json preserves the pre-fix input hashes; this file explicitly supersedes only generator/generated report source bindings and adds the new regression original."
+}

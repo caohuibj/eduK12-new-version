@@ -1,0 +1,2 @@
+/cognitive-batch3-pg sha256:6a2e324ebe59af6031c4c1cd96c1d5072c2ebc36563d2196365e43b8297c062d postgres:16-alpine
+/cognitive-batch3-redis sha256:98c6ca8f397f86e469be752c3e7ed5eb8b17f2479840cb69a2e413037038e9f4 redis:7-alpine

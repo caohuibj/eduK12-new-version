@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "mode": "PREVIEW",
+  "rows": [
+    {
+      "testType": "mot",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.1.1",
+      "scoringVersion": "1.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "8b5a5007-d8f3-42ff-b561-26561aaeffd6",
+      "status": "DRAFT",
+      "sourceHash": "841592e8854b388aeb492a1e30bd204a49fe345df504a18c9b3327bb534b583c"
+    },
+    {
+      "testType": "enumeration",
+      "configVersion": "0.3.0",
+      "engineVersion": "0.2.0",
+      "scoringVersion": "0.2.0",
+      "action": "BLOCKED",
+      "reasons": [
+        "IMMUTABLE_CONFIG_CONFLICT"
+      ],
+      "configId": "f73c782d-066e-41c2-8325-8b1954cca176",
+      "status": "RETIRED",
+      "sourceHash": "afaa0328620bbb5691b42bd6466c85eeb20f436be0d72f6b0b8463903a5cd3f3"
+    }
+  ],
+  "hasBlocked": true
+}

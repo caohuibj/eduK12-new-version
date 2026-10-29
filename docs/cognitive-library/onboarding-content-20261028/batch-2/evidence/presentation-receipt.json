@@ -1,0 +1,76 @@
+{
+  "base": "e4b1ba0c7cf9fa520e046571c8c68fc4fdf6ce23",
+  "sourceSHA256": {
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFReport.tsx": "e1cd1ad9ed7a779de78953f1fe40b4c3d0985fde2a31bad07a0dd873b73c9846",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradReport.tsx": "49637113353e1b02582a9d131a9812ae263ee16693c42c87a4b4ba8d3ca028ce",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualReport.tsx": "ccfcc1e43218ff87ee58dbb2233106d9a8adce53ab1a9b491e6f0df5acb0f6a3",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/SpatialReport.tsx": "ff345a6449180019003bf2f98dcc81bbc2702780af1db5ca41fac5d63ac53168",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/SearchReport.tsx": "72decad34e841c15368b1c7344c90d6ad40ff0fde21d4c8f88f7137a86eca30b",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/BlinkReport.tsx": "ef1149375862d5efb093d8ebec46947aa4126b280d053c744d7270b9c17f51dc",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonReport.tsx": "6ad6147210f6fe571b7bc4a9255d9fa58661dbdbcdbbd15f09842880d2f909de",
+    "server-version/frontend/src/modules/cognitive/cognitive-native-report.css": "387df9daad67e16fd218b521a679619338eaf543fab44dfffcb4a62cb3bb0b10",
+    "server-version/frontend/src/modules/cognitive/__tests__/remaining-reports.presentation.test.tsx": "c5ecdb4aed6c0bee2ec6382789c36befc121bbcc27daa5d897020353bb893c8a"
+  },
+  "execution": [
+    {
+      "command": "NODE_ENV=test node docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/build-report-fixtures.cjs",
+      "original": "Node threw GradCPT paint evidence mismatch in synthetic partial fixture; original node exit not separately captured; combined shell later exited0 after unrelated Python edit. No successful fixture generation claimed.",
+      "log": "report-fixture-build-original.log"
+    },
+    {
+      "command": "same fixture generator after removing frames outside retained slots",
+      "exit": 0,
+      "log": "report-fixture-build.log",
+      "result": "7 changed-consumer datasets; original test assertions not executed"
+    },
+    {
+      "command": "vitest run src/modules/cognitive/__tests__/remaining-reports.presentation.test.tsx --reporter=json",
+      "cwd": "server-version/frontend",
+      "exit": 1,
+      "report": "report-presentation-original.json",
+      "result": "0 assertions; generated fixture absent"
+    },
+    {
+      "command": "same targeted Vitest after fixture generation completed",
+      "cwd": "server-version/frontend",
+      "exit": 0,
+      "report": "report-presentation.json",
+      "passed": 7
+    },
+    {
+      "command": "node docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/check-direct-types.cjs frontend",
+      "exit": 1,
+      "report": "frontend-direct-types-original.json",
+      "reason": "fixture JSON absent; no product diagnostics"
+    },
+    {
+      "command": "same direct types after fixture generation",
+      "exit": 0,
+      "report": "frontend-direct-types.json",
+      "diagnostics": 0
+    },
+    {
+      "command": "node docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/preview-reading.cjs",
+      "exit": 1,
+      "progress": "browser-reading-original-progress.json",
+      "log": "browser-reading-original.log",
+      "completed": 56,
+      "reason": "waited for an h1 in ANT detached instructions that use h2; parent task owns h1"
+    },
+    {
+      "command": "PREVIEW_TASKS=ant,recognition node docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/preview-reading.cjs",
+      "exit": 0,
+      "report": "browser-reading-continued.json",
+      "completed": 6,
+      "unchangedReuse": 56
+    }
+  ],
+  "browser": "Chromium sandbox true; approved outer-sandbox execution due setuid helper limitation; all requests restricted localhost/data URLs",
+  "limits": [
+    "synthetic detached component previews only",
+    "CSS zoom200%, not native device equivalence",
+    "No scorer/protocol/schema/dependency/security-setting/CI/Ready/merge/production/deploy changes",
+    "No new export/download path; same public projections and quality gates"
+  ],
+  "evidenceUnion": "browser-reading-union.json"
+}
