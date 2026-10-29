@@ -10,8 +10,9 @@ import {useTrainingStandardConfigurationIssue,trainingIssueOutcome} from './useT
 const errorMessage=(cause:unknown)=>cause instanceof Error?cause.message:'请求未完成，请重新读取实际状态。'
 type Replacement={source:StandardConfigurationChoice;grant:StandardConfigurationUse;recipient:User}
 function Versions({choice}:{choice:StandardConfigurationChoice}){
- return <dl><dt>内容</dt><dd>{choice.versions.CONTENT}</dd><dt>参数</dt><dd>{choice.versions.PARAMETERS==='none-v1'?'未配置阈值或常模':choice.versions.PARAMETERS}</dd>
-  <dt>报告</dt><dd>{choice.versions.REPORT==='none-v1'?'不反馈':choice.versions.REPORT}</dd></dl>
+ return <dl className="training-configuration-versions"><div><dt>内容</dt><dd>{choice.versions.CONTENT}</dd></div>
+  <div><dt>参数</dt><dd>{choice.versions.PARAMETERS==='none-v1'?'未配置阈值或常模':choice.versions.PARAMETERS}</dd></div>
+  <div><dt>报告</dt><dd>{choice.versions.REPORT==='none-v1'?'不反馈':choice.versions.REPORT}</dd></div></dl>
 }
 function RecipientGrant({choice,onClose,issuer,replacement,reason,onReplace,onReplacementDone}:{choice:StandardConfigurationChoice;onClose:()=>void;issuer:ReturnType<typeof useTrainingStandardConfigurationIssue>;
  replacement:Replacement|null;reason:string;onReplace:(grant:StandardConfigurationUse,recipient:User)=>void;onReplacementDone:(notice:string)=>void}){
@@ -67,8 +68,8 @@ function RecipientGrant({choice,onClose,issuer,replacement,reason,onReplace,onRe
  const recipient=teachers.find(row=>row.id===userId)
  const activeGrant=grant&&!grant.revokedAt
  return <ManagementDialog open title="分配固定量表配置" description={choice.title} onClose={()=>{if(!inFlight.current)onClose()}}
-  closeDisabled={busy} className="training-accounts-dialog training-supervision-dialog" width="compact"
-  actions={<><button type="button" disabled={busy} onClick={onClose}>关闭</button><button type="button"
+  closeDisabled={busy} className="training-accounts-dialog training-supervision-dialog training-configuration-dialog" width="compact"
+  actions={<><button type="button" className="training-accounts-secondary" disabled={busy} onClick={onClose}>关闭</button><button type="button" className="training-accounts-primary"
    disabled={busy||loading||!loaded||!recipient||uncertain||Boolean(activeGrant)||!choice.assignable||!issuer.canIssue||!configurationName.trim()||Boolean(replacement&&(!reason.trim()||reason.trim().length>500))}
    onClick={()=>void mutate('issue')}>{replacement?'确认替换并授权':'授权此配置'}</button></>}>
   <p>管理员选择的内容、参数和报告随此授权固定；培训师不能在建任务时更换报告。</p>
@@ -110,8 +111,8 @@ export function TrainingStandardConfigurationWorkspace({actorId}:{actorId?:strin
   }).catch(cause=>{if(active)setError(errorMessage(cause))}).finally(()=>{if(active)setLoading(false)})
   return()=>{active=false}
  },[page,revision])
- return <section className="training-accounts training-resources-panel" aria-label="固定量表配置授权">
-  <header className="training-management-page-heading"><h2>固定量表配置授权</h2><button disabled={loading} onClick={()=>setRevision(v=>v+1)}>刷新固定配置</button></header>
+ return <section className="training-accounts training-resources-panel training-configuration-workspace" aria-label="固定量表配置授权">
+  <header className="training-configuration-heading"><h2>固定量表配置授权</h2><button className="training-accounts-secondary" disabled={loading} onClick={()=>setRevision(v=>v+1)}>刷新固定配置</button></header>
   <p>只分配系统已批准用于 Training 的精确内容、参数和报告组合。工具审批与培训师使用权分别管理。</p>
   {replacement&&<section aria-label="明确替换 Training 配置"><p>为 {replacement.recipient.nickname||replacement.recipient.username} 替换 {replacement.grant.configurationName??'原固定配置'}。请选择同一工具的另一份已批准组合；保存时撤销原使用权，旧草稿不会自动换版，已开始作答及历史定义保留。</p>
    <label>Training 配置替换原因<input maxLength={500} value={replacementReason} disabled={issuer.busy||Boolean(issuer.pending)} onChange={event=>setReplacementReason(event.target.value)}/></label>
@@ -128,12 +129,12 @@ export function TrainingStandardConfigurationWorkspace({actorId}:{actorId?:strin
   {!loading&&!error&&!rows.length&&<p>尚无已批准用于 Training 的固定量表配置。未装载、未审批或其他入口的内容不会自动成为可分配配置。</p>}
   {replacement&&!loading&&!visibleRows.length&&<p>本页没有同一工具的其他配置，可查看其他页或取消替换。</p>}
   <ApprovedScaleAxes choices={visibleRows.filter(row=>row.assignable)} disabled={loading||issuer.busy} scopeLabel="当前页已读取配置，可用分页查看其他版本" onSelect={id=>{const row=visibleRows.find(value=>value.id===id&&value.assignable);if(row)setChoice(row)}}/>
-  {visibleRows.map(row=><article key={row.id} className="training-accounts-empty"><h3>{row.title}</h3><Versions choice={row}/>
-   <p>{row.assignable?'可分配':row.unavailableReason}</p><button type="button" onClick={()=>setChoice(row)}>管理此配置授权</button>
+  <div className="training-configurations-grid">{visibleRows.map(row=><article key={row.id} className="training-configuration-card"><h3>{row.title}</h3><Versions choice={row}/>
+   <p>{row.assignable?'可分配':row.unavailableReason}</p><button type="button" className="training-accounts-secondary" onClick={()=>setChoice(row)}>管理此配置授权</button>
    <details><summary>配置身份详情</summary><p>{row.toolKey} · {row.instrumentVersion}</p><p className="break-all">{row.id} · {row.combinationHash}</p></details>
-  </article>)}
-  <nav aria-label="固定量表配置分页"><button disabled={loading||page<=1} onClick={()=>setPage(v=>v-1)}>上一页配置</button><span>第 {page} 页</span>
-   <button disabled={loading||!hasMore} onClick={()=>setPage(v=>v+1)}>下一页配置</button></nav>
+  </article>)}</div>
+  <nav className="training-configuration-pagination" aria-label="固定量表配置分页"><button className="training-accounts-secondary" disabled={loading||page<=1} onClick={()=>setPage(v=>v-1)}>上一页配置</button><span>第 {page} 页</span>
+   <button className="training-accounts-secondary" disabled={loading||!hasMore} onClick={()=>setPage(v=>v+1)}>下一页配置</button></nav>
   {choice&&<RecipientGrant key={choice.id+':'+(replacement?replacement.grant.id+':'+replacement.grant.version:'normal')} choice={choice} issuer={issuer} replacement={replacement} reason={replacementReason}
    onClose={()=>setChoice(null)} onReplace={(grant,recipient)=>{setReplacement({source:choice,grant,recipient});setReplacementReason('');setChoice(null);setOperationNotice('')}} onReplacementDone={finishReplacement}/>}
  </section>

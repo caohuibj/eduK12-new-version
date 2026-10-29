@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import './approved-scale-axes.css'
 
 type Axis='CONTENT'|'PARAMETERS'|'REPORT'
 export type ApprovedScaleChoice={id:string;toolKey:string;title:string;versions:Record<Axis,string>}

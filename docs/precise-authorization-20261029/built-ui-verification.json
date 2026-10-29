@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "base": "5a0ea9f1c0136afde277f2246006aca5197a1091",
+  "verifiedMain": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "recordedAt": "2026-10-29T22:50:24.169750+00:00",
+  "finalFrontendTree": "160d68b013570acdd1dbcb1ba5461df025a96635",
+  "scope": "Four administrator built UI C/P/R selection presentation; compact Training cards/dialog and shared responsive finder. No authorization/seed/engine change.",
+  "results": {
+    "baselineDesktopDistinctPassed": 4,
+    "styledArtifactMatrixPassed": 8,
+    "finalTrainingDialogAffectedCasesPassed": 2,
+    "sixUnaffectedOtherEntryMatrixCasesNotReplayed": true,
+    "finalAppTypesExit": 0,
+    "changedTsxLintExit": 0,
+    "retainedExistingRefCleanupWarnings": 1,
+    "allBuildsExit": 0,
+    "qualifiedFormalCI": false,
+    "productionNetworkRequests": 0,
+    "authorizationWrites": 0,
+    "unknownApisInPassedInvocations": 0
+  },
+  "environment": {
+    "node": "24.21.0 official runtime",
+    "chromium": "151.0.7922.173 existing Debian executable",
+    "playwright": "1.62.1 existing environment tool",
+    "preferredViewports": {
+      "desktop": "1280x900 preferred light",
+      "mobile": "390x844 preferred dark"
+    },
+    "themeLimit": "Actual Training theme recorded separately. Survey desktop still reports dark; this does not certify light/dark parity for every product."
+  },
+  "raw": {
+    "file": "built-ui-raw.json",
+    "sha256": "656eb904540f982915e1ad9f6923315aea5438445abe4aae4daddcc551abd727"
+  },
+  "artifactManifest": {
+    "file": "built-ui-artifacts.json",
+    "sha256": "13f2555a8c0ca27c0bfbd7c5fddbd3c5963120103b6ee65c151d32ab02b98cbe"
+  },
+  "screenshots": [
+    {
+      "file": "built-ui-screenshots/training-desktop-light.png",
+      "artifact": "precise-built-ui-final-training",
+      "sha256": "06a19e8677f6ad8a66ed0a8be64aa6b2f4dc2d8639bf68b322ae11981fcb4c94"
+    },
+    {
+      "file": "built-ui-screenshots/training-mobile-dark.png",
+      "artifact": "precise-built-ui-final-training",
+      "sha256": "78d56db4afc572db9541c4a530bea305acf1c56b969f8f6ba18d33eaf6010cf8"
+    },
+    {
+      "file": "built-ui-screenshots/teacher-mobile-dark.png",
+      "artifact": "precise-built-ui-styled",
+      "sha256": "e9045ad1080bcbe2ca1610907e94b8e2ef542518cd36d6197f376f893de830cb"
+    }
+  ],
+  "finalFilesSha256": {
+    "server-version/e2e/precise-authorization-built-ui.cjs": "8a9fdefbb83639dc2fe9e0679637d670763a9503517955e30fe261c780e086e1",
+    "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.tsx": "4cd903a2fbc5f47736a2125c97a33b93fee32032248df7bb7e65e80a7c6d62dd",
+    "server-version/frontend/src/components/scale-governance/approved-scale-axes.css": "5584c67df5aea59ec9ebe2264e561408d57d6449d25bbe95c3200754b0788082",
+    "server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx": "b0fa9c28758a27f2571ed53203ad69edd0941e4d2e2a7d557fc630a675e2ed5e",
+    "server-version/frontend/src/training/training-admin-workspace.css": "fcb3573ae630b86df028994e50058baf188231fd065c0db37259d368fc76af11"
+  },
+  "evidenceLimit": "Final source/artifact hashes recorded after execution; unsigned local presentation evidence. Eight-case styled artifact predates the final Training-only dialog layout change. Only the affected Training cases repeat on final artifact; other six are not labelled as executed on that final artifact.",
+  "notExecuted": [
+    "real browser login/MFA/backend-connected UI mutation",
+    "runtime DB role or performance distributions",
+    "fun-R registration/seed or cognitive profile authorization",
+    "formal CI/PR/merge/deployment"
+  ]
+}

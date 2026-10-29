@@ -20,6 +20,7 @@
 [新组合报告分档兼容性](report-parameter-compatibility-progress.md)只核对 R 所需 key 能否由选定 P 提供，不要求短报告覆盖所有 P 分档。
 [Survey 实际参与者 HTTP](survey-exact-journey-progress.md)验证精确空 R 导入/发布/START、普通撤权后原作答 FINAL/回读及新入场拒绝，保留分阶段失败和恢复证据。
 [Training COURSE 实际参与者 HTTP](training-course-journey-progress.md)补正常报名、精确 START、普通撤权后的原作答 FINAL/full-R 回读及新学员拒绝，不用匿名路径替代课程。
+[四入口编译页面与布局](built-ui-progress.md)给出静态产物、四入口桌面/手机选择检查、Training 卡片/弹窗修正及原失败；权限与真实浏览器登录仍单独验收。
 以下共同契约和撤权矩阵是初始基线记录；当前新增源码仍在独立开发分支，未合入 main。
 
 ## 当前共同契约
