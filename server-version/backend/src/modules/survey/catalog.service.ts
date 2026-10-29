@@ -22,7 +22,7 @@ const fail=(status:number,message:string):never=>{throw new SurveyGovernanceErro
 export type CatalogSnapshot=Awaited<ReturnType<typeof getCatalogSourceSnapshot>>
 type Grant={id:string;createdBy:string;userId:string;status:string;snapshot:CatalogSnapshot;snapshotDigest:string;createdAt:Date;revokedAt:Date|null}
 const view=(r:Grant)=>{const selected=readSurveyStandardUse(r);return {id:r.id,title:r.snapshot.title,kind:r.snapshot.ref.kind,status:r.status,
-  ...(selected?{configurationName:r.snapshot.provenance.configurationName,selectedBinding:selectedConfigurationPointer(selected)}:{}),
+  ...(selected?{recipientId:r.userId,configurationName:r.snapshot.provenance.configurationName,selectedBinding:selectedConfigurationPointer(selected)}:{}),
   sourceRef:r.snapshot.ref,sourceProvenance:{...r.snapshot.provenance,originalSource:r.snapshot.provenance.source??null,source:r.snapshot.ref,
     definitionDigest:r.snapshot.definitionDigest,adapterVersion:r.snapshot.adapterVersion},createdAt:r.createdAt,revokedAt:r.revokedAt}}
 export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourceRef['kind'];organizationId?:string;page:number;discovery?:CatalogDiscoveryFilters}){
@@ -36,10 +36,12 @@ export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourc
       continue}
     const snapshot=await getCatalogSourceSnapshot({actorUserId,ref:row.ref},prisma)
     const policy=await readToolPolicy(prisma,await snapshotPolicyIdentity(prisma,snapshot))
-    const available=(snapshot.provenance.surveyStandardReleaseId?policy.decision!=='RETURNED':policy.decision==='APPROVED')&&!policy.paused
-    list.push({...row,available,unsupportedReason:available?row.unsupportedReason:policy.paused?'Survey 新增分配和投放已暂停：'+policy.reason:'尚未通过 Survey 范围审批；请先在工具库审批中核对精确版本',surveyPolicy:policy})
+    const available=policy.decision==='APPROVED'&&!policy.paused
+    list.push({...row,available,unsupportedReason:available?row.unsupportedReason:policy.paused?'Survey 新增分配和投放已暂停：'+policy.reason:'尚未通过 Survey 范围审批；请先在工具库审批中核对精确版本',surveyPolicy:policy,
+     ...(snapshot.provenance.surveyStandardReleaseId?{configuration:{toolKey:snapshot.provenance.code,instrumentVersion:snapshot.provenance.standardInstrumentVersion,
+      axes:snapshot.provenance.triplet,report:(snapshot.compiledDefinition as {report?:{reportVersion?:string}}).report?.reportVersion??null}}:{})})
   }
-  return {...result,list,pageSize:25}
+  return {...result,list,pageSize:25,actorId:actorUserId}
 }
 async function target(tx:Tx,id:string){
   const rows=await tx.$queryRaw<{id:string}[]>`SELECT u.id FROM users u
@@ -121,7 +123,7 @@ export async function readExactToolGrantRequest(actorUserId:string,userId:string
     AND NOT EXISTS(SELECT 1 FROM survey_package_members pm WHERE pm.technical_grant_id=survey_tool_grants.id)`
   if(!row)return null
   if(canonicalHash(row.snapshot)!==row.snapshotDigest||!readSurveyStandardUse(row))fail(409,'原请求缺少可信固定配置身份')
-  return {grant:view(row),request:{requestId:row.id,configurationName:row.snapshot.provenance.configurationName,source:row.snapshot.ref}}
+  return {grant:view(row),request:{requestId:row.id,userId:row.userId,configurationName:row.snapshot.provenance.configurationName,source:row.snapshot.ref}}
 }
 export async function revokeToolGrant(actorUserId:string,id:string){
   return prisma.$transaction(async tx=>{

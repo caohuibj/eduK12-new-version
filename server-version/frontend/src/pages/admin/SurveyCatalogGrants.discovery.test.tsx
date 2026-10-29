@@ -4,7 +4,9 @@ import {SurveyCatalogGrants} from './SurveyCatalogGrants'
 import type {CatalogApi} from '../../survey/ResearchCatalog'
 import {EMPTY_CATALOG_FACETS} from '../../api/catalogDiscovery'
 const person={id:'r1',username:'研究者甲',status:'ACTIVE'}
-const row=(i:number)=>({ref:{kind:'SCALE' as const,sourceId:'survey-standard:exact-'+i,sourceVersion:'hash-'+i},title:'工具'+i,available:true,classificationTags:[{id:'student_self_report',label:'学生',facet:'population' as const}]})
+// These discovery/selection fixtures exercise the preserved native legacy API.
+// Real standard UUID/hash recovery is qualified separately in .standard.test.
+const row=(i:number)=>({ref:{kind:'SCALE' as const,sourceId:'native-scale-exact-'+i,sourceVersion:'hash-'+i},title:'工具'+i,available:true,classificationTags:[{id:'student_self_report',label:'学生',facet:'population' as const}]})
 const page=(i:number)=>({page:i,hasMore:i===1,terminalReason:i===1?null:'END_OF_CATALOG',list:[row(i===1?1:26)],tagFacets:{...EMPTY_CATALOG_FACETS,population:[{id:'student_self_report',label:'学生'}],language:[{id:'language:zh-CN',label:'简体中文'}]}})
 
 describe('classification discovery and explicitly selected version grants',()=>{

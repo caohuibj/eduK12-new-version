@@ -78,7 +78,7 @@ suite('Survey exact standard grant and frozen original manager authority',()=>{
   expect(a.configuration.axes.REPORT.hash).not.toBe(b.configuration.axes.REPORT.hash)
   expect(a.authorization.authority).toEqual([{kind:'ENTRY_ADMIN',id:entry.id,revision:entry.version}])
   const read=await service.readExactToolGrantRequest(manager.id,owners[0].id,exact.requestId)
-  expect(read.request).toEqual({...exact,source:sources[0]})
+  expect(read.request).toEqual({...exact,userId:owners[0].id,source:sources[0]})
   expect(await service.readExactToolGrantRequest(manager.id,owners[1].id,exact.requestId)).toBeNull()
   expect((await service.listToolGrants(manager.id,owners[0].id)).list[0]).toMatchObject({configurationName:exact.configurationName,selectedBinding:first.selectedBinding})
   observations.push({typedUseIds:[first.id,second.id],legacyUseId:legacy.id,entryId:entry.id,entryRevision:entry.version})

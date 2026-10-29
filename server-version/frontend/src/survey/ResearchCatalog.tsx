@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Kind } from './builder.types'
 export type CatalogSourceRef={kind:Kind;sourceId:string;sourceVersion:string|number;organizationId?:string}
 export type CatalogProvenance={source:CatalogSourceRef;definitionDigest:string;adapterVersion:string;license?:unknown;[key:string]:unknown}
-export type CatalogGrant={id:string;title:string;kind:Kind;status:string;sourceRef:CatalogSourceRef;sourceProvenance?:CatalogProvenance;createdAt?:string;revokedAt?:string|null}
+export type CatalogGrant={id:string;title:string;kind:Kind;status:string;sourceRef:CatalogSourceRef;sourceProvenance?:CatalogProvenance;createdAt?:string;revokedAt?:string|null;
+ recipientId?:string;configurationName?:string;selectedBinding?:{authorizationId:string;authorizationRevision:number;bindingHash:string;configurationHash:string}}
 export type CatalogApi=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
 export function SourceProvenance({source,provenance}:{source?:CatalogSourceRef;provenance?:CatalogProvenance}){
   source=source||provenance?.source
@@ -19,7 +20,7 @@ export function ResearchCatalog({projectId,api,busy,onImport}:{projectId:string;
   const list=catalog?.projectId===projectId&&catalog.api===api?catalog.list:[]
   const [page,setPage]=useState(1),[error,setError]=useState(''),[loading,setLoading]=useState(false)
   const [query,setQuery]=useState('')
-  const filtered=list.filter(grant=>grant.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
+  const filtered=list.filter(grant=>(grant.title+' '+(grant.configurationName??'')).toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
   const readEpoch=useRef(0)
   const pending=useRef<{projectId:string;api:CatalogApi;page:number;promise:Promise<{list:CatalogGrant[]}>}|null>(null)
   const load=useCallback(async(next=1)=>{
@@ -57,8 +58,8 @@ export function ResearchCatalog({projectId,api,busy,onImport}:{projectId:string;
     <label className="block text-sm">筛选当前页授权工具<input type="search" className="input block w-full" value={query} onChange={event=>setQuery(event.target.value)} placeholder="输入当前页的工具名称"/></label>
     {!loading&&!error&&list.length>0&&<p role="status" className="text-sm">当前页显示 {filtered.length} / {list.length} 项；仅筛选已加载的本页，不搜索其他页。</p>}
     <div className="survey-catalog-grid">{filtered.map(grant=><article key={grant.id} className="border rounded-lg p-3 space-y-2">
-      <h4 className="font-medium">{grant.title}</h4><p className="text-sm">{grant.kind} · 版本 {grant.sourceRef.sourceVersion}</p><details><summary>查看来源与使用限制：{grant.title}</summary><SourceProvenance source={grant.sourceRef} provenance={grant.sourceProvenance}/></details>
-      <button type="button" className="btn-secondary" disabled={busy||loading} onClick={()=>void onImport(grant)}>导入此版本：{grant.title}</button>
+      <h4 className="font-medium">{grant.title}</h4><p className="text-sm">{grant.selectedBinding?grant.configurationName:grant.kind+' · 版本 '+grant.sourceRef.sourceVersion}</p><details><summary>查看来源与使用限制：{grant.title}</summary><SourceProvenance source={grant.sourceRef} provenance={grant.sourceProvenance}/></details>
+      <button type="button" className="btn-secondary" disabled={busy||loading} onClick={()=>void onImport(grant)}>{grant.selectedBinding?'使用此配置：'+grant.configurationName:'导入此版本：'+grant.title}</button>
     </article>)}</div>
     <div className="flex gap-3 items-center text-sm"><button type="button" className="btn-secondary" disabled={busy||loading||page<=1} onClick={()=>void load(page-1)}>目录上一页</button>
       <span>目录第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||loading||list.length<25} onClick={()=>void load(page+1)}>目录下一页</button>
