@@ -6,7 +6,7 @@
   "enabled": true,
   "base": "9801107019d51a4af7ddb651789b674867539d24",
   "frozenDevelopmentHead": "9fa3c51e5deb882beb4a0d56f1ebe44dae8f76f5",
-  "productHead": "6f205df5f3ec97d4c85246a4688becf2f0fd9bc4",
+  "productHead": "025ba7253c4d24ef245a047c4651bfe88d401145",
   "frontendTree": "2907eedb6ad9d1bdc5559f3e61b1f6145ac8b39b",
   "backendTree": "8a5df3518f9cadd5b56a397a71de7019e9fb5b95",
   "source": {
@@ -677,7 +677,7 @@
     ".github/workflows/ci-school-teacher.yml": "45a4db88aa1b30e9d8c26dc17191100e37763f88",
     ".github/workflows/ci.yml": "797cc8c87ad01a055663e90ad5e6c8b44b4ed7e0",
     "server-version/e2e/education-self-questionnaire.cjs": "cbc9549944d00415f00355d4573faa93668e2eda",
-    "server-version/e2e/school-teacher-browser.cjs": "5cc6e2515a6204f790cef470bc757c5d87005ce0",
+    "server-version/e2e/school-teacher-browser.cjs": "81b09e4db6abc0c72b8401bb93fa4693465e93ef",
     "server-version/e2e/school-teacher-fixture.cjs": "cc42e320cbf8a5ec49fbf28c0adf690bd15d223c",
     "server-version/e2e/school-teacher-chrome-permissions.cjs": "c2653f2aa38f48aaee1ab17291ed27cb8ea21df5",
     "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "a21ad90aab90e3e12e795301dc09af3505e05976"
@@ -686,9 +686,9 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "DOT independently reviewed f299d6b99 V1 first-admission locking and the exact screenshot guard, including PG before/after reporters and all 12 official guard DOM results. DOT then independently read seventh-run artifact12878301497, the actual Teacher failure PNG/network and HuiteacherApp545/593 plus UI anchor327: SELF skipped the school evaluation navigation needed to mount its region. The exact prescribed SELF-only school-management evaluation link click is implemented in6f205df5f; non-SELF observations and all business/privacy/FINAL assertions remain. No new local DOM or PG observations are repeated. This is engineering review of a bounded executor correction, not GitHub APPROVE or current application qualification. The existing formal selected jobs, real Teacher SELF FINAL/feedback, current SAST and final DOT gate/merge check remain required. Package permission scope and original dynamic bytes/owner/inode/sandbox checks are unchanged.",
-    "basisCommit": "6f205df5f3ec97d4c85246a4688becf2f0fd9bc4",
-    "reviewer": "DOT independent parent review and supplemental Teacher navigation review",
+    "note": "DOT independently reviewed f299d6b99 V1 locking and the exact screenshot guard, then prescribed the Teacher evaluation navigation correction. DOT read eighth-run original logs/artifact12878088980 and Teacher screenshot: School completed again; Teacher authoring and real publication with two executions passed. Participant login succeeded; the only failing probe was the management-MFA-gated author-capabilities GET returning403. DOT verified huiteacher organization.routes34-35 and authority11-18 and prescribed separate exact product assertions. Implemented in025ba7253: School keeps200/canAuthor=false; Teacher requires exactly403 and its already fetched authenticated organization has productAdmin=false. No extra auth/me request, participant MFA or administrative grant, accepted200/403 set, removed negative assertion or repeated local DOM/PG check. Prior guards, true FINAL/feedback and current formal jobs/SAST plus final DOT merge check remain required. This review is not GitHub APPROVE or current application qualification.",
+    "basisCommit": "025ba7253c4d24ef245a047c4651bfe88d401145",
+    "reviewer": "DOT independent parent and supplemental Teacher boundary review",
     "wiringBasisCommit": "fb8489caf91e09fb9ca7183bef5d0c7a49e0ad7e",
     "testRepairBasisCommit": "9f65b298ffe17700638f1a55bca6a91973c17189",
     "permissionAuthorization": "Current user explicitly authorized PR382 temporary GitHub runner /opt, /opt/google, /opt/google/chrome and the installed Chrome package paths confirmed by the existing checker to remove go-w only. Preserve bytes, ownership, all other permission bits and sandbox; no unbounded recursive chmod, added setuid, production or system-policy changes. Revalidate current package records/bytes/owner/inode/path scope before each mutation. DOT independently reviewed commit0b6b3a31c."
@@ -1663,12 +1663,12 @@
     ],
     "browserHelper": "server-version/e2e/education-self-questionnaire.cjs",
     "continuationDecision": {
-      "previousRun": 40828910491,
-      "previousCheckout": "315b231e2ad3df5624f9d581333475cf2200e2ec",
-      "previousSource": "5198fbc6120d8a42d3260163f5e1fd702573c128",
+      "previousRun": 40830867196,
+      "previousCheckout": "d1b34310990ca7a7132a0cb37e9b3d33ba9cfafa",
+      "previousSource": "55a7648cc2adffd7810ff9643608f05d481539b4",
       "officialReuse": "NOT_SUPPORTED_BY_EXISTING_FRESH_EXECUTOR",
       "reason": "Official legacy consumers bind PR338 and fixed run/job/build identities; fresh artifacts require current SHA/run and reject old receipts. Parameter-only substitution cannot preserve those invariants.",
-      "method": "Keep the existing bounded fresh route and all selections unchanged: 117 backend cases in five batches, 56 frontend cases with41 declared filtered, six required jobs, migration/restore and current SAST. Seventh-run School actual three-unit FINAL/resume/permitted feedback and denied author evidence retain their original SHA/run. Teacher authoring succeeded; publication stopped because SELF skipped the required evaluation-section link, now corrected exactly as DOT prescribed in6f205df5f. Existing fresh consumers cannot accept a partial successful School subjourney or arbitrary old manifests through configuration; do not forge admission or add a reuse framework. Each formal browser runner verifies its own approved Chrome scope and real sandbox, then both complete SELF journeys. Local PG/DOM proofs are not repeated or represented as current formal admission. Preserve the original seventh-run failed browser and actual final/cancelled SAST status if superseded by the existing concurrency policy."
+      "method": "Keep the same bounded fresh jobs, all117 backend cases/five batches, frontend56/41 declared filtered, migration/restore and current SAST. Eighth-run School full journey and Teacher authoring/publication successes retain their original SHA/run; its ordinary participant was correctly denied403 by the management capability endpoint, which the old common200 assertion incorrectly rejected. Exact product-specific negative checks and an already authenticated non-admin organization fact now preserve that boundary in025ba7253. Do not add MFA/roles, weaken statuses or repeat DOT/local tests. Existing fresh consumers still cannot configure acceptance of successful subjourneys or arbitrary old manifests; preserve this limitation without a new evidence framework. Every current browser Runner must verify its authorized Chrome scope/sandbox and both complete real SELF journeys. Preserve the previous failed browser and actual SAST success/cancelled status under the existing concurrency policy."
     }
   },
   "blockers": []
