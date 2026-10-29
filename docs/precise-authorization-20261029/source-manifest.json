@@ -484,8 +484,180 @@
       "reason": "no registered seed; real asset pool and integrated native runner absent"
     },
     {
-      "key": "CFQ-7/IPIP-C1/BPS9 zh with basic/fun R",
-      "reason": "DOT exact pushed source unavailable; specifically blocked source/seed change is not reproduced here"
+      "key": "CFQ-7/IPIP-C1/BPS9 independent fun R registration",
+      "reason": "Pure source JSON available and exact C/P hashes verified; main has no automatic sidecar registry/seed. Specifically denied engineering commit is not reproduced. Only 3 basic R embedded in DRAFT definitions loaded."
     }
-  ]
+  ],
+  "scaleMaterials": {
+    "source": {
+      "repository": "caohuibj/eduK12-new-version",
+      "branch": "content/scale-materials-three-20261029",
+      "commit": "6fa885ec74ca01350db25c44bd61c700648b05d1",
+      "tree": "bf8fc715333ab3d96e0faa73249bb385a52e4248",
+      "parent": "2de32609e1888cf28b73cb26e2c0cf38b11ff875",
+      "pullRequest": 387
+    },
+    "runtimeSource": "detached exact reviewed-content worktree; not merged into task1 or main",
+    "backendLockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "existingMaterializerBlob": "2292d7d622098715d0e582f50caad10aea0a02ee",
+    "existingSeedBlob": "8dd2c511e515c067232a619d48d2daf9e5f52783",
+    "database": "isolated materials_load_20261029",
+    "verifiedAt": "2026-10-29T15:40:51.509228+00:00",
+    "rows": [
+      {
+        "key": "cfq7_zh_cn_research",
+        "version": "1.0.1",
+        "title": "认知融合问卷（CFQ-7，7题）— 中文工作译稿",
+        "sourcePath": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/source.json",
+        "sourceFileSHA256": "095500af6fc1dceace4bdf12f2a9087d78254ad56d8ee8263772c59f3ab39bc9",
+        "variantsPath": "docs/scale-intake/materials-three-20261029/cfq7_zh_cn_research/report-variants.json",
+        "variantsFileSHA256": "f47c6464a43e88bc5ff15bf052b93425aa02d9d56978e0fe0332d45a19bfefd0",
+        "measurementHash": "7882f8b3cb47f768e66dc346e017870ec689e30f1a833c50a014113ffde7807c",
+        "C": {
+          "version": "1.0.1:1.0.0",
+          "hash": "7882f8b3cb47f768e66dc346e017870ec689e30f1a833c50a014113ffde7807c"
+        },
+        "P": {
+          "version": "none-v1",
+          "hash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+          "referencePolicy": "none",
+          "references": 0
+        },
+        "basicR": {
+          "version": "1.0.2",
+          "hash": "1cae636bad1bcba70f19063a543f089ba66ecc015d676d78adc277a91023ae99",
+          "status": "EMBEDDED_DRAFT_DEFINITION"
+        },
+        "funR": {
+          "version": "1.1.0",
+          "hash": "3914eefde15920b523f3a23437e899577b564a0391b4d3831fa41588c6cd7e83",
+          "status": "MATERIAL_ONLY_NOT_REGISTERED"
+        },
+        "id": "d0ad3805-dd1f-426c-aa80-492741bb3cd9",
+        "definitionCanonicalHash": "f9d553563819ecb20619582c3b449c864971cdf231688ff956a0cb53ed7c7b95",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "axisHash": "7e119b8ce5cdf9bd221d47887d55683735cceb77724ba80017926a05acf4e287",
+        "sourceSnapshotHash": "a79a18d4065e86752aa6b97804ccb5b0406e0f1eb2f16cd600105fb60032f6d5",
+        "createdAt": "2026-10-29T15:39:59.818Z",
+        "updatedAt": "2026-10-29T15:39:59.818Z",
+        "deploymentActive": false,
+        "standardCombinationRegistered": false,
+        "entryUseGranted": false
+      },
+      {
+        "key": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+        "version": "1.0.0",
+        "title": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+        "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+        "sourceFileSHA256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+        "variantsPath": "docs/scale-intake/materials-three-20261029/ipip_neo_c1_self_efficacy10_zh_cn_research/report-variants.json",
+        "variantsFileSHA256": "170d74225c01d0cac897b5f99e96db46bb768865a86da171fff7e2b161bde288",
+        "measurementHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+        "C": {
+          "version": "1.0.0:1.0.0",
+          "hash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c"
+        },
+        "P": {
+          "version": "none-v1",
+          "hash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+          "referencePolicy": "none",
+          "references": 0
+        },
+        "basicR": {
+          "version": "1.0.1",
+          "hash": "444693a791fa7856aaa20347369472973ee2857ba8c858fb0406a933eb9fbce9",
+          "status": "EMBEDDED_DRAFT_DEFINITION"
+        },
+        "funR": {
+          "version": "1.1.0",
+          "hash": "186cb189fa80992b892ff16b9581baa8062c0f5989ed14acd25245fc8d680f54",
+          "status": "MATERIAL_ONLY_NOT_REGISTERED"
+        },
+        "id": "2657e18e-d23e-4ad2-aab6-4ba2ba9adb12",
+        "definitionCanonicalHash": "af9ca60acb2e393c673f2f683e29581d26a5568d86ec2974033856f40c5142fb",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "axisHash": "5c4b8ccc9ff8d9c5847471de0a4fd35cfd474e7d2141400f3d042180d4ee1590",
+        "sourceSnapshotHash": "b04261c5a8e4ec59b108901e05c55e09ec1ba18ba44c99b829a9df58b97d2c32",
+        "createdAt": "2026-10-29T15:39:59.844Z",
+        "updatedAt": "2026-10-29T15:39:59.844Z",
+        "deploymentActive": false,
+        "standardCombinationRegistered": false,
+        "entryUseGranted": false
+      },
+      {
+        "key": "bps9_zh_cn_research",
+        "version": "1.0.0",
+        "title": "上床拖延问卷（BPS成人9题，中文工作稿）",
+        "sourcePath": "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/source.json",
+        "sourceFileSHA256": "e6306dd5537786e28cd086aea62462ed7634627bc070f7c08d5c48df27c6dcb4",
+        "variantsPath": "docs/scale-intake/materials-three-20261029/bps9_zh_cn_research/report-variants.json",
+        "variantsFileSHA256": "0c4530fb2123663cb58c2685c56d48b39413427a600345223368adc502020f68",
+        "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+        "C": {
+          "version": "1.0.0:1.0.0",
+          "hash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c"
+        },
+        "P": {
+          "version": "none-v1",
+          "hash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+          "referencePolicy": "none",
+          "references": 0
+        },
+        "basicR": {
+          "version": "1.0.0",
+          "hash": "bc979155b76e92348da1a0ed1a0a2ce0a7cbcec408dcbcc01dbef6fe320ab057",
+          "status": "EMBEDDED_DRAFT_DEFINITION"
+        },
+        "funR": {
+          "version": "1.1.0",
+          "hash": "bde2ca82c804a2f8f688947e986fd50170f89f11b79056343d2d7a78195799b7",
+          "status": "MATERIAL_ONLY_NOT_REGISTERED"
+        },
+        "id": "f511609e-43e8-4217-a3ca-ce78eb05c92a",
+        "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "axisHash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+        "sourceSnapshotHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+        "createdAt": "2026-10-29T15:39:59.860Z",
+        "updatedAt": "2026-10-29T15:39:59.860Z",
+        "deploymentActive": false,
+        "standardCombinationRegistered": false,
+        "entryUseGranted": false
+      }
+    ],
+    "counts": {
+      "scales": 3,
+      "configs": 11,
+      "materialGrants": 0,
+      "contentUseGrants": 0,
+      "assignments": 0,
+      "axisSnapshots": 3
+    },
+    "idempotent": true,
+    "repeatCreated": 0,
+    "funRegistered": 0,
+    "sourcePartBindingVerified": true,
+    "normalSourceSeedWouldLoadBasic": true,
+    "fullSetupExecuted": false,
+    "entryUseGranted": false,
+    "evidence": [
+      {
+        "file": "three-basic-preflight.json",
+        "sha256": "6ee59d07085c3a43a820485156d351ad6762154baaf41f9f326c8e1f3372fdd3"
+      },
+      {
+        "file": "three-basic-readback.json",
+        "sha256": "a5e2c084b908b4807984c54319fdeda4ed338310556b2ae0322497fc61536821"
+      },
+      {
+        "file": "three-basic-repeat-readback.json",
+        "sha256": "0b7c216e53dc9a8286651969e62ae8a8ad7b3f9d828dcdc53af603c99a0ccf26"
+      }
+    ],
+    "harnessSHA256": "5adaeb93dd2486efc74509fa3039c009d2fd10b33ea42b041ae757256181ca3b",
+    "reusedEvidence": "DOT reports twenty scoring/report comparisons; not rerun here, not claimed as cloud permission/UI qualification"
+  }
 }

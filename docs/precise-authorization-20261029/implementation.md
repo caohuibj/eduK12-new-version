@@ -3,6 +3,10 @@
 基线：`2de32609e1888cf28b73cb26e2c0cf38b11ff875`。本文件随实现更新；
 [规范](specification.md)及[素材 manifest](source-manifest.json)保留来源和当前缺件。
 
+后续实现与实跑结果分段记录：[Training 管理与匿名全过程](training-progress.md)、
+[教育精确组合批准范围](education-admission-progress.md)、[三份基本素材装载](scale-materials-readback.md)。
+以下共同契约和撤权矩阵是初始基线记录；当前新增源码仍在独立开发分支，未合入 main。
+
 ## 当前共同契约
 
 `modules/assessment-authorization/selected-configuration.ts` 是纯身份合同，
@@ -57,7 +61,7 @@ admission。此初始实现不新增表、迁移、API、Bundle 字段或引擎�
 `educationCompositionExecution.ts`、`library-source.use.ts` 和 `education-use.ts`。
 普通撤权和紧急停止分别测试；不由这张表扩张原有停止/恢复政策。
 
-## 迁移/缺件
+## 初始迁移/缺件记录（后续以 manifest 和上述检查点更新）
 
 当前工程变更没有迁移或历史回填。loaded 数据库只有 11 个候选配置、一个合成
 不可登录安装 actor、11 条安装审计；没有真实用户、任务、material grants。
