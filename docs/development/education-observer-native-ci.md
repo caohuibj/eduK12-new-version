@@ -7,21 +7,22 @@ This batch completes School parent/homeroom-teacher observation, Teacher student
 evaluation/expert observation, and authorized native Cognitive/SJT SELF blocks.
 P6 whole-package references remain on their separate development branch.
 
-The existing six-job `school-teacher` fresh execution path is rebound to the
-complete current raw diff, current component trees and selected assertions.
+The existing six-job `school-teacher` path freezes the complete current raw
+diff, component trees and selected assertions. The first two runs were fresh;
+the stopped-round continuation below verifies their fixed official evidence.
 Its internal `education-self` identifier names that existing executor; it does
 not limit the explicitly frozen backend/frontend selections to SELF. No old
 #382 source marker, green run or historical artifact qualifies this batch.
 
 | Risk to prove | Exact input and existing evidence | Remaining execution / invalidation |
 | --- | --- | --- |
-| Observer identity, consent, receipt privacy and closed history | Actual School parent/teacher PG services, including ADMIN+TEACHER; first/default and explicit-full replay have no assessment/report; current REPORT_READ remains required | Formal PG selection; recheck changes to admission, source policy, history SQL or projection |
-| Student evaluation and source declaration | Actual private and new synthetic STANDARD C/P/R publication, exact U, freeze, ten canonical completions and protected cohort feedback; generic OBSERVER has no reference action and fails sealing | Formal PG selection; source, mapping, SQL seal, role or disclosure changes invalidate |
-| External and non-person experts | Actual invitation/acceptance/revocation, PERSON Scale/Form and TEAM Form FINAL/evidence; missing MFA is 401, stale sensitive proof is 403 | Formal PG selection; invitation, target, native binding or evidence ACL changes invalidate |
-| Native SELF and lifecycle ordering | School experience and Teacher research Scale/Form/Cognitive/SJT FINAL; real NEW_START/NEW_USE versus real retire; original PG deadlock retained and moved checks align config before measurement | Formal PG selection; config/M, U, root binding, runtime or lock order changes invalidate |
-| Shared UI and exact task lifetime | 58 current React cases; 199 backend assertions plus one repaired family-field fixture case passed; raw failures/filtered cases retained | Current types/lint and selected formal assertions; changes to consumed implementation, fixtures or dependencies invalidate |
+| Observer identity, consent, receipt privacy and closed history | Actual School parent/teacher PG services, including ADMIN+TEACHER; first/default and explicit-full replay have no assessment/report; current REPORT_READ remains required | Official run2 PG PASS; recheck changes to admission, source policy, history SQL or projection |
+| Student evaluation and source declaration | Actual private and new synthetic STANDARD C/P/R publication, exact U, freeze, ten canonical completions and protected cohort feedback; generic OBSERVER has no reference action and fails sealing | Official run2 PG PASS; source, mapping, SQL seal, role or disclosure changes invalidate |
+| External and non-person experts | Actual invitation/acceptance/revocation, PERSON Scale/Form and TEAM Form FINAL/evidence; missing MFA is 401, stale sensitive proof is 403 | Official run2 PG PASS; invitation, target, native binding or evidence ACL changes invalidate |
+| Native SELF and lifecycle ordering | School experience and Teacher research Scale/Form/Cognitive/SJT FINAL; real NEW_START/NEW_USE versus real retire; original PG deadlock retained and moved checks align config before measurement | Official run2 PG PASS; config/M, U, root binding, runtime or lock order changes invalidate |
+| Shared UI and exact task lifetime | 58 current React cases; 199 backend assertions plus one repaired family-field fixture case passed; raw failures/filtered cases retained | Official run2 types/lint, UI58 and backend200 PASS; changes to consumed implementation, fixtures or dependencies invalidate |
 | Durable same-page resume | DOT component repair plus current 9-case component evidence; executor contract requires same card/parent/item/answer without reload, preserving Promise.all failure handling | Production-browser Teacher journey; School shared host journey remains the existing integration consumer |
-| Existing migrated state | Fresh ordered integration migrations succeeded, retaining both scientific hash migrations; no applied migration deleted | Formal exact-base nonempty upgrade, actual source/result dump-restore and runtime-role/schema checks |
+| Existing migrated state | Fresh ordered integration migrations succeeded, retaining both scientific hash migrations; no applied migration deleted | Official exact-base nonempty upgrade PASS; missing actual input dump-restore and runtime-role/schema checks |
 
 First run `40846513434` retained successful frontend/backend producers, frontend
 58 assertions and audits. Backend command 0 passed all 200 assertions, but two
@@ -90,3 +91,11 @@ new work is about 3–5 minutes for restore plus 5–10 for browser (25-minute c
 with changed-control CodeQL in parallel. Any first error stops that dependent
 position, retains raw identity/diagnostics and invalidates only changed inputs.
 No deployment or tool activation.
+
+The new/refined control unit contracts have their primary execution locally:
+26 original successes are retained, the missing optional shared-path resolver
+failure is fixed and only that case is rechecked, plus the new PR385 Chrome
+context case. No application assertion or build is reexecuted. Formal admission
+still authenticates the actual full candidate and dependency closures; producers
+verify actual official receipts/output bytes, and changed-control CodeQL runs.
+These local control logs are not relabelled as formal application evidence.

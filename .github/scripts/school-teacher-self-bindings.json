@@ -12,7 +12,7 @@
   "source": {
     "docs/development/education-observer-native-ci.md": {
       "before": "",
-      "after": "5ee6083c534815c60e20512f7f48e4e18253e12f"
+      "after": "85022b0ef6230106640a638606d054a3e51c538c"
     },
     "server-version/backend/prisma/migrations/20261028230000_education_scientific_definition_hash/migration.sql": {
       "before": "",
