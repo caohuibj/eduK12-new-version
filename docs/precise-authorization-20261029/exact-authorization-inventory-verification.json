@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "base": "f4beaea17e2f86563fca56fce4dba44588cb701b",
+  "scope": "Database-enforced read-only exact T1/source evidence inventory; no runtime/route/schema changes or backfill",
+  "at": "2026-10-29T20:09:03.856186+00:00",
+  "databaseBoundary": "Named localhost55439 synthetic fixtures only, owner role. REPEATABLE READ READ ONLY for each inventory. Current permission/eligibility intentionally not evaluated.",
+  "results": [
+    {
+      "database": "precise_training_named_configuration_test_20261029",
+      "counts": {
+        "TRAINING": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 4,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "SURVEY": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "SCHOOL": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "TEACHER": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        }
+      },
+      "inputStateHash": "2c05ea03529f6ca6bf104fb0b269f42e9ba6e14f115c1d239c1c216cf8046264",
+      "outputStateHash": "2c05ea03529f6ca6bf104fb0b269f42e9ba6e14f115c1d239c1c216cf8046264",
+      "sourceIssues": [],
+      "passed": true
+    },
+    {
+      "database": "precise_general_test_20261029",
+      "counts": {
+        "TRAINING": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 1,
+          "LEGACY_NO_PRECISE_EVIDENCE": 1,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "SURVEY": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "SCHOOL": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "TEACHER": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        }
+      },
+      "inputStateHash": "ce48f0510eb5e3fcfdeb44be9b1306cdba570430e85b96a9f5f419fed7b25db7",
+      "outputStateHash": "ce48f0510eb5e3fcfdeb44be9b1306cdba570430e85b96a9f5f419fed7b25db7",
+      "sourceIssues": [],
+      "passed": true
+    },
+    {
+      "database": "precise_survey_standard_use_test_20261029",
+      "counts": {
+        "TRAINING": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "SURVEY": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 4,
+          "LEGACY_NO_PRECISE_EVIDENCE": 1,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "SCHOOL": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 2,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "TEACHER": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 1,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        }
+      },
+      "inputStateHash": "751bdfa235595637c1d9aeaa1dc3afd247a340fa73c328c36d27f679d8e214d7",
+      "outputStateHash": "751bdfa235595637c1d9aeaa1dc3afd247a340fa73c328c36d27f679d8e214d7",
+      "sourceIssues": [],
+      "passed": true
+    },
+    {
+      "database": "precise_education_lifecycle_test_20261029",
+      "counts": {
+        "TRAINING": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "SURVEY": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "SCHOOL": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 3,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        },
+        "TEACHER": {
+          "EXISTING_PRECISE_SOURCE_VERIFIED": 2,
+          "LEGACY_NO_PRECISE_EVIDENCE": 0,
+          "EVIDENCE_REQUIRES_REVIEW": 0
+        }
+      },
+      "inputStateHash": "7f3871d811ee853bee197fcb01caafe491e354fc0dc305f2ac29c36dec99cb5e",
+      "outputStateHash": "7f3871d811ee853bee197fcb01caafe491e354fc0dc305f2ac29c36dec99cb5e",
+      "sourceIssues": [],
+      "passed": true
+    }
+  ],
+  "raw": {
+    "file": "exact-authorization-inventory-raw.json",
+    "sha256": "ca3cd986df05aedd32a95dc3a71258ea511e7d61a0bef62b263d6da61216cf7a"
+  },
+  "directInput": {
+    "path": "server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+    "sha256": "c7b5512c02547842cb70539f2d9420a822b54120bf2a1975986e7a4f0a60238e"
+  },
+  "inputCapture": "Post-execution source inventory, not full dependency signature/CI evidence",
+  "originalFailures": [
+    "First Training/Survey/Education inventory failed on nonexistent Prisma Survey delegate; original general beforeAll failed on the wrapper-specific explicit URL name. No business write; production canonical hash unchanged.",
+    "Second inventory reached snapshot fingerprint and rejected Prisma Date objects as non-plain canonical JSON. Only DB before/after digest now explicitly serializes timestamps; original configuration hashes still use original strict canonical function. All four retained DB attempts were read-only.",
+    "Initial types exposed the same guessed model/fields and absent Express Request.user augmentation in the isolated closure. Corrected actual raw Survey SQL, actual education columns and included existing middleware type augmentation. v2 types0; final post-date-digest types0."
+  ],
+  "limits": [
+    "Not production counts, no aggregate unique platform count across clones",
+    "Existing historical source proof does not establish current permission or full independent cryptographic provenance",
+    "No migration execution, exact legacy conversion or latest/default backfill",
+    "No task/frozen snapshot/report migration or runtime-role qualification",
+    "No new malformed-row fixture inserted: original typed parser negative evidence reused, report keeps EVIDENCE_REQUIRES_REVIEW as explicit failure status"
+  ],
+  "finalBackendClosureTypesExit": 0
+}
