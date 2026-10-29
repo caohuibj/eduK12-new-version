@@ -93,6 +93,26 @@ const packageScopeFixture = () => {
   f.items.get(ROOT + '/chrome-sandbox').mode &= ~0o4000
   return f
 }
+test('PR385 exact continuation retains the verified package-only tightening and rejects mixed PR branch or approval', () => {
+  const make = () => {
+    const f = packageScopeFixture(); f.env.GITHUB_REF = 'refs/pull/385/merge'
+    f.env.GITHUB_HEAD_REF = 'release/education-observer-native-20261029'
+    f.env.SCHOOL_TEACHER_CHROME_TIGHTEN = 'confirmed-observer-package-scope'; return f
+  }
+  const f = make(), result = f.run(); assert.equal(result.status, 'PERMISSIONS_TIGHTENED')
+  assert.equal(result.authorizationScope, 'PR385_VERIFIED_CHROME_PACKAGE_GO_WRITE')
+  assert.equal(result.browserLaunched, false); assert.equal(result.acceptance, false)
+  for (const call of mutations(f)) {
+    assert.equal(call.args[2], 'go-w'); const p = call.args[4]
+    assert(p === '/opt' || p === '/opt/google' || p === ROOT || p.startsWith(ROOT + '/'))
+  }
+  for (const alter of [x => { x.env.GITHUB_REF = 'refs/pull/382/merge' },
+    x => { x.env.GITHUB_HEAD_REF = 'release/education-self-scale-form-20261028' },
+    x => { x.env.SCHOOL_TEACHER_CHROME_TIGHTEN = 'confirmed-self-package-scope' },
+    x => { x.items.get(ROOT + '/chrome').contents[0] ^= 1 }]) {
+    const bad = make(); alter(bad); assert.equal(bad.run().status, 'FAILED'); assert.equal(mutations(bad).length, 0)
+  }
+})
 test('PR382 current package approval removes only go write on verified entries and never adds sandbox privilege', () => {
   const f = packageScopeFixture(), before = new Map([...f.items].map(([p, row]) => [p, { ...row }]))
   const result = f.run(); assert.equal(result.status, 'PERMISSIONS_TIGHTENED')

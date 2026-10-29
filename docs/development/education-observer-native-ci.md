@@ -23,13 +23,6 @@ not limit the explicitly frozen backend/frontend selections to SELF. No old
 | Durable same-page resume | DOT component repair plus current 9-case component evidence; executor contract requires same card/parent/item/answer without reload, preserving Promise.all failure handling | Production-browser Teacher journey; School shared host journey remains the existing integration consumer |
 | Existing migrated state | Fresh ordered integration migrations succeeded, retaining both scientific hash migrations; no applied migration deleted | Formal exact-base nonempty upgrade, actual source/result dump-restore and runtime-role/schema checks |
 
-Formal positions: frontend types/lint/selected tests and one build; one backend
-build; selected PG assertions/upgrade/restore; production browser with the same
-run's verified dist; unchanged HIGH/CRITICAL audits and real CodeQL; stable
-qualified/merge gates. Existing executor does not accept these local application
-reports as formal evidence, so formal selected checks still execute. This is not
-permission to run unrelated platform, media, load, or visual matrices.
-
 First run `40846513434` retained successful frontend/backend producers, frontend
 58 assertions and audits. Backend command 0 passed all 200 assertions, but two
 native Cognitive parameter cases had the same name; the strict report verifier
@@ -46,3 +39,54 @@ Budgets follow the existing jobs: admission 5 minutes, builds 12, PG and browser
 25 each, audit 8, with CodeQL in parallel. At five minutes report the actual
 waiting stage. Preserve run/job/attempt/SHA and first error; repair only affected
 inputs, and pause after two nonconverging rounds. No deployment or activation.
+
+
+Second run `40849532868`, source `fe17d12aae66965b59b3bc3ed93d17dd9455cfdb`,
+checkout `772a8ed525fd769ebd9e11a432b8f80ffa155612`, completed all 58 UI,
+200 backend and 14 real PG assertions, nonempty exact-base migration, both
+production builds, HIGH/CRITICAL audits and full application CodeQL. Its PG job
+failed before dumping because the restore list incorrectly required the legacy
+`cognitive_trials` table to be nonempty. Unified FINAL actually writes
+`cognitive_raw_submissions` (unified-final-submit.service.ts:496); an empty legacy
+table is valid. No assertion, teardown or application build failed. Restore and
+browser remain NOTRUN; two failed rounds are retained, not reset by a new SHA.
+
+The bounded continuation extends the existing fixed-official reuse helpers only
+for this exact PR385 run/source/checkout/job/artifact/digest. Whole application,
+fixtures, schema, dependency and shared input trees stay identical. Official
+metadata, original manifests, output hashes, successful commands, exact unique
+case sets and 24-hour validity are verified. The failed parent/PG job keeps its
+failure identity. No local PASS attestation, old PR382 green, fresh manifest
+relabelling, signer, arbitrary producer selection or fallback is accepted.
+
+| Position | Unique evidence / next execution |
+| --- | --- |
+| UI 58, backend 200, PG 14, migration, compile/build, audit | Verify immutable official run2 receipts/artifact bytes; do not rerun or rebuild |
+| Application SAST | Verify actual successful run2 job/log and identical complete app trees; scan only changed CI/browser-control files |
+| Missing restore | Run once formally using the fixed 148-row/45-table synthetic restore input, compare all required full-row hashes and actual education DDL, then verify restricted runtime role and release schema |
+| Missing production browser | Use the exact unchanged official backend/frontend dist and original manifests; real APIs, School journey and Teacher same-page durable resume, same parent/item/answers, canonical FINAL and authorized feedback |
+| Changed controls | Minimal scope, evidence refusal, producer/consumer identity, restore-input and exact PR385 Chrome-context checks |
+
+The original failed Actions database was destroyed before a dump existed. The
+193,446-byte compressed restore INPUT is a minimized SQL FK closure from this
+cloud node's existing disposable real-service fixture data, with all users from
+synthetic test namespaces. It is not that lost CI database and is not evidence of
+local test success. Loading it exercises no START/FINAL. A new official restore
+checks preservation; the 14 business assertions remain qualified only by run2.
+The source SQL, gzip hashes and row/table counts are fixed in the helper. Empty
+`cognitive_trials` still exists in the full database dump; only the false nonempty
+expectation is removed. Disabled compact facts must still be exactly empty; all
+other required native/canonical storage tables remain nonempty and hash-checked.
+
+Before activation, read R's persisted PR382 fixes: the existing package inventory
+and root/package MD5 consistency are retained. PR385 receives its own exact
+branch/ref/approval binding for the same temporary `go-w` tightening; other refs,
+branches, byte drift, untracked files and wider permission changes remain denied.
+The strict sandbox and original CodeQL queries/actions/thresholds stay intact.
+
+No further full route replay: producer jobs verify prior official successes;
+only missing restore, browser and changed-control SAST execute. Expected unique
+new work is about 3–5 minutes for restore plus 5–10 for browser (25-minute cap),
+with changed-control CodeQL in parallel. Any first error stops that dependent
+position, retains raw identity/diagnostics and invalidates only changed inputs.
+No deployment or tool activation.

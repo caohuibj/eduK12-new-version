@@ -13,6 +13,7 @@ env:
   PLAN: ${{ inputs.plan }}
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  GH_TOKEN: ${{ github.token }}
 jobs:
   admission:
     if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
@@ -23,6 +24,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
@@ -34,7 +38,7 @@ jobs:
           node --test .github/scripts/school-teacher-fresh.test.mjs .github/scripts/school-teacher-restore.test.mjs server-version/e2e/school-teacher-theme-settle.test.cjs
           node --test --test-name-pattern='complete exact-source report' server-version/e2e/school-teacher-ui.test.cjs
       - name: verify current SELF scope job artifact and browser-report contracts
-        if: fromJSON(inputs.plan).candidate == 'education-self'
+        if: fromJSON(inputs.plan).candidate == 'education-self' && fromJSON(inputs.plan).continuation != 'observer-run2'
         run: node --test .github/scripts/school-teacher-self.test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
@@ -56,17 +60,21 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
       - name: prepare exact frontend type dependencies without compiling backend
+        if: fromJSON(inputs.plan).continuation != 'observer-run2'
         env:
           PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
         run: |
           npm ci --ignore-scripts --prefix server-version/backend
           node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
           npm ci --prefix server-version/frontend
-      - name: execute current frontend types lint affected tests and one production build
+      - name: verify the fixed official frontend checks and immutable build or execute fresh inputs
         run: node .github/scripts/school-teacher-checks.mjs frontend
       - uses: actions/upload-artifact@v4
         with:
@@ -115,6 +123,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
@@ -143,7 +154,7 @@ jobs:
         run: |
           node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
           node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
-      - name: compile current backend once and bind the immutable output to this run
+      - name: verify the fixed official backend build or compile fresh inputs once
         run: node .github/scripts/school-teacher-checks.mjs backend
       - uses: actions/upload-artifact@v4
         with:
@@ -153,7 +164,7 @@ jobs:
           retention-days: 3
       - name: prove nonempty upgrade from the frozen main339 baseline
         run: node .github/scripts/school-teacher-checks.mjs migrate
-      - name: execute current affected backend and PostgreSQL assertions with real capacity guard
+      - name: verify fixed official backend and PostgreSQL assertions or execute fresh inputs
         run: node .github/scripts/school-teacher-checks.mjs postgres
       - uses: actions/download-artifact@v4
         with:
@@ -208,18 +219,25 @@ jobs:
       with:
         fetch-depth: 0
         persist-credentials: false
+    - name: fetch only the fixed original observer merge checkout
+      if: fromJSON(inputs.plan).continuation == 'observer-run2'
+      run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
     - uses: actions/setup-node@v4
       with:
         node-version: 24.21.0
-    - run: npm ci --ignore-scripts --prefix .github/release-tools
-    - run: bash server-version/scripts/ci-install-canvas-deps.sh
-    - working-directory: server-version/backend
+    - if: fromJSON(inputs.plan).continuation != 'observer-run2'
+      run: npm ci --ignore-scripts --prefix .github/release-tools
+    - if: fromJSON(inputs.plan).continuation != 'observer-run2'
+      run: bash server-version/scripts/ci-install-canvas-deps.sh
+    - if: fromJSON(inputs.plan).continuation != 'observer-run2'
+      working-directory: server-version/backend
       run: npm ci
-    - working-directory: server-version/backend
+    - if: fromJSON(inputs.plan).continuation != 'observer-run2'
+      working-directory: server-version/backend
       run: |
         node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
         node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
-    - name: compile current backend once and bind the immutable output to this run
+    - name: verify the fixed official backend build or compile fresh inputs once
       run: node .github/scripts/school-teacher-checks.mjs backend
     - uses: actions/upload-artifact@v4
       with:
@@ -270,6 +288,9 @@ jobs:
       with:
         fetch-depth: 0
         persist-credentials: false
+    - name: fetch only the fixed original observer merge checkout
+      if: fromJSON(inputs.plan).continuation == 'observer-run2'
+      run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
     - uses: actions/setup-node@v4
       with:
         node-version: 24.21.0
@@ -310,10 +331,11 @@ jobs:
         path: server-version/backend/dist
     - run: node .github/scripts/school-teacher-checks.mjs verify-backend-artifact
     - name: prove nonempty upgrade from this candidate exact main baseline
+      if: fromJSON(inputs.plan).continuation != 'observer-run2'
       run: node .github/scripts/school-teacher-checks.mjs migrate
-    - name: execute current affected backend and PostgreSQL assertions with real capacity guard
+    - name: verify fixed official backend and PostgreSQL assertions or execute fresh inputs
       run: node .github/scripts/school-teacher-checks.mjs postgres
-    - name: restore once from the current qualified native and declared PostgreSQL facts
+    - name: execute only missing restore from the frozen synthetic real-service input
       run: node .github/scripts/school-teacher-checks.mjs postgres-restore
     - uses: actions/upload-artifact@v4
       if: always()
@@ -360,6 +382,9 @@ jobs:
       with:
         fetch-depth: 0
         persist-credentials: false
+    - name: fetch only the fixed original observer merge checkout
+      if: fromJSON(inputs.plan).continuation == 'observer-run2'
+      run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
     - uses: actions/setup-node@v4
       with:
         node-version: 24.21.0
@@ -414,6 +439,11 @@ jobs:
       env:
         SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-package-scope
       run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
+    - name: tighten only the confirmed PR385 verified Chrome package write bits
+      if: github.repository == 'caohuibj/eduK12-new-version' && github.event_name == 'pull_request' && github.event.pull_request.number == 385 && github.event.pull_request.head.ref == 'release/education-observer-native-20261029' && github.event.pull_request.head.repo.full_name == github.repository && fromJSON(inputs.plan).continuation == 'observer-run2'
+      env:
+        SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-observer-package-scope
+      run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
     - name: inspect this runner Chrome, no automatic install or fallback
       run: node server-version/e2e/school-teacher-chrome.cjs preflight
     - name: seed restricted synthetic browser identities without exposing private output
@@ -446,10 +476,13 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: run current frontend and backend HIGH CRITICAL dependency audits
+      - name: verify the fixed official HIGH CRITICAL audits or execute fresh inputs
         run: node .github/scripts/school-teacher-checks.mjs audit
       - uses: actions/upload-artifact@v4
         if: always()
@@ -470,6 +503,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'

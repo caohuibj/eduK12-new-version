@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
+import observerReuse from './school-teacher-observer-reuse.cjs';
 export const BRANCH='work/school-teacher-review-20261022', REPOSITORY='caohuibj/eduK12-new-version';
 export const SELF_BRANCH='release/education-observer-native-20261029';
 export const SELF_BASE='908af20ecfbd3ede55685d2052bf01b52266661c';
@@ -40,6 +41,14 @@ export function requireFreshQualification(b){
  assert.deepEqual(b.execution.auditComponents,['frontend','backend']);
  return true;
 }
+export function requireSchoolQualification(b){
+ if(b.qualification!==observerReuse.mode)return requireFreshQualification(b);
+ assert.equal(b.branch,SELF_BRANCH);assert.equal(b.base,SELF_BASE);
+ assert.equal(b.frontendTree,observerReuse.fixed.frontendTree);assert.equal(b.backendTree,observerReuse.fixed.backendTree);
+ assert.equal(b.frontendBuildDecision,'fixed-official-observer-build');assert.equal(b.backendBuildDecision,'fixed-official-observer-build');
+ assert.deepEqual(b.execution.officialContinuation,{run:observerReuse.fixed.run,head:observerReuse.fixed.head,checkout:observerReuse.fixed.checkout});
+ assert.equal(b.execution.finalized,true);return true;
+}
 export function validateCandidate(b,o,evidenceBytes){
  assert.equal(b.enabled,true,'Candidate not independently frozen');assert.deepEqual(b.blockers,[]);
  const branch=candidateBranch(b);assert(['pull_request','push'].includes(o.event));assert.equal(o.branch,o.event==='push'?'main':branch);assert.equal(o.repository,REPOSITORY);
@@ -66,7 +75,7 @@ export function validateCandidate(b,o,evidenceBytes){
  assert.match(b.evidenceSha256||'',/^[a-f0-9]{64}$/);assert.equal(sha256(evidenceBytes),b.evidenceSha256);
  assert.equal(b.review.completed,true,'Final control review required');assert.equal(b.review.originalExecutionSigned,false);
  const requiredJobs=branch===SELF_BRANCH?SELF_JOBS:JOBS;
- assert.deepEqual(b.requiredJobs,requiredJobs);if(b.qualification==='fresh-integrated-authoring'){requireFreshQualification(b)}else{
+ assert.deepEqual(b.requiredJobs,requiredJobs);if([observerReuse.mode,'fresh-integrated-authoring'].includes(b.qualification)){requireSchoolQualification(b)}else{
  assert.equal(b.qualification,undefined,'Unknown qualification mode');
  assert.equal(b.frontendBuildDecision,'fixed-run15-frontend-build');
  // Frontend reuses the exact verified run15 build; backend retains its fixed producer identity.
@@ -74,7 +83,7 @@ export function validateCandidate(b,o,evidenceBytes){
  assert(b.backendBuildReason&&b.backendBuildInputsChanged.length>0);
  }
  assert.equal(b.execution.finalized,true,'Final per-check selections required');
- return {schema:1,route:'school-teacher',...(branch===SELF_BRANCH?{candidate:'education-self',browserMode:'SELF_COMPOSITION'}:{}),base:b.base,head:o.checkoutHead,sourceHead:o.sourceHead,sourceTree:o.sourceTree,
+ return {schema:1,route:'school-teacher',...(branch===SELF_BRANCH?{candidate:'education-self',browserMode:'SELF_COMPOSITION'}:{}),...(b.qualification===observerReuse.mode?{continuation:'observer-run2'}:{}),base:b.base,head:o.checkoutHead,sourceHead:o.sourceHead,sourceTree:o.sourceTree,
   product:b.productHead,components:{frontend:b.frontendTree,backend:b.backendTree},requiredJobs,changes:o.entries};
 }
 export function observedCandidate(b,env=process.env){
