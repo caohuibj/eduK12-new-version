@@ -128,6 +128,7 @@ export type CompositeScaleAdmissionParent = {
   frozenActiveSlotSetEncrypted: string | null
   frozenActiveSlotSetHash: string | null
   compositeAssessment: {
+    creationKey?: string | null
     formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
   }
 }
@@ -724,6 +725,12 @@ export const activateScaleAdmission = async (
   referenceTimeMs = Date.now(),
 ): Promise<VersionedFrozenUnitAdmission> => {
   parent = await assertTrainingChildSelected(row, { parent }) ?? parent
+  if((parent?.compositeAssessment as {creationKey?:string}|undefined)?.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')
+    ||row.compositeAttempt?.compositeAssessment?.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
+    const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
+    if(!row.compositeAttemptId||!row.userId)throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE','现场观察需要本人教育账号',403)
+    await currentFieldComposition(prisma,{attemptId:row.compositeAttemptId,actorUserId:row.userId})
+  }
   const stored = await loadStoredScaleAdmission(row)
   if (stored) return (await validateStoredAgainstRuntime(row, stored, referenceTimeMs))
   assertFinalOnly(row.deliveryMode)

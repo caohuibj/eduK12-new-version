@@ -79,12 +79,13 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  const change=(patch:Partial<CompositionTool>)=>{if(tool&&!locked.current){setTool({...tool,...patch});setPreview(false);setPreviewTool(null)}}
  const changeResponseMode=(responseMode:CompositionResponseMode)=>{
   if(!tool||locked.current||tool.definition.administration.responseMode===responseMode)return
-  const administration=compositionAdministrationForEntry({population:tool.definition.administration.population,responseMode},entry)
+  const administration=compositionAdministrationForEntry({population:tool.definition.administration.population,responseMode,...(responseMode==='EXPERT_REPORT'?{targetKind:'PERSON'}:{})},entry)
   if(!administration)return
-  if((tool.definition.blocks.length||responseMode==='STUDENT_REPORT'&&tool.definition.contextFields?.length)
+  if((tool.definition.blocks.length||['STUDENT_REPORT','EXPERT_REPORT'].includes(responseMode)&&tool.definition.contextFields?.length)
    &&!window.confirm('更改作答方式需要重新选择适用的固定工具。确定清空当前工具列表及不适用的个人背景字段吗？'))return
   const {contextFields,...definition}=tool.definition
-  setReferences([]);setAnswers({});change({definition:{...definition,...(responseMode!=='STUDENT_REPORT'&&contextFields?{contextFields}:{}),administration,blocks:[]}})
+  setReferences([]);setAnswers({});change({definition:{...definition,schemaVersion:responseMode==='EXPERT_REPORT'?2:1,adapterVersion:responseMode==='EXPERT_REPORT'?'2.0.0':'1.0.0',
+   ...(!['STUDENT_REPORT','EXPERT_REPORT'].includes(responseMode)&&contextFields?{contextFields}:{}),administration,blocks:[]}})
  }
  const save=()=>{if(!tool||!tool.title.trim())return;void operate(async current=>{
   const submitted={...tool,title:tool.title.trim()}
@@ -104,6 +105,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  }
  const block=preview?tool?.definition.blocks[previewIndex]:undefined
  const responseMode=tool?.definition.administration.responseMode??'SELF'
+ const sourceViewActual=responseMode==='EXPERT_REPORT'?'PRIVATE':sourceView
  const reference=block?references.find(row=>row.sourceProvider===block.source.provider&&row.id===block.source.versionId&&row.contentHash===block.source.contentHash):undefined
  useEffect(()=>{
   let current=true;setPreviewTool(null);setPreviewError('');setPreviewInstruction('');setAnswers({})
@@ -141,12 +143,19 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
    <label>问卷名称<input value={tool.title} maxLength={200} disabled={busy} onChange={event=>change({title:event.target.value})}/></label>
    <label>问卷作答方式<select value={responseMode} disabled={busy} onChange={event=>changeResponseMode(event.target.value as CompositionResponseMode)}>
     {entry==='SCHOOL'?<><option value="SELF">学生自评</option><option value="PARENT_REPORT">家长观察学生</option><option value="TEACHER_REPORT">教师观察学生</option></>:
-     <><option value="SELF">教师自评</option><option value="STUDENT_REPORT">学生评价教师</option></>}
+     <><option value="SELF">教师自评</option><option value="STUDENT_REPORT">学生评价教师</option><option value="EXPERT_REPORT">受邀专家观察</option></>}
    </select></label>
-   {responseMode!=='SELF'&&responseMode!=='STUDENT_REPORT'&&<p>观察任务按当前有效关系分配给家长或教师。参与作答不自动获得学生个人报告，各项反馈仍独立核准。</p>}
+   {['PARENT_REPORT','TEACHER_REPORT'].includes(responseMode)&&<p>观察任务按当前有效关系分配给家长或教师。参与作答不自动获得学生个人报告，各项反馈仍独立核准。</p>}
    <label>问卷说明<textarea value={tool.definition.instruction} maxLength={16000} disabled={busy} onChange={event=>change({definition:{...tool.definition,instruction:event.target.value}})}/></label>
    {responseMode==='STUDENT_REPORT'&&<p>学生评教仅开放符合人数与隐私规则的群体反馈，不显示学生个人答案。本模式不采集个人背景页；需要受评教师个人背景才能计分的工具暂不能加入。</p>}
-   <fieldset disabled={busy||responseMode==='STUDENT_REPORT'}><legend>背景信息区段</legend><p>按所选工具的原版适用范围配置；勾选后会作为问卷第一屏展示并固定。未勾选时不会增加背景页。</p>
+   {tool.definition.administration.responseMode==='EXPERT_REPORT'&&<div><label>专家观察目标类型<select disabled={busy} value={tool.definition.administration.targetKind} onChange={event=>{
+    const administration=compositionAdministrationForEntry({population:'TEACHER',responseMode:'EXPERT_REPORT',targetKind:event.target.value},entry)
+    if(!administration||tool.definition.blocks.length&&!window.confirm('改变观察目标需要重新选择适用工具，确认清空当前工具列表？'))return
+    setReferences([]);setAnswers({});change({definition:{...tool.definition,administration,blocks:[]}})
+   }}>{[['PERSON','教师个人'],['TEAM','团队'],['ORGANIZATION','组织'],['ACTIVITY','活动'],['ARTIFACT','作品'],['PROJECT','项目']].map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
+    <p>专家按接受的活动邀请观察真实目标。量表须在原固定版本中明确声明专家观察，且只用于教师个人；其他目标只用表单。正式证据与被评教师可见反馈分别授权。</p>
+    <p>当前专家合同仅接入本人固定来源；已有公共来源的自评或其他他评声明不能直接替代专家声明。</p></div>}
+   <fieldset disabled={busy||responseMode==='STUDENT_REPORT'||responseMode==='EXPERT_REPORT'}><legend>背景信息区段</legend><p>按所选工具的原版适用范围配置；勾选后会作为问卷第一屏展示并固定。未勾选时不会增加背景页。</p>
     {(['gradeLevel','birthYearMonth','sexAtBirth','primaryLanguage','countryOrRegion'] as AssessmentContextKey[]).map(key=>{
      const labels=assessmentContextLabels
      return <label key={key}><input type="checkbox" checked={tool.definition.contextFields?.some(field=>field.contextKey===key)??false} onChange={event=>{
@@ -156,11 +165,11 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
      }}/>{labels[key]}</label>
     })}
    </fieldset>
-   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceView==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" aria-pressed={sourceView==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button><button type="button" aria-pressed={sourceView==='STANDARD_SCALE'} onClick={()=>setSourceView('STANDARD_SCALE')}>获授权公共量表</button><button type="button" aria-pressed={sourceView==='LIBRARY_SCALE'} onClick={()=>setSourceView('LIBRARY_SCALE')}>获授权共用量表</button></nav>
-    {sourceView==='PRIVATE'?<EducationPrivateVersionChooser key={tool.id+':'+responseMode} api={api} organizationId={organizationId} disabled={busy||tool.definition.blocks.length>=50}
-     onSelect={value=>{if(value.kind==='COMPOSITION')return;const leaf={...value,kind:value.kind,sourceProvider:'PRIVATE_VERSION' as const};setReferences(old=>mergeReferences(old,[leaf]));change({definition:{...tool.definition,blocks:[...tool.definition.blocks,
+   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceViewActual==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" disabled={responseMode==='EXPERT_REPORT'} aria-pressed={sourceViewActual==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button><button type="button" disabled={responseMode==='EXPERT_REPORT'} aria-pressed={sourceViewActual==='STANDARD_SCALE'} onClick={()=>setSourceView('STANDARD_SCALE')}>获授权公共量表</button><button type="button" disabled={responseMode==='EXPERT_REPORT'} aria-pressed={sourceViewActual==='LIBRARY_SCALE'} onClick={()=>setSourceView('LIBRARY_SCALE')}>获授权共用量表</button></nav>
+    {sourceViewActual==='PRIVATE'?<EducationPrivateVersionChooser key={tool.id+':'+responseMode+':'+(tool.definition.administration.responseMode==='EXPERT_REPORT'?tool.definition.administration.targetKind:'')} api={api} organizationId={organizationId} disabled={busy||tool.definition.blocks.length>=50}
+     onSelect={value=>{if(value.kind==='COMPOSITION')return;if(value.kind==='SCALE'&&tool.definition.administration.responseMode==='EXPERT_REPORT'&&tool.definition.administration.targetKind!=='PERSON'){setError('非人员观察目标只支持表单');return}const leaf={...value,kind:value.kind,sourceProvider:'PRIVATE_VERSION' as const};setReferences(old=>mergeReferences(old,[leaf]));change({definition:{...tool.definition,blocks:[...tool.definition.blocks,
       {blockId:crypto.randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:value.kind,versionId:value.id,contentHash:value.contentHash}}]}})}}/>:
-     <EducationPublicFormChooser key={sourceView+':'+responseMode} kind={sourceView==='PUBLIC_FORM'?'FORM':'SCALE'} catalog={sourceView==='LIBRARY_SCALE'?'LIBRARY':'PUBLIC'} responseMode={responseMode} api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
+     <EducationPublicFormChooser key={sourceViewActual+':'+responseMode} kind={sourceViewActual==='PUBLIC_FORM'?'FORM':'SCALE'} catalog={sourceViewActual==='LIBRARY_SCALE'?'LIBRARY':'PUBLIC'} responseMode={responseMode} api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
       const provider=value.sourceProvider==='LIBRARY_SCALE'?'LIBRARY_SCALE' as const:value.kind==='SCALE'?'STANDARD_SCALE' as const:'PUBLIC_FORM' as const
       setReferences(old=>mergeReferences(old,[{id:value.sourceId,sourceProvider:provider,kind:value.kind,title:value.title,contentHash:value.contentHash,version:value.versions.content,versions:value.versions,requiredContextKeys:value.requiredContextKeys}]))
       change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source:value.sourceProvider==='LIBRARY_SCALE'?{provider:'LIBRARY_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:value.kind==='SCALE'?{provider:'STANDARD_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:{provider:'PUBLIC_FORM',kind:'FORM',versionId:value.sourceId,contentHash:value.contentHash}}]}})

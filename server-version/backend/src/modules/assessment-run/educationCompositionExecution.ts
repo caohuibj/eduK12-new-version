@@ -29,8 +29,9 @@ const unitsSchema=z.array(z.object({itemId:z.string(),scaleId:z.string(),version
  * only the independent header anchors and bounded references, never full source
  * definitions, stimuli, report bodies or full snapshot hashes. No author rights. */
 export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResourcePolicy;policyHash:string;organizationId:string;key:string;version:string}){
- const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin,
-  variant=educationCompositionVariant(origin)
+ const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin
+ if(origin.variantKey==='TEACHER:EXPERT_REPORT')privateToolFail('PRIVATE_COMPOSITION_FIELD_INVITATION_REQUIRED',400)
+ const variant=educationCompositionVariant(origin)
  if(input.version!=='1.0.0'||policy.version!==input.version||policy.family!=='BUNDLE'||policy.key!==input.key
   ||educationCompositionKey(origin)!==input.key||origin.organizationId!==input.organizationId||canonicalHash(policy)!==input.policyHash
   ||policy.runtimeLaunchTarget?.kind!=='COMPOSITE'||policy.scientificMaturity!=='PILOT'
@@ -65,7 +66,9 @@ export type FrozenCompositionIdentity=Awaited<ReturnType<typeof readFrozenCompos
  * a participant never needs that role. Continuation uses its frozen admission,
  * while emergency stops still fence collection. Ordinary role withdrawal does
  * not destroy an entered attempt or historical report. */
-export async function assertCompositionCollection(tx:Tx,identity:FrozenCompositionIdentity,purpose:'NEW_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
+export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenCompositionIdentity,'origin'>&{
+ units:ReadonlyArray<{releaseId:string;scaleId:string}>;manifest:ReadonlyArray<{sourceProvider:string;versionId:string;contentHash:string}>
+},purpose:'NEW_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
  if(isStudentComposition(identity.origin)&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)
  const c={entry:identity.origin.entry,organizationId:identity.origin.organizationId,principal:{userId:identity.origin.ownerUserId,accountDomain:'SCHOOL' as const}}
  if(purpose==='NEW_START')await authorizePrivateTool(tx,c)

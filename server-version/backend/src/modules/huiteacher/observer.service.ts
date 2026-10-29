@@ -4,9 +4,8 @@ import { prisma } from '../../config/database'
 import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { appendAudit } from '../organization/service'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
-import { canonicalHash } from '../assessment-runtime/canonical'
-import { dryRunSurveyForm,SurveyFinalValidationError } from '../survey/final.compute'
 import { readBoundHuiteacherFieldForm } from './fieldForm.service'
+import {createCanonicalFieldEvidence} from './fieldComposition.evidence'
 
 type Tx=Prisma.TransactionClient
 export type TeacherObserverRole='EXPERT'|'PEER'
@@ -309,12 +308,19 @@ export async function updateHuiteacherObservation(input:{
 }
 export async function submitHuiteacherObservation(input:{
   id:string;actorUserId:string;expectedRevision:number;
-  fieldFormId?:string;answers?:Record<string,unknown>
+  fieldFormId?:string;answers?:Record<string,unknown>;assessmentAttemptId?:string
 }){
   return prisma.$transaction(async tx=>{
     const item=await tx.huiteacherObservationRecord.findUnique({where:{id:input.id}})
     if(!item||item.observerUserId!==input.actorUserId)
       denied('HUITEACHER_OBSERVATION_NOT_FOUND',404)
+    if(item.kind==='FORMAL_FEEDBACK'&&item.status==='SUBMITTED'){
+      await validEducationActor(tx,input.actorUserId)
+      const evidence=await tx.huiteacherFieldFormEvidence.findUnique({where:{recordId:item.id},select:{attemptId:true}})
+      if(evidence?.attemptId&&evidence.attemptId===input.assessmentAttemptId&&item.revision===input.expectedRevision+1&&!input.answers&&!input.fieldFormId)
+        return {id:item.id,status:'SUBMITTED' as const,revision:item.revision,replayed:true}
+      denied('HUITEACHER_OBSERVATION_REVISION_CHANGED')
+    }
     await schoolEvent(tx,{organizationId:item.organizationId,eventId:item.eventId})
     await activeObserver(tx,{organizationId:item.organizationId,
       eventId:item.eventId,userId:input.actorUserId})
@@ -326,34 +332,12 @@ export async function submitHuiteacherObservation(input:{
     const bound=await readBoundHuiteacherFieldForm(tx,{
       organizationId:item.organizationId,eventId:item.eventId,
     })
+    let canonicalEvidence:{attemptId:string;attemptEpoch:number;finalHash:string}|null=null
     if(bound&&item.kind==='FORMAL_FEEDBACK'){
-      if(input.fieldFormId!==bound.formId||!input.answers
-        ||typeof input.answers!=='object'||Array.isArray(input.answers))
-        denied('HUITEACHER_FIELD_FORM_REQUIRED',400)
-      if(JSON.stringify(input.answers).length>262144)
-        denied('HUITEACHER_FIELD_FORM_TOO_LARGE',413)
-      let output:ReturnType<typeof dryRunSurveyForm>
-      try{output=dryRunSurveyForm(bound.definition,input.answers)}
-      catch(e){
-        if(e instanceof SurveyFinalValidationError)
-          denied('HUITEACHER_FIELD_FORM_ANSWERS_INVALID',400)
-        throw e
-      }
-      const payload={
-        schemaVersion:1 as const,kind:'FIELD_FORM_OBSERVATION' as const,
-        product:'HUITEACHER' as const,recordId:item.id,eventId:item.eventId,
-        formId:bound.formId,definitionDigest:bound.definitionDigest,
-        rawAnswers:output.rawAnswers,missing:output.missing,
-        privateScoring:null,
-      }
-      await tx.huiteacherFieldFormEvidence.create({data:{
-        id:randomUUID(),organizationId:item.organizationId,eventId:item.eventId,
-        recordId:item.id,formId:bound.formId,
-        definitionDigest:bound.definitionDigest,
-        answersCipher:encryptUnifiedRuntimePayload(payload),
-        answersHash:canonicalHash(payload),
-      }})
-    }else if(input.fieldFormId||input.answers){
+      if(!input.assessmentAttemptId||input.fieldFormId||input.answers)denied('HUITEACHER_FIELD_CANONICAL_FINAL_REQUIRED',400)
+      canonicalEvidence=await createCanonicalFieldEvidence(tx,{recordId:item.id,organizationId:item.organizationId,eventId:item.eventId,
+        actorUserId:input.actorUserId,attemptId:input.assessmentAttemptId})
+    }else if(input.fieldFormId||input.answers||input.assessmentAttemptId){
       denied('HUITEACHER_FIELD_FORM_NOT_APPLICABLE',400)
     }
     const changed=await tx.huiteacherObservationRecord.updateMany({where:{
@@ -370,7 +354,7 @@ export async function submitHuiteacherObservation(input:{
         :'HUITEACHER_FORMAL_OBSERVATION_SUBMITTED',
       targetType:'EVALUATION_EVENT',targetId:item.eventId,
       domainEventId:randomUUID(),payload:{kind:item.kind,recordId:item.id,
-        structuredFieldFormId:bound&&item.kind==='FORMAL_FEEDBACK'?bound.formId:null},
+        canonicalEvidence},
     })
     return {id:item.id,status:'SUBMITTED' as const,
       revision:input.expectedRevision+1}

@@ -599,7 +599,7 @@ export default function HuiteacherApp(){
       {workspaceTab==='expert'&&<>
         <p className="ht-workspace-context"><Compass size={16} aria-hidden="true"/><span>专业实践 · 现场观察、专业反馈与同行协作</span></p>
         <div className="ht-practice-layout">
-          <HuiteacherFieldWorkspace api={teacherApi} onDraftStateChange={setPracticeDraftState}/>
+          <HuiteacherFieldWorkspace api={teacherApi} actorKey={me.id} onDraftStateChange={setPracticeDraftState}/>
           <HuiteacherConsensusReviews api={teacherApi}/>
         </div>
       </>}

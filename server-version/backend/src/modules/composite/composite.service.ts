@@ -1,6 +1,7 @@
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
 import {freezeExactStandardScaleDefinition} from './training-standard-combination'
 import {readVerifiedEducationStart,readVerifiedCompositionStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
+import {readVerifiedFieldStart,fieldCompositionBinding,type VerifiedFieldStart} from '../huiteacher/fieldComposition.contract'
 import {resolveEducationAssessmentSituationalItems} from '../education-tools/assessment-resource.source'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
@@ -2715,12 +2716,15 @@ const createAttempt = async (
   relationalIdentity?: RelationalCompositeAttemptIdentityV1,
   restartMaterialClaimId?: string,
   educationStart?: VerifiedEducationStart,
+  fieldStart?: VerifiedFieldStart,
 ) => {
   assertSupportedComposite(composite)
-  const educationProduct=educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''}):undefined
-  const educationComposition=readVerifiedCompositionStart(educationStart,{tx:db,compositeId:composite.id,
+  const field=fieldStart?readVerifiedFieldStart(fieldStart,{tx:db,compositeId:composite.id,respondentUserId:userId??''}):undefined
+  if(field&&(relationalIdentity||educationStart||accessTokenId||credential||composite.productKind!=='ORGANIZATION_RESOURCE'))throw compositeForbidden('现场观察准入上下文不匹配')
+  const educationProduct=field?'TEACHER':educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''}):undefined
+  const educationComposition=field?fieldCompositionBinding(field.assessmentRef):readVerifiedCompositionStart(educationStart,{tx:db,compositeId:composite.id,
     assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''})
-  if(educationProduct&&(composite.productKind!=='ORGANIZATION_RESOURCE'||!relationalIdentity
+  if(educationProduct&&!field&&(composite.productKind!=='ORGANIZATION_RESOURCE'||!relationalIdentity
     ||(!educationComposition&&relationalIdentity.subjectUserId!==userId)||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
   // Parent START and publication stop/archive serialize on the same row. Child
   // progression later consumes the already-admitted immutable runtime plan.
@@ -2734,10 +2738,11 @@ const createAttempt = async (
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
   if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) {
-    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!(educationComposition||composite.creationKey?.startsWith('private-form:'))||!relationalIdentity||!userId
+    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!(educationComposition||composite.creationKey?.startsWith('private-form:'))||(!relationalIdentity&&!field)||!userId
       ||composite.deliveryMode==='LEGACY'||composite.reportPackageKey||composite.analysisProtocolKey)
       throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
     if(!educationComposition){
+      if(!relationalIdentity)throw compositeForbidden('表单缺少已验证的任务身份')
       const {readPrivateFormExecutionSource}=await import('../assessment-run/educationPrivateFormExecution')
       await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
     }
@@ -3036,7 +3041,7 @@ const createAttempt = async (
       userId,
       accessTokenId,
       recoveryTokenHash: credential?.hash ?? null,
-      participantKey: credential?.participantKey ?? `user:${userId}`,
+      participantKey: field?.participantKey ?? credential?.participantKey ?? `user:${userId}`,
       anonymousCode: credential?.anonymousCode ?? null,
       attemptNo,
       deliveryMode: finalOnly ? 'FINAL_ONLY' : 'LEGACY',
@@ -3051,6 +3056,7 @@ const createAttempt = async (
         assignmentRef: relationalIdentity.assignmentRef,
         consentId: relationalIdentity.consentId,
       } : {}),
+      ...(field?{subjectUserId:field.subjectUserId,respondentUserId:field.respondentUserId,respondentType:'OBSERVER',assignmentRef:null,episodeId:null,consentId:null}:{}),
       completedItems,
       progress,
     },
@@ -3154,6 +3160,26 @@ export const startRelationalCompositeAttemptInTransaction = async (
     undefined,
     input.educationStart,
   )
+}
+
+/** Field authority is verified by the product adapter in this same transaction.
+ * This wrapper shares the canonical builder and never creates a relational Run. */
+export async function startFieldCompositeAttemptInTransaction(db:Db,input:{compositeId:string;respondentUserId:string;proof:VerifiedFieldStart;beforeCreate:()=>Promise<void>}){
+ const scope=readVerifiedFieldStart(input.proof,{tx:db,compositeId:input.compositeId,respondentUserId:input.respondentUserId})
+ await db.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${scope.participantKey}))`)
+ const prior=await db.compositeAssessmentAttempt.findFirst({where:{compositeAssessmentId:input.compositeId,participantKey:scope.participantKey},orderBy:{attemptNo:'desc'}})
+ if(prior){
+  if(prior.userId!==scope.respondentUserId||prior.subjectUserId!==scope.subjectUserId||prior.respondentUserId!==scope.respondentUserId||prior.assignmentRef!==null)
+   throw compositeForbidden('现场观察作答身份不匹配')
+  return {attempt:prior,replayed:true}
+ }
+ await input.beforeCreate()
+ const composite=await loadComposite(input.compositeId,true,db)
+ if(composite.status!=='PUBLISHED'||composite.deliveryMode==='LEGACY'||composite.productKind!=='ORGANIZATION_RESOURCE'
+  ||composite.items.some((item:any)=>!['SCALE','FORM'].includes(item.type))||scope.subjectUserId===null&&composite.items.some((item:any)=>item.type==='SCALE'))
+  throw compositeForbidden('现场观察只允许对应目标的量表与表单')
+ const attempt=await createAttempt(db,composite,input.respondentUserId,null,undefined,1,1,undefined,undefined,undefined,input.proof)
+ return {attempt,replayed:false}
 }
 
 export const startUserAttempt = async (userId: string, compositeId: string) => {
@@ -3659,6 +3685,11 @@ const findAttempt = async (attemptId: string, context: { userId?: string; recove
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.recoveryTokenHash === context.recoveryTokenHash && !attempt.userId)
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
+  if(attempt.participantKey?.startsWith('field-v2:')||attempt.compositeAssessment.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
+    const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
+    if(!context.userId)throw compositeForbidden('现场观察需要本人教育账号')
+    await currentFieldComposition(prisma,{attemptId,actorUserId:context.userId})
+  }
   assertSupportedComposite(attempt.compositeAssessment, frozenRead && ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind), false)
   return attempt
 }
@@ -3826,6 +3857,7 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
       publishedAt:true,trainingVariantDraft:true,trainingVariantFrozen:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
       name: true,
       productKind: true,
+      creationKey: true,
       instruction: true,
       reportPackageSnapshotEncrypted: true,
       reportPackageKey: true,
@@ -3910,6 +3942,11 @@ const getUnifiedCompositeAttemptState = async (
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.userId === null && attempt.recoveryTokenHash === context.recoveryTokenHash)
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
+  if(attempt.participantKey?.startsWith('field-v2:')||attempt.compositeAssessment.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
+    const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
+    if(!context.userId)throw compositeForbidden('现场观察需要本人教育账号')
+    await currentFieldComposition(prisma,{attemptId,actorUserId:context.userId})
+  }
   attempt = await applyTrainingAttemptScope(attempt)
   if (attempt.deliveryMode !== 'FINAL_ONLY' || attempt.runtimeGeneration !== 'UNIFIED_V1') {
     throw compositeConflict('综合测评运行时版本不匹配，请重启测评')

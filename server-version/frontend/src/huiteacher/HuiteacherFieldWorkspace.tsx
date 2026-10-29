@@ -2,29 +2,30 @@ import {ClipboardList,Compass,NotebookPen} from 'lucide-react'
 import {SchoolTaskHelp as PracticeHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useRef,useState } from 'react'
-import {deferredPage} from '../components/page-loading/deferredPage'
-const TaskForm=deferredPage(async()=>({default:(await import('../survey/TaskForm')).TaskForm}))
-import { sanitizeFormAnswers,visibleFormKeys } from '../survey/form-visibility'
-import type {FormDraft} from '../survey/builder.types'
-import type {ProfessionalAnswer} from '../survey/ProfessionalFormAnswer'
+import {HuiteacherFieldQuestionnaire,type FieldQuestionnaireTask,type FieldQuestionnaireProgress} from './HuiteacherFieldQuestionnaire'
 type Api=<T>(path:string,method?:string,payload?:unknown)=>Promise<T>
 type Invite={invitationId:string;organizationId:string;eventId:string;title:string;
   kind:string;role:'EXPERT'|'PEER';expiresAt:string;status:'INVITED'|'ACCEPTED'}
 type Note={id:string;eventId:string;kind:'FACT'|'FORMAL_FEEDBACK'|'PRIVATE_REFLECTION';
   status:'DRAFT'|'SUBMITTED';revision:number;content:string;createdAt:string;submittedAt:string|null}
 type Kind=Note['kind']
-type FieldForm={formId:string;title:string;definitionDigest:string;pages:FormDraft['pages']}
+type FieldForm=FieldQuestionnaireTask
 const labels:Record<Kind,string>={
   FACT:'事实观察依据',FORMAL_FEEDBACK:'正式专业反馈',PRIVATE_REFLECTION:'私人反思日志',
 }
-export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDraftStateChange?:(state:{dirty:boolean;writing:boolean})=>void}){
+type Props={api:Api;actorKey?:string;onDraftStateChange?:(state:{dirty:boolean;writing:boolean})=>void}
+export function HuiteacherFieldWorkspace(props:Props){
+  const scope=useRef({api:props.api,actorKey:props.actorKey,epoch:0})
+  if(scope.current.api!==props.api||scope.current.actorKey!==props.actorKey)scope.current={api:props.api,actorKey:props.actorKey,epoch:scope.current.epoch+1}
+  return <FieldWorkspaceSession key={scope.current.epoch} {...props}/>
+}
+function FieldWorkspaceSession({api,onDraftStateChange}:Props){
   const [invitations,setInvitations]=useState<Invite[]>([])
   const [notes,setNotes]=useState<Note[]>([])
   const [text,setText]=useState<Record<string,string>>({})
   const [formState,setFormState]=useState<{api:Api;forms:Record<string,FieldForm|null>;errors:Record<string,string>}>({api,forms:{},errors:{}})
   const [loadedSource,setLoadedSource]=useState<{api:Api}|null>(null)
-  const [formAnswers,setFormAnswers]=useState<Record<string,Record<string,ProfessionalAnswer>>>({})
-  const [formPages,setFormPages]=useState<Record<string,number>>({})
+  const [canonical,setCanonical]=useState<Record<string,FieldQuestionnaireProgress>>({})
   const [newEvent,setNewEvent]=useState('')
   const [expertInviteCode,setExpertInviteCode]=useState('')
   const [kind,setKind]=useState<Kind>('FACT')
@@ -35,15 +36,16 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
   const [notice,setNotice]=useState('')
   const pending=useRef(false)
   const dirty=Object.entries(text).some(([key,value])=>key.startsWith('new:')?!!value.trim():notes.some(note=>note.id===key&&note.status==='DRAFT'&&value!==note.content))
-    ||Object.entries(formAnswers).some(([key,values])=>Object.keys(values).length>0&&(key.startsWith('new:')||notes.some(note=>note.id===key&&note.status==='DRAFT')))
-  useEffect(()=>{onDraftStateChange?.({dirty,writing:busy})},[dirty,busy,onDraftStateChange])
+    ||Object.values(canonical).some(value=>!!value.attemptId&&!value.completed)
+  const writing=busy||Object.values(canonical).some(value=>value.writing)
+  useEffect(()=>{onDraftStateChange?.({dirty,writing})},[dirty,writing,onDraftStateChange])
   useEffect(()=>()=>onDraftStateChange?.({dirty:false,writing:false}),[onDraftStateChange])
   useEffect(()=>{
-    if(!dirty&&!busy)return
+    if(!dirty&&!writing)return
     const protect=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue=''}
     window.addEventListener('beforeunload',protect)
     return()=>window.removeEventListener('beforeunload',protect)
-  },[dirty,busy])
+  },[dirty,writing])
   const refresh=useCallback(async()=>{
     const [inv,note]=await Promise.all([
       api<{list:Invite[]}>('/my-field-invitations'),
@@ -76,7 +78,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
   const eventId=currentNote?.eventId??currentInvite?.eventId??''
   const fieldForms=formState.api===api?formState.forms:{}
   const bound=fieldForms[eventId]
-  const answers=formAnswers[recordKey]??{}
+  const progress=currentInvite?canonical[currentInvite.invitationId]:undefined
   const formError=formState.api===api?formState.errors[eventId]:undefined
   const formLoaded=Object.prototype.hasOwnProperty.call(fieldForms,eventId)
   const submittedFeedback=(event:string)=>notes.find(note=>note.eventId===event&&note.kind==='FORMAL_FEEDBACK'&&note.status==='SUBMITTED')
@@ -124,6 +126,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
     setNotice('已使用当前统一教育账号领取外部专家活动授权；未增加学校成员或心理业务权限。')
   })
   const accept=(inv:Invite)=>action(async()=>{
+    if(inv.role==='EXPERT'&&!window.confirm('接受本次专家观察邀请？请确认观察目标和任务范围。正式提交的问卷证据与专业意见供获权管理员经 MFA 和审计读取；私人反思仍仅本人可见，被评教师仅能读取另行释放的正式意见。'))return
     await api('/field-invitations/'+inv.invitationId+'/accept','POST',{})
     await refresh()
     setNotice('已领取本次任务。只能在活动开放期间保存观察记录。')
@@ -137,12 +140,10 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
     const created=await api<Pick<Note,'id'>>('/organizations/'+inv.organizationId+'/evaluation-events/'+inv.eventId+
       '/field-notes','POST',{kind,content:content.trim()})
     setText(old=>{const next={...old,[created.id]:content.trim()};delete next[recordKey];return next})
-    setFormAnswers(old=>{const next={...old,[created.id]:old[recordKey]??{}};delete next[recordKey];return next})
-    setFormPages(old=>{const next={...old,[created.id]:old[recordKey]??0};delete next[recordKey];return next})
     await refresh();setActiveNoteId(created.id)
     setNotice(kind==='PRIVATE_REFLECTION'?
       '私人反思草稿已加密保存，仅你本人可以读取。':
-      '专业意见草稿已加密保存；表单答案仍在本页暂存，正式提交时一并保存。')
+      '专业意见草稿已加密保存；请完成固定问卷后正式提交意见。')
   })
   const save=(note:Note)=>action(async()=>{
     const current=text[note.id]??note.content
@@ -151,7 +152,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
       expectedRevision:note.revision,content:current.trim(),
     })
     setText(old=>({...old,[note.id]:current.trim()}))
-    await refresh();setNotice('意见正文已加密保存。表单答案在正式提交时一并保存。')
+    await refresh();setNotice('意见正文已加密保存。固定问卷沿原作答进度保存与恢复。')
   })
   const submit=(note:Note)=>action(async()=>{
     if(note.kind==='FORMAL_FEEDBACK'&&submittedFeedback(note.eventId))throw new Error('本活动的正式反馈已提交，不能再次提交。')
@@ -164,19 +165,15 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
     if(note.kind==='FORMAL_FEEDBACK'&&!bound)throw new Error('本活动尚无可填写的预制表单，请联系组织者配置。')
     const input:Record<string,unknown>={expectedRevision:note.revision}
     if(note.kind==='FORMAL_FEEDBACK'&&bound){
-      const answers=formAnswers[note.id]??{}
-      input.fieldFormId=bound.formId
-      input.answers=sanitizeFormAnswers(bound.pages.flatMap(p=>p.questions),answers)
+      if(!progress?.completed||!progress.attemptId)throw Error('请先完成本次邀请的固定观察问卷')
+      input.assessmentAttemptId=progress.attemptId
     }
     await api('/field-notes/'+note.id+'/submit','POST',input)
-    setFormAnswers(old=>{const next={...old};delete next[note.id];return next})
     await refresh();setNotice(note.kind==='PRIVATE_REFLECTION'?
       '私人反思已归档，未向学校披露。':'正式观察记录已提交，原稿将保持不可改写。')
   })
   const active=invitations.filter(i=>i.status==='ACCEPTED')
-  const onLastFormPage=!bound||(formPages[recordKey]??0)>=Math.max(0,bound.pages.filter(page=>
-    page.questions.some(q=>visibleFormKeys(bound.pages.flatMap(p=>p.questions),answers).has(q.itemKey)),
-  ).length-1)
+  const canonicalReady=!formal||!!progress?.completed
   return <section className="ht-panel ht-practice-workbench" aria-label="我的专业实践">
     <header className="ht-section-heading"><h2>我的专业实践</h2><PracticeHelp label="专业实践与记录说明" buttonText=""><p>从受邀活动进入，填写组织者配置的实践表单。私人反思仅本人可见，与提交给学校的专业意见分别保存。</p></PracticeHelp></header>
     <p className="ht-muted">参与受邀活动，留下观察与专业反馈。</p>
@@ -207,7 +204,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
         <input value={expertInviteCode} maxLength={60} onChange={e=>setExpertInviteCode(e.target.value)} placeholder="受控邀请码，勿公开分享" autoComplete="off"/>
       </label><button disabled={busy||!/^[A-Za-z0-9_-]{43}$/.test(expertInviteCode.trim())} onClick={joinExpert}>使用当前账号领取专家任务</button></div>
     </details>
-    {opened&&<TeacherAssessmentPage kind="practice" scope="ht-professional-practice" title={currentInvite?.title??labels[currentKind]} busy={busy} onBack={()=>setOpened(false)}>
+    {opened&&<TeacherAssessmentPage kind="practice" scope="ht-professional-practice" title={currentInvite?.title??labels[currentKind]} busy={writing} onBack={()=>setOpened(false)}>
       <div className="ht-practice-page">
         {notice&&<p className="ht-notice" role="status">{notice}</p>}
         {currentNote?.status==='SUBMITTED'?<>
@@ -218,18 +215,15 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
           {!editable&&<p role="alert" className="ht-notice">{alreadySubmitted?'本活动的正式反馈已提交，不能再次填写或提交。请返回查看已提交记录。':'当前活动授权不可用，不能保存或提交新内容。'}</p>}
           {formal&&<section className="ht-task ht-practice-form ht-form-surface" aria-label="活动预制表单">
             {!currentInvite?<p className="ht-empty">无法读取此活动的预制表单，请联系组织者核实活动授权。</p>:formError?<div role="alert" className="ht-notice"><p>实践表单暂时无法读取：{formError}</p><button disabled={busy} onClick={()=>setFormReload(value=>value+1)}>重试实践表单</button></div>:!formLoaded?<p role="status">正在读取本活动的预制表单…</p>:!bound?<p className="ht-empty">本活动尚未配置预制表单，请联系组织者绑定已发布的实践表单。</p>:<>
-              <p className="ht-muted">按表单逐页填写，最后一页由你确认正式提交。本表单不计分。</p>
-              <TaskForm purpose="HUITEACHER" readOnly={busy||!editable}
-                unit={{kind:'FORM',instrumentKey:bound.formId,title:bound.title,pages:bound.pages}}
-                answer={answers} onChange={(key,value)=>setFormAnswers(old=>({...old,[recordKey]:{...(old[recordKey]??{}),[key]:value}}))}
-                pageIndex={formPages[recordKey]??0} onPageChange={next=>setFormPages(old=>({...old,[recordKey]:next}))}/>
+              <HuiteacherFieldQuestionnaire key={currentInvite.invitationId+':'+bound.assessmentRef.origin.versionId} api={api} invitationId={currentInvite.invitationId} task={{...bound,attemptId:progress?.attemptId??bound.attemptId}}
+                onProgress={value=>setCanonical(old=>({...old,[currentInvite.invitationId]:value}))} onExit={()=>setOpened(false)}/>
             </>}
           </section>}
           {(!formal||bound)&&<>
             <label className="ht-field"><span>{formal?'专业意见与补充说明（必填）':labels[currentKind]}</span><textarea aria-label={formal?'专业意见与补充说明':'记录正文'} disabled={busy||!editable} maxLength={12000} rows={4} value={content} onChange={e=>setText(old=>({...old,[recordKey]:e.target.value}))}/></label>
-            <p className="ht-muted">{formal?'保存意见草稿仅保存文字正文。表单答案在本页暂存，返回列表不会丢失；正式提交时一并加密保存，请勿刷新或关闭页面。':currentKind==='PRIVATE_REFLECTION'?'私人反思加密保存，仅本人可见；归档后不可修改。':'事实观察依据单独保存，不替代活动的正式实践表单。'}</p>
+            <p className="ht-muted">{formal?'专业意见草稿与固定问卷独立保存。问卷按原进度提交、恢复；正式提交意见时将关联同一次问卷的完成证据。':currentKind==='PRIVATE_REFLECTION'?'私人反思加密保存，仅本人可见；归档后不可修改。':'事实观察依据单独保存，不替代活动的正式实践问卷。'}</p>
             <div className="ht-inline"><button disabled={busy||!ready||!content.trim()} onClick={()=>currentNote?save(currentNote):create()}>{formal?'保存专业意见草稿':'保存加密草稿'}</button>
-              <button disabled={busy||!ready||!currentNote||!onLastFormPage||content!==currentNote.content} onClick={()=>currentNote&&submit(currentNote)}>{currentKind==='PRIVATE_REFLECTION'?'归档私人反思':'正式提交'}</button>
+              <button disabled={writing||!ready||!currentNote||!canonicalReady||content!==currentNote.content} onClick={()=>currentNote&&submit(currentNote)}>{currentKind==='PRIVATE_REFLECTION'?'归档私人反思':'正式提交'}</button>
             </div>
             {!currentNote&&<p className="ht-muted">请先保存正文草稿，再确认正式提交。</p>}
           </>}

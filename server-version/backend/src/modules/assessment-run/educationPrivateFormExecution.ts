@@ -58,6 +58,11 @@ export async function assertPrivateFormParentSource(parentId:string,db:Prisma.Tr
  const parent=await db.compositeAssessmentAttempt.findUnique({where:{id:parentId},select:{id:true,userId:true,assignmentRef:true,compositeAssessmentId:true,
   compositeAssessment:{select:{creationKey:true,productKind:true}}}})
  const composition=parent?.compositeAssessment.creationKey?.startsWith('education-composition:')
+ if(parent?.compositeAssessment.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
+  const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
+  if(!parent.userId)fail()
+  return currentFieldComposition(db,{attemptId:parent.id,actorUserId:parent.userId})
+ }
  if(!parent||parent.compositeAssessment.productKind!=='ORGANIZATION_RESOURCE'||!(composition||parent.compositeAssessment.creationKey?.startsWith('private-form:'))
   ||!parent.assignmentRef||!parent.userId)fail()
  if(composition)return readCompositionExecutionSource(db,{assignmentRef:parent.assignmentRef,parentAttemptId:parent.id,actorUserId:parent.userId,compositeId:parent.compositeAssessmentId})
@@ -70,6 +75,12 @@ export async function assertPrivateFormFinalCurrent(tx:Prisma.TransactionClient,
  const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:input.attemptId},select:{id:true,userId:true,assignmentRef:true,compositeAssessmentId:true,
   compositeAssessment:{select:{creationKey:true}}}})
  if(!parent)return
+ if(parent.compositeAssessment.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
+  const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
+  if(!input.actorUserId)fail()
+  await currentFieldComposition(tx,{attemptId:parent.id,actorUserId:input.actorUserId,lock:true})
+  return
+ }
  const composition=parent?.compositeAssessment.creationKey?.startsWith('education-composition:')
  if(!composition&&!parent?.compositeAssessment.creationKey?.startsWith('private-form:'))return
  if(!input.actorUserId||parent.userId!==input.actorUserId||!parent.assignmentRef)fail()

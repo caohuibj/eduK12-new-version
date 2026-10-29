@@ -36,7 +36,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   educationCompositionResourceKeySchema.parse(ref.key)
   const [,entry,versionId,population]=ref.key.split(':')
   z.string().guid().parse(versionId)
-  if(ref.family!=='BUNDLE'||ref.version!=='1.0.0'||entry!==c.entry||population!==(entry==='SCHOOL'?'STUDENT':'TEACHER'))
+  if(ref.family!=='BUNDLE'||ref.version!=='1.0.0'||ref.key.endsWith(':EXPERT_REPORT:2.0.0')||entry!==c.entry||population!==(entry==='SCHOOL'?'STUDENT':'TEACHER'))
    privateToolFail('PRIVATE_COMPOSITION_RESOURCE_INVALID',403)
  }
  await authorizePrivateTool(tx,c)

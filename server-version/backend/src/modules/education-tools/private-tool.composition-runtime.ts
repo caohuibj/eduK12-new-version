@@ -13,11 +13,12 @@ import {educationCompositionBindingSchema,educationCompositionOriginSchema,educa
 import type {CompiledPrivateComposition,CompositionLeaf} from './private-tool.composition-compiler'
 import {compositionLeafKey} from './private-tool.composition-compiler'
 import {materializeEducationLibraryScale} from './library-source.scale'
+import {isExpertComposition} from './expert-observation.contract'
 
 type Tx=Prisma.TransactionClient
 const identitySelect={id:true,creationKey:true,creationHash:true,createdBy:true,status:true,publishedAt:true,productKind:true,
  publicEnabled:true,copyable:true,trainingContentSnapshotHash:true} as const
-export type SealedEducationIdentity={compositeId:string;resourceKey:string;version:'1.0.0';manifestHash:string;
+export type SealedEducationIdentity={compositeId:string;resourceKey:string;version:'1.0.0'|'2.0.0';manifestHash:string;
  origin:EducationCompositionOrigin;status:'DRAFT'|'PUBLISHED';identityOnly:true;canPublish:false}
 
 /** Header only: DB seal guards prove complete source/mapping/children once.
@@ -31,7 +32,7 @@ export async function loadSealedEducationIdentity(tx:Tx,anchor:{compositeId:stri
   ||row.trainingContentSnapshotHash!==anchor.manifestHash||row.productKind!=='ORGANIZATION_RESOURCE'||row.publicEnabled||row.copyable
   ||!['DRAFT','PUBLISHED'].includes(row.status)||(row.status==='DRAFT'?row.publishedAt!==null:row.publishedAt===null))
   privateToolFail('PRIVATE_COMPOSITION_IDENTITY_INVALID')
- return {compositeId:row.id,resourceKey:key,version:'1.0.0',manifestHash:anchor.manifestHash,origin,
+ return {compositeId:row.id,resourceKey:key,version:origin.adapterVersion,manifestHash:anchor.manifestHash,origin,
   status:row.status as 'DRAFT'|'PUBLISHED',identityOnly:true,canPublish:false}
 }
 
@@ -41,9 +42,10 @@ export async function readOwnedCompositionIdentity(tx:Tx,c:PrivateToolContext,ve
  if(version.entry!==c.entry||version.organizationId!==c.organizationId||version.ownerUserId!==c.principal.userId)
   privateToolFail('PRIVATE_COMPOSITION_SOURCE_NOT_FOUND',404)
  const administration=privateCompositionAdministrationSchema.parse((version.definition as {administration?:unknown})?.administration)
- const origin=educationCompositionOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',mode:'COMPOSITION',entry:c.entry,
+ const expert=administration.responseMode==='EXPERT_REPORT'
+ const origin=educationCompositionOriginSchema.parse({schemaVersion:expert?2:1,adapterVersion:expert?'2.0.0':'1.0.0',mode:'COMPOSITION',entry:c.entry,
   organizationId:c.organizationId,ownerUserId:c.principal.userId,toolId:version.toolId,versionId:version.id,
-  contentHash:version.contentHash,variantKey:administration.population+':'+administration.responseMode})
+  contentHash:version.contentHash,variantKey:administration.population+':'+administration.responseMode,...(administration.responseMode==='EXPERT_REPORT'?{targetKind:administration.targetKind}:{})})
  const row=await tx.compositeAssessment.findUnique({where:{creationKey:educationCompositionKey(origin)},select:identitySelect})
  if(!row||!row.trainingContentSnapshotHash)privateToolFail('PRIVATE_COMPOSITION_IDENTITY_INVALID')
  // Reuse the row already loaded in this request, rather than calling the reader
@@ -51,7 +53,7 @@ export async function readOwnedCompositionIdentity(tx:Tx,c:PrivateToolContext,ve
  if(row.creationHash!==canonicalHash(origin)||row.createdBy!==origin.ownerUserId||row.productKind!=='ORGANIZATION_RESOURCE'
   ||row.publicEnabled||row.copyable||!['DRAFT','PUBLISHED'].includes(row.status)
   ||(row.status==='DRAFT'?row.publishedAt!==null:row.publishedAt===null))privateToolFail('PRIVATE_COMPOSITION_IDENTITY_INVALID')
- return {compositeId:row.id,resourceKey:educationCompositionKey(origin),version:'1.0.0' as const,
+ return {compositeId:row.id,resourceKey:educationCompositionKey(origin),version:origin.adapterVersion,
   manifestHash:row.trainingContentSnapshotHash,origin,status:row.status as 'DRAFT'|'PUBLISHED',identityOnly:true as const,canPublish:false as const}
 }
 
@@ -74,9 +76,10 @@ async function materializeScale(tx:Tx,leaf:Extract<CompositionLeaf,{provider:'PR
 /** Internal: same authorized RC freeze transaction, same already compiled leaves.
  * No public prepare API, per-leaf composite, independent review or task creation. */
 export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:EducationPrivateToolVersion,compiled:CompiledPrivateComposition){
- const origin=educationCompositionOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',mode:'COMPOSITION',entry:c.entry,
+ const expert=isExpertComposition(compiled.definition),administration=compiled.definition.administration
+ const origin=educationCompositionOriginSchema.parse({schemaVersion:expert?2:1,adapterVersion:expert?'2.0.0':'1.0.0',mode:'COMPOSITION',entry:c.entry,
   organizationId:c.organizationId,ownerUserId:c.principal.userId,toolId:version.toolId,versionId:version.id,contentHash:version.contentHash,
-  variantKey:compiled.definition.administration.population+':'+compiled.definition.administration.responseMode})
+  variantKey:administration.population+':'+administration.responseMode,...(administration.responseMode==='EXPERT_REPORT'?{targetKind:administration.targetKind}:{})})
  const key=educationCompositionKey(origin)
  await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${key}))`)
  const prior=await tx.compositeAssessment.findUnique({where:{creationKey:key},select:{id:true}})

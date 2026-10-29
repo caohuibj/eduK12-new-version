@@ -87,6 +87,7 @@ import huiteacherGroupReportRoutes from './modules/huiteacher/groupReport.routes
 import huiteacherScaleRuntimeRoutes from './modules/huiteacher/scaleRuntime.routes'
 import {createTeacherAssessmentRuntimeRouter} from './modules/huiteacher/assessmentRuntime.routes'
 import {teacherAssessmentRuntimeSource} from './modules/huiteacher/assessmentRuntime.source'
+import fieldCompositionRoutes from './modules/huiteacher/fieldComposition.routes'
 import huiteacherPersonalScaleRoutes from './modules/huiteacher/personalScale.routes'
 import huiteacherObserverRoutes from './modules/huiteacher/observer.routes'
 import huiteacherConsensusRoutes from './modules/huiteacher/consensus.routes'
@@ -357,6 +358,7 @@ app.use('/api/huiteacher',huiteacherGroupReportRoutes)
 app.use('/api/huiteacher',huiteacherScaleRuntimeRoutes)
 app.use('/api/huiteacher',createTeacherAssessmentRuntimeRouter(teacherAssessmentRuntimeSource))
 app.use('/api/huiteacher/student-assessments',createTeacherAssessmentRuntimeRouter(teacherAssessmentRuntimeSource,undefined,'STUDENT_EVALUATION'))
+app.use('/api/huiteacher/field-assessments',fieldCompositionRoutes)
 app.use('/api/huiteacher',educationTeacherScaleReportRouter)
 app.use('/api/huiteacher',educationTeacherAssessmentReportRouter)
 app.use('/api/huiteacher',huiteacherPersonalScaleRoutes)

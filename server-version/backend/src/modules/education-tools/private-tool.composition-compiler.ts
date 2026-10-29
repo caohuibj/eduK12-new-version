@@ -1,4 +1,5 @@
 import {validateContextFormItems} from '../assessment-context/context'
+import {isExpertComposition} from './expert-observation.contract'
 import {requiredScaleContextKeys} from '../scale/policy/context-preflight'
 import {readEducationStandardSources,type EducationStandardLeaf} from './public-source.standard'
 import {Prisma,type EducationPrivateToolVersion} from '@prisma/client'
@@ -35,6 +36,11 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
  if(!definition.blocks.length)privateToolFail('PRIVATE_TOOL_DEFINITION_INCOMPLETE',400,[{path:'blocks',severity:'error',message:'请加入至少一个固定版本工具'}])
  if(definition.administration.population!==(c.entry==='SCHOOL'?'STUDENT':'TEACHER'))
   privateToolFail('PRIVATE_COMPOSITION_VARIANT_UNSUPPORTED',400)
+ const expert=isExpertComposition(definition)
+ if(expert&&definition.blocks.some(block=>block.source.provider!=='PRIVATE_VERSION'))
+  privateToolFail('PRIVATE_COMPOSITION_EXPERT_SOURCE_DECLARATION_REQUIRED',400)
+ if(expert&&definition.administration.responseMode==='EXPERT_REPORT'&&definition.administration.targetKind!=='PERSON'&&definition.blocks.some(block=>block.source.kind==='SCALE'))
+  privateToolFail('PRIVATE_COMPOSITION_EXPERT_PERSON_TARGET_REQUIRED',400)
  // A student respondent's background cannot silently become the evaluated
  // teacher's scientific reference context. This slice admits no personal page.
  if(definition.administration.responseMode==='STUDENT_REPORT'&&definition.contextFields?.length)
@@ -62,14 +68,15 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
    const checked=validatePrivateToolDefinition('SCALE',row.definition)
    if(!checked.valid||!checked.definition)privateToolFail('PRIVATE_TOOL_DEFINITION_INCOMPLETE',400,checked.issues)
    const scale=checked.definition as ScaleDefinitionV2
+   if(expert&&scale.respondentType!=='expert_report')privateToolFail('PRIVATE_COMPOSITION_EXPERT_SCALE_DECLARATION_REQUIRED',400)
    if(scale.referencePolicy.type!=='none')privateToolFail('PRIVATE_TOOL_RUNTIME_REFERENCE_UNSUPPORTED')
    leaves.set(key,{provider:'PRIVATE_VERSION',version:row,kind:'SCALE',definition:scale})
   }else leaves.set(key,{provider:'PRIVATE_VERSION',version:row,kind:'FORM',form:compilePrivateFormRuntime(row.definition)})
  }
- const standards=await readEducationStandardSources(tx,publicSources.filter(source=>source.provider==='STANDARD_SCALE'),definition.administration)
+ const standards=definition.administration.responseMode==='EXPERT_REPORT'?new Map<string,EducationStandardLeaf>():await readEducationStandardSources(tx,publicSources.filter(source=>source.provider==='STANDARD_SCALE'),definition.administration)
  for(const standard of standards.values())leaves.set('STANDARD_SCALE:'+standard.row.id,{provider:'STANDARD_SCALE',kind:'SCALE',standard,definition:standard.row.snapshot.definition,
   version:{id:standard.row.id,toolId:standard.row.id,title:standard.row.snapshot.title,contentHash:standard.row.combination_hash}})
- const libraries=await readEducationLibrarySources(tx,librarySources,definition.administration)
+ const libraries=definition.administration.responseMode==='EXPERT_REPORT'?new Map<string,EducationLibraryLeaf>():await readEducationLibrarySources(tx,librarySources,definition.administration)
  for(const library of libraries.values())leaves.set('LIBRARY_SCALE:'+library.row.entryId,{provider:'LIBRARY_SCALE',kind:'SCALE',library,definition:library.definition,
   version:{id:library.row.entryId,toolId:library.row.entryId,title:library.row.snapshot.title,contentHash:library.row.snapshotHash}})
  const formSources=publicSources.filter(source=>source.provider==='PUBLIC_FORM')

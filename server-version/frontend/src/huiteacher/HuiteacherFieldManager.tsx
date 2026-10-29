@@ -1,25 +1,38 @@
-import { useState } from 'react'
+import { useRef,useState } from 'react'
 import { HuiteacherConsensusManager } from './HuiteacherConsensus'
+import {EducationPrivateVersionChooser,type PrivateVersionChoice} from '../components/education-tools/EducationPrivateVersionChooser'
+import {compositionAdministrationForEntry} from '../components/education-tools/educationCompositionAdministration'
 type Api=<T>(path:string,method?:string,payload?:unknown)=>Promise<T>
 type Role='EXPERT'|'PEER'
 type Grant={id:string;observerUserId:string;role:Role;status:'INVITED'|'ACCEPTED'|'REVOKED';
   revision:number;expiresAt:string;acceptedAt:string|null}
 type FormalNote={id:string;eventId:string;kind:'FACT'|'FORMAL_FEEDBACK';
   status:'SUBMITTED';submittedAt:string;content:string}
-export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:{
+type Binding={title:string;assessmentRef:{origin:{versionId:string;contentHash:string;targetKind:string}}}
+type Evidence={attemptId:string;attemptEpoch:number;finalHash:string;units:Array<
+ {kind:'FORM';unitId:string;items:Array<{prompt:string;state:string;value:unknown;rowStates?:unknown;otherText?:unknown}>}|
+ {kind:'SCALE';unitId:string;state:'WITHHELD'|'DESCRIPTIVE';metrics:Array<{key:string;label:string;value:number|null}>}>}
+type Props={
   organizationId:string;eventId:string;eventStatus:string;api:Api
-}){
+}
+export function HuiteacherFieldManager(props:Props){
+  const scope=useRef({api:props.api,organizationId:props.organizationId,eventId:props.eventId,epoch:0})
+  if(scope.current.api!==props.api||scope.current.organizationId!==props.organizationId||scope.current.eventId!==props.eventId)
+    scope.current={api:props.api,organizationId:props.organizationId,eventId:props.eventId,epoch:scope.current.epoch+1}
+  return <FieldManagerSession key={scope.current.epoch} {...props}/>
+}
+function FieldManagerSession({organizationId,eventId,eventStatus,api}:Props){
   const base='/organizations/'+organizationId+'/evaluation-events/'+eventId
   const [observerId,setObserverId]=useState('')
   const [expertInviteCode,setExpertInviteCode]=useState('')
   const [role,setRole]=useState<Role>('EXPERT')
   const [expiresAt,setExpiresAt]=useState('')
-  const [formList,setFormList]=useState<Array<{id:string;title:string;status:string}>>([])
-  const [fieldFormId,setFieldFormId]=useState('')
-  const [boundForm,setBoundForm]=useState<{formId:string;title:string}|null>(null)
+  const [choice,setChoice]=useState<PrivateVersionChoice|null>(null)
+  const [boundForm,setBoundForm]=useState<Binding|null>(null)
+  const [bindingLoaded,setBindingLoaded]=useState(false)
   const [grants,setGrants]=useState<Grant[]>([])
   const [formal,setFormal]=useState<FormalNote[]>([])
-  const [evidence,setEvidence]=useState<Record<string,{formId:string;answers:Record<string,unknown>;missing:unknown}>>({})
+  const [evidence,setEvidence]=useState<Record<string,Evidence>>({})
   const [showGrants,setShowGrants]=useState(false)
   const [showFormal,setShowFormal]=useState(false)
   const [busy,setBusy]=useState(false)
@@ -30,21 +43,17 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
       .finally(()=>setBusy(false))
   }
   const loadFormBinding=()=>run(async()=>{
-    const [forms,binding]=await Promise.all([
-      api<{list:Array<{id:string;title:string;status:string}>}>(
-        '/organizations/'+organizationId+'/forms'),
-      api<{formId:string;title:string}|null>(base+'/field-form'),
-    ])
-    setFormList(forms.list.filter(x=>x.status==='PUBLISHED'))
-    setBoundForm(binding)
+    const binding=await api<Binding|null>(base+'/field-form')
+    setBoundForm(binding);setBindingLoaded(true)
   })
   const bindForm=()=>run(async()=>{
-    if(eventStatus!=='DRAFT'||!fieldFormId)throw Error('只能为草稿现场活动绑定已发布表单')
-    const binding=await api<{formId:string;title:string}>(base+'/field-form','POST',{
-      formId:fieldFormId,
+    const administration=compositionAdministrationForEntry(choice?.administration,'TEACHER')
+    if(eventStatus!=='DRAFT'||!choice||administration?.responseMode!=='EXPERT_REPORT')throw Error('请选择明确声明专家观察及目标类型的固定普通问卷')
+    const binding=await api<Binding>(base+'/field-form','POST',{
+      privateComposition:{versionId:choice.id,contentHash:choice.contentHash},
     })
     setBoundForm(binding)
-    setNotice('本次现场 Form V2 已冻结；正式专家反馈必须随附该表单的受控答案。')
+    setNotice('本活动已固定专家观察问卷；正式反馈须关联同一次问卷的完成证据。')
   })
   const readGrants=async()=>{
     const result=await api<{list:Grant[]}>(base+'/observer-grants')
@@ -80,33 +89,31 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
   })
   const readFieldEvidence=(note:FormalNote)=>run(async()=>{
     if(note.kind!=='FORMAL_FEEDBACK')return
-    const source=await api<{formId:string;answers:Record<string,unknown>;missing:unknown}>(
+    const source=await api<Evidence>(
       base+'/field-notes/'+note.id+'/form-evidence')
     setEvidence(prev=>({...prev,[note.id]:source}))
-    setNotice('已核验正式反馈附带的冻结 Form 证据。私人反思和未提交草稿仍不可读取。')
+    setNotice('已核验正式反馈关联的固定问卷证据。此次读取受 MFA 和审计保护。')
   })
   return <section className="ht-field-manager" aria-label="受控现场观察管理">
     <h4>现场观察 · 专家／同行授权</h4>
     <p className="ht-muted">仅适用于这一次活动。邀请、撤销及查看正式反馈需要近期 Teacher MFA；私人反思永不在此显示。</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
     <div className="ht-admin">
-      <h5>现场 Form V2（不计分）</h5>
+      <h5>专家观察普通问卷 · 量表与表单</h5>
       <button disabled={busy} type="button" onClick={loadFormBinding}>
-        查看本次表单绑定与可用目录
+        查看本次固定问卷绑定
       </button>
-      {boundForm?<p className="ht-tag">已绑定：{boundForm.title}（提交后不可改写）</p>
-        :eventStatus==='DRAFT'&&formList.length>0?
-          <div className="ht-inline">
-            <label className="ht-field"><span>选择本校已发布 Form</span>
-              <select value={fieldFormId} onChange={e=>setFieldFormId(e.target.value)}>
-                <option value="">可不绑定，使用纯文字现场观察</option>
-                {formList.map(form=><option key={form.id} value={form.id}>{form.title}</option>)}
-              </select>
-            </label>
-            <button disabled={busy||!fieldFormId} type="button" onClick={bindForm}>
-              冻结本活动的观察表单
-            </button>
-          </div>:<p className="ht-muted">未绑定结构化 Form 时，本次活动仅收集授权观察者的加密文字证据。</p>}
+      {boundForm?<p className="ht-tag">已绑定：{boundForm.title} · {boundForm.assessmentRef.origin.targetKind} · {boundForm.assessmentRef.origin.contentHash.slice(0,12)}…（固定后不可替换）</p>
+        :bindingLoaded&&eventStatus==='DRAFT'?<>
+          <EducationPrivateVersionChooser api={api} organizationId={organizationId} kind="COMPOSITION" disabled={busy} selectLabel="选作专家观察问卷" onSelect={value=>{
+            const administration=compositionAdministrationForEntry(value.administration,'TEACHER')
+            if(administration?.responseMode!=='EXPERT_REPORT'){setNotice('该固定版本没有专家观察声明，请在普通问卷编制页选择受邀专家观察并固定新版本。');return}
+            setChoice(value);setNotice('')
+          }}/>
+          {choice&&<p>{choice.title} · 修订 {choice.sourceRevision} · {choice.contentHash.slice(0,12)}…</p>}
+          <button disabled={busy||!choice} type="button" onClick={bindForm}>固定本活动的专家观察问卷</button>
+          <p className="ht-muted">目标类型须与活动对象完全一致。非人员对象只使用表单；量表原固定版本须明确声明专家观察。</p>
+        </>:bindingLoaded?<p className="ht-muted">本活动尚未配置专家观察问卷，请联系组织者。</p>:null}
     </div>
     {['DRAFT','OPEN'].includes(eventStatus)&&<div className="ht-inline">
       <button type="button" onClick={inviteNewExpert} disabled={busy}>
@@ -153,9 +160,8 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
         {note.kind==='FORMAL_FEEDBACK'&&<button type="button" disabled={busy}
           onClick={()=>readFieldEvidence(note)}>按授权核验结构化观察证据</button>}
         {evidence[note.id]&&<div className="ht-field-evidence">
-          <strong>已提交的 Form 观察答案（不计分）</strong>
-          <dl>{Object.entries(evidence[note.id].answers).map(([key,value])=>
-            <div key={key}><dt>{key}</dt><dd>{JSON.stringify(value)}</dd></div>)}</dl>
+          <strong>已提交的固定问卷证据</strong>
+          {evidence[note.id].units.map(unit=><section key={unit.unitId}>{unit.kind==='FORM'?<><h5>表单观察记录（不计分）</h5><dl>{unit.items.map((item,index)=><div key={index}><dt>{item.prompt}</dt><dd>{item.state==='ANSWERED'?JSON.stringify(item.value):'未作答'}{item.rowStates!==undefined&&<span> · {JSON.stringify(item.rowStates)}</span>}{item.otherText!==undefined&&<span> · {JSON.stringify(item.otherText)}</span>}</dd></div>)}</dl></>:<><h5>量表描述结果</h5>{unit.state==='WITHHELD'?<p>此量表的固定报告设置未授权在正式证据中展示结果。</p>:<dl>{unit.metrics.map(metric=><div key={metric.key}><dt>{metric.label}</dt><dd>{metric.value===null?'无法计算':metric.value}</dd></div>)}</dl>}</>}</section>)}
         </div>}
       </article>):<p>尚无正式提交的观察反馈。私人反思不进入学校反馈。</p>}</div>}
     {eventStatus==='CLOSED'&&<HuiteacherConsensusManager

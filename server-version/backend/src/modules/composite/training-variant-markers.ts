@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client'
 
 /** Select every marker together. Omission is not evidence of a legacy row. */
 export const TRAINING_VARIANT_DEFINITION_MARKER_SELECT = {
+  creationKey: true,
   trainingFlowDraft: true, trainingFlowFrozen: true, trainingFlowDigest: true,
   trainingVariantDraft: true,
   trainingVariantFrozen: true,

@@ -3,6 +3,7 @@ import {assessmentContextKeySchema} from '../assessment-context/context'
 import {z} from 'zod'
 import {resultAudiencePolicySchema} from '../assessment-policy/result-disclosure'
 import {compileEducationApplicability} from '../scale-library-governance/education-applicability'
+import {expertCompositionAdministrationSchema,expertTargetKindSchema,isExpertComposition} from './expert-observation.contract'
 
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 // P1 consumes immutable author-private leaves. Public/native providers are added
@@ -14,36 +15,44 @@ export const privateCompositionSourceSchema=z.discriminatedUnion('provider',[
  z.object({provider:z.literal('PUBLIC_FORM'),kind:z.literal('FORM'),versionId:id,contentHash:hash}).strict(),
 ])
 export const educationCompositionResponseModeSchema=z.enum(['SELF','PARENT_REPORT','TEACHER_REPORT','STUDENT_REPORT'])
-export const privateCompositionAdministrationSchema=z.discriminatedUnion('population',[
+const v1AdministrationSchema=z.discriminatedUnion('population',[
  z.object({population:z.literal('STUDENT'),responseMode:z.enum(['SELF','PARENT_REPORT','TEACHER_REPORT'])}).strict(),
  z.object({population:z.literal('TEACHER'),responseMode:z.enum(['SELF','STUDENT_REPORT'])}).strict(),
 ])
+export const privateCompositionAdministrationSchema=z.union([v1AdministrationSchema,expertCompositionAdministrationSchema])
 /** Read-only catalog/preview filter. Task identity still comes from the sealed
  * version in the write adapter, never from this client-selected filter. */
 export const educationCompositionAdministrationForEntry=(entry:'SCHOOL'|'TEACHER',responseMode:unknown='SELF')=>
  privateCompositionAdministrationSchema.parse({population:entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode})
-export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),
+export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.union([z.literal(1),z.literal(2)]),adapterVersion:z.enum(['1.0.0','2.0.0']),
  administration:privateCompositionAdministrationSchema,
  contextFields:z.array(z.object({contextKey:assessmentContextKeySchema,formType:z.enum(['year_month','single_choice','fill_blank']),formLabel:z.string().min(1).max(240),formOptions:z.array(z.object({value:z.string().min(1).max(240),label:z.string().min(1).max(240)}).strict()).max(50)}).strict()).min(1).max(5).optional(),
  instruction:z.string().max(16000),blocks:z.array(z.object({blockId:id,instruction:z.string().max(16000),
   source:privateCompositionSourceSchema}).strict()).max(50),
 }).strict().superRefine((value,ctx)=>{
+ if(isExpertComposition(value)?value.schemaVersion!==2||value.adapterVersion!=='2.0.0':value.schemaVersion!==1||value.adapterVersion!=='1.0.0')
+  ctx.addIssue({code:'custom',message:'专家观察必须使用独立的 V2 合同，既有施测方式保持 V1'})
+ if(isExpertComposition(value)&&value.contextFields?.length)ctx.addIssue({code:'custom',message:'专家背景不能作为受评教师的计分背景'})
  if(value.contextFields&&new Set(value.contextFields.map(field=>field.contextKey)).size!==value.contextFields.length)ctx.addIssue({code:'custom',path:['contextFields'],message:'背景字段不能重复'})
  if(new Set(value.blocks.map(block=>block.blockId)).size!==value.blocks.length)
   ctx.addIssue({code:'custom',path:['blocks'],message:'问卷工具块身份不能重复'})
 })
 export type PrivateCompositionDefinition=z.infer<typeof privateCompositionDefinitionSchema>
 
-export const educationCompositionOriginSchema=z.object({schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),
+export const educationCompositionOriginSchema=z.object({schemaVersion:z.union([z.literal(1),z.literal(2)]),adapterVersion:z.enum(['1.0.0','2.0.0']),
  mode:z.literal('COMPOSITION'),entry:z.enum(['SCHOOL','TEACHER']),organizationId:id,ownerUserId:id,toolId:id,
- versionId:id,contentHash:hash,variantKey:z.enum(['STUDENT:SELF','STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT','TEACHER:SELF','TEACHER:STUDENT_REPORT'])}).strict()
+ versionId:id,contentHash:hash,variantKey:z.enum(['STUDENT:SELF','STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT','TEACHER:SELF','TEACHER:STUDENT_REPORT','TEACHER:EXPERT_REPORT']),targetKind:expertTargetKindSchema.optional()}).strict()
  .superRefine((origin,ctx)=>{
   if(origin.variantKey.startsWith('STUDENT:')!==(origin.entry==='SCHOOL'))
    ctx.addIssue({code:'custom',message:'教育入口与施测对象不匹配'})
+  if(isExpertComposition(origin)?origin.schemaVersion!==2||origin.adapterVersion!=='2.0.0'||origin.entry!=='TEACHER'||!origin.targetKind:
+    origin.schemaVersion!==1||origin.adapterVersion!=='1.0.0'||origin.targetKind!==undefined)
+   ctx.addIssue({code:'custom',message:'专家观察身份必须与显式 V2 目标声明一致'})
  })
 /** Existing applicability compiler supplies role/relationship semantics. This
  * describes a fixed version; it grants no actor, relationship or report right. */
 export function educationCompositionVariant(origin:Pick<z.infer<typeof educationCompositionOriginSchema>,'variantKey'>){
+ if(isExpertComposition(origin))throw Error('EXPERT_OBSERVATION_REQUIRES_FIELD_AUTHORITY')
  const [population,responseMode]=origin.variantKey.split(':')
  return compileEducationApplicability({schemaVersion:1,administrations:[{population,responseMode}]}).variants[0]
 }
@@ -77,7 +86,7 @@ export type EducationCompositionOrigin=z.infer<typeof educationCompositionOrigin
 export const educationCompositionKey=(origin:EducationCompositionOrigin)=>
  `education-composition:${origin.entry}:${origin.versionId}:${origin.variantKey}:${origin.adapterVersion}`
 
-export const educationCompositionResourceKeySchema=z.string().regex(/^education-composition:(?:SCHOOL:[0-9a-f-]{36}:STUDENT:(?:SELF|PARENT_REPORT|TEACHER_REPORT)|TEACHER:[0-9a-f-]{36}:TEACHER:(?:SELF|STUDENT_REPORT)):1\.0\.0$/)
+export const educationCompositionResourceKeySchema=z.string().regex(/^education-composition:(?:(?:SCHOOL:[0-9a-f-]{36}:STUDENT:(?:SELF|PARENT_REPORT|TEACHER_REPORT)|TEACHER:[0-9a-f-]{36}:TEACHER:(?:SELF|STUDENT_REPORT)):1\.0\.0|TEACHER:[0-9a-f-]{36}:TEACHER:EXPERT_REPORT:2\.0\.0)$/)
 export const privateCompositionSelectionSchema=z.object({versionId:id,contentHash:hash}).strict()
 /** Frozen task anchor. Native scores are scoped to a block, never pooled into
  * an invented cross-tool score or widened by a same-named score in another unit. */
