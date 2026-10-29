@@ -6,7 +6,7 @@
   "enabled": true,
   "base": "9801107019d51a4af7ddb651789b674867539d24",
   "frozenDevelopmentHead": "9fa3c51e5deb882beb4a0d56f1ebe44dae8f76f5",
-  "productHead": "a1c203608290f9a58500a005ae866c14d8db6cee",
+  "productHead": "2647f04a78c33f45301ffff3e1fdf3f5b99d7071",
   "frontendTree": "2907eedb6ad9d1bdc5559f3e61b1f6145ac8b39b",
   "backendTree": "296b66b01b9b282110bd1939049fcee05643717e",
   "source": {
@@ -672,7 +672,7 @@
     ".github/scripts/school-teacher-storage.postgres.test.mjs": "727cc24474da221fcebb49905c58605f6a166f97",
     ".github/workflows/ci-school-teacher.yml": "45a4db88aa1b30e9d8c26dc17191100e37763f88",
     ".github/workflows/ci.yml": "797cc8c87ad01a055663e90ad5e6c8b44b4ed7e0",
-    "server-version/e2e/education-self-questionnaire.cjs": "9165575a36de18ce36926e0e3451aa8ae2d52398",
+    "server-version/e2e/education-self-questionnaire.cjs": "3a2d933245d0473065cdc862d93ed11245ae4ec4",
     "server-version/e2e/school-teacher-browser.cjs": "626433613ec2d5b4df9857e02da2fa8fef9bcdee",
     "server-version/e2e/school-teacher-fixture.cjs": "cc42e320cbf8a5ec49fbf28c0adf690bd15d223c",
     "server-version/e2e/school-teacher-chrome-permissions.cjs": "c2653f2aa38f48aaee1ab17291ed27cb8ea21df5",
@@ -682,9 +682,9 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "DOT independently reviewed wiring fb8489caf, test repairs9f65b298f, verified-package control0b6b3a31c and selector repairs9b0aec2b5/a1c203608. User-authorized temporary Chrome scope and all original package/bytes/owner/inode/sandbox checks remain. Official isolated run40813353358 verified environment only; run40817505383 proved the two actual repaired selectors against synthetic DOM only, old0/new1 with decoys excluded. Neither result qualifies an application journey or another runner. This exact current source still requires real freeze/assign/save-resume/FINAL/feedback, fresh selected jobs, current SAST and final independent DOT gate/merge check. No PR approval or deployment authorization.",
-    "basisCommit": "a1c203608290f9a58500a005ae866c14d8db6cee",
-    "reviewer": "DOT independent parent review",
+    "note": "DOT independently reviewed wiring fb8489caf, test repairs9f65b298f, verified-package control0b6b3a31c and selector repairs9b0aec2b5/a1c203608. The current user explicitly authorized direct repair and formal reactivation after receiving the concrete textarea fix2647f04a7 and its real Playwright observation40819702801. That synthetic DOM observation proves saved textarea exact-label0 versus exact-textbox1 and correct value read/write, not an application journey. User-authorized temporary Chrome scope and all original package/bytes/owner/inode/sandbox checks remain. Prior environment and selector observations retain their original identities; no historical result qualifies this source or another runner. Current source still requires the existing selected jobs, real freeze/assign/save-resume/FINAL/feedback, current SAST and final independent DOT gate/merge check. No PR approval or deployment authorization.",
+    "basisCommit": "2647f04a78c33f45301ffff3e1fdf3f5b99d7071",
+    "reviewer": "DOT independent wiring review; current user repair and activation authorization",
     "wiringBasisCommit": "fb8489caf91e09fb9ca7183bef5d0c7a49e0ad7e",
     "testRepairBasisCommit": "9f65b298ffe17700638f1a55bca6a91973c17189",
     "permissionAuthorization": "Current user explicitly authorized PR382 temporary GitHub runner /opt, /opt/google, /opt/google/chrome and the installed Chrome package paths confirmed by the existing checker to remove go-w only. Preserve bytes, ownership, all other permission bits and sandbox; no unbounded recursive chmod, added setuid, production or system-policy changes. Revalidate current package records/bytes/owner/inode/path scope before each mutation. DOT independently reviewed commit0b6b3a31c."
@@ -1653,12 +1653,12 @@
     ],
     "browserHelper": "server-version/e2e/education-self-questionnaire.cjs",
     "continuationDecision": {
-      "previousRun": 40814683210,
-      "previousCheckout": "efe50da4bab6d3487bc14e810d4c48c45ca98ec0",
-      "previousSource": "4553c083ed70c5d98ad72862babc808eafcdf919",
+      "previousRun": 40818498476,
+      "previousCheckout": "782973d98b12be964547c6c758525841815d50f3",
+      "previousSource": "3928c617f6b6a8826d7e6b0fc55a26ddfa691e7d",
       "officialReuse": "NOT_SUPPORTED_BY_EXISTING_FRESH_EXECUTOR",
       "reason": "Official legacy consumers bind PR338 and fixed run/job/build identities; fresh artifacts require current SHA/run and reject old receipts. Parameter-only substitution cannot preserve those invariants.",
-      "method": "Existing bounded fresh jobs only. Fourth-run successful frontend/backend/audit/PG/restore/CodeQL evidence retains its original SHA/run; current fresh executor cannot admit a new fixed run through configuration alone, and no admission framework is added. The fourth browser failed at an invalid relative locator; repairs9b0aec2b5/a1c203608 now have real Playwright synthetic-DOM-only proof in run40817505383. Both repairs preserve all downstream assertions. Every formal browser runner still performs dynamic authorized package-scope checks/go-w, strict preflight and its own real sandbox and SELF journey. Historical success or synthetic DOM is never current application admission."
+      "method": "Existing bounded fresh jobs only. Fifth-run successful frontend/backend/audit/PG/restore/CodeQL evidence retains its original SHA/run; current fresh executor cannot admit a new fixed run through configuration alone, and no admission framework is added. The fifth browser saved, froze and reopened both questionnaires, then timed out matching a populated textarea by exact label. Repair2647f04a7 changes only five textarea locators to exact textbox roles, retaining saved-value and all downstream assertions; real Playwright observation40819702801 proves the selector semantics on synthetic DOM only. The current user authorized direct repair and reactivation. Every formal browser runner still performs dynamic authorized package-scope checks/go-w, strict preflight and its own real sandbox and SELF journey. Historical success or synthetic DOM is never current application admission."
     }
   },
   "blockers": []
