@@ -405,7 +405,7 @@ test('actual Git diffs select different documentation, presentation, content, fr
       const path=join(fixture,file);mkdirSync(dirname(path),{recursive:true});writeFileSync(path,'fixture\n');
       git('add','.');git('-c','user.name=CI','-c','user.email=ci@example.invalid','commit','-qm','case');
       if(scenario==='unsupported-cognitive') {
-        assert.throws(()=>execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{cwd:fixture,encoding:'utf8',stdio:['ignore','pipe','pipe'],env:{...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_FORCE_FULL:'false',GITHUB_OUTPUT:''}}),/UNSUPPORTED_COGNITIVE_INTAKE:missing-task-package/);
+        assert.throws(()=>execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{cwd:fixture,encoding:'utf8',stdio:['ignore','pipe','pipe'],env:{...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_PR_REPOSITORY:'owner/repo',GITHUB_REPOSITORY:'owner/repo',CI_FORCE_FULL:'false',GITHUB_OUTPUT:''}}),/UNSUPPORTED_COGNITIVE_INTAKE:missing-task-package/);
         continue;
       }
       const output=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{
