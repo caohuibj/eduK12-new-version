@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 import observerReuse from './school-teacher-observer-reuse.cjs';
 export const BRANCH='work/school-teacher-review-20261022', REPOSITORY='caohuibj/eduK12-new-version';
 export const SELF_BRANCH='release/education-observer-native-20261029';
-export const SELF_BASE='908af20ecfbd3ede55685d2052bf01b52266661c';
+export const SELF_BASE='f39a00f12fed2e1b8e1d3cc45185969262925ed8';
 export const SELF_MARKER='.github/scripts/school-teacher-self-bindings.json';
 export const JOBS=['admission','frontend','connected','security'];
 export const SELF_JOBS=['admission','frontend','backend-self','postgres-self','browser-self','security'];
@@ -44,8 +44,8 @@ export function requireFreshQualification(b){
 export function requireSchoolQualification(b){
  if(b.qualification!==observerReuse.mode)return requireFreshQualification(b);
  assert.equal(b.branch,SELF_BRANCH);assert.equal(b.base,SELF_BASE);
- assert.equal(b.frontendTree,observerReuse.fixed.frontendTree);assert.equal(b.backendTree,observerReuse.fixed.backendTree);
- assert.equal(b.frontendBuildDecision,'fixed-official-observer-build');assert.equal(b.backendBuildDecision,'fixed-official-observer-build');
+ assert.equal(b.frontendTree,observerReuse.fixed.frontendTree);assert.equal(b.backendTree,observerReuse.fixed.currentBackendTree);
+ assert.equal(b.frontendBuildDecision,'fixed-official-observer-build');assert.equal(b.backendBuildDecision,'fresh-main-tooling-integration');
  assert.deepEqual(b.execution.officialContinuation,{run:observerReuse.fixed.run,head:observerReuse.fixed.head,checkout:observerReuse.fixed.checkout});
  assert.equal(b.execution.finalized,true);return true;
 }

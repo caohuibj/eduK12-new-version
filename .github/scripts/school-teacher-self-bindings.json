@@ -4,15 +4,15 @@
   "repository": "caohuibj/eduK12-new-version",
   "branch": "release/education-observer-native-20261029",
   "enabled": true,
-  "base": "908af20ecfbd3ede55685d2052bf01b52266661c",
-  "frozenDevelopmentHead": "1a7b4c22de57159deb38d9cce10749f481d26660",
-  "productHead": "1a7b4c22de57159deb38d9cce10749f481d26660",
+  "base": "f39a00f12fed2e1b8e1d3cc45185969262925ed8",
+  "frozenDevelopmentHead": "f9639a79f7b79d61a7a2edb2f45db9a6ed1b4869",
+  "productHead": "f9639a79f7b79d61a7a2edb2f45db9a6ed1b4869",
   "frontendTree": "8a10fe0cd4b78cf0fff76b77c5e76afbd801ef6a",
-  "backendTree": "3988da0f103f76f9b0fcfeb1f9f0d4e785986286",
+  "backendTree": "4294e657f5ebcc9a96d6215875cf581248f6eb79",
   "source": {
     "docs/development/education-observer-native-ci.md": {
       "before": "",
-      "after": "85022b0ef6230106640a638606d054a3e51c538c"
+      "after": "b6b02880341badd7027b7450d438139e9e0327c9"
     },
     "server-version/backend/prisma/migrations/20261028230000_education_scientific_definition_hash/migration.sql": {
       "before": "",
@@ -681,34 +681,32 @@
     ".github/scripts/school-teacher-self-bindings.json": "fa65ccd5b2df4f44e9771e5eb338102f1cb8271f",
     ".github/scripts/school-teacher-self.test.mjs": "c4fd118ac85d7b77d66b6878f6b469422d9ecea6",
     ".github/workflows/ci-school-teacher.yml": "45a4db88aa1b30e9d8c26dc17191100e37763f88",
-    ".github/workflows/ci.yml": "f16189d0d2171524b2d350690fd7db8f81e66a98",
+    ".github/workflows/ci.yml": "925606a2d9405fca545bd95f5b4fc839a944d676",
     "server-version/e2e/education-self-questionnaire.cjs": "af54e6357a1610d8cfd96e9853b173eb966c9dc3",
-    "server-version/e2e/school-teacher-browser.cjs": "265542e0e58f38fccaa8a4f9c13a9e9292e1b1b1",
     "server-version/e2e/school-teacher-chrome-permissions.cjs": "c2653f2aa38f48aaee1ab17291ed27cb8ea21df5",
     "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "a21ad90aab90e3e12e795301dc09af3505e05976",
     "server-version/e2e/school-teacher-ui.cjs": "fce1961fbf7e1e7a04d2eb9fc4656f4919b7acbd"
   },
   "controlAfter": {
-    ".github/scripts/school-teacher-checks.mjs": "524878a3c417f193e2aeb81f2674e2c694d6c57e",
+    ".github/scripts/school-teacher-checks.mjs": "3ab008be96c779e282d101f8d9c8277ad4659b71",
     ".github/scripts/school-teacher-observer-restore-input.sql.gz": "eb694d821fec247da9050c4511409673e6ee2f3c",
-    ".github/scripts/school-teacher-observer-reuse.cjs": "5ae6b712c1e42afefa7908ed18b15a38e83e7947",
-    ".github/scripts/school-teacher-observer-reuse.test.cjs": "2773f5a3895617e21b37427e00a98980726ddbdc",
-    ".github/scripts/school-teacher-scope.mjs": "b98c4accf5c08ee4aeb905fb88da741290822a8f",
+    ".github/scripts/school-teacher-observer-reuse.cjs": "bd6926981a7e61b73323222656dc6d21964671d4",
+    ".github/scripts/school-teacher-observer-reuse.test.cjs": "c4e2f5feb1533b0765dc818003340e7340729b26",
+    ".github/scripts/school-teacher-scope.mjs": "41e85a871dcc046937cbaf21547415132b5d6343",
     ".github/scripts/school-teacher-self-baseline.sql": "41aa7034b492471e930d4fa1b52f156c1184ddf3",
     ".github/scripts/school-teacher-self.test.mjs": "41193eb2371d265deb9f78128c0dd04b64ba9804",
-    ".github/workflows/ci-school-teacher.yml": "07c31327f7e474b2cb1162fac4027c1ccfed327f",
-    ".github/workflows/ci.yml": "9a68fcdc017577489a9aaebd15f79941df6cab14",
+    ".github/workflows/ci-school-teacher.yml": "63dfd260b83aa7126242cdcf0c40d3c105571c89",
+    ".github/workflows/ci.yml": "6ad0cc434a7e40e008b1da6206f0ee4145ab792a",
     "server-version/e2e/education-self-questionnaire.cjs": "e35445243a7a923f0c90624b1e2a2e0ea547da2f",
-    "server-version/e2e/school-teacher-browser.cjs": "229b42d2d67b326393c7841ab65c16fc52bc7860",
     "server-version/e2e/school-teacher-chrome-permissions.cjs": "dfb51e4ebe91247000e045cbaf09dc1bc495c2e5",
     "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "e69cab5e5f1ba8eaa182bef67529278232380f1d",
-    "server-version/e2e/school-teacher-ui.cjs": "44efda889fa060a2a6e775885eef55bff5f3c2ea"
+    "server-version/e2e/school-teacher-ui.cjs": "521dab47bdee058fe343602edc249ac00b2fdd6c"
   },
   "evidenceSha256": "db20d58fbafe0178969fa8ab3d13cde454131630bfe772beada344f6b4df37db",
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "A owns development, targeted validation, CI and normal merge under the latest user delegation. Reuse only the immutable official PR385 run 40849532868 successful stages and artifacts with unchanged complete application/fixture/schema/dependency trees; failed parent and restore remain explicit. No local test assertions admitted. Execute only missing restore, browser and changed CI-control checks."
+    "note": "A owns development, targeted validation, CI and normal merge under the latest user delegation. Reuse only immutable official PR385 successful assertions/frontend/audits after verifying identical runtime, fixtures, schema, dependencies and the exact unconsumed merged-main CLI delta. The compiled CLI changes, so build the backend fresh once. Verify merged-main PR386 CLI SAST separately; failed parents/restore stay explicit. No local test assertions admitted. Execute only missing restore, browser and changed CI-control checks."
   },
   "requiredJobs": [
     "admission",
@@ -720,7 +718,7 @@
   ],
   "qualification": "fixed-official-observer-continuation",
   "frontendBuildDecision": "fixed-official-observer-build",
-  "backendBuildDecision": "fixed-official-observer-build",
+  "backendBuildDecision": "fresh-main-tooling-integration",
   "execution": {
     "frontend": {
       "types": true,
@@ -917,10 +915,10 @@
           },
           {
             "path": "server-version/backend",
-            "tree": "3988da0f103f76f9b0fcfeb1f9f0d4e785986286"
+            "tree": "4294e657f5ebcc9a96d6215875cf581248f6eb79"
           }
         ],
-        "sha256": "63f5a5f5f73c5752a88ec422393bfafbf13513c58c76e8302169b84edc24628b"
+        "sha256": "0bb162a40ef284a1a4130675a74ea7faa0849b7ace95a74030e8c02e5e89f977"
       }
     },
     "backend": {
@@ -1356,14 +1354,14 @@
         "trees": [
           {
             "path": "server-version/backend",
-            "tree": "3988da0f103f76f9b0fcfeb1f9f0d4e785986286"
+            "tree": "4294e657f5ebcc9a96d6215875cf581248f6eb79"
           },
           {
             "path": "server-version/frontend",
             "tree": "8a10fe0cd4b78cf0fff76b77c5e76afbd801ef6a"
           }
         ],
-        "sha256": "ad797b1a9553e3e28b48f9fea76558b7c99ae62314531320c7807bb620d4ea48"
+        "sha256": "694001a9896cf9bbfcf7c1b6e41567ef35c99df9bad1681e2924b06956ea1ab2"
       }
     },
     "migration": {

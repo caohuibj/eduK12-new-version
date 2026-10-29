@@ -247,9 +247,7 @@ async function run() {
     const { treeDigest } = await import(pathToFileURL(path.join(repo, '.github/scripts/ci-artifact.mjs')).href)
     backendManifest = JSON.parse(fs.readFileSync(path.join(backend, 'dist/ci-build-manifest.json'), 'utf8'))
     Object.assign(buildEvidence, { officialBackendReuse,
-      backendCompileDigest: officialBackendReuse.originalRun === require('../../.github/scripts/school-teacher-observer-reuse.cjs').fixed.run
-        ? execFileSync('git', ['rev-parse', 'HEAD:server-version/backend'], { cwd: repo, encoding: 'utf8' }).trim()
-        : computeBackendCompileDigest(execFileSync('git', ['ls-tree', '-r', 'HEAD', '--', 'server-version/backend'], { cwd: repo, encoding: 'utf8' })),
+      backendCompileDigest: computeBackendCompileDigest(execFileSync('git', ['ls-tree', '-r', 'HEAD', '--', 'server-version/backend'], { cwd: repo, encoding: 'utf8' })),
       backendLockDigest: sha(fs.readFileSync(path.join(backend, 'package-lock.json'))),
       backendContentDigest: treeDigest(path.join(backend, 'dist')) })
     validateOfficialBackendReceipt(officialBackendReuse, { ...fixture.identity, runId: process.env.GITHUB_RUN_ID,

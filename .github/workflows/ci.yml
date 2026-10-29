@@ -437,7 +437,7 @@ jobs:
           execFileSync('git',['fetch','--no-tags','--depth=1','origin',source],{stdio:'inherit'});
           JS
       - name: fetch reviewed School Teacher product anchor without full history
-        if: (github.event_name == 'pull_request' && (github.event.pull_request.head.ref == 'work/school-teacher-review-20261022' || github.event.pull_request.head.ref == 'release/education-observer-native-20261029')) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (github.event.before == 'ea887330b6eba11013a00e294d5aff84ecfbaf36' || github.event.before == '908af20ecfbd3ede55685d2052bf01b52266661c'))
+        if: (github.event_name == 'pull_request' && (github.event.pull_request.head.ref == 'work/school-teacher-review-20261022' || github.event.pull_request.head.ref == 'release/education-observer-native-20261029')) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (github.event.before == 'ea887330b6eba11013a00e294d5aff84ecfbaf36' || github.event.before == 'f39a00f12fed2e1b8e1d3cc45185969262925ed8'))
         run: |
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict';

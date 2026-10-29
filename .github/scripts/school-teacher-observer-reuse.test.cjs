@@ -10,7 +10,7 @@ const b = () => JSON.parse(fs.readFileSync('.github/scripts/school-teacher-self-
 const hash = bytes => createHash('sha256').update(bytes).digest('hex')
 
 test('PR385 continuation pins completed source, whole consumer trees and exact invocation inputs', () => {
-  assert.deepEqual(reuse.verifyInputs(b(), git), { frontend: reuse.fixed.frontendTree, backend: reuse.fixed.backendTree })
+  assert.deepEqual(reuse.verifyInputs(b(), git), { frontend: reuse.fixed.frontendTree, backend: reuse.fixed.currentBackendTree, unchangedAssertionsExceptUnconsumedCli: reuse.fixed.toolingPath })
   for (const mutate of [x => x.base = 'a'.repeat(40), x => x.execution.officialContinuation.run++,
     x => x.execution.backend.batches[1].expectedPassed.pop(), x => x.execution.migration.restoreTables.pop()]) {
     const changed = b(); mutate(changed); assert.throws(() => reuse.verifyInputs(changed, git))
@@ -52,8 +52,8 @@ function build(kind) {
   const identity = { head, runId, kind, manifest, componentTree: receipt.componentTree, lockDigest: manifest.lockDigest, contentDigest: manifest.contentDigest }
   return { receipt, identity }
 }
-test('both unchanged official builds keep original manifests and reject fabricated identity bytes or consumer trees', () => {
-  for (const kind of ['frontend', 'backend']) {
+test('unchanged official frontend keeps its original manifest and rejects fabricated identity bytes or consumer trees', () => {
+  for (const kind of ['frontend']) {
     const f = build(kind); assert.equal(reuse.verifyBuildReceipt(f.receipt, f.identity), f.receipt)
     for (const mutate of [x => x.receipt.originalArtifact++, x => x.receipt.originalJobConclusion = 'failure',
       x => x.receipt.currentRun = '1', x => x.identity.componentTree = 'f'.repeat(40), x => x.identity.contentDigest = 'a'.repeat(64),
@@ -63,18 +63,19 @@ test('both unchanged official builds keep original manifests and reject fabricat
   }
 })
 test('browser consumer accepts the independently verified PR385 producers without relabelling them', () => {
-  const ui = require('../../server-version/e2e/school-teacher-ui.cjs'), front = build('frontend'), back = build('backend')
+  const ui = require('../../server-version/e2e/school-teacher-ui.cjs'), front = build('frontend')
+  const backend = { schemaVersion: 1, kind: 'backend', sha: front.identity.head, runId: front.identity.runId, contentDigest: 'b'.repeat(64), lockDigest: 'c'.repeat(64) }
   const options = { head: front.identity.head, tree: 'f'.repeat(40), runId: front.identity.runId,
-    frontend: front.receipt.manifest, backend: back.receipt.manifest,
-    officialFrontendReuse: front.receipt, officialBackendReuse: back.receipt,
-    frontendTree: front.identity.componentTree, backendCompileDigest: back.identity.componentTree,
+    frontend: front.receipt.manifest, backend,
+    officialFrontendReuse: front.receipt,
+    frontendTree: front.identity.componentTree,
     frontendLockDigest: front.identity.lockDigest, frontendContentDigest: front.identity.contentDigest,
-    backendLockDigest: back.identity.lockDigest, backendContentDigest: back.identity.contentDigest }
+    backendLockDigest: backend.lockDigest, backendContentDigest: backend.contentDigest }
   const report = { source: { head: options.head, tree: options.tree }, runId: options.runId,
     inputs: { frontend: options.frontend, backend: options.backend },
-    officialFrontendReuse: front.receipt, officialBackendReuse: back.receipt }
+    officialFrontendReuse: front.receipt }
   assert.equal(ui.validateReportBuildInputs(report, options).ok, true)
-  const changed = structuredClone(report); changed.inputs.backend.sha = options.head
+  const changed = structuredClone(report); changed.inputs.backend.sha = reuse.fixed.checkout
   assert.throws(() => ui.validateReportBuildInputs(changed, options))
 })
 test('restore fixture is fixed synthetic data with a complete 148-row SQL FK closure, never a local PASS attestation', () => {

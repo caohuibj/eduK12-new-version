@@ -10,21 +10,30 @@ const fixed = Object.freeze({
   run: 40849532868, head: 'fe17d12aae66965b59b3bc3ed93d17dd9455cfdb',
   checkout: '772a8ed525fd769ebd9e11a432b8f80ffa155612',
   base: '908af20ecfbd3ede55685d2052bf01b52266661c',
+  currentBase: 'f39a00f12fed2e1b8e1d3cc45185969262925ed8',
   branch: 'release/education-observer-native-20261029',
   frontendTree: '8a10fe0cd4b78cf0fff76b77c5e76afbd801ef6a',
   backendTree: '3988da0f103f76f9b0fcfeb1f9f0d4e785986286',
-  jobs: { frontend: 123365554023, backend: 123365554019, postgres: 123366364842,
+  currentBackendTree: '4294e657f5ebcc9a96d6215875cf581248f6eb79',
+  toolingPath: 'server-version/backend/src/scripts/cognitive-onboarding-check.ts',
+  oldToolingBlob: '975168fed2f76fe37d50c6373070b024ab16aa80',
+  currentToolingBlob: 'e6366a7f90bfc64142055c7710bbd39e1335fa07',
+  jobs: { frontend: 123365554023, postgres: 123366364842,
     audit: 123365554044, sast: 123365404071 },
   artifacts: {
     frontend: [12886686330, '3b366489e563d9e1eac207deb7820af73053e1bdaff0d482739eeb54ea7e0a2e', 'frontend'],
     frontendChecks: [12886631520, '7e5932fca8f348c79999eee1ff253f569e6029e786cb8c2b3598addc27dfd5f0', 'frontend-checks'],
-    backend: [12886786185, 'a902924fb401b7e38722756c4cd827be6315c66c2717c53805c1f971f3608c94', 'backend'],
-    backendChecks: [12885729242, '3b8cda439860fec7d3dc1ad65629852b8386bafb76441a2fc55d087c66b00b62', 'backend-checks'],
     postgres: [12885894459, 'e2dd5eb2def91cf53fe08e69f31f6eb51a2855143e7d393b7f6668bfdb7a5282', 'postgres'],
     audit: [12886162859, 'cd4dc341364eca56867936ad005fc555cbf3ac8fe31d35b0fb67e0c3152b673f', 'audit'],
   },
 })
 const mode = 'fixed-official-observer-continuation'
+const mainToolingSast = {
+  run: 40856204332, head: 'd612c0981603b835774ee489991ec040e94e76c0',
+  checkout: 'd23ac56880e188e350cc24e33d7d41601fd6d32d', job: 123387826227,
+  branch: 'ci/cognitive-intake-control-20261029',
+  config: 'paths: [.github/scripts, server-version/scripts/release, server-version/backend/scripts/scale-intake-selected-check.ts, server-version/backend/scripts/scale-intake-selected-check.test.ts, server-version/backend/src/scripts/cognitive-onboarding-check.ts, server-version/scripts/cognitive]',
+}
 const controlPaths = [
   '.github/scripts/school-teacher-self-bindings.json', '.github/scripts/school-teacher-checks.mjs',
   '.github/scripts/school-teacher-scope.mjs', '.github/scripts/school-teacher-self.test.mjs',
@@ -39,14 +48,36 @@ const controlSastPaths = 'paths: [.github/scripts/school-teacher-checks.mjs, .gi
 const hash = v => createHash('sha256').update(v).digest('hex')
 
 function verifyInputs(b, git) {
-  assert.equal(b.qualification, mode); assert.equal(b.branch, fixed.branch); assert.equal(b.base, fixed.base)
+  assert.equal(b.qualification, mode); assert.equal(b.branch, fixed.branch); assert.equal(b.base, fixed.currentBase)
   assert.deepEqual(b.execution.officialContinuation, { run: fixed.run, head: fixed.head, checkout: fixed.checkout })
   assert.equal(git('rev-parse', fixed.head + '^{tree}'), git('rev-parse', fixed.checkout + '^{tree}'))
   const old = JSON.parse(git('show', fixed.checkout + ':.github/scripts/school-teacher-self-bindings.json'))
-  for (const component of ['frontend', 'backend']) {
-    assert.equal(git('rev-parse', 'HEAD:server-version/' + component), fixed[component + 'Tree'])
-    assert.deepEqual(b.execution[component], old.execution[component], component + ' invocation or dependency closure drift')
+  // PR386 changed precisely one standalone CLI that none of these application
+  // assertions imports. Pin both blobs and all remaining backend bytes. The CLI
+  // is compiled in the backend distribution, so its BUILD is fresh, never reused.
+  assert.equal(git('diff', '--name-only', fixed.head, 'HEAD', '--', 'server-version/backend'), fixed.toolingPath)
+  assert.equal(git('rev-parse', fixed.head + ':' + fixed.toolingPath), fixed.oldToolingBlob)
+  assert.equal(git('rev-parse', 'HEAD:' + fixed.toolingPath), fixed.currentToolingBlob)
+  function unchangedAssertionClosure(value) {
+    const next = structuredClone(value)
+    function visit(v) {
+      if (!v || typeof v !== 'object') return
+      if (Array.isArray(v.files) && Array.isArray(v.trees) && v.sha256) {
+        assert.equal(hash(JSON.stringify({ files: v.files, trees: v.trees })), v.sha256)
+        for (const t of v.trees) if (t.path === 'server-version/backend') {
+          assert.equal(t.tree, fixed.currentBackendTree); t.tree = fixed.backendTree
+        }
+        v.sha256 = hash(JSON.stringify({ files: v.files, trees: v.trees }))
+      }
+      for (const child of Object.values(v)) visit(child)
+    }
+    visit(next); return next
   }
+  for (const component of ['frontend', 'backend']) {
+    assert.equal(git('rev-parse', 'HEAD:server-version/' + component), component === 'backend' ? fixed.currentBackendTree : fixed.frontendTree)
+    assert.deepEqual(unchangedAssertionClosure(b.execution[component]), old.execution[component], component + ' invocation or dependency closure drift')
+  }
+  assert.equal(git('rev-parse', fixed.currentBase + ':server-version/backend/prisma'), git('rev-parse', fixed.base + ':server-version/backend/prisma'))
   for (const p of ['server-version/shared', 'server-version/scripts/ci-install-canvas-deps.sh', '.github/release-tools'])
     assert.equal(git('ls-tree', '-r', 'HEAD', '--', p), git('ls-tree', '-r', fixed.checkout, '--', p))
   assert.deepEqual(b.execution.auditComponents, old.execution.auditComponents)
@@ -54,15 +85,21 @@ function verifyInputs(b, git) {
   migration.restoreTables = migration.restoreTables.filter(t => t !== 'cognitive_trials')
   assert.deepEqual(b.execution.migration, migration, 'Only the false nonempty legacy-table requirement changes')
   const changed = git('diff', '--name-only', fixed.head, 'HEAD').split('\n').filter(Boolean)
-  assert(changed.length > 0); for (const p of changed) assert(controlPaths.includes(p), 'Unexpected continuation input ' + p)
-  return { frontend: fixed.frontendTree, backend: fixed.backendTree }
+  const mainChanges = new Set(git('diff', '--name-only', fixed.base, fixed.currentBase).split('\n'))
+  assert(changed.length > 0); for (const p of changed) if (!controlPaths.includes(p)) {
+    assert(mainChanges.has(p), 'Unexpected continuation input ' + p)
+    assert.equal(git('ls-tree', '-r', 'HEAD', '--', p), git('ls-tree', '-r', fixed.currentBase, '--', p), 'Merged main control changed: ' + p)
+    assert.equal(git('ls-tree', '-r', fixed.head, '--', p), git('ls-tree', '-r', fixed.base, '--', p))
+  }
+  return { frontend: fixed.frontendTree, backend: fixed.currentBackendTree, unchangedAssertionsExceptUnconsumedCli: fixed.toolingPath }
 }
 function verifyJob(run, job, kind, now = Date.now()) {
+  assert(Object.hasOwn(fixed.jobs, kind))
   assert.equal(run.id, fixed.run); assert.equal(run.head_sha, fixed.head); assert.equal(run.head_branch, fixed.branch)
   assert.equal(run.path, '.github/workflows/ci.yml'); assert.equal(run.event, 'pull_request'); assert.equal(run.run_attempt, 1)
   assert.equal(run.status, 'completed'); assert.equal(run.conclusion, 'failure'); assert(run.pull_requests.some(p => p.number === 385))
   assert.equal(job.id, fixed.jobs[kind]); assert.equal(job.run_id, fixed.run); assert.equal(job.head_sha, fixed.head)
-  const names = { frontend: 'school-teacher / frontend', backend: 'school-teacher / backend-self',
+  const names = { frontend: 'school-teacher / frontend',
     postgres: 'school-teacher / postgres-self', audit: 'school-teacher / security', sast: 'codeql (javascript/typescript SAST)' }
   assert.equal(job.name, names[kind]); assert.equal(job.status, 'completed')
   assert.equal(job.conclusion, kind === 'postgres' ? 'failure' : 'success')
@@ -91,6 +128,7 @@ function verifyCases(read, b, component, verifyTestReport) {
   return passed
 }
 function verifyBuildReceipt(r, { head, runId, kind, manifest, componentTree, lockDigest, contentDigest }) {
+  assert.equal(kind, 'frontend', 'Changed compiled CLI requires a new backend build')
   assert.match(head, /^[a-f0-9]{40}$/); assert.match(runId, /^\d+$/)
   const [artifact, digest] = fixed.artifacts[kind]
   assert.deepEqual(r, { schemaVersion: 1, status: 'VERIFIED_OFFICIAL_' + kind.toUpperCase() + '_BUILD',
@@ -110,9 +148,6 @@ const buildManifests = {
   frontend: { schemaVersion: 1, sha: fixed.checkout, runId: String(fixed.run), kind: 'frontend',
     lockDigest: 'ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe',
     contentDigest: '64afa264c40c8c373bc743ca554b6d8543fca7c9125edcc13e47380daafdb2a2' },
-  backend: { schemaVersion: 1, sha: fixed.checkout, runId: String(fixed.run), kind: 'backend',
-    lockDigest: '01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450',
-    contentDigest: 'e6a49d7769883e0c38da4db1a54be383944b29d92de97e814cc8c78fa27c0b87' },
 }
 
 async function reuse(kind, b, d) {
@@ -127,9 +162,9 @@ async function reuse(kind, b, d) {
     originalCheckout: fixed.checkout, originalJob: job.id, originalJobConclusion: job.conclusion,
     originalParentConclusion: 'failure', currentHead: d.git('rev-parse', 'HEAD'), currentRun: process.env.GITHUB_RUN_ID,
     inputs, currentBusinessTestsExecuted: false }
-  if (kind === 'frontend' || kind === 'backend') {
+  if (kind === 'frontend') {
     const read = d.jsonZip(await artifact(kind + 'Checks'))
-    for (const stage of kind === 'frontend' ? ['frontend-types', 'frontend-lint', 'frontend-build', 'frontend-manifest'] : ['backend-build', 'backend-manifest']) {
+    for (const stage of ['frontend-types', 'frontend-lint', 'frontend-build', 'frontend-manifest']) {
       const c = read('command-' + stage + '.json'); assert.equal(c.status, 'COMMAND_SUCCEEDED'); assert.equal(c.exitCode, 0)
     }
     if (kind === 'frontend') result.passed = verifyCases(read, b, kind, d.verifyTestReport)
@@ -153,7 +188,7 @@ async function reuse(kind, b, d) {
     result.audit = audit
   } else if (kind === 'sast') {
     const full = 'paths: [server-version/backend/src, server-version/frontend/src, server-version/e2e, .github/scripts]'
-    const original = d.git('show', fixed.checkout + ':.github/workflows/ci.yml'), current = fs.readFileSync('.github/workflows/ci.yml', 'utf8').trimEnd()
+    const original = d.git('show', fixed.currentBase + ':.github/workflows/ci.yml'), current = fs.readFileSync('.github/workflows/ci.yml', 'utf8').trimEnd()
     const stage = (text, name) => { const section = text.slice(text.indexOf('  codeql:\n'), text.indexOf('\n  miniprogram:\n'));
       const start = section.indexOf('      - name: ' + name + '\n'); assert(start >= 0)
       const end = section.indexOf('\n      - ', start + 1); return section.slice(start, end < 0 ? undefined : end) }
@@ -165,6 +200,23 @@ async function reuse(kind, b, d) {
     assert(log.includes('config: ' + full)); assert(log.includes('languages: javascript-typescript'))
     assert(new RegExp('\\n[0-9T:.-]+Z ' + fixed.checkout + '(?:\\r?\\n|$)').test(log))
     result.originalJobLogSha256 = hash(log); result.applicationScannedAgain = false; result.currentChangedControlScanRequired = true
+    // The sole new compiled CLI is already qualified on merged main PR386.
+    // Read that immutable official SAST identity; do not rescan the passed CLI.
+    const mr = await d.officialApi('/actions/runs/' + mainToolingSast.run), mj = await d.officialApi('/actions/jobs/' + mainToolingSast.job)
+    assert.equal(mr.id, mainToolingSast.run); assert.equal(mr.head_sha, mainToolingSast.head); assert.equal(mr.head_branch, mainToolingSast.branch)
+    assert.equal(mr.path, '.github/workflows/ci.yml'); assert.equal(mr.event, 'pull_request'); assert.equal(mr.run_attempt, 1)
+    assert.equal(mr.status, 'completed'); assert.equal(mr.conclusion, 'success'); assert(mr.pull_requests.some(p => p.number === 386))
+    assert.equal(mj.id, mainToolingSast.job); assert.equal(mj.run_id, mr.id); assert.equal(mj.head_sha, mr.head_sha)
+    assert.equal(mj.name, 'codeql (javascript/typescript SAST)'); assert.equal(mj.status, 'completed'); assert.equal(mj.conclusion, 'success')
+    const age = Date.now() - Date.parse(mj.completed_at); assert(Number.isFinite(age) && age >= 0 && age <= 86400000)
+    for (const name of ['initialize CodeQL', 'analyze with CodeQL']) assert(mj.steps.some(s => s.name === name && s.status === 'completed' && s.conclusion === 'success'))
+    const tree = d.git('rev-parse', fixed.currentBase + '^{tree}')
+    assert.equal(d.git('rev-parse', mainToolingSast.head + '^{tree}'), tree)
+    assert.equal((await d.officialApi('/git/commits/' + mainToolingSast.checkout)).tree.sha, tree)
+    const ml = (await d.officialApi('/actions/jobs/' + mj.id + '/logs', true)).toString('utf8')
+    assert(ml.includes('config: ' + mainToolingSast.config)); assert(ml.includes('languages: javascript-typescript'))
+    assert(new RegExp('\\n[0-9T:.-]+Z ' + mainToolingSast.checkout + '(?:\\r?\\n|$)').test(ml))
+    result.mainToolingSast = { ...mainToolingSast, originalJobLogSha256: hash(ml), tree, currentScanExecuted: false }
   } else assert.fail('Unknown continuation kind')
   d.receipt('observer-official-' + kind + '-reuse', result)
   return result
@@ -218,4 +270,4 @@ async function restore(b, d) {
     sourceHead: d.git('rev-parse', 'HEAD'), runId: process.env.GITHUB_RUN_ID,
     preserved, restrictedRuntimeRole: true, releaseSchemaVerified: true })
 }
-module.exports = { fixed, mode, controlPaths, controlSastPaths, buildManifests, restoreInput, verifyInputs, verifyJob, verifyCases, verifyBuildReceipt, reuse, verifyArtifact, restore }
+module.exports = { fixed, mode, controlPaths, controlSastPaths, buildManifests, restoreInput, mainToolingSast, verifyInputs, verifyJob, verifyCases, verifyBuildReceipt, reuse, verifyArtifact, restore }

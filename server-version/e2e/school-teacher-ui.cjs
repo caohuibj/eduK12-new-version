@@ -448,10 +448,6 @@ function computeBackendCompileDigest(lsTreeText, { historical = false } = {}) {
   return require('node:crypto').createHash('sha256').update(included.join('\n') + '\n').digest('hex')
 }
 function validateOfficialBackendReceipt(receipt, { head, runId, backend, backendCompileDigest, backendLockDigest, backendContentDigest }) {
-  if (receipt?.originalRun === observerReuse.fixed.run) return observerReuse.verifyBuildReceipt(receipt, {
-    head, runId, kind: 'backend', manifest: backend, componentTree: backendCompileDigest,
-    lockDigest: backendLockDigest, contentDigest: backendContentDigest,
-  })
   assert.deepEqual(Object.keys(receipt).sort(), ['schemaVersion', 'status', 'currentHead', 'currentRun',
     ...Object.keys(OFFICIAL_BACKEND), 'manifest'].sort())
   assert.equal(receipt.schemaVersion, 1); assert.equal(receipt.status, 'VERIFIED_OFFICIAL_BACKEND_BUILD')

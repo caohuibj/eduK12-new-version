@@ -225,19 +225,15 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 24.21.0
-    - if: fromJSON(inputs.plan).continuation != 'observer-run2'
-      run: npm ci --ignore-scripts --prefix .github/release-tools
-    - if: fromJSON(inputs.plan).continuation != 'observer-run2'
-      run: bash server-version/scripts/ci-install-canvas-deps.sh
-    - if: fromJSON(inputs.plan).continuation != 'observer-run2'
-      working-directory: server-version/backend
+    - run: npm ci --ignore-scripts --prefix .github/release-tools
+    - run: bash server-version/scripts/ci-install-canvas-deps.sh
+    - working-directory: server-version/backend
       run: npm ci
-    - if: fromJSON(inputs.plan).continuation != 'observer-run2'
-      working-directory: server-version/backend
+    - working-directory: server-version/backend
       run: |
         node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
         node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
-    - name: verify the fixed official backend build or compile fresh inputs once
+    - name: compile the changed main tooling input and current backend exactly once
       run: node .github/scripts/school-teacher-checks.mjs backend
     - uses: actions/upload-artifact@v4
       with:
