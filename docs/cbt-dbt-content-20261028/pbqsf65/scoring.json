@@ -1,0 +1,22 @@
+{
+  "instrument": "Personality Belief Questionnaire – Short Form (PBQ-SF), 65-item",
+  "item_count": 65,
+  "options": [0, 1, 2, 3, 4],
+  "dimensions": {
+    "avoidant": [1, 2, 5, 31, 33, 39, 43],
+    "dependent": [15, 18, 44, 45, 56, 62, 63],
+    "passive_aggressive": [4, 7, 20, 21, 41, 47, 51],
+    "obsessive_compulsive": [6, 9, 11, 19, 30, 40, 57],
+    "antisocial": [23, 32, 35, 38, 42, 59, 61],
+    "narcissistic": [10, 16, 26, 27, 46, 58, 60],
+    "histrionic": [8, 22, 34, 37, 52, 54, 55],
+    "schizoid": [12, 25, 28, 29, 36, 50, 53],
+    "paranoid": [3, 13, 14, 17, 24, 48, 49],
+    "borderline": [31, 44, 45, 49, 56, 64, 65]
+  },
+  "reverse_items": [],
+  "sum_ranges_note": "each scale 0-28; official scoring defines no total score",
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "Scale keys per the official 'Personality Belief Questionnaire – Short Form (PBQ-SF) Scoring Key' (A.C. Butler, 6/00) distributed in the same Beck Institute packet. Items 31/44/45/49/56 belong to one PD scale AND to Borderline (official overlap); the ten scales jointly cover all 65 items exactly once. The printed Z-score formulas (based on 683 psychiatric outpatients with mixed diagnoses) are recorded here but NOT implemented: raw sums only, no norms, no cut-offs. Official scoring defines no total score."
+}
