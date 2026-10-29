@@ -335,6 +335,18 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['题目内容与正确项（frozen bank + seed 抽题顺序）'],
     serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
   },
+  readingcomp: {
+    testType: 'readingcomp',
+    clientObservedFacts: ['选项选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['题目内容与正确项（frozen bank + seed 抽题顺序）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
+  },
+  proofread: {
+    testType: 'proofread',
+    clientObservedFacts: ['选项选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['题目内容与正确项（frozen bank + seed 抽题顺序）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
+  },
   pursuitrotor: {
     testType: 'pursuitrotor',
     clientObservedFacts: ['在目标上时间', '总追踪时长', 'interrupted'],
@@ -589,6 +601,16 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
   },
   seriescomplete: {
     testType: 'seriescomplete',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  readingcomp: {
+    testType: 'readingcomp',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['阅读时长与眼动', '真实 input modality', 'device provenance'],
+  },
+  proofread: {
+    testType: 'proofread',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
   },

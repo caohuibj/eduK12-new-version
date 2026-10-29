@@ -66,12 +66,17 @@ describe('maze scorer', () => {
   })
 
   it('marks incomplete mazes and sets pathEfficiency to null', () => {
+    // Use only legal moves that don't reach the goal
+    const maze = generateMaze('seed-1', 0, 7, 7)
+    // Find a legal move from start
+    const legalDirs = [0, 1, 2, 3].filter((d) => isMoveLegal(maze.walls, 0, 0, d))
+    const moves = legalDirs.slice(0, 1) // just 1 legal move, won't reach goal
     const result = scoreMazeV1({
       config,
       randomSeed: 'seed-1',
       trials: [
-        { trialIndex: 0, payload: { mazeIndex: 0, moves: [1, 2, 1, 2], completionTimeMs: null, completed: false, interrupted: false } },
-        { trialIndex: 1, payload: { mazeIndex: 1, moves: [1, 2, 1, 2], completionTimeMs: null, completed: false, interrupted: false } },
+        { trialIndex: 0, payload: { mazeIndex: 0, moves, completionTimeMs: null, completed: false, interrupted: false } },
+        { trialIndex: 1, payload: { mazeIndex: 1, moves, completionTimeMs: null, completed: false, interrupted: false } },
       ],
     })
     expect(result.metrics.pathEfficiency).toBeNull()
