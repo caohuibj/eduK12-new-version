@@ -1,0 +1,1895 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ars30_2016_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "学业韧性量表（ARS-30，30题）— 中文工作译稿",
+      "abbreviation": "ARS-30-ZH-WORKING",
+      "instrumentFamily": "Academic Resilience Scale (ARS-30)"
+    },
+    "construct": {
+      "primaryDomain": "RESILIENCE",
+      "secondaryDomains": [
+        "MOTIVATION",
+        "WELL_BEING"
+      ],
+      "constructDefinition": "在给定的作业受挫情境中，个体自述作出作者判定为适应性反应的倾向：受挫后继续尝试（14题）、回顾方法与主动求助（9题）、面对受挫时的难受与慌乱（7题），此为原论文的三维结构；测量的是假设情境中的设想反应，不是实际行为、学业能力、人格特质、心理健康诊断或未来成绩预测。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:academic_resilience",
+        "domain:motivation_learning",
+        "domain:wellbeing_strength",
+        "domain:selfreg_executive",
+        "construct:academic_resilience",
+        "construct:perseverance",
+        "construct:adaptive_help_seeking",
+        "construct:learning_self_reflection",
+        "construct:emotional_response_to_setback",
+        "construct:hypothetical_adversity_response",
+        "construct:not_objective_ability",
+        "construct:not_diagnostic_emotion_index",
+        "orientation:educational_psychology",
+        "orientation:self_regulated_learning",
+        "orientation:self_efficacy_theory",
+        "orientation:not_therapy_specific",
+        "population:adult_university_students",
+        "population:project_18_plus",
+        "population:original_british_undergraduates",
+        "population:original_personal_vignette_n321",
+        "population:comparison_other_vignette_n211",
+        "population:not_k12_validated",
+        "population:not_chinese_validated",
+        "response:self",
+        "response:30_items",
+        "response:required_personal_adversity_vignette",
+        "response:vignette_frozen_via_instruction",
+        "response:fixed_table2_order",
+        "response:five_point_1_to_5",
+        "response:likely_to_unlikely",
+        "response:20_positive_items_reversed",
+        "response:one_total_three_facets",
+        "response:no_recall_window",
+        "response:complete_required_project_proposal",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_empirical_cutoffs",
+        "license:cc_by_4_0_article_carrier_only",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:2015_standalone_form_separate_terms",
+        "license:no_author_endorsement",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_work_translation",
+        "language_validation:expert_translation_review_pending",
+        "language_validation:cognitive_interviews_pending",
+        "language_validation:local_validation_pending",
+        "ARS-30",
+        "Academic Resilience Scale",
+        "学业韧性",
+        "学业受挫",
+        "作业反馈",
+        "坚持尝试",
+        "反思方法",
+        "主动求助",
+        "大学生自评",
+        "中文工作译稿",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原研究为英国大学生总样本N=532；其中本人受挫情境 n=321、他人比较情境 n=211，两者不能合并视为同一版本的主验证样本。平台18+为项目保守边界；未建立 K12 或中国人群验证，不外推。"
+    },
+    "administration": {
+      "itemCount": 30,
+      "estimatedMinutes": 10,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "假设情境，无固定回顾时窗；全部30题围绕同一段作业受挫情境作答。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "本人受挫情境必须在全部30题之前完整呈现；通过 versioned instruction 冻结并展示，不删除、不塞入第1题、不作为计分题、不替换为他人 John 情境。",
+        "固定 Table2 的30题原序，平台不重排、不加注意力题。",
+        "原始端点 1=likely 很可能、5=unlikely 不太可能；中间2/3/4仅保留数字，不补造作者文字锚点。",
+        "正向反应题按 6−x 转换：2,4,8,9,10,11,13,16,17,18,20,21,22,23,24,25,26,27,29,30 共20题。",
+        "第23题属于第三维度，但按原作者正向反应题方式以 6−x 转换，不得按维度标签自动改为不转换。",
+        "第三维度转换后更高表示自述中更少意料之外的慌乱与失控感，报告不得写成“负性情绪越多”，也不作为临床情绪指标。",
+        "三维题数14/9/7，范围14–70、9–45、7–35；总分30–150。原论文Table5第三维度误写5–35，此处按实算7–35，不伪造作者勘误。",
+        "Table2“所有题高分更同意”引导句与 Methods 及转换方向不一致，已记录，不用于计分算法。",
+        "complete_required 为项目保守缺答约定：缺任一题时该缺失维度与总分均为 null，不补零、不插补。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原英语版本在英国大学生本人生情境样本有初步证据；独立中文工作稿未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助大学生回顾自己在作业受挫情境中的设想反应；不作能力、人格或诊断判定。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ars30-cassidy2016-en-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "英国大学生；本人受挫情境 n=321 为与本工具 version 直接相关的样本",
+        "ageRange": "原样本未报告精确年龄边界；平台以18+作为保守项目边界",
+        "locale": "en",
+        "territory": "GB",
+        "sampleSize": 321,
+        "studyDesign": "原论文 Methods/Table2/Table3 报告30题三维结构（14/9/7）；总样本532含他人比较情境211，不合并计入本工具有效验证样本。",
+        "rating": "MIXED",
+        "citation": "Cassidy, S. (2016). The Academic Resilience Scale (ARS-30): A New Multidimensional Construct Measure. Frontiers in Psychology, 7, 1787. https://doi.org/10.3389/fpsyg.2016.01787.",
+        "doi": "10.3389/fpsyg.2016.01787",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2016.01787/full",
+        "notes": "采用2016年 CC BY 4.0 论文正文载体中 Methods 的本人逆境情境、Table2 完整30题及分维计分说明；未采用2015独立表单的同意度锚点与版式。评为 MIXED 是因为原英语版仅有初步结构证据，而独立中文工作稿没有任何中国人群验证。"
+      }
+    ]
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ars30_2016_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ars30_2016_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ars30_2016_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2016 Simon Cassidy. Cassidy, S. (2016). The Academic Resilience Scale (ARS-30): A New Multidimensional Construct Measure. Frontiers in Psychology, 7, 1787. https://doi.org/10.3389/fpsyg.2016.01787. 必需本人受挫情境与30题文取自2016论文Methods与Table2，采用CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）；作者2015独立表单/网站版本限定非商业研究且使用同意度锚点，不作为本版本许可依据，也不复制其指导语与版式。中文题文、情境译文及作答说明为EDUK12.TOP独立工作翻译／改编，报告为平台原创；改动包括语言转换、数字化、成人下限18+与完整作答项目约定、并按4/5理论范围纠正原Table5第三维5–35的笔误。不是任何已出版中文ARS译本，不继承其验证。署名、来源、许可链接与改动说明随再分发保留；无作者背书，系统启用仍需真实授权治理。",
+      "事实标签只用于检索，不授予系统实际使用权。DRAFT/CANDIDATE不能据文件存在激活。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "The Academic Resilience Scale (ARS-30): A New Multidimensional Construct Measure — 2016 article Methods personal vignette and Table2",
+        "citation": "Cassidy, S. (2016). The Academic Resilience Scale (ARS-30): A New Multidimensional Construct Measure. Frontiers in Psychology, 7, 1787.",
+        "url": "https://doi.org/10.3389/fpsyg.2016.01787",
+        "publicationYear": 2016
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ars30_likelihood_1_5",
+          "options": [
+            {
+              "value": "1",
+              "score": 1,
+              "label": "很可能"
+            },
+            {
+              "value": "2",
+              "score": 2,
+              "label": "2"
+            },
+            {
+              "value": "3",
+              "score": 3,
+              "label": "3"
+            },
+            {
+              "value": "4",
+              "score": 4,
+              "label": "4"
+            },
+            {
+              "value": "5",
+              "score": 5,
+              "label": "不太可能"
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "ARS30_2016_01",
+          "content": "我不会接受老师的反馈。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_02",
+          "content": "我会利用这些反馈来改进作业。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_03",
+          "content": "我会直接放弃。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_04",
+          "content": "我会用这次经历激励自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_05",
+          "content": "我会改变自己的职业规划。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_06",
+          "content": "我可能会生气。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_07",
+          "content": "我会开始觉得，自己在大学取得成功的希望很小。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_08",
+          "content": "我会把这种情况看作一次挑战。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_09",
+          "content": "我会尽力不再想那些消极的念头。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_10",
+          "content": "我会认为这种情况只是暂时的。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_11",
+          "content": "我会更加努力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_12",
+          "content": "我可能会感到情绪低落。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_13",
+          "content": "我会尝试想出新的解决办法。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_14",
+          "content": "我会非常失望。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_15",
+          "content": "我会责怪老师。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_16",
+          "content": "我会继续尝试。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_17",
+          "content": "我不会改变自己的长期目标和抱负。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_18",
+          "content": "我会用过去的成功经历来激励自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_19",
+          "content": "我会开始觉得，自己得到理想工作的希望很小。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_20",
+          "content": "我会开始检查和评估自己的学习成果及付出的努力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_21",
+          "content": "我会向老师寻求帮助。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 20,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_22",
+          "content": "我会鼓励自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 21,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_23",
+          "content": "我会让自己不慌乱。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 22,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_24",
+          "content": "我会尝试不同的学习方法。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 23,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_25",
+          "content": "我会为自己设定学习目标。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 24,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_26",
+          "content": "我会向家人和朋友寻求鼓励。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 25,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_27",
+          "content": "我会更多地思考自己的长处和不足，帮助自己学得更好。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 26,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_28",
+          "content": "我会觉得，一切都毁了，什么都不对劲。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 27,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_29",
+          "content": "我会根据自己的表现，给自己设定奖励和惩罚。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 28,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ARS30_2016_30",
+          "content": "我会期待证明自己的成绩能够提高。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 29,
+          "responseSetKey": "ars30_likelihood_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "ARS30_2016_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_02",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_04",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_10",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_11",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_13",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_16",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_17",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_18",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_20",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_21",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_22",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_23",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_24",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_25",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_26",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_27",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_29",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ARS30_2016_30",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "学业韧性总分（30题）",
+            "description": "30题按正反方向转换后求和，范围30–150。更高表示在这段作业受挫情境中，自述更可能作出作者判定的适应性反应；这是在假设情境中的自评，不是实际行为、学业能力或成绩预测。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ARS30_2016_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_27",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_30",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "perseverance",
+            "type": "dimension",
+            "label": "受挫后继续尝试",
+            "description": "14题反向/正向混合后求和，范围14–70。转换后更高表示更多自述的适应性设想反应，例如继续尝试、利用反馈、坚持长期目标；不是实际能力、也不是“必须坚持同一办法”的建议。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ARS30_2016_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_30",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "reflection_help_seeking",
+            "type": "dimension",
+            "label": "回顾方法与主动求助",
+            "description": "9题全部按6−x转换后求和，范围9–45。转换后更高表示更多自述的回顾做法与主动求助倾向；不是社交能力或人际关系质量。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ARS30_2016_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_27",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_29",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "adaptive_emotional_response",
+            "type": "dimension",
+            "label": "面对受挫时的难受与慌乱",
+            "description": "7题求和，范围7–35。其中第23题虽属本维度，仍按原作者正向反应题以6−x转换。转换后更高表示自述中更少意料之外的慌乱与失控感，不等同于“负性情绪越多”或临床情绪指标。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ARS30_2016_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ARS30_2016_28",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total",
+          "perseverance",
+          "reflection_help_seeking",
+          "adaptive_emotional_response"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "从一段受挫设想，找出可以回看的反应",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "可以带走的一点：反馈可以用于改进作业，不必变成对整个人的判决。\n\n你回答的是同一段假设：作业不及格、近期成绩不理想，又收到严厉反馈。30题总分30–150，数值越大，表示按原计分方向，这段设想中整体更偏向继续尝试、调整与求助、较少慌乱等反应。它不表示你已经恢复、实际考试表现更好或下次一定进步。\n\n例如，在类似情境中，一个人可能先失望，随后才愿意看清可修改的要求。难受、寻求支持与继续尝试可以前后出现，不必选一种“正确性格”。下方三组帮助分开看这些设想，分数不能替你决定现实中应该坚持什么。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如果现实中有类似经历，可先分开“反馈提到了什么”和“我由此怎样评价自己”，不要把一次作业直接写成整个人的结论。"
+              },
+              {
+                "category": "support",
+                "text": "先判断眼下更需要信息、缓冲还是有人陪着梳理；不必在最难受时立刻独自处理全部反馈。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "perseverance",
+            "headline": "继续尝试，也可以调整走法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一组14题范围14–70。数值越大，表示在同一作业情境中整体更认可继续尝试、利用反馈和保持目标等设想反应，不是实际坚持能力。\n\n例如，继续努力可以是改用另一种论证方法，而非把旧稿一遍遍重写。若现实中需要重新考虑方向，也不能只因问卷如何计分就认定改变目标是失败。可以保留值得保留的目标，同时给方法留调整余地。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "区分仍在意的目标和原先的方法：你想保留什么，哪种做法不必原样保留？"
+              },
+              {
+                "category": "strategy",
+                "text": "从一条具体反馈选择一种可尝试的修订，例如补证据或换结构；不是只增加用力程度。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "reflection_help_seeking",
+            "headline": "把反馈转成一个可以问清的问题",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一组9题范围9–45。数值越大，表示在这段设想中整体更认可回顾学习方法、设目标、鼓励自己或求助等反应。它不能说明现实里有没有可求助的人。\n\n例如，“表达欠佳”很笼统，可以问清是结构、证据还是措辞需要调整。若已有可靠支持可以使用；暂时缺支持不是能力不足。题目中的自我奖惩只是测量内容，并不是本报告建议惩罚自己。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "把一条不清楚的意见改成具体问题，如“这一段最需要补哪种依据？”再找合适的人确认。"
+              },
+              {
+                "category": "support",
+                "text": "也可以向家人或朋友说明需要的是倾听、鼓励还是讨论办法，不必让每个人都承担专业指导。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "adaptive_emotional_response",
+            "headline": "给情境里的难受留一点缓冲",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一组7题范围7–35。经过方向换算后，数值越大表示设想中较少预期慌乱、失控或一切无望等反应，不能读成“负面情绪更多”。它仍不是实际情绪健康的测量。\n\n若现实遇到相似挫折，可以先承认失望或生气，再决定何时回看反馈。缓冲不等于放弃，也不要求自己马上平静；这段假设回答不能证明你实际承受过多少难受。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "若愿意，先用一个大概的词描述当下感受，分清最难受的是分数、批评、目标受影响还是别的部分。"
+              },
+              {
+                "category": "support",
+                "text": "给自己适合的休息和支持，再决定何时处理可修改的内容；不把“必须立刻没情绪”当作要求。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是大学作业假设情境中的自我描述，不提供中文等级或排名，也不是实际表现或成绩预测。30题答完整才提供整份解释，漏答不补0。"
+        ],
+        "disclaimer": "用于大学生回顾自己在作业受挫情境中的设想反应，不作诊断、能力评价、人格标签或成绩预测。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T16:04:01Z",
+            "basis": "本次只读审阅ars30_2016_zh_cn_research C1.0.0精确source、既有固定方法证据及新R1.1.0文字，核情境/构念/组别方向/时窗/人群、0与null、固定例子及可选行动；不继承旧日期，不声称作者批准、平台科学验证或新schema/scorer/PG/CI通过。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ars30",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "min_score",
+        "answers": [
+          {
+            "itemCode": "ARS30_2016_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_24",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_27",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_30",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 30,
+            "perseverance": 14,
+            "reflection_help_seeking": 9,
+            "adaptive_emotional_response": 7
+          },
+          "totalScoreKeys": [
+            "total",
+            "perseverance",
+            "reflection_help_seeking",
+            "adaptive_emotional_response"
+          ]
+        }
+      },
+      {
+        "name": "max_score",
+        "answers": [
+          {
+            "itemCode": "ARS30_2016_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_28",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_30",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 150,
+            "perseverance": 70,
+            "reflection_help_seeking": 45,
+            "adaptive_emotional_response": 35
+          },
+          "totalScoreKeys": [
+            "total",
+            "perseverance",
+            "reflection_help_seeking",
+            "adaptive_emotional_response"
+          ]
+        }
+      },
+      {
+        "name": "all_likely",
+        "answers": [
+          {
+            "itemCode": "ARS30_2016_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ARS30_2016_30",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 110,
+            "perseverance": 54,
+            "reflection_help_seeking": 45,
+            "adaptive_emotional_response": 11
+          },
+          "totalScoreKeys": [
+            "total",
+            "perseverance",
+            "reflection_help_seeking",
+            "adaptive_emotional_response"
+          ]
+        }
+      },
+      {
+        "name": "all_middle",
+        "answers": [
+          {
+            "itemCode": "ARS30_2016_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ARS30_2016_30",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 90,
+            "perseverance": 42,
+            "reflection_help_seeking": 27,
+            "adaptive_emotional_response": 21
+          },
+          "totalScoreKeys": [
+            "total",
+            "perseverance",
+            "reflection_help_seeking",
+            "adaptive_emotional_response"
+          ]
+        }
+      },
+      {
+        "name": "all_unlikely",
+        "answers": [
+          {
+            "itemCode": "ARS30_2016_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_24",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_27",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_28",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ARS30_2016_30",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 70,
+            "perseverance": 30,
+            "reflection_help_seeking": 9,
+            "adaptive_emotional_response": 31
+          },
+          "totalScoreKeys": [
+            "total",
+            "perseverance",
+            "reflection_help_seeking",
+            "adaptive_emotional_response"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,691 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "rses10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 3,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Rosenberg自尊量表（中文研究译稿）",
+      "abbreviation": "RSES",
+      "instrumentFamily": "Rosenberg Self-Esteem Scale"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [],
+      "constructDefinition": "总体自我价值感的自述，不是客观价值或道德判定。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "rses10",
+        "self_esteem",
+        "adult_self_report",
+        "research",
+        "working_translation",
+        "non_diagnostic",
+        "public_domain",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:personality_self",
+        "construct:self_esteem",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "对自身的一般感受，无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "采用PhenX原序（首题I feel that I am a person of worth），不混入以On the whole开头的另一题序。",
+        "作答显示顺序改为SD/D/A/SA，编码0/1/2/3；与PhenX反向显示序等价，不把列号当分数。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "项目独立AI辅助中文工作译稿；未复制未经许可的中文验证版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "专家译审、认知访谈与目标人群效度待完成。第8题仍反向，不因未经核实的文化适配说法改键；未采用PhenX中文worksheet。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "rses10-zh-cn-research-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "rses10-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "rses10-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "UMD官方索引声明公共领域并允许翻译改编；PhenX180901页面明确无需使用许可。",
+      "https://socy.umd.edu/about-us/rosenberg-self-esteem-scale",
+      "https://www.phenxtoolkit.org/protocols/view/180901"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Rosenberg Self-Esteem Scale",
+        "citation": "Rosenberg, M. (1989). Society and the Adolescent Self-Image (Rev. ed.). Wesleyan University Press.",
+        "url": "https://www.phenxtoolkit.org/protocols/view/180901"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Rosenberg Self-Esteem Scale public domain; UMD permits translation/adaptation with scholarly attribution. Rosenberg, M. (1989). Society and the Adolescent Self-Image (Rev. ed.). https://socy.umd.edu/about-us/rosenberg-self-esteem-scale ; https://www.phenxtoolkit.org/protocols/view/180901"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "rses10_responses",
+          "options": [
+            {
+              "value": "0",
+              "label": "很不同意",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "很同意",
+              "score": 3
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "RSES10_01",
+          "content": "我觉得自己是一个有价值的人，至少与其他人同样有价值。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_02",
+          "content": "我觉得自己有不少好的品质。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_03",
+          "content": "总的来说，我倾向于觉得自己是个失败者。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_04",
+          "content": "我做事情能和大多数其他人做得一样好。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_05",
+          "content": "我觉得自己没有多少值得自豪的地方。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_06",
+          "content": "我对自己持积极的态度。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_07",
+          "content": "总体而言，我对自己感到满意。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_08",
+          "content": "我希望自己能更尊重自己一些。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_09",
+          "content": "有时候，我确实觉得自己没有用。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_10",
+          "content": "有时候，我觉得自己一无是处。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "rses10_responses",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "RSES10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_03",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "RSES10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "RSES10_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "RSES10_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "RSES10_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "rses10",
+            "type": "total",
+            "label": "总体自尊",
+            "description": "总体自我价值感的自述；较高分表示本次更认可积极的自我描述，不是个人客观价值判定。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "RSES10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "rses10"
+        ],
+        "scoreOrder": [
+          "rses10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "rses10",
+            "headline": "把一次自我评价，与整个人的价值分开",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "先读懂这份结果\n\n十题按统一方向计分后，总和范围0–30。数值越大，表示这次整体更认可有价值、拥有优点和对自己较积极等描述；不是你客观上值多少，也不是能力或成就排名。它回顾对自己的总体感受，没有固定的最近一周窗口；这里没有可用的中文高低分界，更不能据此诊断疾病。\n\n一件事没做好，不必变成整个人的结论\n\n例如，一次汇报不顺利，你可以认为这次准备或表达需要调整，却不必直接跳到“我什么都不行”。这个例子不是系统已知道你遇到了什么，也不是要求你否认真实不足。自尊可以与接受反馈、承认困难并存，不等于随时对自己满意。\n\n如果你已有比较具体、公允的自我看法，可以保留它；若常常用很严厉的话概括自己，可以先把评价缩回事情本身。近期经历、关系与比较会影响感受，问卷总分不能查明原因，也不能决定你的未来。你不需要靠一份分数证明自己值得被尊重或获得帮助。\n\n下面是可以挑选的回顾方法，不是要求你每天找优点，或强迫自己立刻喜欢自己。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一件愿意回顾的小事，分开写“实际发生了什么”和“我给自己下了什么结论”。能核实的部分具体写，尚不清楚的先留问号，不急着用一个整体标签收尾。"
+              },
+              {
+                "category": "strategy",
+                "text": "把一句“我就是不行”改成一个可处理的问题，例如“这次哪一步没达到要求，我需要什么信息、练习或协助？”若愿意，再留下一件真实、普通的自我认可事实；想不到时也可以跳过，不用编鼓励的话。"
+              },
+              {
+                "category": "support",
+                "text": "找一个安全、愿意认真听的人，谈一件具体经历或一个需要，既可以听取反馈，也保留自己的边界。如果持续的自我否定带来明显痛苦或影响生活，可寻求适当专业支持；帮助不以分数高低为前提。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "独立中文成人工作稿尚未验证，无通用高低界线；分数描述自我感受，不判定真实价值或诊断疾病。"
+        ],
+        "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。来源：Rosenberg, M. (1989). Society and the Adolescent Self-Image (Rev. ed.). 本中文为项目工作译稿，非作者认可版本。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T15:56:08Z",
+            "basis": "本次AI文字自审对应rses10_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "rses10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "keyed-two",
+        "answers": [
+          {
+            "itemCode": "RSES10_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "rses10": 20
+          },
+          "totalScoreKeys": [
+            "rses10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "RSES10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_10",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "rses10": 30
+          },
+          "totalScoreKeys": [
+            "rses10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "RSES10_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "rses10": 0
+          },
+          "totalScoreKeys": [
+            "rses10"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面是一些关于你对自己总体感受的陈述。请根据你的实际感受，选择你对每句话的同意程度。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/rses10/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908（既有平台中文工作指导语；非人类专家审批声明）"
+  }
+}

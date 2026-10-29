@@ -1,0 +1,691 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "任务启动与自律（IPIP-NEO C5 中文研究译稿）",
+      "abbreviation": "IPIP-NEO C5",
+      "instrumentFamily": "IPIP-NEO facet representation"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "PERSONALITY"
+      ],
+      "constructDefinition": "一般任务启动与计划执行习惯的自述；独立IPIP-NEO C5表征，非完整人格评估，也不是Grit或BSCS。",
+      "constructLevel": "FACET",
+      "constructOverlapTags": [
+        "ipip_neo_c5_self_discipline10",
+        "task_initiation",
+        "self_discipline",
+        "adult_self_report",
+        "research",
+        "working_translation",
+        "non_diagnostic",
+        "public_domain",
+        "descriptive_report",
+        "domain:selfreg_executive",
+        "construct:self_discipline",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "对自身的一般感受，无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持IPIP-NEO C5官方题序与1–5符合度锚点。",
+        "第6–10项反向，不把条目词语用于道德或临床判断。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "项目独立AI辅助中文工作译稿；未复制未经许可的中文验证版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "人工译审、认知访谈和适用人群效度待完成；第6题去掉非原文必需的静下心含义，第8题不把push限制为来自某个人。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_neo_c5_self_discipline10-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_neo_c5_self_discipline10-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_neo_c5_self_discipline10-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "IPIP 官方声明题项公有领域，可复制、改编、翻译及电子施测；权利许可不代表此中文译稿已经验证。",
+      "https://ipip.ori.org/newPermission.htm"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "IPIP-NEO C5 Self-Discipline facet representation",
+        "citation": "International Personality Item Pool, IPIP-NEO C5 Self-Discipline facet representation.",
+        "url": "https://ipip.ori.org/newNEOKey.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "IPIP public domain: https://ipip.ori.org/newPermission.htm ; translation remains unvalidated."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ipip_neo_c5_self_discipline10_responses",
+          "options": [
+            {
+              "value": "1",
+              "label": "很不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "介于不符合与符合之间",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "很符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_01",
+          "content": "我会马上把日常杂事做完。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_02",
+          "content": "我总是做好准备。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_03",
+          "content": "我会马上开始任务。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_04",
+          "content": "我会立刻着手做事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_05",
+          "content": "我会执行自己的计划。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_06",
+          "content": "我觉得很难着手做事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_07",
+          "content": "我会浪费时间。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_08",
+          "content": "我需要一些推动才会开始。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_09",
+          "content": "我很难开始一项任务。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_10",
+          "content": "我会推迟作决定。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ipip_neo_c5_self_discipline10_responses",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "task_self_discipline",
+            "type": "total",
+            "label": "任务启动与执行习惯",
+            "description": "开始任务、准备和执行计划习惯的自我描述；不是道德评价或客观能力分数。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "task_self_discipline"
+        ],
+        "scoreOrder": [
+          "task_self_discipline"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "task_self_discipline",
+            "headline": "从想做，到找到一个能开始的入口",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这十题回顾你通常怎样准备、开始任务和落实计划，也涉及推迟行动或决定的体验。统一计分方向后，总分范围10–50；数值越大，表示这次整体更认可及时着手、做好准备和执行计划的描述。它记录的是你的自我感受，不是对实际效率的一次测验。\n\n例如，同样是整理报销材料，“把票据放到一起”可能容易着手，而“把所有事情都处理好”就让人不知道先做什么。开始卡住时，也可能碰上材料缺失、精力不足、不断被打断或任务要求不清。问卷不能从一个总分分清原因，更不能把困难归成懒惰或意志不够。\n\n如果你已有容易进入状态的安排，可以保留；若某件事总拖着，不妨先检查第一步与现实条件，而不是先责备自己。下面是供你核对的生活例子与行动选项，并非系统已经判断你需要哪一种办法。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "比较两个开头：想一件容易开始和一件卡住的事，看看第一步、材料、时间和体力有什么不同。先描述差异，不把它们换算成“我够不够自律”。"
+              },
+              {
+                "category": "strategy",
+                "text": "把第一步写成看得见的动作：例如把“整理材料”改成“把三张票据放进同一文件夹”，再把要用的东西放到手边。先试能否进入，不要求一下做完整件事。"
+              },
+              {
+                "category": "support",
+                "text": "按实际条件调整安排：若缺信息就问清要求，若负担超出精力就缩小范围、重新商量时间或寻求协助。完成一点后看看哪种安排管用，不把休息或求助当成失败。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文版本还在研究完善，没有可用的人群分档或排名。十题需答完整才计算，漏答不是0分，也不按最低分代填。"
+        ],
+        "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、道德评价或高风险选择。本工具是独立IPIP-NEO C5公共领域表征，不是专有NEO-PI-R或完整人格评估。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T15:28:34Z",
+            "basis": "本次只读审阅ipip_neo_c5_self_discipline10_zh_cn_research C1.0.0当前source、既有材料及新R1.1.0文字，核得分方向/范围、通常性时窗、固定解释与条件式例子、适配行动和短提示。保持source/bands/scoreKeys和受众权限，不继承旧审核日期，不声称本中文验证、作者批准或本轮golden/PG/CI通过。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ipip_neo_c5_self_discipline10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "task_self_discipline": 30
+          },
+          "totalScoreKeys": [
+            "task_self_discipline"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "task_self_discipline": 50
+          },
+          "totalScoreKeys": [
+            "task_self_discipline"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "task_self_discipline": 10
+          },
+          "totalScoreKeys": [
+            "task_self_discipline"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/bilingual-content.json#/instructions (项目平台适配工作译稿；b92c69aefa2472775fa7ee86b9c208366886c908；非人工审批声明)"
+  }
+}

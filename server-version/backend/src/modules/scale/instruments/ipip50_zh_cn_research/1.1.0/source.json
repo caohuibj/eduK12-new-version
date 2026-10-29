@@ -1,0 +1,2073 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip50_zh_cn_research",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "IPIP 50题大五因素标记 简体中文研究工作译稿（未验证）",
+      "abbreviation": "IPIP-50",
+      "instrumentFamily": "International Personality Item Pool Big-Five Factor Markers"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [],
+      "constructDefinition": "五种自述人格倾向：外向、宜人、尽责、情绪稳定、智性/想象力；每维10题，无人格总分，不测智力或职业胜任力。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "extraversion",
+        "agreeableness",
+        "conscientiousness",
+        "emotional_stability",
+        "intellect_imagination"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "仅限18岁及以上成人自评研究/描述性自我反思；中文独立AI辅助工作译稿未验证，不外推K12或其他人群。可执行DRAFT准备候选，尚未部署授权。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 50,
+      "estimatedMinutes": 10,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "目前通常的自己；无固定日数或周数的回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "本研究材料固定官网50题示例顺序和1–5准确程度锚点以便复核；官网不要求普遍统一顺序或标准化施测，不把本项目锁序误称作者要求。",
+        "原历史指导语的绝对保密承诺和同性别/近龄比较仅作来源证据；平台不承诺绝对保密，部署指导语适配必须独立版本化审查。",
+        "每维10题，正向原分、负向6-x，各自10–50；不合成总分，不插入注意力题。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "独立中文工作译稿未验证；仅成人研究准备和描述性反思，不表示效果证据已建立。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "独立中文工作译稿未验证；仅成人研究准备和描述性反思，不表示效果证据已建立。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ipip-goldberg-2006-project-methodology",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "Original IPIP project and adult research context; not validation of this exact Chinese working translation",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "Primary project methodology/development overview. Does not establish exact correspondence of current website 50 items to a specific published validation subset.",
+        "rating": "UNKNOWN",
+        "citation": "Goldberg LR, Johnson JA, Eber HW, Hogan R, Ashton MC, Cloninger CR, Gough HG (2006). The international personality item pool and the future of public-domain personality measures. Journal of Research in Personality 40:84–96.",
+        "doi": "10.1016/j.jrp.2005.08.007",
+        "url": "https://ipip.ori.org/Goldberg_etal_2006_IPIP_JRP.pdf",
+        "notes": "Literature index only, article link only. No exact-form local validity, cutoffs, norms or percentile claims. Historical 1992 adjective markers are not these 50 sentence items."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.1.0",
+    "translationSource": "New AI-assisted Simplified Chinese working translation from the official public-domain IPIP 50-item sample questionnaire and Big-Five scoring key; reviewed revisions preserved in docs/scale-instruments/research-drafts/ipip50/1.0.0/. Not an established validated Chinese version or author-endorsed translation.",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文题项沿用1.0.0独立AI辅助工作译稿，未验证、未经专家审核或认知访谈，不是作者认可或既有中文验证版。1.1.0增加可执行与成人报告；指导语为平台独立改编。公有领域不等于部署授权。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip50-adult-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip50-adult-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip50-public-domain-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "IPIP官网公有领域许可：https://ipip.ori.org/newPermission.htm。允许商业/非商业使用；不代表平台授权、中文验证或人类科学审核。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "adult_personality",
+        "locale": "zh-CN",
+        "localizationVersion": "1.1.0"
+      },
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "IPIP 50-item Big-Five Factor Markers — independent unvalidated Chinese working translation",
+        "citation": "International Personality Item Pool official 50-item sample and five 10-item scoring keys, checked 2026-10-23.",
+        "url": "https://ipip.ori.org/New_IPIP-50-item-scale.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Official IPIP public domain permission: https://ipip.ori.org/newPermission.htm; not deployment authorization or validation."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ipip_accuracy_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "既谈不上符合，也谈不上不符合",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPIP50-01",
+          "content": "我是聚会中活跃气氛的人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-02",
+          "content": "我很少关心别人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-03",
+          "content": "我总是做好准备。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-04",
+          "content": "我容易感到压力很大。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-05",
+          "content": "我的词汇丰富。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-06",
+          "content": "我的话不多。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-07",
+          "content": "我对他人感兴趣。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-08",
+          "content": "我把自己的东西随处放。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-09",
+          "content": "我大多数时候都很放松。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-10",
+          "content": "我理解抽象概念有困难。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-11",
+          "content": "和他人在一起时，我感到自在。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-12",
+          "content": "我会侮辱别人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-13",
+          "content": "我留意细节。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-14",
+          "content": "我会为各种事情担忧。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-15",
+          "content": "我的想象力很生动。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-16",
+          "content": "我保持低调，不让自己引人注目。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-17",
+          "content": "我体谅他人的感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-18",
+          "content": "我把事情弄得一团糟。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-19",
+          "content": "我很少感到低落。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-20",
+          "content": "我对抽象概念不感兴趣。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-21",
+          "content": "我主动开始交谈。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 20,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-22",
+          "content": "我对别人的问题不感兴趣。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 21,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-23",
+          "content": "我会马上做完日常杂务。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 22,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-24",
+          "content": "我很容易心神不宁。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 23,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-25",
+          "content": "我有很棒的想法。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 24,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-26",
+          "content": "我没什么话可说。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 25,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-27",
+          "content": "我心肠软。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 26,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-28",
+          "content": "我常忘记把东西放回它们应放的位置。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 27,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-29",
+          "content": "我容易心烦。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 28,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-30",
+          "content": "我的想象力不太好。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 29,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-31",
+          "content": "在聚会上，我会和许多不同的人交谈。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 30,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-32",
+          "content": "我并不怎么对他人感兴趣。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 31,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-33",
+          "content": "我喜欢井然有序。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 32,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-34",
+          "content": "我的情绪经常变化。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 33,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-35",
+          "content": "我理解事情很快。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 34,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-36",
+          "content": "我不喜欢让别人注意到我。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 35,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-37",
+          "content": "我会抽出时间给别人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 36,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-38",
+          "content": "我逃避自己的职责。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 37,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-39",
+          "content": "我的情绪常常起伏不定。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 38,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-40",
+          "content": "我使用难懂的词语。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 39,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-41",
+          "content": "我不介意成为众人关注的焦点。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 40,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-42",
+          "content": "我能感受到他人的情绪。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 41,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-43",
+          "content": "我按日程安排做事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 42,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-44",
+          "content": "我容易烦躁。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 43,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-45",
+          "content": "我会花时间反思事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 44,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-46",
+          "content": "在陌生人面前，我很安静。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 45,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-47",
+          "content": "我让人感到自在。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 46,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-48",
+          "content": "我对自己的工作要求严格。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 47,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-49",
+          "content": "我经常感到低落。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 48,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP50-50",
+          "content": "我有很多想法。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 49,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.1.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "IPIP50-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-02",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-04",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-10",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-12",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-14",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-16",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-18",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-20",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-22",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-24",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-25",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-26",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-27",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-28",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-29",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-30",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-31",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-32",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-33",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-34",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-35",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-36",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-37",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-38",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-39",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-40",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-41",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-42",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-43",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-44",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-45",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-46",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-47",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-48",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP50-49",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP50-50",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "extraversion",
+            "type": "dimension",
+            "label": "外向性",
+            "description": "独立10题原始分；不与其他维度求总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP50-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-31",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-36",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-41",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-46",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "agreeableness",
+            "type": "dimension",
+            "label": "宜人性",
+            "description": "独立10题原始分；不与其他维度求总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP50-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-27",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-32",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-37",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-42",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-47",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "conscientiousness",
+            "type": "dimension",
+            "label": "尽责性",
+            "description": "独立10题原始分；不与其他维度求总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP50-03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-33",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-38",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-43",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-48",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "emotional_stability",
+            "type": "dimension",
+            "label": "情绪稳定性",
+            "description": "独立10题原始分；不与其他维度求总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP50-04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-34",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-39",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-44",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-49",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "intellect_imagination",
+            "type": "dimension",
+            "label": "智性/想象力",
+            "description": "独立10题原始分；不与其他维度求总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP50-05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-30",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-35",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-40",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-45",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP50-50",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.2",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.2; not human expert approval",
+            "reviewedAt": "2026-10-29T15:56:08Z",
+            "basis": "本次AI文字自审对应ipip50_zh_cn_research的标准增强版R1.1.2：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        },
+        "primaryScoreKeys": [
+          "extraversion",
+          "agreeableness",
+          "conscientiousness",
+          "emotional_stability",
+          "intellect_imagination"
+        ],
+        "scoreOrder": [
+          "extraversion",
+          "agreeableness",
+          "conscientiousness",
+          "emotional_stability",
+          "intellect_imagination"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "extraversion",
+            "headline": "外向性：选择适合自己的相处节奏",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "先把整份结果看作五个角度\n\n五项分别描述通常的社交、关怀、做事、情绪和想法倾向，不合成人格总分，也不把你分成某种注定不变的类型。各项都是十题统一方向后的总和10–50，没有可用的中文等级或排名；分数不能决定岗位、专业、关系或未来。\n\n外向性越大，表示这次更认可主动交谈、社交活跃或不介意受到关注等描述。它不是沟通能力、受欢迎程度或一定要外向的标准。\n\n例如，在熟悉的人身边愿意多说，在陌生聚会中较安静，可以出现在同一个人身上。这个例子不是总分已查明你的社交模式。已有自在的联系方式可以保留；需要安静或希望多参与一点时，也可以结合场合调整，不必为了某个数字改变整个人。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "选一段重要的关系或一次需要参与的交流，使用自己能接受的方式：先准备一句话、发消息，或约一次简短谈话。留意是否更容易表达需要和听见对方，不以说得多、成为焦点为目标。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "agreeableness",
+            "headline": "宜人性：关心他人，也保留自己的边界",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项十题总和10–50；越大表示这次更认可关心、体谅、愿意为别人留时间等描述，统一方向后也包含较少认可伤人或忽视他人的说法。它不是善良程度或服从要求的评分。\n\n例如，朋友请你帮忙，而你也有急事，可以表达理解，同时说清能帮哪一部分、何时再联系。这个例子不是系统认定你一定会答应或拒绝。\n\n如果你已有尊重彼此需要的方式，可以继续用；若经常答应到超出余力，边界也值得照顾。有不同意见时仍可以尊重表达，不需要为了“更宜人”放弃必要的拒绝。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "遇到一个请求，先问清对方需要，再核对自己的时间与意愿。可以说“我能做的是……，暂时不能的是……”，不靠全部答应证明关心，也不必用伤人的话守住边界。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "conscientiousness",
+            "headline": "尽责性：让准备和落实更容易发生",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项也是十题总和10–50。越大表示这次更认可准备、细节、整理、按安排行动和完成职责等习惯，不是工作绩效、勤奋品格或可靠程度的认证。\n\n例如，一个人把熟悉任务安排得很清楚，面对临时增加、要求模糊的任务却仍可能忙乱。这个例子提醒你把习惯和条件一起看，不是问卷已找到你卡住的原因。\n\n已有省力的安排可以保留；若事情经常没接上，可以先看要求是否清楚、资源是否够，而不只责备自己。条理不需要变成事事完美，也不能替代合理的任务范围。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "挑一件眼前的事，写清下一小步、完成到什么程度、需要什么材料或帮助。先调整一个最费来回的环节；任务超出资源时，可协商范围或时间，不用继续加清单来证明自己够认真。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "emotional_stability",
+            "headline": "情绪稳定性：较平稳的描述，不是更高的神经质",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这十题统一方向后合计10–50。数值越大表示这次更认可通常较放松、较少担心、烦躁或情绪扰动的描述；不是“神经质越高”。它也不证明没有心理困扰，更不是必须一直平静。\n\n例如，持续赶工、休息不足时更容易烦躁，和在资源充足时的感受可能不同。这里是可能的生活情境，不能据此确定你的起伏原因。\n\n如果已有让自己缓过来的安排，可以保留；如果正在难受，也可以认真对待实际压力，不把有情绪视为失败。总分不代替对具体经历、持续时间和生活影响的了解。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "回顾一个愿意想起的起伏场景，看看当时有哪些可改变的压力或支持条件，选一个小调整，如休息、减少一项负担或与可信任的人商量。困扰持续影响生活时可寻求适当专业支持，不由这个分数确认或排除疾病。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "intellect_imagination",
+            "headline": "智性/想象力：对想法的自述，不是智商测验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项十题总和10–50；越大表示这次更认可与词语、抽象理解、想象、想法和反思有关的自我描述。这里既有兴趣也有对自身的看法，不是现场推理考试，更不等于IQ、创造力实测或专业职业适配度。\n\n例如，对熟悉主题愿意反复琢磨，对陌生概念需要一个具体例子，都可能与经验和接触机会有关。分数不能判断你的知识哪里薄弱，或你应该走哪条道路。\n\n可以保留真正好奇的事情，也可以选择实际操作、例子或阅读等适合自己的入口；不需要用艰深词语或某种爱好证明聪明。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "选一个自己确实想弄明白的小问题，找一条可靠说明或一个实例，再用自己的明白话写一句目前的理解和一个仍待确认的问题。暂时不感兴趣也可以跳过，不把它变成能力训练或岗位选择依据。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "独立中文成人工作稿尚未验证，无等级或百分位；五项不合成总分，不作类型、能力或岗位预测。"
+        ],
+        "disclaimer": "仅供成人研究与自我反思。IPIP原题为公共领域，本中文及报告为独立改编；不推断敏感身份，不用于高风险筛选。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "references": [],
+    "goldenCases": [
+      {
+        "name": "all-1",
+        "answers": [
+          {
+            "itemCode": "IPIP50-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-35",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-42",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-43",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-44",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-45",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-46",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-47",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-48",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-49",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP50-50",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "extraversion": 30,
+            "agreeableness": 26,
+            "conscientiousness": 26,
+            "emotional_stability": 42,
+            "intellect_imagination": 22
+          },
+          "totalScoreKeys": [
+            "extraversion",
+            "agreeableness",
+            "conscientiousness",
+            "emotional_stability",
+            "intellect_imagination"
+          ]
+        }
+      },
+      {
+        "name": "all-3",
+        "answers": [
+          {
+            "itemCode": "IPIP50-01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-42",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-43",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-44",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-45",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-46",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-47",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-48",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-49",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP50-50",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "extraversion": 30,
+            "agreeableness": 30,
+            "conscientiousness": 30,
+            "emotional_stability": 30,
+            "intellect_imagination": 30
+          },
+          "totalScoreKeys": [
+            "extraversion",
+            "agreeableness",
+            "conscientiousness",
+            "emotional_stability",
+            "intellect_imagination"
+          ]
+        }
+      },
+      {
+        "name": "all-5",
+        "answers": [
+          {
+            "itemCode": "IPIP50-01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-24",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-27",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-28",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-31",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-32",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-33",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-34",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-35",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-36",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-37",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-38",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-39",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-40",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-41",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-42",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-43",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-44",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-45",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-46",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-47",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-48",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-49",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP50-50",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "extraversion": 30,
+            "agreeableness": 34,
+            "conscientiousness": 34,
+            "emotional_stability": 18,
+            "intellect_imagination": 38
+          },
+          "totalScoreKeys": [
+            "extraversion",
+            "agreeableness",
+            "conscientiousness",
+            "emotional_stability",
+            "intellect_imagination"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请描述您目前通常的样子，而不是您希望将来成为的样子。请如实判断每项描述与自己的符合程度。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "PR328 fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf platformInstructionsNotOriginalItems.instructions；独立平台改编，省略同性别/近龄比较和绝对保密承诺；官网允许修改施测说明。"
+  }
+}

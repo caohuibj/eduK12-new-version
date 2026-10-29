@@ -1,0 +1,1585 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "pba23_2018_zh_cn",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "父母养育倦怠评估（PBA-23，2018版中文工作稿）",
+      "abbreviation": "PBA23-2018",
+      "instrumentFamily": "Parental Burnout Assessment"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "父母对自身养育耗竭、与过往自我落差、难以承受感和情感距离的自述，不评价孩子、爱意或监护资格。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "pba23_2018_zh_cn",
+        "domain:family_relationships",
+        "construct:burnout",
+        "construct:parental_burnout",
+        "construct:parental_exhaustion",
+        "construct:parental_self_contrast",
+        "construct:parenting_fed_up",
+        "construct:emotional_distancing",
+        "population:adult_research",
+        "population:adult_parent_self",
+        "population:co_resident_child_source_condition",
+        "response:self",
+        "response:parent_self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人父母评价自己的体验，不是家长代评孩子。研究部署须至少有一名子女仍同住；原2018样本20–59岁英/法语父母，18岁为项目保守下限而非源验证界值。中文工作稿无本地验证；同住前提为研究使用要求，不声明系统已核验。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 23,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "原2018版未指定固定回忆窗口；从不至每天的频率",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按2018Table1分组原序EX1–9/CO1–6/FU1–5/ED1–3，不称其为原研究施测随机顺序。",
+        "平台介绍置于首题之前，不改原题干构念；不借用现作者网站中文或混用较新英文EX8。",
+        "23题完整后才形成可解释总体结果；可暂停/退出，不用缺失替代从不。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "据Roskam、Brianda、Mikolajczak(2018) CC BY4 Table1独立翻译的简体中文工作稿，不是作者官网中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "保持2018原英文题文与分组编号；原作者未审定本中译、平台介绍或新增反馈，待人工审校/认知访谈/本地验证。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "pba23_2018_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "pba23_2018_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "pba23_2018_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Roskam I, Brianda M-E, Mikolajczak M (2018). A Step Forward in the Conceptualization and Measurement of Parental Burnout: The Parental Burnout Assessment (PBA). Frontiers in Psychology 9:758. https://doi.org/10.3389/fpsyg.2018.00758. © 2018 Roskam, Brianda and Mikolajczak. Licensed CC BY 4.0.",
+      "2018 article is explicitly CC BY 4.0 and Table 1 contains the authors’ newly generated PBA23 items without separate third-party credit or exclusion. Paper Methods describes inductive generation from parent testimony and Introduction calls this a free alternative to PBI. Article footnote 1 Maslach/Jackson/Mind Garden covers PBI EE1–8 and PA1–6 comparison instrument; footnote3 covers MBI. Neither applies to PBA Table1 EX/CO/FU/ED. Do NOT reproduce the PBI/MBI comparator items.",
+      "Independent Simplified Chinese working translation, platform introduction and original feedback added. Original 2018 English item wording and scoring preserved. Not author-endorsed or a validated Chinese form.",
+      "至少一名子女仍同住的成人父母自评；不得用于孩子标签、监护权、家长资格、学校排名或临床处置。没有已实现资质/同住核验或危机分流声明。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Parental Burnout Assessment (2018 Table1 wording/order)",
+        "citation": "Roskam I, Brianda M-E, Mikolajczak M (2018). A Step Forward in the Conceptualization and Measurement of Parental Burnout: The Parental Burnout Assessment (PBA). Frontiers in Psychology 9:758. https://doi.org/10.3389/fpsyg.2018.00758. © 2018 Roskam, Brianda and Mikolajczak. Licensed CC BY 4.0.",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.00758/full"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Roskam I, Brianda M-E, Mikolajczak M (2018). A Step Forward in the Conceptualization and Measurement of Parental Burnout: The Parental Burnout Assessment (PBA). Frontiers in Psychology 9:758. https://doi.org/10.3389/fpsyg.2018.00758. © 2018 Roskam, Brianda and Mikolajczak. Licensed CC BY 4.0. https://creativecommons.org/licenses/by/4.0/ 2018 article is explicitly CC BY 4.0 and Table 1 contains the authors’ newly generated PBA23 items without separate third-party credit or exclusion. Paper Methods describes inductive generation from parent testimony and Introduction calls this a free alternative to PBI. Article footnote 1 Maslach/Jackson/Mind Garden covers PBI EE1–8 and PA1–6 comparison instrument; footnote3 covers MBI. Neither applies to PBA Table1 EX/CO/FU/ED. Do NOT reproduce the PBI/MBI comparator items. Independent Simplified Chinese working translation, platform introduction and original feedback added. Original 2018 English item wording and scoring preserved. Not author-endorsed or a validated Chinese form."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "pba_frequency_0_6",
+          "options": [
+            {
+              "value": "0",
+              "label": "从不",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "一年几次或更少",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "一个月一次或更少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "一个月几次",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "一周一次",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "一周几次",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "每天",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "EX1",
+          "content": "作为父母，我感到自己已经完全筋疲力尽。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EX2",
+          "content": "我感觉自己作为父母真的已经累垮了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EX3",
+          "content": "做父母让我累得似乎连睡觉都不足以恢复过来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EX4",
+          "content": "早上起床，想到又要和孩子度过一天，我还没开始就已经觉得精疲力尽了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EX5",
+          "content": "只要想到要为孩子做的所有事情，我就觉得疲惫不堪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EX6",
+          "content": "我一点照顾孩子的精力都没有了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EX7",
+          "content": "做父母这件事耗尽了我所有可以调动的资源。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EX8",
+          "content": "有时我觉得自己像开着自动驾驶一样照顾孩子。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EX9",
+          "content": "在做父母这件事上，我正处在勉强撑下去的“生存模式”。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CO1",
+          "content": "我觉得对孩子来说，我已经不再是以前那个好爸爸／好妈妈了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CO2",
+          "content": "我告诉自己，我已经不再是以前那个做父母的自己了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CO3",
+          "content": "对于自己变成了现在这样的父母，我感到羞愧。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CO4",
+          "content": "作为父母，我不再为自己感到自豪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CO5",
+          "content": "和孩子相处时，我觉得自己已经不像自己了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CO6",
+          "content": "我觉得自己已经失去了做爸爸／妈妈的方向。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FU1",
+          "content": "我再也忍受不了自己作为爸爸／妈妈的角色了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FU2",
+          "content": "做父母这件事，我再也承受不了了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FU3",
+          "content": "作为父母，我觉得自己再也撑不下去了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FU4",
+          "content": "作为父母，我觉得自己已经应付不过来了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FU5",
+          "content": "和孩子在一起时，我感受不到乐趣。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ED1",
+          "content": "我只做那些应该为孩子做的事，不会再做更多。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 20,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ED2",
+          "content": "除了日常的例行事务（开车接送、就寝、吃饭），我已经没有能力再为孩子付出更多努力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 21,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ED3",
+          "content": "我已经没有能力向孩子表达我有多么爱他们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 22,
+          "responseSetKey": "pba_frequency_0_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "EX1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EX2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EX3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EX4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EX5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EX6",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EX7",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EX8",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EX9",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CO1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CO2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CO3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CO4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CO5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CO6",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FU1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FU2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FU3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FU4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FU5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ED1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ED2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ED3",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "exhaustion",
+            "type": "dimension",
+            "label": "养育中的疲惫与消耗",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "EX1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX6",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX7",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX8",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX9",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            },
+            "description": "关注照顾孩子时的疲惫、难恢复，以及只能靠惯性撑着的感受。它不是勤奋或责任心的证明。"
+          },
+          {
+            "key": "contrast_previous_self",
+            "type": "dimension",
+            "label": "你是否觉得，自己不像从前那个父母了？",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CO1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO6",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            },
+            "description": "关注你对过去和现在的自己的感受差异。这些自我评价可能很严厉，但不是对你真实价值的裁决。"
+          },
+          {
+            "key": "fed_up",
+            "type": "dimension",
+            "label": "养育中难以承受的感受",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FU1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FU2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FU3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FU4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FU5",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            },
+            "description": "关注难以承受、难以应付，以及和孩子相处时快乐变少的体验。承认这种感受，不等于不爱孩子。"
+          },
+          {
+            "key": "emotional_distancing",
+            "type": "dimension",
+            "label": "日常照顾之外，亲近变难了吗？",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ED1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ED2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ED3",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            },
+            "description": "关注是否只够完成必要事务、很难再表达爱意。这记录的是当下可用的情感精力，不是亲子关系的最终结论。"
+          },
+          {
+            "key": "parental_burnout",
+            "type": "total",
+            "label": "整体看看养育中的消耗",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "EX1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX6",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX7",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX8",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EX9",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO6",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FU1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FU2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FU3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FU4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FU5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ED1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ED2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ED3",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            },
+            "description": "这四个角度合起来描述你的养育体验，不是诊断，也不是养育能力总分。不同维度题数不同，不直接比较原始分数大小。"
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "exhaustion",
+          "contrast_previous_self",
+          "fed_up",
+          "emotional_distancing",
+          "parental_burnout"
+        ],
+        "scoreOrder": [
+          "exhaustion",
+          "contrast_previous_self",
+          "fed_up",
+          "emotional_distancing",
+          "parental_burnout"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "exhaustion",
+            "headline": "疲惫与消耗：先看看实际负担和恢复机会",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷由父母描述自己的养育体验，不评价孩子。频率从0“从不”到6“每天”，没有固定的过去一周或一个月窗口；下面的例子供你核对，不代表系统已经认定你有这些困难。\n\n疲惫这九题相加为0–54，越大表示这次更常报告精力耗尽、难恢复或靠惯性撑着等感受。它不是勤奋或责任心的证明，也不单凭分数判断原因。\n\n例如，想到当天还要完成的照护安排就很累，未必只需“睡一觉就好”，也值得看看任务、休息和分担条件。如果你已有能恢复一点的安排，可以保留；如果没有，先减轻实际负担，比要求自己表现得更耐心更要紧。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "若需要分担，选一件具体事务，与可靠且愿意协助的成年人商量交接，先保证孩子有安全照护。尽量留出一段不用继续安排、提醒或负责的时间；暂时没有人手时，可先减少一项可减少的要求、了解现实支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "contrast_previous_self",
+            "headline": "与从前自己的落差：自我责备不是事实裁决",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这六题范围0–36，越大表示你更常觉得自己不再像从前那个父母，或对现在的自己感到失落、羞愧。它记录的是你对这种落差的感受，不证明你真的变成了更差的父母。\n\n例如，以前愿意慢慢听的事情，如今只想尽快结束，可能让人很责怪自己。这个例子不是个人结论；睡眠、工作、照护难度与帮助有没有变化，都需要结合生活了解，问卷不能判定具体原因。\n\n如果这种比较与你有关，可以先把“我变坏了”放回可描述的事实和需要，不要求自己立刻找优点来盖过难受，也不把安慰自己的责任交给孩子。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一句最常出现的自责，试着改写成“我注意到哪件事变难了，现在缺什么条件或支持”。愿意时把这个具体需要告诉可信任的成年人，不需要先证明自己还足够好。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "fed_up",
+            "headline": "难以承受感：把需要支持的事情说出来",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这五题范围0–30，越大表示这次更常报告养育角色难以承受、难应付，或相处中的乐趣变少。承认这些感受不等于不爱孩子，也不能据此推断你会做什么。\n\n例如，原本能处理的一连串日常事务，现在每一件都像额外压力。这个场景是例子，不是系统对你的状况分级。\n\n如果你已有可用的分担，可以继续依靠；若正在觉得撑不住，不必先学会一套新育儿技巧，才配得到喘息与帮助。可以先处理眼前最重的一项负担，支持不应等到分数达到某条线。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "把“我快承受不了了”说成一个眼下的具体请求，例如请可靠成年人接手一段安全照护、陪你一起梳理安排。持续很难承受或影响生活时，可同时寻求适当专业支持，不只靠独自忍耐。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "emotional_distancing",
+            "headline": "情感距离：先有余力，不强迫自己表现亲近",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这三题范围0–18，越大表示你更常报告只够完成必要照顾，很难再额外付出或表达亲近。它不是爱孩子多少，也不能给亲子关系下最终结论。\n\n例如，接送、吃饭、就寝安排还能维持，但再多聊一会儿已经很费力。这里是帮助回顾的例子，并不是系统要求你增加聊天或拥抱。\n\n若你已有轻松、安全、双方都愿意的相处方式，可以保留；若目前连这样的余力也没有，先争取恢复和分担。没有必要完成一场“完美陪伴”来证明关爱，孩子也不负责修复成年人的耗竭。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "先看看能否减掉或交接一项事务，让恢复有现实空间。之后只有在双方愿意且不勉强时，才选择一点轻松的相处；也可以暂时不安排额外互动，先把照护安全与支持放稳。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "parental_burnout",
+            "headline": "整体消耗：不靠总分决定你是否值得帮助",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "二十三题总和范围0–138，越大表示这次整体更频繁报告上述养育消耗体验。真实0表示这次相关题都回答“从不”，不是缺失；它也不能证明生活里没有任何困难。这里没有本地常模或临床高低界线，不能据此作临床诊断或判断养育能力。\n\n四个方面题数不同，原始和不能直接比谁“最严重”。例如，两类体验合计相近，也不说明需要相同的支持；应回到具体生活，看看你最希望先被帮助的是哪一件事。这个例子不是系统已分清你的处境。\n\n如果看完没有哪项与你相符，可以保留现有支持、跳过建议。如果有一项很吃力，先减少实际负担、让可靠的人参与，比要求自己再撑一阵更合适。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "只选一个最想得到支持的具体环节，商量谁能接手什么、什么时候交接、哪些要求可以减量。资源暂时不足时如实记录限制，不把计划无法实现变成新的自责。"
+              },
+              {
+                "category": "support",
+                "text": "这些体验持续影响睡眠、生活或照护时，可以寻求适当专业支持。若担心眼下无法保障自己或孩子安全，先请可靠成年人协助安全照护，并及时寻求当地紧急帮助。这是一般支持提示，不是系统已判定你的风险或启动报警。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文工作稿尚待专家审校，无本地常模或临床分级；记录父母自身体验，不诊断或评定养育资格。"
+        ],
+        "disclaimer": "中文工作译稿尚待专家审校。结果不能诊断疾病，不能判断你是否爱孩子或是否有资格做父母，也不能用于监护权、学校排名、绩效或资格决定。没有本地常模，不显示高低风险分级。 下面的小行动是可选择的尝试，不替代专业评估，也不保证改善。 下面的例子不表示你已有这些感受；若与你不符，可以跳过建议，保留现有的支持。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "parent",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T15:46:21Z",
+            "basis": "本次AI文字自审对应pba23_2018_zh_cn的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "pba23_2018",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "EX1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX3",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX4",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX5",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX6",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX7",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX8",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX9",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO3",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO4",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO5",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO6",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU3",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU4",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU5",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ED1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ED2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ED3",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 0,
+            "contrast_previous_self": 0,
+            "fed_up": 0,
+            "emotional_distancing": 0,
+            "parental_burnout": 0
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "contrast_previous_self",
+            "fed_up",
+            "emotional_distancing",
+            "parental_burnout"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "EX1",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EX2",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EX3",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EX4",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EX5",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EX6",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EX7",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EX8",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EX9",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CO1",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CO2",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CO3",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CO4",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CO5",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CO6",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "FU1",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "FU2",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "FU3",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "FU4",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "FU5",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "ED1",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "ED2",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "ED3",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 54,
+            "contrast_previous_self": 36,
+            "fed_up": 30,
+            "emotional_distancing": 18,
+            "parental_burnout": 138
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "contrast_previous_self",
+            "fed_up",
+            "emotional_distancing",
+            "parental_burnout"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "EX1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EX2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EX3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EX4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EX5",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EX6",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EX7",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EX8",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EX9",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CO1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CO2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CO3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CO4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CO5",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CO6",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FU1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FU2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FU3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FU4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FU5",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ED1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ED2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ED3",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 27,
+            "contrast_previous_self": 18,
+            "fed_up": 15,
+            "emotional_distancing": 9,
+            "parental_burnout": 69
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "contrast_previous_self",
+            "fed_up",
+            "emotional_distancing",
+            "parental_burnout"
+          ]
+        }
+      },
+      {
+        "name": "one-exhaustion",
+        "answers": [
+          {
+            "itemCode": "EX1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EX2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX3",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX4",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX5",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX6",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX7",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX8",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX9",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO3",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO4",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO5",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CO6",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU3",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU4",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU5",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ED1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ED2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ED3",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 1,
+            "contrast_previous_self": 0,
+            "fed_up": 0,
+            "emotional_distancing": 0,
+            "parental_burnout": 1
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "contrast_previous_self",
+            "fed_up",
+            "emotional_distancing",
+            "parental_burnout"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "EX1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EX3",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "EX4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EX5",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EX6",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "EX7",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EX8",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "EX9",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CO1",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CO2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CO3",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CO4",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "CO5",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CO6",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "FU1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FU2",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "FU3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FU4",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FU5",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ED1",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "ED2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ED3",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 22,
+            "contrast_previous_self": 20,
+            "fed_up": 15,
+            "emotional_distancing": 7,
+            "parental_burnout": 64
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "contrast_previous_self",
+            "fed_up",
+            "emotional_distancing",
+            "parental_burnout"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面的问题关注你作为父母的感受，而不是评价孩子。请根据自己的实际体验，选择每种感受出现的频率。没有对错答案，不愿作答时可以暂停或退出。爱孩子和感到疲惫可以同时存在。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/pba23_2018_zh_cn/1.0.0/bilingual-content.json#/administration/instructionsZh @ b92c69aefa2472775fa7ee86b9c208366886c908；既有平台新增工作说明，非作者原句，仅从EX1前缀移位"
+  }
+}
