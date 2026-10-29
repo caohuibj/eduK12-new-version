@@ -83,7 +83,7 @@ function ParentTasksSession({api}:{api:SchoolApi}){
       {tasks&&tasks.length>0&&visible.length===0&&<p className="hs-collection-empty">没有匹配的观察任务，请尝试其他关键词。</p>}
     </details>
     {feedback&&renderFeedback({executionId:feedback.executionId,title:feedback.runTitle,mode:'COMPOSITION',onClose:()=>setFeedback(null)})}
-    {active&&<SchoolCompositeRunner api={api} execution={active.execution} observer observerRole="parent" observerTaskTitle={active.task.runTitle}
+    {active&&<SchoolCompositeRunner key={active.execution.executionId} api={api} execution={active.execution} observer observerRole="parent" observerTaskTitle={active.task.runTitle}
       onExit={()=>{if(currentScope.current===scope)setActive(null)}}
       onFinished={()=>{if(currentScope.current!==scope)return;setActive(null);if(active.task.feedbackMode==='COMPOSITION')setFeedback(active.task);void refresh()}}/>}
   </section>

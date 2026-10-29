@@ -2,7 +2,6 @@ import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {appendAudit} from '../organization/service'
-import {resolveEducationProductMemberScope} from '../organization/educationProductAccess'
 import {createAssessmentRunDraft,addAssessmentRunTrackDraft} from '../assessment-run/repository'
 import {lockEducationLibraryOrganization} from '../scale-library-governance/education-runtime-resources'
 import {readPrivateCompositionRunSources} from '../education-tools/private-tool.composition-source'
@@ -33,13 +32,13 @@ async function appointment(tx:Prisma.TransactionClient,input:Appointment){
 }
 export async function configureStudentComposition(input:Appointment&{privateComposition:{versionId:string;contentHash:string}}){
  return prisma.$transaction(async tx=>{
-  const member=await resolveEducationProductMemberScope({...input,product:'HUITEACHER'},tx)
-  if(!member?.productAdmin)privateToolFail('HUITEACHER_STUDENT_EVAL_ADMIN_REQUIRED',403)
   const context={entry:'TEACHER' as const,organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL' as const}},ref=studentCompositionRef(input.privateComposition.versionId)
   const libraries=await lockCompositionLibraryUses(tx,context,[ref.key])
+  await lockEducationLibraryOrganization(tx,input.organizationId,'TEACHER')
+  // The source reader resolves current Teacher authorship once, after any org
+  // fence wait. Governance revocation holds this same organization lock.
   const source=(await readPrivateCompositionRunSources(tx,context,[ref],{lockForUse:true,libraryUses:libraries})).get(ref.key)!
   if(source.origin.contentHash!==input.privateComposition.contentHash)privateToolFail('PRIVATE_COMPOSITION_VERSION_MISMATCH',409)
-  await lockEducationLibraryOrganization(tx,input.organizationId,'TEACHER')
   const matched=await appointment(tx,input)
   const where={organizationId_eventId:{organizationId:input.organizationId,eventId:input.eventId}}
   if(await tx.huiteacherStudentEvaluationConfig.findUnique({where,select:{id:true}}))privateToolFail('HUITEACHER_STUDENT_EVAL_ALREADY_CONFIGURED',409)

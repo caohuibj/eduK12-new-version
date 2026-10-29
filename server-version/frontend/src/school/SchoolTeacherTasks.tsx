@@ -94,7 +94,7 @@ function TeacherTasksSession({api,organizationId,compact=false}:Props) {
     {inbox?.truncated&&<p>任务数量较多，仅展示最近的部分任务；请联系学校管理员核查分配。</p>}
     </details>
     {feedback&&renderFeedback({executionId:feedback.executionId,title:feedback.runTitle,mode:'COMPOSITION',onClose:()=>setFeedback(null)})}
-    {active&&<SchoolCompositeRunner api={api} execution={active.execution} observer={compact||active.task.feedbackMode==='COMPOSITION'} observerRole="teacher"
+    {active&&<SchoolCompositeRunner key={active.execution.executionId} api={api} execution={active.execution} observer={compact||active.task.feedbackMode==='COMPOSITION'} observerRole="teacher"
       observerTaskTitle={active.task.runTitle}
       onExit={()=>{if(currentScope.current===scope)setActive(null)}}
       onFinished={()=>{if(currentScope.current!==scope)return;setActive(null);if(active.task.feedbackMode==='COMPOSITION')setFeedback(active.task);void refresh()}}/>}
