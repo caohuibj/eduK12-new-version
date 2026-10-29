@@ -5,14 +5,14 @@
   "branch": "release/education-observer-native-20261029",
   "enabled": true,
   "base": "908af20ecfbd3ede55685d2052bf01b52266661c",
-  "frozenDevelopmentHead": "a5778b4e467f8112eae8c57cdd13f2dca530ac12",
-  "productHead": "a5778b4e467f8112eae8c57cdd13f2dca530ac12",
+  "frozenDevelopmentHead": "1a7b4c22de57159deb38d9cce10749f481d26660",
+  "productHead": "1a7b4c22de57159deb38d9cce10749f481d26660",
   "frontendTree": "8a10fe0cd4b78cf0fff76b77c5e76afbd801ef6a",
-  "backendTree": "1283356a7b2d27211abe053755c33a52dc2f7a2c",
+  "backendTree": "3988da0f103f76f9b0fcfeb1f9f0d4e785986286",
   "source": {
     "docs/development/education-observer-native-ci.md": {
       "before": "",
-      "after": "69fb6ee6deece377d81698b9b8a7d446944f79ad"
+      "after": "af2a7e5ec6c45bfb2e3c49d27432083e85faa4ff"
     },
     "server-version/backend/prisma/migrations/20261028230000_education_scientific_definition_hash/migration.sql": {
       "before": "",
@@ -72,7 +72,7 @@
     },
     "server-version/backend/src/__tests__/education-tools/native-source.cognitive.test.ts": {
       "before": "",
-      "after": "9653bc021409de8950eff77db61886c392db2579"
+      "after": "ea97052a39cd523542624ea5632ad79794425b8f"
     },
     "server-version/backend/src/__tests__/education-tools/native-source.sjt.test.ts": {
       "before": "",
@@ -684,7 +684,7 @@
     ".github/scripts/school-teacher-checks.mjs": "a3ab326850bad80e09cf6b3f8f5080340a2afc18",
     ".github/scripts/school-teacher-scope.mjs": "911d444eff06669c9c929fedeb2e64fb78e4c0bb",
     ".github/scripts/school-teacher-self-baseline.sql": "41aa7034b492471e930d4fa1b52f156c1184ddf3",
-    ".github/scripts/school-teacher-self.test.mjs": "a4e07fbb46d92ba80f2e5b477df671c002342c46",
+    ".github/scripts/school-teacher-self.test.mjs": "41193eb2371d265deb9f78128c0dd04b64ba9804",
     ".github/workflows/ci.yml": "5adcf3ab4d6b42480da360a8a977ca2687782f81",
     "server-version/e2e/education-self-questionnaire.cjs": "e35445243a7a923f0c90624b1e2a2e0ea547da2f"
   },
@@ -901,10 +901,10 @@
           },
           {
             "path": "server-version/backend",
-            "tree": "1283356a7b2d27211abe053755c33a52dc2f7a2c"
+            "tree": "3988da0f103f76f9b0fcfeb1f9f0d4e785986286"
           }
         ],
-        "sha256": "3a45693299d32f453f22ea7440d23930560828f927ee70ccf36e80cd34947fda"
+        "sha256": "63f5a5f5f73c5752a88ec422393bfafbf13513c58c76e8302169b84edc24628b"
       }
     },
     "backend": {
@@ -1052,8 +1052,8 @@
             "direct education native Cognitive config/profile keeps two explicit profiles of one config separate",
             "direct education native Cognitive config/profile never substitutes standard for a missing or unknown profile",
             "direct education native Cognitive config/profile rejects Cognitive and SJT proxy answering before native source reads",
-            "direct education native Cognitive config/profile rejects a stopped or changed original instead of selecting latest",
-            "direct education native Cognitive config/profile rejects a stopped or changed original instead of selecting latest",
+            "direct education native Cognitive config/profile rejects a 'changed content' original instead of selecting latest",
+            "direct education native Cognitive config/profile rejects a 'retired' original instead of selecting latest",
             "direct education native Cognitive config/profile rejects a wrong exact hash and roundtrips only exact non-wildcard native U keys",
             "direct education native Cognitive config/profile requires the original GRANT independently from the new education U, including publication and START recheck",
             "education exact native SJT original sources bounds and validates exact selections before doing source or permission work",
@@ -1166,7 +1166,7 @@
               },
               {
                 "path": "server-version/backend/src/__tests__/education-tools/native-source.cognitive.test.ts",
-                "blob": "9653bc021409de8950eff77db61886c392db2579"
+                "blob": "ea97052a39cd523542624ea5632ad79794425b8f"
               },
               {
                 "path": "server-version/backend/src/__tests__/education-tools/native-source.sjt.test.ts",
@@ -1245,7 +1245,7 @@
                 "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
               }
             ],
-            "sha256": "54b73aef07b4191a768ad539e392591b831e711b12bc22d5bd95d6ff012599b8"
+            "sha256": "8f03fd9eb649b0b5bf531b7b9c0be776207562af358823b595faacace4486d83"
           }
         },
         {
@@ -1340,14 +1340,14 @@
         "trees": [
           {
             "path": "server-version/backend",
-            "tree": "1283356a7b2d27211abe053755c33a52dc2f7a2c"
+            "tree": "3988da0f103f76f9b0fcfeb1f9f0d4e785986286"
           },
           {
             "path": "server-version/frontend",
             "tree": "8a10fe0cd4b78cf0fff76b77c5e76afbd801ef6a"
           }
         ],
-        "sha256": "2cb3cfb1f0b64029e5c6ded38c339df1f23fc551a4da095c64f9382205622d2d"
+        "sha256": "ad797b1a9553e3e28b48f9fea76558b7c99ae62314531320c7807bb620d4ea48"
       }
     },
     "migration": {

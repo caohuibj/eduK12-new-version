@@ -1,7 +1,8 @@
 # Observer questionnaires and native SELF candidate
 
 PR #385 follows merged #382/#384 at base `908af20ecfbd3ede55685d2052bf01b52266661c`.
-The product anchor is `a5778b4e467f8112eae8c57cdd13f2dca530ac12`.
+The initial product anchor is `a5778b4e467f8112eae8c57cdd13f2dca530ac12`;
+the assertion-name continuation is `1a7b4c22de57159deb38d9cce10749f481d26660`.
 This batch completes School parent/homeroom-teacher observation, Teacher student
 evaluation/expert observation, and authorized native Cognitive/SJT SELF blocks.
 P6 whole-package references remain on their separate development branch.
@@ -28,6 +29,18 @@ run's verified dist; unchanged HIGH/CRITICAL audits and real CodeQL; stable
 qualified/merge gates. Existing executor does not accept these local application
 reports as formal evidence, so formal selected checks still execute. This is not
 permission to run unrelated platform, media, load, or visual matrices.
+
+First run `40846513434` retained successful frontend/backend producers, frontend
+58 assertions and audits. Backend command 0 passed all 200 assertions, but two
+native Cognitive parameter cases had the same name; the strict report verifier
+correctly refused qualification before PG/restore/browser. The continuation
+only names those original cases distinctly and adds pre-activation uniqueness
+to the existing frozen-selection contract. The two repaired cases pass with
+eight explicitly filtered; nine related control contracts pass. Application,
+schema, dependency and migration bytes remain unchanged. As recorded in R's
+PR382 second-round review, this fresh executor cannot admit new cross-run
+producer receipts by changing parameters; original successes keep their original
+SHA/run and are not relabelled as continuation results.
 
 Budgets follow the existing jobs: admission 5 minutes, builds 12, PG and browser
 25 each, audit 8, with CodeQL in parallel. At five minutes report the actual
