@@ -1,15 +1,16 @@
 import { assertPackageAdmission } from '../bundle-product/package-release'
+import {instantiateBundleStructure,type BundleSlotResource} from './instantiate'
+import type {BundleBindings} from './instantiate'
+export type {BundleBindings} from './instantiate'
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
-import type { EffectiveScaleDisclosureSnapshot } from '../scale/projection/types'
 import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { canInstantiateConfig } from '../../services/materialGrant'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { encryptCognitivePayload, decryptCognitivePayload } from '../cognitive/cognitive.security'
+import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { assertValidItem, publishComposite } from '../composite/composite.service'
-import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
 import { freezeDataForWrite, freezeAssignmentProfile } from '../cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
@@ -18,11 +19,6 @@ import { BundleDefinitionProvider, freezeBundleProductionDefinition, readFrozenB
 import { createCodeBundleDefinitionProvider } from './code-catalog'
 
 export type BundleActor = { userId: string; role: UserRole }
-export type BundleBindings = {
-  schemaVersion: 1
-  slots: Array<{ slotKey: string; itemId: string; unitType: string; scaleDisclosure?: EffectiveScaleDisclosureSnapshot }>
-  context: Array<{ contextKey: string; itemId: string; valueType: string }>
-}
 export const author = (actor: BundleActor) => {
   if (!['ADMIN', 'TEACHER'].includes(actor.role)) throw compositeForbidden()
 }
@@ -95,34 +91,17 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       if (definition.slots.some(slot => slot.unitType === 'FORM') && !entry.contextDefinition) throw compositeBadRequest('FORM slot 缺少声明的上下文定义')
       if (input.bindings.length !== measurementSlots.length || new Set(input.bindings.map(v => v.slotKey)).size !== measurementSlots.length ||
           input.bindings.some(v => !measurementSlots.some(slot => slot.slotKey === v.slotKey))) throw compositeBadRequest('必须精确绑定全部测评槽位')
-      const frozen = freezeBundleProductionDefinition(entry, { frozenAt: new Date().toISOString(), sourceReference: 'code-catalog' })
-      const row = await tx.compositeAssessment.create({ data: { code: 'B-' + randomUUID(), productKind: 'ASSESSMENT_BUNDLE',
-        name: input.name, courseId: input.courseId, publicEnabled: input.publicEnabled, expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
-        createdBy: actor.userId, creationKey: key, creationHash: hash } })
-      const bindings: BundleBindings = { schemaVersion: 1, slots: [], context: [] }
-      let position = 0
-      for (const field of entry.contextDefinition?.fields ?? []) {
-        const boolean = field.valueType === 'boolean'
-        const choices = boolean ? ['true', 'false'] : field.enumValues
-        const item = await tx.compositeAssessmentItem.create({ data: {
-          compositeAssessmentId: row.id, type: 'FORM', required: field.required, position: position++,
-          formType: choices ? 'single_choice' : 'text_input', formLabel: field.contextKey === 'subject_age_years' ? '年龄（周岁）' : field.contextKey,
-          formOptions: choices ? choices.map(value => ({ label: value, value })) : Prisma.JsonNull,
-        } })
-        bindings.context.push({ contextKey: field.contextKey, valueType: field.valueType, itemId: item.id })
-      }
-      await ensureCompositeFormSections(row.id, tx)
-      for (const slot of [...measurementSlots].sort((a,b) => a.position-b.position)) {
-        if (!slot.required) throw compositeBadRequest('当前 Bundle 投放仅支持必填测评槽位')
-        const binding = input.bindings.find(v => v.slotKey === slot.slotKey)!
-        let scaleDisclosure: EffectiveScaleDisclosureSnapshot | undefined
-        const data: any = { compositeAssessmentId: row.id, type: slot.unitType, required: true, position: position++ }
+      const row=await instantiateBundleStructure(tx,{entry,sourceReference:'code-catalog',
+        header:{code:'B-'+randomUUID(),name:input.name,courseId:input.courseId,publicEnabled:input.publicEnabled,
+          expiresAt:input.expiresAt?new Date(input.expiresAt):null,createdBy:actor.userId,creationKey:key,creationHash:hash},
+        resolveSlot:async(slot,row):Promise<BundleSlotResource>=>{
+        const binding=input.bindings.find(v=>v.slotKey===slot.slotKey)!
         if (slot.unitType === 'SCALE') {
           const scale = await tx.scale.findUnique({ where: { id: binding.resourceId ?? '' } })
           if (!scale || scale.code !== slot.instrumentKey || scale.instrumentVersion !== slot.instrumentVersion) throw compositeBadRequest('量表精确版本不匹配')
           await assertValidItem({ type: 'SCALE', required: true, scaleId: scale.id }, actor.userId, actor.role, row, tx)
-          scaleDisclosure = createScaleProjectionContext({instrumentKey:scale.code,instrumentVersion:scale.instrumentVersion,instrumentClass:scale.instrumentClass,audience:'subject',purpose:'report'}).frozenPolicy
-          data.scaleId = scale.id
+          const scaleDisclosure = createScaleProjectionContext({instrumentKey:scale.code,instrumentVersion:scale.instrumentVersion,instrumentClass:scale.instrumentClass,audience:'subject',purpose:'report'}).frozenPolicy
+          return {type:'SCALE',scaleId:scale.id,scaleDisclosure}
         } else if (slot.unitType === 'COGNITIVE') {
           const source = await tx.cognitiveAssignment.findUnique({ where: { id: binding.resourceId ?? '' }, include: { config: true } })
           if (!source || source.config.testType !== slot.instrumentKey || source.config.configVersion !== slot.instrumentVersion) throw compositeBadRequest('认知任务精确版本不匹配')
@@ -136,22 +115,18 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
             profile: source.profile, profileDefinitionVersion: source.profileDefinitionVersion, resolvedConfigSnapshotEncrypted: source.resolvedConfigSnapshotEncrypted,
             resolvedConfigHash: source.resolvedConfigHash, resolvedReportSnapshotEncrypted: source.resolvedReportSnapshotEncrypted,
           } : freezeDataForWrite(freezeAssignmentProfile({ entry: engine, profile: 'standard', baseConfig: engine.configSchema.parse(source.config.config) }))
-          data.cognitiveAssignmentId = (await tx.cognitiveAssignment.create({ data: {
+          const assignment = await tx.cognitiveAssignment.create({ data: {
             configId: source.configId, createdBy: actor.userId, courseId: input.courseId, title: source.title, status: 'PUBLISHED',
             quotaSourceAssignmentId: source.createdBy === actor.userId ? source.quotaSourceAssignmentId ?? source.id : null,
             maxAttempts: source.maxAttempts,
             publishedAt: new Date(), listedStandalone: false, required: false, ...freeze,
-          } })).id
+          } })
+          return {type:'COGNITIVE',cognitiveAssignmentId:assignment.id}
         } else {
           await assertValidItem({ type: 'SITUATIONAL', required: true, situationalInstrumentKey: slot.instrumentKey, situationalInstrumentVersion: slot.instrumentVersion }, actor.userId, actor.role, row, tx)
-          data.situationalInstrumentKey = slot.instrumentKey; data.situationalInstrumentVersion = slot.instrumentVersion
+          return {type:'SITUATIONAL',situationalInstrumentKey:slot.instrumentKey,situationalInstrumentVersion:slot.instrumentVersion}
         }
-        const item = await tx.compositeAssessmentItem.create({ data })
-        bindings.slots.push({ slotKey: slot.slotKey, itemId: item.id, unitType: slot.unitType, ...(scaleDisclosure ? {scaleDisclosure} : {}) })
-      }
-      await tx.bundleInstance.create({ data: { compositeId: row.id, bundleKey: definition.bundleKey, bundleVersion: definition.bundleVersion,
-        definitionHash: frozen.contentHash, definitionEncrypted: encryptCognitivePayload(frozen),
-        bindingsHash: canonicalHash(bindings), bindingsEncrypted: encryptCognitivePayload(bindings) } })
+      }})
       return row.id
     }, { timeout: 30000 })
     let id: string
