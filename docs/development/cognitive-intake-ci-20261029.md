@@ -96,9 +96,16 @@ a comment in existing reaction seeds; the probe commit is not merged or pushed.
 Node 24.21.0 executed the real root once: reaction engine 1.0.0 with scorers
 1.0.0 / 1.1.0, fixed existing fixtures, all four identity stages, one manifest
 check, one dependency guard and the two declared DOM suites (17 assertions).
-Types rooted at reaction seeds and its generated direct consumer had 72 files,
-no backend source outside Cognitive, and no diagnostics. The changed CLI's own
-single-root compiler check also passed with all diagnostics retained. Existing
+The first data type trace had 72 files and no diagnostics, but the first
+task-mode check exposed 78 missing Node ambient diagnostics: the compiler API
+had not bound its backend tsconfig path. Those original diagnostics are retained.
+After restoring config-relative ambient discovery and the original rootDir,
+the affected type-only checks passed: data has 203 files, task has 570, both
+with zero diagnostics and the original backend ambient type set. These counts
+include dependency declarations, not additional executed application suites.
+The changed CLI's own single-root compiler check also passed with all diagnostics
+retained. A synthetic compiler contract requires Node ambient discovery and
+retains an intentional TS2322 error in both JSON and the original compiler log. Existing
 installed package versions matched their unchanged lockfile versions; this is
 local development evidence, not a signed environment or formal CI result.
 

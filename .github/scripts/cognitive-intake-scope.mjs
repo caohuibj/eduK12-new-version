@@ -37,11 +37,14 @@ export function selectCognitiveIntake(entries, readHeadFile, {readBaseFile} = {}
     const suffix = backend ? e.file.slice(cognitiveTaskRoot.length) : frontend ? e.file.slice(frontRoot.length) : '';
     const [task,...rest] = suffix.split('/');
     if (!suffix || !/^[a-zA-Z0-9_-]+$/.test(task) || !rest.length || task==='shared') return result(false,'NOT_SELECTED','shared-or-mixed-input');
-    if(backend && !(rest.length===1 && (/^[a-zA-Z0-9_-]+\.ts$/.test(rest[0]) || ['task-package.json','README.md','THIRD_PARTY_LICENSE.md'].includes(rest[0])) || rest.length===2 && rest[0]==='fixtures' && /^[a-zA-Z0-9_.-]+\.json$/.test(rest[1])))
+    const stimulus=/\.(?:png|webp|avif|svg|jpg|jpeg|gif|woff2?|mp3|wav|mp4)$/i.test(e.file);
+    // Recognize a task stimulus as unsupported browser input before checking the
+    // narrower executable-backend surface. This grants no browser qualification.
+    if(backend && !stimulus && !(rest.length===1 && (/^[a-zA-Z0-9_-]+\.ts$/.test(rest[0]) || ['task-package.json','README.md','THIRD_PARTY_LICENSE.md'].includes(rest[0])) || rest.length===2 && rest[0]==='fixtures' && /^[a-zA-Z0-9_.-]+\.json$/.test(rest[1])))
       return result(false,'NOT_SELECTED','unsupported-task-path');
     const mode = backend && rest.length===1 && data.has(rest[0]) ? 'data' : 'task';
     if (!modes.has(task) || mode==='task') modes.set(task,mode);
-    if (frontend || /\.(?:png|webp|avif|svg|jpg|jpeg|gif|woff2?|mp3|wav|mp4)$/i.test(e.file)) browsers.add(task);
+    if (frontend || stimulus) browsers.add(task);
   }
   if (!modes.size) return result(false,'NOT_SELECTED','generated-without-task');
   try {

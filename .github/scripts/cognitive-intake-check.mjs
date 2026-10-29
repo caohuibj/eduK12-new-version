@@ -61,8 +61,10 @@ export function checkSelectedTypes(root, selection, output) {
     (selection.taskModes[tFor(f)]==='task'||selection.files.includes(f)));
   assert.ok(selected.length,'Missing selected type sources');
   const config=ts.readConfigFile(path.join(backend,'tsconfig.json'),ts.sys.readFile); assert.ok(!config.error,'Invalid backend tsconfig');
-  const parsed=ts.parseJsonConfigFileContent(config.config,ts.sys,backend); assert.equal(parsed.errors.length,0,'Invalid backend compiler options');
-  const options={...parsed.options,noEmit:true,incremental:false,composite:false,rootDir:backend};
+  const configFile=path.join(backend,'tsconfig.json');
+  const parsed=ts.parseJsonConfigFileContent(config.config,ts.sys,backend,undefined,configFile); assert.equal(parsed.errors.length,0,'Invalid backend compiler options');
+  // Match tsc -p's config-relative ambient type discovery, independent of cwd.
+  const options={...parsed.options,noEmit:true,incremental:false,composite:false};
   const selectedSet=new Set(selected.map(f=>path.resolve(root,f)));
   const {dependencies}=require(path.join(root,'server-version/scripts/cognitive/dependencies.cjs'));
   const edges=[];
@@ -84,7 +86,7 @@ export function checkSelectedTypes(root, selection, output) {
   const roots=[...new Set([...selected,...consumers])].sort();
   const program=ts.createProgram(roots.map(f=>path.join(root,f)),options);
   const diagnostics=ts.getPreEmitDiagnostics(program);
-  const trace={roots,selectedSources:selected,consumers,edges:edges.filter(e=>roots.includes(e.from)||selected.includes(e.to)),
+  const trace={compilerVersion:ts.version,compilerConfig:path.relative(root,configFile),automaticTypes:ts.getAutomaticTypeDirectiveNames(options,ts.sys),roots,selectedSources:selected,consumers,edges:edges.filter(e=>roots.includes(e.from)||selected.includes(e.to)),
     closure:program.getSourceFiles().map(s=>path.relative(root,s.fileName).split(path.sep).join('/')).sort(),
     diagnostics:diagnostics.map(d=>({file:d.file?path.relative(root,d.file.fileName):null,start:d.start,code:d.code,message:ts.flattenDiagnosticMessageText(d.messageText,'\n')}))};
   fs.writeFileSync(path.join(output,'selected-types.json'),JSON.stringify(trace,null,2)+'\n');
