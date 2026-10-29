@@ -13,7 +13,7 @@ const add=f=>({file:f,status:'A',oldMode:'000000',newMode:'100644'});
 const mod=f=>({...add(f),status:'M',oldMode:'100644'});
 test('inline and JSON-backed declarations share one selected identity, normal metadata and generated index',()=>{
  const e=[add(file),add(file.replace('instrument.ts','source.json')),add(file.replace('instrument.ts','THIRD_PARTY_LICENSE.md')),
-  mod('server-version/backend/src/modules/scale/onboarding/instruments.generated.ts'),add('docs/scale-intake/batch/record.json')];
+  mod('server-version/backend/src/modules/scale/onboarding/instruments.generated.ts'),add('docs/scale-intake/batch/record.json'),add('docs/scale-intake/batch/receipt.txt')];
  assert.deepEqual(selectScaleIntake(e).sources,[file]);assert.equal(classifyChanges(e).scale_intake_light,true);
  assert.equal(classifyChanges(e,true).scale_intake_light,false);
 });
