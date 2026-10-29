@@ -104,9 +104,10 @@ async function authorQuestionnaire(s,f,{suffix,toolsPage,report,out}) {
  await preview.getByText('合成固定工具说明 1',{exact:true}).waitFor()
  await preview.getByRole('button',{name:'下一工具',exact:true}).click()
  await preview.getByText('SELF 合成反思题（必答）',{exact:true}).waitFor()
- const previewResponse=p.waitForResponse(r=>new URL(r.url()).pathname===s.prefix+base+'/library-sources/'+f.library.entryId&&r.request().method()==='GET')
- await preview.getByRole('button',{name:'下一工具',exact:true}).click()
- const response=await previewResponse;assert.equal(response.status(),200)
+ const [response]=await Promise.all([
+  p.waitForResponse(r=>new URL(r.url()).pathname===s.prefix+base+'/library-sources/'+f.library.entryId&&r.request().method()==='GET'),
+  preview.getByRole('button',{name:'下一工具',exact:true}).click(),
+ ]);assert.equal(response.status(),200)
  const display=(await response.json()).data.definition
  assert.deepEqual(['scoring','report','referencePolicy'].filter(k=>k in display),[])
  assert.ok(display.responseSets.every(set=>set.options.every(option=>!('score'in option))))
@@ -136,14 +137,17 @@ async function participant(s,f,w,version,{author,report,out}) {
   p.locator('article.ht-event').filter({has:p.locator('strong').filter({hasText:version.title})})
  async function open() {
   const fresh=(await list()).find(t=>(t.executionId||t.id)===executionId);assert.ok(fresh)
-  const loaded=p.waitForResponse(r=>r.request().method()==='GET'&&new RegExp('^'+s.prefix+'/(?:assessment-)?composite-attempts/[^/]+$').test(new URL(r.url()).pathname))
-  await card().getByRole('button',{name:s.product==='SCHOOL'?'开始／继续官方测评':fresh.runtimeBindingRef?'继续测评':'开始测评',exact:true}).click()
-  if(s.product==='SCHOOL'||!fresh.runtimeBindingRef) {
-   const consent=p.getByRole('checkbox',{name:s.product==='SCHOOL'?'我已阅读本次测评的用途与可见性说明，自愿同意作答。':'我已阅读用途与可见性说明，自愿同意作答。',exact:true})
-   if(await consent.count())await consent.check()
-   await p.getByRole('button',{name:s.product==='SCHOOL'?'开始或继续正式测评':'开始或继续测评',exact:true}).click()
-  }
-  const response=await loaded;assert.equal(response.status(),200);return (await response.json()).data
+  const [response]=await Promise.all([
+   p.waitForResponse(r=>r.request().method()==='GET'&&new RegExp('^'+s.prefix+'/(?:assessment-)?composite-attempts/[^/]+$').test(new URL(r.url()).pathname)),
+   (async()=>{
+    await card().getByRole('button',{name:s.product==='SCHOOL'?'开始／继续官方测评':fresh.runtimeBindingRef?'继续测评':'开始测评',exact:true}).click()
+    if(s.product==='SCHOOL'||!fresh.runtimeBindingRef) {
+     const consent=p.getByRole('checkbox',{name:s.product==='SCHOOL'?'我已阅读本次测评的用途与可见性说明，自愿同意作答。':'我已阅读用途与可见性说明，自愿同意作答。',exact:true})
+     if(await consent.count())await consent.check()
+     await p.getByRole('button',{name:s.product==='SCHOOL'?'开始或继续正式测评':'开始或继续测评',exact:true}).click()
+    }
+   })(),
+  ]);assert.equal(response.status(),200);return (await response.json()).data
  }
  if(s.product==='SCHOOL')await p.goto(s.origin+'/workspace/tasks')
  let state=await open(),attemptId=state.id
@@ -159,16 +163,26 @@ async function participant(s,f,w,version,{author,report,out}) {
    await option.click()
    if(index===0) {
     await p.getByRole('button',{name:'保存并退出',exact:true}).click()
+    if(s.product==='TEACHER') {
+     // START leaves the mounted list row unchanged. Reload only after durable
+     // exit closes the answer page, then resume from the persisted parent/draft.
+     await p.getByRole('region',{name:'测评独立作答页',exact:true}).waitFor({state:'hidden'})
+     await p.reload()
+    }
     state=await open();assert.equal(state.id,attemptId);assert.equal(state.currentItem.id,item.id)
     assert.equal(await p.getByRole('button',{name:'合成量表选项乙',exact:true}).getAttribute('aria-pressed'),'true')
    }
-   const submitted=p.waitForResponse(r=>r.request().method()==='POST'&&/\/scale\/submit$/.test(new URL(r.url()).pathname))
-   await p.getByRole('button',{name:'提交整份量表',exact:true}).click();assert.equal((await submitted).status(),200)
+   const [submitted]=await Promise.all([
+    p.waitForResponse(r=>r.request().method()==='POST'&&/\/scale\/submit$/.test(new URL(r.url()).pathname)),
+    p.getByRole('button',{name:'提交整份量表',exact:true}).click(),
+   ]);assert.equal(submitted.status(),200)
   } else {
    assert.equal(item.type,'FORM_SECTION')
    const player=p.locator('.form-player');await player.getByRole('textbox').fill('合成描述性反思，不计心理分数')
-   const submitted=p.waitForResponse(r=>r.request().method()==='POST'&&/\/form-sections\/[^/]+\/submit$/.test(new URL(r.url()).pathname))
-   await player.getByRole('button',{name:'提交本页',exact:true}).click();assert.equal((await submitted).status(),200)
+   const [submitted]=await Promise.all([
+    p.waitForResponse(r=>r.request().method()==='POST'&&/\/form-sections\/[^/]+\/submit$/.test(new URL(r.url()).pathname)),
+    player.getByRole('button',{name:'提交本页',exact:true}).click(),
+   ]);assert.equal(submitted.status(),200)
   }
   state=await s.api(endpoint+'?view=current-unit')
  }

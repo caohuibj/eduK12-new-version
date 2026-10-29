@@ -92,3 +92,53 @@ test('browser report consumer accepts complete exact-source SELF matrix and reje
  const f=reportFixture();assert.equal(browser.verifyReport(f.report,f.identity,f.read).status,'PASSED');
  for(const mutate of [r=>r.source.head='d'.repeat(40),r=>r.runId='old',r=>r.inputs.frontend.sha='d'.repeat(40),r=>r.coverage.pop(),r=>r.coverage[0].displayOnly=false,r=>r.coverage[2].authorDenied=false,r=>r.sessions[0].authenticated=false,r=>r.sessions[1].pageErrors=['synthetic error'],r=>r.sessions[2].failedResponses=[{path:'/unexpected',status:500}],r=>r.chrome.options.chromiumSandbox=false,r=>r.chrome.launchedVersion='old',r=>r.startups[1].ready=false,r=>r.storageModes[0].compactFactsEnabled=true,r=>r.screenshots.pop(),r=>r.errors=['synthetic teardown failure']]){const r=structuredClone(f.report);mutate(r);assert.throws(()=>browser.verifyReport(r,f.identity,f.read));}
 });
+
+// Model the existing Teacher task controller: START does not replace its list
+// rows, leaving the mounted card ASSIGNED until a reload. No DOM, account, API
+// server or application qualification is implied by these executor contracts.
+function teacherResumeFixture({failOpen=false}={}){
+ const events=[],stop=new Error('synthetic stop before FINAL'),openError=new Error('synthetic task click failed');
+ let parentRef=null,rowRef=null,panelOpen=false,selected=false;
+ const waiters=new Set(),state={id:'parent',status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',currentItem:{id:'scale-item',type:'SCALE'}};
+ const parentResponse=()=>{
+  const response={request:()=>({method:()=> 'GET'}),url:()=> 'https://teacher.eduk12.top/api/huiteacher/assessment-composite-attempts/parent?view=current-unit',status:()=>200,json:async()=>({data:state})};
+  for(const waiter of waiters)if(waiter.match(response)){clearTimeout(waiter.timer);waiters.delete(waiter);waiter.resolve(response)}
+ };
+ const card={filter:()=>card,getByRole:(role,{name})=>({click:async()=>{
+  if(failOpen)throw openError;
+  assert.equal(role,'button');assert.equal(name,rowRef?'继续测评':'开始测评','The mounted list keeps its pre-START label until reload');
+  events.push('card:'+name);panelOpen=true;if(rowRef)parentResponse();
+ }})};
+ const page={
+  locator:()=>card,
+  waitForResponse:match=>new Promise((resolve,reject)=>{
+   const waiter={match,resolve,timer:null};waiter.timer=setTimeout(()=>{waiters.delete(waiter);reject(new Error('synthetic missing response'))},15);waiters.add(waiter);
+  }),
+  reload:async()=>{assert.equal(panelOpen,false,'Durable exit must finish before the page reload');events.push('reload');rowRef=parentRef},
+  getByRole:(role,{name})=>{
+   if(role==='region'&&name==='本段作答说明')return {getByText:()=>({waitFor:async()=>{}})};
+   if(role==='region'&&name==='测评独立作答页')return {waitFor:async options=>{assert.deepEqual(options,{state:'hidden'});assert.equal(panelOpen,false);events.push('exit-confirmed')}};
+   if(role==='checkbox')return {count:async()=>1,check:async()=>events.push('consent')};
+   assert.equal(role,'button');
+   if(name==='开始或继续测评')return {click:async()=>{parentRef='parent';events.push('START');parentResponse()}};
+   if(name==='合成量表选项乙')return {click:async()=>{selected=true;events.push('answer')},getAttribute:async attribute=>{assert.equal(attribute,'aria-pressed');events.push('restored');return String(selected)}};
+   if(name==='保存并退出')return {click:async()=>{events.push('save-exit');panelOpen=false}};
+   if(name==='提交整份量表')return {click:async()=>{events.push('before-FINAL');throw stop}};
+   assert.fail('Unexpected synthetic control '+name);
+  },
+ };
+ const session={product:'TEACHER',prefix:'/api/huiteacher',origin:'https://teacher.eduk12.top',page,api:async uri=>{
+  assert.equal(uri,'/my-assessment-tasks?pageSize=25');return {list:[{executionId:'execution',eventId:'event',title:'fixed ordinary questionnaire',runtimeBindingRef:parentRef}]};
+ }};
+ return {events,stop,openError,run:()=>browser.participant(session,{}, {id:'event'},{title:'fixed ordinary questionnaire'},{author:{},report:{coverage:[]},out:'/unused'})};
+}
+test('SELF browser resumes the same durable Teacher parent after refreshing the mounted pre-START task row',async()=>{
+ const f=teacherResumeFixture();await assert.rejects(f.run(),error=>error===f.stop);
+ assert.deepEqual(f.events,['card:开始测评','consent','START','answer','save-exit','exit-confirmed','reload','card:继续测评','restored','before-FINAL']);
+ await new Promise(resolve=>setTimeout(resolve,25)); // The intentionally stopped POST waiter must remain handled.
+});
+test('SELF browser catches a failed UI action while its response waiter later rejects',async()=>{
+ const f=teacherResumeFixture({failOpen:true});await assert.rejects(f.run(),error=>error===f.openError);
+ await new Promise(resolve=>setTimeout(resolve,25)); // node:test fails on an unhandled rejection here.
+ assert.deepEqual(f.events,[]);
+});

@@ -426,9 +426,10 @@ async function run() {
         return result.status === 200 ? result.body.data : result
       }
       s.click = async (locator, uri, method = 'POST') => {
-        const pending = page.waitForResponse(res => new URL(res.url()).pathname === prefix + uri && res.request().method() === method)
-        await locator.click()
-        const response = await pending; assert.equal(response.status(), 200, `${method} ${uri}`)
+        const [response] = await Promise.all([
+          page.waitForResponse(res => new URL(res.url()).pathname === prefix + uri && res.request().method() === method),
+          locator.click(),
+        ]); assert.equal(response.status(), 200, `${method} ${uri}`)
         const body = await response.json(); assert.equal(body.code, 0, `${method} ${uri} application error`)
         return body.data
       }
