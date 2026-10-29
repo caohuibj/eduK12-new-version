@@ -91,6 +91,27 @@ describe('Teacher participant host with synthetic runtime DTOs',()=>{
    '/run-executions/execution/assessment-consent/accept','/run-executions/execution/start-assessment','/assessment-composite-attempts/parent?view=current-unit',
   ])
  })
+ it.each([false,true])('retains a durable first START across exit without repeating consent (initial read fails: %s)',async(failFirstRead)=>{
+  const underlying=fixture([state('SCALE')],[{...task,status:'ASSIGNED',runtimeBindingRef:null,consentRequired:true}])
+  let reads=0
+  const api=vi.fn(async(path:string,...rest:unknown[])=>{
+   if(path.includes('view=current-unit')&&++reads===1&&failFirstRead)throw new Error('合成首次读取失败')
+   return underlying(path,...rest)
+  })
+  render(<HuiteacherMyAssessmentTasks api={api as EducationReportApi} actorKey="teacher"/>)
+  fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
+  fireEvent.click(screen.getByRole('checkbox'))
+  fireEvent.click(screen.getByRole('button',{name:'开始或继续测评'}))
+  await screen.findByText(failFirstRead?'合成首次读取失败':'共享单元：SCALE')
+  fireEvent.click(screen.getByRole('button',{name:'返回任务列表'}))
+  fireEvent.click(screen.getByRole('button',{name:'继续测评'}))
+  await screen.findByText('共享单元：SCALE')
+  expect(reads).toBe(2)
+  expect(api.mock.calls.filter(call=>call[0].endsWith('/assessment-consent/accept'))).toHaveLength(1)
+  expect(api.mock.calls.filter(call=>call[0].endsWith('/start-assessment'))).toHaveLength(1)
+  expect(api.mock.calls.filter(call=>call[0].startsWith('/my-assessment-tasks'))).toHaveLength(1)
+  expect(screen.queryByRole('checkbox')).toBeNull()
+ })
  it('rejects a late completed response after exit and after account replacement',async()=>{
   const pending=deferred<CompositeAttemptState>(),onCompleted=vi.fn()
   const api=vi.fn(async(path:string)=>path==='/my-assessment-tasks'?{list:[task],nextCursor:null}:pending.promise)
