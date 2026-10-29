@@ -10,6 +10,8 @@ import {authenticateSchool} from '../../middleware/auth'
 import activityRouter from '../../modules/campus/activity.run.routes'
 import compositeRouter from '../../modules/campus/composite.routes'
 import {listCampusParentRunTasks} from '../../modules/campus/activity.tasks'
+import {listCampusTeacherRunTasks} from '../../modules/campus/teacher-tasks'
+import {changeCampusActivityStatus} from '../../modules/campus/activity.service'
 import {csrfProtection} from '../../middleware/csrf'
 import {generateToken} from '../../utils/jwt'
 import {SCHOOL_AUTH_COOKIE_NAME,SCHOOL_CSRF_COOKIE_NAME,CSRF_HEADER_NAME} from '../../utils/authCookies'
@@ -63,6 +65,25 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
    ...(mode==='TEACHER_REPORT'?{targetPolicy:{mode:'HOMEROOM_TEACHER'}}:{})}
   return {...f,tools,author,run,body,composition,definition}
  }
+ async function verifyClosedHistory(f:Awaited<ReturnType<typeof prepare>>,executionId:string){
+  const actor=await db.user.findUniqueOrThrow({where:{id:f.participantUserId}})
+  const principal={userId:actor.id,username:actor.username,role:actor.role,platformRole:actor.platformRole,tokenVersion:actor.tokenVersion,mustChangePassword:actor.mustChangePassword,accountDomain:'SCHOOL' as const}
+  const tasks=()=>f.responseMode==='PARENT_REPORT'?listCampusParentRunTasks(principal):listCampusTeacherRunTasks(principal,f.organizationId)
+  const feedbackPath='/run-executions/'+executionId+'/feedback'
+  expect((await request(f.author,f.run+'/close',{})).status).toBe(200)
+  expect((await tasks()).list).toEqual(expect.arrayContaining([expect.objectContaining({executionId,status:'COMPLETED',feedbackMode:'COMPOSITION'})]))
+  const [activity]=await db.$queryRaw<Array<{version:number}>>`SELECT version FROM campus_activities WHERE organization_id=${f.organizationId} AND course_id=${f.workflow.id}`
+  await changeCampusActivityStatus({actor:f.manager,organizationId:f.organizationId,courseId:f.workflow.id,action:'PAUSE',expectedVersion:activity.version})
+  // Each request signs a fresh real School JWT. A new login after closure can
+  // rediscover its own completed execution and read only its approved receipt.
+  expect((await tasks()).list).toEqual(expect.arrayContaining([expect.objectContaining({executionId,status:'COMPLETED'})]))
+  const feedback=await request(actor.id,feedbackPath)
+  expect(feedback.status,JSON.stringify(feedback.value)).toBe(200)
+  expect(feedback.data.state).toBe('COMPLETION_ONLY')
+  expect(JSON.stringify(feedback.data)).not.toMatch(/scores|itemScores|interpretations|Private .* observation/)
+  expect([403,404,409]).toContain((await request(actor.id,f.run+'/executions/'+executionId+'/start',{})).status)
+  return tasks
+ }
  it('parent compiles/fixes, receives a related-child assignment, consents, resumes and finalizes one Scale/Form questionnaire with private completion feedback',async()=>{
   const f=await prepare('PARENT_REPORT'),actor=f.participantUserId
   expect(f.composition.version.runtime.origin.variantKey).toBe('STUDENT:PARENT_REPORT')
@@ -115,11 +136,18 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
   expect(JSON.stringify(feedback.data)).not.toMatch(/Private parent observation|scores|rawScore|sourceDefinition|manifestHash|educationComposition/)
   for(const other of [f.subjectUserId,f.author,f.schoolAdmin!.userId])expect((await request(other,feedbackPath)).status).toBe(404)
   expect(bodies).not.toHaveBeenCalled();bodies.mockRestore()
+  const historical=await verifyClosedHistory(f,execution.id)
+  await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:actor,permission:'RUN_START',reason:'Synthetic collection-only withdrawal',deniedByUserId:f.author}})
+  expect((await historical()).list.some(task=>task.executionId===execution.id)).toBe(true)
   await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:actor,permission:'REPORT_READ',reason:'Synthetic respondent report withdrawal',deniedByUserId:f.author}})
   expect((await request(actor,feedbackPath)).status).toBe(404)
+  expect((await historical()).list.some(task=>task.executionId===execution.id)).toBe(false)
  },60000)
  it('teacher observer requires a homeroom target and preserves the student through START, FINAL and restricted feedback',async()=>{
   const f=await prepare('TEACHER_REPORT')
+  // ADMIN is still an actual TEACHER-persona respondent, not a report reader
+  // for every student in this organization.
+  await db.user.update({where:{id:f.participantUserId},data:{role:'ADMIN'}})
   expect(f.composition.version.runtime.origin.variantKey).toBe('STUDENT:TEACHER_REPORT')
   const {targetPolicy:_,...withoutTarget}=f.body
   expect((await request(f.author,f.run+'/tracks',withoutTarget)).status).toBe(400)
@@ -147,5 +175,6 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
   expect(feedback.data).toMatchObject({state:'COMPLETION_ONLY',units:[{state:'WITHHELD'},{state:'COMPLETION_ONLY'}]})
   expect(JSON.stringify(feedback.data)).not.toMatch(/Private teacher observation|scores|rawScore|sourceDefinition|manifestHash/)
   for(const other of [f.subjectUserId,f.author,f.schoolAdmin!.userId])expect((await request(other,feedbackPath)).status).toBe(404)
+  await verifyClosedHistory(f,execution.id)
  },60000)
 })
