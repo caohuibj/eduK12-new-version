@@ -1,0 +1,491 @@
+{
+  "schemaVersion": 1,
+  "mainSha": "2de32609e1888cf28b73cb26e2c0cf38b11ff875",
+  "source": {
+    "repository": "caohuibj/eduK12-new-version",
+    "branch": "feat/dot-cognitive-content-integration-20261028",
+    "commit": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+    "tree": "a516533b2c87ce4a96a610ad3c8f51f5b5e5b9a3",
+    "files": [
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/config-seeds.ts",
+        "sha256": "a48ff1a612fccd93f8040a2a794b3b48e1350a0bef957dbc7619aaeda8efb6df",
+        "blob": "95258cb45f5cc4578a685831f119fe941f3bf2f7"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/onboarding/install.ts",
+        "sha256": "24563c978b743f8430335b1fe145435145bbf63c8d05098a62cc23deaffe7365",
+        "blob": "610331380aef035c6bfab20a9ee0887247d32ec7"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/task-resource.ts",
+        "sha256": "2f0884bac981970cd65cce3fcb95b6996e83e6abbbc0cb4437c6db6d40f79743",
+        "blob": "ecebd91fcd3554d41f1b8a53d1098b8fd1b95d37"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/profile-freeze.ts",
+        "sha256": "ae5ede034afcbc632b1d29c9c7cf5f7168c9fd442cd4dc9dce6185e59b8e2f1e",
+        "blob": "21133caf94fe0601d8fe0586d446744bacc163a0"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/native-runners.tsx",
+        "sha256": "85db19d7cfe8043d6c2738c90d7024bbfbaf085a402dcdfdb2fa1b5d97f77953",
+        "blob": "fa1fa03f74cd89a4180bdbaf384bb7b49249fc0c"
+      }
+    ]
+  },
+  "kind": "source provenance and isolated load; not main runtime admission",
+  "rows": [
+    {
+      "testType": "ant",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "sourceCoreHash": "485c3bcb9a7318c66d71c3e3625e2e6fca393f626d07a055b2f99e69a2b96111",
+      "databaseCoreHash": "485c3bcb9a7318c66d71c3e3625e2e6fca393f626d07a055b2f99e69a2b96111",
+      "localConfigId": "329c1b7b-21b4-45f1-b55f-a0c3a5e01c6b",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "1.1.0",
+          "configHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+          "reportHash": "43e510f8c5cd2ceb46dbd5c3eb105565885e574f50d9c5db7e185019cfaea3e3",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 48,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "1.1.0",
+          "configHash": "ebd1e9f3f352ca31b949577466d89ab54cc2553b865c6fd350c3ab7e06fa52de",
+          "reportHash": "79f6b980123a1323187152b694b8ee7c54898a8398019dc361e76a2d2f72ee0e",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 288,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "attentional-blink",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "3ef57cf71a9ccf5072b94a4f72f430194dff058d9bceae9db5d54c04b6aa7a45",
+      "databaseCoreHash": "3ef57cf71a9ccf5072b94a4f72f430194dff058d9bceae9db5d54c04b6aa7a45",
+      "localConfigId": "e5d3a5a2-0c7f-4699-ad7b-8e599ecb3778",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "a11027931d04226897bc03de9b97702dcebe3dda8b7afb7583cfe5a80afd1c50",
+          "reportHash": "8b2f3eb43220f06250cab00ef5f1638903634561b8f92eb8f33724842dc94f8c",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 50,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "637bcc8cc0ec83f61479df2cb7a9a99d2465694b79d86c04f5b59f386bd92664",
+          "reportHash": "936691bfc06b5e79ed558b525f64d4cd53a8dfc29032579bc66c1a5f440ccc5b",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 200,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "balloon-effort",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "4e14b4ab66762cc04e35d37f886ab8c055fa947c52da39e819643074b2c6f032",
+      "databaseCoreHash": "4e14b4ab66762cc04e35d37f886ab8c055fa947c52da39e819643074b2c6f032",
+      "localConfigId": "54fbe2b6-ea2c-4af8-82a3-5e985d44713a",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+          "reportHash": "bd3af2883a8c65897c68c1a78a154c93903bbe1b1d7340acadf2e8b4a4569a11",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 18,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "7c529ef53d47709bb17c4489086757ba135ac9747be90671722cd2f9da77686a",
+          "reportHash": "c38b89d8be02422a0d8e576a9b3335264a25ebc209fadfe8e77944eda14adc73",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 72,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "dual-arrow",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "f5a623f397198f9c7cf73174253fa5c48258a3d19342887edcabf704d57800ca",
+      "databaseCoreHash": "f5a623f397198f9c7cf73174253fa5c48258a3d19342887edcabf704d57800ca",
+      "localConfigId": "2ddeac81-d324-4a0b-be2e-6515be9d6749",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+          "reportHash": "9e55342883cb21c5fcc1a21bd3b33cbf797b2a6e61000590c1d6087adcfc9743",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 60,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "e8a1abbb613f44f1b5a81d214b7c11735acb313201af99c7d2b1cab1bb7ebef9",
+          "reportHash": "4cf99a90e3ebebadf1b8e6fd6d03df3014de4d3c3c4d4660fe388b26fdcdf8e2",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 300,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "enumeration",
+      "configVersion": "0.3.0",
+      "engineVersion": "0.2.0",
+      "scoringVersion": "0.2.0",
+      "sourceCoreHash": "afaa0328620bbb5691b42bd6466c85eeb20f436be0d72f6b0b8463903a5cd3f3",
+      "databaseCoreHash": "afaa0328620bbb5691b42bd6466c85eeb20f436be0d72f6b0b8463903a5cd3f3",
+      "localConfigId": "a6d07393-cfab-418a-80e5-ffec84e81a25",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.3.0",
+          "configHash": "7b1ce6092bb2eeb105826848dc69095c35d237217750e4cc7fdfb7c1d5f38317",
+          "reportHash": "3435f8cd9f11a42f8c8a6fa920b4532d2481cdefa431015d678c2908b96bb607",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 25,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.3.0",
+          "configHash": "f08fc6767b1b5edb2ad7b1022b99d745dc19a9d886e751d467c35faedbd5c70e",
+          "reportHash": "edc9e1dc0464f1e1630860ac1b85e4e7ec96a6b0a2aab86815e3a147df7ae6ee",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 100,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "gradcpt",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "a98ae1bfd1035245810580f4365a97ae11f448727e1b9bb4653ab12e1aadae09",
+      "databaseCoreHash": "a98ae1bfd1035245810580f4365a97ae11f448727e1b9bb4653ab12e1aadae09",
+      "localConfigId": "647887c3-2488-416f-b2a8-516e49989378",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "809207140532bbb48104c8eda456bdca1b12a632e5a1caf1b6ecc41b70e4538c",
+          "reportHash": "556db81216bae44475ce707ed1ae68e0b8e80fe6ea6866b8bb8c3c1bd0fa7254",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 100,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "1eea7e00cd6dc1b17547248db5bc44e814bb5a0d6fbdbbd0491c01da035a168e",
+          "reportHash": "d19eac48fab99d78f4506243803f65d36e483c29dae01af82d346a9a93921ada",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 300,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "hearts-flowers",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985",
+      "databaseCoreHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985",
+      "localConfigId": "22547568-b3aa-43dc-a119-6e96a40b1a56",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+          "reportHash": "6380d883b5ce3df44f7f99ef14e0cbc3a7c4742cc0567e2e1964b9ea676d04ff",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 32,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "76fa42c68d72f39c26206515a5a015757cf076c97a21939765de5359d3043672",
+          "reportHash": "e56ad991016020e05d6f50247b5b2ba48833c435a86111d439ae1a4833f14bd2",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 57,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "horizon-exploration",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "d1160648b0e566a1f79bc8bc811ca991821cc193ab1d58d39e2b3f37ea724bae",
+      "databaseCoreHash": "d1160648b0e566a1f79bc8bc811ca991821cc193ab1d58d39e2b3f37ea724bae",
+      "localConfigId": "0053e697-9ddd-41cd-8f4c-204071352dae",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+          "reportHash": "784b53458106716a627e18977a0a026302aed0df9d0325f968cdf4e66a6bde57",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 40,
+          "unit": "games"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "23d1e7567738d2ae373f5380e26f2235db19e6e55936deb39c11d5f7b94a0327",
+          "reportHash": "3fd7e205f740097a63d532caa1f0452a0d93dc75d57dbb93f0694c9f6ed09044",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 320,
+          "unit": "games"
+        }
+      ]
+    },
+    {
+      "testType": "mot",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.1.1",
+      "scoringVersion": "1.1.0",
+      "sourceCoreHash": "841592e8854b388aeb492a1e30bd204a49fe345df504a18c9b3327bb534b583c",
+      "databaseCoreHash": "841592e8854b388aeb492a1e30bd204a49fe345df504a18c9b3327bb534b583c",
+      "localConfigId": "881d239b-28dc-4904-b9d3-b90d69e02750",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "1.0.0",
+          "configHash": "ac18eb0d0ee10f354a6ae9dd9d8bdec4587f991c6e19676eb0f45041154eaf13",
+          "reportHash": "7c0497ca52591fbbec962dba182a21f89eb756e4b9f4f7470b0be9a841b5dd88",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 9,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "1.0.0",
+          "configHash": "a7a2660c4defe8d336926e63ae821d6e750130226bbfba85e8b054d891e4fbba",
+          "reportHash": "c35442eb22ec667475beb559e1ec0441c639145c8574c40d9d9f9892779a2aac",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 45,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "precision-working-memory",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "ca8135dc866ea2d2e69adc5c643b952b0acfff8c676563d4f7bacec6c4f19e33",
+      "databaseCoreHash": "ca8135dc866ea2d2e69adc5c643b952b0acfff8c676563d4f7bacec6c4f19e33",
+      "localConfigId": "af1827c1-24db-4060-8c1a-5fc417570197",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "cb0854e4aaecafb2642add136057de71a619abc933255ed7e23afd12f2c7a5ff",
+          "reportHash": "ba1239158410e19e24906ee5a9262a93c4bfef76c55a0c9c6db48e66c4c723b6",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 40,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "c3138d9059159f04e51d4fdd8ce73c50a579e7d5883167f8a9e6cf00f082d7c6",
+          "reportHash": "2f36d506faec386bd9a28c0aeaed3c00cf9fadb6db7ba5e70c6d8070d8b943ed",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 400,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "visual-search-two-stage",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "23251f0754b34bfe80dd1afca31f09e2852ad817029da352def298d6f81dd1c2",
+      "databaseCoreHash": "23251f0754b34bfe80dd1afca31f09e2852ad817029da352def298d6f81dd1c2",
+      "localConfigId": "47cc43dd-7f3e-4ea1-b92d-b9347c53e98f",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+          "reportHash": "782dca01dbff60b2d9dee782e3c6a2e61b9822b53b6cc780e7b383c6992876a6",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 36,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "3d49a1ebadb43daa274ca235da870e4b4971b2677a4e0af11ff840dc58415523",
+          "reportHash": "796a3d85bb017022f84904c5868673a886c98c2f6b612245fa6a9f7231baf862",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 180,
+          "unit": "trials"
+        }
+      ]
+    }
+  ],
+  "loadEvidence": {
+    "createdDrafts": 11,
+    "frozenProfileArtifacts": 22,
+    "idempotent": true,
+    "installAudits": 11,
+    "assignments": 0,
+    "materialGrants": 0,
+    "database": "isolated materials_load_20261029",
+    "verifiedAt": "2026-10-29T14:52:53.502Z",
+    "seedSourceEvidence": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/installation-continued.json",
+    "localReadbackSha256": "378f1e331b97df09107392c60dee76752e0fb556b7c9a3dc40986754fc451d52"
+  },
+  "missing": [
+    {
+      "key": "continuous-recognition",
+      "reason": "no registered seed; real asset pool and integrated native runner absent"
+    },
+    {
+      "key": "CFQ-7/IPIP-C1/BPS9 zh with basic/fun R",
+      "reason": "DOT exact pushed source unavailable; specifically blocked source/seed change is not reproduced here"
+    }
+  ]
+}
