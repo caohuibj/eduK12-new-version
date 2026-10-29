@@ -3,9 +3,10 @@ import {z} from 'zod'
 import {prisma} from '../../config/database'
 import {assertEntryAdmin,AdminPermissionError} from '../admin-permissions/service'
 import {libraryActor,assertExactTrainingDistributionDelegation} from '../scale-library-governance/authority'
-import {trainingStandardIssueReceiptSchema} from './standard-combination-use'
+import {trainingStandardIssueReceiptSchema,trainingReplacementIntent} from './standard-combination-use'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {readSelectedConfigurationBinding} from '../assessment-authorization/selected-configuration'
+import {selectedConfigurationPointer} from '../assessment-authorization/standard-configuration-binding'
 
 const page=z.coerce.number().int().min(1).max(10000).default(1)
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:10000}
@@ -59,18 +60,41 @@ export async function trainingStandardManagementGrants(actorId:string,combinatio
   return prisma.$transaction(async tx=>{
     await manager(tx,actorId)
     const rows=await tx.$queryRaw<Array<{id:string;userId:string;username:string;nickname:string|null;
-      issuerId:string;version:number;revokedAt:Date|null;combinationHash:string;configurationName:string|null}>>(Prisma.sql`
+      issuerId:string;version:number;revokedAt:Date|null;combinationHash:string;configurationName:string|null;
+      authorityGrantId:string|null;authorityEntryGrantId:string|null;authorityEntryGrantVersion:number|null;
+      evidence:Array<{actor_id:string;selected:unknown;configurationName:string|null}>}>>(Prisma.sql`
       SELECT g.id,g.teacher_id AS "userId",u.username,u.nickname,g.granted_by AS "issuerId",
         g.version,g.revoked_at AS "revokedAt",g.standard_combination_hash AS "combinationHash",
         (SELECT CASE WHEN count(DISTINCT e.metadata->>'configurationName')=1 THEN min(e.metadata->>'configurationName') ELSE NULL END
          FROM assessment_management_events e WHERE e.action='STANDARD_COMBINATION_USE_GRANTED' AND e.resource_id=g.resource_id
-          AND e.metadata->>'grantId'=g.id AND e.metadata->>'useVersion'=(g.version-CASE WHEN g.revoked_at IS NULL THEN 0 ELSE 1 END)::text) AS "configurationName"
+          AND e.metadata->>'grantId'=g.id AND e.metadata->>'useVersion'=(g.version-CASE WHEN g.revoked_at IS NULL THEN 0 ELSE 1 END)::text) AS "configurationName",
+        g.authority_grant_id AS "authorityGrantId",g.authority_entry_grant_id AS "authorityEntryGrantId",g.authority_entry_grant_version AS "authorityEntryGrantVersion",
+        COALESCE((SELECT jsonb_agg(a) FROM (SELECT DISTINCT e.actor_id,e.metadata->'selectedBinding' AS selected,e.metadata->>'configurationName' AS "configurationName"
+          FROM assessment_management_events e WHERE e.action='STANDARD_COMBINATION_USE_GRANTED' AND e.resource_id=g.resource_id
+           AND e.metadata->>'grantId'=g.id AND e.metadata->>'useVersion'=(g.version-CASE WHEN g.revoked_at IS NULL THEN 0 ELSE 1 END)::text
+           AND e.metadata?'selectedBinding' ORDER BY e.actor_id LIMIT 2) a),'[]'::jsonb) AS evidence
       FROM material_grants g JOIN users u ON u.id=g.teacher_id
       WHERE g.resource_type='STANDARD_COMBINATION' AND g.resource_id=${id}
         AND u.account_domain IN ('TRAINING','LEGACY')
         ${input.userId?Prisma.sql`AND g.teacher_id=${input.userId}`:Prisma.empty}
       ORDER BY u.username,g.id LIMIT ${size+1} OFFSET ${(currentPage-1)*size}`)
-    return {page:currentPage,hasMore:rows.length>size,list:rows.slice(0,size).map(row=>({...row,canManage:row.issuerId===actorId}))}
+    return {page:currentPage,hasMore:rows.length>size,list:rows.slice(0,size).map(row=>{
+      const {evidence,authorityGrantId,authorityEntryGrantId,authorityEntryGrantVersion,...header}=row
+      let selectedBinding:ReturnType<typeof selectedConfigurationPointer>|undefined
+      // A small original-identity header, not a new admission decision. The
+      // issuer transaction still verifies complete old/new source facts.
+      if(evidence.length===1&&evidence[0].actor_id===row.issuerId)try{
+        const selected=readSelectedConfigurationBinding(evidence[0].selected,{product:'TRAINING',recipientId:row.userId,organizationId:null,
+          authorizationId:row.id,authorizationRevision:row.version-(row.revokedAt?1:0)})
+        const basis=authorityGrantId&&!authorityEntryGrantId&&authorityEntryGrantVersion===null?[{kind:'CONTENT_DELEGATION',id:authorityGrantId,revision:1}]:
+          !authorityGrantId&&authorityEntryGrantId&&authorityEntryGrantVersion?[{kind:'ENTRY_ADMIN',id:authorityEntryGrantId,revision:authorityEntryGrantVersion}]:null
+        if(selected&&basis&&selected.binding.authorization.kind==='TRAINING_STANDARD_USE'&&selected.binding.authorization.issuerId===row.issuerId
+          &&canonicalHash(selected.binding.authorization.authority)===canonicalHash(basis)&&selected.binding.configuration.kind==='STANDARD_COMBINATION'
+          &&selected.binding.configuration.combinationId===id&&selected.binding.configuration.combinationHash===row.combinationHash)
+          selectedBinding=selectedConfigurationPointer(selected)
+      }catch{ /* Explicitly untyped/unverifiable: keep ordinary legacy read/revoke. */ }
+      return {...header,canManage:row.issuerId===actorId,...(selectedBinding?{selectedBinding}:{})}
+    })}
   },options)
 }
 
@@ -109,12 +133,13 @@ export async function trainingStandardManagementRequest(actorId:string,combinati
    if(!('authorityGrantId'in receipt)||!selected||selected.binding.configuration.kind!=='STANDARD_COMBINATION')throw error
    await assertExactTrainingDistributionDelegation(tx,actorId,selected.binding.configuration.measurement.releaseId,receipt.authorityGrantId)
   }
-  const grant={id:receipt.grantId,version:receipt.useVersion,currentVersion:row.version,revoked:row.version===null||row.revokedAt!==null||row.version!==receipt.useVersion}
+  const grant={id:receipt.grantId,version:receipt.useVersion,currentVersion:row.version,revoked:row.version===null||row.revokedAt!==null||row.version!==receipt.useVersion,...(receipt.supersedes?{supersedes:receipt.supersedes}:{})}
   if(!receipt.requestIntent||!receipt.requestIntentHash||!selected)return {operation:{legacy:true,grant,request:null}}
   const intent=receipt.requestIntent
   if(canonicalHash(intent)!==receipt.requestIntentHash||intent.actorId!==actorId||intent.combinationId!==combinationId||intent.userId!==receipt.userId
    ||intent.combinationHash!==receipt.combinationHash||intent.configurationName!==undefined&&intent.configurationName!==receipt.configurationName
    ||intent.expectedUseId!==undefined&&intent.expectedUseId!==receipt.grantId
+   ||canonicalHash(intent.replaces??null)!==canonicalHash(trainingReplacementIntent(receipt.supersedes)??null)
    ||receipt.selfGrant!==undefined&&receipt.selfGrant!==(actorId===receipt.userId))throw new AdminPermissionError(409,'原完整授权意图与回执不一致')
   return {operation:{legacy:false,grant,request:{requestId,...intent}}}
  },options)

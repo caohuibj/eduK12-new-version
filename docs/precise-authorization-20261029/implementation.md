@@ -15,6 +15,7 @@
 [旧授权来源证据盘点](exact-authorization-inventory-progress.md)在数据库强制只读下核对既有 T1/来源和 legacy，不作历史回填。
 [管理员共用 C/P/R 查找](approved-scale-axes-progress.md)支持在当前入口已有的已批准组合中逐轴筛选，再明确选择精确来源；不代审批新搭配。
 [Survey 显式授权替换](survey-replacement-progress.md)以原 immutable use 指针及原因连接新授权，普通撤销原 use，保留旧草稿与已冻结定义。
+[Training 显式替换](training-replacement-progress.md)分别锁定旧 use 与新目标修订，保留原请求/草稿/已入场定义，补双资格自授及另一发行者边界实证。
 以下共同契约和撤权矩阵是初始基线记录；当前新增源码仍在独立开发分支，未合入 main。
 
 ## 当前共同契约

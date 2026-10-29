@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from 'react'
-import {standardConfigurationGrantsApi as api,validStandardConfigurationPending,sameStandardConfigurationOperation,
- type StandardConfigurationPending,type StandardConfigurationChoice,type StandardConfigurationUse,type StandardConfigurationIssueResult} from '../api/standardConfigurationGrants'
+import {standardConfigurationGrantsApi as api,validStandardConfigurationPending,sameStandardConfigurationOperation,sameStandardConfigurationLineage,
+ type StandardConfigurationPending,type StandardConfigurationChoice,type StandardConfigurationUse,type StandardConfigurationIssueResult,type StandardConfigurationReplacement} from '../api/standardConfigurationGrants'
 import type {ApiClientError} from '../api/client'
 const storageKey=(actorId:string)=>'training-exact-standard-issue:'+actorId
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i
@@ -36,12 +36,13 @@ export function useTrainingStandardConfigurationIssue(actorId?:string){
   setPending(value);setAbsent(false);setError('');setBusy(true);inFlight.current=true
   try{
    const response=await api.issue({id:value.combinationId,combinationHash:value.combinationHash},{requestId:value.requestId,userId:value.userId,configurationName:value.configurationName,
-    ...(value.expectedUseVersion===undefined?{}:{expectedUseVersion:value.expectedUseVersion,expectedUseId:value.expectedUseId})})
+    ...(value.expectedUseVersion===undefined?{}:{expectedUseVersion:value.expectedUseVersion,expectedUseId:value.expectedUseId}),...(value.replaces?{replaces:value.replaces}:{})})
    if(current.current!==owner)return null
    const ack=response.data
    if(response.code!==0||!ack||!uuid.test(ack.id)||ack.userId!==value.userId||ack.combination?.releaseId!==value.combinationId||ack.combination?.combinationHash!==value.combinationHash
     ||!Number.isInteger(ack.version)||ack.version<1||!Number.isInteger(ack.currentVersion)||ack.currentVersion<ack.version||typeof ack.revoked!=='boolean'
-    ||value.expectedUseId!==undefined&&(ack.id!==value.expectedUseId||ack.version!==value.expectedUseVersion!+1))throw Error('授权回执身份不完整，请核对原请求。')
+    ||value.expectedUseId!==undefined&&(ack.id!==value.expectedUseId||ack.version!==value.expectedUseVersion!+1)
+    ||!sameStandardConfigurationLineage(value.replaces,ack.supersedes))throw Error('授权回执身份不完整，请核对原请求。')
    complete(owner);return ack
   }catch(cause){
    if(current.current===owner){
@@ -51,10 +52,10 @@ export function useTrainingStandardConfigurationIssue(actorId?:string){
    throw cause
   }finally{inFlight.current=false;if(current.current===owner)setBusy(false)}
  }
- async function issue(choice:StandardConfigurationChoice,userId:string,configurationName:string,grant:StandardConfigurationUse|null){
+ async function issue(choice:StandardConfigurationChoice,userId:string,configurationName:string,grant:StandardConfigurationUse|null,replaces?:StandardConfigurationReplacement){
   if(pending||blocked||grant&&!grant.revokedAt)throw Error('请先处理原请求或明确撤销当前授权。')
   const value={requestId:crypto.randomUUID(),combinationId:choice.id,combinationHash:choice.combinationHash,userId,configurationName:configurationName.trim(),title:choice.title,
-   ...(grant?{expectedUseVersion:grant.version,expectedUseId:grant.id}:{})}
+   ...(grant?{expectedUseVersion:grant.version,expectedUseId:grant.id}:{}),...(replaces?{replaces:{...replaces,reason:replaces.reason.trim()}}:{})}
   if(!validStandardConfigurationPending(value))throw Error('请填写业务配置名称并确认原使用权修订。')
   return send(value)
  }

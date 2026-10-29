@@ -16,14 +16,15 @@ const grant={id:id(4),userId:person.id,username:person.username,nickname:person.
 
 const key='training-exact-standard-issue:'+id(5)
 const pending=()=>JSON.parse(sessionStorage.getItem(key)!)
-const ack=(input:any)=>({code:0,data:{id:input.expectedUseId??input.requestId,userId:input.userId,combination:{releaseId:choice.id,combinationHash:choice.combinationHash},version:input.expectedUseVersion===undefined?1:input.expectedUseVersion+1,currentVersion:input.expectedUseVersion===undefined?1:input.expectedUseVersion+1,revoked:false}})
-const operation=(p:any)=>({legacy:false,grant:{id:p.expectedUseId??p.requestId,version:p.expectedUseVersion===undefined?1:p.expectedUseVersion+1,currentVersion:p.expectedUseVersion===undefined?1:p.expectedUseVersion+1,revoked:false},request:{...p,actorId:id(5),grantId:null,expectedGrantVersion:null,expectedUseVersion:p.expectedUseVersion??null,title:undefined}})
+const testLineage=(r:any)=>({selectedBinding:{authorizationId:r.grantId,authorizationRevision:r.expectedVersion,bindingHash:'d'.repeat(64),configurationHash:'e'.repeat(64)},reason:r.reason})
+const ack=(input:any,selected:any=choice)=>({code:0,data:{id:input.expectedUseId??input.requestId,userId:input.userId,combination:{releaseId:selected.id,combinationHash:selected.combinationHash},version:input.expectedUseVersion===undefined?1:input.expectedUseVersion+1,currentVersion:input.expectedUseVersion===undefined?1:input.expectedUseVersion+1,revoked:false,...(input.replaces?{supersedes:testLineage(input.replaces)}:{})}})
+const operation=(p:any)=>({legacy:false,grant:{id:p.expectedUseId??p.requestId,version:p.expectedUseVersion===undefined?1:p.expectedUseVersion+1,currentVersion:p.expectedUseVersion===undefined?1:p.expectedUseVersion+1,revoked:false,...(p.replaces?{supersedes:testLineage(p.replaces)}:{})},request:{...p,actorId:id(5),grantId:null,expectedGrantVersion:null,expectedUseVersion:p.expectedUseVersion??null,title:undefined}})
 const noGrant={code:0,data:{page:1,hasMore:false,list:[]}}
 beforeEach(()=>{
  sessionStorage.clear(); vi.resetAllMocks();auth.user=null
  api.catalog.mockResolvedValue({code:0,data:{page:1,hasMore:false,list:[choice]}})
  materials.listTeachers.mockResolvedValue({code:0,data:{list:[person,person2],total:2}})
- api.grants.mockResolvedValue(noGrant);api.issue.mockImplementation(async(_choice,input)=>ack(input))
+ api.grants.mockResolvedValue(noGrant);api.issue.mockImplementation(async(selected,input)=>ack(input,selected))
  api.operation.mockResolvedValue({code:0,data:{operation:null}})
  api.revoke.mockResolvedValue({code:0,data:{id:grant.id,version:3,revoked:true}})
 })
@@ -129,4 +130,42 @@ it('opens the exact Training grant editor chosen by the shared C/P/R finder with
  for(const [name,value] of [['题本 C',choice.versions.CONTENT],['解释参数 P',choice.versions.PARAMETERS],['报告 R',choice.versions.REPORT]])fireEvent.change(screen.getByLabelText(name),{target:{value}})
  fireEvent.change(screen.getByLabelText('核对精确配置'),{target:{value:choice.id}});fireEvent.click(screen.getByRole('button',{name:'使用所选已批准组合'}))
  expect(await screen.findByRole('dialog',{name:'分配固定量表配置'})).toHaveTextContent(choice.title);expect(api.issue).not.toHaveBeenCalled();expect(materials.set).not.toHaveBeenCalled()
+})
+
+describe('Training administrator explicit configuration replacement',()=>{
+ const next={...choice,id:id(21),title:'已有合法量表（无反馈）',combinationHash:'b'.repeat(64),versions:{...choice.versions,REPORT:'none-v1'}}
+ const old={...grant,configurationName:'原具名教学报告',selectedBinding:{authorizationId:grant.id,authorizationRevision:2,bindingHash:'d'.repeat(64),configurationHash:'e'.repeat(64)}}
+ const targetGrant={...grant,id:id(24),version:4,combinationHash:next.combinationHash,revokedAt:'2026-10-29T20:00:00Z',configurationName:'目标历史用途'}
+ function setup(){
+  api.catalog.mockResolvedValue({code:0,data:{page:1,hasMore:false,list:[choice,next]}})
+  api.grants.mockImplementation(async(sourceId)=>({code:0,data:{page:1,hasMore:false,list:[sourceId===choice.id?old:targetGrant]}}))
+ }
+ async function start(){
+  render(<TrainingStandardConfigurationWorkspace actorId={id(5)}/>);const card=(await screen.findByRole('heading',{name:choice.title})).closest('article')!
+  fireEvent.click(within(card).getByRole('button',{name:'管理此配置授权'}));const original=await screen.findByRole('dialog',{name:'分配固定量表配置'})
+  await within(original).findByRole('option',{name:person.nickname+'（'+person.username+'）'});fireEvent.change(within(original).getByLabelText('接收培训师'),{target:{value:person.id}})
+  fireEvent.click(await within(original).findByRole('button',{name:'以新配置替换此使用权'}));await screen.findByRole('region',{name:'明确替换 Training 配置'})
+  fireEvent.click(within(screen.getByRole('heading',{name:next.title}).closest('article')!).getByRole('button',{name:'管理此配置授权'}))
+  const dialog=await screen.findByRole('dialog',{name:'分配固定量表配置'});await within(dialog).findByText('此前授权已撤销，可明确重新分配');return dialog
+ }
+ it('preserves the recipient and sends distinct old and target revisions after an explicit reason, without the legacy SCALE writer',async()=>{
+  setup();const dialog=await start();expect(within(dialog).getByLabelText('接收培训师')).toBeDisabled();expect(within(dialog).getByLabelText('授权配置名称')).toHaveValue(old.configurationName)
+  expect(within(dialog).getByRole('button',{name:'确认替换并授权'})).toBeDisabled();fireEvent.change(screen.getByLabelText('Training 配置替换原因'),{target:{value:'管理员明确改为无反馈'}});fireEvent.click(within(dialog).getByRole('button',{name:'确认替换并授权'}))
+  await waitFor(()=>expect(api.issue).toHaveBeenCalledExactlyOnceWith({id:next.id,combinationHash:next.combinationHash},{requestId:expect.any(String),userId:person.id,configurationName:old.configurationName,expectedUseId:targetGrant.id,expectedUseVersion:4,replaces:{grantId:old.id,expectedVersion:2,reason:'管理员明确改为无反馈'}}))
+  await waitFor(()=>expect(screen.queryByRole('region',{name:'明确替换 Training 配置'})).not.toBeInTheDocument());expect(sessionStorage.getItem(key)).toBeNull();expect(materials.set).not.toHaveBeenCalled()
+ })
+ it('retains both original revision identities after response loss and refuses a mismatching replacement reason during recovery',async()=>{
+  setup();api.issue.mockRejectedValueOnce(Error('response lost'));const dialog=await start();fireEvent.change(screen.getByLabelText('Training 配置替换原因'),{target:{value:'保留原接收者的明确替换'}});fireEvent.click(within(dialog).getByRole('button',{name:'确认替换并授权'}));await screen.findByRole('button',{name:'核对原固定配置请求'})
+  const original=pending();expect(original).toMatchObject({expectedUseId:targetGrant.id,expectedUseVersion:4,replaces:{grantId:old.id,expectedVersion:2,reason:'保留原接收者的明确替换'}});expect(JSON.stringify(original)).not.toContain('password');expect(screen.getByRole('button',{name:'取消替换 Training 配置'})).toBeDisabled()
+  const found=operation(original);found.grant.supersedes!.reason='另一原因';api.operation.mockResolvedValueOnce({code:0,data:{operation:found}});fireEvent.click(screen.getByRole('button',{name:'核对原固定配置请求'}));await screen.findByText(/原请求的接收者、配置/);expect(sessionStorage.getItem(key)).not.toBeNull()
+  api.operation.mockResolvedValueOnce({code:0,data:{operation:operation(original)}});fireEvent.click(screen.getByRole('button',{name:'核对原固定配置请求'}));await waitFor(()=>expect(sessionStorage.getItem(key)).toBeNull());expect(api.issue).toHaveBeenCalledOnce()
+ })
+ it('does not replace the original recipient with a different current qualified teacher when eligibility changes',async()=>{
+  setup();materials.listTeachers.mockResolvedValueOnce({code:0,data:{list:[person,person2],total:2}}).mockResolvedValueOnce({code:0,data:{list:[person2],total:1}})
+  render(<TrainingStandardConfigurationWorkspace actorId={id(5)}/>);fireEvent.click(within((await screen.findByRole('heading',{name:choice.title})).closest('article')!).getByRole('button',{name:'管理此配置授权'}));let dialog=await screen.findByRole('dialog');await within(dialog).findByRole('option',{name:person.nickname+'（'+person.username+'）'});fireEvent.change(within(dialog).getByLabelText('接收培训师'),{target:{value:person.id}});fireEvent.click(await within(dialog).findByRole('button',{name:'以新配置替换此使用权'}));fireEvent.click(within(screen.getByRole('heading',{name:next.title}).closest('article')!).getByRole('button',{name:'管理此配置授权'}));dialog=await screen.findByRole('dialog')
+  await within(dialog).findByText('原接收者不在当前合格培训师名单中，请先核对资格；不能改为另一人。');expect(within(dialog).getByLabelText('接收培训师')).toBeDisabled();expect(within(dialog).getByRole('button',{name:'确认替换并授权'})).toBeDisabled();expect(api.issue).not.toHaveBeenCalled()
+ })
+ it('keeps a precise use from another issuer read-only rather than offering replacement or takeover',async()=>{
+  api.grants.mockResolvedValue({code:0,data:{page:1,hasMore:false,list:[{...old,issuerId:id(9),canManage:false}]}});const dialog=await open();await target(dialog);await within(dialog).findByText('此项由另一发行身份维护；不能覆盖或接管。');expect(within(dialog).queryByRole('button',{name:'以新配置替换此使用权'})).not.toBeInTheDocument();expect(api.issue).not.toHaveBeenCalled()
+ })
 })

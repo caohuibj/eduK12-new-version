@@ -10,12 +10,17 @@ import {standardCombinationPointerSchema} from './standard-combination'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {selectedConfigurationBindingSchema} from '../assessment-authorization/selected-configuration'
-import {sealTrainingStandardUseConfiguration,readTrainingStandardUseConfigurationReceipt,trainingStandardUseFromEvidence,selectedConfigurationPointer,type TrainingStandardUseEvidence} from '../assessment-authorization/standard-configuration-binding'
+import {sealTrainingStandardUseConfiguration,readTrainingStandardUseConfigurationReceipt,trainingStandardUseFromEvidence,selectedConfigurationPointer,selectedConfigurationPointerSchema,type TrainingStandardUseEvidence} from '../assessment-authorization/standard-configuration-binding'
 export {standardCombinationPointerSchema} from './standard-combination'
 
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
+const replacementSchema=z.object({grantId:uuid,expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(500)}).strict()
+const supersedesSchema=z.object({selectedBinding:selectedConfigurationPointerSchema,reason:replacementSchema.shape.reason}).strict()
+export function trainingReplacementIntent(supersedes:z.infer<typeof supersedesSchema>|undefined){
+ return supersedes?{grantId:supersedes.selectedBinding.authorizationId,expectedVersion:supersedes.selectedBinding.authorizationRevision,reason:supersedes.reason}:undefined
+}
 const issueSchema=z.object({requestId:uuid,userId:uuid,combinationHash:hash,grantId:uuid.optional(),
- expectedGrantVersion:z.number().int().positive().optional(),expectedUseVersion:z.number().int().positive().optional(),expectedUseId:uuid.optional(),configurationName:z.string().trim().min(1).max(120).optional()}).strict()
+ expectedGrantVersion:z.number().int().positive().optional(),expectedUseVersion:z.number().int().positive().optional(),expectedUseId:uuid.optional(),configurationName:z.string().trim().min(1).max(120).optional(),replaces:replacementSchema.optional()}).strict()
 const revokeSchema=z.object({expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(1000)}).strict()
 const positive=z.number().int().positive()
 const useAuthority={useGrantId:uuid,useGrantVersion:positive,issuerId:z.string().min(1).max(240)}
@@ -26,7 +31,7 @@ export const trainingStandardUseAuthoritySchema=z.union([
 ])
 const requestIntentSchema=issueSchema.omit({requestId:true}).extend({actorId:uuid,combinationId:uuid,grantId:uuid.nullable(),expectedGrantVersion:positive.nullable(),expectedUseVersion:positive.nullable()}).strict()
 const receipt={grantId:uuid,userId:uuid,combinationHash:hash,useVersion:positive,product:z.literal('TRAINING'),selectedBinding:selectedConfigurationBindingSchema.optional(),requestIntentHash:hash.optional(),
- configurationName:issueSchema.shape.configurationName,requestIntent:requestIntentSchema.optional(),selfGrant:z.boolean().optional()}
+ configurationName:issueSchema.shape.configurationName,requestIntent:requestIntentSchema.optional(),selfGrant:z.boolean().optional(),supersedes:supersedesSchema.optional()}
 export const trainingStandardIssueReceiptSchema=z.union([
  z.object({...receipt,authorityGrantId:uuid}).strict(),
  z.object({...receipt,authorityEntryGrantId:uuid,authorityEntryGrantVersion:positive}).strict(),
@@ -83,7 +88,7 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
  const id=uuid.parse(combinationId),input=issueSchema.parse(raw)
  const requestIntent={actorId,combinationId:id,userId:input.userId,combinationHash:input.combinationHash,
   grantId:input.grantId??null,expectedGrantVersion:input.expectedGrantVersion??null,expectedUseVersion:input.expectedUseVersion??null,
-  ...(input.configurationName!==undefined?{configurationName:input.configurationName}:{}),...(input.expectedUseId!==undefined?{expectedUseId:input.expectedUseId}:{})}
+  ...(input.configurationName!==undefined?{configurationName:input.configurationName}:{}),...(input.expectedUseId!==undefined?{expectedUseId:input.expectedUseId}:{}),...(input.replaces?{replaces:input.replaces}:{})}
  const requestIntentHash=canonicalHash(requestIntent)
  return prisma.$transaction(async tx=>{
   const [header]=await tx.$queryRaw<Array<{tool_key:string;instrument_version:string;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
@@ -103,6 +108,7 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   // One operation receipt and one versioned use, independent of course. Retrying
   // a previously successful request never reactivates a subsequently revoked use.
   await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'standard-use-request:'+input.requestId}))`)
+  await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'standard-use-tool:'+source.row.tool_key+':'+input.userId}))`)
   await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'standard-use:'+id+':'+input.userId}))`)
   const prior=await tx.materialGrant.findUnique({where:{teacherId_resourceType_resourceId:{teacherId:input.userId,resourceType:MaterialResourceType.STANDARD_COMBINATION,resourceId:id}}})
   if(input.expectedUseId!==undefined&&prior?.id!==input.expectedUseId)throw new AdminPermissionError(409,'原使用权身份已变化，请回读原授权后再操作')
@@ -113,9 +119,26 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
     ||receipt.data.userId!==input.userId||receipt.data.combinationHash!==input.combinationHash||canonicalHash(binding(receipt.data))!==canonicalHash(selected)
     ||prior?.id!==receipt.data.grantId||receipt.data.requestIntentHash!==undefined&&receipt.data.requestIntentHash!==requestIntentHash
     ||input.configurationName!==undefined&&receipt.data.configurationName!==input.configurationName
-    ||receipt.data.requestIntent!==undefined&&canonicalHash(receipt.data.requestIntent)!==requestIntentHash)deny('请求编号已用于其他授权')
+    ||receipt.data.requestIntent!==undefined&&canonicalHash(receipt.data.requestIntent)!==requestIntentHash
+    ||canonicalHash(input.replaces??null)!==canonicalHash(trainingReplacementIntent(receipt.data.supersedes)??null))deny('请求编号已用于其他授权')
    return {id:prior.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
-    version:receipt.data.useVersion,currentVersion:prior.version,revoked:prior.revokedAt!==null,changed:false,replayed:true}
+    version:receipt.data.useVersion,currentVersion:prior.version,revoked:prior.revokedAt!==null,changed:false,replayed:true,...(receipt.data.supersedes?{supersedes:receipt.data.supersedes}:{})}
+  }
+  let predecessor:UseRow|undefined,supersedes:z.infer<typeof supersedesSchema>|undefined
+  if(input.replaces){
+   if(input.replaces.grantId===input.requestId)throw new AdminPermissionError(409,'新请求不能替换自身授权编号')
+   ;[predecessor]=await tx.$queryRaw<UseRow[]>(Prisma.sql`SELECT id,teacher_id,resource_id,granted_by,standard_combination_hash,authority_grant_id,authority_entry_grant_id,authority_entry_grant_version,version,revoked_at
+    FROM material_grants WHERE id=${input.replaces.grantId} AND resource_type='STANDARD_COMBINATION' FOR UPDATE`)
+   if(!predecessor||predecessor.teacher_id!==input.userId||predecessor.granted_by!==actorId||predecessor.resource_id===id)
+    throw new AdminPermissionError(409,'替换须选择本人为同一培训师发行的另一份原精确组合；同组合改名请明确撤销后再发行')
+   if(predecessor.revoked_at||predecessor.version!==input.replaces.expectedVersion)throw new AdminPermissionError(409,'原配置授权修订已变化，请回读后明确替换')
+   if(prior&&!prior.revokedAt)throw new AdminPermissionError(409,'目标配置已有生效使用权，请先明确处理该修订，不可覆盖')
+   const oldSource=await readCurrentStandardCombination(tx,{releaseId:predecessor.resource_id,combinationHash:predecessor.standard_combination_hash},'HISTORY')
+   if(oldSource.row.tool_key!==source.row.tool_key)throw new AdminPermissionError(409,'替换必须保留同一工具')
+   const original=await readTrainingStandardUseConfigurationReceipt(tx,oldSource,input.userId,{useGrantId:predecessor.id,useGrantVersion:predecessor.version,
+    issuerId:actorId,...rowBinding(predecessor)})
+   if(!original)throw new AdminPermissionError(409,'原授权缺少可信精确身份，不能自动升级 legacy')
+   supersedes={selectedBinding:selectedConfigurationPointer(original.selectedBinding),reason:input.replaces.reason}
   }
   const request=await tx.materialGrant.findUnique({where:{id:input.requestId}})
   if(request&&request.id!==prior?.id)deny('请求编号已用于其他授权')
@@ -136,14 +159,23 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   if(prior&&!prior.revokedAt&&input.configurationName!==undefined&&(!existing||existing.configurationName!==input.configurationName))
    throw new AdminPermissionError(409,'当前授权修订不能改名或升级；请先明确撤销，再按新修订分配')
   const selectedBinding=!prior||prior.revokedAt?sealTrainingStandardUseConfiguration(source,input.userId,exactUse,authority.version):existing?.selectedBinding??null
+  if(predecessor&&!selectedBinding)throw new AdminPermissionError(409,'新使用配置缺少完整精确绑定，本次替换未保存')
   const configurationName=!prior||prior.revokedAt?input.configurationName:existing?.configurationName??undefined
   await tx.assessmentManagementEvent.create({data:{id:input.requestId,actorId,resourceId:id,action:'STANDARD_COMBINATION_USE_GRANTED',
    metadata:{grantId:use.id,userId:input.userId,combinationHash:input.combinationHash,...selected,useVersion:use.version,product:'TRAINING',requestIntentHash,requestIntent,selfGrant:actorId===input.userId,
-    ...(configurationName?{configurationName}:{}),...(selectedBinding?{selectedBinding}:{})}}})
+    ...(configurationName?{configurationName}:{}),...(selectedBinding?{selectedBinding}:{}),...(supersedes?{supersedes}:{})}}})
   await assertTrainingStandardUse(tx,{userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
    measurementReleaseId:source.measurement.releaseId,useGrantId:use.id,useGrantVersion:use.version})
+  if(predecessor&&supersedes&&selectedBinding){
+   const changed=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`UPDATE material_grants SET revoked_at=clock_timestamp() AT TIME ZONE 'UTC',version=version+1
+    WHERE id=${predecessor.id} AND version=${predecessor.version} AND revoked_at IS NULL RETURNING id`)
+   if(changed.length!==1)throw new AdminPermissionError(409,'原配置授权已变化，本次替换未保存')
+   await tx.assessmentManagementEvent.create({data:{actorId,resourceId:id,action:'STANDARD_COMBINATION_USE_REPLACED',metadata:{
+    previous:supersedes.selectedBinding,next:selectedConfigurationPointer(selectedBinding),reason:supersedes.reason,
+    policy:'STOP_NEW_ADMISSION_KEEP_EXISTING_ATTEMPTS_AND_HISTORY'}}})
+  }
   return {id:use.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},version:use.version,
-   currentVersion:use.version,revoked:false,changed:!prior||prior.revokedAt!==null,replayed:false}
+   currentVersion:use.version,revoked:false,changed:!prior||prior.revokedAt!==null,replayed:false,...(supersedes?{supersedes}:{})}
  },options)
 }
 
