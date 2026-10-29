@@ -1,0 +1,14 @@
+[
+  {
+    "code": "invalid_value",
+    "values": [
+      "TRAINING",
+      "SURVEY"
+    ],
+    "path": [
+      "allowedProducts",
+      0
+    ],
+    "message": "Invalid option: expected one of \"TRAINING\"|\"SURVEY\""
+  }
+]

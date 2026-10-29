@@ -1,0 +1,17 @@
+const fs=require('node:fs'),{pathToFileURL}=require('node:url'),crypto=require('node:crypto')
+const repo='/workspace/eduK12-new-version',front=repo+'/server-version/frontend',out=repo+'/docs/scale-content-batch1-20261028/presentation/evidence'
+const target=front+'/scale-metadata-static-367.tsx'
+async function main(){
+ if(fs.existsSync(target))throw Error('temporary path already exists')
+ fs.writeFileSync(target,`import React from 'react'; import {renderToStaticMarkup} from 'react-dom/server'; import Card from './src/modules/reporting/ScaleUnitReportCard'; import data from '../../docs/scale-content-batch1-20261028/presentation/evidence/preview-data.json'; export function markup(){return renderToStaticMarkup(<main style={{maxWidth:960,margin:'0 auto',padding:16}}><h1 style={{fontSize:24,fontWeight:700}}>量表结果 · 已有字段呈现预览</h1><p>合成组件示例，不是真实个体结果；不是浏览器或移动端验收截图。</p>{Object.entries(data.reports).map(([state,report])=><section key={state} style={{marginTop:32}}><h2 style={{fontWeight:700,marginBottom:16}}>{({complete:'完整作答',invalid:'缺答与无效状态',restricted:'受众受限',unknown:'数量与方向未提供'} as any)[state]}</h2><Card report={report as any}/></section>)}</main>)};`)
+ let server
+ try{
+  const {createServer}=await import(pathToFileURL(front+'/node_modules/vite/dist/node/index.js').href)
+  server=await createServer({root:front,configFile:front+'/vite.config.ts',server:{middlewareMode:true,hmr:false},appType:'custom'})
+  const module=await server.ssrLoadModule('/scale-metadata-static-367.tsx'),base=await server.transformRequest('/src/index.css?direct')
+  const css=base.code+'\n'+fs.readFileSync(front+'/src/modules/reporting/report-ui.css','utf8')+'\n'+fs.readFileSync(front+'/src/modules/reporting/ScaleUnitReportCard.css','utf8')
+  const html='<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Scale report component preview</title><style>'+css+'</style></head><body>'+module.markup()+'</body></html>'
+  fs.writeFileSync(out+'/component-preview.html',html);fs.writeFileSync(out+'/static-preview-receipt.json',JSON.stringify({generated:true,meaning:'ReactDOMServer actual component markup + actual Vite-processed index CSS and existing report CSS; script-free offline review artifact, NOT browser rendering/screenshot acceptance',bytes:Buffer.byteLength(html),sha256:crypto.createHash('sha256').update(html).digest('hex'),scoringExecuted:false,browserExecuted:false},null,2)+'\n');console.log('static HTML generated',Buffer.byteLength(html))
+ }finally{if(server)await server.close();fs.unlinkSync(target)}
+}
+main().catch(e=>{console.error(e);process.exitCode=1})

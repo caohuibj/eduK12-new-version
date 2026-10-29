@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28T00:50:38.555687+00:00",
+  "priorHead": "5e64d33b557fb4a498d03954f4e25b7c7ef05e68",
+  "sourceChange": {
+    "schemaVersion": 1,
+    "priorHead": "5e64d33b557fb4a498d03954f4e25b7c7ef05e68",
+    "originalSourceBranchSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+    "path": "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/source.json",
+    "original": {
+      "releaseStatus": "DRAFT",
+      "blob": "08a648420b4413282bbd14ef6c23fb2be89b6209",
+      "sha256": "970cd97ea150ae055e6a27096e99cd8e95d74dcf15ad7df3a1147121864f6b45",
+      "bytes": 61629
+    },
+    "current": {
+      "releaseStatus": "PUBLISHED",
+      "blob": "33c423f39f08ddb0706aa177ccc251554519c49c",
+      "sha256": "6bd98d3462d23146ae258d171fc81ef7fa993f3493af2b5a7428b98ed9ef9477",
+      "bytes": 61633
+    },
+    "onlyJSONDifference": {
+      "path": "executable.releaseStatus",
+      "before": "DRAFT",
+      "after": "PUBLISHED"
+    },
+    "allOtherJSONFieldsUnchanged": true,
+    "sixteenOtherOriginalFilesUnchanged": [
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/README.md",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/THIRD_PARTY_LICENSE.md",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/administration.md",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/parameter-plan.json",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/report-draft.md",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/report-plan.json",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/runtime-source-inputs.json",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/runtime-support-review.md",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/scoring-and-parameters.md",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/source-manifest.json",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/tags.json",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/validation.json",
+      "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/validation.md",
+      "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/instrument.ts"
+    ],
+    "historical17FileEquality": "batch.json is retained unchanged as the prior 5e64d33 historical comparison. It is not relabelled as equality of the current source bytes.",
+    "authorizationMeaning": "Explicit technical content release after root independent structure review; not translation/scientific approval, rights authorization or production/public database publication."
+  },
+  "isolatedDatabase": {
+    "name": "eduk12_scale367_9cd3f7ef4f",
+    "host": "127.0.0.1",
+    "port": 55432,
+    "fresh": true,
+    "schemaSetup": "Existing prisma migrate deploy; no seed",
+    "credentials": "never retained in repository",
+    "syntheticUser": {
+      "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+      "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+      "accountDomain": "TRAINING",
+      "platformRole": "SYSTEM_ADMIN",
+      "synthetic": true,
+      "password": "random one-use secret discarded; hash not retained in evidence"
+    },
+    "retainedForInspection": true
+  },
+  "states": {
+    "sourceRegistration": "REGISTERED_ON_PR367_ONLY",
+    "sourceReleaseStatus": "PUBLISHED_TECHNICAL_CONTENT_ONLY",
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "localizationReview": "PENDING",
+    "expertReview": "PENDING",
+    "scientificReview": "ABSENT",
+    "isolationInstall": "COMPLETED_DRAFT_HIDDEN_THEN_IDEMPOTENT_REPEAT",
+    "isolationDeployment": "ACTIVE_REVISION_1",
+    "isolationPublicPublication": "COMPLETED_PUBLIC_WITH_SURVEY_ONLY",
+    "isolationSurveyCatalog": "AVAILABLE_TRUE_EXACT_VERSION_1.0.0",
+    "isolationCustomGovernedLibraryEntries": 0,
+    "production": "NOT_QUERIED_NOT_MODIFIED",
+    "realUserCapabilityGrants": 0,
+    "participantAttempts": 0
+  },
+  "frozen": {
+    "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+    "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+    "axisHash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+    "sourceHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+    "axes": {
+      "reportVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+      "instrumentVersion": "1.0.0",
+      "referenceVersions": [],
+      "instructionVersion": "1.0.0",
+      "localizationVersion": "1.0.0",
+      "catalogManifestVersion": 1
+    },
+    "publicationAudit": {
+      "id": "b1435c8d-1edb-4773-80e7-a13461bec324",
+      "proofHash": "15bc0be9ddb2961306540a7defa7a1c681c1255f2f69876dfe324643322d69c2",
+      "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24"
+    },
+    "measurementReleaseId": "f059c18d-a991-4ad7-b06f-0e4e303c8a04"
+  },
+  "integration": {
+    "completed": true,
+    "assertionsPassed": 33,
+    "assertionsFailed": 0,
+    "commands": [
+      {
+        "label": "publication-uninstalled-preview",
+        "exitCode": 2,
+        "expectedExitCode": 2,
+        "readOnly": true,
+        "beforeAfterIdentical": true
+      },
+      {
+        "label": "install-preview",
+        "exitCode": 0,
+        "expectedExitCode": 0,
+        "readOnly": true,
+        "beforeAfterIdentical": true
+      },
+      {
+        "label": "install-first-apply",
+        "exitCode": 0,
+        "expectedExitCode": 0,
+        "readOnly": false,
+        "beforeAfterIdentical": false
+      },
+      {
+        "label": "install-repeat-apply",
+        "exitCode": 0,
+        "expectedExitCode": 0,
+        "readOnly": false,
+        "beforeAfterIdentical": true
+      },
+      {
+        "label": "publication-preview",
+        "exitCode": 0,
+        "expectedExitCode": 0,
+        "readOnly": true,
+        "beforeAfterIdentical": true
+      },
+      {
+        "label": "publication-apply",
+        "exitCode": 0,
+        "expectedExitCode": 0,
+        "readOnly": false,
+        "beforeAfterIdentical": false
+      },
+      {
+        "label": "publication-school-scope-refusal",
+        "exitCode": 1,
+        "expectedExitCode": 1,
+        "readOnly": true,
+        "beforeAfterIdentical": true
+      },
+      {
+        "label": "publication-teacher-scope-refusal",
+        "exitCode": 1,
+        "expectedExitCode": 1,
+        "readOnly": true,
+        "beforeAfterIdentical": true
+      }
+    ],
+    "report": "evidence/isolation-report.json",
+    "receipt": "evidence/integration-execution-receipt.json"
+  },
+  "unit": {
+    "report": "evidence/released-source-install-actor.json",
+    "passed": 1,
+    "failed": 0,
+    "filtered": 2,
+    "cases": [
+      {
+        "fullName": "ARS-30 fixed-source registration on main admission mechanism resolves the original three-part contract through the generated registry with truthful manual states",
+        "status": "skipped"
+      },
+      {
+        "fullName": "ARS-30 fixed-source registration on main admission mechanism consumes complete and incomplete registered answers through the existing result protocol without inventing thresholds",
+        "status": "skipped"
+      },
+      {
+        "fullName": "ARS-30 fixed-source registration on main admission mechanism plans the technically released package but rejects an inactive actor before installation writes",
+        "status": "passed"
+      }
+    ],
+    "note": "Only the changed install/actor case ran. The changed first-case status expectations are additionally covered by actual install/publication CLI observations, not reported as a fresh whole Vitest case. Original middle-score/report test was not repeated."
+  },
+  "fourEntryObservations": [
+    {
+      "product": "SURVEY",
+      "result": "ENTRY_POLICY_ALLOWED",
+      "scope": "actual transaction-scoped policy guard, not end-user grant or participant flow"
+    },
+    {
+      "product": "TRAINING",
+      "result": "REFUSED",
+      "name": "Error",
+      "message": "该精确版本未获本入口准入或已停止新增使用：TRAINING；TRAINING 入口尚未获准",
+      "scope": "actual Training new-entry guard; not chosen in allowedProducts"
+    },
+    {
+      "product": "SCHOOL",
+      "result": "REFUSED",
+      "code": "EDUCATION_ASSESSMENT_CATALOG_ACCOUNT_REQUIRED",
+      "message": "EDUCATION_ASSESSMENT_CATALOG_ACCOUNT_REQUIRED",
+      "scope": "actual education catalog account-domain guard; this CLI also rejects product enum. No organization adapter/distribution tested."
+    },
+    {
+      "product": "TEACHER",
+      "result": "REFUSED",
+      "code": "EDUCATION_ASSESSMENT_CATALOG_ACCOUNT_REQUIRED",
+      "message": "EDUCATION_ASSESSMENT_CATALOG_ACCOUNT_REQUIRED",
+      "scope": "actual education catalog account-domain guard; this CLI also rejects product enum. No organization adapter/distribution tested."
+    }
+  ],
+  "limits": [
+    "Each new CLI process performs its existing selected immutable contract validation on cold start; no separate golden replay suite is invoked.",
+    "PUBLIC database status/catalog discovery is not participant assignment or four-entry launch.",
+    "No successful four-entry user workflow or organization/real-person capability is claimed.",
+    "Standard publication updates Scale PUBLIC and creates a measurement release, exact product policy and publication audit; it does not create a CUSTOM_DESCRIPTIVE scale_library_entries row.",
+    "Original 17-file equality and original failure/filtered reports remain historical at 5e64d33; no old input identity is rewritten.",
+    "Full typecheck, build, SAST, full catalog/golden/report suites and CI were not executed.",
+    "Fresh CLI processes necessarily exercise the existing selected-source cold-cache validation; no caching mechanism was changed to avoid that."
+  ],
+  "remaining": [
+    "Root exact-candidate independent review and CI/merge remain pending.",
+    "Actual end-user assignment and School/Teacher organization distribution are not executed.",
+    "APQ and SPANE unchanged/deferred."
+  ]
+}

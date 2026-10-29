@@ -670,5 +670,65 @@
   "use:research": {
     "label": "研究用途",
     "axis": "use"
+  },
+  "license:author_contact_required": {
+    "label": "需联系作者确认",
+    "axis": "license"
+  },
+  "license:author_contact_pending": {
+    "label": "待联系作者",
+    "axis": "license"
+  },
+  "license:authorization_pending": {
+    "label": "授权范围待核",
+    "axis": "license"
+  },
+  "license:github_redistribution_review_pending": {
+    "label": "公开再分发范围待确认",
+    "axis": "license"
+  },
+  "license:redistribution_review_pending": {
+    "label": "再分发条件待确认",
+    "axis": "license"
+  },
+  "license:commercial_forbidden": {
+    "label": "明确不可商业使用",
+    "axis": "license"
+  },
+  "license:translation_review_pending": {
+    "label": "译本使用范围待确认",
+    "axis": "license"
+  },
+  "license:electronic_format_review_pending": {
+    "label": "电子施测形式待确认",
+    "axis": "license"
+  },
+  "license:derivative_translation_review_pending": {
+    "label": "翻译改编条件待确认",
+    "axis": "license"
+  },
+  "use:research_noncommercial": {
+    "label": "非商业研究",
+    "axis": "use"
+  },
+  "use:clinical_noncommercial": {
+    "label": "非商业临床用途",
+    "axis": "use"
+  },
+  "use:education_noncommercial": {
+    "label": "非商业教育用途",
+    "axis": "use"
+  },
+  "use:individual_reflection": {
+    "label": "个人自我了解",
+    "axis": "use"
+  },
+  "language_validation:expert_review_approved_user_attested": {
+    "label": "译审：管理员确认通过",
+    "axis": "language_validation"
+  },
+  "language_validation:expert_review_pending": {
+    "label": "专家译审待办",
+    "axis": "language_validation"
   }
 }

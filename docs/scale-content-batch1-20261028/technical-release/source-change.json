@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "priorHead": "5e64d33b557fb4a498d03954f4e25b7c7ef05e68",
+  "originalSourceBranchSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "path": "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/source.json",
+  "original": {
+    "releaseStatus": "DRAFT",
+    "blob": "08a648420b4413282bbd14ef6c23fb2be89b6209",
+    "sha256": "970cd97ea150ae055e6a27096e99cd8e95d74dcf15ad7df3a1147121864f6b45",
+    "bytes": 61629
+  },
+  "current": {
+    "releaseStatus": "PUBLISHED",
+    "blob": "33c423f39f08ddb0706aa177ccc251554519c49c",
+    "sha256": "6bd98d3462d23146ae258d171fc81ef7fa993f3493af2b5a7428b98ed9ef9477",
+    "bytes": 61633
+  },
+  "onlyJSONDifference": {
+    "path": "executable.releaseStatus",
+    "before": "DRAFT",
+    "after": "PUBLISHED"
+  },
+  "allOtherJSONFieldsUnchanged": true,
+  "sixteenOtherOriginalFilesUnchanged": [
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/README.md",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/THIRD_PARTY_LICENSE.md",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/administration.md",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/parameter-plan.json",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/report-draft.md",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/report-plan.json",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/runtime-source-inputs.json",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/runtime-support-review.md",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/scoring-and-parameters.md",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/source-manifest.json",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/tags.json",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/validation.json",
+    "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/validation.md",
+    "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+    "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/instrument.ts"
+  ],
+  "historical17FileEquality": "batch.json is retained unchanged as the prior 5e64d33 historical comparison. It is not relabelled as equality of the current source bytes.",
+  "authorizationMeaning": "Explicit technical content release after root independent structure review; not translation/scientific approval, rights authorization or production/public database publication."
+}

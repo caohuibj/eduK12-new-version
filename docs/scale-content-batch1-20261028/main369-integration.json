@@ -1,0 +1,47 @@
+{
+  "previousCandidate": "9e13c19c6c52d848ba4ebcf6419a39f6fc093638",
+  "integratedMain": "aa774983db8edd85b3c1617aef7218f71664746d",
+  "mergeCommit": "eec29d9c923195558ac3c38284408f9a694bdd50",
+  "method": "normal merge; no rewrite/force push",
+  "unchangedInputs": [
+    {
+      "path": "server-version/frontend",
+      "previousObject": "925d20e813c2dad4db4213eb39d833800c926925",
+      "integratedObject": "925d20e813c2dad4db4213eb39d833800c926925",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale",
+      "previousObject": "f486726ca3f74add02b6669df64e5090847acc40",
+      "integratedObject": "f486726ca3f74add02b6669df64e5090847acc40",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance",
+      "previousObject": "7677155c04064c829fe7db0b644c4daf9e891153",
+      "integratedObject": "7677155c04064c829fe7db0b644c4daf9e891153",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/prisma/schema.prisma",
+      "previousObject": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034",
+      "integratedObject": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "previousObject": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "integratedObject": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "identical": true
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "previousObject": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "integratedObject": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "identical": true
+    }
+  ],
+  "mainBackendChange": "Transaction-local join_collapse_limit=1 in education-assessment-personal-report.service.ts, plus own test; no public result schema or Scale scorer/adapter change. Main CI controls inherited unmodified.",
+  "reuse": "Existing12 UI assertions/lint, original33 isolated assertions and real browser reports retain exact original execution identities. Frontend tree/Scale subtree/schema/locks identical, no replay needed. Synthetic screenshots do not execute the changed education report planner.",
+  "remaining": "Independent root review, CI/Ready/merge and production not performed by this worker."
+}

@@ -1,0 +1,8 @@
+{
+  "generated": true,
+  "meaning": "ReactDOMServer actual component markup + actual Vite-processed index CSS and existing report CSS; script-free offline review artifact, NOT browser rendering/screenshot acceptance",
+  "bytes": 112290,
+  "sha256": "ff5519beaedfd320d9af0686b70f20b0df53b5801951438bd136558289770ef5",
+  "scoringExecuted": false,
+  "browserExecuted": false
+}

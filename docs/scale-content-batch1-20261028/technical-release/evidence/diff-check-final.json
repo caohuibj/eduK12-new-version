@@ -1,0 +1,5 @@
+{
+  "command": "git diff --cached --check",
+  "actualToolExitCode": 0,
+  "observation": "Fresh check after exact migration stdout lossless compression; no application/tests were rerun."
+}

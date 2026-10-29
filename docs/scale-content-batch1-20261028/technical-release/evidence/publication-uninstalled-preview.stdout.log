@@ -1,0 +1,75 @@
+{
+  "allowPublish": false,
+  "blockers": [
+    "DEPLOYMENT_BINDING_MISSING",
+    "SCALE_NOT_INSTALLED"
+  ],
+  "proofHash": "8e5015b9a91977f30781b47ef1ef608cf7ccc30128fac095f1571224f83caf69",
+  "proof": {
+    "schemaVersion": 2,
+    "identity": {
+      "instrumentKey": "ars30_2016_zh_cn_research",
+      "instrumentVersion": "1.0.0"
+    },
+    "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+    "scaleId": null,
+    "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+    "sourceHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+    "deploymentPolicyHash": null,
+    "deploymentRevision": null,
+    "scientificMaturity": "PILOT",
+    "qualification": {
+      "pilot": {
+        "eligible": true,
+        "blockers": []
+      },
+      "researchReady": {
+        "eligible": false,
+        "blockers": [
+          "SCIENTIFIC_REVIEW_MISSING",
+          "LOCALIZATION_REVIEW_PENDING"
+        ]
+      },
+      "researchGrade": {
+        "eligible": false,
+        "blockers": [
+          "SCIENTIFIC_REVIEW_MISSING",
+          "LOCALIZATION_REVIEW_PENDING",
+          "RESEARCH_GRADE_REVIEW_MISSING"
+        ]
+      },
+      "maxEligibleMaturity": "PILOT"
+    },
+    "instruction": {
+      "origin": "INSTRUMENT_SOURCE",
+      "schemaVersion": 1,
+      "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。"
+    },
+    "instructionDiagnostics": [],
+    "manualReview": {
+      "localization": [
+        "LOCALIZATION_REVIEW_PENDING",
+        "LOCALIZATION_EXPERT_REVIEW_PENDING"
+      ],
+      "rights": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。"
+      },
+      "reportQc": {
+        "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert review",
+        "reviewedAt": "2026-10-27T00:00:00.000Z",
+        "basis": "Cassidy 2016 CC BY 4.0 article Methods/Table2 carrier; independent working translation; PR356 instruction contract adopted."
+      }
+    },
+    "allowedProducts": [
+      "SURVEY"
+    ],
+    "visibility": "PUBLIC",
+    "previousStatus": null,
+    "previousVisibility": null
+  }
+}

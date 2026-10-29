@@ -1,0 +1,9 @@
+{
+  "instrumentKey": "ars30_2016_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+  "visibility": "PUBLIC",
+  "allowedProducts": [
+    "SCHOOL"
+  ]
+}

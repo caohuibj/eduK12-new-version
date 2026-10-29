@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "base": "23f51c26c132bf4113a4c9ca7f50d7f8f8459886",
+  "node": {
+    "executable": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "execution": "cloud isolated process; no database or HTTP writes; login:false outer shell",
+  "checks": [
+    {
+      "id": "scale-metadata-direct",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/modules/reporting/__tests__/ScaleUnitReportCard.metadata.test.tsx",
+        "src/modules/reporting/__tests__/ScaleUnitReportCard.multidimensional.test.tsx",
+        "src/modules/reporting/__tests__/ScaleUnitReportCard.projection.test.tsx",
+        "src/modules/reporting/__tests__/ScaleUnitReportCard.test.tsx",
+        "--maxWorkers=2",
+        "--reporter=json",
+        "--outputFile=/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/presentation/evidence/scale-metadata-direct.json"
+      ],
+      "startedAt": "2026-10-28T01:03:52.189078+00:00",
+      "endedAt": "2026-10-28T01:03:54.188599+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "scale-metadata-direct.inputs.json.gz",
+        "compressedSha256": "9038a397f9c6d4f6c0a9e6def314353915ac7db5e39ffc4e2374f76ab4ac4737",
+        "uncompressedSha256": "979430448d5a463284a22e5fdfab4ab0e785d12d70b5b68552ce3ffe0f0bd873",
+        "uncompressedBytes": 460402,
+        "count": 1584,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "scale-metadata-direct.stdout.log",
+          "sha256": "e74fef0cf3ced73a79563da148984820de9ec4480944a89b293856d0c5e92f25",
+          "bytes": 137
+        },
+        "stderr": {
+          "path": "scale-metadata-direct.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    }
+  ],
+  "scope": "Six new Scale report metadata assertions and six directly affected existing report assertions; no backend/DB/full suite/build/CI",
+  "environment": {
+    "testEnvironment": "jsdom, frontend Vitest config",
+    "credentials": "not retained; env values not printed"
+  },
+  "limits": [
+    "Source/config/tool hashes are contemporaneous; full installed dependency package bytes and process environment are not enumerated.",
+    "Snapshots include other backend source files solely as input evidence, not assertions that they executed."
+  ],
+  "outerToolExitCode": 0,
+  "outerExitEvidence": "Actual exec_command/write_stdin completion, login:false, recorded after execution"
+}

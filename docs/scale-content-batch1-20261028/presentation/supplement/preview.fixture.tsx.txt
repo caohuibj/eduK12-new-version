@@ -1,0 +1,12 @@
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import ScaleUnitReportCard, { type SafeScaleUnitReport } from './src/modules/reporting/ScaleUnitReportCard'
+import './src/index.css'
+import data from '../../docs/scale-content-batch1-20261028/presentation/supplement/preview-data.json'
+const state = new URLSearchParams(location.search).get('state') || 'complete'
+const reports = data.reports as unknown as Record<string, SafeScaleUnitReport>
+createRoot(document.getElementById('root')!).render(<main style={{ maxWidth: 960, margin: '0 auto', padding: 16 }}>
+  <header style={{ marginBottom: 24 }}><h1 style={{ fontSize: 22, fontWeight: 700 }}>ARS-30 · 合成报告呈现核对</h1>
+    <p style={{ fontSize: 14, marginTop: 8, color: '#52667b' }}>展示状态：{({ complete: '完整作答', invalid: '缺答，当前结果不可解释', restricted: '当前受众不可查看', unknown: '数量与方向未提供', bps9: 'BPS-9 完整作答' } as Record<string, string>)[state]}。仅用于组件演示。</p></header>
+  <ScaleUnitReportCard report={reports[state]} />
+</main>)

@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28T01:10:26.058613+00:00",
+  "priorHead": "23f51c26c132bf4113a4c9ca7f50d7f8f8459886",
+  "scope": "Scale-owned report component, own CSS and direct test; no backend/projection/DTO/schema/scoring/instrument/cognitive changes",
+  "publicFieldAuthority": {
+    "existingAllowlist": "server-version/backend/src/modules/scale/projection/serialization.ts projectExternalScaleScore lines76-86",
+    "disclosureBranches": "scale-result.projector.ts includes this score serializer only when numericScores is permitted; completion/unavailable/educational early branches do not expose score context.",
+    "savedVersionSource": "scale-scoring.ts makeScore copies description/direction and item membership from the definition used for that result. ScaleResult.toScaleUnitReport consumes external scores; the component only reads already supplied result/score objects.",
+    "fields": [
+      "expectedItems",
+      "answeredItems",
+      "description",
+      "direction"
+    ],
+    "noInternalFallback": "No new fetch, live registry, raw answer, itemScores or research-data lookup. Counts only, never item identifiers."
+  },
+  "implementation": {
+    "counts": "Validate nonempty unique expected set and unique answered subset. Show answered/expected/missing; zero answered is known; absent/empty/inconsistent metadata remains unknown.",
+    "meaning": "Show saved description for all scores, including dimensions; otherwise use supplied direction enum; absent direction stays unknown.",
+    "chart": "Existing actual-value/theoretical-range marker unchanged; no invented percentages, cutoffs or population ranking.",
+    "styles": "ScaleUnitReportCard.css only; wrapping count labels and saved meaning under existing range cards. No global primitive or platform styling change."
+  },
+  "consumers": [
+    "student/ScaleResult",
+    "student/QuestionnaireResult",
+    "public/PublicQuestionnaireResult",
+    "education-tools/EducationScalePersonalReport; actual supported entry/disclosure controls unchanged"
+  ],
+  "checks": {
+    "unit": {
+      "report": "evidence/scale-metadata-direct.json",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0,
+      "processExitCode": 0,
+      "outerToolExitCode": 0,
+      "caseResults": [
+        {
+          "fullName": "Scale report saved public score metadata shows real response counts and the saved dimension meaning without item identities or a percentile",
+          "status": "passed"
+        },
+        {
+          "fullName": "Scale report saved public score metadata keeps zero values distinct from missing scores and reports an actual zero answered count",
+          "status": "passed"
+        },
+        {
+          "fullName": "Scale report saved public score metadata leaves counts unknown when projected metadata is absent, empty or inconsistent",
+          "status": "passed"
+        },
+        {
+          "fullName": "Scale report saved public score metadata uses only a supplied direction when no saved explanation exists and preserves unknown direction",
+          "status": "passed"
+        },
+        {
+          "fullName": "Scale report saved public score metadata shows partial counts alongside a supplied limited-data status without altering the saved value",
+          "status": "passed"
+        },
+        {
+          "fullName": "Scale report saved public score metadata does not expose retained score metadata in completion, unavailable or educational disclosures",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleUnitReportCard multidimensional hierarchy renders an explicit total separately from explicit dimensions",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleUnitReportCard multidimensional hierarchy does not invent an overall score for a dimension-only scale",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleUnitReportCard audience-safe DTO rendering renders educational content without falling through to hidden score fields",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleUnitReportCard audience-safe DTO rendering renders completion-only without score/report layers",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleUnitReportCard audience-safe DTO rendering renders unavailable as a safe message without exposing a failure payload",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleUnitReportCard PR6A null/zero and caveat contract renders zero as a score, null as an em dash, and shared caveats/disclaimer",
+          "status": "passed"
+        }
+      ]
+    },
+    "changedFileLint": {
+      "argv": [
+        "node",
+        "node_modules/eslint/bin/eslint.js",
+        "src/modules/reporting/ScaleUnitReportCard.legacy.tsx",
+        "src/modules/reporting/__tests__/ScaleUnitReportCard.metadata.test.tsx"
+      ],
+      "cwd": "server-version/frontend",
+      "processExitCode": 0,
+      "outerToolExitCode": 0,
+      "logs": "evidence/changed-scale-eslint.*.log",
+      "receiptLimit": "Command exit recorded from tool completion; no separate contemporaneous lint environment manifest."
+    },
+    "browser": {
+      "completed": false,
+      "outerToolExitCode": 1,
+      "screenshotsProduced": 0,
+      "assertionsExecuted": 0,
+      "report": "evidence/browser-report.json",
+      "state": "ENVIRONMENT_BLOCKED",
+      "action": "Launch /usr/bin/chromium with headless:true, chromiumSandbox:true for local synthetic component preview",
+      "reason": "Sandbox helper /usr/lib/chromium/chrome-sandbox is owned by nobody:nogroup mode4755; Chromium requires root ownership and terminated before page creation. Post-failure /proc shows NoNewPrivs1, Seccomp2. Crashpad also reported --database required.",
+      "outcome": "Browser process started and exited before opening any page. Not a successful visual test or an automatic approval-review rejection.",
+      "response": "No retry, sandbox disabling, ownership/permission edits, replacement browser install or credential changes."
+    },
+    "staticHTML": {
+      "path": "evidence/component-preview.html",
+      "receipt": "evidence/static-preview-receipt.json",
+      "generationExitCode": 0,
+      "meaning": "Script-free actual ReactDOMServer markup plus Vite-processed existing CSS; an offline review artifact, NOT a screenshot or browser/mobile acceptance.",
+      "stderrStatus": "Vite dependency scan emitted server-closing/outdated-request errors after artifact generation; original stderr preserved. Do not call this a clean application build or cleanup acceptance.",
+      "represents": [
+        "complete",
+        "invalid",
+        "restricted",
+        "unknown"
+      ]
+    },
+    "notRun": [
+      "Phone/tablet visual and overflow assertions (browser never opened)",
+      "Full frontend build/types/tests",
+      "Backend/DB/scoring/golden repetitions",
+      "CI/Ready/merge/deploy"
+    ]
+  },
+  "inputs": [
+    {
+      "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+      "currentBlob": "ce315802e4d6fdffb494c54658d4bb5ac019781d",
+      "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-result.ts",
+      "currentBlob": "9f59bde7913ef0696389713e7f8db7d4b9921b9a",
+      "sha256": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/projection/scale-result.projector.ts",
+      "currentBlob": "25e734a6a0fc87dc5f78d92ec9840e69a569a2a4",
+      "sha256": "3631f95e824f50115a9beaa71e6764b3163a647e64e65502e1306aef4ab262be",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/projection/serialization.ts",
+      "currentBlob": "cf8de17eb4bdc1686702674e063b7ba98bd43ce5",
+      "sha256": "c4e53db7a326cb59bfc8866b596f9fa9b6e7e2c3d1fa7e72653b536232f23a13",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/pages/student/ScaleResult.tsx",
+      "currentBlob": "4ff02fa221f12760a23ebe4ee54c86f64ac5839b",
+      "sha256": "8bc0b6dd39922cc9603b4655eedbd701195052041f19dc135cc2e83fbc6bf051",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/types.ts",
+      "currentBlob": "06414415bb7891ac73362a22554a764284efa885",
+      "sha256": "a18e133272e475f60d8f798f96107319bd5a8de04b0e1008698c694d42b8886e",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.tsx",
+      "currentBlob": "52a6857e02a3f7839aa6027c10673199d5634776",
+      "sha256": "94c23beeab1f53e96923c83b28291d79defbfafb99946622077fd5825837c0c6",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.legacy.tsx",
+      "currentBlob": "c18672d0df94697b1c1c1c63355afeacbdea3604",
+      "sha256": "aac243e9a07e1c6784c19c9f113dccf63b6fcff86b3a45cb01baea9bbdddefa8",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.css",
+      "currentBlob": "77389e3c382a502a87f6f5631f78bf1435bd2f4f",
+      "sha256": "241e4863e07621dcc30fda7a54225657ed6bb398e597649b00695cfdbea5ed73",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/__tests__/ScaleUnitReportCard.metadata.test.tsx",
+      "currentBlob": "5e55be34e4c65e8b517e9060b776ba32231fdfe8",
+      "sha256": "d4b6aa1884953e7b1084b77e1fa30ff494eca422e72e5f7b4a4569be9a51e331",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/ReportPrimitives.tsx",
+      "currentBlob": "bed51f8516f9c84465589cffd89a0183edec8751",
+      "sha256": "da85f924d440dee5bcab93b1e053c8bdaeeb1f76aa83708e74db12f90419426b",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/report-ui.css",
+      "currentBlob": "d6b1d286d2a6f36b5cf438a8a61e78f823195290",
+      "sha256": "043340caa080d471d0faf2fc5fd69eec41ad8b87ba2ae71f4a1fa18b9aa42eec",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/index.css",
+      "currentBlob": "ace8b1ff469b452916786bf6816b96b7feaa4a4d",
+      "sha256": "0270ed02f5fa33108c04479d30e3ae8c55a506e661ffad01728b042631a5bba6",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/tailwind.config.js",
+      "currentBlob": "0907b7854ac29537daa75fe5900193ace9f19c6c",
+      "sha256": "09a37975fdea6adec89215827b9cb757f20e520ab8043d1c370a29fd246ad6d0",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/postcss.config.js",
+      "currentBlob": "a7f73a2d1d7c466d1e8037200bca4d1c79b6e609",
+      "sha256": "3fc8d1c13ad963bbf7da04d59024d38cc2ad14563b36afd71bc8b43c7148dd25",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    },
+    {
+      "path": "server-version/frontend/vite.config.ts",
+      "currentBlob": "07ae0e602c0938352829a55397189baa0c0e0f22",
+      "sha256": "8392c66655f644b0a19c6689333117884ceb5b0183116211b24bbb4a8e2be887",
+      "recorded": "Post-execution read-only binding, not a fabricated at-browser-start manifest"
+    }
+  ],
+  "limits": [
+    "Unit input hashes are contemporaneous before/after. Browser input bindings/config/harness hashes are post-execution; no full browser-start or dependency byte manifest.",
+    "Actual screenshots are still missing; static CSS responsiveness and unit output do not establish phone/tablet visual PASS.",
+    "The source-release and isolated DB evidence remain unchanged under technical-release; this stage did not write any database."
+  ],
+  "remaining": [
+    "Root review of exact presentation patch and original test results",
+    "Obtain phone/tablet screenshots in an environment with an already correctly configured sandboxed browser; do not weaken sandbox to qualify."
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "target": "https://github.com/caohuibj/eduK12-new-version/pull/367",
+  "action": "Update Draft PR title/body to technical release and isolated intake result",
+  "firstAttempt": {
+    "tool": "gh pr edit 367 --title ... --body-file ...",
+    "exitCode": 1,
+    "reason": "GraphQL Projects classic projectCards compatibility error",
+    "outcome": "NOT_APPLIED; subsequent REST read showed original title and no current head in body"
+  },
+  "secondAttempt": {
+    "tool": "gh api --method PATCH repos/caohuibj/eduK12-new-version/pulls/367 --input <structured-json>",
+    "exitCode": 1,
+    "httpStatus": 401,
+    "reason": "Bad credentials",
+    "outcome": "DENIED_NOT_APPLIED"
+  },
+  "completedBeforeBlock": [
+    "Technical source field and isolated integration evidence committed as e6f8b5052617ad8128df54d9359121a83e782d68",
+    "Branch push confirmed successful at e6f8b5052617ad8128df54d9359121a83e782d68",
+    "Actual database cycle completed; no production access"
+  ],
+  "state": "PR_METADATA_UPDATE_PENDING_AUTH_OR_ROOT",
+  "policy": "No retry of denied PR mutation, no replacement credential or alternate connector used. Draft state remains unchanged."
+}

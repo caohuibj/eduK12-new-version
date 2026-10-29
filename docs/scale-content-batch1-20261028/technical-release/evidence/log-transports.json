@@ -1,0 +1,11 @@
+[
+  {
+    "originalPath": "schema-migrate.stdout.log",
+    "transportPath": "schema-migrate.stdout.log.gz",
+    "encoding": "gzip",
+    "originalBytes": 34105,
+    "originalSHA256": "a928c4e50e2e967b8f1eaf8782edfa3521186cbd7080b9d09720dc735c10f3c1",
+    "compressedSHA256": "fd911b866f358e7d9dcd90f6dc076487001dd9cbe3c0dfadeaa38ca7a2c5a1a6",
+    "reason": "Original Prisma migrate stdout has trailing spaces on line 730; lossless transport retains original bytes rather than trimming evidence."
+  }
+]

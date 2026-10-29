@@ -1,0 +1,42 @@
+{
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "node_modules/tsx/dist/cli.mjs",
+    "/tmp/ars30-isolated-cli.ts"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "database": "eduk12_scale367_9cd3f7ef4f",
+  "startedAt": "2026-10-28T00:48:57.271247+00:00",
+  "endedAt": "2026-10-28T00:49:06.312892+00:00",
+  "processExitCode": 0,
+  "node": {
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "inputs": {
+    "path": "integration.inputs.json.gz",
+    "count": 2929,
+    "sha256": "1da5c73c51ba8f38919c355bdeb80ac802e721b5d3686b12a290bc08f703da0f",
+    "uncompressedSHA256": "924993a4d95c08dd13278781f7e85786f26b146001032ee33939ddabb2d5a2d2",
+    "beforeAfterIdentical": true
+  },
+  "harnessSHA256": "9151a75050d748fd006e02227b87cb765a12aa8c7f6cd949e53044438f036f16",
+  "logs": {
+    "stdout": {
+      "path": "integration.stdout.log",
+      "sha256": "0c4582a7d52280e8f6f7eb58b0d181f53c8813b759744281c974f820dd293063",
+      "bytes": 1450
+    },
+    "stderr": {
+      "path": "integration.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "limits": [
+    "No full dependency directory or process environment byte manifest; protected database credentials not logged.",
+    "CLI invocations have their own commands/exits and before-after business snapshots in isolation-report.json."
+  ],
+  "outerToolExitCode": 0,
+  "outerExitEvidence": "exec_command/write_stdin tool completion, recorded after completion; login:false shell"
+}
