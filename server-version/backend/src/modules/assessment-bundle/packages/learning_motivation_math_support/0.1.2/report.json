@@ -1,0 +1,56 @@
+{
+  "key": "learning_motivation_math_support_report",
+  "version": "0.1.1",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "core",
+      "kind": "conclusions",
+      "title": "当前学习动机的暂定组合",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "evidence",
+      "kind": "evidence",
+      "title": "三个不同含义的核心指标",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "scope",
+      "kind": "limitations",
+      "title": "解释边界",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": []
+    }
+  ],
+  "states": {
+    "missing": "核心证据不完整，暂不分型。",
+    "limited": "作答或测量证据有限，仅阅读可支持的单项信息。",
+    "unavailable": "当前证据或权限不足以形成综合画像。"
+  },
+  "profileStateExplanations": {
+    "INSUFFICIENT": "本次用于组合分析的信息还不完整，暂不形成综合画像。你仍可查看已获准展示的单项结果。",
+    "INVALID": "本次部分结果未满足组合分析所需的计算或质量条件，暂不形成综合画像。你仍可查看已获准展示的单项结果。",
+    "NOT_APPLICABLE": "当前测评版本不适用于此次填写的年级或对象，因此暂不形成综合画像。你仍可查看已获准展示的单项结果。",
+    "UNCLASSIFIED": "现有理论组合还不足以充分概括这次结果。学习体验可以有不同组合，可先结合已获准展示的单项结果理解本次情况。",
+    "MIXED": "本次结果与两种理论组合较为接近，暂不选定单一画像。可以结合已获准展示的单项结果，看看哪些描述更贴近近期的学习体验。",
+    "BOUNDARY": "本次结果处在现有理论组合的边界附近，暂不足以清楚归入其中一种。可以先结合已获准展示的单项结果理解本次的学习体验。"
+  }
+}

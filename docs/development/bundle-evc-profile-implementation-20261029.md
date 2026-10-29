@@ -539,3 +539,19 @@ DOT已逐项读取77份原件并决定：接纳School原失败调用中实际到
 恢复的Training HTTP原件、本次新审计及其关联观察仍待DOT最终候选核对：reader能验证原件，但requireNativeEvidence保持拒绝这部分pending；既有enabled=false、control review PENDING未变。后续只在已有最终候选review/激活流程中收口，不另造签名、证据提供者或审批层。只改状态而没有原字节、选择摘要、分支映射和输入一致性，无法通过reader。缺失退出仍null；旧School失败整次仍false；浏览器始终声明开发环境范围。
 
 新增reader控制两例覆盖原件漂移、filtered行、伪造exit、篡改声明source/只读状态、漏行为及未知观察拒绝。逐行分支元数据加入后，负例夹具在构造非法选择时先遇undefined的自校验错误；只修夹具的非法行分支说明，失败原件保留，仅重验该负例PASS。未重复旧模型/三入口用例。本切片不Ready、不运行正式build/audit/runtime/CodeQL、不合main或部署，PR正文拒绝动作未重试。
+
+## 23. F02：冻结的未分型说明；F01保持原边界
+
+本切片基于main dc0f46ba506d51d42c5bb379059df82f18860b72，只补报告已有状态的中文解释。V2报告模板可选`profileStateExplanations`，完整列出INSUFFICIENT、INVALID、NOT_APPLICABLE、UNCLASSIFIED、MIXED、BOUNDARY六类静态说明；不把`reasons[]`、内部身份/版本错误或来源详情直接送出。投影继续要求所有核心源的individualInterpretations和scoreDerivedLabels，WITHHELD的explanation仍null；MATCHED沿用原summary。原前端段落已消费explanation，无需改UI、受众权限或读取路径。没有新增检测、SQL、单项计分、事实存储或后台任务。
+
+新增learning_motivation_math_support@0.1.2（DRAFT），报告/模板0.1.1；模型0.1.0、映射0.1.1、原L1参数/工具/适用年级不变。0.1.1原目录不改，原内容hash仍34625844b7014e409a423e99ee2f31fdf28f3d41f629d6432a928e9a2214a941。旧包无新字段，旧冻结定义重开仍返回原null说明，已存Survey视图不重写。新包经既有bundle:manifest:generate登记；新任务需按原bundle:package:install及独立签审发布流程选择0.1.2，代码登记不是发布。没有自动替换旧任务、旧包或补写旧报告。
+
+必要共享文件只有onboarding/contract.ts（兼容可选模板字段）、profile/report.ts、generated/packages.json（新DRAFT版本）、新0.1.2内容目录及直接报告测试；不改公共目录/授权服务、School任务路由或P6接线。验证只覆盖六状态、真实学生/教师/研究者策略、两项解释能力的交集、内部原因不泄漏、匹配summary和教育内容限制保持、旧冻结定义/哈希及新模板身份。未重跑原模型43+2、PG矩阵、入口计分或浏览器。报告文字与计算结果同用冻结定义；不查最新模板。
+
+F01核对：源DisclosureCapabilitiesV1只有educationalContent布尔能力；静态EducationalFeedbackDefinition禁止分数条件。Bundle validateReview批准contentHash及scientific/rights/language/report与cross_source_condition等声明，未定义可覆盖源educationalContent=false的独立受众能力；当前Profile投影明确取核心交集。因缺乏明确覆盖依据，本切片保留actions隐藏，不把既有report=true解释为越权许可。
+
+交回的唯一产品决定：是否允许经独立Bundle权利/报告签审的自有教育建议，在核心解释与标签权限均已获准时，不再受源educationalContent=false限制？若明确允许，最小建议是在现有Bundle signed review中明确批准这类自有文案并冻结批准范围，由既有投影消费；不改源策略或grant、不另建权限系统。本轮没有实施该语义变更。
+
+CI计划：本地仅做上述新报告边界及受影响后端类型检查；生成器不调用计分或数据库。现有正式路由先以最终完整差异回读，普通Draft只作已有预检，不把Draft成功当正式资格；若Ready仍选平台C广泛矩阵则交DOT集中收敛，未自行新建workflow、门禁或重跑原件。生产构建/扫描/SAST按最终受影响组件选择，未授权部署或GitHub APPROVE。Notion和旧PR详细资料披露拒绝继续停止。
+
+本地原始结果：profile-feedback.test.ts首轮10 PASS/exit0；随后仅把历史夹具的model元数据明确绑定旧模板，对应历史case单项1 PASS/exit0（另9项filtered，不计作重跑成功）。后端tsc --noEmit --incremental false实际exit0、0诊断。普通生成器成功登记3包；新0.1.2相对0.1.1只有manifest/profile/report三份内容变化，其他9份原件逐字相同。新包contentHash=ef95136e38c6c2c05956c6ea602644b8ffd39eb36bc63de1fa10fdd0ecc697e9。未安装或发布新包，未访问生产数据库。

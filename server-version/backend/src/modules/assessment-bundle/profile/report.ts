@@ -26,7 +26,8 @@ export function projectProfileView(result:ProfileResult,pack:DeclarativePackage,
   const view:ProfileView={
     schemaVersion:'bundle-profile-view-v1',state:interpret?result.state:'WITHHELD',
     title:interpret?(profile?.name??String(model.states[result.state])):'当前权限未开放个体画像解释',
-    explanation:profile?.summary??null,profileId:profile?.id??null,
+    explanation:interpret?(profile?.summary??(result.state==='MATCHED'?null:pack.report.profileStateExplanations?.[result.state]??null)):null,
+    profileId:profile?.id??null,
     constructs:result.constructs.filter(c=>policyFor(c.evidenceKey)?.numericScores).map(c=>({
       key:c.key,label:c.label,raw:c.raw,min:c.min,max:c.max,
       referenceCenter:profile && numeric?c.min+(c.max-c.min)*(c.orientation==='DIRECT'?profile.centers[c.key]:1-profile.centers[c.key]):null,
