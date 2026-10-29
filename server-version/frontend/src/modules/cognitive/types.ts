@@ -1048,3 +1048,26 @@ export type CogestTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Maze 冻结 config（与后端 maze.config schema 一致）。 */
+export interface MazeConfig {
+  totalTrials: number
+  mazeCols: number
+  mazeRows: number
+  timeLimitMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Maze 单 trial payload（与后端 maze.trial schema 一致）。 */
+export type MazeTrialPayload = {
+  mazeIndex: number
+  moves: number[]
+  completionTimeMs: number | null
+  completed: boolean
+  interrupted: boolean
+}

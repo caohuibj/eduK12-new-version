@@ -68,6 +68,7 @@ const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: un
     case 'proofread': return { phase: 'test', payload: { itemId: 'pf-01', responseIndex: 0, rtMs: 300, interrupted: false } }
     case 'visualwm': return { phase: 'test', payload: { setSize: 4, isChange: true, response: 'change', rtMs: 300, interrupted: false } }
     case 'cogest': return { phase: 'test', payload: { itemId: 'ce-01', responseIndex: 0, rtMs: 300, interrupted: false } }
+    case 'maze': return { phase: 'test', payload: { mazeIndex: 0, moves: [1, 2, 1, 2], completionTimeMs: 5000, completed: true, interrupted: false } }
     default: throw new Error(`No cognitive smoke payload for ${testType}`)
   }
 }
