@@ -50,7 +50,7 @@ export function inspectScaleIntakeDiff(base, head) {
   assert.notEqual(base,head,'Base and head must differ')
   const checkout=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()
   assert.equal(checkout,head,'Checkout must be the exact PR source SHA, not an unbound merge revision')
-  const raw=execFileSync('git',['diff','--raw','-z','--no-renames',base,head],{encoding:'utf8',maxBuffer:4*1024*1024})
+  const raw=execFileSync('git',['diff','--raw','--abbrev=40','-z','--no-renames',base,head],{encoding:'utf8',maxBuffer:4*1024*1024})
   return admitScaleIntakeEntries(parseRawDiff(raw))
 }
 if (process.argv[1] && fileURLToPath(import.meta.url)===process.argv[1]) {

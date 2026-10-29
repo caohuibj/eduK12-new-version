@@ -38,3 +38,27 @@ test('raw diff parser binds Git object types, status and zero delimiters',()=>{
  assert.deepEqual(parseRawDiff(raw),[a(inst)])
  for(const malformed of [':000000 100644 '+x+' '+y+' A\0'+inst,':invalid\0'+inst+'\0',':100644 100644 '+x+' '+y+' R100\0'+inst+'\0'])assert.throws(()=>parseRawDiff(malformed))
 })
+
+test('real Git raw diff uses unabridged identities and enforces source-only intake',async()=>{
+ const {mkdtempSync,mkdirSync,writeFileSync,rmSync}=await import('node:fs')
+ const {tmpdir}=await import('node:os')
+ const {join,dirname}=await import('node:path')
+ const {execFileSync}=await import('node:child_process')
+ const dir=mkdtempSync(join(tmpdir(),'scale-intake-raw-'))
+ const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8'})
+ try {
+  git('init','-q')
+  git('config','user.email','ci-test@example.invalid')
+  git('config','user.name','CI Test')
+  writeFileSync(join(dir,'README.md'),'base\n')
+  git('add','.');git('commit','-qm','base')
+  const base=git('rev-parse','HEAD').trim()
+  mkdirSync(dirname(join(dir,inst)),{recursive:true})
+  writeFileSync(join(dir,inst),'export const SCALE_INSTRUMENT_SOURCE = {}\n')
+  git('add','.');git('commit','-qm','scale')
+  const head=git('rev-parse','HEAD').trim()
+  const raw=git('diff','--raw','--abbrev=40','-z','--no-renames',base,head)
+  assert.deepEqual(admitScaleIntakeEntries(parseRawDiff(raw)).sources,[inst])
+  assert.throws(()=>parseRawDiff(git('diff','--raw','-z','--no-renames',base,head)),/Unsupported/)
+ } finally {rmSync(dir,{recursive:true,force:true})}
+})
