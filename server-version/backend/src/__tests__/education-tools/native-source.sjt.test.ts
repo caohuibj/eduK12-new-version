@@ -86,6 +86,7 @@ describe('education exact native SJT original sources',()=>{
   const fixture=authorFixture(),{db,tx}=database(fixture),source=selection(authorId,fixture.measurement.content_hash)
   const result=await readEducationSjtSources(tx,[source,source],'SCHOOL'),leaf=result.get(authorId)!
   expect(result.size).toBe(1)
+  expect(db.sjtAuthorRelease.findUnique).toHaveBeenCalledWith({where:{instrumentKey_instrumentVersion:{instrumentKey:fixture.author.instrumentKey,instrumentVersion:fixture.author.instrumentVersion}}})
   expect(leaf).toMatchObject({id:authorId,title:fixture.compiled.package.definition.source.title,contentHash:source.contentHash,
    instrumentKey:fixture.author.instrumentKey,instrumentVersion:fixture.author.instrumentVersion,
    source:{kind:'SJT_AUTHOR_RELEASE',id:authorId,ownerId:'original-author'},

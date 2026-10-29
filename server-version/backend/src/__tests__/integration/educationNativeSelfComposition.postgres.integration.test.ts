@@ -84,7 +84,11 @@ suite('education ordinary Scale/Form/Cognitive/SJT native SELF on real PostgreSQ
   const [execution]=await f.executions();if(!execution)throw Error('Expected actual participant execution')
   const executionPath=product==='TEACHER'?`/run-executions/${execution.id}`:`/organizations/${f.organizationId}/activities/${f.workflow.id}/runs/${f.runId}/executions/${execution.id}`
   const consent=await request(product,f.participantUserId,executionPath+(product==='TEACHER'?'/assessment-consent/accept':'/consent/accept'),{})
-  expect(consent.status,JSON.stringify(consent.value)).toBe(200)
+  const [assignment]=await db.$queryRaw<Array<{consentId:string|null}>>`SELECT a.consent_id AS "consentId" FROM assessment_run_executions e
+   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id WHERE e.id=${execution.id}`
+  // SELF sources can legitimately have no admission consent lineage. The
+  // accept endpoint must refuse to fabricate one; START consumes actual policy.
+  expect(consent.status,JSON.stringify(consent.value)).toBe(assignment.consentId?200:product==='SCHOOL'?409:404)
   const started=await request(product,f.participantUserId,executionPath+(product==='TEACHER'?'/start-assessment':'/start'),{})
   expect(started.status,JSON.stringify(started.value)).toBe(200)
   const parentId=started.data.runtimeBindingRef,path=(product==='TEACHER'?'/assessment-composite-attempts/':'/composite-attempts/')+parentId
@@ -98,8 +102,10 @@ suite('education ordinary Scale/Form/Cognitive/SJT native SELF on real PostgreSQ
    if(kind==='SCALE'){endpoint=path+`/items/${item.id}/scale/submit`;payload={...common,answers:item.scale.definition.items.map((q:any)=>({itemCode:q.itemCode,responseValue:'zero'}))}}
    else if(kind==='FORM_SECTION'){endpoint=path+`/form-sections/${item.formSectionId}/submit`;payload={...common,answers:item.answers.map((q:any)=>({formItemId:q.formItemId,value:'PRIVATE FORM RESPONSE'}))}}
    else if(kind==='COGNITIVE'){
-    const child=item.cognitiveSession;expect(child.profile).toBe(profile);expect(child.config.totalTrials).toBe(totalTrials)
-    endpoint=path+`/items/${item.id}/cognitive/${child.id}/submit`
+    const child=item.cognitiveSession,assignment=await db.cognitiveAssignment.findUniqueOrThrow({where:{id:child.assignmentId}})
+    expect(assignment.profile).toBe(profile);expect(readFrozenReport(assignment.resolvedReportSnapshotEncrypted)?.profile).toBe(profile)
+    expect(child.config.totalTrials).toBe(totalTrials)
+    endpoint=path+`/items/${item.id}/cognitive/${child.sessionId}/submit`
     payload={...common,definitionHash:child.definitionHash,trials:Array.from({length:totalTrials},(_,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*4000,endedAtPerfMs:trialIndex*4000+1300,payload:{foreperiodMs:1000,rtMs:300,prematureCount:0,interrupted:false,inputMode:'pointer'}}))}
    }else{endpoint=path+`/items/${item.id}/situational/${item.situationalAttemptId}/submit`;payload={submissionId:common.submissionId,attemptEpoch:common.attemptEpoch,definitionHash:item.definitionHash,responseProtocol:'sjt-online-response-v1',responses:onlineExample.goldenCases[0].responses}}
    const final=await request(product,f.participantUserId,endpoint,payload);expect(final.status,JSON.stringify(final.value)).toBe(200)

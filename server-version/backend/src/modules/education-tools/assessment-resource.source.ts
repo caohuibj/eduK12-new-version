@@ -77,7 +77,7 @@ export async function resolveEducationAssessmentSituationalItems(tx:Prisma.Trans
  for(const identity of identities){
   let pkg=builtins.some(value=>value.key===identity.instrumentKey)?selectPublishedSituationPackage(builtins,identity.instrumentKey,identity.instrumentVersion):undefined
   if(!pkg){
-   const release=await tx.sjtAuthorRelease.findUnique({where:{instrumentKey_instrumentVersion:identity}})
+   const release=await tx.sjtAuthorRelease.findUnique({where:{instrumentKey_instrumentVersion:{instrumentKey:identity.instrumentKey,instrumentVersion:identity.instrumentVersion}}})
    if(!release?.measurementReleaseId)fail('EDUCATION_ASSESSMENT_SJT_SOURCE_REQUIRED')
    // Independent original author publication, never Training course permission.
    await readSjtEntryDistributionSource(tx,release.measurementReleaseId)

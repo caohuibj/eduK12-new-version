@@ -91,7 +91,7 @@ export async function admitEducationNativeCognitive(tx:Prisma.TransactionClient,
   ||unit.source.assignmentId!==input.assignmentId||unit.source.id!==input.configId||descriptor.data.sourceId!==input.configId)
   privateToolFail('EDUCATION_COGNITIVE_START_CONTEXT_REQUIRED',403)
  const key=JSON.stringify(['education-cognitive-slot-v1',parent.id,input.itemId,parent.attemptEpoch])
- await tx.$queryRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtextextended(${key},0))`)
+ await tx.$queryRaw(Prisma.sql`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${key},0))`)
  if(await tx.cognitiveSession.count({where:{userId:input.actorUserId,compositeAttemptId:parent.id,compositeItemId:input.itemId,attemptNo:parent.attemptEpoch}}))
   privateToolFail('EDUCATION_COGNITIVE_SLOT_ALREADY_ENTERED',409)
 }
