@@ -86,17 +86,59 @@ test('PR382 read-only diagnostics name only verified scope mismatches before any
     unexpectedWritable: [{ path: ROOT + '/chrome', uid: 0, gid: 0, permissionMode: 0o777 }], truncated: false })
   assert.equal(JSON.stringify(r).includes('synthetic private exception'), false)
 })
+const packageScopeFixture = () => {
+  const f = fixture(); f.env.GITHUB_REF = 'refs/pull/382/merge'; f.env.GITHUB_HEAD_REF = 'release/education-self-scale-form-20261028'
+  f.env.SCHOOL_TEACHER_CHROME_TIGHTEN = 'confirmed-self-package-scope'
+  // The observed runner helper has no setuid bit. Tightening must not add it.
+  f.items.get(ROOT + '/chrome-sandbox').mode &= ~0o4000
+  return f
+}
+test('PR382 current package approval removes only go write on verified entries and never adds sandbox privilege', () => {
+  const f = packageScopeFixture(), before = new Map([...f.items].map(([p, row]) => [p, { ...row }]))
+  const result = f.run(); assert.equal(result.status, 'PERMISSIONS_TIGHTENED')
+  assert.equal(result.authorizationScope, 'PR382_VERIFIED_CHROME_PACKAGE_GO_WRITE'); assert.equal(result.environmentOnly, false)
+  assert.equal(result.acceptance, false); assert.equal(result.browserLaunched, false); assert.equal(mutations(f).length, 8)
+  for (const call of mutations(f)) {
+    const p = call.args[4]; assert(p === '/opt' || p === '/opt/google' || p === ROOT || p.startsWith(ROOT + '/'))
+    assert.equal(f.items.get(p).mode, before.get(p).mode & ~0o022)
+    for (const key of ['uid', 'gid', 'ino', 'dev', 'nlink', 'size']) assert.equal(f.items.get(p)[key], before.get(p)[key])
+    assert.deepEqual(f.items.get(p).contents, before.get(p).contents)
+  }
+  assert.equal(f.items.get(ROOT + '/chrome-sandbox').mode & 0o4000, 0)
+  for (const p of ['/opt/unrelated-tool', '/usr/bin/google-chrome-stable', '/usr/share/doc/google-chrome-stable/copyright'])
+    assert.equal(f.items.get(p).mode, before.get(p).mode)
+  for (const alter of [f => { f.items.get(ROOT + '/chrome').contents[0] ^= 1 }, f => { f.items.get('/opt/google').gid = 1001 },
+    f => { f.items.get(ROOT + '/chrome').kind = 'symlink' }, f => f.add(ROOT + '/untracked', 'file', 0o777)]) {
+    const bad = packageScopeFixture(); alter(bad); assert.equal(bad.run().status, 'FAILED'); assert.equal(mutations(bad).length, 0)
+  }
+})
+test('PR382 environment precheck uses its actual dedicated push context and rejects other events branches and identities', () => {
+  const setup = () => {
+    const f = packageScopeFixture(); f.env.GITHUB_EVENT_NAME = 'push'; delete f.env.GITHUB_HEAD_REF
+    f.env.GITHUB_REF = 'refs/heads/ci/pr382-chrome-environment-20261029'; return f
+  }
+  const result = setup().run(); assert.equal(result.status, 'PERMISSIONS_TIGHTENED'); assert.equal(result.environmentOnly, true)
+  for (const alter of [f => { f.env.GITHUB_REF = 'refs/heads/main' }, f => { f.env.GITHUB_REF = 'refs/heads/ci/pr382-chrome-readonly-20261029' },
+    f => { f.env.GITHUB_EVENT_NAME = 'pull_request' }, f => { f.env.GITHUB_EVENT_NAME = 'workflow_dispatch' },
+    f => { f.env.GITHUB_REPOSITORY = 'other/repo' }, f => { f.env.RUNNER_ENVIRONMENT = 'self-hosted' },
+    f => { f.env.SCHOOL_TEACHER_CHROME_TIGHTEN = 'confirmed-self-opt-only' }, f => { f.env.LD_PRELOAD = 'synthetic secret' },
+    f => { f.env.GITHUB_SHA = 'b'.repeat(40) }, f => { f.process.getuid = () => 0 }]) {
+    const f = setup(); alter(f); assert.equal(f.run().status, 'FAILED'); assert.equal(mutations(f).length, 0)
+  }
+  const wrongEvent = packageScopeFixture(); wrongEvent.env.GITHUB_EVENT_NAME = 'push'
+  assert.equal(wrongEvent.run().status, 'FAILED'); assert.equal(mutations(wrongEvent).length, 0)
+})
 test('PR382 workflow calls only the guarded existing helper immediately before unchanged strict Chrome preflight', () => {
   const workflow = require('node:fs').readFileSync(require('node:path').resolve(__dirname, '../../.github/workflows/ci-school-teacher.yml'), 'utf8')
   const job = workflow.split('  browser-self:\n')[1].split('\n  security:')[0]
-  const start = job.indexOf('    - name: tighten only the confirmed PR382 temporary /opt write bits'), end = job.indexOf('    - name: inspect this runner Chrome, no automatic install or fallback')
+  const start = job.indexOf('    - name: tighten only the confirmed PR382 verified Chrome package write bits'), end = job.indexOf('    - name: inspect this runner Chrome, no automatic install or fallback')
   assert(start > job.indexOf('school-teacher-checks.mjs fonts') && end > start)
   const step = job.slice(start, end)
   for (const text of ["github.repository == 'caohuibj/eduK12-new-version'", "github.event_name == 'pull_request'", 'github.event.pull_request.number == 382',
     "github.event.pull_request.head.ref == 'release/education-self-scale-form-20261028'", 'github.event.pull_request.head.repo.full_name == github.repository',
-    "fromJSON(inputs.plan).candidate == 'education-self'", 'SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-opt-only', 'school-teacher-chrome-permissions.cjs tighten']) assert(step.includes(text))
+    "fromJSON(inputs.plan).candidate == 'education-self'", 'SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-package-scope', 'school-teacher-chrome-permissions.cjs tighten']) assert(step.includes(text))
   assert(!/sudo|chmod|chown|sysctl|no-sandbox|continue-on-error/.test(step)); assert.equal(job.split('SCHOOL_TEACHER_CHROME_TIGHTEN').length - 1, 1)
-  assert.equal(workflow.split('SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-opt-only').length - 1, 1)
+  assert.equal(workflow.split('SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-package-scope').length - 1, 1)
   assert.equal(workflow.split('SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-temporary-runner').length - 1, 1)
 })
 test('only approved parents and verified Chrome package entries lose go write with all other bits preserved', () => {
