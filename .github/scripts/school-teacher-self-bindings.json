@@ -6,7 +6,7 @@
   "enabled": true,
   "base": "9801107019d51a4af7ddb651789b674867539d24",
   "frozenDevelopmentHead": "9fa3c51e5deb882beb4a0d56f1ebe44dae8f76f5",
-  "productHead": "025ba7253c4d24ef245a047c4651bfe88d401145",
+  "productHead": "43c2ba35b8bbd85c5d906bb7ba529149e6ed4111",
   "frontendTree": "2907eedb6ad9d1bdc5559f3e61b1f6145ac8b39b",
   "backendTree": "8a5df3518f9cadd5b56a397a71de7019e9fb5b95",
   "source": {
@@ -672,12 +672,12 @@
     ".github/scripts/school-teacher-fresh.test.mjs": "f27123818e33b980f47f0fdece834679bca504e4",
     ".github/scripts/school-teacher-scope.mjs": "0b8d47820a1745142d4317f48bc3d62cf01c2136",
     ".github/scripts/school-teacher-self-baseline.sql": "4052c21cfb980282bf72f581a6cd26494021d153",
-    ".github/scripts/school-teacher-self.test.mjs": "025e3851ec9e8378d4e9cde1979fe66bccd91062",
+    ".github/scripts/school-teacher-self.test.mjs": "c4fd118ac85d7b77d66b6878f6b469422d9ecea6",
     ".github/scripts/school-teacher-storage.postgres.test.mjs": "727cc24474da221fcebb49905c58605f6a166f97",
     ".github/workflows/ci-school-teacher.yml": "45a4db88aa1b30e9d8c26dc17191100e37763f88",
     ".github/workflows/ci.yml": "797cc8c87ad01a055663e90ad5e6c8b44b4ed7e0",
-    "server-version/e2e/education-self-questionnaire.cjs": "cbc9549944d00415f00355d4573faa93668e2eda",
-    "server-version/e2e/school-teacher-browser.cjs": "81b09e4db6abc0c72b8401bb93fa4693465e93ef",
+    "server-version/e2e/education-self-questionnaire.cjs": "af54e6357a1610d8cfd96e9853b173eb966c9dc3",
+    "server-version/e2e/school-teacher-browser.cjs": "265542e0e58f38fccaa8a4f9c13a9e9292e1b1b1",
     "server-version/e2e/school-teacher-fixture.cjs": "cc42e320cbf8a5ec49fbf28c0adf690bd15d223c",
     "server-version/e2e/school-teacher-chrome-permissions.cjs": "c2653f2aa38f48aaee1ab17291ed27cb8ea21df5",
     "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "a21ad90aab90e3e12e795301dc09af3505e05976"
@@ -686,7 +686,7 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "DOT independently reviewed f299d6b99 V1 locking and the exact screenshot guard, then prescribed the Teacher evaluation navigation correction. DOT read eighth-run original logs/artifact12878088980 and Teacher screenshot: School completed again; Teacher authoring and real publication with two executions passed. Participant login succeeded; the only failing probe was the management-MFA-gated author-capabilities GET returning403. DOT verified huiteacher organization.routes34-35 and authority11-18 and prescribed separate exact product assertions. Implemented in025ba7253: School keeps200/canAuthor=false; Teacher requires exactly403 and its already fetched authenticated organization has productAdmin=false. No extra auth/me request, participant MFA or administrative grant, accepted200/403 set, removed negative assertion or repeated local DOM/PG check. Prior guards, true FINAL/feedback and current formal jobs/SAST plus final DOT merge check remain required. This review is not GitHub APPROVE or current application qualification.",
+    "note": "DOT independently reviewed the existing six-job wiring, V1 row-lock repair, screenshot guard, Teacher publication navigation and precise ordinary-participant management denial (basis025ba7253). Current user subsequently instructed direct repair and CI reactivation, then careful repair after repeated CI failures. R traced the ninth-run official stack to participant162: save-and-exit resume, not the first START. Commit43c2ba35b reloads the Teacher task page only after the durable exit closes, then retains the exact parent, item and restored-answer assertions. Promise.all attaches response and action failures immediately throughout the SELF helper and the existing session click primitive, preserving catch/finally report handling without changing accepted statuses, methods, paths or timeouts. Two new targeted Node executor contracts fail on the original and pass on the repair; no new DOM, PG or broad local suite was run. New code has not been represented as a fresh DOT independent review. Prior authorization and runtime guards, current formal qualification/SAST and final DOT exact-head merge review remain required. This is not GitHub APPROVE or current application qualification.",
     "basisCommit": "025ba7253c4d24ef245a047c4651bfe88d401145",
     "reviewer": "DOT independent parent and supplemental Teacher boundary review",
     "wiringBasisCommit": "fb8489caf91e09fb9ca7183bef5d0c7a49e0ad7e",
@@ -1663,12 +1663,12 @@
     ],
     "browserHelper": "server-version/e2e/education-self-questionnaire.cjs",
     "continuationDecision": {
-      "previousRun": 40830867196,
-      "previousCheckout": "d1b34310990ca7a7132a0cb37e9b3d33ba9cfafa",
-      "previousSource": "55a7648cc2adffd7810ff9643608f05d481539b4",
+      "previousRun": 40833644317,
+      "previousCheckout": "c6a75a7e08bad5b22e5e148c8129ee941112137e",
+      "previousSource": "cc65f8587a31cc53cb45959362013c2c2242419b",
       "officialReuse": "NOT_SUPPORTED_BY_EXISTING_FRESH_EXECUTOR",
       "reason": "Official legacy consumers bind PR338 and fixed run/job/build identities; fresh artifacts require current SHA/run and reject old receipts. Parameter-only substitution cannot preserve those invariants.",
-      "method": "Keep the same bounded fresh jobs, all117 backend cases/five batches, frontend56/41 declared filtered, migration/restore and current SAST. Eighth-run School full journey and Teacher authoring/publication successes retain their original SHA/run; its ordinary participant was correctly denied403 by the management capability endpoint, which the old common200 assertion incorrectly rejected. Exact product-specific negative checks and an already authenticated non-admin organization fact now preserve that boundary in025ba7253. Do not add MFA/roles, weaken statuses or repeat DOT/local tests. Existing fresh consumers still cannot configure acceptance of successful subjourneys or arbitrary old manifests; preserve this limitation without a new evidence framework. Every current browser Runner must verify its authorized Chrome scope/sandbox and both complete real SELF journeys. Preserve the previous failed browser and actual SAST success/cancelled status under the existing concurrency policy."
+      "method": "Keep the unchanged bounded fresh jobs,117 backend cases/five batches, frontend56/41 declared filtered, migration/restore and current SAST. Ninth-run CodeQL succeeded; browser failed at the first save-and-exit resume and exited on an unhandled response-wait rejection before publishing browser.json. The actual stack points to participant162, proving initial START and first option selection had already occurred. Teacher START leaves the mounted card in its pre-START row state, while the executor read a fresh runtimeBindingRef and sought the new button label. Repair43c2ba35b waits for durable exit, reloads and verifies the same persisted parent/item/answer; it also attaches response/action rejection handling immediately. Two targeted synthetic Node executor contracts fail-before/pass-after, not application or browser qualification. No repeated old DOM/PG/local groups. The unchanged existing fresh executor does not accept arbitrary old runs or child-journey evidence. Preserve previous real outcomes and require both current complete real SELF journeys plus all selected gates; no new reuse framework."
     }
   },
   "blockers": []
