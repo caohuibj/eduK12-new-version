@@ -1,0 +1,52 @@
+{
+  "mainSha": "9801107019d51a4af7ddb651789b674867539d24",
+  "siblingBranches": ["SELcontents", "exam-anxiety-20261030"],
+  "exact": [],
+  "related": [
+    {
+      "newFamily": "sas_sv_10_adol_en",
+      "existing": "mpats_16_xiongjie_zh_cn",
+      "relation": "同为问题性手机使用：SAS-SV 为引进青少年自评（韩/中验证），MPATS 为中文本土原创。相邻家族不合并题库或计分；国内场景可并行对照使用。"
+    },
+    {
+      "newFamily": "igds9_sf_en",
+      "existing": "smd9_vdeijnden_en",
+      "relation": "同源自 DSM-5 IGD 九条标准：IGDS9-SF 面向游戏行为（全平台），SMD9 面向社交媒体。九条标准对应但对象不同，不合并计分、不互相换算。"
+    },
+    {
+      "newFamily": "iat_20_young_en",
+      "existing": "cias_26_chen_zh_tw",
+      "relation": "同为整体性网络使用工具：IAT 为引进经典，CIAS 为中文本土原创（繁体）。相邻不合并；简体应用路径各自独立。"
+    },
+    {
+      "newFamily": "nmpq_20_yildirim_en",
+      "existing": "dass21_zh_cn",
+      "relation": "NMP-Q 测手机不可及时的情境特异焦虑；DASS-21 焦虑维测泛化焦虑。相邻不合并。"
+    },
+    {
+      "newFamily": "nmpq_20_yildirim_en",
+      "existing": "gad7 / k6（PR 328 research-drafts）",
+      "relation": "广泛性焦虑/心理困扰为泛化构念，与手机分离焦虑为不同对象，不重复登记。"
+    },
+    {
+      "newFamily": "bsmas_6_andreassen_en",
+      "existing": "sas_sv_10_adol_en / igds9_sf_en",
+      "relation": "BSMAS 对象为社交媒体平台使用；SAS-SV/IGDS9-SF 对象为设备与活动（手机/游戏）。构念相邻、对象不同，不合并计分。"
+    },
+    {
+      "newFamily": "screen_use_batch1",
+      "existing": "bscs_zh_cn（简版自我控制量表）",
+      "relation": "自我控制是问题性使用的重要个体差异前因/调节变量，属相邻调节构念，不并入使用失调计分。"
+    },
+    {
+      "newFamily": "screen_use_batch1",
+      "existing": "who5 / sdq_parent_zh_cn / sdq_teacher_zh_cn / sswq16 等",
+      "relation": "福祉与一般行为困难工具不覆盖问题性使用专项；SDQ 注意/同伴维度与本批为泛化 vs 特异关系，不重复登记。"
+    },
+    {
+      "newFamily": "screen_use_batch1",
+      "existing": "exam-anxiety 分支 westside_10/aeq/tai/ctas",
+      "relation": "考试焦虑为学业情境情绪；本批为使用行为失调。均属情境特异构念但对象不同，精确 key 无冲突。"
+    }
+  ]
+}
