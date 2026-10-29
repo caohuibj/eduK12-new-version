@@ -470,6 +470,7 @@ async function run() {
       }
       const me = await s.api('/auth/me'); assert.equal(me.id, user.id)
       assert.equal(me.role, user.role)
+      if(product==='TEACHER')s.authenticatedOrganizations=me.organizations
       const cookies = (await context.cookies(origin)).filter(c => c.name === (product === 'SCHOOL' ? 'huischool_session' : 'huiteacher_session'))
       assert.equal(cookies.length, 1); assert.equal(cookies[0].secure, true); assert.equal(cookies[0].httpOnly, true)
       await page.reload(); s.authenticated = true; lastSafeSession = s
@@ -845,7 +846,15 @@ async function run() {
           const workflow=await publish(author,f,{COMPOSITION:version})
           stage=product+'-ordinary-participant-login'
           const learner=await session(product,f.participant,'participant')
-          assert.equal((await learner.api('/organizations/'+f.organizationId+'/tool-authoring-capabilities')).canAuthor,false)
+          const capabilityPath='/organizations/'+f.organizationId+'/tool-authoring-capabilities'
+          if(product==='SCHOOL')assert.equal((await learner.api(capabilityPath)).canAuthor,false)
+          else {
+            assert.ok(Array.isArray(learner.authenticatedOrganizations))
+            const organization=learner.authenticatedOrganizations.find(row=>row.organizationId===f.organizationId)
+            assert.ok(organization)
+            assert.equal(organization.productAdmin,false)
+            assert.equal((await learner.api(capabilityPath,'GET',undefined,[403])).status,403)
+          }
           stage=product+'-ordinary-execution-feedback'
           await selfConsumer.participant(learner,f,workflow,version,{author,report,out})
           await learner.close();await author.close();return
