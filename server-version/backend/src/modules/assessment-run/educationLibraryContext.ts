@@ -1,4 +1,6 @@
 import {readPrivateFormRuntimeResource} from '../education-tools/private-tool.form-runtime-resources'
+import {readPrivateCompositionRunSources} from '../education-tools/private-tool.composition-source'
+import {lockCompositionLibraryUses,readLockedEducationLibraryUses} from '../education-tools/library-source.use'
 import {privateFormDraftResourcePolicy} from '../education-tools/private-tool.form-draft-policy'
 import {assertPrivateScaleRunWorkflow} from './educationPrivateScaleContext'
 import {readPrivateScaleRuntimeResource} from '../education-tools/private-tool.runtime-resources'
@@ -41,8 +43,8 @@ export async function readEducationRunLibraryContext(tx:Prisma.TransactionClient
  * Return values are local transaction facts, not durable capabilities.
  */
 export async function assertEducationRunLibraryResources(tx:Prisma.TransactionClient,input:Scope&{resources:Ref[];purpose:'EDIT'|'PREVIEW'|'PUBLISH'}){
- const privateRefs=input.resources.filter(ref=>ref.key.startsWith('private-scale:')||ref.key.startsWith('private-form:'))
- if(privateRefs.some(ref=>ref.family!==(ref.key.startsWith('private-form:')?'FORM':'SCALE')||ref.version!=='1.0.0'))fail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID',409)
+ const privateRefs=input.resources.filter(ref=>ref.key.startsWith('private-scale:')||ref.key.startsWith('private-form:')||ref.key.startsWith('education-composition:'))
+ if(privateRefs.some(ref=>ref.family!==(ref.key.startsWith('education-composition:')?'BUNDLE':ref.key.startsWith('private-form:')?'FORM':'SCALE')||ref.version!=='1.0.0'))fail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID',409)
  if(!input.resources.some(ref=>ref.family==='SCALE')&&!privateRefs.length)return null
  const initial=await readEducationRunLibraryContext(tx,input)
  if(!initial){
@@ -63,12 +65,16 @@ export async function assertEducationRunLibraryResources(tx:Prisma.TransactionCl
     fail('EDUCATION_LIBRARY_REGISTERED_IDENTITY_MISMATCH')
   const context={product:initial.product,organizationId:input.organizationId,actorId:input.actorUserId,
     entryId:origin.entryId,releaseId:origin.releaseId,contentHash:origin.contentHash}
-  const selected=await readEducationLibraryUse(tx,context)
-  prepared.push({ref,context,grantId:selected.grantId})
+  prepared.push({ref,context})
  }
+ const authorContext={entry:initial.product,organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL' as const}}
+ const compositionUses=await lockCompositionLibraryUses(tx,authorContext,privateRefs.filter(ref=>ref.key.startsWith('education-composition:')).map(ref=>ref.key),prepared.map(item=>item.context.entryId))
+ const selectedUses=compositionUses?readLockedEducationLibraryUses(tx,authorContext,compositionUses):new Map()
  const current=await lockAndAssertEducationRunWorkflow(tx,input,initial)
  for(const item of prepared){
-  await readEducationLibraryUse(tx,item.context,{onlyGrantId:item.grantId})
+  const selected=selectedUses.get(item.context.entryId)
+  if(!selected)fail('EDUCATION_LIBRARY_USE_GRANT_REQUIRED',403)
+  await readEducationLibraryUse(tx,item.context,{onlyGrantId:selected.id})
   const source=await readEducationLibraryRegisteredSource(tx,{product:current.product,resourceKey:item.ref.key,resourceVersion:item.ref.version,purpose:'NEW_USE'})
   if(!isSupportedEducationLibraryVariant(current.product,source.variantKey))fail('EDUCATION_LIBRARY_WORKFLOW_RESPONSE_MODE_UNSUPPORTED',409)
   const expectedPopulation=current.product==='TEACHER'?'TEACHER':'STUDENT'
@@ -77,13 +83,16 @@ export async function assertEducationRunLibraryResources(tx:Prisma.TransactionCl
  const privateResourcePolicies=new Map<string,RunResourcePolicy>()
  if(privateRefs.length){
   const editor=await assertPrivateScaleRunWorkflow(tx,input,current)
-  for(const ref of [...privateRefs].sort((a,b)=>a.key.localeCompare(b.key))){
+  const compositions=await readPrivateCompositionRunSources(tx,editor.context,privateRefs.filter(ref=>ref.key.startsWith('education-composition:')),
+   {lockForUse:input.purpose!=='PREVIEW',libraryUses:compositionUses})
+  for(const [key,source] of compositions)privateResourcePolicies.set(key,source.policy)
+  for(const ref of privateRefs.filter(ref=>!ref.key.startsWith('education-composition:')).sort((a,b)=>a.key.localeCompare(b.key))){
    const form=ref.key.startsWith('private-form:')
    const source=await (form?readPrivateFormRuntimeResource:readPrivateScaleRuntimeResource)(tx,{key:ref.key,version:'1.0.0',purpose:'NEW_USE',context:editor.context})
    privateResourcePolicies.set(ref.key,form?privateFormDraftResourcePolicy(source):relationalEntryToRunPolicy(source.resourceEntry))
   }
  }
- return {...current,privateResourcePolicies}
+ return {...current,privateResourcePolicies,libraryUses:compositionUses}
 }
 
 /** Shared workflow facts only. Public callers must lock selected issuers BEFORE

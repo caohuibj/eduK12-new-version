@@ -11,8 +11,9 @@ export type TeacherAssessmentTask={
  executionId:string;organizationId:string;runId:string;eventId:string;eventTitle:string;title:string;
  family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';status:'ASSIGNED'|'STARTED'|'COMPLETED';runStatus:string;
  runtimeBindingRef:string|null;consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
+ mode?:'COMPOSITION'|'PACKAGE_REFERENCE'|'TOOL'
 }
-export type TeacherAssessmentCompletion={executionId:string;attemptId:string}
+export type TeacherAssessmentCompletion={executionId:string;attemptId:string;mode?:TeacherAssessmentTask['mode']}
 export const teacherAssessmentParentPath=(attemptId:string)=>'/assessment-composite-attempts/'+encodeURIComponent(attemptId)
 const wrapped=<T,>(data:T):ApiResponse<T>=>({code:0,message:'成功',data})
 const same=(actual:string,expected:string)=>{if(actual!==expected)throw new Error('测评子项与当前冻结任务不一致')}

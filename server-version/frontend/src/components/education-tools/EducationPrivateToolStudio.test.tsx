@@ -25,6 +25,14 @@ async function openDraft(api:ReturnType<typeof apiWith>){
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals()})
 
 describe('EducationPrivateToolStudio bounded private authoring workflow',()=>{
+ it('does not route an ordinary questionnaire deep link into the Form editor',async()=>{
+  const api=apiWith(path=>path===`${base}/${draft.id}`?{...draft,kind:'COMPOSITION',definition:{schemaVersion:1,blocks:[]}}:undefined)
+  render(<EducationPrivateToolStudio api={api as PrivateToolApi} organizationId="a" entry="TEACHER"/>)
+  fireEvent.click(await screen.findByRole('button',{name:'编辑 我的量表'}))
+  await screen.findByText('请从普通问卷编制入口打开这份问卷。')
+  expect(screen.queryByRole('button',{name:'保存草稿'})).not.toBeInTheDocument()
+  expect(api.mock.calls.some(([path])=>path.endsWith('/versions'))).toBe(false)
+ })
  it('explains private image editing and authorized task/report reading separately',async()=>{
   const api=apiWith()
   render(<EducationPrivateToolStudio api={api as PrivateToolApi} organizationId="a" entry="SCHOOL"/>)

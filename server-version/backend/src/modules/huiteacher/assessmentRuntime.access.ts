@@ -9,6 +9,8 @@ import {boundCompositeContinuationSql} from '../assessment-run/boundCompositeCon
 import {relationalEntryToRunPolicy,type RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import type {RelationalProductEntryV1} from '../assessment-relational/product-registry'
 import {educationAssessmentOriginSchema,educationAssessmentResourceKey,type EducationAssessmentOrigin} from '../education-tools/assessment-resource.contract'
+import {readFrozenCompositionIdentity,assertCompositionCollection} from '../assessment-run/educationCompositionExecution'
+import {EducationPrivateToolError} from '../education-tools/private-tool.contracts'
 
 export type TeacherRuntimeDb=Prisma.TransactionClient
 export type TeacherSourceIdentity={origin:EducationAssessmentOrigin;entry:RelationalProductEntryV1;identityOnly:true}
@@ -27,8 +29,9 @@ export type TeacherAssessmentTask={
  executionId:string;organizationId:string;runId:string;eventId:string;eventTitle:string;title:string;
  family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';status:'ASSIGNED'|'STARTED'|'COMPLETED';runStatus:string;
  runtimeBindingRef:string|null;consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
+ mode:'COMPOSITION'|'PACKAGE_REFERENCE'|'TOOL'
 }
-type Row=Omit<TeacherAssessmentTask,'title'>&{
+type Row=Omit<TeacherAssessmentTask,'title'|'mode'>&{
  resourceKey:string;resourceVersion:string;policy:RunResourcePolicy;policyHash:string;
  assignmentId:string;episodeId:string;bindingKind:string|null;cursorCreatedAt:string;
  attemptEpoch:number|null;frozenSlotSet:string|null;frozenSlotSetHash:string|null
@@ -85,7 +88,7 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
   AND parent.composite_assessment_id=t.frozen_resource_policy->'runtimeLaunchTarget'->>'ref'
   AND parent.delivery_mode='FINAL_ONLY' AND parent.runtime_generation='UNIFIED_V1'
  WHERE t.resource_family IN ('COGNITIVE','SITUATIONAL','BUNDLE') AND t.resource_version='1.0.0'
-  AND t.resource_key LIKE 'education-assessment:TEACHER:%'
+  AND (t.resource_key LIKE 'education-assessment:TEACHER:%' OR t.resource_key LIKE 'education-composition:TEACHER:%')
   AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)
   AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`)}
   AND ((e.status='ASSIGNED' AND a.status='OPEN' AND r.status='PUBLISHED' AND event.status='OPEN'
@@ -101,10 +104,20 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
 }
 function taskDto(row:Row,title:string):TeacherAssessmentTask{
  const {executionId,organizationId,runId,eventId,eventTitle,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}=row
- return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}
+ return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility,
+  mode:row.resourceKey.startsWith('education-composition:')?'COMPOSITION':family==='BUNDLE'?'PACKAGE_REFERENCE':'TOOL'}
 }
 export function createTeacherAssessmentAccess<Identity extends TeacherSourceIdentity>(db:TeacherRuntimeDb,source:TeacherAssessmentSourceAccess<Identity>){
  const authorize=async(row:Row,actorUserId:string)=>{
+  if(row.resourceKey.startsWith('education-composition:')){
+   if(row.family!=='BUNDLE')fail()
+   const identity=await readFrozenCompositionIdentity(db,{policy:row.policy,policyHash:row.policyHash,organizationId:row.organizationId,
+    key:row.resourceKey,version:row.resourceVersion})
+   if(identity.origin.entry!=='TEACHER')fail()
+   if(row.status!=='COMPLETED')await assertCompositionCollection(db,identity,row.status==='ASSIGNED'?'NEW_START':'BOUND_COLLECTION')
+   return {task:taskDto(row,identity.title),identity,row,runtimeCompositeId:identity.compositeId,
+    units:identity.units.map(unit=>({itemId:unit.itemId,family:'SCALE' as const}))}
+  }
   const identity=await source.readIdentity(db,{resourceKey:row.resourceKey,version:row.resourceVersion,purpose:row.status==='ASSIGNED'?'NEW_USE':'HISTORY'})
   const origin=educationAssessmentOriginSchema.parse(identity.origin),entry=identity.entry
   if(identity.identityOnly!==true||origin.product!=='TEACHER'||origin.organizationId!==row.organizationId
@@ -118,7 +131,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
    ||a.analysisMode!=='INDIVIDUAL_ONLY'||a.minimumRespondents!==null)fail()
   const purpose:TeacherRuntimePurpose=row.status==='ASSIGNED'?'START':row.status==='COMPLETED'?'HISTORY_READ':'BOUND_COLLECTION'
   await source.assertUse(db,{identity,executionId:row.executionId,actorUserId,purpose})
-  return {task:taskDto(row,entry.title),identity,row}
+  return {task:taskDto(row,entry.title),identity,row,runtimeCompositeId:origin.runtimeCompositeId,units:origin.units}
  }
  const own=async(actorUserId:string,input:{executionId?:string;attemptId?:string})=>{
   if(!input.executionId&&!input.attemptId)fail()
@@ -136,6 +149,10 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
     try{list.push((await authorize(row,actorUserId)).task)}catch(error){
      if(error instanceof EducationAssessmentSourceError&&['EDUCATION_ASSESSMENT_RESOURCE_NOT_AVAILABLE','EDUCATION_ASSESSMENT_ORIGINAL_ISSUER_REVOKED'].includes(error.code))continue
      if(error instanceof ContentAuthorityError&&error.code==='CONTENT_AUTHORITY_DENIED')continue
+     if(error instanceof EducationPrivateToolError&&['PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE','PRIVATE_TOOL_AUTHOR_REQUIRED'].includes(error.code))continue
+     if(row.status==='ASSIGNED'&&error instanceof EducationPrivateToolError&&[
+      'PUBLIC_SOURCE_USE_REQUIRED','LIBRARY_SOURCE_USE_REQUIRED','LIBRARY_SOURCE_USE_EXPIRED','LIBRARY_SOURCE_UNAVAILABLE',
+     ].includes(error.code))continue
      throw error
     }
    }
@@ -145,7 +162,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
   async child(actorUserId:string,input:{attemptId:string;itemId:string;sessionId?:string;situationalAttemptId?:string;type:'COGNITIVE'|'SITUATIONAL'|'SCALE'|'FORM_SECTION'}){
    const proof=await own(actorUserId,{attemptId:input.attemptId})
    const expected=input.type==='SITUATIONAL'?'SJT':input.type
-   if(input.type!=='FORM_SECTION'&&!proof.identity.origin.units.some(unit=>unit.itemId===input.itemId&&unit.family===expected))fail()
+   if(input.type!=='FORM_SECTION'&&!proof.units.some(unit=>unit.itemId===input.itemId&&unit.family===expected))fail()
    const rows=await db.$queryRaw<Array<{id:string;compiledRuntimeHash:string|null;definitionHash:string|null}>>(Prisma.sql`
     SELECT slot.id,
      ${input.type==='COGNITIVE'?Prisma.sql`(SELECT child.compiled_runtime_hash FROM cognitive_sessions child WHERE child.id=${input.sessionId??''})`
@@ -154,7 +171,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
     FROM composite_assessment_attempts parent
     JOIN composite_assessment_items slot ON slot.composite_assessment_id=parent.composite_assessment_id
     WHERE parent.id=${input.attemptId} AND parent.user_id=${actorUserId}
-     AND parent.composite_assessment_id=${proof.identity.origin.runtimeCompositeId}
+     AND parent.composite_assessment_id=${proof.runtimeCompositeId}
      AND ${input.type==='FORM_SECTION'?Prisma.sql`slot.form_section_id=${input.itemId} AND slot.type='FORM'`:Prisma.sql`slot.id=${input.itemId} AND slot.type::text=${input.type}`}
      ${input.type==='COGNITIVE'?Prisma.sql`AND EXISTS(SELECT 1 FROM cognitive_sessions child
       WHERE child.id=${input.sessionId??''} AND child.composite_attempt_id=parent.id AND child.composite_item_id=slot.id

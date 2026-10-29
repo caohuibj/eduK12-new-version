@@ -1,3 +1,4 @@
+import type {DisclosureCapabilitiesV1} from '../scale/policy/types'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import type { CanonicalUnitResultEnvelopeV1 } from '../assessment-runtime/unit-result'
 import type { EducationAssessmentOrigin } from '../education-tools/assessment-resource.contract'
@@ -27,12 +28,21 @@ export function projectEducationAssessmentReports(input:{
   const {origin}=input
   if(origin.product!==input.product||input.binding.compositeId!==origin.runtimeCompositeId
     ||input.binding.units.length!==origin.units.length)hidden()
+  return projectEducationDeclaredUnitReports({...input,units:origin.units})
+}
+
+/** Shared safe participant projection. Product adapters supply independently
+ * authorized frozen units and per-unit ceilings; all report math stays here. */
+export function projectEducationDeclaredUnitReports(input:Omit<Parameters<typeof projectEducationAssessmentReports>[0],'origin'>&{
+ disclosureByItem?:ReadonlyMap<string,DisclosureCapabilitiesV1>;
+ units:Pick<EducationAssessmentOrigin['units'][number],'itemId'|'family'|'measurement'|'report'|'references'>[]
+}):EducationAssessmentUnitReport[]{
   const read=(pointer:{releaseId:string;contentHash:string})=>{
     const release=input.releases.get(pointer.releaseId)
     if(!release||release.releaseId!==pointer.releaseId||release.contentHash!==pointer.contentHash)hidden()
     return release
   }
-  return origin.units.map(unit=>{
+  return input.units.map(unit=>{
     const base={itemId:unit.itemId,family:unit.family,rendered:null}
     const bound=input.binding.units.find(candidate=>candidate.itemId===unit.itemId)
     if(!bound||bound.family!==unit.family||canonicalHash(bound.measurement)!==canonicalHash(unit.measurement)
@@ -77,6 +87,21 @@ export function projectEducationAssessmentReports(input:{
     })
     const needsReference=report.content.template.blocks.some(block=>block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')
     const missingReference=needsReference&&report.content.template.blocks.some(block=>(block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')&&!references.some(reference=>reference.metricKey===block.metricKey&&reference.status==='AVAILABLE'&&(block.type!=='REFERENCE_BAND'||reference.referenceKind===block.referenceKind)))
-    return {...base,status:'READY',...(missingReference?{message:'当前没有适用且获准的参考或阈值，未作等级与阈值解释。'}:{}),rendered:renderDeclaredReport(report.content.template,metrics,references)}
+    return {...base,status:'READY',...(missingReference?{message:'当前没有适用且获准的参考或阈值，未作等级与阈值解释。'}:{}),rendered:restrictDeclaredEducationReport(renderDeclaredReport(report.content.template,metrics,references),input.disclosureByItem?.get(unit.itemId))}
   })
+}
+
+/** Original native respondent restrictions remain an independent ceiling on
+ * the approved R view. This filters display blocks, never reinterprets scores. */
+function restrictDeclaredEducationReport(report:ReturnType<typeof renderDeclaredReport>,rule:DisclosureCapabilitiesV1|undefined){
+ if(!rule)return report
+ return {...report,blocks:report.blocks.filter(value=>{
+  if(!value||typeof value!=='object')return false
+  const block=value as Record<string,unknown>
+  if(block.type==='TEXT')return rule.individualInterpretations||rule.educationalContent
+  if(block.type==='METRIC')return block.display==='REFERENCE_RESULT'?rule.references&&rule.scoreDerivedLabels:rule.numericScores
+  if(block.type==='CHART')return rule.numericScores
+  if(block.type==='REFERENCE_BAND')return rule.references&&rule.individualInterpretations&&rule.scoreDerivedLabels
+  return false
+ })}
 }

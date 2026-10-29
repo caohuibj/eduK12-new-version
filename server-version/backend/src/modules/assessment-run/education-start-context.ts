@@ -1,7 +1,7 @@
 /** Server-only, transaction-bound proof issued after exact education START admission.
  * A serialized product hint cannot select the education SJT runtime path. */
 export interface VerifiedEducationStart { readonly kind: 'VERIFIED_EDUCATION_START' }
-type Facts={tx:object;product:'SCHOOL'|'TEACHER';compositeId:string;assignmentRef:string;respondentUserId:string}
+type Facts={tx:object;product:'SCHOOL'|'TEACHER';compositeId:string;assignmentRef:string;respondentUserId:string;composition?:EducationCompositionPolicyBinding}
 const proofs=new WeakMap<object,Facts>()
 export function issueVerifiedEducationStart(facts:Facts):VerifiedEducationStart {
  const proof=Object.freeze({kind:'VERIFIED_EDUCATION_START' as const});proofs.set(proof,{...facts});return proof
@@ -11,6 +11,11 @@ export function readVerifiedEducationStart(proof:VerifiedEducationStart,expected
  if(!facts||facts.tx!==expected.tx||facts.compositeId!==expected.compositeId||facts.assignmentRef!==expected.assignmentRef||facts.respondentUserId!==expected.respondentUserId)
   throw new Error('EDUCATION_START_CONTEXT_MISMATCH')
  return facts.product
+}
+export function readVerifiedCompositionStart(proof:VerifiedEducationStart|undefined,expected:Omit<Facts,'product'>){
+ if(!proof)return undefined
+ readVerifiedEducationStart(proof,expected)
+ return proofs.get(proof)?.composition
 }
 export interface VerifiedEducationAttempt { readonly kind:'VERIFIED_EDUCATION_ATTEMPT' }
 const attempts=new WeakMap<object,Facts&{attemptId:string}>()
@@ -25,3 +30,4 @@ export function readVerifiedEducationAttempt(proof:VerifiedEducationAttempt|unde
  if(!facts||facts.tx!==tx||facts.attemptId!==attemptId||facts.respondentUserId!==userId)throw new Error('EDUCATION_START_CONTEXT_MISMATCH')
  return facts.product
 }
+import type {EducationCompositionPolicyBinding} from '../education-tools/private-tool.composition-contracts'

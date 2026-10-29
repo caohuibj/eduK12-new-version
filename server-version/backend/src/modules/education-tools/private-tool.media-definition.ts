@@ -11,6 +11,9 @@ export {materialLimits}
 /** Private tool-bound images, videos and PDF materials only. Retain reports separately from stimuli;
  * these authoring refs are not a participant media allowlist. */
 export function privateToolImageReferences(kind:PrivateToolKind,definition:unknown){
+ // A composition owns references, not a second copy of its leaves' media.
+ // Leaf media identities are checked by the compiler at the freeze boundary.
+ if(kind==='COMPOSITION')return {stimuli:[],reports:[],all:[]}
  let stimuli:AssessmentAssetIdentityV1[],reports:AssessmentAssetIdentityV1[]=[]
  if(kind==='SCALE'){
   const scale=definition as ScaleDefinitionV2

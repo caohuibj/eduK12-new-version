@@ -1,6 +1,6 @@
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest'
 import { educationReportFixture } from './education-assessment-report.fixture'
-import { projectEducationAssessmentReports } from '../../modules/reporting/education-assessment-report.projector'
+import { projectEducationAssessmentReports,projectEducationDeclaredUnitReports } from '../../modules/reporting/education-assessment-report.projector'
 
 beforeEach(()=>vi.stubEnv('DATA_ENCRYPTION_KEY','a'.repeat(64)))
 afterEach(()=>vi.unstubAllEnvs())
@@ -43,4 +43,16 @@ describe('education exact-version declared projection',()=>{
     if(change==='family')f.origin.units[0].family='SJT'
     expect(()=>projectEducationAssessmentReports(f)).toThrow()
   })
+})
+
+describe('ordinary native disclosure ceiling on declared R',()=>{
+ it('keeps permitted numeric blocks and strips forbidden interpretations without changing saved facts',async()=>{
+  const f=await educationReportFixture(),unit=f.origin.units[0],before=JSON.stringify(f.receipt)
+  const {DISCLOSURE_PRESETS}=await import('../../modules/scale/policy/disclosure')
+  const report=projectEducationDeclaredUnitReports({...f,units:f.origin.units,disclosureByItem:new Map([[unit.itemId,DISCLOSURE_PRESETS.SCORES()]])})[0]
+  expect(report.status).toBe('READY')
+  expect(report.rendered!.blocks.every(block=>block.type==='METRIC'||block.type==='CHART')).toBe(true)
+  expect(report.rendered!.blocks.some(block=>block.type==='METRIC')).toBe(true)
+  expect(JSON.stringify(f.receipt)).toBe(before)
+ })
 })
