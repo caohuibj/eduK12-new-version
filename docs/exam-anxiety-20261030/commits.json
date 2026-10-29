@@ -1,0 +1,50 @@
+{
+  "branch": "exam-anxiety-20261030",
+  "baseSha": "9801107019d51a4af7ddb651789b674867539d24",
+  "baseTree": "9a960561e651463ee237ece84f49b4c5d4b11b18",
+  "note": "逐家族独立提交，[skip ci]；未触发 CI、未建 PR、未合并、未部署。",
+  "commits": [
+    {
+      "sha": "d8360dd58370ace471a066981c0313af0b299e37",
+      "message": "docs(exam-anxiety): 考试焦虑入库骨架与查重预案 [skip ci]",
+      "files": [
+        "docs/exam-anxiety-20261030/README.md",
+        "docs/exam-anxiety-20261030/dedup.json"
+      ]
+    },
+    {
+      "sha": "1c18bfa55a3b4b2507d4212c91cf11c0c4f1c4ce",
+      "message": "content(scale): westside_10_driscoll_en 原生 DRAFT（官方授权、逐字题文、4 组 golden cases） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/westside_10_driscoll_en/1.0.0/instrument.ts",
+        "docs/exam-anxiety-20261030/westside/source.md",
+        "docs/exam-anxiety-20261030/westside/scoring.py",
+        "docs/exam-anxiety-20261030/westside/report_sample.html"
+      ]
+    },
+    {
+      "sha": "a55bd965e5e28a7a7d3baad0e55b6368d27be358",
+      "message": "content(scale): 登记 aeq_test_anxiety_en（catalog-only：官方手册不可达、条款未归档） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/aeq_test_anxiety_en/1.0.0/instrument.ts",
+        "docs/exam-anxiety-20261030/aeq/source-and-blockers.md"
+      ]
+    },
+    {
+      "sha": "34009f94be9702122a2fed3ed96afd3c3548f034",
+      "message": "content(scale): 登记 ctas_27_cassady_en（catalog-only：题文订阅墙内） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/ctas_27_cassady_en/1.0.0/instrument.ts",
+        "docs/exam-anxiety-20261030/ctas/source-and-blockers.md"
+      ]
+    },
+    {
+      "sha": "31f150e5b17f66e82abf8770c4cadf185aa6b64c",
+      "message": "content(scale): 登记 tai_20_spielberger_en（catalog-only：Mind Garden 商业分发） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/tai_20_spielberger_en/1.0.0/instrument.ts",
+        "docs/exam-anxiety-20261030/tai/source-and-blockers.md"
+      ]
+    }
+  ]
+}
