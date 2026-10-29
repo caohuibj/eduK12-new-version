@@ -28,6 +28,7 @@ import {listEducationPublicSources} from '../../modules/education-tools/public-s
 import {listEducationLibrarySources} from '../../modules/education-tools/library-source.catalog'
 import {readEducationPublicFormPreview} from '../../modules/education-tools/public-source.preview'
 import {readEducationLibraryScalePreview} from '../../modules/education-tools/library-source.preview'
+import {setupEducationLibraryRuntimeFixture} from './educationLibraryRuntimeFixture'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 // Runs on an explicitly selected migrated disposable real PG. No production access,
 // fake relational assignment or test-only execution protocol is introduced.
@@ -178,4 +179,37 @@ suite('Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL)'
   expect(JSON.stringify(feedback)).not.toMatch(/EXPERT professional evidence|PRIVATE expert reflection|metrics|answersCipher|respondentUserId/)
   expect((await request(manager.id,evidencePath.replace(note.id,privateNote.id))).status).toBe(404)
  },90000)
+ it('non-person expert observation uses only Form, preserves a null person subject and commits actual canonical evidence',async()=>{
+  const f=await setupEducationLibraryRuntimeFixture({db,product:'TEACHER',trackCount:0,publish:false})
+  const expert=await db.user.create({data:{username:'team-expert-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'SCHOOL',role:'TEACHER',teacherApproved:true}})
+  const c={entry:'TEACHER' as const,organizationId:f.organizationId,principal:{userId:f.managerUserId,accountDomain:'SCHOOL' as const}}
+  const fixed=async(kind:'FORM'|'COMPOSITION',definition:unknown)=>{
+   const draft=await tools.createPrivateTool(c,{kind,title:'Synthetic team '+kind}),saved=await tools.updatePrivateTool(c,draft.id,{expectedRevision:1,title:draft.title,definition})
+   return tools.freezePrivateTool(c,draft.id,{expectedRevision:saved.revision,expectedContentHash:saved.contentHash})
+  }
+  const leaf=await fixed('FORM',{schemaVersion:2,pages:[{pageKey:'team',title:'Team evidence',questions:[{itemKey:'q',type:'SHORT_TEXT',prompt:'Observed team process',required:true,options:[],rows:[]}]}]})
+  const source=await fixed('COMPOSITION',{schemaVersion:2,adapterVersion:'2.0.0',administration:{population:'TEACHER',responseMode:'EXPERT_REPORT',targetKind:'TEAM'},instruction:'Observe the invited team',
+   blocks:[{blockId:randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:'FORM',versionId:leaf.id,contentHash:leaf.contentHash}}]})
+  const target=await createHuiteacherTarget({organizationId:f.organizationId,actorUserId:f.managerUserId,kind:'TEAM',name:'Synthetic invited team'})
+  const event=await createHuiteacherEvent({organizationId:f.organizationId,actorUserId:f.managerUserId,targetId:target.id,kind:'TEACHING_RESEARCH',title:'Synthetic team expert observation'})
+  const campaign={organizationId:f.organizationId,eventId:event.id,actorUserId:f.managerUserId}
+  await bindFieldComposition({...campaign,privateComposition:{versionId:source.id,contentHash:source.contentHash}})
+  const invitation=await inviteHuiteacherObserver({...campaign,observerUserId:expert.id,role:'EXPERT',expiresAt:new Date(Date.now()+3600000)})
+  await acceptHuiteacherObserver({userId:expert.id,invitationId:invitation.id})
+  await transitionHuiteacherEvent({...campaign,action:'OPEN',expectedVersion:event.version})
+  const started=await request(expert.id,'/field-assessments/invitations/'+invitation.id+'/start',{})
+  expect(started.status,JSON.stringify(started.value)).toBe(200)
+  const parent=started.data.attemptId,path='/field-assessments/assessment-composite-attempts/'+parent
+  expect(await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:parent},select:{userId:true,subjectUserId:true,respondentUserId:true}}))
+   .toEqual({userId:expert.id,subjectUserId:null,respondentUserId:expert.id})
+  const current=await request(expert.id,path+'?view=current-unit'),item=current.data.currentItem
+  expect(item.type).toBe('FORM_SECTION')
+  const submitted=await request(expert.id,path+'/form-sections/'+item.formSectionId+'/submit',{submissionId:randomUUID(),attemptEpoch:current.data.attemptEpoch,definitionHash:item.definitionHash,contextSnapshotHash:current.data.contextSnapshotHash,
+   answers:item.answers.map((question:any)=>({formItemId:question.formItemId,value:'Synthetic team professional evidence'}))})
+  expect(submitted.status,JSON.stringify(submitted.value)).toBe(200);expect((await request(expert.id,path)).data.status).toBe('COMPLETED')
+  const note=await createHuiteacherObservation({...campaign,actorUserId:expert.id,kind:'FORMAL_FEEDBACK',content:'Explicit team observation'})
+  expect((await request(expert.id,'/field-notes/'+note.id+'/submit',{expectedRevision:1,assessmentAttemptId:parent})).status).toBe(200)
+  expect(await db.huiteacherFieldFormEvidence.findUniqueOrThrow({where:{recordId:note.id}})).toMatchObject({attemptId:parent,attemptEpoch:1})
+  expect(await db.organizationMembership.count({where:{organizationId:f.organizationId,userId:expert.id}})).toBe(0)
+ },30000)
 })
