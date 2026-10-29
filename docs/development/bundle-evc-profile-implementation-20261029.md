@@ -555,3 +555,5 @@ F01核对：源DisclosureCapabilitiesV1只有educationalContent布尔能力；�
 CI计划：本地仅做上述新报告边界及受影响后端类型检查；生成器不调用计分或数据库。现有正式路由先以最终完整差异回读，普通Draft只作已有预检，不把Draft成功当正式资格；若Ready仍选平台C广泛矩阵则交DOT集中收敛，未自行新建workflow、门禁或重跑原件。生产构建/扫描/SAST按最终受影响组件选择，未授权部署或GitHub APPROVE。Notion和旧PR详细资料披露拒绝继续停止。
 
 本地原始结果：profile-feedback.test.ts首轮10 PASS/exit0；随后仅把历史夹具的model元数据明确绑定旧模板，对应历史case单项1 PASS/exit0（另9项filtered，不计作重跑成功）。后端tsc --noEmit --incremental false实际exit0、0诊断。普通生成器成功登记3包；新0.1.2相对0.1.1只有manifest/profile/report三份内容变化，其他9份原件逐字相同。新包contentHash=ef95136e38c6c2c05956c6ea602644b8ffd39eb36bc63de1fa10fdd0ecc697e9。未安装或发布新包，未访问生产数据库。
+
+Draft首轮run40972703596/source1369d661d在backend job123793241307的Bundle content and immutable history步骤失败；前端类型、mini-program等结果保留，未执行下游backend build。官方日志下载403、未取得字节，不能声称读到官方具体异常；同一标准内容检查在隔离环境实际复现0.1.2缺少ci-fixtures同版本文件的ENOENT（exit1，原结果保留）。这是新增包遗漏正常登记fixture的工程错误。补0.1.2 smoke JSON，输入与0.1.1逐字相同；只readSmoke定向解析新文件实际PASS/exit0，没有重跑类型、报告10例、单项计分或旧完整旅程。未取消断言或修改检查器。原Ready仍是platform，未激活。Notion错误回写因既有同类披露拒绝保持pending，本对话保留原run/job/诊断/修复及下轮只核新fixture登记的清单。
