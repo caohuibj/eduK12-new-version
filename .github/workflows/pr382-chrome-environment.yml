@@ -55,7 +55,18 @@ jobs:
               report.status = 'ENVIRONMENT_READY'; report.code = 'CHROME_ENVIRONMENT_VERIFIED'
             } catch (error) {
               report.code = 'CHROME_ENVIRONMENT_OPERATION_FAILED'
-              report.errorDigest = createHash('sha256').update(String(error)).digest('hex')
+              const message = String(error)
+              // Emit only fixed public causes, never arbitrary stderr, argv or tokens.
+              const reasons = [
+                [/No usable sandbox/i, 'No usable sandbox'], [/Failed to move to new namespace/i, 'Failed to move to new namespace'],
+                [/Operation not permitted/i, 'Operation not permitted'], [/SUID sandbox helper binary.+not configured correctly/i, 'SUID sandbox helper configuration is invalid'],
+                [/error while loading shared libraries/i, 'Missing Chrome shared library'], [/Permission denied|EACCES/i, 'Permission denied'],
+                [/ENOENT|No such file or directory/i, 'Required executable or file not found'], [/Timeout.+exceeded/i, 'Browser operation timed out'],
+                [/Target page, context or browser has been closed/i, 'Browser closed during operation'], [/SIGTRAP|SIGSEGV|Received signal/i, 'Chrome terminated by signal']
+              ]
+              report.publicReasons = reasons.filter(([pattern]) => pattern.test(message)).map(([, reason]) => reason)
+              report.errorKind = ['Error', 'TimeoutError'].includes(error?.name) ? error.name : 'UNCLASSIFIED_ERROR'
+              report.errorDigest = createHash('sha256').update(message).digest('hex')
             } finally {
               report.stage = stage
               if (browser) { try { await browser.close() } catch { report.status = 'FAILED'; report.code = 'BROWSER_CLOSE_FAILED' } }
