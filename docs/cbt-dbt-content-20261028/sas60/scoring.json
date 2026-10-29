@@ -1,0 +1,32 @@
+{
+  "instrument": "Sociotropy-Autonomy Scale (SAS), 60-item 1983 form",
+  "item_count": 60,
+  "options": [0, 1, 2, 3, 4],
+  "dimensions": {
+    "soc_concern_disapproval": [50, 44, 38, 24, 11, 33, 29, 17, 27, 18],
+    "soc_attachment_separation": [31, 49, 34, 35, 4, 53, 40, 19, 26, 58, 59, 47, 8],
+    "soc_pleasing_others": [5, 1, 46, 7, 52, 15, 56],
+    "aut_individualistic_achievement": [60, 32, 14, 3, 12, 9, 30, 48, 45, 39, 20, 2],
+    "aut_mobility_freedom": [21, 55, 54, 13, 57, 41, 28, 23, 36, 43, 6, 22],
+    "aut_preference_solitude": [16, 42, 10, 37, 25, 51]
+  },
+  "totals": {
+    "sociotropy": [50, 44, 38, 24, 11, 33, 29, 17, 27, 18, 31, 49, 34, 35, 4, 53, 40, 19, 26, 58, 59, 47, 8, 5, 1, 46, 7, 52, 15, 56],
+    "autonomy": [60, 32, 14, 3, 12, 9, 30, 48, 45, 39, 20, 2, 21, 55, 54, 13, 57, 41, 28, 23, 36, 43, 6, 22, 16, 42, 10, 37, 25, 51]
+  },
+  "reverse_items": [],
+  "sum_ranges": {
+    "soc_concern_disapproval": [0, 40],
+    "soc_attachment_separation": [0, 52],
+    "soc_pleasing_others": [0, 28],
+    "aut_individualistic_achievement": [0, 48],
+    "aut_mobility_freedom": [0, 48],
+    "aut_preference_solitude": [0, 24],
+    "sociotropy": [0, 120],
+    "autonomy": [0, 120]
+  },
+  "mean_range": [0, 4],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "Scale composition per the factor-analytic article included in the same Beck Institute packet (Clark et al., Development of the Sociotropy-Autonomy Scale, Tables 2-3): Sociotropy = Concern About Disapproval (10) + Attachment/Concern About Separation (13) + Pleasing Others (7); Autonomy = Individualistic Achievement (12) + Mobility/Freedom From Control (12) + Preference for Solitude (6); the six subscales jointly cover all 60 items exactly once; no reverse items. Original anchors are percentages (0%/25%/50%/75%/100% of the time); product scores use the linear 0-4 equivalent (0%=0 ... 100%=4), recorded here for transparency."
+}
