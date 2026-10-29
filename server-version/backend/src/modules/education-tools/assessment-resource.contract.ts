@@ -1,3 +1,4 @@
+import {educationNativeBundleSchema} from '../bundle-product/education-identity'
 import {trainingFeedbackPolicySchema} from '../assessment-policy/training-feedback-policy'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -35,6 +36,7 @@ export const educationAssessmentOriginSchema=z.object({
   family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),
   sourceCompositeId:id,runtimeCompositeId:id,sourceSnapshotHash:digest,runtimeSnapshotHash:digest,runtimeDefinitionHash:digest,
   distribution:educationDistributionSchema,
+  nativeBundle:educationNativeBundleSchema.optional(),
   // Absent historical policy remains absent: do not change frozen origin hashes.
   feedbackPolicy:trainingFeedbackPolicySchema.optional(),
   units:z.array(unit).max(1000),

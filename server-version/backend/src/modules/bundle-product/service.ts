@@ -1,3 +1,6 @@
+import {readInstance,type BundleBindings} from './instance'
+export {readInstance} from './instance'
+export type {BundleBindings} from './instance'
 import { profileGradeForm } from '../assessment-bundle/profile/admission'
 import { assertPackageAdmission } from '../bundle-product/package-release'
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
@@ -8,36 +11,23 @@ import { z } from 'zod'
 import { canInstantiateConfig } from '../../services/materialGrant'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { encryptCognitivePayload, decryptCognitivePayload } from '../cognitive/cognitive.security'
+import { encryptCognitivePayload } from '../cognitive/cognitive.security'
 import { assertValidItem, publishComposite } from '../composite/composite.service'
 import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
 import { freezeDataForWrite, freezeAssignmentProfile } from '../cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { publishAssignmentMeasurementRelease } from '../cognitive/assignment-measurement-release'
-import { BundleDefinitionProvider, freezeBundleProductionDefinition, readFrozenBundleProductionDefinition } from './definition-provider'
+import { BundleDefinitionProvider, freezeBundleProductionDefinition } from './definition-provider'
 import { createCodeBundleDefinitionProvider } from './code-catalog'
 
 export type BundleActor = { userId: string; role: UserRole }
-export type BundleBindings = {
-  schemaVersion: 1
-  slots: Array<{ slotKey: string; itemId: string; unitType: string; scaleDisclosure?: EffectiveScaleDisclosureSnapshot }>
-  context: Array<{ contextKey: string; itemId: string; valueType: string }>
-}
 export const author = (actor: BundleActor) => {
   if (!['ADMIN', 'TEACHER'].includes(actor.role)) throw compositeForbidden()
 }
 export const owner = (actor: BundleActor, row: { createdBy: string | null }) => {
   author(actor)
   if (actor.role !== 'ADMIN' && row.createdBy !== actor.userId) throw compositeForbidden()
-}
-export function readInstance(row: { definitionEncrypted: string; definitionHash: string; bindingsEncrypted: string; bindingsHash: string }) {
-  const frozen = readFrozenBundleProductionDefinition(decryptCognitivePayload(row.definitionEncrypted))
-  const bindings = decryptCognitivePayload<BundleBindings>(row.bindingsEncrypted)
-  if (frozen.contentHash !== row.definitionHash || canonicalHash(bindings) !== row.bindingsHash || bindings.schemaVersion !== 1) {
-    throw compositeConflict('Bundle 冻结定义或绑定校验失败')
-  }
-  return { frozen, bindings }
 }
 const createSchema = z.object({
   requestId: z.string().guid(), bundleKey: z.string().min(1), bundleVersion: z.string().regex(/^\d+\.\d+\.\d+$/),

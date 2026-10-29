@@ -1,3 +1,4 @@
+import {isNativeBundleComposite} from '../bundle-product/runtime'
 import {prepareTrainingFinalReceipt} from '../composite/training-content-final'
 import { applyTrainingAttemptScope } from '../composite/training-variant-scope'
 import { resolveTrainingFlowScope } from '../composite/training-flow-scope'
@@ -1038,7 +1039,7 @@ const finalizeTrainingFlowCompositeUnified = async (attemptId: string, expected:
     assertReportJobIdentity(parent, expected)
     if (parent.status !== 'IN_PROGRESS') return terminalFromParent(parent)
     const assessment = parent.compositeAssessment
-    if (assessment.productKind === 'ASSESSMENT_BUNDLE' || parent.assignmentRef
+    if (isNativeBundleComposite(assessment) || parent.assignmentRef
       || [assessment.reportPackageKey, assessment.reportPackageVersion,
         assessment.reportPackageProfile, assessment.reportPackageSnapshotEncrypted].some(value => value != null)
       || parent.compiledBundleRuntimeHash != null) throw aggregateInputError('流程不能与报告包或关系测评混用')
@@ -1186,7 +1187,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
         || packageSnapshot.profile !== assessment.reportPackageProfile
       ) throw aggregateInputError('报告包实例与冻结快照不匹配')
     }
-    const nextCompiledBundleRuntimeHash = assessment.productKind === 'ASSESSMENT_BUNDLE'
+    const nextCompiledBundleRuntimeHash = isNativeBundleComposite(assessment)
       ? (assessment.bundleInstance ? bundleRuntimeHash(assessment.bundleInstance) : (() => { throw aggregateInputError('Bundle 实例缺失') })())
       : packageSnapshot
       ? compileBundleRuntimeFromSnapshot(packageSnapshot).compiledRuntimeHash
@@ -1284,7 +1285,7 @@ const persistCompositeCompletion = async (input: {
           trainingContentInterpretationEncrypted:content.encrypted,trainingContentInterpretationHash:content.hash}})
       }
 
-      const instance = input.parent.compositeAssessment?.productKind === 'ASSESSMENT_BUNDLE'
+      const instance = input.parent.compositeAssessment && isNativeBundleComposite(input.parent.compositeAssessment)
         ? input.parent.compositeAssessment.bundleInstance : null
       if (instance) {
         await tx.bundleAnalysis.upsert({
@@ -1584,7 +1585,7 @@ export const finalizeQuestionnaireAttemptUnifiedIfReady = async (assessmentId: s
 // Reads only canonical snapshots / declared Form facts; never raw child answers.
 export async function readCompletedCompositeBundleInputs(attemptId: string) {
   const parent = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: compositeParentGraphSelect as any }) as any
-  if (!parent || parent.status !== 'COMPLETED' || parent.compositeAssessment.productKind !== 'ASSESSMENT_BUNDLE') throw aggregateInputError('Bundle 尚未完成')
+  if (!parent || parent.status !== 'COMPLETED' || !isNativeBundleComposite(parent.compositeAssessment)) throw aggregateInputError('Bundle 尚未完成')
   const frozenSlots = await readFrozenSlotSet(parent)
   const headers = await loadSnapshotHeaders({ parentId: attemptId, attemptEpoch: parent.attemptEpoch, composite: true })
   const completeness = evaluateCompleteness({ slots: frozenSlots.slots, snapshots: headers, attemptEpoch: parent.attemptEpoch })

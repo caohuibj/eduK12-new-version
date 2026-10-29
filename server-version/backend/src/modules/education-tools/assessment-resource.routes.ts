@@ -4,6 +4,7 @@ import {asyncHandler} from '../../middleware/asyncHandler'
 import {success} from '../../utils/response'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {ContentReleaseError} from '../measurement-content/release'
+import {EducationNativeBundleError} from '../bundle-product/education-identity'
 import {EducationAssessmentSourceError} from './assessment-resource.repository'
 import {EducationAssessmentManagementError,type EducationAssessmentContext} from './assessment-resource.issuer'
 import * as service from './assessment-resource.service'
@@ -24,7 +25,7 @@ export function educationAssessmentResourceRouter(product:'SCHOOL'|'TEACHER',req
   catch(error){
    if(error instanceof z.ZodError)return res.status(400).json({code:'EDUCATION_ASSESSMENT_INPUT_INVALID',message:'测评资源参数无效',data:null})
    if(error instanceof ContentAuthorityError)return res.status(403).json({code:error.code,message:error.code,data:null})
-   if(error instanceof EducationAssessmentManagementError||error instanceof EducationAssessmentSourceError||error instanceof ContentReleaseError)
+   if(error instanceof EducationAssessmentManagementError||error instanceof EducationAssessmentSourceError||error instanceof ContentReleaseError||error instanceof EducationNativeBundleError)
     return res.status('statusCode' in error?Number(error.statusCode):409).json({code:error.code,message:error.code,data:null})
    throw error
   }

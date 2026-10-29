@@ -121,12 +121,12 @@ export async function processInitial(attemptId: string) {
   }
 }
 
-export async function readReport(attemptId: string, audience: BundleReportAudienceV1, analysisId?: string) {
-  const parent = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, include: { compositeAssessment: { include: { bundleInstance: true } } } })
+export async function readReport(attemptId: string, audience: BundleReportAudienceV1, analysisId?: string, db:Prisma.TransactionClient=prisma) {
+  const parent = await db.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, include: { compositeAssessment: { include: { bundleInstance: true } } } })
   const instance = parent?.compositeAssessment.bundleInstance
   if (!parent || !instance) throw compositeNotFound('Bundle 报告不存在')
-  const row = analysisId ? await prisma.bundleAnalysis.findFirst({ where: { id: analysisId, attemptId, attemptEpoch: parent.attemptEpoch } })
-    : await prisma.bundleAnalysis.findUnique({ where: { attemptId_attemptEpoch_requestKey: { attemptId, attemptEpoch: parent.attemptEpoch, requestKey: 'INITIAL' } } })
+  const row = analysisId ? await db.bundleAnalysis.findFirst({ where: { id: analysisId, attemptId, attemptEpoch: parent.attemptEpoch } })
+    : await db.bundleAnalysis.findUnique({ where: { attemptId_attemptEpoch_requestKey: { attemptId, attemptEpoch: parent.attemptEpoch, requestKey: 'INITIAL' } } })
   if (!row) throw compositeNotFound('分析记录不存在')
   const target = readFrozenBundleProductionDefinition(decryptCognitivePayload(row.targetDefinitionEncrypted))
   if (target.contentHash !== row.targetDefinitionHash) throw compositeConflict('报告定义校验失败')
@@ -136,7 +136,7 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
     if (canonicalHash(facts) !== row.factsHash || facts.identity.snapshotHash !== target.bundleSnapshot.snapshotHash) throw compositeConflict('报告快照校验失败')
     view = projectBundleAudienceView(facts, audience)
     const {bindings} = readInstance(instance)
-    const scaleAdmissions = await prisma.assessment.findMany({where:{compositeAttemptId:attemptId},select:{compositeItemId:true,runtimeSnapshotEncrypted:true}})
+    const scaleAdmissions = await db.assessment.findMany({where:{compositeAttemptId:attemptId},select:{compositeItemId:true,runtimeSnapshotEncrypted:true}})
     let restrictSummary = false
     const profilePolicies=new Map<string,DisclosureCapabilitiesV1|null>()
     for (const binding of bindings.slots.filter(slot => slot.unitType === 'SCALE')) {
@@ -147,7 +147,7 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
       try {
         if (!admission?.runtimeSnapshotEncrypted) policy = denyAllScaleProjectionPolicy()
         else {
-          const runtime = (await loadFrozenScaleRuntimeSnapshot(admission.runtimeSnapshotEncrypted))
+          const runtime = (await loadFrozenScaleRuntimeSnapshot(admission.runtimeSnapshotEncrypted,db))
           if (runtime.schemaVersion === 2) policy = scaleProjectionPolicyFromCompiled(runtime.compiledPolicy)
           frozenReportAudience=runtime.definition.report.audienceContract?.audience
         }

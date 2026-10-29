@@ -310,3 +310,56 @@ DOT已在原Notion CI清单增量写回PR388首轮CI-003并回读成功，source
 精确的单次浏览器安全启动已通过执行环境require_escalated正式审批并执行，/usr/bin/chromium、chromiumSandbox:true、TLS与owner/mode保持原值，about:blank成功、exit0。这只证明宿主原有沙箱能正常启动，不等于EVC页面验收；后续代表页面旅程将按同一正式执行权限机制单独提交。原受限环境失败保留。
 
 共享边界已获DOT协调：允许可选nativeBundle在组织聚合、个人报告和Survey冻结包中消费；整包身份/来源适配放专用Bundle adapter，默认旧行为不变，不修改角色或精确grant核心。继续在独立分支小提交推进；真实整包U仍须存在，不因接口未接通绕过。
+
+
+## 17. CI收敛、真实浏览器及School整包闭环
+
+第16节修复已提交并推送 `ce5d062b6708154c9ff94eb074e8303be960968b`。第二轮正式 [run40912998176](https://github.com/caohuibj/eduK12-new-version/actions/runs/40912998176) SUCCESS：实际选中的classify、backend compile、frontend lint/typecheck、mini-program smoke、maintenance、merge gate均成功；独立publication40912997055也成功。第一轮run40909139388的失败保留，累计一次后已收敛。这里是Draft light成功，不外推Ready完整资格。
+
+真实浏览器已通过两次独立正式require_escalated审批：先验证官方Chromium沙箱启动，再执行本地合成账号的cookie登录和已存报告。首次页面脚本错误等待training-login，本地127入口实际使用auth/login，尚未进行报告断言；保留首错并仅修正等待URL。最终实际完成P4中文概述、三轴原量尺SVG及表格、两份单项报告、无获准教育行动、键盘展开、重开同factsHash和390px无文档横向溢出；无页面异常。证据 `evc-browser-result.json`、desktop/mobile截图，source ce5d062b6，sandbox=true。TLS、helper owner/mode和文件安全设置未修改；这不是生产或School浏览器验收。
+
+### 本切片的生产接口与权限边界
+
+School沿**既有完整sourceComposite的material.distribute授权**接通，不冒充尚未进入main的P6公开包U目录。prepare已经核原整源和全部C/P/R授权，adapter随后保留完整Bundle定义密文，只重映射原slot/context的全部itemId，冻结definitionHash/sourceBindingsHash/bindingsHash。缺槽、混入额外槽、来源变化均拒绝。已有R、SELF、execution、开放时间、受试/答者和当前权限检查全部保留，单项不可读或核心metric未开放时综合画像WITHHELD。没有从年级推导身份/权限。
+
+共享改动清单：
+
+| 文件 | 实际最小变化 |
+|---|---|
+| `bundle-product/education-{identity,adapter}.ts` | 可选三hash身份、整包保留、人口适用检查、受限综合反馈投影；不颁发grant |
+| `bundle-product/instance.ts`、`service.ts` | 原readInstance及Bindings原样抽到纯模块，service兼容re-export，避免组织服务循环初始化 |
+| `education-tools/assessment-resource.{contract,source,service,repository}.ts` | 可选nativeBundle身份、完整绑定保存/读取校验；普通旧来源无新字段/新hash |
+| `education-tools/assessment-resource.routes.ts` | 识别专用身份错误；Teacher青少年模型400，绑定冲突409；不改角色判断 |
+| `bundle-product/runtime.ts`、`composite/composite.service.ts` | 只给确有BundleInstance的组织资源执行原包admission、编译身份和INITIAL处理 |
+| `assessment-runtime/unified-aggregate-finalizer.service.ts` | 原聚合完整性/FINAL路径识别上述native组织资源，持久化INITIAL；不另计单项分数 |
+| `bundle-product/analysis.ts` | readReport可选同事务DB参数，旧调用默认不变，避免嵌套全局连接池读取 |
+| `reporting/education-assessment-personal-report.service.ts` | 原权限后可选nativeBundle，仍输出前recheck；仅已开放核心单项进入综合反馈 |
+| `frontend/.../EducationAssessmentReport.tsx` | READY时增加只读中文BundleProfileSummary，沿用既有图表与方法说明 |
+
+保持B模型0.1.0、包/映射0.1.1、template0.1.0与原L1参数，仍标研究试验，未变年龄范围。Teacher成人SELF拒绝此youth模型，不把教师伪装学生。此adapter只输出package2 Profile反馈；其他旧包仍按原单项报告且综合WITHHELD，不宣称所有复杂包都已接通。
+
+### 新增定向证据与首错保留
+
+新增adapter4例PASS（完整映射/无改定义、拆混拒绝、单项/metric受限弃权、Teacher人口拒绝），UI1例PASS（READY展示、WITHHELD移除综合反馈）。自审错误状态改动后仅重跑该4例，exit0；未重跑原43+2。最终backend生产与新fixture类型闭包2311文件0诊断、exit0；frontend对应337文件0诊断。最初adapter的service动态加载形成TDZ/超时，已用纯instance抽取修复；首次便携夹具缺加密key已改成受控测试stub并恢复。保留原失败，未放宽断言。
+
+真实PG按正常签名发布原Bundle、独立C/R发布/组织资源register-review-publish、Campus身份/班级/名册/报名审批、正式run授权发布与START、年级FORM FINAL、两SCALE FINAL、原个人报告reader完成。新资源8c349460-8079-4954-a5e6-bf004a2e81b7，attempt1a7542f0-f6e9-4707-a87e-0e6a40d41a4a，P4 READY、actions=[]，factsHash `584f20b0a2df6e165331bbb2b6e0f3d5d990e213db05f045497737fa93c14122`。模型config hash仍87f889c9…40a3f。实际服务continuation PASS，不把此前setup失败或因缺opt-in跳过的执行算通过。
+
+前置首错依次是PERSONA_REQUIRED、CAMPUS_KEY_NOT_CONFIGURED、重复合成unit名、合成login超长、ROSTER_FROZEN、缺expectedVersion/expectedRunId；均在计分前，使用现有正常persona/capability/登记窗口/run版本接口修正，未直填审批状态或撤销断言。中途一次从仓库根启动Vitest exit127无测试，亦非通过。反复夹具补齐造成无效调用，已改为先完整静态类型/合同核对，再从已发布资源checkpoint继续，不重复C/P/R发布。新fixture文件明确区分完整安装、已发布资源续行和只读/重放验收。
+
+`education-native-saved-read`实际验证原受试者重开同factsHash、另一管理者拒绝、同submission FINAL幂等、1 INITIAL/3 snapshots；scoreScale和projectBundleReportFacts spy遇调用直接失败。随后自审修复同事务读参数，仅复验受影响读取/重放，PASS。未找到旧非native组织资源样本，legacyIdentityRead=false，不能声称这项真实旧组织历史验收通过。
+
+School新状态原生pg_dump2230414字节，SHA256 `461fb131e7a95eab20308170ff9c7865b345995171516fe6a44da162505b5dfd`，恢复独立 `eduk12_evc_school_restore_20261029_test`，pg_restore无错误。仅在恢复库以connection_limit=1运行保存结果读取/重放：PASS、另一actor拒绝、零新计分/画像调用、相同hash。单样本read793.28ms、CPU user362193/system39080μs、SQL event51、响应2334字节；不是p95或网络往返数。原测试库未覆盖，未访问生产。没有合格改前同条件baseline，不声称性能提高。
+
+### 当前入口矩阵和未执行项
+
+| 入口 | 此时实际能力与缺口 |
+|---|---|
+| Training/通用Bundle | 正规安装、发布、年级/两组件FINAL、单项+综合、HTTP重放、真实Chrome/移动宽度、持久化恢复已验；Draft正式CI已绿，Ready完整资格待办 |
+| School现有明确授权整源分发 | 本切片真实PG发布→Campus START/FINAL→单项及P4综合→异actor拒绝→单连接恢复读取/幂等已验；新UI定向合同已验，School实际浏览器NOTRUN |
+| Survey | 仍只有现有TEXT/METRIC/FORM_FIELD的组合报告合同，未有native Profile冻结/持久化/完整发布消费者，NOT_IMPLEMENTED；不能用BUNDLE枚举替代 |
+| Teacher | 青少年EVC B不适用于成人SELF，明确拒绝；本次未扩展科学年龄，也未声称另一个成人包已完整验收 |
+| P6公开整包U | 原候选仅preview/read；main公共U key尚不含NATIVE_RELEASE。未改通用授权核心、未merge任务1 WIP、不以叶工具许可替代整包U，NOT_IMPLEMENTED |
+
+PR388正文先前两次容量故障均已知未执行；此切片提交后按DOT最新授权先读回再仅有界重试一次。当前Ready路由仍是platform/legacy，真实required将涉及广泛默认套件；没有现成给本分支接纳这些本地应用证据的通用途径。不能通过skip、伪造gate或抢跑merge解决，不能把Draft green冒称Ready green。需在自然节点集中协调适用正式qualification范围，不为此创建新CI平台。
+
+最新已读main c52e1675fe7990ce49b42589d993fb12e8541ae1（PR389独立32份材料），没有改EVC两源或本切片消费者。提交后按正常merge对齐并回读，不改写已推历史。新输入将再执行实际受影响Draft正式检查；适用CI-001/003/006/019/020，原第一轮失败保留。未执行生产部署、GitHub APPROVE、保护修改或生产数据访问。
