@@ -45,6 +45,11 @@
       "relation": "CAMS-R 为单维总分特质正念工具，与 FFMQ 多侧面结构不同；同为特质层但结构不同，分数不互换比较。选项锚点差异已记录（GGSC 表未印锚点，OA 文献佐证 4 点）。"
     },
     {
+      "newFamily": "phlms20",
+      "existing": "ffmq39 / maas15 / cams_r12",
+      "relation": "PHLMS 两维（觉察/接纳）相互独立、不合成总分，与单维总分工具（MAAS/CAMS-R）和五侧面结构（FFMQ）测量取向不同；分数不互换比较。"
+    },
+    {
       "newFamily": "cmipq28_zh_cn",
       "existing": "ffmq39 / maas15 / ffmq15_zh_cn_research",
       "relation": "C-MIPQ 为家长正念养育自评（评价对象是家长与孩子的互动），与个体特质正念工具（FFMQ/MAAS）评价层次不同，分数不互换比较。"

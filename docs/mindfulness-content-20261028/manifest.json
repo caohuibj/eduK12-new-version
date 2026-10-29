@@ -4,12 +4,12 @@
   "actualDatabaseImport": false,
   "published": false,
   "ciTriggered": false,
-  "toolFamilies": 10,
-  "exactVersions": 6,
-  "executableDrafts": 6,
+  "toolFamilies": 11,
+  "exactVersions": 7,
+  "executableDrafts": 7,
   "catalogOnly": 4,
-  "nativeGoldenCases": 39,
-  "reportSamples": 6,
+  "nativeGoldenCases": 45,
+  "reportSamples": 7,
   "baseline": {
     "mainSha": "6203a829dc8d7de707e67f413acfa5a354a21e09",
     "contentBranchCompared": "content/dot-local-scales-20261025",
@@ -156,7 +156,7 @@
       "fullTextSource": "PENDING",
       "wordingAndScoring": "PENDING_FULL_CONTENT_IN_SOURCE",
       "report": "NOT_STARTED",
-      "gap": "原文 Frank, Jennings, & Greenberg (2016), Mindfulness 7(1), 155-163 为付费墙；MTS-C 论文（Li et al., 2019, PMC6651434, OA）核实为14题、五级（1=Never true…5=Always true）并经回译流程，但正文只印2个例题、无完整题表；土耳其版适配论文（hrpub）当前网络不可达。缺完整可验证题文，待取得原文或适配论文附录后导入。",
+      "gap": "原文 Frank, Jennings, & Greenberg (2016), Mindfulness 7(1), 155-163 为付费墙；已核实：14题、五级（1=Never…5=Always）、负向题反向后计分（PMC8443903 OA 逐字佐证）、MTS-C（PMC6651434）回译流程；土耳其版适配站点不可达。缺完整可验证题文，待取得原文或适配论文附录后导入。",
       "versions": [
         {
           "key": "mts_teacher14",
@@ -202,7 +202,27 @@
           "executable": false
         }
       ]
+    },
+    {
+      "family": "phlms20",
+      "name": "PHLMS（费城正念量表）",
+      "category": "成人正念特质自评（觉察/接纳两维）",
+      "fullTextSource": "https://greatergood.berkeley.edu/images/uploads/Cardaciotto-Mindfulness_on_Present_Moment_Awareness_and_Acceptance.pdf",
+      "wordingAndScoring": "PASS_WITH_RECORDED_GAP",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "19a5d71c1613b20233e8a473002537206cb91cd3",
+      "goldenCases": 6,
+      "gap": "题干与官方计分注（奇数直加/偶数反向求和、两维不合成总分）取自 GGSC 托管的原始论文 Table 1（逐字）；论文内锚点口径冲突（表注1–5 vs Study2正文0–4）按表注实现并如实记录；SAGE付费墙，再分发审查待定。",
+      "versions": [
+        {
+          "key": "phlms20",
+          "version": "1.0.0",
+          "itemCount": 20,
+          "locale": "en",
+          "executable": true
+        }
+      ]
     }
   ],
-  "structuralCheck": "scale:instruments:check PASS after regenerating onboarding/instruments.generated.ts (6 new instruments registered at source level; no DB import)"
+  "structuralCheck": "scale:instruments:check PASS after regenerating onboarding/instruments.generated.ts (7 new instruments registered at source level; no DB import)"
 }

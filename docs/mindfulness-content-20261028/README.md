@@ -1,6 +1,6 @@
 # 正念内容入库与验收记录｜2026-10-28
 
-10 个正念工具家族已登记，形成 6 个精确版本：6 个家族具备完整原生 DRAFT；另外 4 个家族保留 catalog-only（登记缺口，题文/许可/版本问题解决前不得施测）。不得把目录登记当作工具入库完成。
+11 个正念工具家族已登记，形成 7 个精确版本：7 个家族具备完整原生 DRAFT；另外 4 个家族保留 catalog-only（登记缺口，题文/许可/版本问题解决前不得施测）。不得把目录登记当作工具入库完成。
 
 每家族一个独立提交；语言、长短版和报告者版本不重复计为独立构念。全部为内容草稿：没有导入生产数据库、没有发布、没有开 PR、没有触发 CI；已在本分支内重生成 `scale:instruments:check` 所需的源级注册索引（`instruments.generated.ts`）并使该检查通过，仅此而已。
 
@@ -14,6 +14,7 @@
 | 4 | [MAAS-15](./maas15/) | 成人正念特质自评（单维频次） | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://ppc.sas.upenn.edu/sites/default/files/mindfulnessscale.pdf)（UPenn PPC） |
 | 5 | [CAMS-R](./cams_r12/) | 成人正念特质自评（单维总分） | 通过（锚点差异已记录）；原生DRAFT | 原生模板＋图文样稿 | [来源](https://ggsc.berkeley.edu/images/uploads/The_Cognitive_and_Affective_Mindfulness_Scale_%E2%80%93_Revised.pdf)（GGSC Berkeley） |
 | 6 | [TMS-13](./tms13/) | 练习后即时状态正念（两维） | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://www.rotman-baycrest.on.ca/files/publicationmodule/@random45f5724eba2f8/pid3280.pdf)（Lau 2006 论文附录） |
+| 7 | [PHLMS-20](./phlms20/) | 成人正念特质自评（觉察/接纳两维，独立不合成） | 通过（锚点口径冲突已记录）；原生DRAFT | 原生模板＋图文样稿 | [来源](https://greatergood.berkeley.edu/images/uploads/Cardaciotto-Mindfulness_on_Present_Moment_Awareness_and_Acceptance.pdf)（Cardaciotto 2008 论文） |
 | 7 | FMI（Walach 原版14题） | 成人正念特质自评 | 未通过：仅找到中文 FMI-12（周仁来/陈思佚），非原版；原版题本仍无可验证来源 | 未开始 | 待核 |
 | 8 | MTS（教学正念） | 教师正念自评 | 未通过：原文付费墙，缺完整题文（锚点已核实：五级 1=Never true…5=Always true） | 未开始 | 待核 |
 | 9 | [C-MIPQ](./mipq28_zh_cn/)（正念教养中文版） | 家长正念教养自评（两维） | 题文已具备（28题视转写+复核）；点数冲突（附录四点 vs Methods/Table4 五点）未裁定，catalog-only | 未开始 | [Front Psychol 2019](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.01847/full)（OA CC BY） |
@@ -21,7 +22,7 @@
 
 ## 版本与计分核验
 
-6 个可执行版本的 39 组原生 golden cases 全部通过（ffmq39×5、kims39×10、camm10×6、maas15×6、cams_r12×6、tms13×6）；6 份源记录以可验证来源逐字录入，工作副本 SHA-256 均记录于各家族 source.md；6 个原生记录均通过本分支 `scale:instruments:check`（重生成 `instruments.generated.ts` 后）。未运行与本次内容无关的全仓构建或数据库测试。
+7 个可执行版本的 45 组原生 golden cases 全部通过（ffmq39×5、kims39×10、camm10×6、maas15×6、cams_r12×6、tms13×6、phlms20×6）；7 份源记录以可验证来源逐字录入，工作副本 SHA-256 均记录于各家族 source.md；7 个原生记录均通过本分支 `scale:instruments:check`（重生成 `instruments.generated.ts` 后）。未运行与本次内容无关的全仓构建或数据库测试。
 
 - FFMQ-39：五侧面 8/8/8/8/7，官方计分表 19 道反向题（6−response）；PDF 计分表无总分行，故不设 total。
 - KIMS-39：四技能 12/8/10/9，18 道反向题；Observe 分维在原论文部分样本内部一致性偏低的已知情况仅陈述、不作裁定。
