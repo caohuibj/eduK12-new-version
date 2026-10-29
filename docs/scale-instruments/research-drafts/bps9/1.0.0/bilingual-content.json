@@ -1,0 +1,110 @@
+{
+  "identity": {
+    "instrumentKey": "bps9_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2014.00611/full",
+  "sourcePosition": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+  "originalAdministrationLanguage": "en",
+  "platformLocale": "zh-CN",
+  "independentWorkingTranslation": true,
+  "questions": [
+    {
+      "number": 1,
+      "itemCode": "BPS_01",
+      "platformChinese": "我上床的时间比原先打算的晚。",
+      "reverse": false,
+      "authorEnglish": "I go to bed later than I had intended."
+    },
+    {
+      "number": 2,
+      "itemCode": "BPS_02",
+      "platformChinese": "如果早上需要早起，我会早点上床。",
+      "reverse": true,
+      "authorEnglish": "I go to bed early if I have to get up early in the morning."
+    },
+    {
+      "number": 3,
+      "itemCode": "BPS_03",
+      "platformChinese": "晚上到了该关灯的时间，我会马上关灯。",
+      "reverse": true,
+      "authorEnglish": "If it is time to turn off the lights at night I do it immediately."
+    },
+    {
+      "number": 4,
+      "itemCode": "BPS_04",
+      "platformChinese": "到了该上床的时间，我常常还在做其他事情。",
+      "reverse": false,
+      "authorEnglish": "Often I am still doing other things when it is time to go to bed."
+    },
+    {
+      "number": 5,
+      "itemCode": "BPS_05",
+      "platformChinese": "当我其实想上床时，我很容易被其他事情分散注意。",
+      "reverse": false,
+      "authorEnglish": "I easily get distracted by things when I actually would like to go to bed."
+    },
+    {
+      "number": 6,
+      "itemCode": "BPS_06",
+      "platformChinese": "我没有按时上床。",
+      "reverse": false,
+      "authorEnglish": "I do not go to bed on time."
+    },
+    {
+      "number": 7,
+      "itemCode": "BPS_07",
+      "platformChinese": "我有固定的上床时间，也会照着这个时间做。",
+      "reverse": true,
+      "authorEnglish": "I have a regular bedtime which I keep to."
+    },
+    {
+      "number": 8,
+      "itemCode": "BPS_08",
+      "platformChinese": "我想按时上床，但就是没有做到。",
+      "reverse": false,
+      "authorEnglish": "I want to go to bed on time but I just don’t."
+    },
+    {
+      "number": 9,
+      "itemCode": "BPS_09",
+      "platformChinese": "到了该上床的时间，我能轻松停下手头的活动。",
+      "reverse": true,
+      "authorEnglish": "I can easily stop with my activities when it is time to go to bed."
+    }
+  ],
+  "sourceOptionLabels": [
+    "(almost) never",
+    null,
+    null,
+    null,
+    "(almost) always"
+  ],
+  "platformOptions": [
+    {
+      "value": "1",
+      "label": "（几乎）从不",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "2",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "3",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "4",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "（几乎）总是",
+      "score": 5
+    }
+  ]
+}

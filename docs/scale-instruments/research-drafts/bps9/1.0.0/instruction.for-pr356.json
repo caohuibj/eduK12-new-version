@@ -1,0 +1,15 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "identity": {
+    "instrumentKey": "bps9_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "instructionVersion": "1.0.0",
+    "title": "作答说明",
+    "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+    "locale": "zh-CN"
+  },
+  "note": "Prepared content only; adapt to the actual PR356 instruction schema before integration. Not included in current executable old-schema source."
+}

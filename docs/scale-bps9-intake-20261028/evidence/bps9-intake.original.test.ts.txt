@@ -1,0 +1,51 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { describe, expect, it } from 'vitest'
+import { SCALE_INSTRUMENT_REGISTRY, getScaleInstrumentSource, getScaleInstrumentValidation, resolveFrozenScaleInstructionForScale } from '../../../modules/scale/onboarding/instrument-registry'
+import { projectExternalScaleScores } from '../../../modules/scale/projection/serialization'
+import { parseScaleResultV2 } from '../../../modules/scale/scale-result'
+import { previewScaleInstrument } from '../../../modules/scale/onboarding/preview'
+
+const identity = { instrumentKey: 'bps9_zh_cn_research', instrumentVersion: '1.0.0' }
+const docs = resolve('../../docs/scale-instruments/research-drafts/bps9/1.0.0')
+
+describe('BPS9 existing instruction binding and selected intake', () => {
+  it('binds the exact prepared instruction into the current registered contract without approving manual review', () => {
+    const prepared = JSON.parse(readFileSync(resolve(docs, 'instruction.for-pr356.json'), 'utf8'))
+    const source = getScaleInstrumentSource(identity.instrumentKey, identity.instrumentVersion)!
+    expect(source.instruction).toMatchObject({ text: prepared.instruction.text, version: prepared.instruction.instructionVersion, language: prepared.instruction.locale })
+    expect(getScaleInstrumentValidation(identity.instrumentKey, identity.instrumentVersion)).toEqual({ valid: true, issues: [] })
+    expect(SCALE_INSTRUMENT_REGISTRY.listSources().filter(row => row.identity.instrumentKey === identity.instrumentKey)).toHaveLength(1)
+    expect(SCALE_INSTRUMENT_REGISTRY.getExecutable(identity.instrumentKey, identity.instrumentVersion)?.definition.items).toHaveLength(9)
+    expect(resolveFrozenScaleInstructionForScale({ code: identity.instrumentKey, instrumentVersion: identity.instrumentVersion, instrumentClass: 'STANDARD' })).toEqual({ text: prepared.instruction.text, version: '1.0.0', language: 'zh-CN', origin: 'INSTRUMENT_SOURCE' })
+    const preview = previewScaleInstrument({ ...identity, locale: 'zh-CN', territory: 'CN', deploymentModes: ['STANDALONE'] })
+    expect(preview.allowActivation).toBe(true)
+    expect(preview.blockers).toEqual([])
+    expect(preview.manualReview.localization).toContain('LOCALIZATION_REVIEW_PENDING')
+    expect(source.catalog.catalogStatus).toBe('CANDIDATE')
+    expect(source.catalog.scientificMaturity).toBe('PILOT')
+    expect(source.localization?.expertReviewStatus).toBe('PENDING')
+    expect(source.scientificReview).toBeUndefined()
+  })
+
+  it('consumes the retained synthetic report through the current result and public metadata protocol without rescoring it', () => {
+    // This fixed prior report is compatibility input, not a fresh scoring result.
+    const prior = parseScaleResultV2(JSON.parse(readFileSync(resolve(docs, 'report-result.synthetic.json'), 'utf8')))
+    const source = getScaleInstrumentSource(identity.instrumentKey, identity.instrumentVersion)!
+    expect(prior.instrument.code).toBe(identity.instrumentKey)
+    expect(prior.method.instrumentVersion).toBe('1.0.0')
+    expect(prior.method.scoringVersion).toBe(source.executable!.definition.scoring.scoringVersion)
+    expect(prior.method.reportVersion).toBe(source.executable!.definition.report.reportVersion)
+    expect(prior.interpretations[0].interpretation).toBe(source.executable!.definition.report.interpretations[0].summary)
+    const projected = projectExternalScaleScores(prior.scores)
+    expect(projected).toHaveLength(1)
+    expect(projected[0].range).toEqual({ min: 1, max: 5 })
+    expect(projected[0].expectedItems).toHaveLength(9)
+    expect(projected[0].answeredItems).toHaveLength(9)
+    expect(projected[0].description).toBe(source.executable!.definition.scoring.scores[0].description)
+    expect(projected[0].direction).toBe('higher_is_more')
+    expect(prior.references).toEqual([])
+    expect(prior.interpretations[0].label).toBeNull()
+    expect(prior.interpretations[0].referenceVersion).toBeNull()
+  })
+})

@@ -1,0 +1,36 @@
+{
+  "completed": true,
+  "database": "eduk12_bps9_518fa660de",
+  "commands": 6,
+  "assertions": 27,
+  "states": {
+    "scale": "PUBLISHED",
+    "visibility": "PUBLIC",
+    "deployment": "ACTIVE",
+    "audits": 1,
+    "entries": [
+      {
+        "product": "SURVEY",
+        "result": "ENTRY_POLICY_ALLOWED",
+        "scope": "actual transaction-scoped policy guard, not end-user grant or participant flow"
+      },
+      {
+        "product": "TRAINING",
+        "result": "REFUSED",
+        "name": "Error",
+        "message": "该精确版本未获本入口准入或已停止新增使用：TRAINING；TRAINING 入口尚未获准",
+        "scope": "actual Training new-entry guard; not chosen in allowedProducts"
+      },
+      {
+        "product": "SCHOOL",
+        "result": "NOT_EXECUTED",
+        "scope": "No organization adapter/distribution/real-user grant created. Existing CLI supports only TRAINING/SURVEY; prior ARS refusal evidence has unchanged shared backend inputs, not relabelled as BPS execution."
+      },
+      {
+        "product": "TEACHER",
+        "result": "NOT_EXECUTED",
+        "scope": "Same boundary; no claim of four-entry availability."
+      }
+    ]
+  }
+}

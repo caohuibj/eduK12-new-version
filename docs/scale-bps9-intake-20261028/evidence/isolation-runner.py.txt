@@ -1,0 +1,18 @@
+import os,json,pathlib,subprocess,urllib.parse,hashlib,gzip,datetime,sys
+root=pathlib.Path('/workspace/eduK12-new-version');backend=root/'server-version/backend';out=root/'docs/scale-bps9-intake-20261028/evidence'
+u=urllib.parse.urlsplit(os.environ['DATABASE_URL']);setup=json.load(open(out/'database-setup.json'));name=setup['database']
+assert setup['createdFresh'] and setup['schemaInitialized'] and u.hostname=='127.0.0.1' and u.port==55432 and name.startswith('eduk12_bps9_')
+env=dict(os.environ,DATABASE_URL=urllib.parse.urlunsplit((u.scheme,u.netloc,'/'+name,u.query,u.fragment)),NODE_ENV='test')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def snapshot():
+ paths={p for p in (backend/'src').rglob('*') if p.is_file()}
+ for f in ['package.json','package-lock.json','tsconfig.json','vitest.config.ts','prisma/schema.prisma','node_modules/.prisma/client/index.js','node_modules/.prisma/client/schema.prisma','node_modules/tsx/dist/cli.mjs','node_modules/vitest/vitest.mjs']:
+  p=backend/f
+  if p.is_file():paths.add(p)
+ return {str(p.relative_to(root)):sha(p) for p in sorted(paths)}
+before=snapshot();start=datetime.datetime.now(datetime.timezone.utc).isoformat();node=subprocess.check_output(['which','node'],text=True).strip();argv=[node,'node_modules/tsx/dist/cli.mjs','/tmp/bps9-isolated-cli.ts'];result=subprocess.run(argv,cwd=backend,env=env,capture_output=True);after=snapshot()
+for k,b in [('stdout',result.stdout),('stderr',result.stderr)]: (out/('integration.'+k+'.log')).write_bytes(b)
+raw=json.dumps({'before':before,'after':after},sort_keys=True,indent=2).encode()+b'\n';gz=gzip.compress(raw,mtime=0);(out/'integration.inputs.json.gz').write_bytes(gz)
+receipt={'argv':argv,'cwd':str(backend),'database':name,'startedAt':start,'endedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'processExitCode':result.returncode,'node':{'version':subprocess.check_output([node,'--version'],text=True).strip(),'sha256':sha(pathlib.Path(node))},'inputs':{'path':'integration.inputs.json.gz','count':len(before),'sha256':hashlib.sha256(gz).hexdigest(),'uncompressedSHA256':hashlib.sha256(raw).hexdigest(),'beforeAfterIdentical':before==after},'harnessSHA256':sha(pathlib.Path('/tmp/bps9-isolated-cli.ts')),'logs':{k:{'path':'integration.'+k+'.log','sha256':hashlib.sha256(b).hexdigest(),'bytes':len(b)} for k,b in [('stdout',result.stdout),('stderr',result.stderr)]},'limits':['No full dependency directory or process environment byte manifest; protected database credentials not logged.','CLI invocations have their own commands/exits and before-after business snapshots in isolation-report.json.']}
+(out/'integration-execution-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(result.stdout.decode(errors='replace')[-6000:]);print(result.stderr.decode(errors='replace')[-3000:]);print('integration actual exit',result.returncode,'inputs stable',before==after)
+sys.exit(result.returncode)

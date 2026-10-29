@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "contentCommit": "2c47978c7000f2049cb7ed089e6056a1bb511390",
+  "presentationApplicationCommit": "e4e1e1548c111db8141ca6724f3c22c813d41e62",
+  "supplementCommit": "9e13c19c6c52d848ba4ebcf6419a39f6fc093638",
+  "indexURL": "https://github.com/caohuibj/eduK12-new-version/blob/9e13c19c6c52d848ba4ebcf6419a39f6fc093638/docs/scale-content-batch1-20261028/presentation/supplement/index.json",
+  "phoneScreenshot": "https://github.com/caohuibj/eduK12-new-version/blob/9e13c19c6c52d848ba4ebcf6419a39f6fc093638/docs/scale-content-batch1-20261028/presentation/supplement/bps9-header-fix/bps9-390.png",
+  "tabletScreenshot": "https://github.com/caohuibj/eduK12-new-version/blob/9e13c19c6c52d848ba4ebcf6419a39f6fc093638/docs/scale-content-batch1-20261028/presentation/supplement/bps9-header-fix/bps9-820.png",
+  "meaning": "Actual Chromium rendering at390/820 of retained BPS9 synthetic audience-safe result fields in existing Scale presentation component after PR367 enhancement. Not a new scoring or real-person result.",
+  "outcomes": [
+    "BPS9 title corrected in fixture-only rerun, two affected views only; original screenshots retained",
+    "No horizontal overflow,9/9 displayed,no item identifiers,one mean1–5 range marker",
+    "No API/external page requests or browser page errors",
+    "Application/source/scoring/DB inputs were not changed or rerun for screenshots"
+  ],
+  "executionMode": "Existing managed cloud container browser launch configuration; Chromium internal sandbox false, no system-file or permission modification. See full original launch options and prior failed SUID attempt in supplementary index.",
+  "integrationDependency": "Presentation enhancement remains in independent Draft PR367; this BPS9 PR stays main-based and does not copy UI changes. Align actual main before final qualification.",
+  "remaining": "Root independent review and CI/Ready/merge/production not executed."
+}

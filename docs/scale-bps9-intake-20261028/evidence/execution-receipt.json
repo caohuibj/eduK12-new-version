@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "base": "642fda7ab754790686d6626efac62b73a332e663",
+  "node": {
+    "executable": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "execution": "cloud isolated process; no database or HTTP writes; login:false outer shell",
+  "checks": [
+    {
+      "id": "bps9-intake",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/scale/instruments/bps9-intake.test.ts",
+        "--reporter=json",
+        "--outputFile=/workspace/eduK12-new-version/docs/scale-bps9-intake-20261028/evidence/bps9-intake.json"
+      ],
+      "startedAt": "2026-10-28T01:20:28.046856+00:00",
+      "endedAt": "2026-10-28T01:20:29.468457+00:00",
+      "processExitCode": 1,
+      "inputs": {
+        "manifest": "bps9-intake.inputs.json.gz",
+        "compressedSha256": "f8bb0599e7c9da6a3a4f0ea5209acd8295a1f1ca5db189646e7cc1809f1b74c7",
+        "uncompressedSha256": "7b60d1fa94acadad3e7261e51d69fb10ea61298ec4351cbc5e9bac96121da115",
+        "uncompressedBytes": 892436,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "bps9-intake.stdout.log",
+          "sha256": "d22083556af1720d2da81ab6071f9041f8fa9f1e0d66dbf4ce8d8ff5027afa3a",
+          "bytes": 111
+        },
+        "stderr": {
+          "path": "bps9-intake.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    },
+    {
+      "id": "generated-index",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "scripts/generate-scale-instruments.ts",
+        "--check"
+      ],
+      "startedAt": "2026-10-28T01:20:29.845141+00:00",
+      "endedAt": "2026-10-28T01:20:29.983791+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "generated-index.inputs.json.gz",
+        "compressedSha256": "f8bb0599e7c9da6a3a4f0ea5209acd8295a1f1ca5db189646e7cc1809f1b74c7",
+        "uncompressedSha256": "7b60d1fa94acadad3e7261e51d69fb10ea61298ec4351cbc5e9bac96121da115",
+        "uncompressedBytes": 892436,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "generated-index.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "generated-index.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    }
+  ],
+  "scope": "One selected BPS9 source and retained report compatibility; no standalone golden replay, full catalog, build, types, database or CI",
+  "environment": {
+    "COGNITIVE_TEST_FIXTURES_ENABLED": "true (Vitest config)",
+    "credentials": "not retained; env values not printed"
+  },
+  "limits": [
+    "Source/config/tool hashes are contemporaneous; full installed dependency package bytes and process environment are not enumerated.",
+    "Snapshots include other backend source files solely as input evidence, not assertions that they executed."
+  ],
+  "outerToolExitCode": 1,
+  "outerExitEvidence": "Actual exec_command/write_stdin completion, login:false shell; recorded after completion"
+}
