@@ -10,6 +10,25 @@ const props={entry:'SCHOOL' as const,organizationId:'org',actorId:'author',toolI
 async function prepare(){await screen.findByText('当前量表没有申请记录。');fireEvent.click(screen.getByRole('button',{name:'准备此固定版本的入库申请'}));await screen.findByLabelText('量表名称')}
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals()})
 describe('private-scale application session',()=>{
+ it('freezes an explicit expert declaration in the same original request on unknown-result retry, without defaulting or editing an old version',async()=>{
+  const teacherPrepared={...prepared,product:'TEACHER',mediaManifest:{...mediaManifest,items:[]}},teacherRow={...row,product:'TEACHER'}
+  let writes=0
+  const api=vi.fn(async(path:string,method='GET')=>{
+   if(path.endsWith('/prepare'))return teacherPrepared
+   if(path.endsWith('/submissions')&&method==='POST'){if(++writes===1)throw Error('synthetic unknown confirmation');return teacherRow}
+   return {list:[],hasMore:false}
+  })
+  render(<EducationPrivateScaleSharing {...props} entry="TEACHER" api={api as PrivateToolApi}/>);await prepare()
+  const checkbox=screen.getByRole('checkbox',{name:'本次新固定版本另行声明适用于受邀专家观察教师个人'})
+  expect(checkbox).not.toBeChecked();fireEvent.click(checkbox)
+  fireEvent.click(screen.getByRole('button',{name:'提交此版本入库申请'}));await screen.findByText(/提交结果尚未确认/)
+  expect(checkbox).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'按原申请编号及内容重试'}));await screen.findByText(/入库申请已提交，等待管理员审核/)
+  const bodies=(api.mock.calls as unknown[][]).filter(([,method])=>method==='POST').slice(1).map(call=>call[2])
+  expect(bodies).toHaveLength(2);expect(bodies[1]).toBe(bodies[0])
+  expect(bodies[0]).toMatchObject({educationExpertApplicability:{schemaVersion:2,administrations:[{population:'TEACHER',responseMode:'EXPERT_REPORT',targetKind:'PERSON'}]}})
+  expect(bodies[0]).not.toHaveProperty('educationApplicability');expect(writes).toBe(2)
+ })
  it('locks editing and navigation after unknown submission, retries exactly the original body and request identity',async()=>{
   let writes=0
   const api=vi.fn(async(path:string,method='GET')=>{

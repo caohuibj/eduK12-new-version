@@ -8,9 +8,10 @@ import {educationStandardHeaderColumns,educationFormHeaderColumns,educationPubli
 import {assertContentGrantChain,type ContentGrant} from '../measurement-content/content-authority'
 import {educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
 import {educationCompositionResponseModeSchema,educationCompositionAdministrationForEntry} from './private-tool.composition-contracts'
+import {expertTargetKindSchema,supportsExpertSource,isNativeExpertObserver} from './expert-observation.contract'
 
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
-export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional()}).strict()
+export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
 type GrantRow={id:string;subject_id:string;issuer_id:string;product:'SCHOOL'|'TEACHER';scope_id:string;resource_keys:string[];
  valid_from:Date;expires_at:Date;read_at:Date;version:number;revoked_at:Date|null;parent_grant_id:string|null;ancestry:string[];
  capabilities:ContentGrant['capabilities'];delegable_capabilities:ContentGrant['capabilities'];remaining_delegation_depth:number}
@@ -50,7 +51,7 @@ export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:Priva
  * recheck exact use and current source state in their own write transaction. */
 export async function listEducationPublicSources(c:PrivateToolContext,raw:unknown){
  const input=educationPublicCatalogQuery.parse(raw)
- const administration=educationCompositionAdministrationForEntry(c.entry,input.responseMode)
+ const administration=educationCompositionAdministrationForEntry(c.entry,input.responseMode,input.targetKind)
  const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'STUDENT'
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
@@ -82,16 +83,18 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
   const selected=candidates.slice(0,40)
   return {list:selected.map(header=>{
    const declaration=header.kind==='FORM'?educationApplicabilitySchema.safeParse(header.applicability):null
-   const applicable=header.kind==='STANDARD_SCALE'?header.nativeAvailable&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes(respondent):declaration?.success&&declaration.data.administrations.some(a=>a.population===administration.population&&a.responseMode===administration.responseMode)
+   const applicable=administration.responseMode==='EXPERT_REPORT'?supportsExpertSource(header.expertApplicability,administration)
+    &&(header.kind==='FORM'||administration.targetKind==='PERSON'&&header.nativeAvailable&&isNativeExpertObserver(header.nativeRespondentType)&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes('OBSERVER')):
+    header.kind==='STANDARD_SCALE'?header.nativeAvailable&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes(respondent):declaration?.success&&declaration.data.administrations.some(a=>a.population===administration.population&&a.responseMode===administration.responseMode)
    const requiredContextKeys=educationPublicRequiredContextKeys(header)
-   const contextUnavailable=administration.responseMode==='STUDENT_REPORT'&&requiredContextKeys.length>0
+   const contextUnavailable=['STUDENT_REPORT','EXPERT_REPORT'].includes(administration.responseMode)&&requiredContextKeys.length>0
    return {
    catalogKey:header.key,kind:header.kind==='STANDARD_SCALE'?'SCALE':'FORM',sourceProvider:header.kind,sourceId:header.id,contentHash:header.hash,
    title:header.title,language:header.language,versions:header.versions,requiredContextKeys,referenceContextKeys:header.referenceContextKeys,sourceLabel:'获授权公共固定版本',
    allowedActions:applicable&&!contextUnavailable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':header.nativeAvailable?'CHECK_EXACT_STANDARD_AT_FREEZE':'NATIVE_UNAVAILABLE',canEditOriginal:false,canDistribute:false,
    ...(header.kind==='STANDARD_SCALE'&&!applicable?{unavailableReason:header.nativeAvailable?'该版本未声明支持当前作答方式。':'原生量表尚未安装或已停止使用；授权不会创建执行程序。'}:{}),
    ...(header.kind==='FORM'&&!applicable?{unavailableReason:'该固定版本未声明适用于当前问卷的施测方式。'}:{}),
-   ...(contextUnavailable?{unavailableReason:'该版本需要受评教师的个人背景才能计分，当前学生评教暂不支持。原版内容与参数保持不变。'}:{}),
+   ...(contextUnavailable?{unavailableReason:administration.responseMode==='EXPERT_REPORT'?'该版本需要受评教师的个人背景；当前专家观察不能用专家背景代替，原版内容与参数保持不变。':'该版本需要受评教师的个人背景才能计分，当前学生评教暂不支持。原版内容与参数保持不变。'}:{}),
   }}),nextCursor:candidates.length>40?selected.at(-1)!.key:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }

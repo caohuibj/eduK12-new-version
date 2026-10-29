@@ -1,5 +1,6 @@
 import {educationSubmissionSource} from './education-source'
 import type {FrozenEducationApplicability} from './education-applicability'
+import type {FrozenExpertApplicability} from '../education-tools/expert-observation.contract'
 import type {LibraryMediaManifest} from './media'
 import {Prisma} from '@prisma/client'
 import {getContentRelease,type StoredRelease} from '../measurement-content/repository'
@@ -10,7 +11,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {compileResearchScale} from '../survey/builder.compiler'
 import {assertSurveyDraft} from '../survey/builder.definition'
 import {fail,librarySourceProduct,type LibrarySourceProduct} from './contracts'
-export type LibrarySnapshot=FrozenEducationApplicability & {title:string;product:LibrarySourceProduct;instrumentClass:'CUSTOM_DESCRIPTIVE';definition:unknown;compiledDefinition:ScaleDefinitionV2;instruction?:string;snapshotOrigin?:'PUBLISHED_PROVENANCE'|'APPLICATION_CAPTURE';definitionHash?:string;mediaManifest?:LibraryMediaManifest;educationSource?:{toolId:string;versionId:string;entry:'SCHOOL'|'TEACHER';organizationId:string;contentHash:string}}
+export type LibrarySnapshot=FrozenEducationApplicability & FrozenExpertApplicability & {title:string;product:LibrarySourceProduct;instrumentClass:'CUSTOM_DESCRIPTIVE';definition:unknown;compiledDefinition:ScaleDefinitionV2;instruction?:string;snapshotOrigin?:'PUBLISHED_PROVENANCE'|'APPLICATION_CAPTURE';definitionHash?:string;mediaManifest?:LibraryMediaManifest;educationSource?:{toolId:string;versionId:string;entry:'SCHOOL'|'TEACHER';organizationId:string;contentHash:string}}
 export async function submissionSource(tx:Prisma.TransactionClient,actorId:string,product:LibrarySourceProduct,releaseId:string){
   librarySourceProduct.parse(product)
   const release=await getContentRelease(tx,releaseId,true)

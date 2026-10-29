@@ -82,6 +82,8 @@ export interface ScaleInstrumentSourceV1 {
   catalog: ScaleCatalogMetadataBodyV1
   localization?: ScaleLocalizationMetadataBodyV1
   applicability?: InstrumentApplicabilityV1
+  /** Explicit new education source version, independent from V1 roles. */
+  educationExpertApplicability?: import('../../education-tools/expert-observation.contract').ExpertSourceApplicability
   disclosure?: AudienceDisclosurePolicyV1
   usageRequirements?: InstrumentUsageRequirementsV1
   educationalFeedback?: EducationalFeedbackDefinitionV1

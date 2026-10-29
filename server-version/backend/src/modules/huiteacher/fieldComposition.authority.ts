@@ -21,7 +21,7 @@ function source(row:SourceRow):FieldSource{
  const ref=fieldAssessmentRefSchema.parse({schemaVersion:1,kind:'COMPOSITION',compositeId:row.compositeId,resourceKey:row.resourceKey,
   resourceVersion:'2.0.0',manifestHash:row.manifestHash,origin})
  if(row.creationHash!==canonicalHash(origin)||row.createdBy!==origin.ownerUserId||row.resourceKey!==educationCompositionKey(origin)
-  ||!Array.isArray(row.manifest)||!row.manifest.length||row.manifest.length>50||row.manifest.some(block=>block.sourceProvider!=='PRIVATE_VERSION')
+  ||!Array.isArray(row.manifest)||!row.manifest.length||row.manifest.length>50||row.manifest.some(block=>!['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE'].includes(block.sourceProvider))
   ||origin.targetKind!=='PERSON'&&row.manifest.some(block=>block.kind==='SCALE'))fieldFail('HUITEACHER_FIELD_SOURCE_INTEGRITY',409)
  return {ref,title:row.title,status:row.status,manifest:row.manifest,units:row.units}
 }

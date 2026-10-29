@@ -64,13 +64,19 @@ export async function createCanonicalFieldEvidence(tx:Tx,input:{recordId:string;
  if(scales.length){
   const children=await tx.assessment.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,status:'COMPLETED'}})
   const reader=await createStoredScaleFactsReader(children,tx),canonical=await loadStoredCanonicalUnitResults(scales.map(row=>row.canonicalResultEncrypted!),tx,[],reader)
-  const declarations=await tx.$queryRaw<Array<{itemId:string;audience:string|null;respondent:string|null;scores:Array<{key:string;label:string}>;allowed:string[]}>>(Prisma.sql`
-   SELECT b->'itemIds'->>0 AS "itemId",v.definition#>>'{report,audienceContract,audience}' AS audience,v.definition#>>'{report,audienceContract,respondent}' AS respondent,
-    (SELECT jsonb_agg(jsonb_build_object('key',s->>'key','label',s->>'label')) FROM jsonb_array_elements(v.definition#>'{scoring,scores}') s) AS scores,
-    ARRAY(SELECT jsonb_array_elements_text(v.definition#>'{report,scoreOrder}')) AS allowed
+  const declarations=await tx.$queryRaw<Array<{itemId:string;audience:string|null;respondent:string|null;scoresAllowed:boolean;scores:Array<{key:string;label:string}>;allowed:string[]}>>(Prisma.sql`
+   SELECT b->'itemIds'->>0 AS "itemId",fixed.definition#>>'{report,audienceContract,audience}' AS audience,fixed.definition#>>'{report,audienceContract,respondent}' AS respondent,
+    (SELECT jsonb_agg(jsonb_build_object('key',s->>'key','label',s->>'label')) FROM jsonb_array_elements(fixed.definition#>'{scoring,scores}') s) AS scores,
+    ARRAY(SELECT jsonb_array_elements_text(fixed.definition#>'{report,scoreOrder}')) AS allowed,
+    CASE WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN COALESCE((u#>>'{source,educationStandard,respondentDisclosure,numericScores}')::boolean,false) ELSE true END AS "scoresAllowed"
    FROM composite_assessments c CROSS JOIN LATERAL jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b
-   JOIN education_private_tool_versions v ON v.id=b->>'versionId' AND v.content_hash=b->>'contentHash' AND v.kind='SCALE'
-    AND v.definition->>'respondentType'='expert_report' WHERE c.id=${scope.assessmentRef.compositeId} AND b->>'kind'='SCALE'`)
+   JOIN LATERAL jsonb_array_elements(c.training_content_snapshot->'units') u ON u->>'itemId'=b->'itemIds'->>0
+   LEFT JOIN education_private_tool_versions v ON b->>'sourceProvider'='PRIVATE_VERSION' AND v.id=b->>'versionId' AND v.content_hash=b->>'contentHash' AND v.kind='SCALE'
+   LEFT JOIN survey_standard_releases std ON b->>'sourceProvider'='STANDARD_SCALE' AND std.id=b->>'versionId' AND std.combination_hash=b->>'contentHash'
+   LEFT JOIN scale_library_entries entry ON b->>'sourceProvider'='LIBRARY_SCALE' AND entry.id=b->>'versionId'
+   LEFT JOIN scale_library_submissions library ON library.id=entry.submission_id AND library.snapshot_hash=b->>'contentHash'
+   JOIN LATERAL (SELECT CASE b->>'sourceProvider' WHEN 'PRIVATE_VERSION' THEN v.definition WHEN 'STANDARD_SCALE' THEN std.snapshot->'definition' WHEN 'LIBRARY_SCALE' THEN library.snapshot->'compiledDefinition' END AS definition) fixed ON fixed.definition IS NOT NULL
+   WHERE c.id=${scope.assessmentRef.compositeId} AND b->>'kind'='SCALE'`)
   for(const [index,row] of scales.entries()){
    const child=children.find(child=>child.id===row.sourceAttemptId),result=canonical[index]
    if(!child||child.subjectUserId!==scope.subjectUserId||child.respondentUserId!==scope.respondentUserId||child.userId!==scope.respondentUserId
@@ -79,7 +85,7 @@ export async function createCanonicalFieldEvidence(tx:Tx,input:{recordId:string;
     ||result.persistenceProvenance.sourceAttemptId!==child.id||result.persistenceProvenance.sourceSubmissionId!==child.submissionId)fieldFail('HUITEACHER_FIELD_FINAL_INTEGRITY',409)
    const declaration=declarations.find(declaration=>declaration.itemId===child.compositeItemId)
    if(!declaration)fieldFail('HUITEACHER_FIELD_FINAL_INTEGRITY',409)
-   const visible=declaration.audience==='teacher'&&declaration.respondent==='OBSERVER_REPORT'
+   const visible=declaration.scoresAllowed&&declaration.audience==='teacher'&&declaration.respondent==='OBSERVER_REPORT'
    const metrics=visible?declaration.scores.filter(score=>declaration.allowed.includes(score.key)).map(score=>{
     const metric=result.core.metrics.find(metric=>metric.key===score.key)
     if(!metric||metric.value!==null&&(typeof metric.value!=='number'||!Number.isFinite(metric.value)))fieldFail('HUITEACHER_FIELD_FINAL_INTEGRITY',409)

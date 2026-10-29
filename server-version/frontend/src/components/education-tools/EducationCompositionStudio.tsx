@@ -105,18 +105,19 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  }
  const block=preview?tool?.definition.blocks[previewIndex]:undefined
  const responseMode=tool?.definition.administration.responseMode??'SELF'
- const sourceViewActual=responseMode==='EXPERT_REPORT'?'PRIVATE':sourceView
+ const sourceViewActual=sourceView
+ const targetKind=tool?.definition.administration.responseMode==='EXPERT_REPORT'?tool.definition.administration.targetKind:undefined
  const reference=block?references.find(row=>row.sourceProvider===block.source.provider&&row.id===block.source.versionId&&row.contentHash===block.source.contentHash):undefined
  useEffect(()=>{
   let current=true;setPreviewTool(null);setPreviewError('');setPreviewInstruction('');setAnswers({})
   if(block&&reference)void api<{id:string;kind:'SCALE'|'FORM';title:string;contentHash:string;definition:PrivateTool['definition'];instruction?:string}>(
-   reference.sourceProvider==='PRIVATE_VERSION'?`${base}/${reference.toolId}/versions/${block.source.versionId}`:reference.sourceProvider==='PUBLIC_FORM'?publicFormPreviewPath(organizationId,reference.id,reference.contentHash,responseMode):reference.sourceProvider==='LIBRARY_SCALE'?libraryScalePreviewPath(organizationId,reference.id,reference.contentHash,responseMode):publicStandardPreviewPath(organizationId,reference.id,reference.contentHash,responseMode))
+   reference.sourceProvider==='PRIVATE_VERSION'?`${base}/${reference.toolId}/versions/${block.source.versionId}`:reference.sourceProvider==='PUBLIC_FORM'?publicFormPreviewPath(organizationId,reference.id,reference.contentHash,responseMode,targetKind):reference.sourceProvider==='LIBRARY_SCALE'?libraryScalePreviewPath(organizationId,reference.id,reference.contentHash,responseMode,targetKind):publicStandardPreviewPath(organizationId,reference.id,reference.contentHash,responseMode,targetKind))
    .then(value=>{if(current){
     if(value.id!==block.source.versionId||value.contentHash!==block.source.contentHash||value.kind!==block.source.kind)throw new Error('固定工具身份已不匹配。')
     setPreviewTool({id:reference.sourceProvider==='PRIVATE_VERSION'?reference.toolId:reference.id,title:value.title,kind:value.kind,definition:value.definition});setPreviewInstruction(value.instruction??'')
    }}).catch(reason=>{if(current)setPreviewError(privateToolError(reason))})
   return()=>{current=false}
- },[api,base,organizationId,block,reference,responseMode])
+ },[api,base,organizationId,block,reference,responseMode,targetKind])
  const previewToolId=previewTool?.id
  const publicMedia=useMemo(()=>block&&block.source.provider!=='PRIVATE_VERSION'?educationPublicFormPreviewMedia({api,entry,organizationId,actorId,versionId:block.source.versionId,contentHash:block.source.contentHash,provider:block.source.provider}):undefined,
   [api,entry,organizationId,actorId,block?.source.provider,block?.source.versionId,block?.source.contentHash])
@@ -154,7 +155,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
     setReferences([]);setAnswers({});change({definition:{...tool.definition,administration,blocks:[]}})
    }}>{[['PERSON','教师个人'],['TEAM','团队'],['ORGANIZATION','组织'],['ACTIVITY','活动'],['ARTIFACT','作品'],['PROJECT','项目']].map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
     <p>专家按接受的活动邀请观察真实目标。量表须在原固定版本中明确声明专家观察，且只用于教师个人；其他目标只用表单。正式证据与被评教师可见反馈分别授权。</p>
-    <p>当前专家合同仅接入本人固定来源；已有公共来源的自评或其他他评声明不能直接替代专家声明。</p></div>}
+    <p>公共和共用工具须有匹配本次目标的显式专家观察声明，并已获授权；已有自评或其他他评声明不能代替。</p></div>}
    <fieldset disabled={busy||responseMode==='STUDENT_REPORT'||responseMode==='EXPERT_REPORT'}><legend>背景信息区段</legend><p>按所选工具的原版适用范围配置；勾选后会作为问卷第一屏展示并固定。未勾选时不会增加背景页。</p>
     {(['gradeLevel','birthYearMonth','sexAtBirth','primaryLanguage','countryOrRegion'] as AssessmentContextKey[]).map(key=>{
      const labels=assessmentContextLabels
@@ -165,11 +166,12 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
      }}/>{labels[key]}</label>
     })}
    </fieldset>
-   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceViewActual==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" disabled={responseMode==='EXPERT_REPORT'} aria-pressed={sourceViewActual==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button><button type="button" disabled={responseMode==='EXPERT_REPORT'} aria-pressed={sourceViewActual==='STANDARD_SCALE'} onClick={()=>setSourceView('STANDARD_SCALE')}>获授权公共量表</button><button type="button" disabled={responseMode==='EXPERT_REPORT'} aria-pressed={sourceViewActual==='LIBRARY_SCALE'} onClick={()=>setSourceView('LIBRARY_SCALE')}>获授权共用量表</button></nav>
+   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceViewActual==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" aria-pressed={sourceViewActual==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button><button type="button" aria-pressed={sourceViewActual==='STANDARD_SCALE'} onClick={()=>setSourceView('STANDARD_SCALE')}>获授权公共量表</button><button type="button" aria-pressed={sourceViewActual==='LIBRARY_SCALE'} onClick={()=>setSourceView('LIBRARY_SCALE')}>获授权共用量表</button></nav>
     {sourceViewActual==='PRIVATE'?<EducationPrivateVersionChooser key={tool.id+':'+responseMode+':'+(tool.definition.administration.responseMode==='EXPERT_REPORT'?tool.definition.administration.targetKind:'')} api={api} organizationId={organizationId} disabled={busy||tool.definition.blocks.length>=50}
      onSelect={value=>{if(value.kind==='COMPOSITION')return;if(value.kind==='SCALE'&&tool.definition.administration.responseMode==='EXPERT_REPORT'&&tool.definition.administration.targetKind!=='PERSON'){setError('非人员观察目标只支持表单');return}const leaf={...value,kind:value.kind,sourceProvider:'PRIVATE_VERSION' as const};setReferences(old=>mergeReferences(old,[leaf]));change({definition:{...tool.definition,blocks:[...tool.definition.blocks,
       {blockId:crypto.randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:value.kind,versionId:value.id,contentHash:value.contentHash}}]}})}}/>:
-     <EducationPublicFormChooser key={sourceViewActual+':'+responseMode} kind={sourceViewActual==='PUBLIC_FORM'?'FORM':'SCALE'} catalog={sourceViewActual==='LIBRARY_SCALE'?'LIBRARY':'PUBLIC'} responseMode={responseMode} api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
+     <EducationPublicFormChooser key={sourceViewActual+':'+responseMode} kind={sourceViewActual==='PUBLIC_FORM'?'FORM':'SCALE'} catalog={sourceViewActual==='LIBRARY_SCALE'?'LIBRARY':'PUBLIC'} responseMode={responseMode} targetKind={targetKind} api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
+      if(value.kind==='SCALE'&&targetKind&&targetKind!=='PERSON'){setError('非人员观察目标只支持表单');return}
       const provider=value.sourceProvider==='LIBRARY_SCALE'?'LIBRARY_SCALE' as const:value.kind==='SCALE'?'STANDARD_SCALE' as const:'PUBLIC_FORM' as const
       setReferences(old=>mergeReferences(old,[{id:value.sourceId,sourceProvider:provider,kind:value.kind,title:value.title,contentHash:value.contentHash,version:value.versions.content,versions:value.versions,requiredContextKeys:value.requiredContextKeys}]))
       change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source:value.sourceProvider==='LIBRARY_SCALE'?{provider:'LIBRARY_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:value.kind==='SCALE'?{provider:'STANDARD_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:{provider:'PUBLIC_FORM',kind:'FORM',versionId:value.sourceId,contentHash:value.contentHash}}]}})

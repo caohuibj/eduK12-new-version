@@ -16,6 +16,18 @@ import observerRouter from '../../modules/huiteacher/observer.routes'
 import {generateToken} from '../../utils/jwt'
 import {csrfProtection} from '../../middleware/csrf'
 import {HUITEACHER_AUTH_COOKIE_NAME,HUITEACHER_CSRF_COOKIE_NAME,CSRF_HEADER_NAME} from '../../utils/authCookies'
+import {preparePrivateScaleSharing,submitPrivateScaleSharing} from '../../modules/education-tools/private-tool.sharing.service'
+import {review as reviewLibrary} from '../../modules/scale-library-governance/service'
+import {grantEducationPublicUseInTransaction} from '../../modules/scale-library-governance/education-distribution-public'
+import {revokeUse} from '../../modules/scale-library-governance/distribution'
+import {createDraft,updateDraft} from '../../modules/survey/builder.service'
+import {submitOwnedSurveyTool,approveGovernedTool} from '../../modules/survey/governed-tool.service'
+import {issueAdminContentRoot,revokeAdminContentGrant} from '../../modules/measurement-content/admin-authority.service'
+import {educationPublicSourceKey} from '../../modules/education-tools/public-source.identity'
+import {listEducationPublicSources} from '../../modules/education-tools/public-source.catalog'
+import {listEducationLibrarySources} from '../../modules/education-tools/library-source.catalog'
+import {readEducationPublicFormPreview} from '../../modules/education-tools/public-source.preview'
+import {readEducationLibraryScalePreview} from '../../modules/education-tools/library-source.preview'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 // R executes this on the migrated disposable real PG. No production access,
 // fake relational assignment or test-only execution protocol is introduced.
@@ -23,6 +35,7 @@ suite('Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL)'
  let server:Server,base:string
  beforeAll(async()=>{
   requireIsolatedReleaseDatabase(url!);vi.stubEnv('DATA_ENCRYPTION_KEY',process.env.DATA_ENCRYPTION_KEY??'55'.repeat(32))
+  vi.stubEnv('SURVEY_WORKSPACE_ENABLED','true');vi.stubEnv('SURVEY_PUBLICATION_ENABLED','true')
   const app=express();app.use(express.json());app.use('/api',csrfProtection)
   app.use('/api/huiteacher/field-assessments',fieldRouter);app.use('/api/huiteacher',fieldFormRouter,observerRouter)
   app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.statusCode??500).json({code:error.code,message:error.message}))
@@ -36,7 +49,7 @@ suite('Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL)'
   const response=await fetch(base+path,{method:body===undefined?'GET':'POST',headers:{'content-type':'application/json',cookie:`${HUITEACHER_AUTH_COOKIE_NAME}=${token}; ${HUITEACHER_CSRF_COOKIE_NAME}=${csrf}`,[CSRF_HEADER_NAME]:csrf},...(body===undefined?{}:{body:JSON.stringify(body)})})
   const value:any=await response.json();return {status:response.status,value,data:value.data}
  }
- it('uses a real invited expert and actual teacher target, rejects stale authority, links canonical completion atomically and releases only explicit opinion text',async()=>{
+ it.each(['PRIVATE','PUBLIC_LIBRARY'] as const)('%s uses the actual expert/teacher, exact frozen source, current U at NEW entry and independently audited evidence',async provider=>{
   const makeUser=()=>db.user.create({data:{username:'p4_'+randomUUID().replace(/-/g,''),passwordHash:'synthetic-only',accountDomain:'SCHOOL',role:'TEACHER',teacherApproved:true}})
   const [manager,teacher,expert,outsider]=await Promise.all([makeUser(),makeUser(),makeUser(),makeUser()])
   const org=await db.organization.create({data:{id:randomUUID(),name:'Synthetic P4 '+randomUUID(),productDomain:'SCHOOL',createdByUserId:manager.id}})
@@ -58,8 +71,39 @@ suite('Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL)'
   // New authored native source declaration, before freeze; never relabel a V1
   // publication or extend the shared Survey SELF draft contract.
   native.respondentType='expert_report';native.report.audienceContract={schemaVersion:1,respondent:'OBSERVER_REPORT',audience:'teacher',locale:'zh-CN'}
-  const [scale,form]=[await fixed('SCALE','Expert support',native),await fixed('FORM','Professional observations',{schemaVersion:2,pages:[{pageKey:'p',title:'观察证据',questions:[{itemKey:'comment',type:'LONG_TEXT',prompt:'正式专家证据',required:true,options:[],rows:[],maxLength:120}]}]})]
-  const composition=await fixed('COMPOSITION','Expert ordinary questionnaire',{schemaVersion:2,adapterVersion:'2.0.0',administration:{population:'TEACHER',responseMode:'EXPERT_REPORT',targetKind:'PERSON'},instruction:'观察本次已核验教师',blocks:[scale,form].map(version=>({blockId:randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:version.kind,versionId:version.id,contentHash:version.contentHash}}))})
+  const formDefinition={schemaVersion:2,pages:[{pageKey:'p',title:'观察证据',questions:[{itemKey:'comment',type:'LONG_TEXT',prompt:'正式专家证据',required:true,options:[],rows:[],maxLength:120}]}]}
+  const [scale,form]=[await fixed('SCALE','Expert support',native),await fixed('FORM','Professional observations',formDefinition)]
+  let sources=[scale,form].map(version=>({provider:'PRIVATE_VERSION',kind:version.kind,versionId:version.id,contentHash:version.contentHash})),revokeSources:undefined|(()=>Promise<void>)
+  if(provider==='PUBLIC_LIBRARY'){
+   const system=await db.user.create({data:{username:'p4_sys_'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',role:'ADMIN',platformRole:'SYSTEM_ADMIN'}})
+   const expertApplicability={schemaVersion:2,administrations:[{population:'TEACHER',responseMode:'EXPERT_REPORT',targetKind:'PERSON'}]},proof=()=>({tokenVersion:system.tokenVersion,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:'synthetic-p4-public-source'})
+   const prepared=await preparePrivateScaleSharing(context,scale.toolId,scale.id,{contentHash:scale.contentHash})
+   const application=await submitPrivateScaleSharing(context,scale.toolId,scale.id,{requestId:randomUUID(),contentHash:scale.contentHash,releaseId:prepared.releaseId,educationExpertApplicability:expertApplicability,
+    metadata:{title:'Synthetic expert library',author:'Synthetic expert author',copyright:'Self authored and shared for bound use',applicability:'Expert observation of Teacher PERSON only',scoringDescription:'Fixed independent descriptive mean',reportDescription:'Fixed observer descriptive report only'}})
+   const approved=await reviewLibrary(system.id,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic explicit expert source',allowedProducts:['TRAINING']})
+   const entryId=approved.entryId!,libraryGrant=await db.$transaction(tx=>grantEducationPublicUseInTransaction(tx,system.id,entryId,{requestId:randomUUID(),releaseId:prepared.releaseId,contentHash:prepared.contentHash,
+    product:'TEACHER',organizationId:org.id,scopeKind:'USER',userId:manager.id}))
+   const author=await db.user.create({data:{username:'p4_pub_'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'SURVEY'}}),login='p4'+randomUUID().replace(/-/g,'').slice(0,18)
+   await db.surveyAccount.create({data:{userId:author.id,loginName:login,normalizedLogin:login}})
+   await db.surveyResearcherGrant.create({data:{userId:author.id,status:'ACTIVE',grantedBy:system.id}});await db.surveyMfaCredential.create({data:{userId:author.id,enabled:true,secretCipher:'synthetic'}})
+   const project=await db.surveyProject.create({data:{id:randomUUID(),ownerUserId:author.id,title:'P4 synthetic expert public Form',collectionMode:'SINGLE_UNLINKED'}})
+   const draft=await createDraft(author.id,project.id,{requestId:randomUUID(),instrumentKey:'expertform',kind:'FORM',title:'Public expert Form'}),saved=await updateDraft(author.id,project.id,draft.id,{revision:draft.revision,title:draft.title,definition:formDefinition})
+   const publicForm=await submitOwnedSurveyTool(author.id,project.id,draft.id,{requestId:randomUUID(),revision:saved.revision,version:'expert-form-v2',statement:'Synthetic explicit author share',reference:{educationExpertApplicability:expertApplicability,language:'zh-CN'}})
+   expect((await approveGovernedTool(system.id,publicForm.id,{expectedVersion:publicForm.version,hash:publicForm.hash,decision:'APPROVE',reason:'Synthetic fixed expert Form',allowedProducts:['SURVEY']},proof())).state).toBe('ONLINE')
+   const publicGrant=await issueAdminContentRoot(system.id,proof(),{requestId:randomUUID(),expectedVersion:0,reason:'Synthetic exact expert Form U',grant:{subjectId:manager.id,
+    scope:{product:'TEACHER',scopeKind:'ORGANIZATION',scopeId:org.id,resourceKind:'material',resourceKeys:[educationPublicSourceKey({kind:'FORM',id:publicForm.id,hash:publicForm.hash})]},capabilities:['material.use'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60000).toISOString(),expiresAt:new Date(Date.now()+3600_000).toISOString()}})
+   const library=await db.scaleLibrarySubmission.findUniqueOrThrow({where:{id:application.id},select:{snapshotHash:true}})
+   sources=[{provider:'LIBRARY_SCALE',kind:'SCALE',versionId:entryId,contentHash:library.snapshotHash},{provider:'PUBLIC_FORM',kind:'FORM',versionId:publicForm.id,contentHash:publicForm.hash}]
+   const filter={responseMode:'EXPERT_REPORT',targetKind:'PERSON'}
+   expect((await listEducationLibrarySources(context,filter)).list).toEqual(expect.arrayContaining([expect.objectContaining({sourceId:entryId,allowedActions:['REFERENCE_FIXED_VERSION']})]))
+   expect((await listEducationPublicSources(context,{...filter,kind:'FORM'})).list).toEqual(expect.arrayContaining([expect.objectContaining({sourceId:publicForm.id,allowedActions:['REFERENCE_FIXED_VERSION']})]))
+   expect((await readEducationPublicFormPreview(context,publicForm.id,publicForm.hash,'EXPERT_REPORT','PERSON')).definition).toMatchObject(formDefinition)
+   expect((await readEducationLibraryScalePreview(context,entryId,library.snapshotHash,'EXPERT_REPORT','PERSON')).kind).toBe('SCALE')
+   expect((await listEducationLibrarySources(context,{responseMode:'EXPERT_REPORT',targetKind:'TEAM'})).list.find(row=>row.sourceId===entryId)?.allowedActions).toEqual([])
+   await expect(readEducationPublicFormPreview(context,publicForm.id,publicForm.hash,'EXPERT_REPORT','TEAM')).rejects.toThrow('PUBLIC_FORM_EXPERT_DECLARATION_REQUIRED')
+   revokeSources=async()=>{await revokeUse(system.id,libraryGrant.id,{expectedVersion:1,reason:'Synthetic no new expert library starts'});await revokeAdminContentGrant(system.id,proof(),publicGrant.grantId,{expectedVersion:1,reason:'Synthetic no new expert public Form starts'})}
+  }
+  const composition=await fixed('COMPOSITION','Expert ordinary questionnaire',{schemaVersion:2,adapterVersion:'2.0.0',administration:{population:'TEACHER',responseMode:'EXPERT_REPORT',targetKind:'PERSON'},instruction:'观察本次已核验教师',blocks:sources.map(source=>({blockId:randomUUID(),instruction:'',source}))})
   const campaign={organizationId:org.id,eventId:event.id,actorUserId:manager.id},binding={...campaign,privateComposition:{versionId:composition.id,contentHash:composition.contentHash}}
   await expect(bindFieldComposition({...binding,privateComposition:{...binding.privateComposition,contentHash:'f'.repeat(64)}})).rejects.toThrow()
   await expect(bindFieldComposition({...binding,actorUserId:expert.id})).rejects.toThrow()
@@ -88,6 +132,12 @@ suite('Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL)'
   const next=await request(expert.id,startPath,{});expect(next.status,JSON.stringify(next.value)).toBe(200)
   const parent=next.data.attemptId,path='/field-assessments/assessment-composite-attempts/'+parent
   expect(parent).not.toBe(oldParent);expect((await request(expert.id,oldPath)).status).toBe(409)
+  if(revokeSources){
+   const fresh=await inviteHuiteacherObserver({...campaign,observerUserId:outsider.id,role:'EXPERT',expiresAt:new Date(Date.now()+3600_000)})
+   await acceptHuiteacherObserver({userId:outsider.id,invitationId:fresh.id});await revokeSources()
+   expect((await request(outsider.id,'/field-assessments/invitations/'+fresh.id+'/start',{})).status).toBe(403)
+   expect((await request(expert.id,startPath,{})).data).toMatchObject({attemptId:parent,replayed:true})
+  }
   expect((await request(teacher.id,path)).status).toBe(403)
   const note=await createHuiteacherObservation({organizationId:org.id,eventId:event.id,actorUserId:expert.id,kind:'FORMAL_FEEDBACK',content:'Explicitly released professional opinion'})
   const privateNote=await createHuiteacherObservation({organizationId:org.id,eventId:event.id,actorUserId:expert.id,kind:'PRIVATE_REFLECTION',content:'PRIVATE expert reflection'})

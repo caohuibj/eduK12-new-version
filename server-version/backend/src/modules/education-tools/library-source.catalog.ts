@@ -8,16 +8,22 @@ import {ScaleLibraryError} from '../scale-library-governance/contracts'
 import {AdminPermissionError} from '../admin-permissions/service'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {educationCompositionResponseModeSchema,educationCompositionAdministrationForEntry} from './private-tool.composition-contracts'
+import {expertTargetKindSchema} from './expert-observation.contract'
 
-export const educationLibraryCatalogQuery=z.object({cursor:z.string().guid().optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional()}).strict()
+export const educationLibraryCatalogQuery=z.object({cursor:z.string().guid().optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
 type Header={entryId:string;releaseId:string;contentHash:string;snapshotHash:string;title:string;sourceProduct:string;version:string;
  language:string|null;nativeReportVersion:string|null;compatible:boolean;dependencies:Array<{releaseId:string;contentHash:string;layer:string;version:string}>}
-const libraryHeaderFields=(entry:'SCHOOL'|'TEACHER',responseMode:unknown='SELF')=>Prisma.sql`e.id AS "entryId",e.release_id AS "releaseId",m.content_hash AS "contentHash",
+const libraryHeaderFields=(entry:'SCHOOL'|'TEACHER',responseMode:unknown='SELF',targetKind?:unknown)=>Prisma.sql`e.id AS "entryId",e.release_id AS "releaseId",m.content_hash AS "contentHash",
  s.snapshot_hash AS "snapshotHash",s.snapshot->>'title' AS title,s.product AS "sourceProduct",m.version,
  s.snapshot#>>'{compiledDefinition,versionAxes,locale}' AS language,s.snapshot#>>'{compiledDefinition,report,reportVersion}' AS "nativeReportVersion",
  (cardinality(s.dependency_release_ids)=0 AND s.snapshot#>>'{compiledDefinition,referencePolicy,type}'='none'
-  AND EXISTS(SELECT 1 FROM jsonb_array_elements(s.snapshot#>'{educationApplicability,administrations}') a
-   WHERE a->>'population'=${entry==='SCHOOL'?'STUDENT':'TEACHER'} AND a->>'responseMode'=${responseMode})
+  AND ${responseMode==='EXPERT_REPORT'?Prisma.sql`(${entry}='TEACHER' AND ${targetKind??null}='PERSON'
+   AND s.snapshot#>>'{compiledDefinition,respondentType}' IN ('expert_report','observer_report')
+   AND s.snapshot#>>'{educationExpertApplicability,schemaVersion}'='2'
+   AND EXISTS(SELECT 1 FROM jsonb_array_elements(s.snapshot#>'{educationExpertApplicability,administrations}') a
+    WHERE a->>'population'='TEACHER' AND a->>'responseMode'='EXPERT_REPORT' AND a->>'targetKind'=${targetKind??null}))`:
+   Prisma.sql`EXISTS(SELECT 1 FROM jsonb_array_elements(s.snapshot#>'{educationApplicability,administrations}') a
+    WHERE a->>'population'=${entry==='SCHOOL'?'STUDENT':'TEACHER'} AND a->>'responseMode'=${responseMode})`}
   AND NOT EXISTS(SELECT 1 FROM scales installed WHERE installed.library_entry_id=e.id AND installed.status<>'PUBLISHED')
   AND NOT EXISTS(SELECT 1 FROM scale_library_emergency_stops stop WHERE stop.target_kind='RELEASE' AND stop.target_id=e.release_id
    OR stop.target_kind='TRAINING_SCALE' AND EXISTS(SELECT 1 FROM scales installed WHERE installed.library_entry_id=e.id AND installed.id=stop.target_id))) AS compatible,
@@ -33,12 +39,12 @@ const projectLibraryHeader=(row:Header)=>({catalogKey:`education-library-source:
  ...(!row.compatible?{unavailableReason:'该版本的参考／报告依赖、作答方式或当前停用状态尚不满足本入口普通问卷，原始内容保持不变。'}:{})})
 
 /** Draft reopening resolves only authorized exact headers, not source bodies. */
-export async function readEducationLibrarySourceSummaries(tx:Prisma.TransactionClient,c:PrivateToolContext,sources:readonly {versionId:string;contentHash:string}[],responseMode:unknown='SELF'){
- const administration=educationCompositionAdministrationForEntry(c.entry,responseMode)
+export async function readEducationLibrarySourceSummaries(tx:Prisma.TransactionClient,c:PrivateToolContext,sources:readonly {versionId:string;contentHash:string}[],responseMode:unknown='SELF',targetKind?:unknown){
+ const administration=educationCompositionAdministrationForEntry(c.entry,responseMode,targetKind)
  const ids=[...new Set(sources.map(source=>source.versionId))]
  const uses=await readEducationLibrarySourceUses(tx,c,ids),visible=ids.filter(id=>uses.has(id))
  if(!visible.length)return []
- const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT ${libraryHeaderFields(c.entry,administration.responseMode)}
+ const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT ${libraryHeaderFields(c.entry,administration.responseMode,targetKind)}
   FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
   JOIN measurement_content_releases m ON m.id=e.release_id AND m.status='PUBLISHED' AND m.layer='MEASUREMENT' AND m.family='SCALE'
   WHERE e.id IN (${Prisma.join(visible)}) AND e.status='ACTIVE' ORDER BY e.id`)
@@ -122,10 +128,10 @@ export async function assertEducationLibraryHeaders(tx:Prisma.TransactionClient,
  * are absent. Discovery itself does not materialize a Scale or Composite. */
 export async function listEducationLibrarySources(c:PrivateToolContext,raw:unknown){
  const input=educationLibraryCatalogQuery.parse(raw)
- const administration=educationCompositionAdministrationForEntry(c.entry,input.responseMode)
+ const administration=educationCompositionAdministrationForEntry(c.entry,input.responseMode,input.targetKind)
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
-  const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT ${libraryHeaderFields(c.entry,administration.responseMode)}
+  const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT ${libraryHeaderFields(c.entry,administration.responseMode,input.targetKind)}
    FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
    JOIN measurement_content_releases m ON m.id=e.release_id AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
    WHERE e.status='ACTIVE' AND (${input.cursor??null}::text IS NULL OR e.id>${input.cursor??null})

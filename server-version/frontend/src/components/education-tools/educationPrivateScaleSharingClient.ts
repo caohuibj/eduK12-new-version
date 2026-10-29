@@ -1,8 +1,8 @@
-import type {EducationApplicability,GovernanceSubmission,GovernanceMediaManifest,GovernanceMediaConsent,SubmissionMetadata} from '../../api/scaleLibraryGovernance'
+import type {EducationExpertApplicability,EducationApplicability,GovernanceSubmission,GovernanceMediaManifest,GovernanceMediaConsent,SubmissionMetadata} from '../../api/scaleLibraryGovernance'
 import {privateToolBase,type PrivateToolApi} from './privateToolClient'
 export type PrivateSharingRow=GovernanceSubmission&{versionId:string;privateContentHash:string}
 export type PrivateSharingPrepared={sourceId:string;versionId:string;privateContentHash:string;product:'SCHOOL'|'TEACHER';releaseId:string;contentHash:string;defaults:SubmissionMetadata;mediaManifest:GovernanceMediaManifest;canRequestLibraryShare:boolean}
-export type PrivateSharingBody={contentHash:string;releaseId:string;requestId:string;metadata:SubmissionMetadata;dependencyReleaseIds:[];mediaConsent?:GovernanceMediaConsent;educationApplicability?:EducationApplicability}
+export type PrivateSharingBody={contentHash:string;releaseId:string;requestId:string;metadata:SubmissionMetadata;dependencyReleaseIds:[];mediaConsent?:GovernanceMediaConsent;educationApplicability?:EducationApplicability;educationExpertApplicability?:EducationExpertApplicability}
 export type PrivateSharingDetail=PrivateSharingRow&{snapshot:unknown;mediaManifest:GovernanceMediaManifest}
 export const sharingManifestValid=(manifest:GovernanceMediaManifest)=>Boolean(manifest?.schemaVersion===1&&manifest.manifestHash&&Array.isArray(manifest.items)&&manifest.items.every(item=>item&&item.assetId&&item.contentHash&&typeof item.sizeBytes==='number'&&Array.isArray(item.usages)&&item.usages.every(usage=>typeof usage==='string')&&['image/png','image/jpeg','image/webp','video/mp4','video/webm','application/pdf'].includes(item.mimeType)))
 export function createPrivateScaleSharingClient(api:PrivateToolApi,organizationId:string,toolId:string,entry:'SCHOOL'|'TEACHER'){

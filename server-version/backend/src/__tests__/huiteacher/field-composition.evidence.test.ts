@@ -30,7 +30,7 @@ beforeEach(()=>{
    {key:'matrix',label:'逐行观察',state:'ANSWERED',value:{one:0},rowStates:{one:'ANSWERED',two:'REFUSED'}}]})},
  {slotKey:'scale:'+item,unitType:'SCALE',terminalState:'COMPLETED',sourceType:'ASSESSMENT',sourceAttemptId:id(31),sourceSubmissionId:id(32),sourceDefinitionHash:hash,compiledRuntimeHash:'d'.repeat(64),canonicalResultEncrypted:encryptUnifiedRuntimePayload({canonical:'native-result'}),collectionFactsEncrypted:null}]
  children=[{id:id(31),compositeItemId:item,submissionId:id(32),userId:scope.respondentUserId,respondentUserId:scope.respondentUserId,subjectUserId:scope.subjectUserId}]
- declarations=[{itemId:item,audience:'teacher',respondent:'OBSERVER_REPORT',scores:[{key:'zero',label:'Observed zero'},{key:'missing',label:'Missing'},{key:'private',label:'Private'}],allowed:['zero','missing']}]
+ declarations=[{itemId:item,scoresAllowed:true,audience:'teacher',respondent:'OBSERVER_REPORT',scores:[{key:'zero',label:'Observed zero'},{key:'missing',label:'Missing'},{key:'private',label:'Private'}],allowed:['zero','missing']}]
  stored={core:{unitType:'SCALE',sourceDefinitionHash:hash,compiledRuntimeHash:'d'.repeat(64),contextHash:null,quality:{status:'valid'},metrics:[{key:'zero',value:0},{key:'missing',value:null,quality:'not_calculable'},{key:'private',value:99}]},persistenceProvenance:{sourceType:'ASSESSMENT',sourceAttemptId:id(31),sourceSubmissionId:id(32)}}
  getParent.mockImplementation(async()=>parent);getSnapshots.mockImplementation(async()=>snapshots);getChildren.mockImplementation(async()=>children)
  query.mockImplementation(async sql=>sql.sql.includes('SELECT b->')?declarations:[{id:attempt,attemptEpoch:1}]);save.mockImplementation(async({data})=>data)
@@ -58,6 +58,13 @@ describe('Formal expert evidence consumes the exact durable native final',()=>{
   declarations[0].audience='teacher';stored.core.quality.status='invalid';await createCanonicalFieldEvidence(tx,input)
   payload=decryptUnifiedRuntimePayload(save.mock.calls[1][0].data.answersCipher)
   expect(payload.units[1].metrics.map((x:any)=>x.value)).toEqual([null,null])
+ })
+ it('withholds numeric expert evidence when the selected standard source has a stricter disclosure ceiling',async()=>{
+  declarations[0].scoresAllowed=false
+  await createCanonicalFieldEvidence(tx,input)
+  const payload:any=decryptUnifiedRuntimePayload(save.mock.calls[0][0].data.answersCipher)
+  expect(payload.units[1]).toEqual({kind:'SCALE',unitId:'scale:'+item,state:'WITHHELD',metrics:[]})
+  expect(payload.units[0]).toMatchObject({kind:'FORM',items:[{otherText:'EXPERT professional text'},{}]})
  })
  it('refuses incomplete, stale-epoch, wrong-person and wrong-generation native completion without creating evidence',async()=>{
   const original={...parent}

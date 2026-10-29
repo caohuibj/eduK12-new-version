@@ -46,14 +46,15 @@ describe('Explicit expert source and transaction-bound field identity',()=>{
    await expect(compilePrivateComposition(tx,context,definition('PERSON',[old,f]))).rejects.toMatchObject({code:'PRIVATE_COMPOSITION_EXPERT_SCALE_DECLARATION_REQUIRED'})
   }
  })
- it('permits a non-person Form but rejects a non-person Scale and undeclared public/library providers before source queries',async()=>{
+ it('permits a non-person Form, rejects a non-person Scale and requires independent U before reading external source bodies',async()=>{
   findMany.mockResolvedValueOnce([f]);expect((await compilePrivateComposition(tx,context,definition('TEAM',[f]))).leaves.size).toBe(1)
   findMany.mockClear();await expect(compilePrivateComposition(tx,context,definition('TEAM'))).rejects.toMatchObject({code:'PRIVATE_COMPOSITION_EXPERT_PERSON_TARGET_REQUIRED'})
+  query.mockResolvedValue([])
   for(const [provider,kind] of [['PUBLIC_FORM','FORM'],['STANDARD_SCALE','SCALE'],['LIBRARY_SCALE','SCALE']] as const){
    const raw=definition();raw.blocks=[{...raw.blocks[0],source:{...raw.blocks[0].source,provider,kind}}]
-   await expect(compilePrivateComposition(tx,context,raw)).rejects.toMatchObject({code:'PRIVATE_COMPOSITION_EXPERT_SOURCE_DECLARATION_REQUIRED'})
+   await expect(compilePrivateComposition(tx,context,raw)).rejects.toMatchObject({code:provider==='LIBRARY_SCALE'?'LIBRARY_SOURCE_USE_REQUIRED':'PUBLIC_SOURCE_USE_REQUIRED'})
   }
-  expect(findMany).not.toHaveBeenCalled();expect(query).not.toHaveBeenCalled()
+  expect(findMany).not.toHaveBeenCalled();expect(query).toHaveBeenCalledTimes(3)
  })
  it('keeps accepted-generation/source keys stable on retry and different across target, invitation and a new acceptance',()=>{
   const value=scope(),key=fieldParticipantKey(value)

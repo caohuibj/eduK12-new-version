@@ -11,6 +11,7 @@ import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
 import {privateToolFail} from './private-tool.contracts'
 import {educationStandardSourceSchema,type PrivateCompositionDefinition} from './private-tool.composition-contracts'
+import {supportsExpertSource,isNativeExpertObserver} from './expert-observation.contract'
 
 /** Content adapter only. The caller checks current author/U before this bounded
  * body read. No Training grant, single-tool Composite or approval is created. */
@@ -38,7 +39,9 @@ export async function readEducationStandardSources(tx:Prisma.TransactionClient,s
    instrumentVersion:scale.instrumentVersion,definition:frozenDatabaseScaleDefinition(scale),instrumentClass:'STANDARD',scope:measurement.scope}))
   if(installed.contentHash!==measurement.contentHash)privateToolFail('PUBLIC_STANDARD_NATIVE_CONTENT_MISMATCH')
   const applicability=row.snapshot.parts.CONTENT.reference.metadata.applicability as {respondentTypes?:string[]}|undefined
-  const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'STUDENT'
+  const respondent=administration.responseMode==='EXPERT_REPORT'?'OBSERVER':administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'STUDENT'
+  if(administration.responseMode==='EXPERT_REPORT'&&(administration.targetKind!=='PERSON'||!isNativeExpertObserver(row.snapshot.definition.respondentType)
+   ||!supportsExpertSource(row.snapshot.parts.CONTENT.reference.metadata.educationExpertApplicability,administration)))privateToolFail('PUBLIC_STANDARD_EXPERT_DECLARATION_REQUIRED',400)
   if(!applicability?.respondentTypes?.includes(respondent))privateToolFail('PUBLIC_STANDARD_VARIANT_UNSUPPORTED',400)
   const descriptor=educationStandardSourceSchema.parse({releaseId:row.id,combinationHash:row.combination_hash,toolKey:row.snapshot.toolKey,
    instrumentVersion:row.snapshot.instrumentVersion,nativeDefinitionHash:canonicalHash(row.snapshot.definition),

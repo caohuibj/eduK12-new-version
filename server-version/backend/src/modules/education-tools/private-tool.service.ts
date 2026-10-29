@@ -92,7 +92,7 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   const allowed=await readEducationPublicUse(tx,c,publicSources.map(publicKey))
   const visibleSources=publicSources.filter(source=>allowed.has(publicKey(source)))
   const publicHeaders=await readEducationPublicSourceHeaders(tx,visibleSources.map(source=>({kind:source.provider==='PUBLIC_FORM'?'FORM':'STANDARD_SCALE',id:source.versionId,hash:source.contentHash})))
-  const libraryHeaders=await readEducationLibrarySourceSummaries(tx,c,definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source),definition.administration.responseMode)
+  const libraryHeaders=await readEducationLibrarySourceSummaries(tx,c,definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source),definition.administration.responseMode,definition.administration.responseMode==='EXPERT_REPORT'?definition.administration.targetKind:undefined)
   return {...tool,references:[...references.map(ref=>({...ref,sourceProvider:'PRIVATE_VERSION' as const})),
    ...[...publicHeaders.values()].map(header=>({id:header.id,kind:header.kind==='FORM'?'FORM' as const:'SCALE' as const,title:header.title,contentHash:header.hash,version:header.versions.content,versions:header.versions,requiredContextKeys:educationPublicRequiredContextKeys(header),referenceContextKeys:header.referenceContextKeys,
     sourceProvider:header.kind==='FORM'?'PUBLIC_FORM' as const:'STANDARD_SCALE' as const})),
