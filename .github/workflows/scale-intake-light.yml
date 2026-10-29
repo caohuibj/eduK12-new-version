@@ -1,0 +1,55 @@
+name: Scale intake / focused content check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - 'server-version/backend/src/modules/scale/instruments/**/instrument.ts'
+      - 'server-version/backend/src/modules/scale/onboarding/instruments.generated.ts'
+      - '.github/workflows/scale-intake-light.yml'
+      - '.github/scripts/scale-intake-light-scope.mjs'
+      - '.github/scripts/scale-intake-light-scope.test.mjs'
+      - 'server-version/backend/scripts/scale-intake-light-check.ts'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scale-intake-light-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  focused:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SCALE_LIGHT_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      SCALE_LIGHT_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      CI: 'true'
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: Refuse mixed platform changes and verify fail-closed scope
+        run: |
+          node --test .github/scripts/scale-intake-light-scope.test.mjs
+          node .github/scripts/scale-intake-light-scope.mjs
+      - name: Install pinned backend dependencies only (no lifecycle hooks)
+        working-directory: server-version/backend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check deterministic static instrument registry (no app build)
+        working-directory: server-version/backend
+        run: npm run scale:instruments:check
+      - name: Validate changed C/P/R, real scorer fixtures and report consumer
+        working-directory: server-version/backend
+        run: npx tsx scripts/scale-intake-light-check.ts
