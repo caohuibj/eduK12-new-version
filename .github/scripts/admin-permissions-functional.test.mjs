@@ -147,6 +147,8 @@ test('real administrator verification and merge CLIs re-read Git and reject tamp
 const fs=require('node:fs'),fixture=JSON.parse(fs.readFileSync(process.env.ADMIN_CLI_GIT_FIXTURE,'utf8')),args=process.argv.slice(2);
 if(JSON.stringify(args)===JSON.stringify(['rev-parse','HEAD']))process.stdout.write(fixture.head+'\\n');
 else if(JSON.stringify(args)===JSON.stringify(['diff','--no-ext-diff','--no-textconv','--no-renames','--raw','--abbrev=40','-z',fixture.base,fixture.head,'--']))process.stdout.write(fixture.raw);
+else if(JSON.stringify(args)===JSON.stringify(['diff','--no-ext-diff','--no-textconv','--ignore-submodules=none','--name-only','HEAD','--']))process.stdout.write('');
+else if(JSON.stringify(args)===JSON.stringify(['diff','--no-ext-diff','--no-textconv','--ignore-submodules=none','--raw','--abbrev=40','--no-renames','-z',fixture.base,fixture.head]))process.stdout.write(fixture.raw);
 else if(JSON.stringify(args)===JSON.stringify(['show',fixture.head+':'+fixture.configPath]))process.stdout.write(JSON.stringify(fixture.config));
 else process.exit(1);
 `,{mode:0o700});

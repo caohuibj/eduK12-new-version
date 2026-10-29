@@ -1,3 +1,4 @@
+import {selectCognitiveIntake} from './cognitive-intake-scope.mjs';
 import {selectScaleIntake} from './scale-intake-scope.mjs';
 import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
 import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
@@ -248,8 +249,14 @@ export function parseChangedEntries(raw) {
   return entries;
 }
 
-export function classifyChanges(entries, forceFull = false) {
+function gitContent(sha,file) {
+  try {const row=execFileSync('git',['ls-tree',sha,'--',file],{encoding:'utf8'});if(!/^100644 blob [a-f0-9]{40}\t/.test(row))return null;return execFileSync('git',['show',sha+':'+file],{encoding:'utf8',maxBuffer:8*1024*1024});} catch{return null;}
+}
+
+export function classifyChanges(entries, forceFull = false, readers = {}) {
   const result = classify(entries.map(entry => entry.file));
+  const cognitiveIntake = !forceFull && readers.readHeadFile ? selectCognitiveIntake(entries,readers.readHeadFile,{readBaseFile:readers.readBaseFile}) : null;
+  if(cognitiveIntake?.selected) Object.assign(result,{content:true,frontend:false,presentation:false,documentation:false,domains:['cognitive']});
   const regularChanges = entries.every(({ status, oldMode, newMode }) =>
     newMode === '100644' && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && oldMode === '100644')));
@@ -264,6 +271,8 @@ export function classifyChanges(entries, forceFull = false) {
     maintenance: !forceFull && result.maintenance && maintenanceChanges,
     documentation: !forceFull && result.documentation && regularChanges,
     content: !forceFull && result.content && regularChanges,
+    cognitive_intake_light: cognitiveIntake?.selected === true,
+    cognitive_intake_plan: cognitiveIntake?.selected ? cognitiveIntake : null,
     scale_intake_light: !forceFull && result.content && regularChanges && Boolean(selectScaleIntake(entries)),
     presentation: !forceFull && result.presentation && regularChanges,
     frontend: !forceFull && result.frontend && regularChanges,
@@ -429,7 +438,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     throw new Error('Known Training candidate must retain its explicit functional-only scope; do not fall back to performance');
   const result = event === 'workflow_dispatch'
     ? { maintenance:false, content:false, presentation:false, frontend:false, documentation:false, domains:[] }
-    : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true');
+    : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true', {readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)});
+  const cognitiveCandidate=entries.some(e=>/^server-version\/(?:backend\/src\/modules\/cognitive\/(?:tasks|generated|content-candidates)\/|frontend\/src\/modules\/cognitive\/(?:(?:tasks|generated)\/|native-runners\.tsx$))/.test(e.file));
+  if(cognitiveCandidate && !result.cognitive_intake_light && process.env.CI_FORCE_FULL!=='true' && event!=='workflow_dispatch') {
+    const refused=selectCognitiveIntake(entries,file=>gitContent('HEAD',file),{readBaseFile:file=>gitContent(base,file)});
+    console.log(JSON.stringify({kind:'cognitive-intake-refusal',base,...refused}));
+    throw Error('UNSUPPORTED_COGNITIVE_INTAKE:'+refused.reason+': explicit affected route required; no platform fallback');
+  }
   const dependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
     && dependencyScope(entries, {base});
   const surveySelection = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && surveyWaveSelectionScope(entries);
@@ -464,7 +479,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   // No production artifact or acceptance scenario is changed by a narrowly
   // admitted test-only diff. Keep the full frontend test suite itself mandatory.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = surveySelection || performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = result.cognitive_intake_light || surveySelection || performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   // Preserve every platform functional/security/build/recovery check. Only the
@@ -481,11 +496,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     documentation: result.documentation, codeql, scenario,
     frontend_build:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
+    cognitive_intake_light:result.cognitive_intake_light === true,cognitive_intake_plan:JSON.stringify(result.cognitive_intake_plan || null),
     scale_intake_light: result.scale_intake_light === true, scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
-  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: surveySelection || performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
+  console.log(JSON.stringify({ ...output, base, validationClosure: result.cognitive_intake_light ? 'selected-cognitive-tasks' : 'all-bundles', platformReasons: surveySelection || performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

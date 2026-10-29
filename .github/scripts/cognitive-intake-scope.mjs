@@ -22,13 +22,14 @@ const readJSON = (read, file) => { const text = read?.(file); return text == nul
 
 /** Pure, dependency-free planning. AST and generated-byte verification belong to the executor. */
 export function selectCognitiveIntake(entries, readHeadFile, {readBaseFile} = {}) {
-  const files = [], modes = new Map(), browsers = new Set();
+  const files = Array.isArray(entries)?entries.map(e=>e?.file).filter(f=>typeof f==='string'):[], seen=new Set(), modes = new Map(), browsers = new Set();
   const result = (selected, status, reason) => ({selected,status,reason,tasks:[...modes.keys()].sort(),mode:[...modes.values()].every(m=>m==='data')?'data':'task',taskModes:Object.fromEntries([...modes].sort()),requiresBrowser:browsers.size>0,browserTasks:[...browsers].sort(),files:[...files].sort()});
   if (!Array.isArray(entries) || !entries.length) return result(false,'NOT_SELECTED','empty-diff');
   let generatedChanged = false, runnerChanged = false;
   for (const e of entries) {
-    if (!e || !safe(e.file) || files.includes(e.file)) return result(false,'NOT_SELECTED','invalid-or-duplicate-path');
-    files.push(e.file);
+    if (!e || !safe(e.file) || seen.has(e.file)) return result(false,'NOT_SELECTED','invalid-or-duplicate-path');
+    seen.add(e.file);
+    if(e.file.startsWith('server-version/backend/src/modules/cognitive/content-candidates/') || e.file==='server-version/frontend/src/modules/cognitive/native-runners.tsx') return result(false,'UNSUPPORTED_NATIVE_CANDIDATE','native-candidate-not-registered-in-task-packages');
     if (e.newMode !== '100644' || !(e.status==='A'&&e.oldMode==='000000'||e.status==='M'&&e.oldMode==='100644')) return result(false,'NOT_SELECTED','nonregular-or-deleted-change');
     if (generated.has(e.file)) { generatedChanged=true; continue; }
     if (e.file===generatedRunner) { runnerChanged=true; continue; }
@@ -36,6 +37,8 @@ export function selectCognitiveIntake(entries, readHeadFile, {readBaseFile} = {}
     const suffix = backend ? e.file.slice(cognitiveTaskRoot.length) : frontend ? e.file.slice(frontRoot.length) : '';
     const [task,...rest] = suffix.split('/');
     if (!suffix || !/^[a-zA-Z0-9_-]+$/.test(task) || !rest.length || task==='shared') return result(false,'NOT_SELECTED','shared-or-mixed-input');
+    if(backend && !(rest.length===1 && (/^[a-zA-Z0-9_-]+\.ts$/.test(rest[0]) || ['task-package.json','README.md','THIRD_PARTY_LICENSE.md'].includes(rest[0])) || rest.length===2 && rest[0]==='fixtures' && /^[a-zA-Z0-9_.-]+\.json$/.test(rest[1])))
+      return result(false,'NOT_SELECTED','unsupported-task-path');
     const mode = backend && rest.length===1 && data.has(rest[0]) ? 'data' : 'task';
     if (!modes.has(task) || mode==='task') modes.set(task,mode);
     if (frontend || /\.(?:png|webp|avif|svg|jpg|jpeg|gif|woff2?|mp3|wav|mp4)$/i.test(e.file)) browsers.add(task);
@@ -49,6 +52,8 @@ export function selectCognitiveIntake(entries, readHeadFile, {readBaseFile} = {}
       const suites = current.acceptance?.frontendSuites;
       if (!Array.isArray(suites) || !suites.length || new Set(suites).size!==suites.length || suites.some(s=>!safe(s)||!s.startsWith('src/modules/cognitive/')||!/\.test\.tsx?$/.test(s))) return result(false,'NOT_SELECTED','invalid-acceptance-suites');
       const oldSuites = previous?.acceptance?.frontendSuites || [];
+      const identity = id => `${id.testType}/${id.engineVersion}/${id.scoringVersion}`;
+      if(previous && previous.identities.some(id=>!current.identities.some(next=>identity(next)===identity(id)))) return result(false,'NOT_SELECTED','existing-identity-removed');
       if (oldSuites.some(s=>!suites.includes(s)) || suites.some(s=>!oldSuites.includes(s)&&!s.startsWith('src/modules/cognitive/tasks/'+task+'/'))) return result(false,'NOT_SELECTED','acceptance-suite-substitution');
       const engines = pack => [...new Set((pack?.identities||[]).map(id=>id.engineVersion))].sort();
       if (!previous || JSON.stringify(engines(current))!==JSON.stringify(engines(previous)) || JSON.stringify(current.frontend)!==JSON.stringify(previous.frontend)) browsers.add(task);
