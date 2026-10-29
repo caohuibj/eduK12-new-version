@@ -125,7 +125,30 @@
         "sample-social2-rest1": 50,
         "missing-social": null
       }
+    },
+    {
+      "family": "pbqsf65",
+      "instrumentKey": "pbqsf65@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedSums": {
+        "all-keyed-min": "all scales 0",
+        "all-keyed-max": "all scales 28",
+        "sample-odd2-even3": {
+          "avoidant": 15,
+          "dependent": 18,
+          "passive_aggressive": 16,
+          "obsessive_compulsive": 17,
+          "antisocial": 17,
+          "narcissistic": 20,
+          "histrionic": 19,
+          "schizoid": 18,
+          "paranoid": 17,
+          "borderline": 17
+        },
+        "missing-borderline": "invalid (dependent & borderline null)"
+      }
     }
   ],
-  "goldenCaseTotal": 36
+  "goldenCaseTotal": 40
 }

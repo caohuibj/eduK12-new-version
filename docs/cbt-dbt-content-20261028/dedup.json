@@ -68,6 +68,16 @@
       "newFamily": "dts15",
       "existing": "PLANNED:dts_subscales",
       "relation": "DTS 四因子（Tolerance/Absorption/Appraisal/Regulation）题项归属未经原论文核实；未核实前不得在产品中提供分量表分。"
+    },
+    {
+      "newFamily": "pbqsf65",
+      "existing": "dasa40",
+      "relation": "DAS 测量一般失调态度（成就/认可/控制），PBQ-SF 测量与人格风格相关的信念维度；同属 CBT 信念层但构念组织不同，不合并计分。"
+    },
+    {
+      "newFamily": "pbqsf65",
+      "existing": "bsl23",
+      "relation": "PBQ-SF 边缘型信念量表与 BSL-23 症状强度分属信念层与症状层，均限成人临床研究情境，不得互推或用于学生筛查。"
     }
   ]
 }

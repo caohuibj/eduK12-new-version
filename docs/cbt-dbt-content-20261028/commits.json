@@ -47,6 +47,11 @@
       "family": "cats40_zh_cn",
       "commit": "edad977",
       "message": "content(scale): stage official zh-CN CATS child self-report draft (translator-credited Macquarie form) with golden cases [skip ci]"
+    },
+    {
+      "family": "pbqsf65",
+      "commit": "3896664",
+      "message": "content(scale): stage PBQ-SF 65-item en draft with official 10-scale key, scan-verified verbatim items, golden cases and report sample [skip ci]"
     }
   ]
 }

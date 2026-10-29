@@ -4,12 +4,12 @@
   "actualDatabaseImport": false,
   "published": false,
   "ciTriggered": false,
-  "toolFamilies": 8,
-  "exactVersions": 9,
-  "executableDrafts": 9,
+  "toolFamilies": 9,
+  "exactVersions": 10,
+  "executableDrafts": 10,
   "catalogOnly": 0,
-  "nativeGoldenCases": 36,
-  "reportSamples": 9,
+  "nativeGoldenCases": 40,
+  "reportSamples": 10,
   "tools": [
     {
       "family": "atq30",
@@ -157,6 +157,24 @@
           "key": "dasb40",
           "version": "1.0.0",
           "itemCount": 40,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "pbqsf65",
+      "name": "PBQ-SF",
+      "category": "CBT人格相关信念（成人临床研究用）",
+      "fullTextSource": "https://beckinstitute.org/wp-content/uploads/2021/06/PBQ-SF-Full-Documents.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "3896664",
+      "versions": [
+        {
+          "key": "pbqsf65",
+          "version": "1.0.0",
+          "itemCount": 65,
           "locale": "en",
           "executable": true
         }
