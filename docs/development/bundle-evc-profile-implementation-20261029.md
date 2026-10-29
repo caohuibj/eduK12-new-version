@@ -256,3 +256,57 @@ Ready前仍须独立审阅精确base/head及适用CI：当前实际scope是platf
 已实读Notion09的 `BND-R-P1-APPLICABILITY-20261029`，确认根因：package2的runRules在显式适用条件false/unknown时返回UNAVAILABLE，Profile wrapper却继续计算。修复为直接返回同一UNAVAILABLE合同，先于runBundleProfile与modifier求值；没有改B参数、单项计分、package1或当前未声明此条件的EVC内容。新增false、unknown两小例严格比较整个结果，禁止携带profile/modifier/解释payload；真实Vitest结果2 PASS、24未选中，exit0，日志 `profile-applicability.{json,log,exit}`。原43+2及PG/HTTP未重复执行。
 
 本轮继续授权已明确允许在原模型下有界重试Draft一次。此前创建已知未执行，本轮先以GitHub只读API按head查询所有状态PR，结果为空；仍保持同仓库、head、base main及draft=true。官方云端README所指浏览器脚本实际使用--no-sandbox，与本次安全要求冲突，因此不执行该脚本；平台capabilities为空，无另一已注册浏览器入口。当前helper owner=nobody/mode4755，只读核实后保留环境阻碍；不改owner/mode或降低沙箱。
+
+
+## 15. Draft PR388与首次正式CI（2026-10-29）
+
+按DOT本轮有界重试授权，先两次只读确认本head所有状态PR均为空，再使用原connector、同模型、同head/base、draft=true重试一次，实际创建 [PR388](https://github.com/caohuibj/eduK12-new-version/pull/388)。原容量故障仍保留，不改写成首次创建成功。PR source head `0d3548b16fc00d6407d9bb368513d95da81de149`、base `6142ddc74db9787f6606746610df58c73de256f5`。
+
+创建前重新实读现有Notion CI清单并运行真实classifier。首次正式 [run40909139388 / attempt1](https://github.com/caohuibj/eduK12-new-version/actions/runs/40909139388) 已完成：classify、backend compile、mini-program smoke、maintenance均SUCCESS；独立publication run40909138329 SUCCESS。frontend job123572262243的npm ci及lint SUCCESS，typecheck FAILURE；merge gate连带FAILURE。没有正式browser/UI/Ready资格。累计正式失败1次，不以新SHA清零。
+
+CI-003根因已经定向复现：轻量Draft job只安装frontend依赖，但main既有 `PrivateFormRuntimeRendering.test.tsx` 静态导入后端form definition/runtime/adapter，闭包需要backend Zod、Prisma客户端。GitHub failure annotations实际报告这两模块缺失和连带implicit-any；TypeScript host只隐藏本机backend node_modules（未改文件/tsconfig）即复现同类原文件诊断。main与本head的这些测试/依赖闭包/两锁文件/tsconfig/CI job字节相同；本机已有backend依赖令早期类型结果通过，不能等同干净frontend-only安装。首次预检未识别轻量job与正式frontend组件前置不一致，记录这项遗漏。
+
+最小修复已经具体化：Draft `pr-light-frontend` 复用现有 `ci-frontend.yml` 的同一正规前置 `npm ci --ignore-scripts` + `npx prisma generate`。不改业务、断言、锁文件、tsconfig、门禁阈值或模块缺失错误。候选patch在本云端 `pr-light-frontend-dependencies.patch`，尚未应用CI文件/激活下一轮。现有legacy Draft路由不支持仅以一次请求接纳本轮已成功job并复验缺失frontend，故不声称已能自动复用；不为本功能临时建立第二套CI admission框架。
+
+GitHub原job metadata/annotations已取得；job日志下载重定向到签名存储返回Forbidden，未声称取得完整原stdout，未改变域名绕过。读取main保护必需checks API另返回Resource not accessible by integration (HTTP403)，已停止该读取；不改保护规则。实际PR merge gate仍以GitHub当前状态为准。
+
+### CI失败回写阻塞及可复制条目
+
+已按AGENTS尝试向原Notion清单末尾追加CI-003复现（不改维护人/历史/共享权限），工具返回 `Automatic approval review failed: Selected model is at capacity. Please try a different model.`，并明确action was not executed。此Notion写入为NOT_WRITTEN，未绕过或重试，不因Draft创建曾成功便虚构本次写成功。下面保留原失败所需复制内容，DOT/平台恢复写入后才能继续相关CI激活。
+
+- CI-003：PR388，source0d3548b16、base6142ddc74；run40909139388/attempt1，frontend job123572262243。
+- npm ci、lint成功，typecheck缺backend Zod/Prisma及连带implicit-any失败；main既有跨包测试导入闭包与frontend-only安装前置不符；本地后端依赖掩盖了干净安装差别。
+- 修复候选：仅复制已有正规backend锁定安装/Prisma generate前置到Draft frontend job；原失败和backend/maintenance/publication等真实成功保留。
+- 下轮checking：CI-003核干净依赖/生成schema，CI-019保留首错及未跑browser，CI-020冻结精确head和实际证据接纳能力。不能自动把原成功job重跑、把没有官方接纳的本地结果标成门禁成功。
+- 正式失败累计1；下一轮未激活。浏览器真实页面、正式Ready资格及合并仍未完成。
+
+### 跨入口实际共享接口（请求DOT一次边界协调）
+
+独立静态追踪进一步确认：P6四个package-reference文件未进入main；其整包U依赖任务1所有的 `public-source.catalog`，不能从叶工具或Training授权自行推断整包U。School/Teacher当前 `assessment-resource.service.ts` 克隆为ORGANIZATION_RESOURCE并不保存BundleInstance；main的聚合finalizer/readCompletedCompositeBundleInputs只识别ASSESSMENT_BUNDLE，个人报告reader也只展示单项receipt。因此不能用family=BUNDLE或普通组合伪称native EVC已执行。
+
+最小拟用接口与文件（未改授权核心/共享底层前先按原委托交DOT协调）：
+
+| 文件 | 最小兼容输入/输出 |
+|---|---|
+| `education-tools/package-reference.{contracts,headers,catalog,source}.ts` | 从已读P6候选仅复用整包精确sourceRef与现有U检查；不合并其WIP或制造叶grant |
+| `education-tools/assessment-resource.{contract,source,service}.ts` | 可选nativeBundle `{definitionHash,bindingsHash}` 及完整原包；按原slot顺序一体实例化，保留原组织资源身份/权限与三轴选择复核 |
+| `assessment-runtime/unified-aggregate-finalizer.service.ts` | 只在ORG资源确有完整冻结BundleInstance且身份匹配时使用原Bundle编译hash/INITIAL持久化；普通ORG资源不变 |
+| `bundle-product/analysis.ts` | 相同canonical读取和已存Profile结果；不重新评分、不借Training身份授权 |
+| `reporting/education-assessment-personal-report.service.ts` | 现有execution/SELF/subject/respondent/来源权限复核后增加兼容可选综合投影，仍在输出前重查权限 |
+| `survey/publication.service.ts` 的FrozenGovernedPackage与专用adapter | 可选完整native包引用，不拆包；使用实际Survey frozen unit result及精确source hash，FINAL后持久化分析状态，报告失败不回滚FINAL |
+
+当前B的适用对象是7—12年级数学学生SELF；Teacher自身SELF入口不能把教师冒充学生。通用Teacher Bundle机制和本B科学适用性应分别验收。先沿现有SELF lane，观察者能力不自行扩张。以上不是已开发/通过主张；已异步提出一次具体接口边界问题，同时继续无此依赖的定向修复与CI诊断。
+
+官方云端README浏览器路径实际脚本含--no-sandbox，故没有执行。平台没有另一注册browser capability。已异步提出具体新增权限动作：只在本云端以require_escalated启动/usr/bin/chromium、保持chromiumSandbox:true/TLS/文件权限，验证宿主原helper；批准尚待，不以时间经过代替批准。未修改owner/mode或禁用沙箱。
+
+
+补充：尝试仅更新PR388正文以交接上述真实CI失败状态（不推新提交、不触发CI），也被自动审批容量故障拒绝执行。此正文更新已知NOT_EXECUTED，PR当前正文仍是创建时文本；未换工具重试。当前远端功能head保持0d3548b16，本节失败交接记录仅在本云端，未推送以免重新激活未解决的Draft路由。运行时代码无未提交改动，CI前置patch尚未应用。
+
+
+## 16. DOT继续授权与CI前置修复
+
+DOT已在原Notion CI清单增量写回PR388首轮CI-003并回读成功，source0d3548b16；本节点不重复写同一条。按本轮明确授权，已应用第15节五行前置到Draft frontend job，与main的正式frontend组件相同：原锁定backend install（ignore-scripts）＋prisma generate，没有启动后端、迁移或seed。现有控制用例 `frontend compilation and checks are separate while both remain required` 定向1 PASS、exit0。没有以any、跳过缺模块或弱化断言修复。下一次正常Draft同步仍按实际legacy路由执行，未新增临时证据接纳框架，也不把原成功job改写为本轮结果。
+
+精确的单次浏览器安全启动已通过执行环境require_escalated正式审批并执行，/usr/bin/chromium、chromiumSandbox:true、TLS与owner/mode保持原值，about:blank成功、exit0。这只证明宿主原有沙箱能正常启动，不等于EVC页面验收；后续代表页面旅程将按同一正式执行权限机制单独提交。原受限环境失败保留。
+
+共享边界已获DOT协调：允许可选nativeBundle在组织聚合、个人报告和Survey冻结包中消费；整包身份/来源适配放专用Bundle adapter，默认旧行为不变，不修改角色或精确grant核心。继续在独立分支小提交推进；真实整包U仍须存在，不因接口未接通绕过。
