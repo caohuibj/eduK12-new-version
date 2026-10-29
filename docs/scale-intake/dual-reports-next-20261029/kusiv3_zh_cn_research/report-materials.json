@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "kusiv3_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "b6b75a681f885cab82e3de64fa6e5dd1ce7982e4cd131847c888c74b66a225d5",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "interpersonal_trust"
+    ],
+    "scoreOrder": [
+      "interpersonal_trust"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "interpersonal_trust",
+        "headline": "你通常怎样看待别人的善意？",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这三道题像一张小小的合影：记录你此刻对“别人一般能不能信任”的看法，不是给你贴上天真或多疑的标签。更愿意相信别人，可能让合作更容易开始；多留一点心，也可能是在保护自己的边界。合适的做法往往取决于眼前的人和事，而不是把信任越多当成越好。例如，和新同事分工时，可以先约定一件小任务，看看对方是否按时完成，再决定下一步合作。信任不必一次全给，也不必永远关门。分数越高，表示这次回答越倾向于认为他人通常可信，并不说明某个具体的人一定安全可靠。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次别人兑现承诺的经历，再想一次让你失望的经历：这两件事有哪些不同？"
+          },
+          {
+            "category": "strategy",
+            "text": "下一次合作先说清楚任务、时间和边界，用实际表现慢慢积累信任。 遇到借钱、隐私或安全问题，核实信息和保留拒绝权始终重要。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这是独立中文工作译稿，仍待人工审校和本地验证，仅供成人研究与自我了解。",
+      "英国和德国成人研究中的平均值仅作出处记录，不能当作中国人的标准答案；本报告不作高低分级、排名或风险判断。",
+      "三题都需完整回答才提供结果。漏答不补零、不猜测。",
+      "不能用于诊断、重要选拔、对个人诚信作结论或自动剔除研究参与者。"
+    ],
+    "disclaimer": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3) — Nießen, D., Beierlein, C., Rammstedt, B., Lechner, C. M. (2020). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ 。仅供成人研究与自我了解，不用于心理诊断或诚信评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T15:16:30Z",
+        "basis": "AI editorial check only: everyday reflection language, raw directions preserved, no individual dishonesty/exclusion/ranking claim; not expert or psychometric validation."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "interpersonal_trust"
+    ],
+    "scoreOrder": [
+      "interpersonal_trust"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "interpersonal_trust",
+        "headline": "给一般信任与具体判断留出不同的位置",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这三题关注你通常是否觉得大多数人怀有善意、他人总体上能否信任。统一计分方向后，均分范围1–5；数值越大，表示这次整体更认可他人通常可信的看法。它不评估某个具体人的可靠性，也不代表信任越多就越好。\n\n例如，和新同事合作时，你可以愿意听对方的方案，同时把分工、时间与信息边界说清楚。对方之后是否兑现承诺，是具体的新信息；它与对“多数人”的总体预期并不完全相同。若你倾向先保留一点距离，也不应被贴成多疑；愿意合作也不等于需要放弃核实。\n\n可以保留让你安心的合作方式，并允许判断随着实际信息调整。下面是可自行选择的做法，不是分数已判断你应该信谁、应该开放多少隐私。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "分清总体预期和这次证据：想到某个人时，列出已经观察到的兑现/未兑现行为，以及仍不知道的部分。未知可以先留作未知，不急着全盘相信或否定。"
+          },
+          {
+            "category": "strategy",
+            "text": "从范围清楚、可核对的合作开始：先讲明一项分工、时间和双方责任，再根据实际表现决定是否继续，不用一次交出所有信息或承诺。"
+          },
+          {
+            "category": "support",
+            "text": "保留调整和拒绝的权利：即使平时愿意信任人，遇到不合理要求、隐私或安全疑虑也可以核实、延后或拒绝。一般信任分数不能替代眼前的边界判断。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本仍在研究完善，没有可用的人群分档或排名；不能据分数认定具体对象安全可靠。三题需答完整才计算，漏答不是0分。"
+    ],
+    "disclaimer": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3) — Nießen, D., Beierlein, C., Rammstedt, B., Lechner, C. M. (2020). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ 。仅供成人研究与自我了解，不用于心理诊断或诚信评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:38:18Z",
+        "basis": "本次只读审阅kusiv3_zh_cn_research C1.0.0当前source、固定既有材料及新R1.1.0文字，核分组/原方向/时窗/缺失0与null、固定例子和构念适配行动；不改受众权限，不继承旧审核日期，不声称新中文验证、作者批准或新schema/scorer/PG/CI通过。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "interpersonal_trust"
+    ],
+    "scoreOrder": [
+      "interpersonal_trust"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "interpersonal_trust",
+        "headline": "信任可以分步给，不用一次交出全部钥匙",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：给合作留入口，也给自己留退路。\n\n把信任想成一串不同用途的钥匙，不必一次全交出去。这三题只是回看“别人一般是否可信”的总体预期，统一方向后均分1–5；数值越大表示整体更认可他人通常可信，不是在替任何具体的人开安全证明。\n\n假设刚认识的同事邀请合作。你可以先把一项分工谈清楚，看看实际配合；不必因为愿意信任，就立刻把所有承诺和私人信息一并交出去。若对方没有做到，也可以先核实发生了什么；是否继续合作，仍由你结合信息和边界决定。\n\n想靠近一点或想谨慎一点，都值得放回具体关系和真实证据里看。比喻不是让你必须多信人，也不是系统从分数给你分了“天真派”或“防备派”。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "先看看这把钥匙开哪扇门：具体是什么合作、会共享什么、可能承担什么？把范围说清楚，不拿对人的整体感觉代替每一项判断。"
+          },
+          {
+            "category": "strategy",
+            "text": "给一个可核对的入口：先约定一项双方都理解的合作，用兑现过程慢慢增加或调整信任，不以问卷分数决定投入多少。"
+          },
+          {
+            "category": "support",
+            "text": "自己的钥匙可以留着：碰到越界要求或不确定的信息，可以暂停、问清或拒绝。保持边界，不必先证明对方有坏意才被允许。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本仍在研究完善，没有可用的人群分档或排名；不能据分数认定具体对象安全可靠。三题需答完整才计算，漏答不是0分。"
+    ],
+    "disclaimer": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3) — Nießen, D., Beierlein, C., Rammstedt, B., Lechner, C. M. (2020). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ 。仅供成人研究与自我了解，不用于心理诊断或诚信评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:38:18Z",
+        "basis": "本次只读审阅kusiv3_zh_cn_research C1.0.0当前source、固定既有材料及新R1.2.0文字，核分组/原方向/时窗/缺失0与null、固定例子和构念适配行动；不改受众权限，不继承旧审核日期，不声称新中文验证、作者批准或新schema/scorer/PG/CI通过。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

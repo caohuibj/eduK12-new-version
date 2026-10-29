@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip50_zh_cn_research",
+  "instrumentVersion": "1.1.0",
+  "originalSourceSha256": "8e25a0410d7845dd0ce16d4ab10bdbd3769d073491f51a5c0a7df6dba0a07faf",
+  "oldReport": {
+    "reportVersion": "1.1.1",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "OpenAI AI-assisted editorial and contract review (not human scientific review)",
+        "reviewedAt": "2026-10-23T16:40:00.000Z",
+        "basis": "Adult wording; student is the existing respondent report channel, not a child population. No scientific approval claimed."
+      }
+    },
+    "primaryScoreKeys": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "intellect_imagination"
+    ],
+    "scoreOrder": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "intellect_imagination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "extraversion",
+        "headline": "你与人相处时的活跃程度",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分关注你在社交中是否愿意开口、主动接近别人或成为关注的焦点。分数越高，表示这次更认可活跃、外向的描述。安静与热闹都可能适合不同的人和场合；它不能判断你是否受欢迎，也不是沟通能力考试。想一想，怎样的相处节奏既让你自在，也能照顾重要的关系。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "哪些场合让你愿意多说一点，哪些时候你更需要安静？"
+          },
+          {
+            "category": "strategy",
+            "text": "为一段重要关系选择一种适合自己的联系方式，不必勉强自己变得热闹。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "agreeableness",
+        "headline": "你回应他人感受的习惯",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分关注你是否留意别人的感受、愿意关心或给对方留出时间。分数越高，表示这次更认可这些倾向。关怀不等于必须答应所有要求，保留边界也不等于冷漠。这份回答无法判断一个人的善良程度；具体情境、双方需要和可用精力都值得一起考虑。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一次关心别人时，你也照顾到自己的需要了吗？"
+          },
+          {
+            "category": "strategy",
+            "text": "试着问一句“你希望我听你说，还是一起想办法？”并说明自己能提供的支持。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "conscientiousness",
+        "headline": "你安排和落实事情的习惯",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分关注准备、整理、按计划行动和完成职责的习惯。分数越高，表示这次更认可有条理、能落实事情的描述。忙乱或拖延可能与任务不清、疲劳及现实资源有关，不能简单等同于懒惰。比起责备自己，找出一个能让行动更省力的安排往往更有用。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一件顺利完成的事，哪些准备或环境安排帮了忙？"
+          },
+          {
+            "category": "strategy",
+            "text": "把眼前任务拆出一个清楚的小动作，提前准备好所需材料。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_stability",
+        "headline": "你描述的情绪起伏",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分关注你通常怎样描述紧张、烦躁、担心和心情变化。按本量表的计分方向，分数越高表示更认可较平稳、较少受到扰动的描述；不是“神经质越高”。它不能诊断心理疾病，也不要求你始终平静。有情绪并不是失败，需要支持时可以认真对待自己的处境。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近让你起伏较大的事是什么？当时有哪些现实压力？"
+          },
+          {
+            "category": "strategy",
+            "text": "留意一个能让自己稍微缓过来的条件，例如休息、调整安排或与信任的人聊聊。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "intellect_imagination",
+        "headline": "你对想法和想象的兴趣",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分关注你对抽象想法、词语、反思和想象的兴趣及自我感受。分数越高，表示这次更认可这类描述。它不是智商测验，也不能判断你是否聪明、适合什么专业或职业。阅读经历、兴趣和接触机会都会影响回答；你可以从真正想弄明白的一件事开始探索。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近哪个问题让你愿意多想一会儿？你想弄明白哪一点？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一个感兴趣的小问题，找一条新信息，再写下自己的发现。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "此简体中文是独立AI辅助工作译稿，尚未验证；非已验证中文版本，不声称原作者认可。",
+      "仅限18岁及以上成人研究和描述性自我反思，不外推K12、其他年龄或群体。",
+      "五个维度各10题、原始分10–50，不合成人格总分，无常模、百分位、等级、临床阈值或人格好坏评价。",
+      "缺失使所属维度不计分，其余完整维度保留原始分；现有引擎将整份结果标为invalid并抑制全部解释文本。不补值、不折算。非法选项、未知题号或重复题号拒绝计分。此为平台保守策略，不是作者规定的缺失规则。",
+      "情绪稳定性不是同方向的神经质；智性/想象力不是IQ或能力测验。",
+      "结果受自我认识、作答情境和反应方式影响，不能用于诊断、招聘、升学、排名或其他高风险决策。",
+      "不承诺绝对保密；实际施测前必须落实真实的数据用途、访问范围、保存期限与退出说明。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思。IPIP原题为公共领域，本中文及报告为独立改编；不推断敏感身份，不用于高风险筛选。"
+  },
+  "standardReport": {
+    "reportVersion": "1.1.2",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.2; not human expert approval",
+        "reviewedAt": "2026-10-29T15:56:08Z",
+        "basis": "本次AI文字自审对应ipip50_zh_cn_research的标准增强版R1.1.2：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    },
+    "primaryScoreKeys": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "intellect_imagination"
+    ],
+    "scoreOrder": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "intellect_imagination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "extraversion",
+        "headline": "外向性：选择适合自己的相处节奏",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "先把整份结果看作五个角度\n\n五项分别描述通常的社交、关怀、做事、情绪和想法倾向，不合成人格总分，也不把你分成某种注定不变的类型。各项都是十题统一方向后的总和10–50，没有可用的中文等级或排名；分数不能决定岗位、专业、关系或未来。\n\n外向性越大，表示这次更认可主动交谈、社交活跃或不介意受到关注等描述。它不是沟通能力、受欢迎程度或一定要外向的标准。\n\n例如，在熟悉的人身边愿意多说，在陌生聚会中较安静，可以出现在同一个人身上。这个例子不是总分已查明你的社交模式。已有自在的联系方式可以保留；需要安静或希望多参与一点时，也可以结合场合调整，不必为了某个数字改变整个人。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一段重要的关系或一次需要参与的交流，使用自己能接受的方式：先准备一句话、发消息，或约一次简短谈话。留意是否更容易表达需要和听见对方，不以说得多、成为焦点为目标。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "agreeableness",
+        "headline": "宜人性：关心他人，也保留自己的边界",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项十题总和10–50；越大表示这次更认可关心、体谅、愿意为别人留时间等描述，统一方向后也包含较少认可伤人或忽视他人的说法。它不是善良程度或服从要求的评分。\n\n例如，朋友请你帮忙，而你也有急事，可以表达理解，同时说清能帮哪一部分、何时再联系。这个例子不是系统认定你一定会答应或拒绝。\n\n如果你已有尊重彼此需要的方式，可以继续用；若经常答应到超出余力，边界也值得照顾。有不同意见时仍可以尊重表达，不需要为了“更宜人”放弃必要的拒绝。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "遇到一个请求，先问清对方需要，再核对自己的时间与意愿。可以说“我能做的是……，暂时不能的是……”，不靠全部答应证明关心，也不必用伤人的话守住边界。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "conscientiousness",
+        "headline": "尽责性：让准备和落实更容易发生",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项也是十题总和10–50。越大表示这次更认可准备、细节、整理、按安排行动和完成职责等习惯，不是工作绩效、勤奋品格或可靠程度的认证。\n\n例如，一个人把熟悉任务安排得很清楚，面对临时增加、要求模糊的任务却仍可能忙乱。这个例子提醒你把习惯和条件一起看，不是问卷已找到你卡住的原因。\n\n已有省力的安排可以保留；若事情经常没接上，可以先看要求是否清楚、资源是否够，而不只责备自己。条理不需要变成事事完美，也不能替代合理的任务范围。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "挑一件眼前的事，写清下一小步、完成到什么程度、需要什么材料或帮助。先调整一个最费来回的环节；任务超出资源时，可协商范围或时间，不用继续加清单来证明自己够认真。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_stability",
+        "headline": "情绪稳定性：较平稳的描述，不是更高的神经质",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这十题统一方向后合计10–50。数值越大表示这次更认可通常较放松、较少担心、烦躁或情绪扰动的描述；不是“神经质越高”。它也不证明没有心理困扰，更不是必须一直平静。\n\n例如，持续赶工、休息不足时更容易烦躁，和在资源充足时的感受可能不同。这里是可能的生活情境，不能据此确定你的起伏原因。\n\n如果已有让自己缓过来的安排，可以保留；如果正在难受，也可以认真对待实际压力，不把有情绪视为失败。总分不代替对具体经历、持续时间和生活影响的了解。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "回顾一个愿意想起的起伏场景，看看当时有哪些可改变的压力或支持条件，选一个小调整，如休息、减少一项负担或与可信任的人商量。困扰持续影响生活时可寻求适当专业支持，不由这个分数确认或排除疾病。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "intellect_imagination",
+        "headline": "智性/想象力：对想法的自述，不是智商测验",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项十题总和10–50；越大表示这次更认可与词语、抽象理解、想象、想法和反思有关的自我描述。这里既有兴趣也有对自身的看法，不是现场推理考试，更不等于IQ、创造力实测或专业职业适配度。\n\n例如，对熟悉主题愿意反复琢磨，对陌生概念需要一个具体例子，都可能与经验和接触机会有关。分数不能判断你的知识哪里薄弱，或你应该走哪条道路。\n\n可以保留真正好奇的事情，也可以选择实际操作、例子或阅读等适合自己的入口；不需要用艰深词语或某种爱好证明聪明。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一个自己确实想弄明白的小问题，找一条可靠说明或一个实例，再用自己的明白话写一句目前的理解和一个仍待确认的问题。暂时不感兴趣也可以跳过，不把它变成能力训练或岗位选择依据。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "独立中文成人工作稿尚未验证，无等级或百分位；五项不合成总分，不作类型、能力或岗位预测。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思。IPIP原题为公共领域，本中文及报告为独立改编；不推断敏感身份，不用于高风险筛选。"
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T15:56:08Z",
+        "basis": "本次AI文字自审对应ipip50_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    },
+    "primaryScoreKeys": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "intellect_imagination"
+    ],
+    "scoreOrder": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "intellect_imagination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "extraversion",
+        "headline": "相处有音量，不必永远调到最大",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：五个角度帮助回顾习惯，不是一张命运签。\n\n这份报告五项各算各的，每项十题、范围10–50，不合成人格总分。没有中文等级线，也不从图形给你分类型、配岗位或预测未来。下面的例子和尝试都供你选择，不是系统已经识别出的个人故事。\n\n外向性数字越大，表示这次更认可主动开口、社交活跃和愿意被关注等描述，不是“人气值”或沟通资格。\n\n假设你和熟悉朋友聊得自在，到了陌生场合却想先听一听，安静与活跃也可以随场景变化。这不是问卷认定你的具体模式。已有舒服的节奏可以保留，想参与时找一个入口，需要安静时也可以说明，不必一直把音量拧到最大。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "给一段重要交流选个合适音量：一条消息、一句准备好的问题，或一次短谈都可以。看是否更容易表达与倾听，不把发言次数或成为焦点当作成功线。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "agreeableness",
+        "headline": "体谅可以和边界同桌",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "宜人性十题合计10–50，越大表示这次更认同关心、体谅、愿意给别人时间等描述，不是好人积分，也不是“越听话越好”。\n\n比如，朋友需要帮忙，你也正赶一件事，可以在意对方，也可以说清自己能做多少。这里是在举例，不是系统给你发一张“老好人”标签。\n\n已有彼此舒服的方式可以继续；如果总答应到超出余力，不用把拒绝写成冷漠。尊重表达和有不同意见可以同时存在，边界不必靠伤人的话来守。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "先问需要，再报容量：说清“我现在能帮的是……”和“暂时做不到的是……”。不用全盘答应换取好评价，也给对方选择别的支持的机会。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "conscientiousness",
+        "headline": "给行动铺路，不靠责备催动",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "尽责性十题合计10–50，越大表示这次更认同准备、整理、留意细节与落实安排等习惯。它不是产出排行榜，也不签发“勤奋”或“懒惰”证书。\n\n假设熟悉的事能顺着清单做完，临时任务却因要求不清而卡住；条理和条件要一起看。例子没替你找原因，也不意味着多写一张表就能解决资源不足。\n\n好用的安排可以保留；若哪里一直费力，可以先把路铺平一点，而不是只催自己。认真也不等于把所有事情都做到完美。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "只铺下一步：写一项具体动作、一个完成标准，再备好材料或问清要求。确实超出时间与资源时，先协商范围，不让“做计划”变成另一份过量任务。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_stability",
+        "headline": "平稳不是不许起伏",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "情绪稳定性十题合计10–50。数字越大，表示这次更认可较放松、较少担心烦躁或受扰动的描述，不是神经质分更大，也不是心理健康合格证。\n\n比如，休息不足又连续赶工时，人可能更容易心烦。这里只是一个情境，不是系统已经查明你的原因。一个分数不能知道经历多强、持续多久，也不能替代对真实生活的了解。\n\n已有能恢复一点的办法可以继续；正在难受时，也不需要为了“稳定”把情绪关掉。先看能否补一点休息、资源或支持，比责怪自己有起伏更具体。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "给恢复找一个现实条件：选一项能调整的压力、一个可协商的安排，或一次可信任的交流。困扰持续影响生活时，可寻求适当专业支持；不拿这个数字自己下诊断或证明无需帮助。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "intellect_imagination",
+        "headline": "给好奇一个入口，不给聪明盖章",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "智性/想象力十题合计10–50，越大表示这次更认可有关词语、抽象理解、想象、想法和反思的描述。它不是IQ、创意天赋或适合什么岗位的答案。\n\n有人在熟悉的话题上很爱琢磨，碰到陌生概念时仍需要一个生活例子；经验、兴趣和接触机会都值得考虑。例子不是问卷给你的知识或能力画像。\n\n真正想知道的事可以继续探索，不喜欢某种抽象话题也不用给自己定性。表达清楚不需要故意用难词，也不必把所有兴趣改造成证明自己聪明的项目。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "从一个真问题开始：找一条可靠说明或一个实例，用自己的话讲清目前理解了什么、还想问什么。愿意再往下走就继续，不愿意也可换题；不是为了提高分数或替未来选职业。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "独立中文成人工作稿尚未验证，无等级或百分位；五项不合成总分，不作类型、能力或岗位预测。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思。IPIP原题为公共领域，本中文及报告为独立改编；不推断敏感身份，不用于高风险筛选。"
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

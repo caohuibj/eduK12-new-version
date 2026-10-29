@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "jss8_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "originalSourceSha256": "8a90a776122d8daab948c15117061085a7e328d250c500e909dbfa838c2071ff",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "victim",
+      "observer",
+      "beneficiary",
+      "perpetrator"
+    ],
+    "scoreOrder": [
+      "victim",
+      "observer",
+      "beneficiary",
+      "perpetrator"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "victim",
+        "headline": "自己处于不利位置",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "留意自己吃亏时，什么最容易触动您。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一次觉得不公平时，您站在哪个位置？"
+          },
+          {
+            "category": "strategy",
+            "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "observer",
+        "headline": "看到他人受到不公平对待",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "留意看到别人吃亏时，您最在意什么。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把自己换到另一个位置，会多看到什么信息？"
+          },
+          {
+            "category": "strategy",
+            "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "beneficiary",
+        "headline": "自己从不公平中获益",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "留意自己无意中占了便宜时，内心会有什么反应。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一次觉得不公平时，您站在哪个位置？"
+          },
+          {
+            "category": "strategy",
+            "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "perpetrator",
+        "headline": "自己造成不公平",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "留意自己的行为影响别人时，您会怎样看待它。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把自己换到另一个位置，会多看到什么信息？"
+          },
+          {
+            "category": "strategy",
+            "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+      "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+      "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+      "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+    ],
+    "disclaimer": "仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T16:19:00Z",
+        "basis": "AI editorial check only: adult descriptive report; no individual diagnostic/ability/moral classification; source sample statistics not Chinese norms. Not human expert review."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "victim",
+      "observer",
+      "beneficiary",
+      "perpetrator"
+    ],
+    "scoreOrder": [
+      "victim",
+      "observer",
+      "beneficiary",
+      "perpetrator"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "victim",
+        "headline": "自己吃亏时：先分清事实、感受和需要",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份报告带走一句话：先看自己站在哪个位置，再想需要什么信息和行动，不把感受加成人品分。\n\nJSS-8记录四个视角中的自述或想象反应，不是遭遇次数；没经历过的情境也可能按想象回答。四项各两题均分1–6，分别看，不合成总分，也没有中文高低界线。它不能证明某件事确实不公，或你实际会怎样做。\n\n自己处于不利位置这一项，越大表示这次更认可面对无正当理由的差别待遇时，会生气或感到困扰。例如，同样投入却获得不同机会，可能让人想问规则是什么。这是情境例子，不是系统确认你遭受了什么。\n\n如果你已有核实信息、表达需要的方式，可以保留；如果反应强烈，也可以先给自己一点整理空间。感受值得听见，但事实、差异原因和可行途径仍需分别了解，不用靠争辩强弱证明是否公平。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一件愿意回顾的小事，分开写已知事实、尚不清楚的规则、自己的感受与希望。合适且安全时提出一个具体问题，如“这个安排按什么标准决定？”不把想象补成事实，也不要求立即当面对质。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "observer",
+        "headline": "旁观他人吃亏时：受到触动不等于已经帮助",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题均分1–6。越大表示这次更认可自己看到或得知别人受到不公平待遇时，会难受或受困扰；不是你目睹过多少次，更不是实际帮助能力。\n\n例如，在合作中得知某人的贡献没有被看见，你可能在意其处境。但目前知道多少信息、当事人希望怎样处理，都不能由这个分数回答。例子不是系统已看见的事件。\n\n若你愿意支持别人，可以保留尊重对方意愿的做法；若一时不知道怎么办，也不必靠激烈表态证明关心。先了解需要、再决定自己能安全地做什么。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "在合适时问当事人是否需要倾听、信息或协助，先征得同意再代为表达或公开细节。自己能力有限时也可说明，寻找合适渠道，不把所有解决责任揽到身上。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "beneficiary",
+        "headline": "自己被动获益时：不安不是有错的证明",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题均分1–6。越大表示这次更认可在结果对自己有利、对他人不利时，会感到内疚或不安。它描述被动获益的视角，不等于你主动造成不公，也不证明你曾经历或实施了某种行为。\n\n例如，某项默认安排让你更容易得到资源，你可能想知道条件是否一致。不同结果是否缺乏正当理由，还要看规则和实际情况，不能只由内疚感决定。这里是例子，不是对你的指控。\n\n可以认真了解他人的处境，也不必把所有差别都当成自己的过错。若确有不合理之处，再在自己权限和现实条件内考虑怎样改进，而不是用持续责备替代处理。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "先核对一项具体安排的标准、自己知道的信息和别人实际受影响的部分。有不清楚的先询问；若确认存在不合理，可选择说明情况或向合适渠道提出调整，不为缓解内疚而替他人作决定。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "perpetrator",
+        "headline": "自己造成不公的想象：看反应，不先给自己定性",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题均分1–6。越大表示这次更认可如果自己以他人为代价获利、靠手段取得优势，会内疚或不安；不表示你做这种事更多，也不构成事件证据或道德鉴定。\n\n例如，把共同成果说成主要由自己完成，可能涉及对他人贡献的忽视。这是用来理解视角的例子，报告并没有指认你这样做过。感到内疚也不自动代表已经作出补救。\n\n如果现实中确有不妥，可以把注意力放到停止、澄清与修复；如果只是想象作答，不必把假设当成自己的罪证。反应强弱与具体责任需要分开看。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "只在确有具体事实时，核对自己做了什么、谁受影响、能停止或纠正哪一部分，例如准确补充贡献归属。倾听受影响者的需要，不要求对方立即原谅或安慰你；不要仅凭问卷分数向自己或他人定罪。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "独立中文成人工作稿尚未验证；四项为自述或想象反应，不证明事件、实际行为或道德高低。"
+    ],
+    "disclaimer": "仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:06:07Z",
+        "basis": "本次AI文字自审对应jss8_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "victim",
+      "observer",
+      "beneficiary",
+      "perpetrator"
+    ],
+    "scoreOrder": [
+      "victim",
+      "observer",
+      "beneficiary",
+      "perpetrator"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "victim",
+        "headline": "先看自己站哪边，不急着给人发好坏牌",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：感受是一条线索，不是事实证明，也不是人品总分。\n\n这八题分成四个位置，各两题均分1–6，没有四项相加的总分。回答可能来自经历，也可能按题意想象；没有中文等级线，也不能据此算出谁更公正、谁更自私。\n\n自己吃亏这一项越大，表示这次更认可面对无正当理由的差别时会生气或困扰。比如投入相近却机会不同，你可能很想问为什么。这里是例子，不是系统替你确认了差别的原因。\n\n已有问清规则、说明需要的方式可以保留。反应很强时也可以先理一理：我知道什么，还有什么没弄清？不是让你否认感受，也不需要用争得多响来换一张“有理”的证明。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "给事情分三格：事实、感受、希望。再留一个问号给尚不清楚的规则。合适且安全时问一个具体问题，不必马上对质，也不让猜测抢先变成定论。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "observer",
+        "headline": "看见别人吃亏，先问怎样帮才合适",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "旁观视角的两题均分1–6，越大表示这次更认可自己会因他人被不公平对待而难受或困扰。它不是热心行动次数，也不发“正义感强者”标签。\n\n假设合作中有人的贡献被漏掉，你可能被触动，但知道的信息和对方想要的帮助还要了解。例子没有指向你的真实经历。\n\n可以认真在意，也可以保留边界。不必先冲到台前表态，才算关心；受到触动与怎样提供支持，是两个问题。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "先给帮助一个问句：对方想被听见、核实信息，还是需要协助？未经同意不替人公开细节；能做多少就说明多少，不让支持变成替对方接管决定。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "beneficiary",
+        "headline": "得到好处时，也可以先核对规则",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "被动获益两题均分1–6，越大表示这次更认可自己在无正当理由地占优势时会内疚或不安。不是说你更常占便宜，更不证明你暗中做了什么。\n\n例如，默认安排让你较容易拿到某项资源，你可能觉得不自在；但差别有没有理由，需要看事实与标准，不是由不安直接判定。这里只是一个帮助理解的位置。\n\n关心公平不等于把一切优势都背成过错。有需要改的地方可以处理，暂时没弄清时也可以先问，不用让内疚一直替规则“值班”。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把不安变成一次核对：这项安排按什么标准，别人受到什么影响，我有哪些信息还不知道？确认问题后，在实际权限内说明或提出调整，不为让自己好受而替别人决定。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "perpetrator",
+        "headline": "想象做错，不等于已经做过；真有问题就落到修复",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "主动造成不公两题均分1–6，越大表示这次更认可自己若牺牲他人获利或耍手段，会内疚或不安。不表示做坏事频繁，也不是问卷抓到了证据。\n\n例如，把共同成果全说成自己的，是理解这个位置的一种场景；它不是对你的指认。心里很不安，也不自动等于事情已经改好。\n\n若只是想象作答，可以把假设留在假设里。若现实中确有一件不妥，则看看怎样停止、澄清或修复，比给整个人盖一个标签更具体。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "有事实再处理事实：核对具体行为、影响和能改的部分，例如补正贡献归属或停止不公平做法。听听受影响者的需要，不让对方承担安慰或马上原谅的任务；分数本身不负责定罪或免责。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "独立中文成人工作稿尚未验证；四项为自述或想象反应，不证明事件、实际行为或道德高低。"
+    ],
+    "disclaimer": "仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:06:07Z",
+        "basis": "本次AI文字自审对应jss8_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

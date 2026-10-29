@@ -1,0 +1,510 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "kusiv3_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "人际信任简表（3题）（中文研究译稿）",
+      "abbreviation": "KUSIV3",
+      "instrumentFamily": "interpersonal-trust"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [],
+      "constructDefinition": "对他人通常是否可信的总体预期，不是特定对象的安全判断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "人际关系",
+        "人际信任",
+        "自我了解",
+        "成人",
+        "研究用途",
+        "中文工作译稿",
+        "CC BY 4.0",
+        "kusiv3",
+        "adult_self_report",
+        "descriptive_report",
+        "non_diagnostic",
+        "domain:social_emotional",
+        "construct:interpersonal_trust",
+        "population:ages_18_unspecified",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "原英德研究样本18–69岁成人，本中文仅成人研究与自我了解，尚无本地验证。ADULT_SELF/student为现有技术角色映射，不表示儿童适用。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "一般自我描述，无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留作者英文版题序和1–5锚点；中文独立工作翻译。",
+        "KUSIV3仅第2题反向6−x。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "本项目据作者英文题本独立翻译为中文工作稿，并编写通俗反馈；尚非经验证的中文版本。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "待人工译审、认知访谈和本地验证；英语适配及原德语研究证据不可作为当前中文常模。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "kusiv3-zh-cn-research-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "kusiv3-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "kusiv3-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3) — Nießen, D., Beierlein, C., Rammstedt, B., Lechner, C. M. (2020). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。",
+      "https://creativecommons.org/licenses/by/4.0/",
+      "https://link.springer.com/article/10.1186/s42409-020-00016-1",
+      "CC BY 4.0，署名/许可链接/标明修改，无原作者认可；允许商业及非商业再使用，不把推荐研究用途误当NC版权限制。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3)",
+        "citation": "Nießen, D.; Beierlein, C.; Rammstedt, B.; Lechner, C. M. (2020). An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3). Measurement Instruments for the Social Sciences. DOI 10.1186/s42409-020-00016-1",
+        "url": "https://link.springer.com/article/10.1186/s42409-020-00016-1",
+        "publicationYear": 2020
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3) — Nießen, D., Beierlein, C., Rammstedt, B., Lechner, C. M. (2020). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ https://link.springer.com/article/10.1186/s42409-020-00016-1"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "kusiv3_agreement_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不太同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有些同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "大体同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "完全同意",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "KUSIV3_01",
+          "content": "我相信大多数人都怀有善意。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "kusiv3_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "KUSIV3_02",
+          "content": "如今谁都靠不住。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "kusiv3_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "KUSIV3_03",
+          "content": "总的来说，人们是可以信任的。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "kusiv3_agreement_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "KUSIV3_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "KUSIV3_02",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "KUSIV3_03",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "interpersonal_trust",
+            "type": "total",
+            "label": "对他人的信任预期",
+            "description": "对他人的信任预期的回答均值；不是诚信、能力或风险等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "KUSIV3_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "KUSIV3_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "KUSIV3_03",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "interpersonal_trust"
+        ],
+        "scoreOrder": [
+          "interpersonal_trust"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "interpersonal_trust",
+            "headline": "给一般信任与具体判断留出不同的位置",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这三题关注你通常是否觉得大多数人怀有善意、他人总体上能否信任。统一计分方向后，均分范围1–5；数值越大，表示这次整体更认可他人通常可信的看法。它不评估某个具体人的可靠性，也不代表信任越多就越好。\n\n例如，和新同事合作时，你可以愿意听对方的方案，同时把分工、时间与信息边界说清楚。对方之后是否兑现承诺，是具体的新信息；它与对“多数人”的总体预期并不完全相同。若你倾向先保留一点距离，也不应被贴成多疑；愿意合作也不等于需要放弃核实。\n\n可以保留让你安心的合作方式，并允许判断随着实际信息调整。下面是可自行选择的做法，不是分数已判断你应该信谁、应该开放多少隐私。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "分清总体预期和这次证据：想到某个人时，列出已经观察到的兑现/未兑现行为，以及仍不知道的部分。未知可以先留作未知，不急着全盘相信或否定。"
+              },
+              {
+                "category": "strategy",
+                "text": "从范围清楚、可核对的合作开始：先讲明一项分工、时间和双方责任，再根据实际表现决定是否继续，不用一次交出所有信息或承诺。"
+              },
+              {
+                "category": "support",
+                "text": "保留调整和拒绝的权利：即使平时愿意信任人，遇到不合理要求、隐私或安全疑虑也可以核实、延后或拒绝。一般信任分数不能替代眼前的边界判断。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文版本仍在研究完善，没有可用的人群分档或排名；不能据分数认定具体对象安全可靠。三题需答完整才计算，漏答不是0分。"
+        ],
+        "disclaimer": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3) — Nießen, D., Beierlein, C., Rammstedt, B., Lechner, C. M. (2020). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ 。仅供成人研究与自我了解，不用于心理诊断或诚信评价。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T15:38:18Z",
+            "basis": "本次只读审阅kusiv3_zh_cn_research C1.0.0当前source、固定既有材料及新R1.1.0文字，核分组/原方向/时窗/缺失0与null、固定例子和构念适配行动；不改受众权限，不继承旧审核日期，不声称新中文验证、作者批准或新schema/scorer/PG/CI通过。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "kusiv3",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "KUSIV3_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KUSIV3_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KUSIV3_03",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "interpersonal_trust": 1
+          },
+          "totalScoreKeys": [
+            "interpersonal_trust"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "KUSIV3_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KUSIV3_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KUSIV3_03",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "interpersonal_trust": 5
+          },
+          "totalScoreKeys": [
+            "interpersonal_trust"
+          ]
+        }
+      },
+      {
+        "name": "all-three",
+        "answers": [
+          {
+            "itemCode": "KUSIV3_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "KUSIV3_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "KUSIV3_03",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "interpersonal_trust": 3
+          },
+          "totalScoreKeys": [
+            "interpersonal_trust"
+          ]
+        }
+      },
+      {
+        "name": "all-one",
+        "answers": [
+          {
+            "itemCode": "KUSIV3_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KUSIV3_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KUSIV3_03",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "interpersonal_trust": 2.3333333333333335
+          },
+          "totalScoreKeys": [
+            "interpersonal_trust"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面我们想了解你对其他人的看法。请指出你对以下每句话的同意或不同意程度。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/bilingual-content.json#/instructions/zh @ b92c69aefa2472775fa7ee86b9c208366886c908（作者英文题本指导语的项目中文工作译稿；非专家批准）"
+  }
+}

@@ -1,0 +1,692 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip_responsive_joy10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "IPIP共感愉悦10题（研究译稿）",
+      "abbreviation": "IPIP_RESPONSIVE_JOY10",
+      "instrumentFamily": "International Personality Item Pool"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "PERSONALITY"
+      ],
+      "constructDefinition": "Self-reported tendency to share or be influenced by others' positive affect; not overall empathy, kindness, moral quality or professional competence.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ipip_responsive_joy10",
+        "emotional_tendency",
+        "adult_self_report",
+        "self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:responsive_joy",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目前通常状态；无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方项目顺序；1–5符合度锚点。",
+        "项目采用全10题完整作答才求和，不把缺失当零。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "基于IPIP官方Barchard(2001)构念题库的AI辅助中文工作译稿，不是官方中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文专家译审、认知访谈和目标人群心理测量验证待完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_responsive_joy10-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_responsive_joy10-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_responsive_joy10-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "IPIP 官方声明题项公有领域，可复制、改编、翻译及电子施测；权利许可不代表此中文译稿已经验证。",
+      "https://ipip.ori.org/newPermission.htm"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "IPIP Responsive Joy",
+        "citation": "Barchard (2001), as attributed by the official IPIP key; do not claim a complete emotional-intelligence battery.",
+        "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "IPIP public domain: https://ipip.ori.org/newPermission.htm ; translation remains unvalidated."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ipip_responsive_joy10_accuracy",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "介于不符合与符合之间",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_01",
+          "content": "我喜欢看孩子们拆礼物。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_02",
+          "content": "如果周围的人在笑，我通常也会跟着笑起来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_03",
+          "content": "我能感受到他人的喜悦。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_04",
+          "content": "当他人庆祝时，我也会受到那种兴奋气氛的感染。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_05",
+          "content": "他人的好心情会对我产生很大的影响。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_06",
+          "content": "如果周围的人很开心，我就很难一直保持坏心情。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_07",
+          "content": "当我感到难过时，我不喜欢待在开心的人身边。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_08",
+          "content": "他人的快乐不会影响到我。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_09",
+          "content": "我很少被兴奋的气氛所感染。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_JOY10_10",
+          "content": "我不喜欢孩子们的生日聚会。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ipip_responsive_joy10_accuracy",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "ipip_responsive_joy10",
+            "type": "total",
+            "label": "共感愉悦",
+            "description": "分数概括你在他人开心或庆祝时受到积极情绪感染的自述倾向。它不代表整体共情能力，也不用于判断是否关心别人。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_JOY10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "ipip_responsive_joy10"
+        ],
+        "scoreOrder": [
+          "ipip_responsive_joy10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_responsive_joy10",
+            "headline": "分享好消息时，你的心情会怎样回应",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "先读懂这个总分\n\n十题统一计分方向后相加，范围10–50。越大表示这次更认同自己会受到他人的好心情、笑声或庆祝气氛感染。它不是你平时快乐多少，也不测整体共情、善良或照顾他人的能力。题目问通常的符合程度，没有固定的最近一周窗口，也没有可用的中文高低分界。\n\n感受与表达，不必长得一样\n\n例如，朋友分享一个好消息，你可能一起兴奋，也可能安静地听、问一个细节；外在反应与内心感受未必相同。这是生活例子，不是问卷已知道你如何回应。生日聚会、孩子拆礼物等场景，也会受经历、文化和个人处境影响，不喜欢某种活动不能直接读成不关心别人。\n\n如果你已有自然、双方都舒服的分享方式，可以保留。若当下疲惫、难过，或没有同样兴奋，也不必强迫自己笑起来。可以真诚承认对方的好事，同时保留自己的感受；一个总分不能解释你为什么有某种反应。\n\n下面是几种可选择的回应，不是让你变成更热闹、更会“带气氛”的人。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次别人分享好消息的情形：你心里是什么反应，怎样让对方知道自己听见了？只回顾真实经历，不比较谁表现得更开心，也不要求自己重现同样强烈的感受。"
+              },
+              {
+                "category": "strategy",
+                "text": "若愿意，可以问一句“哪一部分让你最开心？”或具体回应一件你听到的事。让对方有选择继续分享的空间，不把交流变成必须跟着兴奋的表演。"
+              },
+              {
+                "category": "environment",
+                "text": "选一种双方都能接受的方式：简短消息、安静聊一会儿，或一起参加活动。自己需要休息或暂时不想参加时也可以说明，不必用聚会偏好给关系或关心程度下结论。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "独立中文成人工作稿尚未验证，场景受经历与文化影响；不分等级，也不代表整体共情或品格。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。共感愉悦不是整体共情、善良程度或教师/亲职能力。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T15:56:08Z",
+            "basis": "本次AI文字自审对应ipip_responsive_joy10_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ipip_responsive_joy10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_responsive_joy10": 30
+          },
+          "totalScoreKeys": [
+            "ipip_responsive_joy10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_responsive_joy10": 50
+          },
+          "totalScoreKeys": [
+            "ipip_responsive_joy10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_JOY10_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_responsive_joy10": 10
+          },
+          "totalScoreKeys": [
+            "ipip_responsive_joy10"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+  }
+}
