@@ -1,0 +1,615 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "phq4_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 3,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "超简抑郁焦虑筛查量表（PHQ-4） — 中文研究工作译稿",
+      "abbreviation": "PHQ-4",
+      "instrumentFamily": "Patient Health Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "过去两周焦虑与抑郁相关症状的超短自陈筛查；非诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "phq4",
+        "anxiety_symptoms",
+        "depressive_symptoms",
+        "ultra_brief_screening",
+        "public_domain",
+        "adult_self_report",
+        "non_diagnostic",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_local_norms",
+        "domain:distress_behavior",
+        "construct:depressive_experience",
+        "construct:anxiety_experience",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去两周",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持原始2009论文附录题序A1、A2、D2、D1；使用0–3频率锚点。",
+        "独立中文工作指导语已按双语材料逐字绑定到顶层instruction，保留过去两周回顾期；实际冻结与页面显示以当前安装器及报告消费者核验为准，不冒称已完成译审或本地验证。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "项目 AI 辅助中文工作译稿；未声明与任何既有经验证中文版本相同。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "待独立译审、认知访谈与目标人群证据。尚无在本main源库可直接去重的PHQ9/GAD7执行版本；不声称已完成经验证译本逐字对齐。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "phq4-zh-cn-research-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "phq4-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "phq4-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "作者手册p8明确复制、翻译、显示和分发无需许可；许可不代表译稿验证。",
+      "https://archive.thepcc.org/sites/default/files/resources/instructions.pdf"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "超简抑郁焦虑筛查量表（PHQ-4） — 中文研究工作译稿",
+        "citation": "Kroenke K, Spitzer RL, Williams JBW, Löwe B. An Ultra-Brief Screening Scale for Anxiety and Depression: The PHQ–4. Psychosomatics. 2009;50(6):613–621. doi:10.1016/S0033-3182(09)70864-3.",
+        "url": "https://doi.org/10.1016/S0033-3182(09)70864-3"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Public domain / permission-free reproduction and translation per author manual p8: https://archive.thepcc.org/sites/default/files/resources/instructions.pdf"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "phq4_responses",
+          "options": [
+            {
+              "value": "0",
+              "label": "完全没有",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "有几天",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "超过一半的天数",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "几乎每天",
+              "score": 3
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "PHQ4_A1",
+          "content": "感到紧张、焦虑或坐立不安",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "phq4_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ4_A2",
+          "content": "不能停止或控制担忧",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "phq4_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ4_D2",
+          "content": "感到情绪低落、沮丧或绝望",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "phq4_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ4_D1",
+          "content": "做事时少有兴趣或乐趣",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "phq4_responses",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "PHQ4_A1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ4_A2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ4_D2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ4_D1",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "phq4_total",
+            "type": "total",
+            "label": "困扰总分",
+            "description": "过去两周相关症状自报频率之和；不等于诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "PHQ4_A1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ4_A2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ4_D2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ4_D1",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "gad2",
+            "type": "dimension",
+            "label": "焦虑相关分",
+            "description": "过去两周相关症状自报频率之和；不等于诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "PHQ4_A1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ4_A2",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "phq2",
+            "type": "dimension",
+            "label": "抑郁相关分",
+            "description": "过去两周相关症状自报频率之和；不等于诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "PHQ4_D2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ4_D1",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "phq4_total",
+          "gad2",
+          "phq2"
+        ],
+        "scoreOrder": [
+          "phq4_total",
+          "gad2",
+          "phq2"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "phq4_total",
+            "headline": "用四个问题打开讨论，不让总分代替全部生活",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题回看过去两周，总分范围0–12。数字越大，表示四种相关困扰的自报频率合计更多；两个两题分组只是把同四题分开看，不能与总分再相加。它们没有记录生活的全部，也没有直接测量你还可以工作、休息或求助到什么程度。\n\n例如，担心占着注意力，原本喜欢的事也难以投入；另一个人可能主要是低落，担心却不多。同一个总分不能替你说明是哪种情境、什么原因或需要哪一种帮助。可以把下面两组当作说清近况的入口，而不急着由一个数给自己贴标签。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选过去两周一件受影响的具体事情，记录当时的困扰、出现的情境和对日常生活的影响；也可以写已有哪种支持。"
+              },
+              {
+                "category": "support",
+                "text": "如果这些困扰持续或影响生活，可与可信任的人或合格心理健康专业人员讨论；不必等某条分数线，若不知道从哪里开始，可向当地医疗机构询问合适的支持。"
+              },
+              {
+                "category": "support",
+                "text": "如有迫切安全顾虑，应优先寻求现实中的即时帮助，而不是用四题结果判断安全或等待分数变化。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "gad2",
+            "headline": "两题里的焦虑相关体验：紧张与难停下的担忧",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这两题只看过去两周的紧张、不安，以及不能停止或控制担忧，和分范围0–6。数字越大，表示这两类体验报告得更频繁；它没有测出担忧的原因或一个人的应对能力。\n\n例如，准备休息时，脑中仍反复想一件事。如果这个例子与你的生活相似，可以说清它何时出现、占用了什么时间，以及怎样影响你。实际需要的信息、现实压力和支持条件，都值得一起讨论；不是简单要求自己“别想了”。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "记下一次担忧的具体内容和影响，区分已知事实、仍未确定的部分，以及现在最想获得的信息或帮助。"
+              },
+              {
+                "category": "support",
+                "text": "愿意时把这段经历带给可信任的人或专业人员；若担忧持续、难以摆脱或影响生活，可以主动寻求支持，不需要先证明自己足够严重。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "phq2",
+            "headline": "两题里的抑郁相关体验：低落与兴趣变化",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这两题只看过去两周的低落、沮丧或无望感，以及做事少有兴趣或乐趣，和分范围0–6。数字越大，表示这些体验报告得更频繁，不代表一个人是否努力或有价值。\n\n例如，以前愿意参与的活动，近来提不起兴趣；也可能仍在完成事情，内心却很低落。如果这些情况与你相似，可以把变化与实际生活联系起来说明，而不是催自己马上振作。能否继续做某些事，也不能单凭这两题说明全部处境。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一件原本有兴趣的事，记下过去两周有什么变化，以及是否影响休息、活动或与人相处，不用勉强找一个积极解释。"
+              },
+              {
+                "category": "support",
+                "text": "若这些体验持续或影响生活，可以和可信任的人或合格专业人员谈谈，并说清希望得到的是倾听、实际协助还是进一步评估。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文工作译稿尚未验证，不启用个人轻重或诊断分界；四题不能判断自伤风险，较少报告不等于安全或不需要帮助。漏答不是0分。"
+        ],
+        "disclaimer": "本报告仅描述过去两周相关症状自报情况，不用于心理诊断。尚未验证的工作译稿不能替代专业评估，未达参考值也不能排除心理困扰。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial self-review; not human, clinical or author approval",
+            "reviewedAt": "2026-10-29T16:43:50Z",
+            "basis": "本次仅审读新R文字、当前源的时间窗／方向及非诊断边界；一般求助路径另核NIMH权威页。不运行计分或报告测试，不构成人工译审、临床审核或心理测量验证；不改变成人自答受众。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "phq4",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "zero",
+        "answers": [
+          {
+            "itemCode": "PHQ4_A1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ4_A2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ4_D2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ4_D1",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phq4_total": 0,
+            "gad2": 0,
+            "phq2": 0
+          },
+          "totalScoreKeys": [
+            "phq4_total",
+            "gad2",
+            "phq2"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "PHQ4_A1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ4_A2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ4_D2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ4_D1",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phq4_total": 12,
+            "gad2": 6,
+            "phq2": 6
+          },
+          "totalScoreKeys": [
+            "phq4_total",
+            "gad2",
+            "phq2"
+          ]
+        }
+      },
+      {
+        "name": "one",
+        "answers": [
+          {
+            "itemCode": "PHQ4_A1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ4_A2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ4_D2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ4_D1",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phq4_total": 4,
+            "gad2": 2,
+            "phq2": 2
+          },
+          "totalScoreKeys": [
+            "phq4_total",
+            "gad2",
+            "phq2"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "过去两周里，以下问题困扰你的频率如何？",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/phq4/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908；既有独立中文工作指导语，与reviewed-source-pack.json一致，保留过去两周。"
+  }
+}

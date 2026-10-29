@@ -1,0 +1,834 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "djgls6_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "De Jong Gierveld 简式孤独感量表（6题）（中文研究译稿）",
+      "abbreviation": "DJGLS6",
+      "instrumentFamily": "De Jong Gierveld Short Loneliness Scale"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [],
+      "constructDefinition": "关系亲密感与可依靠联结不足的主观体验；不是朋友数量或不合群的人格判断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "孤独感",
+        "社会联结",
+        "情感联结",
+        "成人",
+        "老年人",
+        "自评",
+        "非商业",
+        "CC-BY-NC-2.0",
+        "独立中译待验证",
+        "非诊断",
+        "domain:social_emotional",
+        "construct:loneliness",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:not_diagnostic",
+        "license:noncommercial",
+        "license:cc_by_nc_2_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "仅限成人非商业研究；原英语题本独立中译尚未验证，不借用其他中文版或儿童常模。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "当前一般感受；原2010题项无统一固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按2010原作者论文情感后社会分组列项顺序，非声称所有施测表唯一题序；中间选项每题都记1。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅非商业研究；中文工作译稿未验证。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "基于原作者公开许可英文题本的项目独立中文工作翻译；非既有验证中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "待人工审校、认知访谈及中文目标人群验证。保留2010论文列项顺序，问卷一般说明为项目适配，未称验证版。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "djgls6-zh-cn-noncommercial-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "djgls6-zh-cn-noncommercial-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "djgls6-zh-cn-noncommercial-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130. https://link.springer.com/article/10.1007/s10433-010-0144-6 https://creativecommons.org/licenses/by-nc/2.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。",
+      "仅非商业；署名、来源、许可链接、标明改动。收费平台/学校收费培训不因研究名义自动合规；本tag不替代实际用途审查。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "De Jong Gierveld Short Loneliness Scale — English items as published by original authors in 2010 article, grouped emotional then social",
+        "citation": "De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130.",
+        "url": "https://link.springer.com/article/10.1007/s10433-010-0144-6",
+        "publicationYear": 2010
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130. https://link.springer.com/article/10.1007/s10433-010-0144-6 https://creativecommons.org/licenses/by-nc/2.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业使用；禁止超出授权用途。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "djgls6_item_1",
+          "options": [
+            {
+              "value": "no",
+              "label": "不是这样",
+              "score": 0
+            },
+            {
+              "value": "middle",
+              "label": "或多或少是这样",
+              "score": 1
+            },
+            {
+              "value": "yes",
+              "label": "是这样",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "key": "djgls6_item_2",
+          "options": [
+            {
+              "value": "no",
+              "label": "不是这样",
+              "score": 0
+            },
+            {
+              "value": "middle",
+              "label": "或多或少是这样",
+              "score": 1
+            },
+            {
+              "value": "yes",
+              "label": "是这样",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "key": "djgls6_item_3",
+          "options": [
+            {
+              "value": "no",
+              "label": "不是这样",
+              "score": 0
+            },
+            {
+              "value": "middle",
+              "label": "或多或少是这样",
+              "score": 1
+            },
+            {
+              "value": "yes",
+              "label": "是这样",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "key": "djgls6_item_4",
+          "options": [
+            {
+              "value": "no",
+              "label": "不是这样",
+              "score": 1
+            },
+            {
+              "value": "middle",
+              "label": "或多或少是这样",
+              "score": 1
+            },
+            {
+              "value": "yes",
+              "label": "是这样",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "djgls6_item_5",
+          "options": [
+            {
+              "value": "no",
+              "label": "不是这样",
+              "score": 1
+            },
+            {
+              "value": "middle",
+              "label": "或多或少是这样",
+              "score": 1
+            },
+            {
+              "value": "yes",
+              "label": "是这样",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "djgls6_item_6",
+          "options": [
+            {
+              "value": "no",
+              "label": "不是这样",
+              "score": 1
+            },
+            {
+              "value": "middle",
+              "label": "或多或少是这样",
+              "score": 1
+            },
+            {
+              "value": "yes",
+              "label": "是这样",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "DJGLS6_01",
+          "content": "我感到一种空虚感。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "djgls6_item_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DJGLS6_02",
+          "content": "我想念有人在身边的感觉。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "djgls6_item_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DJGLS6_03",
+          "content": "我常常感到被拒绝。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "djgls6_item_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DJGLS6_04",
+          "content": "遇到困难时，我有很多可以依靠的人。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "djgls6_item_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DJGLS6_05",
+          "content": "有很多人是我可以完全信赖的。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "djgls6_item_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DJGLS6_06",
+          "content": "有足够多的人让我感到亲近。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "djgls6_item_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "DJGLS6_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DJGLS6_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DJGLS6_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DJGLS6_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DJGLS6_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DJGLS6_06",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "loneliness",
+            "type": "total",
+            "label": "联结不足的感受",
+            "description": "联结不足的感受的题项线索汇总；较高分表示更多联结不足感受，不是人格或社交评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DJGLS6_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DJGLS6_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DJGLS6_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DJGLS6_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DJGLS6_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DJGLS6_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "emotional",
+            "type": "dimension",
+            "label": "亲近与陪伴的不足感",
+            "description": "亲近与陪伴的感受的题项线索汇总；较高分表示更多联结不足感受，不是人格或社交评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DJGLS6_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DJGLS6_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DJGLS6_03",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "social",
+            "type": "dimension",
+            "label": "可依靠联结的不足感",
+            "description": "可依靠的联结的题项线索汇总；较高分表示更多联结不足感受，不是人格或社交评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DJGLS6_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DJGLS6_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DJGLS6_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "loneliness"
+        ],
+        "scoreOrder": [
+          "loneliness",
+          "emotional",
+          "social"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "loneliness",
+            "headline": "联结不足：看需要，不数朋友",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份报告带走一句话：找一种安全、合适的联结，不把朋友数量变成任务。\n\n题目关注目前的一般感受，没有统一的最近七天或一个月窗口。六题按原规则把回答记为0或1，总和0–6；越大表示联结不足相关的题项线索更多，不是孤独发生次数、朋友人数、疾病或社交能力。\n\n例如，身边很热闹仍觉得缺少理解，是一种可能场景，不是系统已认定你的生活。想要亲近陪伴和需要实际帮助也可能不同。已有可靠支持值得保留；暂时缺少联结不全由个人努力决定，不需要责怪自己，也不必向不安全的人证明愿意交往。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "只选当前最在意的一种需要：有人听你说、一起相处，还是一件实际帮助？可以先说清需要，不急着决定必须找谁，也不设朋友数量目标。"
+              },
+              {
+                "category": "support",
+                "text": "若有安全可信的人，可提出一个小而具体的请求，并允许对方回应或暂时无法回应。没有合适人选时，也可了解愿意尝试的稳定活动或合适支持渠道，不要求联系疏远或曾伤害你的关系。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "emotional",
+            "headline": "亲近与陪伴：感受被看见，不等于事实已判定",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "前三题合计0–3，越大表示空虚、想念陪伴或被拒绝感相关的肯定线索更多。每题“或多或少”与“是这样”都记1，所以不是体验强度或频率的精确计数。\n\n例如，想说一件重要的事却暂时找不到合适对象，是回顾提示，不证明别人不喜欢你，也不是报告查到的事件。独处和孤独并不相同，未必需要更热闹。\n\n已有让自己安心的相处可保留；需要亲近感也不表示应该接受让人不舒服的联系。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "若你愿意且有安全对象，可说一个具体愿望，例如希望对方听一会儿而不急着建议。没有适合的人时先找可接受的支持入口，或暂停；不勉强倾诉、和好或解释隐私。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "social",
+            "headline": "可依靠联结：支持可以来自不同地方",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "后三题合计0–3，越大表示可信赖、可依靠或感到亲近的联结不足线索更多，不是支持者人数更少的精确统计。这组“不是这样”和“或多或少”都记1，已在选项编码中统一方向，不再反转。\n\n例如，能聊工作的人未必能帮生活事务，不同支持可以由不同人或资源提供；这只是可能的情境，报告不能确定你的支持网络。\n\n已有可用支持可以保留，也不要求一个人满足全部需要。缺少支持可能涉及环境、资源和他人的回应，不全是你的责任。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "把一种具体需要与可能的安全资源对应起来，如信息、实际协助或情绪支持，先了解一个即可。可以保留关系边界，不必用增加付出换支持；长期困扰影响生活时，也可考虑合适专业支持。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "每个方面仅3题，本独立中文稿尚未验证；线索分不等于人数、疾病或等级，不用于个人排名。"
+        ],
+        "disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。 De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130. https://link.springer.com/article/10.1007/s10433-010-0144-6 https://creativecommons.org/licenses/by-nc/2.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业研究；不用于心理诊断。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:43:04Z",
+            "basis": "本次AI文字自审对应djgls6_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "djgls6",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "DJGLS6_01",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_02",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_03",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_04",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_05",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_06",
+            "responseValue": "yes"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "loneliness": 0,
+            "emotional": 0,
+            "social": 0
+          },
+          "totalScoreKeys": [
+            "loneliness",
+            "emotional",
+            "social"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "DJGLS6_01",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_02",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_03",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_04",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_05",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_06",
+            "responseValue": "no"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "loneliness": 6,
+            "emotional": 3,
+            "social": 3
+          },
+          "totalScoreKeys": [
+            "loneliness",
+            "emotional",
+            "social"
+          ]
+        }
+      },
+      {
+        "name": "all-middle",
+        "answers": [
+          {
+            "itemCode": "DJGLS6_01",
+            "responseValue": "middle"
+          },
+          {
+            "itemCode": "DJGLS6_02",
+            "responseValue": "middle"
+          },
+          {
+            "itemCode": "DJGLS6_03",
+            "responseValue": "middle"
+          },
+          {
+            "itemCode": "DJGLS6_04",
+            "responseValue": "middle"
+          },
+          {
+            "itemCode": "DJGLS6_05",
+            "responseValue": "middle"
+          },
+          {
+            "itemCode": "DJGLS6_06",
+            "responseValue": "middle"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "loneliness": 6,
+            "emotional": 3,
+            "social": 3
+          },
+          "totalScoreKeys": [
+            "loneliness",
+            "emotional",
+            "social"
+          ]
+        }
+      },
+      {
+        "name": "all-no",
+        "answers": [
+          {
+            "itemCode": "DJGLS6_01",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_02",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_03",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_04",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_05",
+            "responseValue": "no"
+          },
+          {
+            "itemCode": "DJGLS6_06",
+            "responseValue": "no"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "loneliness": 3,
+            "emotional": 0,
+            "social": 3
+          },
+          "totalScoreKeys": [
+            "loneliness",
+            "emotional",
+            "social"
+          ]
+        }
+      },
+      {
+        "name": "all-yes",
+        "answers": [
+          {
+            "itemCode": "DJGLS6_01",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_02",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_03",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_04",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_05",
+            "responseValue": "yes"
+          },
+          {
+            "itemCode": "DJGLS6_06",
+            "responseValue": "yes"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "loneliness": 3,
+            "emotional": 3,
+            "social": 0
+          },
+          "totalScoreKeys": [
+            "loneliness",
+            "emotional",
+            "social"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据你目前的情况，判断下面每句话与你的感受是否相符。没有标准答案。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/djgls6/1.0.0/bilingual-content.json#instructions @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+  }
+}

@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "phq4_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "5e9c68b412701682fb7f1e02e92e64a098501c8e6a351e084e6ed00a815491dd",
+  "oldReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "scoreOrder": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phq4_total",
+        "headline": "过去两周：这些困扰占了多少生活空间",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "总分把过去两周四种困扰的出现频率加在一起；分数越高，表示这次回答中，这些困扰出现得更频繁。请同时留意它们是否影响休息、工作和日常活动。分数不能确定是否患有某种疾病；分数较低，也不意味着真实的难受不值得关注。这份中文研究译稿不自动划分风险等级。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "过去两周，哪一种困扰最占用你的时间或精力？有没有一些时刻相对轻松，当时有什么不同？"
+          },
+          {
+            "category": "support",
+            "text": "可以简单记下困扰出现的时间、情境和对生活的影响。若它们持续或已经影响日常生活，可把这些记录带给有资质的心理健康专业人员讨论，不必等分数达到某条线。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "gad2",
+        "headline": "焦虑相关体验：紧张和担心是否经常出现",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项只看过去两周的紧张、不安，以及难以停止或控制的担心；分数越高，表示这些体验在这次回答中出现得更频繁。它不能确定是否患有焦虑障碍，也不代表你“想太多”。这份中文研究译稿不自动套用原版研究的筛查分界，请把结果和实际生活影响一起看。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "担心出现时，你还能把注意力转回手头的事情吗？它有没有影响睡眠、工作或与人相处？"
+          },
+          {
+            "category": "support",
+            "text": "试着记下一次担心的内容和它带来的影响。若担心持续、难以摆脱或影响生活，可以寻求专业支持；不需要先证明自己“足够严重”。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "phq2",
+        "headline": "抑郁相关体验：心情与兴趣最近怎样",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项只看过去两周的低落、沮丧或无望感，以及对事情缺少兴趣或乐趣的体验；分数越高，表示这些体验在这次回答中出现得更频繁。它不能确定是否患有抑郁症，也不能靠分数排除其他困扰。这份中文研究译稿不自动套用原版研究的筛查分界。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近有没有哪些原本愿意做的事，变得难以提起兴趣？这些变化怎样影响了你的日常生活？"
+          },
+          {
+            "category": "support",
+            "text": "可以把最近心情、兴趣和日常活动的变化记下来，与可信赖的人或专业人员谈谈。若困扰持续或影响生活，不必等到分数达到某个界线再求助。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+      "原版成人研究有参考分界，详细来源已记录；本报告不把它自动套在这份尚未验证的中文译稿上，也不使用尚待核实的青少年分界。",
+      "四题需完整回答；漏答不当作零分，也不代填。回答不完整时，不能把结果当作“没有困扰”。",
+      "这些题目不能判断是否有自杀风险；低分也不能证明安全。",
+      "不用于诊断、重要选拔、学校排名或缺少依据的群体比较。"
+    ],
+    "disclaimer": "本报告仅描述过去两周相关症状自报情况，不用于心理诊断。尚未验证的工作译稿不能替代专业评估，未达参考值也不能排除心理困扰。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T14:13:00Z",
+        "basis": "AI editorial check: adult self-reflection, non-diagnostic language, no automatic external norm transfer; not expert translation approval or psychometric validation."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "scoreOrder": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phq4_total",
+        "headline": "用四个问题打开讨论，不让总分代替全部生活",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这四题回看过去两周，总分范围0–12。数字越大，表示四种相关困扰的自报频率合计更多；两个两题分组只是把同四题分开看，不能与总分再相加。它们没有记录生活的全部，也没有直接测量你还可以工作、休息或求助到什么程度。\n\n例如，担心占着注意力，原本喜欢的事也难以投入；另一个人可能主要是低落，担心却不多。同一个总分不能替你说明是哪种情境、什么原因或需要哪一种帮助。可以把下面两组当作说清近况的入口，而不急着由一个数给自己贴标签。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选过去两周一件受影响的具体事情，记录当时的困扰、出现的情境和对日常生活的影响；也可以写已有哪种支持。"
+          },
+          {
+            "category": "support",
+            "text": "如果这些困扰持续或影响生活，可与可信任的人或合格心理健康专业人员讨论；不必等某条分数线，若不知道从哪里开始，可向当地医疗机构询问合适的支持。"
+          },
+          {
+            "category": "support",
+            "text": "如有迫切安全顾虑，应优先寻求现实中的即时帮助，而不是用四题结果判断安全或等待分数变化。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "gad2",
+        "headline": "两题里的焦虑相关体验：紧张与难停下的担忧",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题只看过去两周的紧张、不安，以及不能停止或控制担忧，和分范围0–6。数字越大，表示这两类体验报告得更频繁；它没有测出担忧的原因或一个人的应对能力。\n\n例如，准备休息时，脑中仍反复想一件事。如果这个例子与你的生活相似，可以说清它何时出现、占用了什么时间，以及怎样影响你。实际需要的信息、现实压力和支持条件，都值得一起讨论；不是简单要求自己“别想了”。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "记下一次担忧的具体内容和影响，区分已知事实、仍未确定的部分，以及现在最想获得的信息或帮助。"
+          },
+          {
+            "category": "support",
+            "text": "愿意时把这段经历带给可信任的人或专业人员；若担忧持续、难以摆脱或影响生活，可以主动寻求支持，不需要先证明自己足够严重。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "phq2",
+        "headline": "两题里的抑郁相关体验：低落与兴趣变化",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题只看过去两周的低落、沮丧或无望感，以及做事少有兴趣或乐趣，和分范围0–6。数字越大，表示这些体验报告得更频繁，不代表一个人是否努力或有价值。\n\n例如，以前愿意参与的活动，近来提不起兴趣；也可能仍在完成事情，内心却很低落。如果这些情况与你相似，可以把变化与实际生活联系起来说明，而不是催自己马上振作。能否继续做某些事，也不能单凭这两题说明全部处境。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一件原本有兴趣的事，记下过去两周有什么变化，以及是否影响休息、活动或与人相处，不用勉强找一个积极解释。"
+          },
+          {
+            "category": "support",
+            "text": "若这些体验持续或影响生活，可以和可信任的人或合格专业人员谈谈，并说清希望得到的是倾听、实际协助还是进一步评估。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本中文工作译稿尚未验证，不启用个人轻重或诊断分界；四题不能判断自伤风险，较少报告不等于安全或不需要帮助。漏答不是0分。"
+    ],
+    "disclaimer": "本报告仅描述过去两周相关症状自报情况，不用于心理诊断。尚未验证的工作译稿不能替代专业评估，未达参考值也不能排除心理困扰。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial self-review; not human, clinical or author approval",
+        "reviewedAt": "2026-10-29T16:43:50Z",
+        "basis": "本次仅审读新R文字、当前源的时间窗／方向及非诊断边界；一般求助路径另核NIMH权威页。不运行计分或报告测试，不构成人工译审、临床审核或心理测量验证；不改变成人自答受众。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "scoreOrder": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phq4_total",
+        "headline": "带走一句话：四个问题是一扇小窗，不是生活的全景",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这扇小窗只看过去两周的四种体验：紧张、难停下的担忧、低落和兴趣乐趣减少。四题合计0–12，数字越大，表示相关困扰的自报频率合计更多。下面两个分组来自同四题，不是另外两次考试，也不能和总分再加一次。\n\n窗里能看见一些近况，看不见所有经历。有的人看起来照常做事，心里却很吃力；相同总分也可能来自不同体验。如果这个比喻合适，可以先把最希望被听见的一件事摆到窗前，再和实际处境一起看，不让一个数字充当全景照片。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一件过去两周受影响的事，说清“什么时候、有什么感受、影响了什么”，不必先整理成一个诊断名称。"
+          },
+          {
+            "category": "support",
+            "text": "若困扰持续或影响生活，把这件事带给可信任的人或合格专业人员；不知道去哪里时，可以向当地医疗机构询问合适的支持。"
+          },
+          {
+            "category": "support",
+            "text": "若此刻有迫切安全顾虑，优先寻求现实中的即时帮助；这扇小窗没有提供判断自伤风险或保证安全的能力。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "gad2",
+        "headline": "担忧没有按下暂停键时，先把它说具体",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题回看过去两周的紧张、不安和难以停下或控制的担忧，和分0–6；数字越大，表示这些体验报告得更频繁，不能把它简化成“想太多”。\n\n例如，事情暂时告一段落，担忧却还占着注意力。如果这个画面像你，可以先说清它担心什么、何时最打扰、眼下需要什么帮助。不需要先找到一个神奇暂停键，才允许自己去讨论困扰；现实压力也不必被一句“放松点”带过。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "为一次担忧写一段简短说明：它说了什么、哪些已知、哪些未定，以及怎样影响当时的事。"
+          },
+          {
+            "category": "support",
+            "text": "把这段说明带给可信任的人或专业人员；担忧持续或影响生活时，可以主动寻求支持，不用先等一个分数许可。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "phq2",
+        "headline": "有些生活的声音变小了，也值得被听见",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题看过去两周的低落、沮丧或无望，以及兴趣乐趣减少，和分0–6；数字越大，表示这些体验报告得更频繁，不是你变得不认真生活。\n\n例如，一件原先喜欢的事，近来不再带来同样感受；外表照常做事，也可能内心很费力。如果这个描述贴近你，可以把变化说出来，不必逼自己立刻把生活的“音量”调回原样。变化本身值得被了解，不需要先有一个病名。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件过去愿意做的事，记下近两周兴趣、感受和参与上有什么变化，不强迫自己填出好消息。"
+          },
+          {
+            "category": "support",
+            "text": "如果变化持续或影响生活，与可信任的人或合格专业人员讨论；也可以明确说出自己需要的是倾听、实际协助还是进一步评估。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本中文工作译稿尚未验证，不启用个人轻重或诊断分界；四题不能判断自伤风险，较少报告不等于安全或不需要帮助。漏答不是0分。"
+    ],
+    "disclaimer": "本报告仅描述过去两周相关症状自报情况，不用于心理诊断。尚未验证的工作译稿不能替代专业评估，未达参考值也不能排除心理困扰。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial self-review; not human, clinical or author approval",
+        "reviewedAt": "2026-10-29T16:43:50Z",
+        "basis": "本次仅审读新R文字、当前源的时间窗／方向及非诊断边界；一般求助路径另核NIMH权威页。不运行计分或报告测试，不构成人工译审、临床审核或心理测量验证；不改变成人自答受众。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

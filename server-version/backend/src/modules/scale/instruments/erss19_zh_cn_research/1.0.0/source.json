@@ -1,0 +1,1911 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "erss19_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "情绪调节策略问卷（Torrence–Connelly 19题，中文工作稿）",
+      "abbreviation": "ERSS-19-ZH",
+      "instrumentFamily": "Four emotion regulation strategy scales reported by Torrence and Connelly (2019); ERSS discovery alias"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "情境调整、注意转移、认知重评及表达抑制四类情绪调节方式的自报倾向或自认能做到的做法；各维独立，不是统一情绪能力、领导胜任力或心理疾病评价。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "erss19_zh_cn_research",
+        "domain:social_emotional",
+        "domain:emotion_regulation",
+        "domain:self_regulation",
+        "construct:emotion_regulation_strategies",
+        "construct:situation_modification",
+        "construct:attentional_deployment",
+        "construct:cognitive_reappraisal",
+        "construct:expressive_suppression",
+        "orientation:gross_process_model",
+        "orientation:CBT_DBT_related_not_exclusive",
+        "population:adult_18_plus",
+        "population:source_us_undergraduates",
+        "population:not_leadership_selection_validated",
+        "population:not_k12_validated",
+        "response:19_items",
+        "response:two_reverse_items",
+        "response:seven_point_agreement",
+        "response:endpoint_labels_only",
+        "use:emotion_habit_reflection",
+        "use:not_leadership_assessment",
+        "use:not_teacher_appraisal",
+        "情绪调节策略",
+        "调整处境",
+        "转移注意",
+        "换个角度",
+        "认知重评",
+        "表达情绪",
+        "把情绪留在心里",
+        "成人自评",
+        "population:self_report",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:fixed_order",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_high_stakes_selection",
+        "use:not_school_ranking",
+        "use:no_validated_cutoff",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:source_allows_redistribution",
+        "license:source_allows_adaptation",
+        "license:source_allows_commercial_use",
+        "language_validation:original_en",
+        "language_validation:zh_cn_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:china_validation_not_established",
+        "中文工作译稿",
+        "个人反思",
+        "非诊断",
+        "可署名再分发"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "美国Oklahoma大学IRB研究中的大学生，要求18岁以上；226人初样本，最终196人，初样本平均18.8岁。研究为情绪相关模拟领导任务，不推定职业领导者、中国成人或K12验证。 本平台暂设18岁以上成人自评，是当前使用边界，不代表所有中国成人均已验证。"
+    },
+    "administration": {
+      "itemCount": 19,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般日常习惯或看法；未额外指定最近7天或30天",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按原论文逐维列题顺序固定19题，四维3/4/7/5题；原施测整表题序未另公开，不冒称已取得未公开顺序。",
+        "原文24题起池/删4题与实际列出的19题存在算术差异；完整保留明确列出的19句，不补造第20题。",
+        "第6题英文feelings语法笔误原样留在双语档；中文按原意译。第6、7题用8减原始值反向。",
+        "四维分别等权均分1–7，与原论文描述统计尺度一致；不拼总分、不把表达抑制多简单等同能力差。",
+        "原文只明确1/7两端文字，2–6保留数字，不照搬OpenScales自行补出的中间词。",
+        "原文未给缺失插补规则，本平台保守要求各维齐答；任一主要维度不足时报告整体不解释，其他可算维度保留。",
+        "原研究结构拟合和情境调整信度有限，不据此挑选领导者、评判教师或推断因果/干预疗效。",
+        "既有项目独立指导语已逐字绑定到顶层instruction，不塞进第一题，不增加固定回忆时窗；具体页面显示以实际消费者核验为准。",
+        "预计时长为平台估计，不是原作者实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原语言研究可追溯；本中文工作稿独立管理，不继承验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于回顾个人体验与可行小行动，不贴能力、人格或疾病标签。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "erss19-original-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "美国Oklahoma大学IRB研究中的大学生，要求18岁以上；226人初样本，最终196人，初样本平均18.8岁。研究为情绪相关模拟领导任务，不推定职业领导者、中国成人或K12验证。",
+        "ageRange": "18岁以上，初样本平均18.8岁，完整范围未报告",
+        "locale": "en",
+        "territory": "US",
+        "sampleSize": 196,
+        "studyDesign": "来源研究结构结果有明确适用边界，不构成中国常模或本中文版验证。",
+        "rating": "MIXED",
+        "citation": "Torrence, B. S., & Connelly, S. (2019). Emotion Regulation Tendencies and Leadership Performance: An Examination of Cognitive and Behavioral Regulation Strategies. Frontiers in Psychology, 10, 1486. https://doi.org/10.3389/fpsyg.2019.01486.",
+        "doi": "10.3389/fpsyg.2019.01486",
+        "url": "https://doi.org/10.3389/fpsyg.2019.01486",
+        "notes": "情境调整信度与结构拟合有限；初始题数/删题叙述与19句列题的算术矛盾原样记录，不造题。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "原作者2019论文Method / Measures / Emotion Regulation Strategies，按四类策略逐项完整列出19题；补充文件仅为领导情境与评分示例，不是另一个题本",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "独立中文工作翻译，原版/作者文件修订与平台版本分别管理，未复制其他中文译本。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "erss19_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "erss19_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "erss19_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2019 Torrence and Connelly。原文说明部分题文由ERQ (Gross & John,2003; doi:10.1037/0022-3514.85.2.348)抽取或改编，保留源流；复制对象仅为本论文明确列出的19句，非ERQ原表或其他译本，原文未对这些句子设单独权利排除。 Torrence, B. S., & Connelly, S. (2019). Emotion Regulation Tendencies and Leadership Performance: An Examination of Cognitive and Behavioral Regulation Strategies. Frontiers in Psychology, 10, 1486. https://doi.org/10.3389/fpsyg.2019.01486. 精确复制源：原作者2019论文Method / Measures / Emotion Regulation Strategies，按四类策略逐项完整列出19题；补充文件仅为领导情境与评分示例，不是另一个题本。CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）；本包由作者公开英文独立译为中文，独立编写指导语与反馈，保留署名、原始出处、许可链接和修改说明，不声称原作者认可、专家译审或中国人群验证。作者PDF SHA-256：23dbf5a5093b98f56f4b00df49421cb60b4aa024a22ce08b701bc88f0fef255b。",
+      "许可及人群标签服务检索，不自动授予系统权限；本包DRAFT，不授权或激活产品入口。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "Four emotion regulation strategy scales reported by Torrence and Connelly (2019); ERSS discovery alias; independently prepared Chinese working version",
+        "citation": "Torrence, B. S., & Connelly, S. (2019). Emotion Regulation Tendencies and Leadership Performance: An Examination of Cognitive and Behavioral Regulation Strategies. Frontiers in Psychology, 10, 1486. https://doi.org/10.3389/fpsyg.2019.01486.",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.01486/full",
+        "publicationYear": 2019
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2019 Torrence and Connelly。原文说明部分题文由ERQ (Gross & John,2003; doi:10.1037/0022-3514.85.2.348)抽取或改编，保留源流；复制对象仅为本论文明确列出的19句，非ERQ原表或其他译本，原文未对这些句子设单独权利排除。 Torrence, B. S., & Connelly, S. (2019). Emotion Regulation Tendencies and Leadership Performance: An Examination of Cognitive and Behavioral Regulation Strategies. Frontiers in Psychology, 10, 1486. https://doi.org/10.3389/fpsyg.2019.01486. 精确复制源：原作者2019论文Method / Measures / Emotion Regulation Strategies，按四类策略逐项完整列出19题；补充文件仅为领导情境与评分示例，不是另一个题本。CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）；本包由作者公开英文独立译为中文，独立编写指导语与反馈，保留署名、原始出处、许可链接和修改说明，不声称原作者认可、专家译审或中国人群验证。作者PDF SHA-256：23dbf5a5093b98f56f4b00df49421cb60b4aa024a22ce08b701bc88f0fef255b。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "erss19_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "ERSS_01",
+          "content": "当我想体验更多积极情绪时，我能改变情境中的某些方面来做到这一点。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_02",
+          "content": "我能通过在情境中加入幽默，改变它带来的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_03",
+          "content": "我会通过改变情境中的某些方面来调节自己的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_04",
+          "content": "我能够把注意力从强烈的情绪上转移开。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_05",
+          "content": "处在带有情绪的情境中时，我会把注意力放在其中不涉及情绪的方面，来调节自己的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_06",
+          "content": "我很难停止想着自己正在感受到的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_07",
+          "content": "体验消极情绪时，除了那种情绪，我无法想到别的事情。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_08",
+          "content": "当我想体验更多积极情绪时，我能换个角度看待情境。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_09",
+          "content": "当我想少体验一些消极情绪时，我能换个角度看待情境。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_10",
+          "content": "我能通过改变对情境的看法来控制自己的消极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_11",
+          "content": "我能通过改变对情境的看法来控制自己的积极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_12",
+          "content": "我会通过改变看待所处情境的角度来调节自己的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_13",
+          "content": "我能通过思考情境中的不同方面，增加自己的积极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_14",
+          "content": "我能通过思考情境中的不同方面，减少自己的消极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_15",
+          "content": "我通常会尽量不表现出自己的消极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_16",
+          "content": "我把自己的情绪留在心里。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_17",
+          "content": "我会通过不表达情绪来调节自己的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_18",
+          "content": "我不表达自己的消极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERSS_19",
+          "content": "我通常会尽量不表现出自己的积极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "erss19_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "ERSS_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ERSS_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "ERSS_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERSS_19",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "situation_modification",
+            "type": "dimension",
+            "label": "调整眼前的处境",
+            "description": "本维等权均分1–7，更多表示该类做法自报更符合，不是好坏等级或胜任力评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ERSS_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_03",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "attentional_deployment",
+            "type": "dimension",
+            "label": "让注意力换个落点",
+            "description": "本维等权均分1–7，更多表示该类做法自报更符合，不是好坏等级或胜任力评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ERSS_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_07",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "cognitive_reappraisal",
+            "type": "dimension",
+            "label": "换个角度想一想",
+            "description": "本维等权均分1–7，更多表示该类做法自报更符合，不是好坏等级或胜任力评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ERSS_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_14",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "suppression",
+            "type": "dimension",
+            "label": "把情绪先留在心里",
+            "description": "本维等权均分1–7，更多表示该类做法自报更符合，不是好坏等级或胜任力评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ERSS_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERSS_19",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "situation_modification",
+          "attentional_deployment",
+          "cognitive_reappraisal",
+          "suppression"
+        ],
+        "scoreOrder": [
+          "situation_modification",
+          "attentional_deployment",
+          "cognitive_reappraisal",
+          "suppression"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "situation_modification",
+            "headline": "能调整处境时，不必把所有任务交给心情",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这三题均分1–7，数字越大，表示你更认同通过调整情境、合适的幽默等方式改变情绪，或自认能做到这些做法，不是实际效果已经被测出。\n\n例如，讨论容易越说越急，换个沟通安排可能比催自己开心更贴近问题。如果类似方式适合你，可以保留；但能否调整也受权力、关系和资源影响，不是所有处境都由一个人改变。题目提到幽默，不等于任何场合都该开玩笑，尤其不能拿他人的难受缓和气氛。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "为一个情绪起伏的场景列出一项自己能协调的条件和一项需要他人参与的条件，分清可做与不可独自承担的部分。"
+              },
+              {
+                "category": "environment",
+                "text": "若合适，试着协调时间、地点、沟通方式或一项实际负担，再回看是否有帮助；不要求自己靠个人努力改变整个环境。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "attentional_deployment",
+            "headline": "注意力可以换落点，也可以约好何时回来",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题中两题已按原规则反向处理，均分1–7。数字越大，表示你更认同能把注意从强烈情绪移开、转向情境其他方面，而不是更常陷在情绪里。\n\n例如，争执之后先去做一项中性的事情，等有余力再谈。如果这种缓冲适合你，可以保留；若重要问题因此一直悬着，也值得重新安排。转移注意并不自动等于逃避，持续盯住情绪也不一定更好，要看当时需要和之后的影响。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次转移注意后的实际情况：它提供了缓冲，还是让你想处理的事一直搁置？不只看用了多少。"
+              },
+              {
+                "category": "strategy",
+                "text": "若需要暂时换落点，选择一项安全、可做的活动，同时在合适时约好何时或怎样回来处理重要问题，不强迫立刻完成。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "cognitive_reappraisal",
+            "headline": "换一种理解，可以和核对事实一起进行",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这七题均分1–7，数字越大，表示更认同通过改变看待情境的方式来影响积极或消极情绪，或自认能这样做；不意味着解释一定正确。\n\n例如，收到简短回复，除了“对方不在乎”，也可能有别的背景。如果你愿意换角度，可以同时查看事实与自己的需要，不必把不合理的事包装成好事。重看情境可以帮助理解，也允许结论仍是“这件事确实需要改变”，而不只是让自己没感觉。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一件负担较小的事，把已知事实、第一种解释和另一种有依据的解释分开写，允许有些信息仍未知。"
+              },
+              {
+                "category": "strategy",
+                "text": "看看不同理解会带来哪些可行回应，再结合事实选择；不强迫接受更积极的版本，也不以情绪是否立刻变化判断解释对错。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "suppression",
+            "headline": "没有表现出来，不等于没有感受",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这五题均分1–7，数字越大，表示你更认同把情绪留在心里、少表现积极或消极情绪的做法。它不是控制能力更强，也不能说明内心感受较少。\n\n例如，当时不方便表达，先不说出来可能是一个选择；如果每次都只能把话留住，也可能需要其他空间。分数不规定必须公开感受，或把不表达一律判成错误。更值得看的是当时是否安全、自己是否愿意，以及需要时有没有合适的方式照顾这些感受。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回看一次没有表达的经历，看看当时是主动选择、环境限制还是不知怎样开口，以及之后是否仍有需要被看见的部分。"
+              },
+              {
+                "category": "support",
+                "text": "如果愿意分享，选安全时机并先确认对方方便；也可以先记录给自己，不必一次说完，更不把表达当必须完成的任务。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文是尚未验证的工作译稿，四类方式各自看，没有总分或个人优劣分档；用得多不一定更合适，也不能证明能力或效果，漏答不当最低分。"
+        ],
+        "disclaimer": "供成年人回顾个人体验和习惯，不是考试，也不能用于诊断或证明干预效果。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial self-review; not human or author approval",
+            "reviewedAt": "2026-10-29T16:58:29Z",
+            "basis": "本次仅审读新R文字与当前源的构念、窗口、分数方向及适龄受众；不运行计分／报告测试，不构成人工译审、作者批准或心理测量验证。保留原自答受众及权限，不扩大适用范围。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "erss19",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "references": [],
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "ERSS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "situation_modification": 1,
+            "attentional_deployment": 1,
+            "cognitive_reappraisal": 1,
+            "suppression": 1
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "ERSS_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "situation_modification": 7,
+            "attentional_deployment": 7,
+            "cognitive_reappraisal": 7,
+            "suppression": 7
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "ERSS_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "situation_modification": 4,
+            "attentional_deployment": 4,
+            "cognitive_reappraisal": 4,
+            "suppression": 4
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_one",
+        "answers": [
+          {
+            "itemCode": "ERSS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "situation_modification": 1,
+            "attentional_deployment": 4,
+            "cognitive_reappraisal": 1,
+            "suppression": 1
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_max",
+        "answers": [
+          {
+            "itemCode": "ERSS_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "situation_modification": 7,
+            "attentional_deployment": 4,
+            "cognitive_reappraisal": 7,
+            "suppression": 7
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "ERSS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "situation_modification": 2,
+            "attentional_deployment": 3,
+            "cognitive_reappraisal": 4,
+            "suppression": 3
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "only_attentional_deployment_higher",
+        "answers": [
+          {
+            "itemCode": "ERSS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "situation_modification": 1,
+            "attentional_deployment": 7,
+            "cognitive_reappraisal": 1,
+            "suppression": 1
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "only_suppression_higher",
+        "answers": [
+          {
+            "itemCode": "ERSS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "situation_modification": 1,
+            "attentional_deployment": 1,
+            "cognitive_reappraisal": 1,
+            "suppression": 7
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "missing_first",
+        "answers": [
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "situation_modification": null,
+            "attentional_deployment": 4,
+            "cognitive_reappraisal": 4,
+            "suppression": 4
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "missing_reverse",
+        "answers": [
+          {
+            "itemCode": "ERSS_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "situation_modification": 4,
+            "attentional_deployment": null,
+            "cognitive_reappraisal": 4,
+            "suppression": 4
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "missing_each_dimension",
+        "answers": [
+          {
+            "itemCode": "ERSS_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERSS_19",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "situation_modification": null,
+            "attentional_deployment": null,
+            "cognitive_reappraisal": null,
+            "suppression": null
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "situation_modification": null,
+            "attentional_deployment": null,
+            "cognitive_reappraisal": null,
+            "suppression": null
+          },
+          "totalScoreKeys": [
+            "situation_modification",
+            "attentional_deployment",
+            "cognitive_reappraisal",
+            "suppression"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据平时的情况，选择你对下面每句话的同意程度。1表示非常不同意，7表示非常同意，2至6是两端之间的选项。没有对错，请按自己的实际情况选择。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/erss19/1.0.0/administration.md @ b92c69aefa2472775fa7ee86b9c208366886c908；原论文未提供独立完整施测指导语，本段为项目依据同意度量尺独立编写，非作者原文或专家审批。"
+  }
+}

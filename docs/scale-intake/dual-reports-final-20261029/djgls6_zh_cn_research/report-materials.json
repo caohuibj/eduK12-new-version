@@ -1,0 +1,244 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "djgls6_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "originalSourceSha256": "b6b16ea4c28cccfb795af036ec675ad33143db868fc1f9c4912bc0ba04e337de",
+  "oldReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "loneliness"
+    ],
+    "scoreOrder": [
+      "loneliness",
+      "emotional",
+      "social"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "loneliness",
+        "headline": "你想要的联结，和眼下感受到的联结",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "孤独感不只取决于身边有多少人：有时缺的是一位能说心里话的人，有时缺的是遇事可以依靠的支持。回答汇总越高，表示这次呈现的联结不足线索越多，不是给你贴上不合群的标签。比如，身处热闹的聚会也可能觉得无人理解，而一次安静的谈话却可能让人安心。请把结果当成理解自己需要的起点，不必把交朋友的数量当任务，也不用责怪自己为什么会有这些感受。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "现在更想要的是有人陪伴、有人理解，还是遇事有人可依靠？"
+          },
+          {
+            "category": "support",
+            "text": "从一个小动作开始：约信任的人聊近况，或参加一项愿意重复去的活动。重视关系质量，不给自己规定朋友数量。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional",
+        "headline": "有没有可以说心里话的亲近感？",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分关注空虚、缺少陪伴和被拒绝的感受。回答汇总越高，表示本次回答中与这些体验有关的线索更多，但它不说明别人一定不喜欢你，也不是对你社交能力的判断。有时经历搬家、关系变化或忙碌的一段时间，熟悉的亲近感会暂时变少。先承认自己想被理解、被接纳的需要，再看谁能提供一点合适的陪伴，往往比强迫自己立刻热闹起来更温和。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近有没有一次谈话让你觉得被理解？那个人或那种相处方式有什么特别？"
+          },
+          {
+            "category": "support",
+            "text": "可以向一个可信的人表达一个具体需要，例如想聊十分钟，或希望对方先听你说完；也可以选择适合自己的支持渠道。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "social",
+        "headline": "遇到事情时，有哪些联结可以依靠？",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分关注你是否感到有人可信、亲近，以及遇到困难时有谁可以依靠。回答汇总越高，表示本次回答中的可依靠联结不足线索更多，并不是说身边人数越多就一定越好。比如，不同的人可能分别适合聊工作、分享心情或帮一个实际的小忙。支持不必都由一个人提供，也不是只靠你单方面努力就能得到；寻找合适的关系和环境，需要时间与双方的回应。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "当你需要聊天、具体帮助或一起做事时，分别会想到谁？还有哪类支持暂时缺少？"
+          },
+          {
+            "category": "support",
+            "text": "挑一段愿意维护的关系，从一次可行的联系开始。若暂时没有合适的人，可以寻找稳定的社区活动或专业支持，不必一次解决所有关系问题。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本中文为独立工作译稿，尚待人工审校和本地验证，仅供成人非商业研究。",
+      "原研究的参考分界或统计分组另有来源档案，本报告不把它们直接用于这份中文译稿，不作诊断、排名或风险分档。",
+      "6题都需完整有效回答才提供完整报告；漏答不补零、不猜测，不承诺保留部分维度反馈。",
+      "结果只是本次回答的记录，不代表永久状态；不用于选拔、学生筛选或教师考核。"
+    ],
+    "disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。 De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130. https://link.springer.com/article/10.1007/s10433-010-0144-6 https://creativecommons.org/licenses/by-nc/2.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业研究；不用于心理诊断。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "loneliness"
+    ],
+    "scoreOrder": [
+      "loneliness",
+      "emotional",
+      "social"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "loneliness",
+        "headline": "联结不足：看需要，不数朋友",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份报告带走一句话：找一种安全、合适的联结，不把朋友数量变成任务。\n\n题目关注目前的一般感受，没有统一的最近七天或一个月窗口。六题按原规则把回答记为0或1，总和0–6；越大表示联结不足相关的题项线索更多，不是孤独发生次数、朋友人数、疾病或社交能力。\n\n例如，身边很热闹仍觉得缺少理解，是一种可能场景，不是系统已认定你的生活。想要亲近陪伴和需要实际帮助也可能不同。已有可靠支持值得保留；暂时缺少联结不全由个人努力决定，不需要责怪自己，也不必向不安全的人证明愿意交往。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "只选当前最在意的一种需要：有人听你说、一起相处，还是一件实际帮助？可以先说清需要，不急着决定必须找谁，也不设朋友数量目标。"
+          },
+          {
+            "category": "support",
+            "text": "若有安全可信的人，可提出一个小而具体的请求，并允许对方回应或暂时无法回应。没有合适人选时，也可了解愿意尝试的稳定活动或合适支持渠道，不要求联系疏远或曾伤害你的关系。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional",
+        "headline": "亲近与陪伴：感受被看见，不等于事实已判定",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "前三题合计0–3，越大表示空虚、想念陪伴或被拒绝感相关的肯定线索更多。每题“或多或少”与“是这样”都记1，所以不是体验强度或频率的精确计数。\n\n例如，想说一件重要的事却暂时找不到合适对象，是回顾提示，不证明别人不喜欢你，也不是报告查到的事件。独处和孤独并不相同，未必需要更热闹。\n\n已有让自己安心的相处可保留；需要亲近感也不表示应该接受让人不舒服的联系。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "若你愿意且有安全对象，可说一个具体愿望，例如希望对方听一会儿而不急着建议。没有适合的人时先找可接受的支持入口，或暂停；不勉强倾诉、和好或解释隐私。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "social",
+        "headline": "可依靠联结：支持可以来自不同地方",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "后三题合计0–3，越大表示可信赖、可依靠或感到亲近的联结不足线索更多，不是支持者人数更少的精确统计。这组“不是这样”和“或多或少”都记1，已在选项编码中统一方向，不再反转。\n\n例如，能聊工作的人未必能帮生活事务，不同支持可以由不同人或资源提供；这只是可能的情境，报告不能确定你的支持网络。\n\n已有可用支持可以保留，也不要求一个人满足全部需要。缺少支持可能涉及环境、资源和他人的回应，不全是你的责任。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "把一种具体需要与可能的安全资源对应起来，如信息、实际协助或情绪支持，先了解一个即可。可以保留关系边界，不必用增加付出换支持；长期困扰影响生活时，也可考虑合适专业支持。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每个方面仅3题，本独立中文稿尚未验证；线索分不等于人数、疾病或等级，不用于个人排名。"
+    ],
+    "disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。 De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130. https://link.springer.com/article/10.1007/s10433-010-0144-6 https://creativecommons.org/licenses/by-nc/2.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业研究；不用于心理诊断。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:43:04Z",
+        "basis": "本次AI文字自审对应djgls6_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "loneliness"
+    ],
+    "scoreOrder": [
+      "loneliness",
+      "emotional",
+      "social"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "loneliness",
+        "headline": "这不是通讯录人数统计",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：给需要找一个安全入口，不给自己下交友指标。\n\n这里看目前的一般感受，不固定最近一周或一月。六题按规则各记0或1，总和0–6；数字越大是联结不足的题项线索更多，不是孤独次数、朋友人数或社交成绩。\n\n聚会很热闹却觉得没人懂，是一种可能场景，报告并没查看你的通讯录。想被理解、想有人陪或需要搭把手，也不一定是同一种需要。已经可靠的支持就留下，暂时缺少联结也不全归你负责，更不必为了“多联系”回到不安全的关系里。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "只给一种需要起名字：想被听见、想一起做事，还是需要实际协助？先知道想要什么，不必马上把通讯录翻一遍。"
+          },
+          {
+            "category": "support",
+            "text": "有安全可信的对象时，只提一个小请求；对方暂时没空不等于你的需要不重要。没有人选可先了解合适活动或支持渠道，不把联系过去伤害自己的人当作必做题。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional",
+        "headline": "想被理解，不一定要把日程排热闹",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "亲近与陪伴三题和分0–3，越大是空虚、缺少陪伴或被拒绝感的肯定线索更多。“或多或少”和“是这样”同记1，不是精确测出难受有几分或每天几次。\n\n想说一件事却没找到合适对象，是可能场景，不是系统替别人判“都不喜欢你”。一个人安静待着也可能舒服，不用把独处自动写成问题。\n\n有安心的相处就珍惜；想要理解，也不必用接受不舒服的联系来交换。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "若愿意，可以向安全的人说一句“我想先被听一会儿”。没有合适对象时留着这个需要，另找可接受入口或先暂停，不强迫倾诉、和好或交代隐私。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "social",
+        "headline": "支持不用全装在一个人身上",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "可依靠联结三题和分0–3，越大是可信、可依靠或亲近支持不足的线索更多，不是系统数出了你有几个朋友。编码已统一方向，不需要再反转一次。\n\n能帮你找资料的人，未必也能听心事；不同资源可分担不同需要。这只是例子，报告没有画出你的实际关系网。\n\n好用的支持继续用，不要求一人全能。暂时找不到，也不代表你必须更努力讨好别人。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "只找一个安全的对应：这次需要信息、帮手还是倾听，哪里可能提供？先了解即可，保留边界；若困扰长期影响生活，也可找合适专业支持，不把报告当一份社交拓展任务。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每个方面仅3题，本独立中文稿尚未验证；线索分不等于人数、疾病或等级，不用于个人排名。"
+    ],
+    "disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。 De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130. https://link.springer.com/article/10.1007/s10433-010-0144-6 https://creativecommons.org/licenses/by-nc/2.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业研究；不用于心理诊断。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:43:04Z",
+        "basis": "本次AI文字自审对应djgls6_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

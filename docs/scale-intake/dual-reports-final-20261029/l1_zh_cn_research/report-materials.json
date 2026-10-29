@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "l1_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "bdf363d799a826acb4156141c38bc28f0a624781541bd01eccf9cf7ac7c790b1",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "life_satisfaction"
+    ],
+    "scoreOrder": [
+      "life_satisfaction"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "life_satisfaction",
+        "headline": "给近来的生活拍一张“全景照”",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这道题记录的是您此刻对整段生活的总体感受，不是对人生是否成功的判决。不同生活领域可能一边顺利、一边吃力，一句话并不能说完所有经历。选择越靠近“完全满意”，表示您这次对生活的总体评价越满意；这不是需要追求满分的考试。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近哪件小事让您觉得生活还不错？"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一个最在意的小方面，定下本周可以完成的一步，例如留出十分钟休息或与信任的人聊聊。过段时间再回看感受，不必追着数字跑。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+      "这是一张当下快照，不解释变化原因，也不诊断心理疾病。中文内容为工作译本，暂不与外国样本作个人排名。",
+      "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+      "完整回答才提供报告；漏答不补零、不插补。"
+    ],
+    "disclaimer": "非商业使用；本译文和反馈依CC BY-NC-SA 4.0同许可提供。仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T16:19:00Z",
+        "basis": "AI editorial check only: adult descriptive report; no individual diagnostic/ability/moral classification; source sample statistics not Chinese norms. Not human expert review."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "life_satisfaction"
+    ],
+    "scoreOrder": [
+      "life_satisfaction"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "life_satisfaction",
+        "headline": "总体满意度：一题总览，不是人生判决",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份报告带走一句话：保留值得留下的部分，也给真正需要改变的事一点支持，不追求满分。\n\n这道题问的是综合各方面后，对近来生活的总体满意程度，不是只问此刻心情，也没有指定最近七天或一个月。答案1–11，越大表示这次整体评价越满意；数字不是百分比、成功程度或个人价值，没有中文高低等级。\n\n例如，工作比较顺利，同时健康或照护安排很吃力，仍然可能形成某种总体评价。这只是帮助回顾的场景，不是报告从单题查出了你的生活领域。相同答案也可能来自很不同的处境，一题不能分清原因、替每方面打分或诊断疾病。\n\n如果已有让生活较合适的安排，可以继续保留，不必再提高数字；如果有不满意的部分，也可以承认它。经济、健康、环境和他人的支持不全由个人控制，不能把问题都归到心态。先选一个最在意、且有现实调整空间的方面即可；需要更大支持时，也不用先完成一个自我改善任务才有资格求助。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "说清一件想保留的事和一件当前想获得支持的事，两者可以同时存在。不必为了平衡而强迫感恩，也不需要给所有生活领域列分数。"
+          },
+          {
+            "category": "strategy",
+            "text": "只选一个安全、可行的下一步，如问清一条信息、减少一项非必要负担或争取具体协助。受条件限制时可以先了解资源，不把“本周一定完成”当新压力。"
+          },
+          {
+            "category": "support",
+            "text": "愿意时再回看真实需要是否得到照顾，不必每天重测或只追数字。若长期不满意带来明显困扰或影响生活，可找可信的人或合适专业支持一起了解，不凭单题判断病因。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "仅一题总体评价，不能推出生活各领域、变化原因或疾病；本独立中文稿尚未验证，不作等级或排名。"
+    ],
+    "disclaimer": "非商业使用；本译文和反馈依CC BY-NC-SA 4.0同许可提供。仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:43:04Z",
+        "basis": "本次AI文字自审对应l1_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "life_satisfaction"
+    ],
+    "scoreOrder": [
+      "life_satisfaction"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "life_satisfaction",
+        "headline": "一张生活全景照，不是人生排行榜",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：照片留作参考，生活不用为数字摆姿势。\n\nL-1只问一件事：综合各方面，你对近来的生活有多满意？不是此刻情绪温度计，也没固定七天或一个月。1–11越大，表示这次总体评价越满意；不等于人生越成功，更不是需要冲到满格的任务。\n\n比如，工作顺手、照护安排却吃力，仍可能得到一个总体答案。这只是场景，系统没有从一个数字里看出你在哪方面顺利或困难。同样的答案，背后可以是完全不同的生活，不能自动展开成工作、关系、健康三份成绩单。\n\n有用的安排就留着，不满意的地方也可以不急着美化。资源、环境、健康和别人的回应都可能重要，不是换个积极想法就必然解决。你可以只挑一件真正想关照的事；现在做不了改变时，先得到理解或实际帮助，也是一种合理选择，不必给自己加一张“让生活满意”的打卡表。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "给照片加两句备注即可：什么想留下，什么需要支持？可以两句都具体，也允许暂时说不清，不强迫写一条积极总结。"
+          },
+          {
+            "category": "strategy",
+            "text": "只留一个现实可做的小步：问一条信息、减一件非必要事或提出一个具体请求。不在自己掌控内的条件如实留下，不把小步说成能解决全部难处。"
+          },
+          {
+            "category": "support",
+            "text": "之后愿意再看需要有没有被照顾，不每天检查“满意度进度条”。长期困扰影响生活时，可以找可信支持或合适专业人士；这不是单题已经认定了某种问题。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "仅一题总体评价，不能推出生活各领域、变化原因或疾病；本独立中文稿尚未验证，不作等级或排名。"
+    ],
+    "disclaimer": "非商业使用；本译文和反馈依CC BY-NC-SA 4.0同许可提供。仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:43:04Z",
+        "basis": "本次AI文字自审对应l1_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}
