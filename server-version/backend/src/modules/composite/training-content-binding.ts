@@ -1,4 +1,7 @@
+import {assertCompositionPublicContent} from '../education-tools/private-tool.composition-content'
+import {educationStandardSourceSchema,educationLibrarySourceSchema} from '../education-tools/private-tool.composition-contracts'
 import {educationMarkerBindingSchema} from '../education-tools/assessment-resource.marker-contract'
+import {educationCompositionBindingSchema,educationCompositionRuntimeAnchorSchema,type EducationCompositionPolicyBinding,type EducationCompositionRuntimeAnchor} from '../education-tools/private-tool.composition-contracts'
 import {readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
 import {readPrivateRuntimeScaleSource,assertPrivateRuntimeCompositeIdentity} from '../education-tools/private-tool.runtime-source'
 import {readLibraryScaleMeasurementSource} from '../scale-library-governance/training-source'
@@ -11,6 +14,7 @@ import { validateTrainingReportPointer } from './training-report-selection'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import type {EducationSlotPresentation} from '../assessment-runtime/attempt-runtime'
 import { getContentRelease } from '../measurement-content/repository'
 import { ContentReleaseError, prepareRelease, type ReleaseInput } from '../measurement-content/release'
 import { scaleMeasurementRelease } from '../measurement-content/scale'
@@ -25,7 +29,9 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  educationBinding:educationMarkerBindingSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),educationLibrary:educationLibrarySourceSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+ if(source.educationLibrary&&(source.kind!=='SCALE'||source.libraryEntryId!==source.educationLibrary.entryId||source.privateVersionId||source.standardCombination||source.educationBinding||source.educationStandard))ctx.addIssue({code:'custom',message:'Education library retains its exact approved entry identity'})
+ if(source.educationStandard&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.standardCombination||source.educationBinding))ctx.addIssue({code:'custom',message:'Education Standard retains its independent exact approved source'})
  if(source.standardCombination&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.id!==source.standardCombination.reference.scaleId))ctx.addIssue({code:'custom',message:'Standard combination must retain its installed Scale identity'})
  if(source.privateVersionId&&(source.kind!=='SCALE'||source.libraryEntryId!==undefined))ctx.addIssue({code:'custom',message:'Private Scale identity cannot alias library or other families'})
  if(source.libraryEntryId&&source.kind!=='SCALE')ctx.addIssue({code:'custom',message:'Library identity is only valid for Scale'})
@@ -34,8 +40,12 @@ const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR
 })
 const unitSchema=z.object({itemId:text,family:z.enum(['SCALE','COGNITIVE','SJT']),source:sourceSchema,
   measurement:z.object({releaseId:z.string().guid(),contentHash:digest,measurementHash:digest}).strict(),referencePolicy:trainingReferencePolicySchema.optional(),report:z.object({releaseId:z.string().guid(),contentHash:digest}).strict().optional()}).strict()
-export const trainingContentSnapshotSchema=z.object({schemaVersion:z.literal(1),compositeId:text,units:z.array(unitSchema).max(1000)}).strict()
+export const trainingContentSnapshotSchema=z.object({schemaVersion:z.literal(1),compositeId:text,units:z.array(unitSchema).max(1000),
+ educationBinding:educationCompositionBindingSchema.optional()}).strict()
 export type TrainingContentSnapshot=z.infer<typeof trainingContentSnapshotSchema>
+export const trainingContentAttemptBindingSchema=trainingContentSnapshotSchema.omit({educationBinding:true}).extend({
+ attemptId:text,epoch:z.number().int().positive(),publicationHash:digest,educationComposition:educationCompositionRuntimeAnchorSchema.optional(),
+}).strict()
 type Unit=TrainingContentSnapshot['units'][number]
 type Stored=NonNullable<Awaited<ReturnType<typeof getContentRelease>>>
 type SourceRow={library_entry_id?:string|null;kind:Unit['source']['kind'];id:string;assignment_id:string|null;owner_id:string|null;measurement_release_id:string|null;instrument_key:string|null;instrument_version:string|null}
@@ -161,7 +171,7 @@ function projectActualMeasurement(item:any,release:Stored,resolvedSituational:Ma
   return expected
 }
 export function trainingMeasurementSourceScopeMatches(release:Stored,source:Unit['source']){
- if(source.libraryEntryId||source.standardCombination)return false // Requires the database-backed exact adapter below.
+ if(source.libraryEntryId||source.standardCombination||source.educationStandard)return false // Requires the database-backed exact adapter below.
  const scope=release.scope
  if(release.provenance?.sourceKind==='STATIC_SJT_REGISTRY'&&source.kind!=='STATIC_SJT_REGISTRY')return false
  if(source.kind==='STATIC_SJT_REGISTRY')return release.layer==='MEASUREMENT'&&release.family==='SJT'&&scope.kind==='PLATFORM'&&scope.ownerId===undefined&&source.ownerId===undefined
@@ -190,7 +200,20 @@ async function readExactLibrarySource(db:Prisma.TransactionClient,release:Stored
 /** Frozen consumers validate the real platform wrapper, never a client-provided
  * entry marker or a widened PRIVATE scope. Their existing lifecycle/stop policy
  * remains at each collection or historical-report boundary. */
-export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma.TransactionClient,release:Stored,source:Unit['source'],context?:{compositeId:string;ownerId:string;itemId:string}){
+export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma.TransactionClient,release:Stored,source:Unit['source'],context?:{compositeId:string;ownerId:string;itemId:string;educationComposition?:EducationCompositionRuntimeAnchor}){
+ if(context?.educationComposition){
+  // The caller verified this immutable attempt's parent header once for the
+  // batch. DB containment and immutability bind each unit to that publication.
+  if(source.educationStandard||source.educationLibrary){
+   if(release.layer!=='MEASUREMENT')return false
+   await assertCompositionPublicContent(db,{...context,measurementOnly:true,unit:{itemId:context.itemId,family:'SCALE',source,measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}},release})
+   return true
+  }
+  const origin=context.educationComposition.origin,scope=release.scope
+  return source.kind==='SCALE'&&Boolean(source.privateVersionId)&&!source.libraryEntryId&&!source.educationBinding&&!source.standardCombination
+   &&source.ownerId===origin.ownerUserId&&context.ownerId===origin.ownerUserId
+   &&scope.kind==='PRIVATE'&&scope.product===origin.entry&&scope.ownerId===origin.ownerUserId&&scope.resourceId===source.privateVersionId
+ }
  if(source.standardCombination){
   if(!context||release.layer!=='MEASUREMENT')fail('SCOPE_DENIED')
   const exact=await readTrainingStandardContentIdentity(db,{itemId:context.itemId,family:'SCALE',source,measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}},context)
@@ -224,15 +247,44 @@ function assertScope(release:Stored,source:Unit['source']){
 
 /** New START binds exact publication pointers. Historical null/null remains
  * legacy; recovery uses the already stored attempt binding, never this selector. */
-export async function prepareTrainingContentAttemptBinding(db:Prisma.TransactionClient,input:{compositeId:string;attemptId:string;epoch:number;snapshot:unknown;snapshotHash:string|null|undefined;composite:{id:string;createdBy?:string|null;items:any[]};resolvedSituational:Map<string,ResolvedSituationalRelease>}){
+export async function prepareTrainingContentAttemptBinding(db:Prisma.TransactionClient,input:{compositeId:string;attemptId:string;epoch:number;snapshot:unknown;snapshotHash:string|null|undefined;composite:{id:string;createdBy?:string|null;items:any[]};resolvedSituational:Map<string,ResolvedSituationalRelease>;educationComposition?:EducationCompositionPolicyBinding}){
   if(input.snapshot==null&&input.snapshotHash==null)return null
   if(!input.snapshot||!input.snapshotHash)fail('SNAPSHOT_INVALID')
   const parsed=trainingContentSnapshotSchema.safeParse(input.snapshot)
   if(!parsed.success)fail('SNAPSHOT_INVALID')
   const snapshot=parsed.data
-  if(snapshot.compositeId!==input.compositeId||canonicalHash(snapshot)!==input.snapshotHash
+  if(snapshot.compositeId!==input.compositeId||(!input.educationComposition&&canonicalHash(snapshot)!==input.snapshotHash)
     ||new Set(snapshot.units.map(unit=>unit.itemId)).size!==snapshot.units.length||!input.attemptId||!Number.isSafeInteger(input.epoch)||input.epoch<1)fail('SNAPSHOT_INVALID')
   if(input.composite.id!==input.compositeId||input.composite.items.length>1000)fail('SNAPSHOT_INVALID')
+  if(snapshot.educationBinding||input.educationComposition){
+    const anchor=educationCompositionRuntimeAnchorSchema.parse({origin:input.educationComposition?.origin,manifestHash:input.educationComposition?.manifestHash})
+    if(!snapshot.educationBinding||anchor.manifestHash!==input.snapshotHash||input.composite.createdBy!==anchor.origin.ownerUserId
+      ||canonicalHash(snapshot.educationBinding.origin)!==canonicalHash(anchor.origin))fail('SNAPSHOT_INVALID')
+    const measurementItems=input.composite.items.filter(item=>item.type!=='FORM')
+    if(measurementItems.length!==snapshot.units.length||snapshot.units.some(unit=>unit.family!=='SCALE'||unit.source.kind!=='SCALE'
+      ||(!unit.source.educationStandard&&!unit.source.educationLibrary&&(unit.source.ownerId!==anchor.origin.ownerUserId||!unit.source.privateVersionId))
+      ||!measurementItems.some(item=>item.id===unit.itemId&&item.type==='SCALE'&&item.scaleId===unit.source.id)))fail('SOURCE_MISMATCH')
+    // Admission supplied this anchor from the existing transaction-bound START
+    // proof; the loaded source is sealed under its publication SHARE lock.
+    // Do not recompile/rehash definitions or pretend a leaf has a single-Scale
+    // registry wrapper. Native runtime freezing still occurs once per child.
+    const binding=trainingContentAttemptBindingSchema.parse({schemaVersion:1,compositeId:input.compositeId,attemptId:input.attemptId,
+      epoch:input.epoch,publicationHash:input.snapshotHash,units:snapshot.units,educationComposition:anchor})
+    const presentation=new Map<string,EducationSlotPresentation>(),orderedSlots:string[]=snapshot.educationBinding.context?['form-section:'+snapshot.educationBinding.context.sectionId]:[]
+    if(snapshot.educationBinding.context){
+      const id=snapshot.educationBinding.context.sectionId
+      presentation.set('form-section:'+id,{blockId:id})
+    }
+    for(const block of snapshot.educationBinding.manifest){
+      const keys=block.kind==='SCALE'?block.itemIds.map(id=>'scale:'+id):block.sectionIds.map(id=>'form-section:'+id)
+      const instruction=[block.instruction,block.sourceInstruction].filter(Boolean).join('\n\n')
+      for(const [index,key] of keys.entries()){
+        orderedSlots.push(key);presentation.set(key,{blockId:block.blockId,...(index===0&&instruction?{instruction}:{})})
+      }
+    }
+    return {binding,bindingHash:canonicalHash(binding),educationUnitOrder:new Map(orderedSlots.map((key,index)=>[key,index])),
+      educationUnitPresentation:presentation,recheckSourceLicenses:async()=>{}}
+  }
   const actualItems=input.composite.items.filter(item=>item.type!=='FORM')
   const itemsById=new Map<string,any>(actualItems.map(item=>[item.id,item]))
   if(actualItems.length!==snapshot.units.length||itemsById.size!==actualItems.length)fail('SOURCE_MISMATCH')

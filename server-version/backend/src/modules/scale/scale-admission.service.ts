@@ -60,7 +60,9 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   questionnaireAssessmentId: true,
   compositeAttemptId: true,
   compositeItemId: true,
-  compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
+  compositeAttempt: { select: {...TRAINING_VARIANT_PARENT_MARKER_SELECT,compositeAssessment:{select:{
+    ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select,creationKey:true,
+  }}} },
   scaleId: true,
   subjectUserId: true,
   respondentUserId: true,
@@ -725,13 +727,9 @@ export const activateScaleAdmission = async (
   const stored = await loadStoredScaleAdmission(row)
   if (stored) return (await validateStoredAgainstRuntime(row, stored, referenceTimeMs))
   assertFinalOnly(row.deliveryMode)
-  const runtime = (await loadScaleAdmissionRuntime(row))
-  if (runtime.schemaVersion === 1) return prisma.$transaction(async tx=>{
-    if(row.compositeAttemptId)await assertTrainingScaleCollectionAllowed(tx,[row.scaleId],{compositeAttemptId:row.compositeAttemptId,compositeItemIds:row.compositeItemId?[row.compositeItemId]:[]})
-    else await assertScaleLibraryCollectionAllowed(tx,[],[row.scaleId])
-    return activateUnstoredScaleAdmission(tx,row,runtime,parent)
-  })
-
+  // First delivery must lock before the collection guard takes a shared child
+  // lock. Two V1 readers otherwise deadlock upgrading those locks to persist
+  // admission. Reuse the same locked winner/epoch checks for both versions.
   return withSerializableScaleTransaction(prisma,
     async (tx) => {
       await tx.$queryRaw`SELECT "id" FROM "assessments" WHERE "id" = ${row.id} FOR UPDATE`

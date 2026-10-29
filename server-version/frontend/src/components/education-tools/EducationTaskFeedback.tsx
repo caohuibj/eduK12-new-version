@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { EducationScalePersonalReport, type EducationReportApi, type EducationScalePersonalReportData } from './EducationScalePersonalReport'
 import { EducationAssessmentReport } from './EducationAssessmentReport'
+import {EducationOrdinaryFeedback,type OrdinaryFeedbackData} from './EducationOrdinaryFeedback'
 
-export type EducationFeedbackData = EducationScalePersonalReportData & { releaseAt?:string|null }
+export type EducationFeedbackData = EducationScalePersonalReportData & OrdinaryFeedbackData & { releaseAt?:string|null }
 export type EducationTaskFeedbackProps = {
   entry:'SCHOOL'|'TEACHER';executionId:string;title:string;api:EducationReportApi
   loadFeedback:()=>Promise<EducationFeedbackData>;onClose:()=>void
@@ -41,7 +42,7 @@ export function EducationTaskFeedback({entry,executionId,title,api,loadFeedback,
   const close=()=>{current.current=null;request.current=null;onClose()}
   const visible=result?.scope===scope?result:null,data=visible?.data
   const ready=data?.state==='READY'
-  const recognized=data?.kind==='EDUCATION_SCALE_PERSONAL_REPORT'||data?.kind==='EDUCATION_ASSESSMENT_PERSONAL_REPORT'
+  const recognized=data?.kind==='EDUCATION_SCALE_PERSONAL_REPORT'||data?.kind==='EDUCATION_ASSESSMENT_PERSONAL_REPORT'||data?.kind==='EDUCATION_FEEDBACK'
   return <section className="education-task-feedback" role="region" aria-label="获准的个人测评反馈" onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();close()}}}>
     <h3 ref={heading} tabIndex={-1}>{title} · {entry==='SCHOOL'?'我的反馈':'本人反馈'}</h3>
     <p role="status">本次作答已完成，正式提交已确认。</p>
@@ -51,7 +52,8 @@ export function EducationTaskFeedback({entry,executionId,title,api,loadFeedback,
       {data.state==='PENDING'&&<p role="status">报告正在生成，请稍后重新读取。无需再次交卷。</p>}
       {data.state==='WITHHELD'&&<p>当前反馈尚未获准显示，或暂未达到开放时间与披露条件。</p>}
       {data.state==='COMPLETED'&&<p>当前测评仅允许展示完成状态，不提供分数或诊断。</p>}
-      {data.kind==='EDUCATION_ASSESSMENT_PERSONAL_REPORT'?<EducationAssessmentReport data={data}/>:
+      {data.kind==='EDUCATION_FEEDBACK'?<EducationOrdinaryFeedback entry={entry} data={data} api={api} executionId={executionId}/>:
+        data.kind==='EDUCATION_ASSESSMENT_PERSONAL_REPORT'?<EducationAssessmentReport data={data}/>:
         data.kind==='EDUCATION_SCALE_PERSONAL_REPORT'?<EducationScalePersonalReport data={data} api={api} executionId={executionId} entry={entry}/>:
         renderLegacy?renderLegacy(data):ready?<p>结果已经生成，但针对学生的逐工具解释尚未完成科学与适龄内容审核，因此这里不会直接展示指标代码、分数或诊断推论。</p>:null}
       {!recognized&&typeof data.message==='string'&&<p>{data.message}</p>}

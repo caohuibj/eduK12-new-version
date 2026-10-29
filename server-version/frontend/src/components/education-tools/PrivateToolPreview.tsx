@@ -10,7 +10,8 @@ import {FormChoiceExtras,toggleFormMultiple} from '../../modules/assessment-core
 import {visibleFormKeys} from '../../modules/assessment-core/form/form-visibility'
 import type {ProfessionalAnswer} from '../../modules/assessment-core/form/types'
 
-export function PrivateToolPreview({tool,answers,onAnswer,imageAdapter,renderMaterials}:{tool:PrivateTool;answers:Record<string,ProfessionalAnswer>;onAnswer:(key:string,value:ProfessionalAnswer)=>void;imageAdapter?:ImageAuthoringAdapter;renderMaterials?:(items:PublicMaterial[]|undefined)=>ReactNode}){
+export type PrivateToolPreviewValue=Pick<PrivateTool,'id'|'title'|'kind'|'definition'>
+export function PrivateToolPreview({tool,answers,onAnswer,imageAdapter,renderMaterials}:{tool:PrivateToolPreviewValue;answers:Record<string,ProfessionalAnswer>;onAnswer:(key:string,value:ProfessionalAnswer)=>void;imageAdapter?:ImageAuthoringAdapter;renderMaterials?:(items:PublicMaterial[]|undefined)=>ReactNode}){
  if(tool.kind==='SCALE'){
   const definition=tool.definition as ScaleDefinition
   return <div className="education-private-preview">{[...definition.items].sort((a,b)=>a.sortOrder-b.sortOrder).map((item,index)=><fieldset key={item.itemCode}>

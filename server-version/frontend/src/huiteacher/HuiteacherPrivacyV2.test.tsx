@@ -47,7 +47,7 @@ describe('Huiteacher PR2 student feedback admin materialized release',()=>{
     expect(await screen.findByText(/已正式发布并冻结/)).toBeInTheDocument()
     expect(screen.getByText('教学节奏')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'查看群体反馈'}))
-    await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/report'))
+    await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/report','GET',undefined))
     expect(api).not.toHaveBeenCalledWith(expect.stringContaining('/report/release'),'GET',expect.anything())
   })
 })
@@ -59,7 +59,7 @@ describe('Huiteacher streamlined three-stage student evaluation',()=>{
     let currentStatus='DRAFT'
     const api=vi.fn(async(path:string,method='GET',body?:unknown)=>{
       calls.push(method+' '+path)
-      if(path===base&&method==='GET')throw Error('NO_CONFIG')
+      if(path===base&&method==='GET')throw Object.assign(Error('NO_CONFIG'),{status:404})
       if(path===base+'/candidates')return {list:[{
         staffAssignmentId:'staff-record',classUnitId:'class-record',
         className:'六年级一班',staffRole:'TEACHING',

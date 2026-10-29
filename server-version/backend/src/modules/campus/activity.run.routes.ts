@@ -76,6 +76,10 @@ router.get('/organizations/:organizationId/activities/:courseId/runs/:runId',
 )
 router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/tracks',
   authenticateSchool,wrap(async(req,res)=>{
+    // Ordinary attachment owns current editor/own activity, author, draft CAS
+    // and source checks inside its single write transaction. Do not repeat the
+    // same read-only editor preflight before that authoritative boundary.
+    if(req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateComposition'))return assessmentRunController.addTrack(req,res)
     const result=await assertCampusActivityRunEditor({
       actor:req.user!,...runPath.parse(req.params),
     })

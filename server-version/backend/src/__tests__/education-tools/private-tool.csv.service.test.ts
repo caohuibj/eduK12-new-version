@@ -24,7 +24,7 @@ const proof=(p:Awaited<ReturnType<typeof preview>>)=>({...input(),digest:p.diges
 describe('education private CSV real adapter contract',()=>{
  beforeEach(()=>{
   vi.clearAllMocks();stored=makeRow()
-  m.query.mockResolvedValue([{organizationId:org,organizationName:'Synthetic',membershipId:'member',orgRole:'MEMBER',productAdmin:false}])
+  m.query.mockResolvedValue([{organizationId:org,organizationName:'Synthetic',membershipId:'member',orgRole:'MEMBER',productAdmin:true}])
   m.find.mockImplementation(async({where}:{where:Record<string,unknown>})=>Object.entries(where).every(([k,v])=>stored[k as keyof typeof stored]===v)?structuredClone(stored):null)
   m.images.mockResolvedValue([]);m.sync.mockResolvedValue(undefined)
   m.update.mockImplementation(async({where,data}:{where:Record<string,unknown>;data:Record<string,unknown>})=>{

@@ -5,6 +5,7 @@ import {collectAssetReferences} from '../../services/assetStorage'
 import {createCustomScaleDefinition,scaleDefinitionSchema,validateScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
 import {formDraftSchema,validateFormDefinition,type FormDraft} from '../assessment-core/form/definition'
 import {privateToolFail,type PrivateToolKind} from './private-tool.contracts'
+import {privateCompositionDefinitionSchema} from './private-tool.composition-contracts'
 
 // Drafts may be incomplete, but keep the native authoring shape. Only empty
 // item/score/report-key arrays are relaxed; full validators gate preview and freezing.
@@ -19,9 +20,16 @@ const draftScaleSchema=scaleDefinitionSchema.extend({
   scores:z.array(scaleDefinitionSchema.shape.scoring.shape.scores.element),
  }),
 })
-export const initialPrivateToolDefinition=(kind:PrivateToolKind)=>kind==='SCALE'?createCustomScaleDefinition():{schemaVersion:2,pages:[]}
+export const initialPrivateToolDefinition=(kind:PrivateToolKind,entry:'SCHOOL'|'TEACHER'='TEACHER')=>kind==='COMPOSITION'
+ ?{schemaVersion:1,adapterVersion:'1.0.0',administration:{population:entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode:'SELF'},instruction:'',blocks:[]}
+ :kind==='SCALE'?createCustomScaleDefinition():{schemaVersion:2,pages:[]}
 export function privateToolDefinition(kind:PrivateToolKind,input:unknown){
  if(Buffer.byteLength(JSON.stringify(input)??'','utf8')>512000)privateToolFail('PRIVATE_TOOL_DEFINITION_TOO_LARGE',400)
+ if(kind==='COMPOSITION'){
+  const parsed=privateCompositionDefinitionSchema.safeParse(input)
+  if(!parsed.success)privateToolFail('PRIVATE_TOOL_DEFINITION_INVALID',400,parsed.error.issues)
+  return parsed.data
+ }
  const parsed=(kind==='SCALE'?draftScaleSchema:formDraftSchema).safeParse(input)
  if(!parsed.success)privateToolFail('PRIVATE_TOOL_DEFINITION_INVALID',400,parsed.error.issues)
  // Structure alone is not authorization: service callers must validate these
@@ -36,6 +44,11 @@ export function privateToolDefinition(kind:PrivateToolKind,input:unknown){
 }
 export function validatePrivateToolDefinition(kind:PrivateToolKind,definition:unknown){
  const parsed=privateToolDefinition(kind,definition)
+ if(kind==='COMPOSITION'){
+  const composition=privateCompositionDefinitionSchema.parse(parsed)
+  const issues=composition.blocks.length?[]:[{path:'blocks',severity:'error' as const,message:'请加入至少一个固定版本工具'}]
+  return {valid:issues.length===0,issues,definition:composition}
+ }
  const result=kind==='SCALE'?validateScaleDefinition(parsed,{instrumentClass:'CUSTOM_DESCRIPTIVE'}):validateFormDefinition(parsed,{forPreview:true})
  const issues=[...result.issues,...privateToolMaterialRightsIssues(kind,parsed)]
  const valid=Boolean(result.definition)&&!issues.some(issue=>issue.severity==='error')

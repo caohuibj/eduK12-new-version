@@ -73,3 +73,5 @@ export const parseDelimitedOptions = (input: string): AssessmentContextOption[] 
 export const serializeDelimitedOptions = (options: AssessmentContextOption[]): string => options
   .map((option) => `${option.value}=${option.label}`)
   .join(',')
+
+export const assessmentContextLabels:Record<AssessmentContextKey,string>={gradeLevel:'年级',birthYearMonth:'出生年月',sexAtBirth:'出生时性别',primaryLanguage:'主要语言',countryOrRegion:'国家或地区'}

@@ -23,6 +23,18 @@ describe('current Training consumers do not borrow Survey approval or PRIVATE sc
     expect(trainingContentSnapshotSchema.safeParse(snapshot).success).toBe(false)
     expect(trainingContentSnapshotSchema.safeParse({...snapshot,units:[{...c.unit,source:{...c.unit.source,combinationHash:c.row.combination_hash}}]}).success).toBe(false)
   })
+  it('does not turn a forged education Standard descriptor into an ordinary sealed parent',async()=>{
+    const c=context(),{canonicalHash}=await import('../../modules/assessment-runtime/canonical'),{DISCLOSURE_PRESETS}=await import('../../modules/scale/policy/disclosure')
+    if(c.measurement.layer!=='MEASUREMENT')throw Error('fixture')
+    const report=stored({layer:'REPORT',family:'SCALE',key:'synthetic-forged-education-report',version:'R1',scope:{kind:'PLATFORM',ownerId:'system'},provenance:{},assetRefs:[],sourceReleaseId:null,
+      content:{projectionVersion:1,measurements:[{releaseId:c.measurement.releaseId,contentHash:c.measurement.contentHash}],metricKeys:['effort'],audience:'teacher',language:'zh-CN',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:{title:'Synthetic forged report',blocks:[],limitations:[]}}})
+    const unit={...c.unit,report:{releaseId:report.releaseId,contentHash:report.contentHash},source:{...c.unit.source,educationStandard:{releaseId:c.row.id,combinationHash:c.row.combination_hash,
+      toolKey:c.row.snapshot.toolKey,instrumentVersion:c.row.snapshot.instrumentVersion,nativeDefinitionHash:canonicalHash(c.row.snapshot.definition),
+      parametersAxisHash:c.row.snapshot.parts.PARAMETERS.hash,reportAxisHash:c.row.snapshot.parts.REPORT.hash,reportAudience:'teacher' as const,respondentDisclosure:DISCLOSURE_PRESETS.NONE()}}}
+    c.db.$queryRaw.mockResolvedValue([])
+    await expect(validateTrainingReportPointer(c.db as never,{unit,compositeId:'invented-composite',ownerId:'teacher',reportReleaseId:report.releaseId,publication:false,releases:new Map([[report.releaseId,report]])})).rejects.toThrow('PRIVATE_COMPOSITION_IDENTITY_INVALID')
+    expect(c.db.$queryRaw).toHaveBeenCalledOnce();expect(c.db.$executeRaw).not.toHaveBeenCalled()
+  })
   it.each(['theoretical_range','descriptive_sample','criterion_threshold'] as const)(
     'a PLATFORM %s parameter snapshot is not a formal normative publication just because its Survey combo is approved',async referenceKind=>{
       const c=context(),entry={scoreKey:'effort',referenceKind,instrumentVersion:'1.0.0',scoringVersion:'survey-research-v1',population:{description:'Synthetic scope only'}}

@@ -115,6 +115,8 @@ suite('Private Form fixed-version draft attachment and read-only preview, preser
     await db.organizationCapabilityGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId, membershipId: member.id, capability: 'PSYCHOLOGY_STAFF', grantedByUserId: f.managerUserId } })
     const foreign = await frozen({ ...context, principal: { userId: other.id, accountDomain: 'SCHOOL' } })
     await db.educationProductEntitlement.create({ data: { organizationId: f.organizationId, product: 'HUITEACHER', grantedByUserId: f.managerUserId } })
+    const teacherMember = await db.organizationMembership.findFirstOrThrow({ where: { organizationId: f.organizationId, userId: f.managerUserId, validUntil: null } })
+    await db.educationProductRoleGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId, membershipId: teacherMember.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', grantedByUserId: f.managerUserId } })
     const entry = await frozen({ ...context, entry: 'TEACHER' })
     for (const version of [foreign.version, entry.version]) {
       const before = await effects(f.runId, version.ownerUserId)

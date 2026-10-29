@@ -31,6 +31,8 @@ export interface AssessmentRunProductTrack {
   requestedPolicy: unknown
   frozenResourcePolicy: unknown | null
   resourcePolicyHash: string | null
+  title?:string
+  sourceRevision?:number
 }
 
 export interface AssessmentRunFrozenActorSummary {
@@ -114,13 +116,16 @@ export async function readAssessmentRunProduct(
 
   const [tracks, actors, relationships, executions] = await Promise.all([
     prisma.$queryRaw<AssessmentRunProductTrack[]>`
-      SELECT "id", "resource_family" AS "resourceFamily", "resource_key" AS "resourceKey",
-             "resource_version" AS "resourceVersion", "subject_selector" AS "subjectSelector",
-             "respondent_selector" AS "respondentSelector", "requested_policy" AS "requestedPolicy",
-             "frozen_resource_policy" AS "frozenResourcePolicy", "resource_policy_hash" AS "resourcePolicyHash"
-      FROM "assessment_run_tracks"
-      WHERE "organization_id" = ${organizationId} AND "run_id" = ${runId}
-      ORDER BY "created_at", "id"
+      SELECT t."id",t."resource_family" AS "resourceFamily",t."resource_key" AS "resourceKey",
+        t."resource_version" AS "resourceVersion",t."subject_selector" AS "subjectSelector",
+        t."respondent_selector" AS "respondentSelector",t."requested_policy" AS "requestedPolicy",
+        t."frozen_resource_policy" AS "frozenResourcePolicy",t."resource_policy_hash" AS "resourcePolicyHash",
+        v.title,v.source_revision AS "sourceRevision"
+      FROM "assessment_run_tracks" t LEFT JOIN education_private_tool_versions v ON v.id=split_part(t.resource_key,':',3)
+       AND v.organization_id=t.organization_id AND v.kind='COMPOSITION' AND t.resource_family='BUNDLE'
+       AND t.resource_key='education-composition:'||v.entry||':'||v.id||':'||CASE v.entry WHEN 'SCHOOL' THEN 'STUDENT' ELSE 'TEACHER' END||':SELF:1.0.0'
+      WHERE t."organization_id" = ${organizationId} AND t."run_id" = ${runId}
+      ORDER BY t."created_at",t."id"
     `,
     prisma.$queryRaw<AssessmentRunFrozenActorSummary[]>`
       SELECT "provenance_kind" AS "provenanceKind", "actor_role" AS "actorRole", COUNT(*)::int AS "count"
@@ -147,7 +152,7 @@ export async function readAssessmentRunProduct(
 
   return {
     run,
-    tracks,
+    tracks:tracks.map(({title,sourceRevision,...track})=>title==null?track:{...track,title,sourceRevision}),
     frozenPopulation: { actors, relationships },
     executions,
   }

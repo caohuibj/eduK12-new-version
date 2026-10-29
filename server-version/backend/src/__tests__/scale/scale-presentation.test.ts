@@ -10,6 +10,7 @@ import { createFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart, enc
 import { loadScaleAssessmentForResponse } from '../../modules/scale/scale-workflow.service'
 import { canStartLibraryCourseScale } from '../../modules/scale/scale-access'
 import { ScaleLibraryError } from '../../modules/scale-library-governance/contracts'
+import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 const definition = compileResearchScale('Test', { schemaVersion: 1, respondentType: 'participant_self_report', aggregation: 'sum',
   responseOptions: [{ optionKey: 'yes', label: 'Yes', score: 1 }, { optionKey: 'no', label: 'No', score: 0 }],
   dimensions: [{ dimensionKey: 'total', label: 'Total', direction: 'descriptive' }],
@@ -41,6 +42,17 @@ describe('exact frozen Scale presentation and course start', () => {
     const snapshot = await freezeScaleRuntimeAtAttemptStart(tx as never, { instrumentKey: 'library:test', instrumentVersion: '1', definition })
     expect(snapshot.measurementPresentation?.presentationMode).toBe('ALL_AT_ONCE')
     expect(parseFrozenScaleRuntimeSnapshot(snapshot).measurementPresentation?.releaseId).toBe('release')
+  })
+  it('uses the sealed education presentation without another measurement read and rejects a different native entry, C or M',async()=>{
+    const tx={scale:{findUnique:vi.fn().mockResolvedValue({id:'wrapper',code:'library:test',instrumentVersion:'1',instrumentClass:'CUSTOM_DESCRIPTIVE',
+      status:'PUBLISHED',libraryEntryId:'entry',measurementReleaseId:'release'})}}
+    const sealedLibraryPresentation={entryId:'entry',sourceDefinitionHash:canonicalHash(definition),presentation:{releaseId:'release',contentHash:'a'.repeat(64),presentationMode:'ALL_AT_ONCE' as const}}
+    const input={instrumentKey:'library:test',instrumentVersion:'1',definition,sealedLibraryPresentation}
+    expect((await freezeScaleRuntimeAtAttemptStart(tx as never,input)).measurementPresentation).toEqual(sealedLibraryPresentation.presentation)
+    for(const invalid of [{...sealedLibraryPresentation,entryId:'another'},{...sealedLibraryPresentation,sourceDefinitionHash:'b'.repeat(64)},
+      {...sealedLibraryPresentation,presentation:{...sealedLibraryPresentation.presentation,releaseId:'another'}}])
+      await expect(freezeScaleRuntimeAtAttemptStart(tx as never,{...input,sealedLibraryPresentation:invalid})).rejects.toThrow(/identity mismatch/)
+    expect(mocks.release).not.toHaveBeenCalled()
   })
   it('keeps historical snapshot bytes and defaults legacy/RUNNER_DEFAULT to Training one-by-one', async () => {
     const snapshot = createFrozenScaleRuntimeSnapshot({ instrumentKey: 'legacy', instrumentVersion: '1', definition })

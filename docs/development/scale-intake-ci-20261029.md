@@ -32,3 +32,11 @@ checker专用测试原夹具失败与定向修复保留；已有PUBLISHED样本�
 3. 对最终base/head回读路由、必需结果与Merge Gate。旧失败保留，不用独立focused代替资格。内容合并仍需环境加载与授权安装/发布/readback才是实际公共库。
 
 Project每批必须输出base/head、真实选中路线、工具清单、run链接及安装/公开状态；纯内容预检不符合先列超范围文件并拆分，不默默触发全平台或砍掉安全检查。
+
+## PR382 合并后的控制集成（2026-10-29 08:00 UTC）
+
+新基线 main 468b75c9bbb2febc6f680c8da83e2e5a368da476。PR382 正式 run40836587392、CodeQL 与 merge gate 均成功后正常合并。此控制分支吸收新 main；两个测试冲突保留更完整的 jobNeeds 解析及精确依赖身份断言，不覆盖 School/Teacher 的新路由。相对新 main 的变更为 14 个控制/检查器/文档文件；应用源码、schema、迁移和锁依赖不变。
+
+唯一新增本地集成复验：content-workflows 与 maintenance-routing 两文件 42/42 PASS，0 filtered；未重跑原纯内容来源或 scorer 合格证据。后续正式 control qualification 与 CodeQL 使用实际合并候选；原5783c913绿灯不覆盖后续CodeQL路径补充和新main集成。运行结果以新run回读为准。
+
+当前执行顺序：本控制PR完成后，先处理A开发成果的补测闭环、CI和分批合并；#383恢复纯内容的流程设计保留，但不抢当前主线顺序。无部署或公共库数据库写入。

@@ -1,6 +1,6 @@
 import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
-import {addPrivateScaleRunTrack,addPrivateFormRunTrack} from '../education-tools/private-tool.run-adapter'
-import {privateToolRunTrackInput} from '../education-tools/private-tool.run-contract'
+import {addPrivateScaleRunTrack,addPrivateFormRunTrack,addPrivateCompositionRunTrack} from '../education-tools/private-tool.run-adapter'
+import {educationPrivateRunTrackInput} from '../education-tools/private-tool.run-contract'
 import {prisma} from '../../config/database'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
@@ -167,14 +167,14 @@ export const assessmentRunController = {
 
   async addTrack(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
-    if(req.body&&(Object.prototype.hasOwnProperty.call(req.body,'privateScale')||Object.prototype.hasOwnProperty.call(req.body,'privateForm'))){
+    if(req.body&&['privateScale','privateForm','privateComposition'].some(key=>Object.prototype.hasOwnProperty.call(req.body,key))){
       if(!req.params.courseId)return error(res,'Private tools require the product activity route',-1,400)
-      const parsed=privateToolRunTrackInput.safeParse(req.body)
+      const parsed=educationPrivateRunTrackInput.safeParse(req.body)
       if(!parsed.success)return error(res,'Invalid private fixed-version track',-1,400)
-      try{return success(res,await ('privateForm' in parsed.data?addPrivateFormRunTrack:addPrivateScaleRunTrack)({organizationId:req.params.organizationId,runId:req.params.runId,actorUserId:req.user.userId,parent:{kind:'SCHOOL_ACTIVITY',id:req.params.courseId}},parsed.data))}
+      try{return success(res,await ('privateComposition' in parsed.data?addPrivateCompositionRunTrack:'privateForm' in parsed.data?addPrivateFormRunTrack:addPrivateScaleRunTrack)({organizationId:req.params.organizationId,runId:req.params.runId,actorUserId:req.user.userId,parent:{kind:'SCHOOL_ACTIVITY',id:req.params.courseId}},parsed.data))}
       catch(err){return fail(res,err)}
     }
-    if((typeof req.body?.resource?.key==='string'&&(req.body.resource.key.startsWith('private-scale:')||req.body.resource.key.startsWith('private-form:')))
+    if((typeof req.body?.resource?.key==='string'&&(req.body.resource.key.startsWith('private-scale:')||req.body.resource.key.startsWith('private-form:')||req.body.resource.key.startsWith('education-composition:')))
       ||req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateFormOrigin')
       ||req.body?.resource&&Object.prototype.hasOwnProperty.call(req.body.resource,'privateFormOrigin')
       ||req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateOrigin')
