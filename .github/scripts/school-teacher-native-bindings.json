@@ -1,0 +1,477 @@
+{
+  "schemaVersion": 1,
+  "candidate": "native-bundle",
+  "repository": "caohuibj/eduK12-new-version",
+  "branch": "feat/bundle-evc-profile-20261029",
+  "enabled": false,
+  "base": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "productHead": "72078d2ccd1546abe4ca915366b694a18433c44a",
+  "productTree": "d285d33c5c8e1ad0a4ffc1c7fe3c22a0625e9c4d",
+  "frontendTree": "5a2676e3fea15901e55cd320c4b015678a49528a",
+  "backendTree": "0e2ef32d7467de7b7da6f1700918c510a7ca7554",
+  "review": {
+    "status": "PENDING",
+    "recordSha256": null
+  },
+  "requiredJobs": [
+    "admission",
+    "frontend",
+    "backend-self",
+    "native-evidence",
+    "native-runtime",
+    "security"
+  ],
+  "source": {
+    "server-version/backend/src/__tests__/bundle-onboarding/education-adapter.test.ts": {
+      "before": null,
+      "after": "34d23a6f49a090fcfe10442482234de6ad1588e5"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/education-native-continuation.postgres.integration.test.ts": {
+      "before": null,
+      "after": "9f2b483cceadc4add3ef085ee45d711a5fd1d263"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/education-native-runtime.fixture.ts": {
+      "before": null,
+      "after": "d556770f25a7407517a51a7cb5242e8c45495e38"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/education-native-saved-read.postgres.integration.test.ts": {
+      "before": null,
+      "after": "5df4b77ee66ddb26eea4d56d6dcc2ba75aa39812"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/education-native.postgres.integration.test.ts": {
+      "before": null,
+      "after": "915565c1a458e02fdf19389363d87d0807905e10"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/profile-cache.test.ts": {
+      "before": null,
+      "after": "d01bec0a4562cf8bc282e7adcaf5f528ef986e10"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/profile-continuation.postgres.integration.test.ts": {
+      "before": null,
+      "after": "0a517709cbd59d2e44966f41dbb962a6f7750247"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/profile-lifecycle.postgres.integration.test.ts": {
+      "before": null,
+      "after": "11720d25e0d4cda034045ab6230147282f18a32f"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/profile-native-setup.test.ts": {
+      "before": null,
+      "after": "54bac7319a52605a0d47e96b9221d863d3df4509"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/profile-restore.postgres.integration.test.ts": {
+      "before": null,
+      "after": "e140112bbccf604a053e034b770b55e64efe8038"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/profile.test.ts": {
+      "before": null,
+      "after": "a5d45aa0416d70537a9a0750ea72266c6df86eed"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/survey-native-saved-read.postgres.integration.test.ts": {
+      "before": null,
+      "after": "99ca7c2c200a2f8f011d45c6a6033a3e16599941"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/survey-native.fixture.ts": {
+      "before": null,
+      "after": "96612de414ddb09a54fada838077743a6937d92c"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/survey-native.postgres.integration.test.ts": {
+      "before": null,
+      "after": "8fa94d257e305cf819d792695acff775f5a1c010"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/survey-native.test.ts": {
+      "before": null,
+      "after": "601b72b51f53970332465fa8494c19c84597c2df"
+    },
+    "server-version/backend/src/modules/assessment-bundle/bootstrap.ts": {
+      "before": "086eebd8028e84ee82d800249d05fa98ff768696",
+      "after": "444dafd926abbf2192baa126b512dc0d13abcb74"
+    },
+    "server-version/backend/src/modules/assessment-bundle/ci-fixtures/learning_motivation_math_support/0.1.1.json": {
+      "before": null,
+      "after": "a8c6efa27ecdace17070a736e35c591b12038aa5"
+    },
+    "server-version/backend/src/modules/assessment-bundle/generated/packages.json": {
+      "before": "285d988aaaeadcaa26c3123ca79c75c7dd467e17",
+      "after": "26a9433ffe025af051ec760025774a854a4cbfd8"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts": {
+      "before": "171719b67d754dfbbdaaec71bd3ebf323287b090",
+      "after": "6aaf8419e89699e427d72efbdd1c469f9659bf92"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts": {
+      "before": "f3e532a72a7ec0b99e3519774d4375e5854ae0f7",
+      "after": "8896e3039ee2b737b77532909ac95e470931fc8b"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/engine.ts": {
+      "before": "0060521418696decd46a79b954a8713645b800ef",
+      "after": "245d277c0d692edcd39af074208b1905258d9c8f"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts": {
+      "before": "aa1542b4741fee5b63cb360c90be3dae7daa8c9e",
+      "after": "51695457de7e20dfb3d226891120bad778ef11f1"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/loader.ts": {
+      "before": "fe5eec8f2a538a5a01fa7e1ccac86724f70c9d98",
+      "after": "27e19f2a8fdf7be85f563cf7b9b77f7c3bf2ee4c"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/context.json": {
+      "before": null,
+      "after": "dddde39899e9f394b8fe3f9f062b8cfc7551cdb9"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/evidence-map.json": {
+      "before": null,
+      "after": "46a6d34cde58cfc0b119c89d2aaa0bc51c9a3d9d"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/fixtures/invalid.json": {
+      "before": null,
+      "after": "c9986f07107b14ac67bfde686283315e2f40cb5a"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/fixtures/missing.json": {
+      "before": null,
+      "after": "fc316e2819084bb09956cd47abec7ae2e82198eb"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/fixtures/not-applicable.json": {
+      "before": null,
+      "after": "638560f6c77d005e99fb79354912a116ed74e68a"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/fixtures/valid.json": {
+      "before": null,
+      "after": "7606daeda4b96e3a6ec726bc6b81608816dfa974"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/manifest.json": {
+      "before": null,
+      "after": "355e03bb0bfad6d9efc335d9614e859db3b3a36f"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/profile.json": {
+      "before": null,
+      "after": "a3ed681b0f07c5f51a5f6dc328034bb833d2ed82"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/publication.json": {
+      "before": null,
+      "after": "80d6b9ebbd1fdec46fd252888cfb5f1ef2aecf9c"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/report.json": {
+      "before": null,
+      "after": "d877e76b9e2bff651c87f6f903325e0f969d219f"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/rules.json": {
+      "before": null,
+      "after": "27b7b88ac60133772499bb25a8c795992ff10d01"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1/scientific.json": {
+      "before": null,
+      "after": "46804debdf96af35ff5090c542d91ec3fc7b72ae"
+    },
+    "server-version/backend/src/modules/assessment-bundle/profile/admission.ts": {
+      "before": null,
+      "after": "401fda13ed1fe900f85674ac313d4eb2f007109b"
+    },
+    "server-version/backend/src/modules/assessment-bundle/profile/contract.ts": {
+      "before": null,
+      "after": "59cc284dcfbfbd2c0ee68e9ae8a2ad550b55fd53"
+    },
+    "server-version/backend/src/modules/assessment-bundle/profile/match.ts": {
+      "before": null,
+      "after": "a6404114ab36600d8da9c683c54ba686d3f9ea8e"
+    },
+    "server-version/backend/src/modules/assessment-bundle/profile/report.ts": {
+      "before": null,
+      "after": "1f304835921957b9fc4f42b3a102c6b62076dece"
+    },
+    "server-version/backend/src/modules/assessment-bundle/profile/sources.ts": {
+      "before": null,
+      "after": "cd9a88eb50d3bbf12d2a76e17e8cee00a15f3ce0"
+    },
+    "server-version/backend/src/modules/assessment-bundle/report-facts.ts": {
+      "before": "72140520a0f2597566a48d53d2d915b0e388dab5",
+      "after": "33ab573b3ce19d7da8dfb6dfe8f220feb9090506"
+    },
+    "server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts": {
+      "before": "a13ee56b946b7c7e4ceb165ef10ad07a490137b5",
+      "after": "a4be44e5c13135bb476d500a212684a738faa490"
+    },
+    "server-version/backend/src/modules/bundle-product/admin-authoring.ts": {
+      "before": "a0d42e2a09414058f330af444837ef30ef742021",
+      "after": "7151395150ed543af6e5667f63ec61e8da87c6e9"
+    },
+    "server-version/backend/src/modules/bundle-product/analysis.ts": {
+      "before": "584587187b17024fddcf2a1a50e5793a5c909bba",
+      "after": "52d22bcd214c4864741cbddb7b4eda7ad1504ef4"
+    },
+    "server-version/backend/src/modules/bundle-product/education-adapter.ts": {
+      "before": null,
+      "after": "ed3973b226e89b5373e82611ea5aadbb502976e2"
+    },
+    "server-version/backend/src/modules/bundle-product/education-identity.ts": {
+      "before": null,
+      "after": "2dc571c4379e4a3a089c49ce5f7cc5afd14079c6"
+    },
+    "server-version/backend/src/modules/bundle-product/instance.ts": {
+      "before": null,
+      "after": "9be6ffb8213f890b9cb45ff2cc237b232e2f1117"
+    },
+    "server-version/backend/src/modules/bundle-product/package-release.ts": {
+      "before": "60c2f5d1070ceb36205c03c5f8dbf3e83f8fa9c5",
+      "after": "3cd611046abf2421a9f4102ba81bcd2ff53f8f4b"
+    },
+    "server-version/backend/src/modules/bundle-product/runtime.ts": {
+      "before": "c646eae89b1d2016cc1833b86211de69b9e51c65",
+      "after": "4bf36904017e1439077014ad62919b12dd77e7f4"
+    },
+    "server-version/backend/src/modules/bundle-product/service.ts": {
+      "before": "ddcddb22a6c29948fe2b066909e3f2c88b308034",
+      "after": "d8f8ab34f4d3da54c3d88743c82d36ea46e56745"
+    },
+    "server-version/backend/src/modules/bundle-product/survey-native.ts": {
+      "before": null,
+      "after": "730fa61bf4903002242193e920a0468194e90242"
+    },
+    "server-version/backend/src/modules/bundle-product/survey-source.ts": {
+      "before": null,
+      "after": "a937de71cc33dff1bee4351270ad3bea3752b002"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "830640c7b8539612804b964997a7bc48888bdf31",
+      "after": "b5e2979f25b8e34467e28e5a44cd321c60298c3d"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": {
+      "before": "391cf78a3dbe4869d5bfcc553173a0c65a917204",
+      "after": "31710ec34bf2504857a8a700f9b827fc55ba3e15"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts": {
+      "before": "5612ca1269348a516239f18827854f2187286afc",
+      "after": "65c08968e6bc67a27de0e225019b5cb01e969ecf"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.routes.ts": {
+      "before": "f34a0f532a571fc85899435fdbf4c1d833d0c974",
+      "after": "0edf4ec1f23bb132b7d088e425bf9217e1c3de34"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.service.ts": {
+      "before": "77dc141bbd7817eaf18c8228a19fd0e8b5746f95",
+      "after": "27747d8d4f4f0038048302d4d181bd14eedc921b"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.source.ts": {
+      "before": "5cf2f1c97c00f782b0e7112c493a454fb3edb10e",
+      "after": "6c84400189dad0be97d055e506d7c1868fea6320"
+    },
+    "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": {
+      "before": "48d968e8e0442c88de15cbd324a133cbcc0ee180",
+      "after": "e862c25933648a9f72e0e71ca99ea2276a7429fe"
+    },
+    "server-version/backend/src/modules/survey/final.compute.ts": {
+      "before": "5932a6cb19f3567aadf173f835793c18b90190ff",
+      "after": "dde79c1117c02d5437ced06cc660d15d773a2584"
+    },
+    "server-version/backend/src/modules/survey/final.service.ts": {
+      "before": "58ef4183ebe04ab47485a4cc22ee3bcaee99d854",
+      "after": "d06656218bd5b1972787964f17cf8286801f8bce"
+    },
+    "server-version/backend/src/modules/survey/governed-package.reports.ts": {
+      "before": "2bbdf2c1f1e1d9f3393ebe14ec5d8f9a54da4476",
+      "after": "b101c5d4d598e2065dda88340b28c1a4b88f8790"
+    },
+    "server-version/backend/src/modules/survey/governed-package.service.ts": {
+      "before": "87d952927bd473676647ce17b1f6f0fc69607c19",
+      "after": "f1ce01091a87cd80644b828b3b6057736793e66c"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.content.ts": {
+      "before": "5a101e804cbd684da41faf003f98f7a9f19e2041",
+      "after": "0bd13fceda284f9efdae66644dee2e86446d878f"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.model.ts": {
+      "before": "a3874eff856a627183d4c0be4bde0e4d2c243c77",
+      "after": "e182f1a6cc1066038c7fff7147b6685ac4bd69fc"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.routes.ts": {
+      "before": "b1f70ee2391c2fe36a86718f4d23835a75a152d3",
+      "after": "1712fb2469117fb150b1abea1b666697617ff81a"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.service.ts": {
+      "before": "721484b1328ac81d1bd5be6be34f915df0bb14d8",
+      "after": "7c6a0d077f08e8d2efc2ffa953d8aef78a20d57e"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.summary.ts": {
+      "before": "7786aa6acd21ecafa6b3146364c093cf318f9b73",
+      "after": "868d48394bb053655c0c43863ccb821fbc54d866"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.trial.ts": {
+      "before": "3e03137fda98cd6b84ee4db2d9c50d0fa6c3caa7",
+      "after": "04ff27bdeccfc128f6023648e40cb8548eac0dab"
+    },
+    "server-version/backend/src/modules/survey/participant-feedback-response.ts": {
+      "before": "7d842c50089c48ede356e33c9b94b1f98b67fff8",
+      "after": "d7cef77b7fa263ad5320b9bcd8ee234f247482fa"
+    },
+    "server-version/backend/src/modules/survey/participant-feedback.ts": {
+      "before": "9e00f3821682b134dd5b4b0504aa2d3a34397929",
+      "after": "1ddf6dbe3ba19ce420f3f1219d143b7fc12f218b"
+    },
+    "server-version/backend/src/modules/survey/publication.service.ts": {
+      "before": "993495aebd79defb10d75b99401dcdd4b568287d",
+      "after": "401e1c96e0c4c75ebfa3cab6bd0ed1effeee8fb5"
+    },
+    "server-version/backend/src/modules/survey/report-results.service.ts": {
+      "before": "406db30d50adbe087f95adcffc0cbc2dc3f54d0e",
+      "after": "83fbd3db8f485a36eeea1469ccdf3e7a4817c611"
+    },
+    "server-version/backend/src/scripts/bundle-onboarding.ts": {
+      "before": "670c7030234d87a77ea331d5be5b8de6e9481e93",
+      "after": "c2779e40a603c87f0bac19d89e14add7e54c5262"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentReport.bundle.test.tsx": {
+      "before": null,
+      "after": "b5d61b0adcaf0c749ad59824520615e0e1c93113"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentReport.tsx": {
+      "before": "58dc0a259cae7eafd6ffbce85076992f85c11d75",
+      "after": "08d238a065373891b690c8f1dc6d0adff38c12ad"
+    },
+    "server-version/frontend/src/pages/admin/GovernedToolsWorkspace.test.tsx": {
+      "before": "15700ce38e1709a503955dc64517b49d7defeaba",
+      "after": "598f821b7bf23ade2062146503e127a89bedde6a"
+    },
+    "server-version/frontend/src/pages/admin/GovernedToolsWorkspace.tsx": {
+      "before": "12fe9d998cbb9e1fd1054014ce53166c211a78ac",
+      "after": "f03de084d304c9ad4f452290be10abfb2bc9313d"
+    },
+    "server-version/frontend/src/pages/bundle/BundleAuthoring.tsx": {
+      "before": "984c6ad88f43830c9d7bc8f5e2cec6d0e58ddc39",
+      "after": "6fc9ff72f66b1145fea4f43ea21c9e04a472d2aa"
+    },
+    "server-version/frontend/src/pages/bundle/BundleProfileSummary.tsx": {
+      "before": null,
+      "after": "ce25e55861c3c17a791c3f94bd5acecac49525de"
+    },
+    "server-version/frontend/src/pages/bundle/BundleReport.tsx": {
+      "before": "eacba68e38dedad61a9dd8621c4d39ff55e55e49",
+      "after": "7d5784b89719ec1ec89c5912e4e8fc1b1e3c9078"
+    },
+    "server-version/frontend/src/pages/bundle/__tests__/BundleProfileSummary.test.tsx": {
+      "before": null,
+      "after": "1ea798febd1cef252b5821539a7a3b91620d5353"
+    },
+    "server-version/frontend/src/survey/StoredPackageReports.tsx": {
+      "before": "ec0f65b44fc28517a577cda5936e6a523b25beb8",
+      "after": "bedef4d9844d7c2bc236c394f81e923cbad0d675"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "before": "91452b4b56f7c0dcbf0ed3b38bf4f6ee53cab397",
+      "after": "404eabd32885cb9c62d33ee755725bb4e5acd047"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "before": "624c9659c0cc31f33b72afafae68916029cb0c11",
+      "after": "69d07207c19ce15ae429023d0e532ab4fcfca988"
+    }
+  },
+  "controls": {
+    ".github/scripts/merge-gate.mjs": {
+      "before": "5dea59f321ddef5fe975ef74d02708cc3113affe",
+      "after": "53c7f80151c32c99f56570f18de7246769858fe9"
+    },
+    ".github/scripts/school-teacher-checks.mjs": {
+      "before": "3ab008be96c779e282d101f8d9c8277ad4659b71",
+      "after": "1f1e54b1c5bd2e20ec77d9fe79e281893652b54f"
+    },
+    ".github/scripts/school-teacher-native-bindings.json": {
+      "before": null,
+      "after": null
+    },
+    ".github/scripts/school-teacher-native-runtime.py": {
+      "before": null,
+      "after": "bf8229b2bf8be0032c7e935491ef6c741a33556f"
+    },
+    ".github/scripts/school-teacher-native-runtime.test.py": {
+      "before": null,
+      "after": "b989131402ef4e06fbe5298b28a536ec3f2c027e"
+    },
+    ".github/scripts/school-teacher-native.mjs": {
+      "before": null,
+      "after": "633488b001f1f9f3a1a80dbf34e13d5af56f2713"
+    },
+    ".github/scripts/school-teacher-native.test.mjs": {
+      "before": null,
+      "after": "29e77e6e45d535a2184b81813113318bd67cd46e"
+    },
+    ".github/scripts/school-teacher-scope.mjs": {
+      "before": "41e85a871dcc046937cbaf21547415132b5d6343",
+      "after": "0f553bba6766571834830ea8af05371e54fb4d90"
+    },
+    ".github/scripts/school-teacher-self.test.mjs": {
+      "before": "8b2fd8c3a41745b7d1622501b533dcc7cbc69a2e",
+      "after": "e80a5a263e70866e0d1b73b580078b6bd8b267cd"
+    },
+    ".github/workflows/ci-school-teacher.yml": {
+      "before": "98705c8760e6823eefc6133f6f6cd19e7df9162f",
+      "after": "d778bf7cbbe8e922d3ea03bc7a5a87e40f7b09c4"
+    },
+    ".github/workflows/ci.yml": {
+      "before": "521c5d49777b7481be7317a1f7112535e1bfda80",
+      "after": "231e3d02ef5a25ddd23365192379eaf89243b628"
+    },
+    "docs/development/bundle-evc-profile-implementation-20261029.md": {
+      "before": null,
+      "after": "9e3fa23fd6d6b34f4bceea86a42f426497f02b92"
+    }
+  },
+  "protectedInputs": {
+    ".github/config/acceptance-scopes.json": "3e712ad61188aac0ec9af4cc4ca99496bde186df",
+    ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e",
+    ".github/release-tools/package.json": "1913b93fbd582fbbd28398488e8e91d6bb9865d5",
+    ".github/scripts/ci-artifact.mjs": "113e99e003bd376bb7a25d617dc299ae54418671",
+    ".github/scripts/content-scope.mjs": "fb826d2008be6c47ffaf5d0c85e4feab005ddf50",
+    ".github/scripts/exact-candidate-runtime.py": "cd0e30282a029194c25f471963be44f41e9d06c9",
+    ".github/scripts/school-teacher-bindings.json": "cd0ff6c2c87b3c124ea528ebff3abd77224b66b2",
+    ".github/scripts/school-teacher-evidence.json": "6f358e2ad7aefaa32c294f19cbb050b73c34b7c3",
+    ".github/scripts/school-teacher-observer-reuse.cjs": "e67ce7300474f4562e47523539a57c4ac8e4fc53",
+    ".github/scripts/school-teacher-self-bindings.json": "32a9ac97334735c7d7b663912cef7518bdb645c0",
+    "AGENTS.md": "27d6849de6d3461941a2772b008a28347e933e03",
+    "docs/release/README.md": "cd7858296514a91a892fdb44e03e1715a1625414",
+    "server-version/backend/Dockerfile": "8dfd85f6e843d964eb192cfdf52addffdc3c4132",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/prisma/schema.prisma": "8beef2106fff0996ba42c9b9bfc3dd94a6e337d6",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/vitest.config.ts": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+    "server-version/frontend/Dockerfile": "45dd87f6a8ed5a5bf45d3ea1e4126ce5e8d9f8b4",
+    "server-version/frontend/nginx.conf": "8d24ece56129c7aedca32deb28f162686952440c",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/src/test/setup.ts": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7",
+    "server-version/scripts/ci-install-canvas-deps.sh": "75e8b7f5ce24a53e1c040d105b8b757e3686f102"
+  },
+  "execution": {
+    "buildComponents": [
+      "frontend",
+      "backend"
+    ],
+    "auditComponents": [
+      "frontend",
+      "backend"
+    ],
+    "historicalOfficialReuse": false,
+    "runtime": {
+      "node": "node:24.21.0-bookworm-slim",
+      "nginx": "nginx:1.31.6-alpine3.24-slim",
+      "trivy": "0.70.0",
+      "severity": [
+        "CRITICAL",
+        "HIGH"
+      ],
+      "ignoreUnfixed": true
+    }
+  },
+  "evidence": {
+    "status": "PENDING_INDEPENDENT_REVIEW",
+    "obligations": [
+      "EVC-B-model-boundaries-and-applicability",
+      "deterministic-source-permissions-and-cache",
+      "Training-FINAL-replay-saved-restore-browser",
+      "School-native-source-FINAL-replay-saved-restore-browser",
+      "Survey-whole-U-frozen-R-FINAL-replay-saved-restore-browser",
+      "Survey-native-authoring-and-legacy-projections"
+    ]
+  }
+}

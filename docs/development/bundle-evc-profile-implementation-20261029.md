@@ -452,3 +452,46 @@ CI checklist已有本次提交/fixture首错/原CI修复成功和下一轮边界
 最小修复新增一个共享消费文件 `survey/report-results.service.ts`：沿原项目/研究者/数据/来源权限之后，读取**该FINAL冻结publication中对应unit**的可选nativeBundleReport受众，原生R未开放researcher时返回403。实现放 `bundle-product/survey-source.ts`，仅查当前FINAL的一份静态publication（最多30unit），不扫被试、不调用当前native source/admission或重新计分。历史/非native unit无此字段时返回undefined，原通用报告路径保持；没有把所有报告的intendedAudience重新定义为一套通用授权策略，也没有重写角色、grant或管理员分配。
 
 只复验受影响保存读取case：学生2单项＋P4仍可读，研究者不能经旧单项接口绕过native R受众，原aggregate研究者WITHHELD/错误凭据拒绝保持，scorer、Profile与current native admission spy零调用，实际1 PASS/exit0。原PG FINAL/三入口浏览器不重跑。该共享文件及最小输入/输出已列明供DOT在本自然节点集中复核。
+
+## 20. Native Bundle资格控制草稿（DOT已限定范围，尚未激活Ready）
+
+本自然切片只改既有School/Teacher控制族，不改72078d2的业务源码、B科学模型、年龄、量表、DDL、依赖或锁文件。固定base仍为e65d87222d351e5dfde52e389f3aa403380443eb，产品锚点72078d2ccd1546abe4ca915366b694a18433c44a，产品tree d285d33c5c8e1ad0a4ffc1c7fe3c22a0625e9c4d。backend tree为0e2ef32d7467de7b7da6f1700918c510a7ca7554，frontend tree为5a2676e3fea15901e55cd320c4b015678a49528a。最终控制HEAD/tree在自然提交后独立记录，不能为避免自引用将JSON里的一个状态字当作外部授权。
+
+### 精确差异与既有消费者
+
+- 新增`school-teacher-native-bindings.json`及同目录`school-teacher-native.mjs`，场景名native-bundle，与旧School/SELF/observer绑定分离。85个产品路径和12个控制路径逐一绑定旧/新blob及正常模式；27个关键控制/锁/schema/配置/运行时输入另显式核对。其余传递输入由固定base和完整raw diff限定，未知新增/删除/混合/模式变化不能进入本路线。自引用binding本身不伪造固定blob，其完整内容和最终source/tree仍需DOT审阅。
+- 现有`school-teacher-scope.mjs`只加场景选择、完整PR source/checkout tree一致性及正常main双亲合并观察；保留旧分支、SELF_BASE、历史官方run的独立行为。新分支不能借旧marker、手动full/probe或外部PR进入其他路线。旧官方run不作为本候选产物。
+- 现有`school-teacher-checks.mjs`为native增加最薄phase分派。两个producer各构建一次，沿用ci-artifact manifest，分别输出同run/attempt的runtime context；没有重复运行已有43+2、PG或浏览器。审计仍使用原锁定production依赖HIGH/CRITICAL验证器。
+- 新`school-teacher-native-runtime.py`直接复用既有exact-candidate-runtime.py的安全解包和runtime_recipe纯函数。只接收本run/attempt、当前head/component tree/lock/内容hash一致的编译闭包；保留原生产Dockerfile运行时段，不能npm ci或再编译业务。官方固定Node/Nginx版本拉取后记录digest，实际镜像ID喂给Trivy0.70.0，保持原os/library、HIGH/CRITICAL及ignore-unfixed策略；保留完整扫描结果、DB metadata和命令退出/hash。backend还验证canvas/sharp及worker入口。未执行镜像构建、下载、审计或扫描，不宣称已有runtime资格。
+- 复用`ci-school-teacher.yml`的admission/frontend/backend-self/security/qualified，在同一workflow中只新增native-evidence和native-runtime消费者，没有新workflow。既有SELF graph测试仅补两个未选中native节点应为skipped的图结构预期。
+- `ci.yml`仅加新场景必要的产品锚点fetch、现有轻量分类名单、原manual/probe拒绝名单与原School caller。真实CodeQL job保留，native选JS/TS加新增Python运行时控制、security-extended；Python路径使用目录根并排除无关旧Python，原始SARIF保留供独立处置，不把analyze成功当作发现已处置。原30分钟CodeQL上限不变。
+- `merge-gate.mjs`继续独立重算完整candidate。Ready仍必须scope、school-teacher和真实codeql全部成功，缺失/失败/取消/skipped不能通过；未改保护、身份、密钥或生产配置。
+
+### Draft控制预检与Ready的区别
+
+只推控制变更时，旧legacy Draft会重复编译未变业务源码，因此在同一family增加明确`preflightOnly`计划。实际Draft只有完整source/tree/raw边界及实际输入核对和严格汇总；本地已完成的合成控制unit不在CI重跑；不安装业务依赖、不编译、不运行应用/PG/browser/审计/镜像或CodeQL。stable Draft gate要求scope与该控制workflow实际成功；该计划不能用于Ready，门禁会独立拒绝伪造或漂移。它既不接纳720的应用结果，也不授予合并资格。
+
+当前binding保持`enabled:false`、control review PENDING。即使将控制状态字改成已审，`native-evidence`仍无条件拒绝未被独立接纳的应用断言；此处有意没有新增通用attestation、签名或自批准层。DOT读原件后，再以明确小补丁接入原验证器或仅运行真正缺失的断言，不能仅改一个label标绿。当前不能markReady或启动重型资格。
+
+### 控制验证与保留的失败
+
+native集成控制9例实际PASS，Python编译上下文/沿用runtime recipe控制2例PASS；受影响SELF范围/拒绝/图结构/producer控制4例PASS。actionlint1.7.12从官方release取得，官方checksum核验后检查两个workflow，最终exit0；这里只检查YAML/Actions表达式和action合同，未安装shellcheck/pyflakes，不冒称运行了这两项。
+
+新增控制首轮6PASS/1FAIL是测试误断言不存在的accept_media缺省字段；用显式acceptance配置验证所有选中输出关闭，失败原件保留。actionlint首轮检出新增job级runner.temp上下文不合法，移至step env；同文件8处历史端口数字索引改为等价字符串键，保持实际端点不变，最终两文件exit0。不是通过忽略这些错误取得成功。
+
+定向旧School suite得到31PASS/5FAIL；5个失败在未修改72078d2的隔离源码副本逐个复现（原样5FAIL），来自旧fixture的虚拟base与fresh模式冲突、旧SAST字符串预期。未修改旧绑定去追认或清零历史，也不把这5个旧合同列为本native新选中断言。旧完整SELF frozen-controls断言本来绑定历史候选，不能因本控制变化而被描述成当前候选已合格。
+
+### 原件接纳、缺口和唯一执行地点
+
+当前应用证据全部保持未签名本地原身份，控制预检不会下载或签发这些结果。已存在的原始report/exit/log及测试名、修复/filtered/失败均保留。此前Survey索引在执行后生成，并未完整记录每次历史调用当时的argv、全环境字节清单和输入闭包；不能把当前source哈希补写成当时执行证明。DOT需要据原件和实际传递消费者逐项审阅，不能只凭ZIP摘要或本节结论接纳。没有据此擅自重跑已过的PG、恢复或浏览器。
+
+| 尚未完成的资格项 | 唯一执行地点/处理 |
+| --- | --- |
+| 模型/权限、Training/School/Survey FINAL、幂等、恢复、浏览器等原本地断言的正式接纳 | DOT先读保留原件与输入闭包；native-evidence目前明确阻塞。只有具体缺失断言被定位后才指定一个定向执行地点，不将整个历史矩阵重跑。 |
+| 当前两组件可验证正式编译产物 | GitHub原frontend/backend-self两个producer各一次；Draft旧编译无可核验dist artifact，不能当作已合格产物。 |
+| 当前锁定production依赖审计 | GitHub原security job，两组件；不替换HIGH/CRITICAL策略。 |
+| 运行时包装/扫描 | GitHub native-runtime，消费上述同run/attempt产物；不再编译。跨attempt无自动fallback，失败须先定位及独立检查可复用的成功producer。 |
+| 受影响JS/TS与Python CodeQL及原SARIF处置 | GitHub原codeql job实际执行；处置由独立review完成，未通过前不能合并。 |
+| 正式qualified与stable gate | 上述实际结果齐备后的原workflow/原stable gate；当前Draft成功只表示控制预检。 |
+
+预算修正：控制边界/原件核验约1—2分钟；两个producer各预计2—4分钟并行，runtime包装/扫描受官方下载影响应保留原30分钟作业上限并报告实际等待项。CodeQL需保守按接近20分钟或更久准备，原job上限30分钟；此前第19节3—6分钟不是保证。五分钟是报告具体等待项的阈值，不是超时后削弱检查的理由。本切片不启动Ready重型任务，不改成人EVC适用性，不部署。
