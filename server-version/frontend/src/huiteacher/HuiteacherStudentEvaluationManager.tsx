@@ -1,5 +1,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react'
 import {HuiteacherStudentFeedbackView,type StudentFeedbackReport} from './HuiteacherStudentFeedbackView'
+import {EducationPrivateVersionChooser,type PrivateVersionChoice} from '../components/education-tools/EducationPrivateVersionChooser'
+import {compositionAdministrationForEntry} from '../components/education-tools/educationCompositionAdministration'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
 type Appointment={
@@ -8,7 +10,7 @@ type Appointment={
 }
 type Config={
   id:string;eventId:string;classUnitId:string;staffAssignmentId:string;
-  formId:string;definitionDigest:string
+  formId:string|null;definitionDigest:string|null;privateComposition?:{versionId:string;contentHash:string}
 }
 type Preview={
   eventId:string;eligibleStudentCount:number;privacyFloor:number;
@@ -35,6 +37,8 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
   const [appointments,setAppointments]=useState<Appointment[]>([])
   const [staffId,setStaffId]=useState('')
   const [formId,setFormId]=useState('')
+  const [sourceKind,setSourceKind]=useState<'FORM'|'COMPOSITION'>('FORM')
+  const [composition,setComposition]=useState<PrivateVersionChoice|null>(null)
   const [configured,setConfigured]=useState<Config|null>(null)
   const [preview,setPreview]=useState<Preview|null>(null)
   const [assignedRun,setAssignedRun]=useState<Run|null>(null)
@@ -109,10 +113,10 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
   })
   const configure=()=>run(async()=>{
     const appointment=appointments.find(c=>c.staffAssignmentId===staffId)
-    if(!appointment||!formId)throw new Error('请先选择正式任教关系与发布版本')
+    if(!appointment||(sourceKind==='FORM'?!formId:!composition))throw new Error('请先选择正式任教关系与固定问卷版本')
     const result=await api<Config>(base,'POST',{
       staffAssignmentId:appointment.staffAssignmentId,
-      classUnitId:appointment.classUnitId,formId,
+      classUnitId:appointment.classUnitId,...(sourceKind==='FORM'?{formId}:{privateComposition:{versionId:composition!.id,contentHash:composition!.contentHash}}),
     })
     setConfigured(result)
     // Configuration and Run remain independent immutable services. If the
@@ -188,7 +192,7 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
       <button disabled={busy} onClick={()=>run(readCurrent,true)}>重试读取评价配置与任务</button></div>}
     {readState==='READY'&&eventStatus==='DRAFT'&&!configured&&<button disabled={blocked} onClick={load}>
       选择学校核验的任教关系</button>}
-    {readState==='READY'&&!configured&&<p className="ht-muted">须先冻结本次评价的教师、任教班级和正式发布 Form。</p>}
+    {readState==='READY'&&!configured&&<p className="ht-muted">须先冻结本次评价的教师、任教班级和正式问卷版本。普通问卷须固定为“学生评价教师”，各工具独立计分，学生个人答案不向被评教师开放。</p>}
     {!configured&&appointments.length>0&&<div className="ht-inline">
       <label className="ht-field"><span>本教师合法任教的班级</span>
         <select value={staffId} onChange={e=>setStaffId(e.target.value)}>
@@ -197,20 +201,27 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
             {a.className} · {a.staffRole==='HOMEROOM'?'班主任':'任课教师'}</option>)}
         </select>
       </label>
-      <label className="ht-field"><span>已发布 Form V2（不计分）</span>
+      <label className="ht-field"><span>评价问卷来源</span><select disabled={blocked} value={sourceKind} onChange={e=>{setSourceKind(e.target.value as 'FORM'|'COMPOSITION');setComposition(null);setFormId('');setNotice('')}}>
+        <option value="FORM">已发布表单</option><option value="COMPOSITION">本人固定普通问卷（量表＋表单）</option>
+      </select></label>
+      {sourceKind==='FORM'?<label className="ht-field"><span>已发布 Form V2（不计分）</span>
         <select value={formId} onChange={e=>setFormId(e.target.value)}>
           <option value="">请选择</option>
           {available.map(f=><option key={f.id} value={f.id}>{f.title}</option>)}
-        </select></label>
+        </select></label>:<div><EducationPrivateVersionChooser api={api} organizationId={organizationId} kind="COMPOSITION" selectLabel="用于学生评教" disabled={blocked} onSelect={value=>{
+          const administration=compositionAdministrationForEntry(value.administration,'TEACHER')
+          if(value.kind!=='COMPOSITION'||administration?.responseMode!=='STUDENT_REPORT'){setComposition(null);setNotice('请选择已固定为“学生评价教师”的普通问卷，不能把教师自评版本改为学生代答。');return}
+          setComposition(value);setNotice('')
+        }}/>{composition&&<p>已选：{composition.title} · 固定修订 {composition.sourceRevision} · 学生评价教师</p>}</div>}
       <label className="ht-field"><span>截止时间（选填，本地时间）</span>
         <input type="datetime-local" value={deadline}
           onChange={e=>setDeadline(e.target.value)}/></label>
-      <button disabled={blocked||!staffId||!formId} onClick={configure}>准备评价草稿</button>
+      <button disabled={blocked||!staffId||(sourceKind==='FORM'?!formId:!composition)} onClick={configure}>准备评价草稿</button>
     </div>}
     {configured&&<div className="ht-field-evidence">
       <p>冻结班级：<code>{configured.classUnitId}</code>
-        {' · '}发布 Form：<code>{configured.formId}</code></p>
-      <p>问卷内容摘要：<code>{configured.definitionDigest.slice(0,16)}…</code></p>
+        {' · '}{configured.privateComposition?'固定普通问卷：':'发布 Form：'}<code>{configured.privateComposition?.versionId??configured.formId}</code></p>
+      <p>问卷内容摘要：<code>{(configured.privateComposition?.contentHash??configured.definitionDigest??'').slice(0,16)}…</code></p>
       {eventStatus==='DRAFT'&&<button disabled={blocked} onClick={count}>
         核验当前参与资格与隐私人数下限</button>}
       {preview&&<p>当前符合资格学生：{preview.eligibleStudentCount} 人，

@@ -35,6 +35,10 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
  if(!definition.blocks.length)privateToolFail('PRIVATE_TOOL_DEFINITION_INCOMPLETE',400,[{path:'blocks',severity:'error',message:'请加入至少一个固定版本工具'}])
  if(definition.administration.population!==(c.entry==='SCHOOL'?'STUDENT':'TEACHER'))
   privateToolFail('PRIVATE_COMPOSITION_VARIANT_UNSUPPORTED',400)
+ // A student respondent's background cannot silently become the evaluated
+ // teacher's scientific reference context. This slice admits no personal page.
+ if(definition.administration.responseMode==='STUDENT_REPORT'&&definition.contextFields?.length)
+  privateToolFail('PRIVATE_COMPOSITION_STUDENT_CONTEXT_UNSUPPORTED',400)
  const librarySources=definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source)
  const libraryIds=[...new Set(librarySources.map(source=>source.versionId))]
  const libraryUses=libraryIds.length?(options.purpose==='FREEZE'?readLockedEducationLibraryUses(tx,c,options.libraryUses):

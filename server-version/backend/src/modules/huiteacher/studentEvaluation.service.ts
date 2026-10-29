@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import {Prisma} from '@prisma/client'
 import { prisma } from '../../config/database'
 import { appendAudit } from '../organization/service'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
@@ -8,6 +9,7 @@ import {publishAssessmentRun,previewAssessmentRun} from '../assessment-run/publi
 import {assertCurrentRunPublisherBoundary} from '../assessment-run/resourceBoundary'
 import {studentFormResourceRef,STUDENT_FORM_PRIVACY_FLOOR} from './studentFormResource'
 import {teacherResourceMinimum,teacherStudentPrivacyNotice} from './privacyV2'
+import {configureStudentComposition,createStudentCompositionRun} from './studentComposition.service'
 
 export const STUDENT_FEEDBACK_MIN_RESPONDENTS = 10 as const
 
@@ -88,8 +90,9 @@ export async function listHuiteacherStudentEvaluationCandidates(input:{
  */
 export async function configureHuiteacherStudentEvaluation(input:{
   actorUserId:string;organizationId:string;eventId:string;
-  classUnitId:string;staffAssignmentId:string;formId:string
-}){
+  classUnitId:string;staffAssignmentId:string;
+}&({formId:string;privateComposition?:never}|{formId?:never;privateComposition:{versionId:string;contentHash:string}})){
+  if(input.privateComposition!==undefined)return configureStudentComposition({...input,privateComposition:input.privateComposition})
   return prisma.$transaction(async tx=>{
     const scope=await resolveEducationProductMemberScope({
       actorUserId:input.actorUserId,organizationId:input.organizationId,
@@ -201,10 +204,10 @@ async function readStudentConfigInTransaction(
         organizationId:input.organizationId,eventId:input.eventId,
       }},
       select:{id:true,organizationId:true,eventId:true,classUnitId:true,
-        staffAssignmentId:true,formId:true,definitionDigest:true,createdAt:true},
+        staffAssignmentId:true,formId:true,definitionDigest:true,createdAt:true,compositionVersionId:true,compositionContentHash:true},
     })
     if(!row)deny('HUITEACHER_STUDENT_EVAL_NOT_FOUND',404)
-    return row
+    return {...row,...(row.compositionVersionId?{privateComposition:{versionId:row.compositionVersionId,contentHash:row.compositionContentHash!}}:{})}
 }
 
 export async function readHuiteacherStudentEvaluation(input:StudentConfigReadInput){
@@ -298,6 +301,9 @@ export async function createHuiteacherStudentEvaluationRun(input:{
       product:'HUITEACHER',
     },tx)
     if(!scope?.productAdmin)deny('HUITEACHER_STUDENT_EVAL_ADMIN_REQUIRED',403)
+    const sourceConfig=await tx.huiteacherStudentEvaluationConfig.findUnique({where:{organizationId_eventId:{organizationId:input.organizationId,eventId:input.eventId}},
+      select:{classUnitId:true,staffAssignmentId:true,compositionVersionId:true,compositionContentHash:true}})
+    if(sourceConfig?.compositionVersionId)return createStudentCompositionRun(tx,input,sourceConfig)
     const cfg=await tx.$queryRaw<Array<{
       eventId:string;eventTitle:string;formId:string;definitionDigest:string;
       classUnitId:string;teacherMembershipId:string;teacherUserId:string
@@ -385,7 +391,7 @@ export async function createHuiteacherStudentEvaluationRun(input:{
     })
     return {runId:run.id,eventId:input.eventId,status:'DRAFT' as const,
       version:run.version+1,trackCount:1}
-  })
+  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }
 
 /** Publication uses the SAME serializable frozen-population transaction as

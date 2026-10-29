@@ -35,8 +35,11 @@ export function assertPrivateRunSelection(input:PrivateRunTrackInput|PrivateForm
 export function assertPrivateAdministrationSelection(mode:string,input:Pick<PrivateRunTrackInput,'subjectSelector'|'respondentSelector'|'targetPolicy'>){
  if(input.subjectSelector.kind==='RELATED_PARENT'||(mode==='PARENT_REPORT')!==(input.respondentSelector.kind==='RELATED_PARENT'))
   privateToolFail('PRIVATE_TOOL_SELECTOR_COMBINATION_INVALID',400)
- if(mode==='TEACHER_REPORT'&&!input.targetPolicy||mode!=='TEACHER_REPORT'&&input.targetPolicy)
+ const teacherTarget=mode==='TEACHER_REPORT'||mode==='STUDENT_REPORT'
+ if(teacherTarget&&!input.targetPolicy||!teacherTarget&&input.targetPolicy)
   privateToolFail('PRIVATE_TOOL_TARGET_REQUIRED_OR_UNEXPECTED',400)
+ if(mode==='STUDENT_REPORT'&&input.targetPolicy?.mode!=='SELECTED_CLASS_TEACHERS')
+  privateToolFail('PRIVATE_TOOL_TARGET_SELECTION_INVALID',400)
  if(input.targetPolicy){
   const selected=input.targetPolicy.mode==='SELECTED_CLASS_TEACHERS'
   if(selected!==Boolean(input.targetPolicy.teacherMembershipIds?.length))privateToolFail('PRIVATE_TOOL_TARGET_SELECTION_INVALID',400)

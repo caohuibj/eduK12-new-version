@@ -2,6 +2,7 @@ import {privateFormTrackIdentitySql} from './educationPrivateFormIdentitySql'
 import {educationCompositionTrackIdentitySql} from './educationCompositionIdentitySql'
 import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
 import { Prisma } from '@prisma/client'
+import {studentEvaluationTrackConfigSql} from '../huiteacher/studentCompositionResource'
 import { currentRunActorAuthoritySql, currentWindowSql, type RunAuthorityPurpose } from './currentActorAuthority'
 
 /** Shared current population gate. Intake deadlines do not remove own history.
@@ -149,9 +150,7 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
             JOIN assessment_run_tracks track
               ON track.organization_id=h.organization_id AND track.run_id=h.run_id
               AND track.id=x.track_id
-              AND track.resource_family='FORM'
-              AND track.resource_key='huiteacher-student-form:'||cfg.form_id
-              AND track.resource_version=cfg.definition_digest
+              AND ${studentEvaluationTrackConfigSql(Prisma.sql`track`,Prisma.sql`cfg`)}
             JOIN huiteacher_evaluation_targets target
               ON target.organization_id=cfg.organization_id
               AND target.id=event.target_id AND target.kind='PERSON'

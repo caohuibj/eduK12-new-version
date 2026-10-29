@@ -13,10 +13,10 @@ export const privateCompositionSourceSchema=z.discriminatedUnion('provider',[
  z.object({provider:z.literal('STANDARD_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash}).strict(),
  z.object({provider:z.literal('PUBLIC_FORM'),kind:z.literal('FORM'),versionId:id,contentHash:hash}).strict(),
 ])
-export const educationCompositionResponseModeSchema=z.enum(['SELF','PARENT_REPORT','TEACHER_REPORT'])
+export const educationCompositionResponseModeSchema=z.enum(['SELF','PARENT_REPORT','TEACHER_REPORT','STUDENT_REPORT'])
 export const privateCompositionAdministrationSchema=z.discriminatedUnion('population',[
- z.object({population:z.literal('STUDENT'),responseMode:educationCompositionResponseModeSchema}).strict(),
- z.object({population:z.literal('TEACHER'),responseMode:z.literal('SELF')}).strict(),
+ z.object({population:z.literal('STUDENT'),responseMode:z.enum(['SELF','PARENT_REPORT','TEACHER_REPORT'])}).strict(),
+ z.object({population:z.literal('TEACHER'),responseMode:z.enum(['SELF','STUDENT_REPORT'])}).strict(),
 ])
 /** Read-only catalog/preview filter. Task identity still comes from the sealed
  * version in the write adapter, never from this client-selected filter. */
@@ -36,7 +36,7 @@ export type PrivateCompositionDefinition=z.infer<typeof privateCompositionDefini
 
 export const educationCompositionOriginSchema=z.object({schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),
  mode:z.literal('COMPOSITION'),entry:z.enum(['SCHOOL','TEACHER']),organizationId:id,ownerUserId:id,toolId:id,
- versionId:id,contentHash:hash,variantKey:z.enum(['STUDENT:SELF','STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT','TEACHER:SELF'])}).strict()
+ versionId:id,contentHash:hash,variantKey:z.enum(['STUDENT:SELF','STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT','TEACHER:SELF','TEACHER:STUDENT_REPORT'])}).strict()
  .superRefine((origin,ctx)=>{
   if(origin.variantKey.startsWith('STUDENT:')!==(origin.entry==='SCHOOL'))
    ctx.addIssue({code:'custom',message:'教育入口与施测对象不匹配'})
@@ -77,12 +77,12 @@ export type EducationCompositionOrigin=z.infer<typeof educationCompositionOrigin
 export const educationCompositionKey=(origin:EducationCompositionOrigin)=>
  `education-composition:${origin.entry}:${origin.versionId}:${origin.variantKey}:${origin.adapterVersion}`
 
-export const educationCompositionResourceKeySchema=z.string().regex(/^education-composition:(?:SCHOOL:[0-9a-f-]{36}:STUDENT:(?:SELF|PARENT_REPORT|TEACHER_REPORT)|TEACHER:[0-9a-f-]{36}:TEACHER:SELF):1\.0\.0$/)
+export const educationCompositionResourceKeySchema=z.string().regex(/^education-composition:(?:SCHOOL:[0-9a-f-]{36}:STUDENT:(?:SELF|PARENT_REPORT|TEACHER_REPORT)|TEACHER:[0-9a-f-]{36}:TEACHER:(?:SELF|STUDENT_REPORT)):1\.0\.0$/)
 export const privateCompositionSelectionSchema=z.object({versionId:id,contentHash:hash}).strict()
 /** Frozen task anchor. Native scores are scoped to a block, never pooled into
  * an invented cross-tool score or widened by a same-named score in another unit. */
 export const educationCompositionPolicyBindingSchema=z.object({origin:educationCompositionOriginSchema,manifestHash:hash,
- unitReports:z.array(z.object({blockId:id,versionId:id,contentHash:hash,respondent:resultAudiencePolicySchema}).strict()).max(50),
+ unitReports:z.array(z.object({blockId:id,versionId:id,contentHash:hash,respondent:resultAudiencePolicySchema,subject:resultAudiencePolicySchema.optional()}).strict()).max(50),
 }).strict()
 export type EducationCompositionPolicyBinding=z.infer<typeof educationCompositionPolicyBindingSchema>
 export const educationCompositionRuntimeAnchorSchema=educationCompositionPolicyBindingSchema.pick({origin:true,manifestHash:true})

@@ -38,7 +38,7 @@ export async function readEducationStandardSources(tx:Prisma.TransactionClient,s
    instrumentVersion:scale.instrumentVersion,definition:frozenDatabaseScaleDefinition(scale),instrumentClass:'STANDARD',scope:measurement.scope}))
   if(installed.contentHash!==measurement.contentHash)privateToolFail('PUBLIC_STANDARD_NATIVE_CONTENT_MISMATCH')
   const applicability=row.snapshot.parts.CONTENT.reference.metadata.applicability as {respondentTypes?:string[]}|undefined
-  const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':'TEACHER'
+  const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'STUDENT'
   if(!applicability?.respondentTypes?.includes(respondent))privateToolFail('PUBLIC_STANDARD_VARIANT_UNSUPPORTED',400)
   const descriptor=educationStandardSourceSchema.parse({releaseId:row.id,combinationHash:row.combination_hash,toolKey:row.snapshot.toolKey,
    instrumentVersion:row.snapshot.instrumentVersion,nativeDefinitionHash:canonicalHash(row.snapshot.definition),

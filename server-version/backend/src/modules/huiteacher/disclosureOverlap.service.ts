@@ -34,9 +34,11 @@ export async function assertTeacherComparableDisclosure(tx:Tx,input:{
   organizationId:string;runId:string;definitionDigest:string;
   scenario:Scenario;respondents:readonly string[];
   enhanced:boolean;teacherUserId?:string;
+  comparableKeys?:readonly string[];
 }){
   if(input.respondents.length<5||new Set(input.respondents).size!==input.respondents.length)
     fail('TEACHER_REPORT_CURRENT_POPULATION_INVALID')
+  const comparableKeys=input.comparableKeys??['FORM:'+input.definitionDigest]
   let previous:Prior[]
   if(input.scenario==='TEACHER_ADULT_FORM_GROUP'){
     previous=await tx.$queryRaw<Prior[]>(Prisma.sql`
@@ -62,6 +64,7 @@ export async function assertTeacherComparableDisclosure(tx:Tx,input:{
     `)
   }else{
     if(!input.teacherUserId)fail('TEACHER_REPORT_TARGET_MISSING')
+    if(input.comparableKeys&&(!comparableKeys.length||comparableKeys.length>50||comparableKeys.some(key=>!/^(FORM|SCALE):[a-f0-9]{64}$/.test(key))))fail('TEACHER_REPORT_COMPARABLE_SOURCE_INVALID')
     previous=await tx.$queryRaw<Prior[]>(Prisma.sql`
       SELECT prior."runId",BOOL_OR(prior.enhanced) AS enhanced FROM (
         SELECT release.source_run_id AS "runId",
@@ -81,13 +84,14 @@ export async function assertTeacherComparableDisclosure(tx:Tx,input:{
         WHERE release.organization_id=${input.organizationId}
           AND release.report_kind='TEACHER_STUDENT_EVALUATION'
           AND target.subject_user_id=${input.teacherUserId}
-          AND release.report_projection->>'definitionDigest'=${input.definitionDigest}
+          AND (('FORM:'||(release.report_projection->>'definitionDigest'))=ANY(${[...comparableKeys]}::text[])
+            OR release.report_projection->'comparableKeys' ?| ${[...comparableKeys]}::text[])
         UNION ALL
         SELECT ledger.first_run_id AS "runId",TRUE AS enhanced
         FROM huiteacher_student_disclosure_ledgers ledger
         WHERE ledger.organization_id=${input.organizationId}
           AND ledger.teacher_user_id=${input.teacherUserId}
-          AND ledger.form_digest=${input.definitionDigest}
+          AND (('FORM:'||ledger.form_digest)=ANY(${[...comparableKeys]}::text[]) OR ledger.comparable_keys&&${[...comparableKeys]}::text[])
       ) prior
       WHERE prior."runId"<>${input.runId}
       GROUP BY prior."runId" ORDER BY prior."runId" LIMIT 101
@@ -101,7 +105,7 @@ export async function assertTeacherComparableDisclosure(tx:Tx,input:{
   if(!previous.length)return
   const prefix=input.scenario==='TEACHER_ADULT_FORM_GROUP'
     ?'huiteacher-form:%':'huiteacher-student-form:%'
-  const contributors=await tx.$queryRaw<Contributor[]>(Prisma.sql`
+  const contributors=input.scenario==='TEACHER_STUDENT_EVALUATION'?await studentContributors(tx,{...input,teacherUserId:input.teacherUserId!,runIds:previous.map(record=>record.runId),comparableKeys}):await tx.$queryRaw<Contributor[]>(Prisma.sql`
     SELECT execution.run_id AS "runId",respondent.user_id AS "userId"
     FROM assessment_run_executions execution
     JOIN assessment_run_tracks track
@@ -141,4 +145,35 @@ export async function assertTeacherComparableDisclosure(tx:Tx,input:{
     if(unsafeTeacherDisclosureOverlap(input.respondents,ids))
       fail('TEACHER_REPORT_EFFECTIVE_DIFFERENCING_BLOCKED')
   }
+}
+
+/** Exact historical FINAL contributors across both approved student runtimes.
+ * This is a single batch; current membership withdrawal cannot trim history. */
+async function studentContributors(tx:Tx,input:{organizationId:string;teacherUserId:string;runIds:string[];comparableKeys:readonly string[]}){
+ const forms=input.comparableKeys.filter(key=>key.startsWith('FORM:')).map(key=>key.slice(5))
+ return tx.$queryRaw<Contributor[]>(Prisma.sql`
+  SELECT e.run_id AS "runId",respondent.user_id AS "userId" FROM assessment_run_executions e
+  JOIN assessment_run_tracks t ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
+  JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id
+   AND respondent.run_id=e.run_id AND respondent.actor_role='STUDENT'
+  JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id AND subject.organization_id=e.organization_id
+   AND subject.run_id=e.run_id AND subject.actor_role='TEACHER' AND subject.user_id=${input.teacherUserId}
+  WHERE e.organization_id=${input.organizationId} AND e.run_id IN (${Prisma.join(input.runIds)}) AND e.status='COMPLETED' AND (
+   (t.resource_family='FORM' AND t.resource_key LIKE 'huiteacher-student-form:%' AND t.resource_version=ANY(${forms}::text[])
+    AND EXISTS(SELECT 1 FROM huiteacher_form_attempts a JOIN huiteacher_form_finals f ON f.attempt_id=a.id AND f.organization_id=a.organization_id AND f.definition_digest=a.definition_digest
+     WHERE e.runtime_binding_kind='HUITEACHER_FORM_V2' AND a.id=e.runtime_binding_ref AND a.run_execution_id=e.id AND a.run_id=e.run_id
+      AND a.organization_id=e.organization_id AND a.status='COMPLETED' AND a.respondent_user_id=respondent.user_id AND a.definition_digest=t.resource_version))
+   OR (t.resource_family='BUNDLE' AND t.resource_version='1.0.0' AND EXISTS(
+    SELECT 1 FROM huiteacher_evaluation_run_links link JOIN huiteacher_student_eval_configs cfg ON cfg.organization_id=link.organization_id AND cfg.event_id=link.event_id
+    JOIN relational_assessment_assignments assignment ON assignment.id=e.relational_assignment_id AND assignment.status='COMPLETED'
+     AND assignment.policy_domain='ORGANIZATION_RUN' AND assignment.analysis_mode='COHORT_AGGREGATE'
+     AND assignment.subject_user_id=subject.user_id AND assignment.respondent_user_id=respondent.user_id
+    JOIN composite_assessment_attempts parent ON e.runtime_binding_kind='COMPOSITE' AND parent.id=e.runtime_binding_ref AND parent.assignment_ref=assignment.id
+     AND parent.episode_id=assignment.episode_id AND parent.user_id=respondent.user_id AND parent.respondent_user_id=respondent.user_id
+     AND parent.subject_user_id=subject.user_id AND parent.status='COMPLETED' AND parent.delivery_mode='FINAL_ONLY' AND parent.runtime_generation='UNIFIED_V1'
+     AND parent.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
+    WHERE link.organization_id=e.organization_id AND link.run_id=e.run_id AND cfg.composition_version_id IS NOT NULL
+     AND t.resource_key='education-composition:TEACHER:'||cfg.composition_version_id||':TEACHER:STUDENT_REPORT:1.0.0'
+     AND t.frozen_resource_policy#>>'{educationComposition,origin,contentHash}'=cfg.composition_content_hash)))
+  ORDER BY e.run_id,respondent.user_id`)
 }

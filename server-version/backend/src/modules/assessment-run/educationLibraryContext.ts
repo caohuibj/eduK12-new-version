@@ -3,6 +3,8 @@ import {readPrivateCompositionRunSources} from '../education-tools/private-tool.
 import {lockCompositionLibraryUses,readLockedEducationLibraryUses} from '../education-tools/library-source.use'
 import {privateFormDraftResourcePolicy} from '../education-tools/private-tool.form-draft-policy'
 import {assertPrivateScaleRunWorkflow} from './educationPrivateScaleContext'
+import {isStudentCompositionKey} from '../huiteacher/studentComposition.policy'
+import {assertStudentCompositionRunUse} from '../huiteacher/studentCompositionResource'
 import {readPrivateScaleRuntimeResource} from '../education-tools/private-tool.runtime-resources'
 import {relationalEntryToRunPolicy,type RunResourcePolicy} from './resourceAuthority'
 import {isSupportedEducationLibraryVariant} from '../scale-library-governance/education-supported-variants'
@@ -82,7 +84,12 @@ export async function assertEducationRunLibraryResources(tx:Prisma.TransactionCl
  }
  const privateResourcePolicies=new Map<string,RunResourcePolicy>()
  if(privateRefs.length){
-  const editor=await assertPrivateScaleRunWorkflow(tx,input,current)
+  const student=privateRefs.filter(ref=>isStudentCompositionKey(ref.key))
+  if(student.length){
+   if(student.length!==1||input.resources.length!==1||current.product!=='TEACHER')fail('HUITEACHER_STUDENT_COMPOSITION_SCOPE_REQUIRED',403)
+   await assertStudentCompositionRunUse(tx,{...input,ref:{family:'BUNDLE',key:student[0].key,version:student[0].version}})
+  }
+  const editor=student.length?{context:authorContext}:await assertPrivateScaleRunWorkflow(tx,input,current)
   const compositions=await readPrivateCompositionRunSources(tx,editor.context,privateRefs.filter(ref=>ref.key.startsWith('education-composition:')),
    {lockForUse:input.purpose!=='PREVIEW',libraryUses:compositionUses})
   for(const [key,source] of compositions)privateResourcePolicies.set(key,source.policy)

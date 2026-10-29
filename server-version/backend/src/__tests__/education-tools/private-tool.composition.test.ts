@@ -43,7 +43,7 @@ describe('Private ordinary composition definition and scoped compilation',()=>{
   expect(privateCompositionDefinitionSchema.safeParse({...original,blocks:[{...original.blocks[0],scoring:{}}]}).success).toBe(false)
   expect(privateCompositionDefinitionSchema.safeParse({...original,blocks:[original.blocks[0],original.blocks[0]]}).success).toBe(false)
   expect(privateCompositionDefinitionSchema.safeParse({...original,flow:{}}).success).toBe(false)
-  expect(privateCompositionDefinitionSchema.safeParse({...original,administration:{population:'TEACHER',responseMode:'STUDENT_REPORT'}}).success).toBe(false)
+  expect(privateCompositionDefinitionSchema.safeParse({...original,administration:{population:'TEACHER',responseMode:'PARENT_REPORT'}}).success).toBe(false)
  })
  it('batch loads exact immutable sources once and preserves original ordered definitions and pages',async()=>{
   const raw=definition(),before=structuredClone(raw),compiled=await compilePrivateComposition(tx,context,raw)
@@ -52,6 +52,13 @@ describe('Private ordinary composition definition and scoped compilation',()=>{
   expect(compiled.leaves.get('PRIVATE_VERSION:'+b.id)).toMatchObject({kind:'FORM',form:{definition:form,sections:[{title:'A page',items:[{formDefinition:form.pages[0].questions[0]}]}]}})
   expect(m.findMany).toHaveBeenCalledExactlyOnceWith({where:{id:{in:[a.id,b.id]},entry:'TEACHER',organizationId:id(1),ownerUserId:id(2),kind:{in:['SCALE','FORM']}}})
   expect(m.assets).not.toHaveBeenCalled();expect(raw).toEqual(before)
+ })
+ it('compiles the approved Teacher student observer composition without substituting a SELF administration or changing leaf scoring',async()=>{
+  const raw={...definition(),administration:{population:'TEACHER',responseMode:'STUDENT_REPORT'}},before=structuredClone(raw)
+  const compiled=await compilePrivateComposition(tx,context,raw)
+  expect(compiled.definition).toEqual(before)
+  expect(compiled.leaves.get('PRIVATE_VERSION:'+a.id)).toMatchObject({kind:'SCALE',definition:a.definition})
+  expect(m.findMany).toHaveBeenCalledTimes(1);expect(m.assets).not.toHaveBeenCalled()
  })
  it('rejects missing, foreign, wrong-kind and changed exact source references rather than selecting latest',async()=>{
   m.findMany.mockResolvedValueOnce([b])

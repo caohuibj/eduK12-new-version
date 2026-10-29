@@ -17,7 +17,7 @@ describe('School ordinary questionnaires preserve exact observer identity',()=>{
   }
   expect(educationCompositionResourceKeySchema.safeParse('education-composition:TEACHER:'+id+':TEACHER:PARENT_REPORT:1.0.0').success).toBe(false)
   expect(educationCompositionOriginSchema.safeParse(origin('TEACHER:SELF','TEACHER')).success).toBe(true)
-  expect(privateCompositionDefinitionSchema.safeParse({schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'TEACHER',responseMode:'STUDENT_REPORT'},instruction:'',blocks:[]}).success).toBe(false)
+  expect(privateCompositionDefinitionSchema.safeParse({schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'TEACHER',responseMode:'PARENT_REPORT'},instruction:'',blocks:[]}).success).toBe(false)
  })
  it('refuses SELF relabeling, reversed actors, same-person observers and unrelated teachers',()=>{
   const o=educationCompositionOriginSchema.parse(origin('STUDENT:PARENT_REPORT'))

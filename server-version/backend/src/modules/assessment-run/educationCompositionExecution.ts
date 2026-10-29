@@ -1,4 +1,6 @@
 import {readSealedCompositionContent} from '../education-tools/private-tool.composition-content'
+import {isStudentComposition,validStudentCompositionPolicy} from '../huiteacher/studentComposition.policy'
+import {studentEvaluationTrackConfigSql} from '../huiteacher/studentCompositionResource'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -32,7 +34,7 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
  if(input.version!=='1.0.0'||policy.version!==input.version||policy.family!=='BUNDLE'||policy.key!==input.key
   ||educationCompositionKey(origin)!==input.key||origin.organizationId!==input.organizationId||canonicalHash(policy)!==input.policyHash
   ||policy.runtimeLaunchTarget?.kind!=='COMPOSITE'||policy.scientificMaturity!=='PILOT'
-  ||policy.analysisMode!=='INDIVIDUAL_ONLY'||policy.minimumRespondents!==null
+  ||(isStudentComposition(origin)?!validStudentCompositionPolicy(policy):policy.analysisMode!=='INDIVIDUAL_ONLY'||policy.minimumRespondents!==null)
   ||canonicalHash([policy.subjectRoles,policy.respondentRoles,policy.relationshipKinds,policy.perspectives])
    !==canonicalHash([[variant.subjectRole],[variant.respondentRole],variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),[variant.perspective]]))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
@@ -64,6 +66,7 @@ export type FrozenCompositionIdentity=Awaited<ReturnType<typeof readFrozenCompos
  * while emergency stops still fence collection. Ordinary role withdrawal does
  * not destroy an entered attempt or historical report. */
 export async function assertCompositionCollection(tx:Tx,identity:FrozenCompositionIdentity,purpose:'NEW_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
+ if(isStudentComposition(identity.origin)&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)
  const c={entry:identity.origin.entry,organizationId:identity.origin.organizationId,principal:{userId:identity.origin.ownerUserId,accountDomain:'SCHOOL' as const}}
  if(purpose==='NEW_START')await authorizePrivateTool(tx,c)
  const releases=[...new Set(identity.units.map(unit=>unit.releaseId))],scales=[...new Set(identity.units.map(unit=>unit.scaleId))]
@@ -103,7 +106,7 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
    AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
-   AND a.analysis_mode='INDIVIDUAL_ONLY'
+   AND (a.analysis_mode='INDIVIDUAL_ONLY' OR (a.analysis_mode='COHORT_AGGREGATE' AND a.subject_role='TEACHER' AND a.respondent_role='STUDENT'))
   JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id AND subject.organization_id=e.organization_id
    AND subject.run_id=e.run_id AND subject.user_id=a.subject_user_id AND subject.actor_role=a.subject_role
   JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id
@@ -114,8 +117,11 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
    AND t.resource_family='BUNDLE'
    AND ((school.run_id IS NOT NULL AND teacher.run_id IS NULL AND a.subject_role='STUDENT'
      AND t.resource_key LIKE 'education-composition:SCHOOL:%')
-    OR (teacher.run_id IS NOT NULL AND school.run_id IS NULL AND a.subject_role='TEACHER' AND a.respondent_role='TEACHER'
-     AND t.resource_key LIKE 'education-composition:TEACHER:%'))`)
+    OR (teacher.run_id IS NOT NULL AND school.run_id IS NULL AND a.subject_role='TEACHER'
+     AND t.resource_key LIKE 'education-composition:TEACHER:%' AND (a.respondent_role='TEACHER'
+      OR (a.respondent_role='STUDENT' AND EXISTS(SELECT 1 FROM huiteacher_student_eval_configs cfg
+       WHERE cfg.organization_id=e.organization_id AND cfg.event_id=teacher.event_id AND cfg.composition_version_id IS NOT NULL
+        AND ${studentEvaluationTrackConfigSql(Prisma.sql`t`,Prisma.sql`cfg`)})))))`)
  if(!row||!['PUBLISHED','CLOSED'].includes(row.runStatus)||!['ASSIGNED','STARTED','COMPLETED'].includes(row.status)
   ||!['OPEN','STARTED','COMPLETED'].includes(row.assignmentStatus)||(input.actorUserId!==undefined&&input.actorUserId!==row.respondentUserId))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')

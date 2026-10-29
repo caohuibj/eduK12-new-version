@@ -52,7 +52,7 @@ export async function readEducationPublicFormPreviewAsset(c:PrivateToolContext,v
  * scorer inputs remain internal; preview is never a freeze or use receipt. */
 export async function readEducationPublicStandardPreview(c:PrivateToolContext,versionId:string,contentHash:string,responseMode:unknown='SELF'){
  const administration=educationCompositionAdministrationForEntry(c.entry,responseMode)
- const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':'TEACHER'
+ const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'STUDENT'
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
   const key=educationPublicSourceKey({kind:'STANDARD_SCALE',id:versionId,hash:contentHash})

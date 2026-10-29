@@ -51,7 +51,7 @@ export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:Priva
 export async function listEducationPublicSources(c:PrivateToolContext,raw:unknown){
  const input=educationPublicCatalogQuery.parse(raw)
  const administration=educationCompositionAdministrationForEntry(c.entry,input.responseMode)
- const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':'TEACHER'
+ const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'STUDENT'
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
   // Deduplicate grant keys before the PK joins and paginate/search real source
@@ -83,12 +83,15 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
   return {list:selected.map(header=>{
    const declaration=header.kind==='FORM'?educationApplicabilitySchema.safeParse(header.applicability):null
    const applicable=header.kind==='STANDARD_SCALE'?header.nativeAvailable&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes(respondent):declaration?.success&&declaration.data.administrations.some(a=>a.population===administration.population&&a.responseMode===administration.responseMode)
+   const requiredContextKeys=educationPublicRequiredContextKeys(header)
+   const contextUnavailable=administration.responseMode==='STUDENT_REPORT'&&requiredContextKeys.length>0
    return {
    catalogKey:header.key,kind:header.kind==='STANDARD_SCALE'?'SCALE':'FORM',sourceProvider:header.kind,sourceId:header.id,contentHash:header.hash,
-   title:header.title,language:header.language,versions:header.versions,requiredContextKeys:educationPublicRequiredContextKeys(header),referenceContextKeys:header.referenceContextKeys,sourceLabel:'获授权公共固定版本',
-   allowedActions:applicable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':header.nativeAvailable?'CHECK_EXACT_STANDARD_AT_FREEZE':'NATIVE_UNAVAILABLE',canEditOriginal:false,canDistribute:false,
+   title:header.title,language:header.language,versions:header.versions,requiredContextKeys,referenceContextKeys:header.referenceContextKeys,sourceLabel:'获授权公共固定版本',
+   allowedActions:applicable&&!contextUnavailable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':header.nativeAvailable?'CHECK_EXACT_STANDARD_AT_FREEZE':'NATIVE_UNAVAILABLE',canEditOriginal:false,canDistribute:false,
    ...(header.kind==='STANDARD_SCALE'&&!applicable?{unavailableReason:header.nativeAvailable?'该版本未声明支持当前作答方式。':'原生量表尚未安装或已停止使用；授权不会创建执行程序。'}:{}),
    ...(header.kind==='FORM'&&!applicable?{unavailableReason:'该固定版本未声明适用于当前问卷的施测方式。'}:{}),
+   ...(contextUnavailable?{unavailableReason:'该版本需要受评教师的个人背景才能计分，当前学生评教暂不支持。原版内容与参数保持不变。'}:{}),
   }}),nextCursor:candidates.length>40?selected.at(-1)!.key:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }

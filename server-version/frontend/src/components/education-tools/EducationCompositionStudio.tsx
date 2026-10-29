@@ -81,8 +81,10 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
   if(!tool||locked.current||tool.definition.administration.responseMode===responseMode)return
   const administration=compositionAdministrationForEntry({population:tool.definition.administration.population,responseMode},entry)
   if(!administration)return
-  if(tool.definition.blocks.length&&!window.confirm('更改作答方式需要重新选择适用的固定工具。确定清空当前工具列表吗？'))return
-  setReferences([]);setAnswers({});change({definition:{...tool.definition,administration,blocks:[]}})
+  if((tool.definition.blocks.length||responseMode==='STUDENT_REPORT'&&tool.definition.contextFields?.length)
+   &&!window.confirm('更改作答方式需要重新选择适用的固定工具。确定清空当前工具列表及不适用的个人背景字段吗？'))return
+  const {contextFields,...definition}=tool.definition
+  setReferences([]);setAnswers({});change({definition:{...definition,...(responseMode!=='STUDENT_REPORT'&&contextFields?{contextFields}:{}),administration,blocks:[]}})
  }
  const save=()=>{if(!tool||!tool.title.trim())return;void operate(async current=>{
   const submitted={...tool,title:tool.title.trim()}
@@ -123,7 +125,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
   if(current()){setVersions(old=>merge(old,page.list));setVersionsCursor(page.nextCursor)}
  })}
  return <section className={'education-private-tools education-private-tools--'+entry.toLowerCase()+' '+(entry==='SCHOOL'?'hs-panel':'ht-panel')+' education-composition-studio education-composition-studio--'+entry.toLowerCase()} aria-label="普通问卷编制">
-  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单、获授权公共量表与表单编成一份{entry==='SCHOOL'?'学生自评或家长、教师观察':'教师自评'}问卷，各项保留独立计分与反馈。</p></div></header>
+  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单、获授权公共量表与表单编成一份{entry==='SCHOOL'?'学生自评或家长、教师观察':'教师自评或学生评教'}问卷，各项保留独立计分与反馈。</p></div></header>
   {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {!tool?<>
    <form onSubmit={event=>{event.preventDefault();create()}}><label>问卷名称<input value={title} maxLength={200} onChange={event=>setTitle(event.target.value)} disabled={busy}/></label><button type="submit" disabled={busy||uncertain||!title.trim()}>新建普通问卷</button></form>
@@ -137,12 +139,14 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
     <button type="button" disabled={busy||dirty||!tool.definition.blocks.length} onClick={freeze}>固定问卷版本</button></div>
    {dirty&&<p role="status">当前有未保存修改，请先保存后再预览或固定版本。</p>}
    <label>问卷名称<input value={tool.title} maxLength={200} disabled={busy} onChange={event=>change({title:event.target.value})}/></label>
-   {entry==='SCHOOL'?<label>问卷作答方式<select value={responseMode} disabled={busy} onChange={event=>changeResponseMode(event.target.value as CompositionResponseMode)}>
-    <option value="SELF">学生自评</option><option value="PARENT_REPORT">家长观察学生</option><option value="TEACHER_REPORT">教师观察学生</option>
-   </select></label>:<p>问卷作答方式：教师自评</p>}
-   {responseMode!=='SELF'&&<p>观察任务按当前有效关系分配给家长或教师。参与作答不自动获得学生个人报告，各项反馈仍独立核准。</p>}
+   <label>问卷作答方式<select value={responseMode} disabled={busy} onChange={event=>changeResponseMode(event.target.value as CompositionResponseMode)}>
+    {entry==='SCHOOL'?<><option value="SELF">学生自评</option><option value="PARENT_REPORT">家长观察学生</option><option value="TEACHER_REPORT">教师观察学生</option></>:
+     <><option value="SELF">教师自评</option><option value="STUDENT_REPORT">学生评价教师</option></>}
+   </select></label>
+   {responseMode!=='SELF'&&responseMode!=='STUDENT_REPORT'&&<p>观察任务按当前有效关系分配给家长或教师。参与作答不自动获得学生个人报告，各项反馈仍独立核准。</p>}
    <label>问卷说明<textarea value={tool.definition.instruction} maxLength={16000} disabled={busy} onChange={event=>change({definition:{...tool.definition,instruction:event.target.value}})}/></label>
-   <fieldset disabled={busy}><legend>背景信息区段</legend><p>按所选工具的原版适用范围配置；勾选后会作为问卷第一屏展示并固定。未勾选时不会增加背景页。</p>
+   {responseMode==='STUDENT_REPORT'&&<p>学生评教仅开放符合人数与隐私规则的群体反馈，不显示学生个人答案。本模式不采集个人背景页；需要受评教师个人背景才能计分的工具暂不能加入。</p>}
+   <fieldset disabled={busy||responseMode==='STUDENT_REPORT'}><legend>背景信息区段</legend><p>按所选工具的原版适用范围配置；勾选后会作为问卷第一屏展示并固定。未勾选时不会增加背景页。</p>
     {(['gradeLevel','birthYearMonth','sexAtBirth','primaryLanguage','countryOrRegion'] as AssessmentContextKey[]).map(key=>{
      const labels=assessmentContextLabels
      return <label key={key}><input type="checkbox" checked={tool.definition.contextFields?.some(field=>field.contextKey===key)??false} onChange={event=>{

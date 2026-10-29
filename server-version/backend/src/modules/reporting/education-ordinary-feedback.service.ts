@@ -39,7 +39,9 @@ async function readOwn(tx:Prisma.TransactionClient,input:ScopedInput,loadContent
   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
    AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
    AND a.subject_user_id=subject.user_id AND a.respondent_user_id=respondent.user_id
-   AND a.subject_role=subject.actor_role AND a.respondent_role=respondent.actor_role AND a.analysis_mode='INDIVIDUAL_ONLY'
+   AND a.subject_role=subject.actor_role AND a.respondent_role=respondent.actor_role
+   AND (a.analysis_mode='INDIVIDUAL_ONLY' OR (a.analysis_mode='COHORT_AGGREGATE' AND a.subject_role='TEACHER' AND a.respondent_role='STUDENT'
+    AND t.resource_key LIKE 'education-composition:TEACHER:%:TEACHER:STUDENT_REPORT:1.0.0'))
   LEFT JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
    AND p.assignment_ref=a.id AND p.episode_id=a.episode_id AND p.user_id=${input.actorUserId}
    AND p.subject_user_id=a.subject_user_id AND p.respondent_user_id=a.respondent_user_id

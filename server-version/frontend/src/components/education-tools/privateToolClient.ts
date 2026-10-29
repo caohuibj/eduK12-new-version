@@ -30,6 +30,7 @@ export function privateToolError(error:unknown):string{
   PRIVATE_TOOL_AUTHOR_REQUIRED:'当前账号或学校不具备私有工具编制权限。',
   PRIVATE_COMPOSITION_SOURCE_NOT_FOUND:'所选固定工具不属于当前作者、学校或入口，或版本已不可用。请重新选择。',
   PRIVATE_COMPOSITION_VARIANT_UNSUPPORTED:'问卷施测对象或作答方式不适用于当前入口，请重新核对固定版本。',
+  PRIVATE_COMPOSITION_STUDENT_CONTEXT_UNSUPPORTED:'学生评教暂不支持受评教师的个人背景页；请移除背景区段并选择无需个人背景即可计分的工具。',
   PRIVATE_COMPOSITION_SOURCE_UNAVAILABLE:'所选固定工具当前不可用于新增任务，请重新核对来源状态。',
   PUBLIC_SOURCE_USE_REQUIRED:'当前学校、入口或作者已无该固定公共版本的使用授权，请重新核对来源。',
   PUBLIC_SOURCE_USE_EXPIRED:'固定公共版本的使用授权已到期。本页草稿仍保留，请核对授权后再固定或投放。',

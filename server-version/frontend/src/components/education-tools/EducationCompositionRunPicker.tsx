@@ -54,7 +54,9 @@ function RunPickerSession({api,entry,organizationId,actorKey,endpoint,expectedVe
   {opened&&<EducationPrivateVersionChooser key={`${entry}:${actorKey}:${organizationId}:${endpoint}`} api={api} organizationId={organizationId}
    kind="COMPOSITION" selectLabel="选择本版本" disabled={disabled||writing||needsReview} onSelect={value=>{
     setHomeroom(false);setNotice('')
-    if(!compositionAdministrationForEntry(value.administration,entry)){setChoice(null);setError('该固定版本的作答方式缺失或不适用于当前入口，请重新读取版本。');return}
+    const mode=compositionAdministrationForEntry(value.administration,entry)
+    if(!mode){setChoice(null);setError('该固定版本的作答方式缺失或不适用于当前入口，请重新读取版本。');return}
+    if(mode.responseMode==='STUDENT_REPORT'){setChoice(null);setError('学生评教问卷请在“学生评教”中绑定学校核验的任教关系后使用。');return}
     setChoice(value);setError('')
    }}/>}
   {choice&&<p>{choice.title} · 修订 {choice.sourceRevision} · {compositionAdministrationLabel(administration??undefined)}</p>}

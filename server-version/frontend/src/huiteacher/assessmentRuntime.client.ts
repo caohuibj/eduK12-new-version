@@ -12,9 +12,14 @@ export type TeacherAssessmentTask={
  family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';status:'ASSIGNED'|'STARTED'|'COMPLETED';runStatus:string;
  runtimeBindingRef:string|null;consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
  mode?:'COMPOSITION'|'PACKAGE_REFERENCE'|'TOOL'
+ teacherName?:string
 }
 export type TeacherAssessmentCompletion={executionId:string;attemptId:string;mode?:TeacherAssessmentTask['mode']}
 export const teacherAssessmentParentPath=(attemptId:string)=>'/assessment-composite-attempts/'+encodeURIComponent(attemptId)
+/** The existing renderer uses a separately mounted, config-bound student
+ * authority. It cannot fall back to the Teacher SELF or Training transports. */
+export const createStudentAssessmentApi=(api:EducationReportApi):EducationReportApi=><T,>(path:string,method?:string,data?:unknown,options?:{responseType?:'blob'})=>
+ api<T>('/student-assessments'+path,method,data,options)
 const wrapped=<T,>(data:T):ApiResponse<T>=>({code:0,message:'成功',data})
 const same=(actual:string,expected:string)=>{if(actual!==expected)throw new Error('测评子项与当前冻结任务不一致')}
 async function blob(api:EducationReportApi,path:string){

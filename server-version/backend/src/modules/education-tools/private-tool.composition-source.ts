@@ -1,4 +1,5 @@
 import {Prisma} from '@prisma/client'
+import {isStudentComposition,studentCompositionRunPolicy,studentCompositionSubjectCeiling} from '../huiteacher/studentComposition.policy'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {createRelationalProductRegistry,type RelationalProductEntryV1} from '../assessment-relational/product-registry'
@@ -17,12 +18,13 @@ import {educationCompositionKey,educationCompositionOriginSchema,educationCompos
 type Tx=Prisma.TransactionClient
 type Ref={family:string;key:string;version:string}
 const leafSummarySchema=z.array(z.object({blockId:z.string().guid(),versionId:z.string().guid(),contentHash:z.string(),
- kind:z.enum(['SCALE','FORM']),audience:z.string().nullable(),metricKeys:z.array(z.string()).max(100)}).strict()).min(1).max(50)
+ kind:z.enum(['SCALE','FORM']),audience:z.string().nullable(),metricKeys:z.array(z.string()).max(100),sourceProvider:z.string().optional(),
+ reportRespondent:z.string().nullable().optional(),subjectNumeric:z.boolean().nullable().optional(),reportScoreKeys:z.array(z.string()).nullable().optional()}).strict()).min(1).max(50)
 type Row={id:string;key:string;creationHash:string;createdBy:string;status:string;publishedAt:Date|null;productKind:string;
  publicEnabled:boolean;copyable:boolean;manifestHash:string;versionId:string;toolId:string;entry:string;organizationId:string;
  ownerUserId:string;contentHash:string;variantKey:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[];librarySources:Array<{versionId:string;contentHash:string}>}
 export type PrivateCompositionRunSource={origin:EducationCompositionOrigin;compositeId:string;manifestHash:string;
- resourceEntry:RelationalProductEntryV1;policy:RunResourcePolicy;identityOnly:true;canPublish:false}
+ resourceEntry:RelationalProductEntryV1|null;policy:RunResourcePolicy;identityOnly:true;canPublish:false}
 
 /** Metadata for NEW_USE only. Caller owns the real workflow/publication lock.
  * Author authority is read once per batch; the DB's immutable seal proves the
@@ -47,7 +49,11 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   (SELECT COALESCE(jsonb_agg(jsonb_build_object('versionId',b->>'versionId','contentHash',b->>'contentHash')),'[]'::jsonb)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider'='LIBRARY_SCALE') AS "librarySources",
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','versionId',b->>'versionId','contentHash',b->>'contentHash','kind',b->>'kind',
+    'sourceProvider',b->>'sourceProvider',
     'audience',COALESCE(s.definition#>>'{report,audienceContract,audience}',std.snapshot#>>'{definition,report,audienceContract,audience}',library.snapshot#>>'{compiledDefinition,report,audienceContract,audience}'),
+    'reportRespondent',COALESCE(s.definition#>>'{report,audienceContract,respondent}',std.snapshot#>>'{definition,report,audienceContract,respondent}',library.snapshot#>>'{compiledDefinition,report,audienceContract,respondent}'),
+    'reportScoreKeys',COALESCE(s.definition#>'{report,scoreOrder}',std.snapshot#>'{definition,report,scoreOrder}',library.snapshot#>'{compiledDefinition,report,scoreOrder}'),
+    'subjectNumeric',std.snapshot#>'{parts,CONTENT,reference,metadata,disclosure,audiences,subject,numericScores}',
     'metricKeys',CASE WHEN b->>'sourceProvider'='LIBRARY_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(library.snapshot#>'{compiledDefinition,scoring,scores}') score) WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(std.snapshot#>'{definition,scoring,scores}') score) WHEN s.kind='SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]')
       FROM jsonb_array_elements(s.definition#>'{scoring,scores}') score) ELSE '[]'::jsonb END) ORDER BY ordinal)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') WITH ORDINALITY blocks(b,ordinal)
@@ -96,10 +102,18 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
    ||(row.status==='DRAFT'?row.publishedAt!==null:row.publishedAt===null))privateToolFail('PRIVATE_COMPOSITION_IDENTITY_INVALID')
   if(!row.available)privateToolFail('PRIVATE_COMPOSITION_SOURCE_UNAVAILABLE')
   const variant=educationCompositionVariant(origin),none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
-  const binding=educationCompositionPolicyBindingSchema.parse({origin,manifestHash:row.manifestHash,
+ const student=isStudentComposition(origin)
+ const binding=educationCompositionPolicyBindingSchema.parse({origin,manifestHash:row.manifestHash,
    unitReports:leafSummarySchema.parse(row.leaves).filter(leaf=>leaf.kind==='SCALE').map(leaf=>({blockId:leaf.blockId,versionId:leaf.versionId,
     contentHash:leaf.contentHash,respondent:variant.responseMode==='SELF'&&leaf.audience===(origin.entry==='SCHOOL'?'student':'teacher')
-     ?{mode:'INDIVIDUAL_SUMMARY',metricKeys:leaf.metricKeys,longitudinalMetricKeys:[]}:none}))})
+     ?{mode:'INDIVIDUAL_SUMMARY',metricKeys:leaf.metricKeys,longitudinalMetricKeys:[]}:none,
+    ...(student?{subject:studentCompositionSubjectCeiling(leaf)}:{})}))})
+  if(student){
+   if(process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)
+   sources.set(row.key,{origin,compositeId:row.id,manifestHash:row.manifestHash,resourceEntry:null,
+    policy:studentCompositionRunPolicy({origin,binding,compositeId:row.id}),identityOnly:true,canPublish:false})
+   continue
+  }
   const policyKey='EDUCATION_PRIVATE_COMPOSITION_V1'
   const resourceEntry:RelationalProductEntryV1={title:row.title,description:'普通问卷固定版本；单元独立计分，不是跨工具评分整包。',
    releaseStatus:row.status as 'DRAFT'|'PUBLISHED',scienceMaturity:'PILOT',
