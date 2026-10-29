@@ -27,3 +27,21 @@ describe('Survey original standard request intent',()=>{
    expect(sameSurveyStandardOperation(pending,value as unknown as SurveyStandardOperation)).toBe(false)
  })
 })
+
+describe('Survey original replacement intent',()=>{
+ const replaces={grantId:id(8),expectedVersion:1 as const,reason:'明确切换报告'},p={...pending,replaces},supersedes={selectedBinding:{authorizationId:id(8),authorizationRevision:1,bindingHash:'d'.repeat(64),configurationHash:'e'.repeat(64)},reason:replaces.reason}
+ const op={...operation,request:{...operation.request,replaces},grant:{...operation.grant,supersedes}}
+ it('retains only a bounded predecessor identity and reason, never an arbitrary historical binding',()=>{
+  expect(isSurveyStandardPending(p)).toBe(true)
+  for(const change of [{...replaces,grantId:pending.requestId},{...replaces,expectedVersion:2},{...replaces,reason:''},{...replaces,reason:'x'.repeat(501)},{...replaces,selectedBinding:{injected:true}}])expect(isSurveyStandardPending({...pending,replaces:change})).toBe(false)
+ })
+ it('compares both original predecessor request and immutable returned lineage, including the reason',()=>{
+  expect(sameSurveyStandardOperation(p,op)).toBe(true)
+  expect(sameSurveyStandardOperation(p,{...op,grant:{...op.grant,status:'REVOKED'}})).toBe(true)
+  for(const value of [{...op,request:{...op.request,replaces:{...replaces,grantId:id(9)}}},{...op,request:{...op.request,replaces:{...replaces,reason:'不同意图'}}},
+   {...op,grant:{...op.grant,supersedes:{...supersedes,reason:'不同原因'}}},{...op,grant:{...op.grant,supersedes:{...supersedes,selectedBinding:{...supersedes.selectedBinding,authorizationId:id(9)}}}},
+   {...op,grant:{...op.grant,supersedes:{...supersedes,selectedBinding:{...supersedes.selectedBinding,bindingHash:'bad'}}}},operation])expect(sameSurveyStandardOperation(p,value)).toBe(false)
+  expect(sameSurveyStandardOperation(pending,op)).toBe(false)
+  for(const malformed of [{},{selectedBinding:null}])expect(sameSurveyStandardOperation(p,{...op,grant:{...op.grant,supersedes:malformed}} as unknown as SurveyStandardOperation)).toBe(false)
+ })
+})

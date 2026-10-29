@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from 'react'
 import type {CatalogApi,CatalogGrant,CatalogSourceRef} from './ResearchCatalog'
-import {isSurveyStandardPending,sameSurveyStandardOperation,type SurveyStandardPending,type SurveyStandardOperation} from '../api/surveyStandardConfigurations'
+import {isSurveyStandardPending,sameSurveyStandardOperation,type SurveyStandardPending,type SurveyStandardOperation,type SurveyStandardReplacement} from '../api/surveyStandardConfigurations'
 const key=(id:string)=>'survey-exact-standard-use:'+id
 
 /** One unresolved operation per authenticated manager across recipient/source
@@ -18,6 +18,7 @@ export function useSurveyStandardConfigurationGrant(actorId:string|null,api:Cata
    if(value&&!isSurveyStandardPending(value))throw Error('原请求记录不完整，请先核对审计；不能另编新请求。')
    setPending(value);setReady(actorId)
   }catch(reason){setBlocked(true);setError(reason instanceof Error?reason.message:'无法读取原请求，请先核对审计。')}
+  return()=>{if(actor.current===actorId)actor.current=null}
  },[actorId])
  useEffect(()=>{
   if(!pending)return
@@ -37,9 +38,9 @@ export function useSurveyStandardConfigurationGrant(actorId:string|null,api:Cata
   setPending(value);setAbsent(false);setError('');inFlight.current=true;setBusy(true)
   try{
    const grant=await api<CatalogGrant>('/researchers/'+encodeURIComponent(value.recipientId)+'/tool-grants','POST',{
-    currentPassword:password,source:value.source,exact:{requestId:value.requestId,configurationName:value.configurationName}})
+    currentPassword:password,source:value.source,exact:{requestId:value.requestId,configurationName:value.configurationName,...(value.replaces?{replaces:value.replaces}:{})}})
    if(actor.current!==owner)return null
-   if(!sameSurveyStandardOperation(value,{grant,request:{requestId:value.requestId,userId:value.recipientId,configurationName:value.configurationName,source:value.source}}))
+   if(!sameSurveyStandardOperation(value,{grant,request:{requestId:value.requestId,userId:value.recipientId,configurationName:value.configurationName,source:value.source,...(value.replaces?{replaces:value.replaces}:{})}}))
     throw Error('回执与原固定配置身份不一致。')
    complete(owner);return grant
   }catch(reason){
@@ -47,9 +48,9 @@ export function useSurveyStandardConfigurationGrant(actorId:string|null,api:Cata
    throw reason
   }finally{inFlight.current=false;if(actor.current===owner)setBusy(false)}
  }
- async function issue(recipientId:string,source:CatalogSourceRef,title:string,configurationName:string,password:string){
+ async function issue(recipientId:string,source:CatalogSourceRef,title:string,configurationName:string,password:string,replaces?:SurveyStandardReplacement){
   if(pending||blocked)throw Error('请先核对原配置请求。')
-  const value={requestId:crypto.randomUUID(),recipientId,source:{kind:source.kind,sourceId:source.sourceId,sourceVersion:source.sourceVersion},title,configurationName:configurationName.trim()}
+  const value={requestId:crypto.randomUUID(),recipientId,source:{kind:source.kind,sourceId:source.sourceId,sourceVersion:source.sourceVersion},title,configurationName:configurationName.trim(),...(replaces?{replaces}:{})}
   if(!isSurveyStandardPending(value))throw Error('请填写业务配置名称，并选择已批准的精确标准量表组合。')
   return send(value,password)
  }

@@ -3,7 +3,8 @@ import type { Kind } from './builder.types'
 export type CatalogSourceRef={kind:Kind;sourceId:string;sourceVersion:string|number;organizationId?:string}
 export type CatalogProvenance={source:CatalogSourceRef;definitionDigest:string;adapterVersion:string;license?:unknown;[key:string]:unknown}
 export type CatalogGrant={id:string;title:string;kind:Kind;status:string;sourceRef:CatalogSourceRef;sourceProvenance?:CatalogProvenance;createdAt?:string;revokedAt?:string|null;
- recipientId?:string;configurationName?:string;selectedBinding?:{authorizationId:string;authorizationRevision:number;bindingHash:string;configurationHash:string}}
+ recipientId?:string;issuerId?:string;configurationName?:string;selectedBinding?:{authorizationId:string;authorizationRevision:number;bindingHash:string;configurationHash:string};
+ supersedes?:{selectedBinding:{authorizationId:string;authorizationRevision:number;bindingHash:string;configurationHash:string};reason:string}}
 export type CatalogApi=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
 export function SourceProvenance({source,provenance}:{source?:CatalogSourceRef;provenance?:CatalogProvenance}){
   source=source||provenance?.source

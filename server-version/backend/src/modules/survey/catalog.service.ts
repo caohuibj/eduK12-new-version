@@ -12,7 +12,7 @@ import {assertSurveyManager} from './admin-role'
 import {SurveyGovernanceError} from './governance.service'
 import {getCatalogSourceSnapshot,listCatalogSources,assertCatalogSourcesCurrent,recheckCatalogSjtSourceAuthority,type CatalogSourceRef} from './catalog.sources'
 import type {ResearchFrozenUnit} from './publication.service'
-import {surveyStandardUseInput,readSurveyStandardUse,assertSurveyStandardUseAuthority,surveyStandardSourceForRecheck} from '../assessment-authorization/survey-standard-use'
+import {surveyStandardUseInput,readSurveyStandardUse,readSurveyStandardSupersedes,assertSurveyStandardUseAuthority,surveyStandardSourceForRecheck} from '../assessment-authorization/survey-standard-use'
 import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
 import {standardConfigurationIdentity,selectedConfigurationPointer} from '../assessment-authorization/standard-configuration-binding'
 import {sealSelectedConfigurationBinding} from '../assessment-authorization/selected-configuration'
@@ -21,8 +21,8 @@ type Tx=Prisma.TransactionClient
 const fail=(status:number,message:string):never=>{throw new SurveyGovernanceError(status,message)}
 export type CatalogSnapshot=Awaited<ReturnType<typeof getCatalogSourceSnapshot>>
 type Grant={id:string;createdBy:string;userId:string;status:string;snapshot:CatalogSnapshot;snapshotDigest:string;createdAt:Date;revokedAt:Date|null}
-const view=(r:Grant)=>{const selected=readSurveyStandardUse(r);return {id:r.id,title:r.snapshot.title,kind:r.snapshot.ref.kind,status:r.status,
-  ...(selected?{recipientId:r.userId,configurationName:r.snapshot.provenance.configurationName,selectedBinding:selectedConfigurationPointer(selected)}:{}),
+const view=(r:Grant)=>{const selected=readSurveyStandardUse(r),supersedes=selected?readSurveyStandardSupersedes(r.snapshot.provenance.configurationSupersedes):null;return {id:r.id,title:r.snapshot.title,kind:r.snapshot.ref.kind,status:r.status,
+  ...(selected?{recipientId:r.userId,issuerId:r.createdBy,configurationName:r.snapshot.provenance.configurationName,selectedBinding:selectedConfigurationPointer(selected),...(supersedes?{supersedes}:{})}:{}),
   sourceRef:r.snapshot.ref,sourceProvenance:{...r.snapshot.provenance,originalSource:r.snapshot.provenance.source??null,source:r.snapshot.ref,
     definitionDigest:r.snapshot.definitionDigest,adapterVersion:r.snapshot.adapterVersion},createdAt:r.createdAt,revokedAt:r.revokedAt}}
 export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourceRef['kind'];organizationId?:string;page:number;discovery?:CatalogDiscoveryFilters}){
@@ -81,12 +81,28 @@ export async function grantCatalogSource(actorUserId:string,userId:string,ref:Ca
     if(!isGovernedSource(ref.sourceId))await assertSurveyToolPolicy(tx,await snapshotPolicyIdentity(tx,snapshot),true)
     if(precise){
       const source=await readCurrentStandardCombination(tx,{releaseId:ref.sourceId.slice('survey-standard:'.length),combinationHash:ref.sourceVersion})
+      if(precise.replaces?.grantId===precise.requestId)fail(409,'新授权不能替换自身请求编号')
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-standard-use:'+precise.requestId}))`
+      // One recipient/tool lock precedes any predecessor row lock. Opposing
+      // replacements cannot acquire two uses in opposite order.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-standard-use-name:'+userId+':'+source.row.tool_key}))`
+      let predecessor:Grant|undefined,supersedes:ReturnType<typeof readSurveyStandardSupersedes>=null
+      if(precise.replaces){
+        await assertNotTechnicalPackageGrant(tx,precise.replaces.grantId)
+        ;[predecessor]=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,snapshot,snapshot_digest AS "snapshotDigest",created_at AS "createdAt",revoked_at AS "revokedAt"
+          FROM survey_tool_grants WHERE id=${precise.replaces.grantId} AND user_id=${userId} AND created_by=${actorUserId} FOR UPDATE`
+        if(!predecessor||canonicalHash(predecessor.snapshot)!==predecessor.snapshotDigest)return fail(409,'只能替换本人为同一研究者发行的可信原精确配置')
+        const original=readSurveyStandardUse(predecessor),configuration=original?.binding.configuration
+        if(!original||!configuration||configuration.kind!=='STANDARD_COMBINATION'||configuration.toolKey!==source.row.tool_key)return fail(409,'替换须保留同一工具和原精确授权身份')
+        const priorSource=await readCurrentStandardCombination(tx,{releaseId:configuration.combinationId,combinationHash:configuration.combinationHash},'HISTORY')
+        if(canonicalHash(standardConfigurationIdentity(priorSource))!==canonicalHash(configuration))fail(409,'前一配置与原精确来源不一致')
+        supersedes={selectedBinding:selectedConfigurationPointer(original),reason:precise.replaces.reason}
+      }
       const selected=sealSelectedConfigurationBinding({product:'SURVEY',configuration:standardConfigurationIdentity(source),authorization:{kind:'SURVEY_TOOL_USE',
        id:precise.requestId,revision:1,issuerId:actorUserId,recipientId:userId,organizationId:null,authority:[{kind:'ENTRY_ADMIN',id:manager.grantId,revision:manager.grantVersion}]}})
       const intent=canonicalHash({schemaVersion:1,actorUserId,userId,ref,...precise})
-      snapshot.provenance={...snapshot.provenance,selectedBinding:selected,configurationName:precise.configurationName,configurationRequestIntentHash:intent}
+      snapshot.provenance={...snapshot.provenance,selectedBinding:selected,configurationName:precise.configurationName,configurationRequestIntentHash:intent,...(supersedes?{configurationSupersedes:supersedes}:{})}
       const digest=canonicalHash(snapshot)
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-standard-use:'+precise.requestId}))`
       const prior=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,snapshot,snapshot_digest AS "snapshotDigest",created_at AS "createdAt",revoked_at AS "revokedAt" FROM survey_tool_grants WHERE id=${precise.requestId} FOR SHARE`
       if(prior.length){
        const row=prior[0]
@@ -94,17 +110,24 @@ export async function grantCatalogSource(actorUserId:string,userId:string,ref:Ca
         ||row.snapshot.provenance.configurationRequestIntentHash!==intent)fail(409,'原请求编号已用于不同研究配置、接收者或权限依据')
        return {...view(row),replayed:true}
       }
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-standard-use-name:'+userId+':'+source.row.tool_key}))`
+      if(predecessor&&predecessor.status!=='ACTIVE')fail(409,'原配置授权已撤销，请重新读取后明确选择后续修订')
       const duplicate=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM survey_tool_grants WHERE user_id=${userId} AND status='ACTIVE'
        AND snapshot#>>'{provenance,selectedBinding,binding,configuration,toolKey}'=${source.row.tool_key}
-       AND snapshot#>>'{provenance,configurationName}'=${precise.configurationName} LIMIT 1`
+       AND snapshot#>>'{provenance,configurationName}'=${precise.configurationName} ${predecessor?Prisma.sql`AND id<>${predecessor.id}`:Prisma.empty} LIMIT 1`
       if(duplicate.length)fail(409,'同一工具已有此配置名称，请管理员使用不同业务名称或先撤销原授权')
       await assertSurveyManager(tx,actorUserId);await target(tx,userId)
       const rows=await tx.$queryRaw<Grant[]>`INSERT INTO survey_tool_grants(id,user_id,status,snapshot,snapshot_digest,created_by)
        VALUES(${precise.requestId},${userId},'ACTIVE',${JSON.stringify(snapshot)}::jsonb,${digest},${actorUserId})
        RETURNING id,user_id AS "userId",created_by AS "createdBy",status,snapshot,snapshot_digest AS "snapshotDigest",created_at AS "createdAt",revoked_at AS "revokedAt"`
       await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:userId,action:'CATALOG_TOOL_GRANTED',
-       metadata:{grantId:precise.requestId,source:ref,snapshotDigest:digest,selectedBinding:selected,configurationName:precise.configurationName,requestIntentHash:intent,selfGrant:actorUserId===userId}}})
+       metadata:{grantId:precise.requestId,source:ref,snapshotDigest:digest,selectedBinding:selected,configurationName:precise.configurationName,requestIntentHash:intent,selfGrant:actorUserId===userId,...(supersedes?{supersedes}:{})}}})
+      if(predecessor&&supersedes){
+        const changed=await tx.$queryRaw<Array<{id:string}>>`UPDATE survey_tool_grants SET status='REVOKED',revoked_at=statement_timestamp()
+          WHERE id=${predecessor.id} AND status='ACTIVE' RETURNING id`
+        if(changed.length!==1)fail(409,'原配置授权已变化，本次替换未保存')
+        await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:userId,action:'CATALOG_TOOL_CONFIGURATION_REPLACED',
+          metadata:{previous:supersedes.selectedBinding,next:selectedConfigurationPointer(selected),reason:supersedes.reason,policy:'STOP_NEW_ADMISSION_AND_COLLECTION_KEEP_SAVED_DATA'}}})
+      }
       return {...view(rows[0]),replayed:false}
     }
     const snapshotDigest=canonicalHash(snapshot)
@@ -137,7 +160,12 @@ export async function readExactToolGrantRequest(actorUserId:string,userId:string
     AND NOT EXISTS(SELECT 1 FROM survey_package_members pm WHERE pm.technical_grant_id=survey_tool_grants.id)`
   if(!row)return null
   if(canonicalHash(row.snapshot)!==row.snapshotDigest||!readSurveyStandardUse(row))fail(409,'原请求缺少可信固定配置身份')
-  return {grant:view(row),request:{requestId:row.id,userId:row.userId,configurationName:row.snapshot.provenance.configurationName,source:row.snapshot.ref}}
+  const supersedes=readSurveyStandardSupersedes(row.snapshot.provenance.configurationSupersedes)
+  const request={requestId:row.id,userId:row.userId,configurationName:row.snapshot.provenance.configurationName,source:row.snapshot.ref,
+    ...(supersedes?{replaces:{grantId:supersedes.selectedBinding.authorizationId,expectedVersion:1,reason:supersedes.reason}}:{})}
+  if(canonicalHash({schemaVersion:1,actorUserId,userId,ref:row.snapshot.ref,requestId:row.id,configurationName:request.configurationName,
+    ...(request.replaces?{replaces:request.replaces}:{})})!==row.snapshot.provenance.configurationRequestIntentHash)fail(409,'原授权完整意图摘要不匹配')
+  return {grant:view(row),request}
 }
 export async function revokeToolGrant(actorUserId:string,id:string){
   return prisma.$transaction(async tx=>{

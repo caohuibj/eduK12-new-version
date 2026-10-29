@@ -119,3 +119,46 @@ it('keeps Survey axis discovery in the authenticated approved page and submits t
  const selected=screen.getByRole('region',{name:'已选精确版本'});expect(selected).toHaveTextContent('已选 1 个精确版本');expect(writes(api)).toHaveLength(0)
  fireEvent.click(within(selected).getByRole('button',{name:/授权已选版本/}));await waitFor(()=>expect(writes(api)).toHaveLength(1));expect(writes(api)[0][2]).toMatchObject({source,exact:{configurationName:'固定体验报告'}});expect(writes(api)[0][2]).not.toHaveProperty('axisVersions')
 })
+
+describe('Survey administrator explicit configuration replacement',()=>{
+ const old={...grant({source,exact:{requestId:id(11),configurationName:'原教学报告'}}),title:'旧授权量表',issuerId:actor,sourceProvenance:{source,definitionDigest:'d'.repeat(64),adapterVersion:'survey-catalog-scale-v2',code:'same-tool'}}
+ const nextSource={...source,sourceVersion:'f'.repeat(64)},next={...row,ref:nextSource,configuration:{...row.configuration,toolKey:'same-tool'}}
+ const lineage=(body:any)=>({selectedBinding:old.selectedBinding!,reason:body.exact.replaces.reason})
+ function apiFor(post:(body:any)=>unknown,read:(body:any)=>unknown=body=>({grant:{...grant(body),supersedes:lineage(body)},request:{...body.exact,userId:recipient,source:nextSource}})){
+  let original:any
+  return vi.fn(async(path:string,method?:string,body?:any)=>{
+   if(method==='POST'){original=body;return post(body)}
+   if(path.startsWith('/source-catalog'))return {list:[next],page:1,hasMore:false,terminalReason:'END_OF_CATALOG',actorId:actor}
+   if(path.includes('/tool-grant-requests/'))return {operation:read(original)}
+   return {list:[old]}
+  })
+ }
+ async function start(api:ReturnType<typeof vi.fn>){
+  await prepare(api,false);fireEvent.click(await screen.findByRole('button',{name:'以新配置替换：原教学报告'}))
+  expect(screen.getByLabelText('授权给研究者')).toBeDisabled();expect(screen.getByLabelText('来源类型')).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'查询可授权版本'}));await screen.findByRole('heading',{name:row.title})
+ }
+ it('requires an explicit reason and sends the old exact revision with the unchanged recipient before switching reports',async()=>{
+  const api=apiFor(body=>({...grant(body),sourceRef:nextSource,supersedes:lineage(body)}));await start(api)
+  const button=screen.getByRole('button',{name:/授权此版本：原量表/});expect(button).toBeDisabled();fireEvent.change(screen.getByLabelText('研究配置替换原因'),{target:{value:'管理员明确由教学改为科研无反馈'}});await waitFor(()=>expect(button).toBeEnabled());fireEvent.click(button)
+  await waitFor(()=>expect(writes(api)).toHaveLength(1));expect(writes(api)[0]).toEqual([endpoint,'POST',{currentPassword:'synthetic-password',source:nextSource,exact:{requestId:expect.any(String),configurationName:'原教学报告',replaces:{grantId:old.id,expectedVersion:1,reason:'管理员明确由教学改为科研无反馈'}}}])
+  await waitFor(()=>expect(screen.queryByRole('region',{name:'明确替换研究配置'})).not.toBeInTheDocument());expect(sessionStorage.getItem('survey-exact-standard-use:'+actor)).toBeNull()
+ })
+ it('keeps the complete replacement unresolved after a lost response or changed original reason and recovers only matching lineage',async()=>{
+  let correct=false;const api=apiFor(()=>{throw Error('lost replacement response')},body=>({grant:{...grant(body),supersedes:{...lineage(body),reason:correct?body.exact.replaces.reason:'另一原因'}},request:{...body.exact,userId:recipient,source:nextSource}}));await start(api)
+  fireEvent.change(screen.getByLabelText('研究配置替换原因'),{target:{value:'保留原接收者明确替换'}});fireEvent.click(screen.getByRole('button',{name:/授权此版本：原量表/}));await screen.findByRole('region',{name:'固定量表原请求核对'})
+  const stored=JSON.parse(sessionStorage.getItem('survey-exact-standard-use:'+actor)!);expect(stored.replaces).toEqual({grantId:old.id,expectedVersion:1,reason:'保留原接收者明确替换'});expect(JSON.stringify(stored)).not.toContain('synthetic-password');expect(screen.getByRole('button',{name:'取消替换研究配置'})).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'核对原固定配置请求'}));await screen.findByText(/完整配置意图不一致/);expect(sessionStorage.getItem('survey-exact-standard-use:'+actor)).not.toBeNull();correct=true
+  fireEvent.click(screen.getByRole('button',{name:'核对原固定配置请求'}));await waitFor(()=>expect(sessionStorage.getItem('survey-exact-standard-use:'+actor)).toBeNull());expect(writes(api)).toHaveLength(1)
+ })
+ it('keeps another issuer use visible while offering replacement only to the actual original issuer',async()=>{
+  const api=apiFor(grant);api.mockImplementation(async(path:string)=>path.startsWith('/source-catalog')?{list:[next],page:1,hasMore:false,terminalReason:'END_OF_CATALOG',actorId:actor}:{list:[{...old,issuerId:other}]})
+  await prepare(api,false);expect(screen.getByRole('heading',{name:'旧授权量表'})).toBeInTheDocument();expect(screen.queryByRole('button',{name:'以新配置替换：原教学报告'})).not.toBeInTheDocument();expect(writes(api)).toHaveLength(0)
+ })
+})
+
+it('retains an unresolved operation after leaving the manager workspace and ignores its late success response',async()=>{
+ let finish!:(value:unknown)=>void,input:any
+ const api=mockApi(body=>{input=body;return new Promise(resolve=>{finish=resolve})})
+ const view=render(<SurveyCatalogGrants api={api as CatalogApi} password="synthetic-password" researchers={people} actorId={actor}/>);fireEvent.change(screen.getByLabelText('授权给研究者'),{target:{value:recipient}});await waitFor(()=>expect(screen.getByRole('button',{name:'查询可授权版本'})).toBeEnabled());fireEvent.click(screen.getByRole('button',{name:'查询可授权版本'}));await screen.findByRole('heading',{name:row.title});fireEvent.change(screen.getByLabelText('标准量表授权配置名称'),{target:{value:'原账号意图'}});await waitFor(()=>expect(screen.getByRole('button',{name:/授权此版本：原量表/})).toBeEnabled());fireEvent.click(screen.getByRole('button',{name:/授权此版本：原量表/}));await waitFor(()=>expect(writes(api)).toHaveLength(1));view.unmount();finish(grant(input));await new Promise(resolve=>setTimeout(resolve,0));expect(sessionStorage.getItem('survey-exact-standard-use:'+actor)).not.toBeNull()
+})

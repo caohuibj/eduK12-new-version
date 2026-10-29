@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "base": "770790c9b15b25e52a6c55d7c5c5ff243bb47894",
+  "main": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "scope": "Survey explicit exact-use replacement, immutable supersedes, current-manager UI and complete original-intent recovery. No engine/schema/seed change.",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost55439 owner role",
+    "database": "precise_survey_replacement_test_20261029",
+    "template": "precise_survey_standard_use_test_20261029 unchanged",
+    "productionAccessed": false
+  },
+  "results": {
+    "postgresPassed": 4,
+    "actualProtectedHttpPassed": 2,
+    "frontendPassed": 20,
+    "frontendBreakdown": {
+      "originalApi": 4,
+      "newApi": 2,
+      "originalUi": 10,
+      "newUi": 4
+    },
+    "malformedLineageApiContinuation": {
+      "passed": 2,
+      "filteredOriginal": 4
+    },
+    "finalBackendHttpClosureTypesExit": 0,
+    "frontendTypesExit": 0,
+    "finalChangedApiClosureTypesExit": 0,
+    "changedFrontendLintExit": 0,
+    "finalPageLintExit": 0,
+    "retainedDatabaseGrants": 9,
+    "retainedDatabasePublications": 5
+  },
+  "raw": {
+    "file": "survey-replacement-raw.json",
+    "sha256": "139d48fc8b4fe2533e75123557a8e1ec115d40c42aef96e3303b55ddf9cf65de"
+  },
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.http.postgres.integration.test.ts",
+      "sha256": "7d05af59ed9551a137e81f1a01fb5fcbbfd7ec274299420917765dcb147c8935"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.postgres.integration.test.ts",
+      "sha256": "9ca40c8c39406b5c550a17f633a965dee8b1a28e15c2f8435d6073dc62e6de30"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/survey-standard-use.ts",
+      "sha256": "5a150ceb1b82eeaaeb4913b7d9ca08ce0e1537af48340582d358cbefe31f5323"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "sha256": "f520431c8dcd0b072d0dc626e3b416266dc1d493a1104803d618732ed430bc75"
+    },
+    {
+      "path": "server-version/frontend/src/api/__tests__/surveyStandardConfigurations.test.ts",
+      "sha256": "df35d5510f756cf623735f24283df7313dd75f921c9ce30563c3b08d3cfc608b"
+    },
+    {
+      "path": "server-version/frontend/src/api/surveyStandardConfigurations.ts",
+      "sha256": "dabf59011b9a7b06c70b0c085e81c3c27f9b13600352c1322c34612bc2017aec"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+      "sha256": "a706af9afd087ccc637a279f0212e63d762e6fe99f566f8d93b009b721e5fa0f"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx",
+      "sha256": "477f38a49136ea8b65945fbeaa26ced13eca1319be983c6ef7ee19be55142522"
+    },
+    {
+      "path": "server-version/frontend/src/survey/ResearchCatalog.tsx",
+      "sha256": "aa170c2ec2adde5990fbce4c098ef587e57724641061a850835ee74c8cc65204"
+    },
+    {
+      "path": "server-version/frontend/src/survey/useSurveyStandardConfigurationGrant.ts",
+      "sha256": "fce9493fbc27c3a7abc175aaf29ecda26ff2f003d508a5b07998c8ba0d3cce24"
+    }
+  ],
+  "captureAt": "2026-10-29T20:34:28.677866+00:00",
+  "inputCapture": "Post-execution direct inventory, not full dependency/flag contemporaneous manifest or signed CI. Frontend full types preceded final text-only page wording; new API optional-chain malformed guard has its own final closed types0 and affected API2 rerun. Backend final types includes the new actual router fixture.",
+  "failuresPreserved": [
+    "Only initial backend types failed: nullable/discriminated source was not narrowed across the arrow fail() call. return fail() makes termination explicit without changing runtime throw. Types then0. PG4 were already passed under the same rejecting checks; not replayed."
+  ],
+  "reuseBoundary": "Existing source C/P and all source rows verified unchanged; full vs none R only. No new fun registration or repeated scoring/seed/DOT20 pairs. No old participant/browser or source approval replay. Ordinary cases included only because changed original-intent/client paths affect them.",
+  "notExecuted": [
+    "Actual different-tool replacement fixture (same-tool identity check present)",
+    "Actual participant existing-attempt continuation and report rendering after new replacement",
+    "Compiled browser",
+    "Representative performance and batch issuance",
+    "Runtime-role DB",
+    "Training replacement / arbitrary new combination approval / cognitive four-entry precise profile",
+    "Formal CI / Draft PR / merge / production"
+  ]
+}

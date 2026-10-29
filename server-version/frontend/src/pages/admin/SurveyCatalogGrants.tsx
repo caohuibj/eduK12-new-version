@@ -21,6 +21,7 @@ export function SurveyCatalogGrants({api,password,researchers,ensureVerification
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [queried,setQueried]=useState(false)
   const [managerActorId,setManagerActorId]=useState<string|null>(null),[configurationName,setConfigurationName]=useState('')
+  const [replacement,setReplacement]=useState<CatalogGrant|null>(null),[replacementReason,setReplacementReason]=useState('')
   const exact=useSurveyStandardConfigurationGrant(actorId&&actorId===managerActorId?actorId:null,api)
   const [filters,setFilters]=useState<CatalogFilters>(EMPTY_CATALOG_FILTERS),[appliedFilters,setAppliedFilters]=useState<CatalogFilters>(EMPTY_CATALOG_FILTERS),[selected,setSelected]=useState<Record<string,Source>>({})
   const inFlight=useRef(false),sourceEpoch=useRef(0),targetRef=useRef(researcherId)
@@ -47,18 +48,20 @@ export function SurveyCatalogGrants({api,password,researchers,ensureVerification
   })
   const loadGrants=async(id=researcherId,next=1)=>{const data=await api<{list:CatalogGrant[]}>('/researchers/'+encodeURIComponent(id)+'/tool-grants?page='+next);if(id!==targetRef.current)return;setGrants(data.list);setGrantPage(next)}
   const canWrite=(context:string)=>ensureVerification?ensureVerification(context):Boolean(password)
-  const sourceWritable=(source:Source)=>!isSurveyStandardSource(source.ref)||exact.canIssue&&Boolean(configurationName.trim())
+  const replacementCompatible=(source:Source)=>!replacement||isSurveyStandardSource(source.ref)&&typeof replacement.sourceProvenance?.code==='string'&&source.configuration?.toolKey===replacement.sourceProvenance.code
+  const sourceWritable=(source:Source)=>replacementCompatible(source)&&(!isSurveyStandardSource(source.ref)||exact.canIssue&&Boolean(configurationName.trim()))
+    &&(!replacement||replacement.recipientId===researcherId&&Boolean(replacementReason.trim())&&replacementReason.trim().length<=500)
   const grant=async(source:Source)=>{
     const target=researcherId
-    if(!canGrant||!target||!source.available)return
+    if(!canGrant||!target||!source.available||!sourceWritable(source))return
     try{
-      if(isSurveyStandardSource(source.ref)){const result=await exact.issue(target,source.ref,source.title,configurationName,password);if(!result)return}
+      if(isSurveyStandardSource(source.ref)){const result=await exact.issue(target,source.ref,source.title,configurationName,password,replacement?{grantId:replacement.id,expectedVersion:1,reason:replacementReason.trim()}:undefined);if(!result)return}
       else await api('/researchers/'+encodeURIComponent(target)+'/tool-grants','POST',{currentPassword:password,source:source.ref})
     }
-    catch(e){throw new Error((e instanceof Error?e.message:'授权请求失败')+'；未取得成功确认，请先刷新现有授权核对结果，再决定是否重试。')}
+    catch(e){throw new Error((e instanceof Error?e.message:'授权请求失败')+(isSurveyStandardSource(source.ref)?'；未取得成功确认，请按原请求编号核对，不要改号重发。':'；未取得成功确认，请先刷新现有授权核对结果，再决定是否重试。'))}
     if(target!==targetRef.current)return
-    setSelected(old=>{const next={...old};delete next[sourceKey(source)];return next})
-    setNotice('已向 '+objectName+' 授权 '+source.title+' · 版本 '+source.ref.sourceVersion+'；研究者可在自己的项目中导入。')
+    if(replacement){setSelected({});setReplacement(null);setReplacementReason('')}else setSelected(old=>{const next={...old};delete next[sourceKey(source)];return next})
+    setNotice((replacement?'新固定配置已保存，原授权已撤销；旧草稿及历史定义保持原版。':'')+'已向 '+objectName+' 授权 '+source.title+' · 版本 '+source.ref.sourceVersion+'；研究者可在自己的项目中导入。')
     try{await loadGrants()}catch{setError('版本授权已完成，但授权列表刷新失败。请仅重选该研究者刷新列表，不要重复授权。')}
   }
   return <><section className="survey-admin-panel survey-admin-grants" aria-label="研究工具版本授权">
@@ -67,32 +70,36 @@ export function SurveyCatalogGrants({api,password,researchers,ensureVerification
     {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
     {exact.error&&<p role="alert">{exact.error}</p>}
     {exact.pending&&<section aria-label="固定量表原请求核对"><p>{exact.pending.title} · {exact.pending.configurationName}；请求编号：<code>{exact.pending.requestId}</code>。核对期间保留原接收者和固定配置。</p>
-      <button disabled={busy||exact.busy} onClick={()=>void run(async()=>{const original=exact.pending,result=await exact.recover();if(result){setNotice(result.status==='REVOKED'?'原配置已确认保存，目前已撤销。':'原固定配置已确认保存。');if(original?.recipientId===targetRef.current)await loadGrants(original.recipientId)}})}>核对原固定配置请求</button>
-      {exact.absent&&<><p role="status">暂未发现原请求，只能按原编号、原接收者和原配置重试。</p><button disabled={busy||exact.busy||(!ensureVerification&&!password)} onClick={()=>{if(canWrite('按原编号重试固定配置授权'))void run(async()=>{const original=exact.pending,result=await exact.retry(password);if(result){setNotice(result.status==='REVOKED'?'原请求已保存，目前已撤销。':'原固定配置已确认保存。');if(original?.recipientId===targetRef.current)await loadGrants(original.recipientId)}})}}>按原固定配置请求重试</button></>}
+      <button disabled={busy||exact.busy} onClick={()=>void run(async()=>{const original=exact.pending,result=await exact.recover();if(result){setReplacement(null);setReplacementReason('');setSelected({});setNotice(result.status==='REVOKED'?'原配置已确认保存，目前已撤销。':'原固定配置已确认保存。');if(original?.recipientId===targetRef.current)await loadGrants(original.recipientId)}})}>核对原固定配置请求</button>
+      {exact.absent&&<><p role="status">暂未发现原请求，只能按原编号、原接收者和原配置重试。</p><button disabled={busy||exact.busy||(!ensureVerification&&!password)} onClick={()=>{if(canWrite('按原编号重试固定配置授权'))void run(async()=>{const original=exact.pending,result=await exact.retry(password);if(result){setReplacement(null);setReplacementReason('');setSelected({});setNotice(result.status==='REVOKED'?'原请求已保存，目前已撤销。':'原固定配置已确认保存。');if(original?.recipientId===targetRef.current)await loadGrants(original.recipientId)}})}}>按原固定配置请求重试</button></>}
     </section>}
     {busy&&<p role="status">正在读取或更新工具授权，请稍候…</p>}
     <fieldset disabled={busy} className="survey-admin-grant-form">
-      <div className="survey-admin-grant-controls"><div className="survey-admin-grant-field"><label className="block">授权给研究者<select className="input block w-full" value={researcherId} onChange={e=>{const id=e.target.value;setResearcherId(id);setSelected({});setGrants([]);setGrantPage(1);setError('');setNotice('');if(id)void run(()=>loadGrants(id))}}>
+      <div className="survey-admin-grant-controls"><div className="survey-admin-grant-field"><label className="block">授权给研究者<select className="input block w-full" disabled={Boolean(replacement)} value={researcherId} onChange={e=>{const id=e.target.value;setResearcherId(id);setSelected({});setGrants([]);setGrantPage(1);setError('');setNotice('');if(id)void run(()=>loadGrants(id))}}>
         <option value="">从当前研究者列表选择</option>{researchers.filter(r=>r.status!=='REVOKED').map(r=><option value={r.id} key={r.id}>{r.username} · {r.status}</option>)}</select></label>
       <p className="survey-admin-field-hint">下拉列表对应本页研究者；可用下方研究者分页切换。</p></div>
-      <div className="survey-admin-grant-field"><label className="block">来源类型<select className="input block" value={kind} onChange={e=>{sourceEpoch.current++;setKind(e.target.value as Kind);setFilters({...EMPTY_CATALOG_FILTERS});setAppliedFilters({...EMPTY_CATALOG_FILTERS});setSelected({});setSourcePage(emptySourcePage);setQueried(false);setError('');setNotice('')}}>
+      <div className="survey-admin-grant-field"><label className="block">来源类型<select className="input block" disabled={Boolean(replacement)} value={kind} onChange={e=>{sourceEpoch.current++;setKind(e.target.value as Kind);setFilters({...EMPTY_CATALOG_FILTERS});setAppliedFilters({...EMPTY_CATALOG_FILTERS});setSelected({});setSourcePage(emptySourcePage);setQueried(false);setError('');setNotice('')}}>
         <option value="SCALE">Scale · 量表</option><option value="SJT">SJT · 情境判断</option><option value="COGNITIVE">Cognitive · 认知任务</option><option value="FORM">Form · 已批准的表单</option></select></label><p className="survey-admin-field-hint">按来源查询，保留工具的具体版本。</p></div></div>
       <p className="survey-admin-grant-target"><UserRound size={16} aria-hidden="true"/><span>当前授权对象：<strong>{objectName}</strong></span></p>
       {selectedResearcher&&!canGrant&&<p className="text-sm">该研究者当前资格不可接收新授权；可查看或撤销已有授权，后台权限规则保持不变。</p>}
 
       {kind==='FORM'&&<p className="text-sm">可授权的表单须已完成系统审批、自动保存验证和 Survey 范围准入；不会扫描其他研究者未提交的私有草稿。</p>}
       {kind==='SCALE'&&<label className="block">标准量表授权配置名称<input aria-label="标准量表授权配置名称" className="input block" maxLength={120} value={configurationName} disabled={Boolean(exact.pending)} onChange={event=>setConfigurationName(event.target.value)}/><span className="survey-admin-field-hint">标准量表以管理员选定的报告组合固定。请用用途或报告样式命名；研究者直接使用，不能再选择 R。专业搭配由管理员核对。</span></label>}
+      {replacement&&<section aria-label="明确替换研究配置"><p>为 {objectName} 替换 {replacement.configurationName}。保存新修订时撤销原使用权；原草稿不会自动换版，已开始作答和历史报告定义保留。</p>
+        <label>研究配置替换原因<input maxLength={500} value={replacementReason} disabled={Boolean(exact.pending)} onChange={event=>setReplacementReason(event.target.value)}/></label>
+        <button type="button" disabled={Boolean(exact.pending)} onClick={()=>{setReplacement(null);setReplacementReason('');setSelected({})}}>取消替换研究配置</button>
+      </section>}
       <CatalogDiscoveryFilters label="可授权版本检索" filters={filters} facets={sourcePage.tagFacets??EMPTY_CATALOG_FACETS} onChange={setFilters} onApply={search} disabled={busy}/>
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>search(filters)}><Search size={16} aria-hidden="true"/>查询可授权版本</button>
       {!queried&&!busy&&!error&&<div className="survey-admin-empty-state survey-admin-source-empty"><span className="survey-admin-empty-icon"><BookOpen size={28} aria-hidden="true"/></span><p>选择来源类型后查询版本；不会自动加载全部目录。</p><span>核对来源与版本后，再为所选研究者授权。</span></div>}
-      {kind==='SCALE'&&<ApprovedScaleAxes choices={sources.flatMap(source=>source.available&&isSurveyStandardSource(source.ref)&&source.configuration?.toolKey?[{id:sourceKey(source),toolKey:source.configuration.toolKey,title:source.title,versions:source.configuration.axisVersions??source.configuration.axes}]:[])} disabled={busy||!!exact.pending||Object.keys(selected).length>=10} scopeLabel="当前来源目录页，可用现有分页与检索查看其他版本" onSelect={id=>{const source=sources.find(value=>sourceKey(value)===id&&value.available);if(source)setSelected(old=>({...old,[id]:source}))}}/>}
+      {kind==='SCALE'&&<ApprovedScaleAxes choices={sources.flatMap(source=>source.available&&replacementCompatible(source)&&isSurveyStandardSource(source.ref)&&source.configuration?.toolKey?[{id:sourceKey(source),toolKey:source.configuration.toolKey,title:source.title,versions:source.configuration.axisVersions??source.configuration.axes}]:[])} disabled={busy||!!exact.pending||Object.keys(selected).length>=10} scopeLabel="当前来源目录页，可用现有分页与检索查看其他版本" onSelect={id=>{const source=sources.find(value=>sourceKey(value)===id&&value.available);if(source)setSelected(old=>replacement?{[id]:source}:{...old,[id]:source})}}/>}
       <section aria-label="已选精确版本" className="survey-admin-selection">
         <h3>已选 {Object.keys(selected).length} 个精确版本（最多10个）</h3>
         <p>只勾选明确版本；翻页保留选择，重新检索、切换来源或授权对象时清空。每个版本单独授权。</p>
         {Object.values(selected).map(source=><div key={sourceKey(source)}><p>{source.title} · 版本 {source.ref.sourceVersion} → {objectName}</p><button type="button" className="btn-secondary" onClick={()=>toggle(source)}>移除选择：{source.title}</button><button type="button" className="btn-primary" aria-label={'授权已选版本：'+source.title+' · '+source.ref.sourceVersion+' → '+objectName} disabled={busy||(!ensureVerification&&!password)||!canGrant||!sourceWritable(source)} onClick={()=>{if(canWrite('授权 '+source.title+' · 版本 '+source.ref.sourceVersion+' 给 '+objectName))void run(()=>grant(source))}}>授权此精确版本</button></div>)}
       </section>
       <div className="survey-admin-tool-grid">{sources.map((source,index)=><article key={JSON.stringify(source.ref)+index} className="survey-admin-card survey-admin-tool-card">
-        <label><input type="checkbox" checked={Boolean(selected[sourceKey(source)])} disabled={busy||!source.available||(!selected[sourceKey(source)]&&Object.keys(selected).length>=10)} onChange={()=>toggle(source)}/>{'选择精确版本：'+source.title+' · '+source.ref.sourceVersion}</label>
+        <label><input type="checkbox" checked={Boolean(selected[sourceKey(source)])} disabled={busy||Boolean(replacement)||!source.available||(!selected[sourceKey(source)]&&Object.keys(selected).length>=10)} onChange={()=>toggle(source)}/>{'选择精确版本：'+source.title+' · '+source.ref.sourceVersion}</label>
         <details className="survey-admin-tool-disclosure"><summary aria-label={'版本详情与授权：'+source.title}>
           <span className="survey-admin-avatar"><BookOpen size={21} aria-hidden="true"/></span>
           <span className="survey-admin-card-name"><h3>{source.title}</h3><span>{source.ref.kind} · 版本 {source.ref.sourceVersion}</span></span>
@@ -110,12 +117,15 @@ export function SurveyCatalogGrants({api,password,researchers,ensureVerification
         <details className="survey-admin-tool-disclosure"><summary aria-label={'查看与管理授权：'+item.title}>
           <span className="survey-admin-avatar"><ShieldCheck size={21} aria-hidden="true"/></span><span className="survey-admin-card-name"><h4>{item.title}</h4><span>{item.kind} · 版本 {item.sourceRef.sourceVersion}</span></span><span className="survey-admin-badge" data-status={item.status}>{item.status==='ACTIVE'?'已授权':item.status==='REVOKED'?'已撤销':'状态待核对'}</span><ChevronDown className="survey-admin-disclosure-chevron" size={18} aria-hidden="true"/>
         </summary><div className="survey-admin-tool-body"><p className="survey-admin-object">研究者：<strong>{objectName}</strong> · 版本 {item.sourceRef.sourceVersion}</p>
-        {item.selectedBinding&&<p>固定使用配置：{item.configurationName}</p>}<details><summary>来源与冻结摘要</summary><SourceProvenance source={item.sourceRef} provenance={item.sourceProvenance}/></details>
+        {item.selectedBinding&&<p>固定使用配置：{item.configurationName}</p>}
+        {item.supersedes&&<details><summary>查看原配置修订</summary><p>原授权：{item.supersedes.selectedBinding.authorizationId}；原因：{item.supersedes.reason}</p></details>}
+        {item.status==='ACTIVE'&&item.selectedBinding&&item.selectedBinding.authorizationRevision===1&&item.recipientId===researcherId&&item.issuerId===actorId&&actorId===managerActorId&&<button type="button" disabled={busy||Boolean(exact.pending)||Boolean(replacement)} onClick={()=>{setReplacement(item);setReplacementReason('');setConfigurationName(item.configurationName??'');setSelected({});setKind('SCALE');setSourcePage(emptySourcePage);setQueried(false)}}>以新配置替换：{item.configurationName}</button>}
+<details><summary>来源与冻结摘要</summary><SourceProvenance source={item.sourceRef} provenance={item.sourceProvenance}/></details>
         {item.status==='ACTIVE'&&<button type="button" className="btn-secondary" disabled={busy||(!ensureVerification&&!password)} onClick={()=>{
           if(!canWrite('撤销 '+objectName+' 的工具版本授权'))return
-          if(window.confirm('撤销 '+objectName+' 的 '+item.title+' · 版本 '+item.sourceRef.sourceVersion+' 授权？将阻止新的导入及后续冻结发布；既有已发布和进行中的研究不受影响。'))void run(async()=>{
+          if(window.confirm('撤销 '+objectName+' 的 '+item.title+' · 版本 '+item.sourceRef.sourceVersion+' 授权？将阻止新的导入、后续冻结发布和未入场的新启动；已开始作答及历史定义保留。'))void run(async()=>{
             await api('/tool-grants/'+encodeURIComponent(item.id)+'/revoke','POST',{currentPassword:password})
-            setNotice(objectName+' 的 '+item.title+' · 版本 '+item.sourceRef.sourceVersion+' 授权已撤销。既有已发布研究不变。')
+            setNotice(objectName+' 的 '+item.title+' · 版本 '+item.sourceRef.sourceVersion+' 授权已撤销。已开始作答及历史定义保留，新导入、发布和新启动须有有效授权。')
             try{await loadGrants()}catch{setError('撤销已完成，但列表刷新失败；请仅重选研究者刷新列表，不要重复撤销。')}})
           else{setError('');setNotice('已取消撤销 '+objectName+' 的 '+item.title+' · 版本 '+item.sourceRef.sourceVersion+' 授权，未提交变更。')}
         }} aria-label={'撤销版本授权：'+objectName+' · '+item.title+' · '+item.sourceRef.sourceVersion}>撤销版本授权</button>}

@@ -4,8 +4,12 @@ import type {CatalogSourceSnapshot} from '../survey/catalog.sources'
 import {SurveyGovernanceError} from '../survey/governance.service'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {readSelectedConfigurationBinding,type SelectedConfigurationBinding} from './selected-configuration'
+import {selectedConfigurationPointerSchema} from './standard-configuration-binding'
 
-export const surveyStandardUseInput=z.object({requestId:z.string().guid(),configurationName:z.string().trim().min(1).max(120)}).strict()
+export const surveyStandardReplacementSchema=z.object({grantId:z.string().guid(),expectedVersion:z.literal(1),reason:z.string().trim().min(1).max(500)}).strict()
+export const surveyStandardUseInput=z.object({requestId:z.string().guid(),configurationName:z.string().trim().min(1).max(120),replaces:surveyStandardReplacementSchema.optional()}).strict()
+const supersedesSchema=z.object({selectedBinding:selectedConfigurationPointerSchema,reason:surveyStandardReplacementSchema.shape.reason}).strict()
+export function readSurveyStandardSupersedes(raw:unknown){return raw==null?null:supersedesSchema.parse(raw)}
 const fail=(message:string):never=>{throw new SurveyGovernanceError(409,message)}
 export type SurveyUseRow={id:string;createdBy:string;userId:string;snapshot:Pick<CatalogSourceSnapshot,'ref'|'provenance'>}
 /** Historical projection only; caller retains its ordinary data ACL. Null old
@@ -18,6 +22,8 @@ export function readSurveyStandardUse(row:SurveyUseRow):SelectedConfigurationBin
  catch{return fail('研究固定配置证据不完整')}
  if(!selected)return fail('研究固定配置证据不完整')
  const {configuration:c,authorization:a}=selected.binding,p=row.snapshot.provenance
+ const supersedes=readSurveyStandardSupersedes(p.configurationSupersedes)
+ if(supersedes&&(supersedes.selectedBinding.authorizationId===row.id||supersedes.selectedBinding.authorizationRevision!==1))return fail('研究前一授权修订身份不完整')
  if(a.kind!=='SURVEY_TOOL_USE'||a.issuerId!==row.createdBy||a.authority.length!==1||a.authority[0].kind!=='ENTRY_ADMIN'
   ||c.kind!=='STANDARD_COMBINATION'||row.snapshot.ref.kind!=='SCALE'||row.snapshot.ref.sourceId!=='survey-standard:'+c.combinationId
   ||row.snapshot.ref.sourceVersion!==c.combinationHash||p.surveyStandardReleaseId!==c.combinationId||p.code!==c.toolKey
@@ -32,7 +38,7 @@ export function readSurveyStandardUse(row:SurveyUseRow):SelectedConfigurationBin
  * grant-owned fields; all source/score/presentation/provenance checks remain. */
 export function surveyStandardSourceForRecheck<T extends SurveyUseRow&{snapshot:CatalogSourceSnapshot}>(row:T){
  if(!readSurveyStandardUse(row))return row.snapshot
- const {selectedBinding:_,configurationName:__,configurationRequestIntentHash:___,...provenance}=row.snapshot.provenance
+ const {selectedBinding:_,configurationName:__,configurationRequestIntentHash:___,configurationSupersedes:____,...provenance}=row.snapshot.provenance
  return {...row.snapshot,provenance}
 }
 /** Only new typed sourced drafts pay this bounded authority read. No latest,
