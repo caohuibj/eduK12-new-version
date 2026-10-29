@@ -1,3 +1,4 @@
+import {cognitiveIntakeToolingInputs} from '../../../.github/scripts/cognitive-intake-scope.mjs';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -80,8 +81,18 @@ export function classify(changes,read){
 }
 // Tooling-only C is not an application release. Its exact diff must leave both
 // component trees unchanged; unknown files/modes and mixed app changes escalate.
+const selectedCognitiveControlFiles=new Set(cognitiveIntakeToolingInputs.filter(file=>file.startsWith('server-version/backend/')));
 const selectedScaleControlFiles=new Set(['server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts']);
 const releaseToolFiles=new Set([
+ ...cognitiveIntakeToolingInputs,
+ 'docs/development/cognitive-intake-ci-20261029.md',
+ '.agents/skills/eduk12-cognitive-intake/SKILL.md',
+ '.agents/skills/eduk12-cognitive-intake/references/workflow.md',
+ '.agents/skills/eduk12-cognitive-intake/assets/instrument.json',
+ '.agents/skills/eduk12-cognitive-intake/assets/batch.json',
+ 'docs/cognitive-intake/PROJECT-INSTRUCTIONS.md',
+ 'docs/cognitive-intake/USE-IN-CHAT.md',
+
  '.github/scripts/scale-intake-scope.mjs','.github/scripts/scale-intake-scope.test.mjs',
  '.github/scripts/admin-permissions-functional.test.mjs','.github/scripts/ci-topology.test.mjs',
  '.github/scripts/content-workflows.test.mjs','.github/scripts/maintenance-routing.test.mjs',
@@ -101,7 +112,7 @@ export function toolingOnly(entries){return entries.length>0&&entries.every(e=>r
 export function componentFingerprint(sha,component){
  const roots=component==='frontend'?[front]:['server-version/backend/'];
  const files=git('ls-tree','-r',sha,'--',...roots).trim().split('\n').filter(Boolean);
- return hash(files.filter(row=>!selectedScaleControlFiles.has(row.split('\t')[1])).join('\n'));
+ return hash(files.filter(row=>!selectedScaleControlFiles.has(row.split('\t')[1])&&!selectedCognitiveControlFiles.has(row.split('\t')[1])).join('\n'));
 }
 function toolFingerprint(sha,files){try{return hash(files.map(f=>`${f}\0${readAt(sha,f)}`).join('\0'));}catch{return null;}}
 export function plan(base,head){

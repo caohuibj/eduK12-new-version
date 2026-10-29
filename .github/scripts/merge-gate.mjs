@@ -1,3 +1,17 @@
+import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
+export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd()}={}) {
+  const actual=readCognitiveIntakeDiff(base,head,{cwd});
+  const scope=needs.scope?.outputs||{};
+  if(!actual.selected && scope.cognitive_intake_light!=='true') {
+    return actual.entries.some(e=>/^server-version\/(?:backend\/src\/modules\/cognitive\/(?:tasks|generated|content-candidates)\/|frontend\/src\/modules\/cognitive\/(?:(?:tasks|generated)\/|native-runners\.tsx$))/.test(e.file)) ? ['unsupported-cognitive-intake'] : [];
+  }
+  const {base:baseSHA,head:checkout,entries,...selection}=actual;
+  const failed=[];
+  if(!actual.selected || scope.cognitive_intake_light!=='true' || scope.cognitive!=='true' || scope.content!=='true' || scope.scenario!=='content' || JSON.stringify(selection)!==scope.cognitive_intake_plan) failed.push('recomputed-cognitive-intake');
+  if(actual.requiresBrowser || scope.scale_intake_light==='true' || scope.scale==='true' || scope.situational==='true' || scope.bundle==='true') failed.push('unsupported-or-mixed-cognitive-intake');
+  for(const name of ['scope','content','codeql']) if(needs[name]?.result!=='success')failed.push(name);
+  return [...new Set(failed)];
+}
 import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
 import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
 import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
@@ -123,6 +137,7 @@ export function requiredChecks(needs, draft) {
     return ['scope','scoped-release', ...(p.required?.includes('sast') ? ['codeql'] : [])];
   }
   if (scope.scenario === 'release-tooling') return ['scope','release-tools',...(!draft?['codeql']:[])];
+  if (scope.cognitive_intake_light === 'true') return ['scope','content',...(!draft?['codeql']:[])];
   const dependencies = scope.scenario === 'dependencies';
   let checks = ['scope'];
   if (dependencies) checks.push('maintenance','backend','backend-regression','frontend-build','frontend','docker');
@@ -444,6 +459,9 @@ export function failedChecks(needs, draft) {
   if(scope.scale_intake_light !== undefined && (!['true','false'].includes(scope.scale_intake_light)
     || scope.scale_intake_light === 'true' && (scope.content !== 'true' || scope.frontend === 'true' || scope.scenario !== 'content')))
     failed.push('scope');
+  if(scope.cognitive_intake_light !== undefined && (!['true','false'].includes(scope.cognitive_intake_light) || scope.cognitive_intake_light==='true' &&
+    (scope.content!=='true'||scope.cognitive!=='true'||scope.frontend!=='false'||scope.codeql!=='true'||scope.scenario!=='content'||scope.scale_intake_light==='true'||scope.scale==='true'||scope.situational==='true'||scope.bundle==='true')))
+    failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
   const scenarios = {'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
@@ -703,6 +721,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if(needs.scope?.outputs?.application_route==='survey-mac-ui') {
     try { recheckSurveyMac(JSON.parse(needs.scope.outputs.survey_mac_ui_plan)); }
     catch { failed.push('recomputed-survey-mac-ui-plan'); }
+  }
+  // The actual Git diff decides whether emitted Cognitive flags need checking.
+  if((!needs.scope?.outputs?.application_route || needs.scope.outputs.application_route==='legacy') && process.env.CI_FORCE_FULL!=='true') {
+    try {
+      const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+      failed.push(...recheckCognitiveIntake(needs,{base:process.env.CI_BASE_SHA,head}));
+    } catch {failed.push('recomputed-cognitive-intake');}
   }
   if (['A','B'].includes(needs.scope?.outputs?.application_route) || needs.scope?.outputs?.scenario === 'release-tooling') {
     const {plan,toolingOnly}=await import('../../server-version/scripts/release/policy.mjs');

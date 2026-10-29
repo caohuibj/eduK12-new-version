@@ -37,6 +37,10 @@ test('merge-gate large full-object transport preserves hostile strings with a sm
   const dir=mkdtempSync(join(tmpdir(),'merge-gate-input-'));
   const file=join(dir,'merge-gate-needs-123-1.json'), script=join(dir,'write.cjs'), sentinel=join(dir,'injected'), githubEnv=join(dir,'github-env');
   const env={...process.env,RUNNER_TEMP:dir,GITHUB_RUN_ID:'123',GITHUB_RUN_ATTEMPT:'1',GITHUB_ENV:githubEnv,IS_DRAFT:'false'};delete env.NEEDS_JSON;delete env.NEEDS_JSON_FILE;
+  const git=(...args)=>{const result=spawnSync('git',args,{cwd:dir,encoding:'utf8'});assert.equal(result.status,0,result.stderr);return result.stdout.trim();};
+  git('init','-q');git('config','user.name','Synthetic transport');git('config','user.email','test@example.invalid');
+  writeFileSync(join(dir,'source.txt'),'base');git('add','source.txt');git('commit','-qm','base');env.CI_BASE_SHA=git('rev-parse','HEAD');
+  writeFileSync(join(dir,'source.txt'),'candidate');git('add','source.txt');git('commit','-qm','candidate');
   const payload=`\"; require('node:fs').writeFileSync(${JSON.stringify(sentinel)},'bad'); //\n\`\${process.exit(19)}\`\n$(touch ${sentinel})\nEOF\n'`;
   const outputs={application_route:'legacy',scenario:'platform',runner_profile:'hosted',release_plan:JSON.stringify({changes:[{file:payload,padding:'x'.repeat(200*1024)}]})};
   for(const flag of ['maintenance','frontend_test','content','presentation','frontend','documentation'])outputs[flag]='false';
@@ -47,7 +51,7 @@ test('merge-gate large full-object transport preserves hostile strings with a sm
   for(const key of requiredChecks(needs,false))if(key!=='scope')needs[key]={result:'success',outputs:{preserved:payload}};
   const serialize=value=>JSON.stringify(JSON.stringify(value));
   const write=value=>{writeFileSync(script,mergeGateWriter().replace('${{ toJSON(toJSON(needs)) }}',serialize(value)));return spawnSync(process.execPath,[script],{env,encoding:'utf8'});};
-  const cli=()=>spawnSync(process.execPath,[new URL('./merge-gate.mjs',import.meta.url).pathname],{env,encoding:'utf8'});
+  const cli=()=>spawnSync(process.execPath,[new URL('./merge-gate.mjs',import.meta.url).pathname],{cwd:dir,env,encoding:'utf8'});
   try {
     assert.ok(Buffer.byteLength(JSON.stringify(needs))>128*1024);
     assert.equal(spawnSync(process.execPath,['--version'],{env,encoding:'utf8'}).status,0,'checkout-equivalent Node launch keeps large payload out of env');

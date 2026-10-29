@@ -47,14 +47,15 @@ jobs:
             sudo apt-get -o Dir::Etc::sourcelist="$RUNNER_TEMP/ingress-official.list" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup=0 update
             sudo apt-get -o Dir::Etc::sourcelist="$RUNNER_TEMP/ingress-official.list" -o Dir::Etc::sourceparts="-" install -y --no-install-recommends nginx-core
           fi
-      - name: prepare selected Scale checker dependencies only when its tooling changes
+      - name: prepare selected assessment checker dependencies only when their tooling changes
         if: steps.local.outputs.reused != 'true'
         run: |
           if node --input-type=module <<'JS'
           import {execFileSync} from 'node:child_process';
+          import {cognitiveIntakeToolingChanged} from './.github/scripts/cognitive-intake-scope.mjs';
           import {scaleIntakeToolingChanged} from './.github/scripts/scale-intake-scope.mjs';
           const files=execFileSync('git',['diff','--name-only','-z','--no-renames',process.env.CI_BASE_SHA,process.env.GITHUB_SHA],{encoding:'utf8'}).split('\0').filter(Boolean);
-          process.exitCode=scaleIntakeToolingChanged(files)?0:1;
+          process.exitCode=scaleIntakeToolingChanged(files)||cognitiveIntakeToolingChanged(files)?0:1;
           JS
           then
             npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend

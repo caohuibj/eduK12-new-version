@@ -1,0 +1,192 @@
+{
+  "recordType": "cognitive-intake-instrument",
+  "workflowVersion": "0.1.2",
+  "key": null,
+  "name": null,
+  "locale": null,
+  "sources": [],
+  "sourceCommit": null,
+  "sourceHash": null,
+  "existingImplementation": null,
+  "deduplication": {
+    "status": "NOT_RUN",
+    "conflicts": []
+  },
+  "profiles": {
+    "experience": {
+      "status": "UNKNOWN",
+      "formalTrials": null,
+      "blocks": [],
+      "conditions": [],
+      "practiceTrials": null,
+      "practiceCriterion": null,
+      "estimatedMinutes": null,
+      "measuredMinutes": null,
+      "timingConfigHash": null,
+      "randomization": null,
+      "supportedInputs": [],
+      "deviationsFromSource": [],
+      "stableProfileKey": "experience",
+      "frozenVersionBinding": {
+        "measurement": null,
+        "config": null,
+        "scoring": null,
+        "parameters": null,
+        "report": null,
+        "presentation": null
+      },
+      "visualEvidence": [],
+      "behaviorEvidence": []
+    },
+    "research": {
+      "status": "UNKNOWN",
+      "formalTrials": null,
+      "blocks": [],
+      "conditions": [],
+      "practiceTrials": null,
+      "practiceCriterion": null,
+      "estimatedMinutes": null,
+      "measuredMinutes": null,
+      "timingConfigHash": null,
+      "randomization": null,
+      "supportedInputs": [],
+      "deviationsFromSource": [],
+      "stableProfileKey": "research",
+      "frozenVersionBinding": {
+        "measurement": null,
+        "config": null,
+        "scoring": null,
+        "parameters": null,
+        "report": null,
+        "presentation": null
+      },
+      "visualEvidence": [],
+      "behaviorEvidence": []
+    }
+  },
+  "sharedImplementationPath": null,
+  "versions": {
+    "measurement": null,
+    "config": null,
+    "engine": null,
+    "scoring": null,
+    "parameters": {
+      "policy": "UNKNOWN",
+      "references": []
+    },
+    "report": null,
+    "presentation": null,
+    "catalog": null
+  },
+  "audit": {
+    "design": "NOT_RUN",
+    "actualVisuals": "NOT_RUN",
+    "interaction": "NOT_RUN",
+    "instructionsAndPractice": "NOT_RUN",
+    "scoring": "NOT_RUN",
+    "parameters": "NOT_RUN",
+    "reportTextAndCharts": "NOT_RUN",
+    "issues": [],
+    "changes": [],
+    "evidence": []
+  },
+  "designConfirmation": {
+    "requiredForChanges": [],
+    "existingEvidence": [],
+    "status": "UNKNOWN"
+  },
+  "tags": {},
+  "notes": {
+    "researchMaturity": "UNKNOWN",
+    "commercialUse": "UNKNOWN",
+    "rightsByMaterial": []
+  },
+  "verification": {
+    "inputDependencies": [],
+    "reusedEvidence": [],
+    "newChecks": [],
+    "notRun": [],
+    "evidenceRecordFields": [
+      "sourceCommit",
+      "dependencyHashes",
+      "profile",
+      "environment",
+      "commandOrReadMethod",
+      "result",
+      "artifactPath",
+      "invalidatedBy",
+      "evidenceType",
+      "recordedAt",
+      "inputHash"
+    ]
+  },
+  "delivery": {
+    "gitCommit": null,
+    "pushReadback": "NOT_RUN",
+    "merged": "UNKNOWN",
+    "environment": null,
+    "loadedCodeSha": null,
+    "isolatedInstall": "NOT_RUN",
+    "targetInstall": "NOT_RUN",
+    "publication": "NOT_RUN",
+    "allocation": "NOT_RUN",
+    "allowedProducts": [],
+    "configId": null,
+    "releaseId": null,
+    "readback": null,
+    "configStatus": "UNKNOWN",
+    "accessPolicy": "UNKNOWN",
+    "publicVisibility": "NOT_RUN"
+  },
+  "storageEvidence": {
+    "reportSaved": "NOT_RUN",
+    "rawArchiveAcknowledged": "NOT_RUN",
+    "storeKind": "UNKNOWN",
+    "downloadAvailable": "NOT_RUN"
+  },
+  "operationReceipts": [],
+  "notion": {
+    "pageId": null,
+    "syncStatus": "NOT_RUN"
+  },
+  "blockedBy": [],
+  "nextAction": null,
+  "materials": {
+    "requiredAssets": [],
+    "actualPoolHash": null,
+    "availability": "UNKNOWN",
+    "evidenceKind": "UNKNOWN",
+    "realAssetCoverage": null,
+    "missingAssets": []
+  },
+  "resumeContract": {
+    "readBeforeWrite": true,
+    "identityFields": [
+      "testType",
+      "configVersion",
+      "engineVersion",
+      "scoringVersion"
+    ],
+    "receiptFields": [
+      "operation",
+      "environment",
+      "sourceCommit",
+      "exactInputHash",
+      "status",
+      "action",
+      "configId",
+      "sourceHash",
+      "configStatus",
+      "accessPolicy",
+      "measurementReleaseId",
+      "evidencePath",
+      "readbackAt",
+      "error",
+      "nextAction"
+    ],
+    "uncertainWrite": "READ_BACK_FIRST",
+    "alreadyPresent": "CONTINUE_MISSING_DOWNSTREAM_ONLY",
+    "conflict": "STOP_AND_VERSION_PLAN",
+    "repeatApplyOnEveryResume": false
+  }
+}
