@@ -27,7 +27,7 @@ jobs:
         env:
           SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-package-scope
         run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
-      - name: observe only saved textarea locator semantics with sandboxed Chrome
+      - name: verify only screenshot guard boundaries with sandboxed Chrome
         run: |
           node <<'NODE'
           'use strict'
@@ -52,17 +52,36 @@ jobs:
               report.sandbox = await verifyChromeSandbox(browser)
               const checked = validateChromeEvidence({ options: CHROME_LAUNCH_OPTIONS, preflight: report.preflight, sandbox: report.sandbox })
               if (!checked.ok) { report.code = checked.code; return }
-              stage = 'SAVED_TEXTAREA_LABEL_OBSERVATION'
+              stage = 'SCREENSHOT_GUARD_SYNTHETIC_DOM'
+              const assert = require('node:assert/strict')
+              const { execFileSync } = require('node:child_process')
+              const helperPath = 'server-version/e2e/education-self-questionnaire.cjs'
+              const blob = execFileSync('git', ['hash-object', helperPath], { encoding: 'utf8' }).trim()
+              assert.equal(blob, 'cbc9549944d00415f00355d4573faa93668e2eda')
+              const { isSafeScreenshot } = require('./' + helperPath)
+              report.guardDom = { scope: 'SYNTHETIC_DOM_ONLY', sourceCommit: 'f299d6b991d9e86159d78fc55fd9c01268fbc787',
+                helperBlob: blob, helperSha256: createHash('sha256').update(fs.readFileSync(helperPath)).digest('hex'), cases: [] }
+              const account = (attrs = '', current = '', next = '', extra = '') => '<dialog id="ht-account-settings" class="ht-account-dialog" ' + attrs + '><form aria-label="修改账号密码"><label>当前密码<input type="password" autocomplete="current-password" value="' + current + '"></label><label>新密码<input type="password" autocomplete="new-password" value="' + next + '"></label></form></dialog>' + extra
+              const cases = [
+                { name: 'school-no-auth-controls', product: 'SCHOOL', html: '<main>Synthetic ordinary content</main>', expected: true },
+                { name: 'teacher-closed-native-empty-pair', product: 'TEACHER', html: account(), expected: true },
+                { name: 'teacher-open-native-empty-pair', product: 'TEACHER', html: account('open'), expected: false },
+                { name: 'teacher-closed-native-retained-value', product: 'TEACHER', html: account('', 'SYNTHETIC_ONLY'), expected: false },
+                { name: 'teacher-closed-native-forced-visible', product: 'TEACHER', html: account('style="display:block"'), expected: false },
+                { name: 'teacher-unrelated-hidden-password', product: 'TEACHER', html: account('', '', '', '<input type="password" hidden>'), expected: false },
+                { name: 'school-cannot-use-teacher-exception', product: 'SCHOOL', html: account(), expected: false },
+                { name: 'teacher-hidden-recovery-secret', product: 'TEACHER', html: account('', '', '', '<div class="ht-secret" hidden>SYNTHETIC_ONLY</div>'), expected: false },
+                { name: 'teacher-hidden-mfa-setup', product: 'TEACHER', html: account('', '', '', '<div class="ht-mfa-setup" hidden>SYNTHETIC_ONLY</div>'), expected: false },
+                { name: 'teacher-hidden-school-secret', product: 'TEACHER', html: account('', '', '', '<div class="hs-secret" hidden>SYNTHETIC_ONLY</div>'), expected: false },
+                { name: 'teacher-unrecognized-password-form', product: 'TEACHER', html: account().replace('aria-label="修改账号密码"', 'aria-label="Other"'), expected: false },
+                { name: 'unknown-product-fails-closed', product: 'UNKNOWN', html: '<main>Synthetic ordinary content</main>', expected: false },
+              ]
               const p = await browser.newPage()
-              await p.setContent('<section aria-label="普通问卷编制"><label>问卷名称<input value="已保存的问卷"/></label><label>问卷说明<textarea maxlength="16000" rows="4">合成固定问卷说明</textarea></label></section>')
-              const studio = p.getByRole('region', { name: '普通问卷编制', exact: true })
-              const label = studio.getByLabel('问卷说明', { exact: true }), role = studio.getByRole('textbox', { name: '问卷说明', exact: true })
-              report.savedTextareaObservation = { scope: 'SYNTHETIC_DOM_ONLY', labelMatches: await label.count(), roleMatches: await role.count(),
-                inputLabelMatches: await studio.getByLabel('问卷名称', { exact: true }).count(), labelTextContent: await studio.locator('label').nth(1).textContent() }
-              if (report.savedTextareaObservation.roleMatches === 1) {
-                report.savedTextareaObservation.savedValue = await role.inputValue()
-                await role.fill('后续草稿不应成为已固定作答说明')
-                report.savedTextareaObservation.editedValue = await role.inputValue()
+              for (const test of cases) {
+                await p.setContent(test.html)
+                const actual = await isSafeScreenshot(p, test.product)
+                report.guardDom.cases.push({ name: test.name, expected: test.expected, actual, passed: actual === test.expected })
+                assert.equal(actual, test.expected, test.name)
               }
               await p.close()
               report.status = 'ENVIRONMENT_READY'; report.code = 'CHROME_ENVIRONMENT_VERIFIED'
