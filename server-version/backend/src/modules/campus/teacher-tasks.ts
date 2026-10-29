@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { boundCompositeContinuationSql } from '../assessment-run/boundCompositeContinuation'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
+import {completedSchoolOrdinaryFeedbackSql} from '../assessment-run/completedSchoolFeedback'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { listAssignedRunTasks } from '../assessment-run/productRead'
@@ -34,15 +35,12 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
       AND a.relationship_kind='CLASS_TEACHER_STUDENT' AND a.policy_domain='ORGANIZATION_RUN'
     JOIN campus_activity_runs ar ON ar.organization_id=e.organization_id AND ar.run_id=e.run_id
     JOIN campus_activities activity ON activity.organization_id=ar.organization_id
-      AND activity.course_id=ar.course_id AND activity.status='OPEN'
+      AND activity.course_id=ar.course_id
     JOIN courses course ON course.id=activity.course_id AND course.course_type='CAMPUS_ACTIVITY'
     JOIN organizations org ON org.id=ar.organization_id AND org.status='ACTIVE' AND org.product_domain='SCHOOL'
     JOIN education_product_entitlements ent ON ent.organization_id=org.id
       AND ent.product='HUISCHOOL' AND ent.status='ACTIVE'
     JOIN assessment_runs run ON run.id=e.run_id AND run.organization_id=e.organization_id
-      AND (run.status='PUBLISHED' OR (run.status='CLOSED'
-        AND ${boundCompositeContinuationSql(Prisma.sql`e.id`,actor.userId)}
-        AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`)}))
     JOIN organization_memberships teacher ON teacher.id=r.membership_id
       AND teacher.organization_id=e.organization_id AND teacher.user_id=${actor.userId}
       AND teacher.valid_from<=statement_timestamp()
@@ -82,9 +80,13 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
       WHERE enrollment.organization_id=e.organization_id
         AND enrollment.user_id=student.user_id AND enrollment.status='APPROVED'
     )
-      AND NOT EXISTS (SELECT 1 FROM organization_access_denies d
+      AND ((activity.status='OPEN' AND (run.status='PUBLISHED' OR (run.status='CLOSED'
+        AND ${boundCompositeContinuationSql(Prisma.sql`e.id`,actor.userId)}
+        AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`)}))
+       AND NOT EXISTS (SELECT 1 FROM organization_access_denies d
         WHERE d.organization_id=e.organization_id AND d.user_id IN (${actor.userId},s.user_id)
-          AND d.lifted_at IS NULL AND d.permission IN ('*','RUN_START','ACTIVITY_READ'))
+          AND d.lifted_at IS NULL AND d.permission IN ('*','RUN_START','ACTIVITY_READ')))
+       OR ${completedSchoolOrdinaryFeedbackSql(Prisma.sql`e.id`,actor.userId)})
     ORDER BY e.created_at DESC,e.id DESC LIMIT 101
   `
   const allowed=candidates.slice(0,100)
@@ -92,6 +94,7 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
   const official=await listAssignedRunTasks(actor.userId,{
     runIds:[...new Set(allowed.map(t=>t.runId))],
     preserveBoundSchoolContinuation:true,
+    includeCompletedSchoolFeedback:true,
   })
   const byExecution=new Map(allowed.map(row=>[row.executionId,row]))
   const list=official.list.flatMap(row=>{

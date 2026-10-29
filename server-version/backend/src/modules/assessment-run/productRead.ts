@@ -1,6 +1,7 @@
 import { boundCompositeContinuationSql } from './boundCompositeContinuation'
 import { Prisma } from '@prisma/client'
 import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
+import {completedSchoolOrdinaryFeedbackSql} from './completedSchoolFeedback'
 import { prisma } from '../../config/database'
 import { AssessmentRunRepositoryError, type AssessmentRunStatus } from './repository'
 
@@ -163,6 +164,8 @@ export async function listAssignedRunTasks(userId: string, options?: {
   runIds?: string[]
   /** Campus inbox only: restore an already bound attempt, never new admission. */
   preserveBoundSchoolContinuation?: boolean
+  /** Own completed ordinary observer feedback; does not authorize collection. */
+  includeCompletedSchoolFeedback?: boolean
 }) {
   if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false }
   const runScope=options?.runIds
@@ -181,8 +184,11 @@ export async function listAssignedRunTasks(userId: string, options?: {
       AND ${boundCompositeContinuationSql(Prisma.sql`e."id"`, userId)})`
     : Prisma.sql`FALSE`
   const closedScope = options?.preserveBoundSchoolContinuation
-    ? Prisma.sql`AND (r."status" <> 'CLOSED' OR NOT ${schoolScope} OR ${schoolContinuation})`
-    : Prisma.empty
+    ? Prisma.sql`(r."status" <> 'CLOSED' OR NOT ${schoolScope} OR ${schoolContinuation})`
+    : Prisma.sql`TRUE`
+  const completedSchoolFeedback=options?.includeCompletedSchoolFeedback
+    ? completedSchoolOrdinaryFeedbackSql(Prisma.sql`e."id"`,userId)
+    : Prisma.sql`FALSE`
   const list = await prisma.$queryRaw<Array<{
     __boundSchoolContinuation: boolean;
     executionId: string; organizationId: string; runId: string; runName: string;
@@ -224,11 +230,12 @@ export async function listAssignedRunTasks(userId: string, options?: {
     LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
     WHERE respondent."user_id" = ${userId}
       ${runScope}
-      ${closedScope}
+      AND ((${closedScope}
       AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
-          AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START'))
+          AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')))
+        OR ${completedSchoolFeedback})
     ORDER BY e."created_at" DESC, e."id" DESC LIMIT 101
   `
   return {
