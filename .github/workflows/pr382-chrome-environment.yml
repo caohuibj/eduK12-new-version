@@ -69,6 +69,22 @@ jobs:
               await card.getByRole('button', { name: '加入共用量表', exact: true }).click()
               report.selectorDom.clicked = await p.evaluate(() => window.picked)
               assert.deepEqual(report.selectorDom.clicked, ['expected']); report.selectorDom.status = 'PASS'
+              stage = 'TEACHER_PUBLICATION_SELECTOR_DOM'
+              const publication = fs.readFileSync(path.join(repo, 'server-version/e2e/school-teacher-browser.cjs'), 'utf8')
+              const publicationLine = publication.split('\n').find(row => row.includes("const picker=scope.locator('details').filter("))
+              const publicationExpression = publicationLine.trim().slice('const picker='.length)
+              await p.setContent(`<section aria-label="评价活动"><article class="ht-event"><strong>目标活动</strong><details id="expected-picker"><summary>选用本人普通问卷</summary><button>选择固定版本</button></details></article><article class="ht-event"><strong>其他活动</strong><details id="outside-picker"><summary>选用本人普通问卷</summary></details></article></section>`)
+              const scope = p.getByRole('region', { name: '评价活动', exact: true }).locator('article.ht-event').filter({ has: p.getByText('目标活动', { exact: true }) })
+              const oldPickerMatches = await scope.locator('details').filter({ has: scope.locator('summary').filter({ hasText: '选用本人普通问卷' }) }).count()
+              const picker = new Function('scope', 's', 'return (' + publicationExpression + ')')(scope, { page: p })
+              const correctedPickerMatches = await picker.count()
+              report.publicationSelectorDom = { scope: 'SYNTHETIC_DOM_ONLY', sourceCommit: 'a1c203608290f9a58500a005ae866c14d8db6cee', publicationSha256: createHash('sha256').update(publication).digest('hex'), oldMatches: oldPickerMatches, correctedMatches: correctedPickerMatches }
+              assert.equal(oldPickerMatches, 0); assert.equal(correctedPickerMatches, 1)
+              await picker.locator('summary').click()
+              assert.equal(await picker.getAttribute('id'), 'expected-picker')
+              assert.equal(await picker.evaluate(node => node.open), true)
+              report.publicationSelectorDom.openedExpectedOnly = await p.locator('#outside-picker').evaluate(node => !node.open)
+              assert.equal(report.publicationSelectorDom.openedExpectedOnly, true); report.publicationSelectorDom.status = 'PASS'
               await p.close()
               report.status = 'ENVIRONMENT_READY'; report.code = 'CHROME_ENVIRONMENT_VERIFIED'
             } catch (error) {
