@@ -18,7 +18,7 @@ function reads(path:string){
  throw Error('Unexpected request '+path)
 }
 async function fill(){
- await screen.findByRole('option',{name:/已批准固定量表/})
+ await screen.findByRole('option',{name:/已批准固定量表 · C/})
  fireEvent.change(screen.getByLabelText('已批准量表配置'),{target:{value:choice.id}})
  await screen.findByRole('option',{name:recipient.username})
  fireEvent.change(screen.getByLabelText('精确分发委托'),{target:{value:id(4)}})
@@ -37,7 +37,7 @@ describe('education manager exact configuration and unknown-result recovery',()=
     validFrom:'2020-01-01T00:00:00Z',expiresAt:'2021-01-01T00:00:00Z',configurationName:'历史固定配置',canManage:true}]} as never
    return reads(path) as never
   })
-  render(<EducationStandardConfigurations {...props}/>);await screen.findByRole('option',{name:/已批准固定量表/})
+  render(<EducationStandardConfigurations {...props}/>);await screen.findByRole('option',{name:/已批准固定量表 · C/})
   fireEvent.change(screen.getByLabelText('已批准量表配置'),{target:{value:choice.id}})
   await screen.findByText('当前学校没有符合本入口资格的接收者。');await screen.findByText(/已过期/)
   expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
@@ -182,7 +182,7 @@ describe('education manager exact configuration and unknown-result recovery',()=
    if(path.includes('/use-grants?page='))return {page:1,list:[old],hasMore:false} as never
    return reads(path) as never
   })
-  render(<EducationStandardConfigurations {...props}/>);await screen.findByRole('option',{name:/已批准固定量表/})
+  render(<EducationStandardConfigurations {...props}/>);await screen.findByRole('option',{name:/已批准固定量表 · C/})
   fireEvent.change(screen.getByLabelText('已批准量表配置'),{target:{value:choice.id}})
   fireEvent.click(await screen.findByRole('button',{name:'以新配置替换 '+recipient.username+' 的此配置'}))
   await screen.findByText(/原接收者尚未在当前有效名单中/);expect(screen.getByLabelText('配置接收者')).toBeDisabled()
@@ -190,4 +190,14 @@ describe('education manager exact configuration and unknown-result recovery',()=
   fireEvent.click(screen.getByRole('button',{name:'保存替换配置并授权'}));expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
   fireEvent.click(screen.getByRole('button',{name:'取消替换配置'}));await waitFor(()=>expect(screen.getByLabelText('配置接收者')).toBeEnabled())
  })
+})
+
+it.each(['HUISCHOOL','HUITEACHER'] as const)('selects the exact existing %s source through shared axis discovery without bypassing recipient or delegation',async product=>{
+ const currentBase=educationConfigurationBase(props.organizationId,product)
+ api.mockImplementation(async path=>reads(path.replace(currentBase,base)) as never)
+ render(<EducationStandardConfigurations {...props} product={product}/>);await screen.findByRole('option',{name:/已批准固定量表 · C/})
+ fireEvent.click(screen.getByText('按题本、参数和报告查找已批准配置'));fireEvent.change(screen.getByLabelText('量表工具'),{target:{value:choice.toolKey}})
+ for(const [name,value] of [['题本 C',choice.versions.CONTENT],['解释参数 P',choice.versions.PARAMETERS],['报告 R',choice.versions.REPORT]])fireEvent.change(screen.getByLabelText(name),{target:{value}})
+ fireEvent.change(screen.getByLabelText('核对精确配置'),{target:{value:choice.id}});fireEvent.click(screen.getByRole('button',{name:'使用所选已批准组合'}))
+ expect(screen.getByLabelText('已批准量表配置')).toHaveValue(choice.id);await screen.findByRole('option',{name:recipient.username});fireEvent.click(screen.getByRole('button',{name:'保存固定配置并授权'}));await screen.findByText('请选择合法接收者和分发委托，填写配置名称、委托期限内的使用期限及本次密码。');expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
 })

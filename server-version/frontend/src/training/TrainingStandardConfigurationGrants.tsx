@@ -1,3 +1,4 @@
+import ApprovedScaleAxes from '../components/scale-governance/ApprovedScaleAxes'
 import {useEffect,useRef,useState} from 'react'
 import ManagementDialog from '../components/staff-ui/ManagementDialog'
 import {eligibleGrantTeachers,materialGrantApi} from '../api/materialGrants'
@@ -107,6 +108,7 @@ export function TrainingStandardConfigurationWorkspace({actorId}:{actorId?:strin
   </section>}
   {loading&&<p role="status">正在读取已批准配置…</p>}{error&&<p role="alert">{error}</p>}
   {!loading&&!error&&!rows.length&&<p>尚无已批准用于 Training 的固定量表配置。未装载、未审批或其他入口的内容不会自动成为可分配配置。</p>}
+  <ApprovedScaleAxes choices={rows.filter(row=>row.assignable)} disabled={loading||issuer.busy} scopeLabel="当前页已读取配置，可用分页查看其他版本" onSelect={id=>{const row=rows.find(value=>value.id===id&&value.assignable);if(row)setChoice(row)}}/>
   {rows.map(row=><article key={row.id} className="training-accounts-empty"><h3>{row.title}</h3><Versions choice={row}/>
    <p>{row.assignable?'可分配':row.unavailableReason}</p><button type="button" onClick={()=>setChoice(row)}>管理此配置授权</button>
    <details><summary>配置身份详情</summary><p>{row.toolKey} · {row.instrumentVersion}</p><p className="break-all">{row.id} · {row.combinationHash}</p></details>

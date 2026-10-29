@@ -105,3 +105,17 @@ describe('Survey named fixed standard configuration and exact request recovery',
   fireEvent.change(screen.getByLabelText('筛选当前页授权工具'),{target:{value:'固定体验'}});expect(api).toHaveBeenCalledTimes(1)
  })
 })
+
+it('keeps Survey axis discovery in the authenticated approved page and submits the exact chosen source after normal name/password checks',async()=>{
+ const actual={...row,configuration:{...row.configuration,toolKey:'original-tool',axisVersions:{CONTENT:'内容一',PARAMETERS:'none-v1',REPORT:'报告二'}}}
+ const api=mockApi(grant);api.mockImplementation(async(path:string,method?:string,body?:any)=>{
+  if(method==='POST')return grant(body)
+  if(path.startsWith('/source-catalog'))return {list:[actual],page:1,hasMore:false,terminalReason:'END_OF_CATALOG',actorId:actor}
+  return {list:[]}
+ })
+ await prepare(api);fireEvent.click(screen.getByText('按题本、参数和报告查找已批准配置'));fireEvent.change(screen.getByLabelText('量表工具'),{target:{value:'original-tool'}})
+ for(const [name,value] of [['题本 C','内容一'],['解释参数 P','none-v1'],['报告 R','报告二']])fireEvent.change(screen.getByLabelText(name),{target:{value}})
+ const exact=screen.getByLabelText('核对精确配置'),option=within(exact).getAllByRole('option')[1] as HTMLOptionElement;fireEvent.change(exact,{target:{value:option.value}});fireEvent.click(screen.getByRole('button',{name:'使用所选已批准组合'}))
+ const selected=screen.getByRole('region',{name:'已选精确版本'});expect(selected).toHaveTextContent('已选 1 个精确版本');expect(writes(api)).toHaveLength(0)
+ fireEvent.click(within(selected).getByRole('button',{name:/授权已选版本/}));await waitFor(()=>expect(writes(api)).toHaveLength(1));expect(writes(api)[0][2]).toMatchObject({source,exact:{configurationName:'固定体验报告'}});expect(writes(api)[0][2]).not.toHaveProperty('axisVersions')
+})

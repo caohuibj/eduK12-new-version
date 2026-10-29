@@ -41,7 +41,21 @@ export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourc
      ...(snapshot.provenance.surveyStandardReleaseId?{configuration:{toolKey:snapshot.provenance.code,instrumentVersion:snapshot.provenance.standardInstrumentVersion,
       axes:snapshot.provenance.triplet,report:(snapshot.compiledDefinition as {report?:{reportVersion?:string}}).report?.reportVersion??null}}:{})})
   }
-  return {...result,list,pageSize:25,actorId:actorUserId}
+  // Display-only version labels, batched for this page. Do not add these fields
+  // to the source snapshot/provenance: existing immutable grants must retain
+  // their complete original adapter identity.
+  const ids=list.flatMap(row=>'configuration'in row&&row.configuration?[row.ref.sourceId.slice('survey-standard:'.length)]:[])
+  const versions=ids.length?await prisma.$queryRaw<Array<{id:string;hash:string;CONTENT:string;PARAMETERS:string;REPORT:string}>>(Prisma.sql`
+    SELECT id,combination_hash AS hash,snapshot#>>'{parts,CONTENT,version}' AS "CONTENT",
+      snapshot#>>'{parts,PARAMETERS,version}' AS "PARAMETERS",snapshot#>>'{parts,REPORT,version}' AS "REPORT"
+    FROM survey_standard_releases WHERE id=ANY(${ids}::text[])`):[]
+  const labelled=list.map(row=>{
+    if(!('configuration'in row)||!row.configuration)return row
+    const header=versions.find(value=>row.ref.sourceId==='survey-standard:'+value.id&&row.ref.sourceVersion===value.hash)
+    if(!header||!header.CONTENT||!header.PARAMETERS||!header.REPORT)return row
+    return {...row,configuration:{...row.configuration,axisVersions:{CONTENT:header.CONTENT,PARAMETERS:header.PARAMETERS,REPORT:header.REPORT}}}
+  })
+  return {...result,list:labelled,pageSize:25,actorId:actorUserId}
 }
 async function target(tx:Tx,id:string){
   const rows=await tx.$queryRaw<{id:string}[]>`SELECT u.id FROM users u

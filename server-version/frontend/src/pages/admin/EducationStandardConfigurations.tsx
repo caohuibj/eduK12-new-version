@@ -1,3 +1,4 @@
+import ApprovedScaleAxes from '../../components/scale-governance/ApprovedScaleAxes'
 import {useEffect,useRef,useState} from 'react'
 import {educationConfigurationBase,educationConfigurationRequest as request,EducationConfigurationHttpError,isEducationPending,sameEducationOperation,
  type EducationManagerProduct,type EducationConfigurationChoice,type EducationManagedUse,type EducationPendingOperation,type EducationManagerOperation} from '../../api/educationStandardConfigurations'
@@ -137,6 +138,7 @@ function ConfigurationSession(props:Props){
    <button disabled={locked} onClick={()=>{setReplacement(null);setReplacementReason('');setError('')}}>取消替换配置</button></section>}
   {loading&&<p role="status">正在读取本校可分发配置…</p>}
   {!loading&&!rows.length&&<p>当前没有可分发配置。请先完成原件装载、入口批准及本校精确分发委托。</p>}
+  <ApprovedScaleAxes choices={rows.filter(row=>row.assignable)} disabled={locked||loading} scopeLabel="当前已读取的本校可分发配置，可继续读取更多配置" onSelect={select}/>
   <label>已批准量表配置<select value={combinationId} disabled={locked} onChange={event=>select(event.target.value)}>
    <option value="">选择固定配置</option>{rows.map(row=><option key={row.id} value={row.id}>{row.title} · C {row.versions.CONTENT} / P {row.versions.PARAMETERS} / R {row.versions.REPORT}{row.assignable?'':' · 仅供回读'}</option>)}
   </select></label>{more&&<button disabled={locked||loading} onClick={()=>setPage(old=>old+1)}>读取更多配置</button>}

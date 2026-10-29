@@ -1,3 +1,4 @@
+import ApprovedScaleAxes from '../../components/scale-governance/ApprovedScaleAxes'
 import SurveyPackageGrantAdmin from './SurveyPackageGrantAdmin'
 import { ChevronDown, BookOpen, KeyRound, Search, ShieldCheck, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -9,7 +10,7 @@ import {useSurveyStandardConfigurationGrant} from '../../survey/useSurveyStandar
 import {isSurveyStandardSource} from '../../api/surveyStandardConfigurations'
 import type { Kind } from '../../survey/builder.types'
 type Source={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason?:string;definitionDigest?:string;classificationTags?:CatalogClassificationTag[];
- configuration?:{instrumentVersion:string;axes:Record<'CONTENT'|'PARAMETERS'|'REPORT',string>;report:string|null}}
+ configuration?:{toolKey?:string;instrumentVersion:string;axes:Record<'CONTENT'|'PARAMETERS'|'REPORT',string>;axisVersions?:Record<'CONTENT'|'PARAMETERS'|'REPORT',string>;report:string|null}}
 type SourcePage={list:Source[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null;tagFacets?:CatalogTagFacets;actorId?:string}
 const emptySourcePage:SourcePage={list:[],page:1,hasMore:false,terminalReason:null}
 const sourceKey=(source:Source)=>JSON.stringify([source.ref.kind,source.ref.sourceId,String(source.ref.sourceVersion),source.ref.organizationId??''])
@@ -84,6 +85,7 @@ export function SurveyCatalogGrants({api,password,researchers,ensureVerification
       <CatalogDiscoveryFilters label="可授权版本检索" filters={filters} facets={sourcePage.tagFacets??EMPTY_CATALOG_FACETS} onChange={setFilters} onApply={search} disabled={busy}/>
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>search(filters)}><Search size={16} aria-hidden="true"/>查询可授权版本</button>
       {!queried&&!busy&&!error&&<div className="survey-admin-empty-state survey-admin-source-empty"><span className="survey-admin-empty-icon"><BookOpen size={28} aria-hidden="true"/></span><p>选择来源类型后查询版本；不会自动加载全部目录。</p><span>核对来源与版本后，再为所选研究者授权。</span></div>}
+      {kind==='SCALE'&&<ApprovedScaleAxes choices={sources.flatMap(source=>source.available&&isSurveyStandardSource(source.ref)&&source.configuration?.toolKey?[{id:sourceKey(source),toolKey:source.configuration.toolKey,title:source.title,versions:source.configuration.axisVersions??source.configuration.axes}]:[])} disabled={busy||!!exact.pending||Object.keys(selected).length>=10} scopeLabel="当前来源目录页，可用现有分页与检索查看其他版本" onSelect={id=>{const source=sources.find(value=>sourceKey(value)===id&&value.available);if(source)setSelected(old=>({...old,[id]:source}))}}/>}
       <section aria-label="已选精确版本" className="survey-admin-selection">
         <h3>已选 {Object.keys(selected).length} 个精确版本（最多10个）</h3>
         <p>只勾选明确版本；翻页保留选择，重新检索、切换来源或授权对象时清空。每个版本单独授权。</p>

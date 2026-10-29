@@ -13,6 +13,7 @@
 [Survey 原入口修订绑定](survey-standard-use-progress.md)与[Survey 页面/HTTP](survey-standard-ui-progress.md)记录精确 grant、草稿/波次冻结、新 START 原授权校验及账号/请求恢复；被试全链路仍待执行。
 [Training 具名配置与原请求恢复](training-named-configuration-progress.md)记录管理员业务命名、完整原意图回读、使用者精确选择身份及固定 P/R 展示。
 [旧授权来源证据盘点](exact-authorization-inventory-progress.md)在数据库强制只读下核对既有 T1/来源和 legacy，不作历史回填。
+[管理员共用 C/P/R 查找](approved-scale-axes-progress.md)支持在当前入口已有的已批准组合中逐轴筛选，再明确选择精确来源；不代审批新搭配。
 以下共同契约和撤权矩阵是初始基线记录；当前新增源码仍在独立开发分支，未合入 main。
 
 ## 当前共同契约

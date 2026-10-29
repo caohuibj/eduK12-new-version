@@ -122,3 +122,11 @@ describe('Training exact issuance durable original-intent recovery',()=>{
   auth.user=null;view.rerender(<TrainingStandardConfigurationGrants/>);expect(screen.queryByRole('region',{name:'固定量表配置授权'})).not.toBeInTheDocument()
  })
 })
+
+it('opens the exact Training grant editor chosen by the shared C/P/R finder without issuing immediately',async()=>{
+ render(<TrainingStandardConfigurationWorkspace actorId={id(5)}/>);await screen.findByRole('button',{name:'管理此配置授权'});fireEvent.click(screen.getByText('按题本、参数和报告查找已批准配置'))
+ fireEvent.change(screen.getByLabelText('量表工具'),{target:{value:choice.toolKey}})
+ for(const [name,value] of [['题本 C',choice.versions.CONTENT],['解释参数 P',choice.versions.PARAMETERS],['报告 R',choice.versions.REPORT]])fireEvent.change(screen.getByLabelText(name),{target:{value}})
+ fireEvent.change(screen.getByLabelText('核对精确配置'),{target:{value:choice.id}});fireEvent.click(screen.getByRole('button',{name:'使用所选已批准组合'}))
+ expect(await screen.findByRole('dialog',{name:'分配固定量表配置'})).toHaveTextContent(choice.title);expect(api.issue).not.toHaveBeenCalled();expect(materials.set).not.toHaveBeenCalled()
+})
