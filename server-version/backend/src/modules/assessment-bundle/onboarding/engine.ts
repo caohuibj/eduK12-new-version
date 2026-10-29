@@ -1,6 +1,7 @@
 import type { BundleEngineInputV1, BundleEngineResultV1 } from '../registry'
 import type { EvidenceItemV1 } from '../types'
-import { parseDeclarativePackage, type Condition } from './contract'
+import { runBundleProfile } from '../profile/match'
+import { parseDeclarativePackage, type DeclarativePackage, type Condition } from './contract'
 export type Truth = true | false | 'unknown'
 export function evaluateCondition(c: Condition, evidence: EvidenceItemV1[]): Truth {
   if (c.op === 'all' || c.op === 'any') {
@@ -53,8 +54,7 @@ export function mapDeclarativeEvidence(input: BundleEngineInputV1): EvidenceItem
       value:invalid?{state:'invalid' as const}:missing?{state:'missing' as const}:{state:'present' as const,value:raw as number|string|boolean,unit:mapping.unit},quality,criterionBandKey:score?.criterionBandKey??null }
   })
 }
-export function runDeclarativeEvidence(input: BundleEngineInputV1): BundleEngineResultV1 {
-  const pack = parseDeclarativePackage(input.declarativePackage)
+function runRules(input: BundleEngineInputV1,pack:DeclarativePackage): BundleEngineResultV1 {
   if (pack.manifest.definition.bundleKey!==input.snapshot.bundleKey || pack.manifest.definition.bundleVersion!==input.snapshot.bundleVersion) throw new Error('DECLARATIVE_PACKAGE_IDENTITY_MISMATCH')
   if (pack.rules.applicability && evaluateCondition(pack.rules.applicability,input.evidence)!==true) return {kind:'UNAVAILABLE',reason:'DECLARATIVE_NOT_APPLICABLE_OR_UNKNOWN'}
   const conclusions = [...pack.rules.items].sort((a,b)=>a.ruleId.localeCompare(b.ruleId)).filter(rule => {
@@ -65,4 +65,26 @@ export function runDeclarativeEvidence(input: BundleEngineInputV1): BundleEngine
     })
   }).map(rule=>({ruleId:rule.ruleId,ruleVersion:pack.rules.version,kind:rule.kind,text:rule.text,evidenceKeys:[...rule.evidenceKeys].sort(),supportRefs:[...rule.supportRefs].sort()}))
   return {kind:'COMPUTED',payload:{schemaVersion:'declarative-report-v1',status:'declarative',conclusions}}
+}
+
+export function runDeclarativeEvidence(input:BundleEngineInputV1):BundleEngineResultV1{
+  const pack=parseDeclarativePackage(input.declarativePackage)
+  if(pack.schemaVersion!==1)throw new Error('DECLARATIVE_ENGINE_PACKAGE_VERSION_MISMATCH')
+  return runRules(input,pack)
+}
+export function runProfileEvidence(input:BundleEngineInputV1):BundleEngineResultV1{
+  const pack=parseDeclarativePackage(input.declarativePackage)
+  if(pack.schemaVersion!==2)throw new Error('DECLARATIVE_ENGINE_PACKAGE_VERSION_MISMATCH')
+  const base=runRules(input,pack)
+  const profile=runBundleProfile(pack.profile,input)
+  const modifiers=pack.profile.modifierRuleIds.map(ruleId=>{
+    const rule=pack.rules.items.find(r=>r.ruleId===ruleId)!
+    const rows=rule.evidenceKeys.map(k=>input.evidence.find(e=>e.evidenceKey===k))
+    const unknown=rows.some(e=>!e || e.quality!=='interpretable' || e.value.state!=='present')
+    return {ruleId,state:profile.state!=='MATCHED'?'NOT_TRIGGERED':unknown?'UNKNOWN':evaluateCondition(rule.when,input.evidence)===true?'TRIGGERED':'NOT_TRIGGERED',
+      evidenceKeys:[...rule.evidenceKeys].sort(),sourceResultHashes:[...new Set(rows.flatMap(e=>e && e.source.kind!=='CONTEXT_FACT'?[e.source.sourceResultHash]:[]))].sort()}
+  })
+  // Native Profile states remain available even when the core evidence abstains.
+  return {kind:'COMPUTED',payload:{schemaVersion:'declarative-profile-report-v1',status:profile.state,
+    conclusions:base.kind==='COMPUTED'?(base.payload as {conclusions:unknown[]}).conclusions:[],profile,modifiers}}
 }

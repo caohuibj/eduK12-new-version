@@ -3,7 +3,7 @@ import path from 'node:path'
 import { parseDeclarativePackage, PACKAGE_LIMITS, type DeclarativePackage } from './contract'
 
 const required = ['manifest.json','evidence-map.json','rules.json','report.json','scientific.json','publication.json']
-const optional = ['context.json', 'fixtures']
+const optional = ['context.json', 'fixtures', 'profile.json']
 function readJson(file: string): unknown {
   const stat = fs.lstatSync(file)
   if (!stat.isFile() || stat.isSymbolicLink() || stat.size > PACKAGE_LIMITS.bytes) throw new Error('PACKAGE_FILE_REJECTED:'+file)
@@ -20,7 +20,9 @@ export function loadPackage(directory: string): DeclarativePackage {
   const names = ['valid','missing','invalid','not-applicable']
   if (fs.readdirSync(fixtureDir).some(n => !names.map(x=>x+'.json').includes(n))) throw new Error('PACKAGE_UNKNOWN_FIXTURE')
   const fixtures = Object.fromEntries(names.map(name=>[name,readJson(path.join(fixtureDir,name+'.json'))]))
-  const raw = {schemaVersion:1,fixtures,manifest:content['manifest.json'],evidence:content['evidence-map.json'],rules:content['rules.json'],report:content['report.json'],scientific:content['scientific.json'],publication:content['publication.json'],
+  const manifest=content['manifest.json'] as {packageSchemaVersion?:unknown}
+  const raw = {schemaVersion:manifest.packageSchemaVersion??1,fixtures,manifest:content['manifest.json'],evidence:content['evidence-map.json'],rules:content['rules.json'],report:content['report.json'],scientific:content['scientific.json'],publication:content['publication.json'],
+    ...(fs.existsSync(path.join(directory,'profile.json'))?{profile:readJson(path.join(directory,'profile.json'))}:{}),
     ...(fs.existsSync(path.join(directory,'context.json'))?{context:readJson(path.join(directory,'context.json'))}:{})}
   return parseDeclarativePackage(raw)
 }
@@ -56,5 +58,5 @@ export function writePackage(directory: string, pack: DeclarativePackage) {
   fs.mkdirSync(directory,{recursive:true})
   fs.mkdirSync(path.join(directory,'fixtures'))
   for(const [name,fixture] of Object.entries(pack.fixtures))fs.writeFileSync(path.join(directory,'fixtures',name+'.json'),JSON.stringify(fixture,null,2)+'\n')
-  for(const [name,content] of Object.entries({'manifest.json':pack.manifest,'evidence-map.json':pack.evidence,'rules.json':pack.rules,'report.json':pack.report,'scientific.json':pack.scientific,'publication.json':pack.publication,...(pack.context?{'context.json':pack.context}:{})})) fs.writeFileSync(path.join(directory,name),JSON.stringify(content,null,2)+'\n')
+  for(const [name,content] of Object.entries({'manifest.json':pack.manifest,'evidence-map.json':pack.evidence,'rules.json':pack.rules,'report.json':pack.report,'scientific.json':pack.scientific,'publication.json':pack.publication,...(pack.context?{'context.json':pack.context}:{}),...(pack.schemaVersion===2?{'profile.json':pack.profile}:{})})) fs.writeFileSync(path.join(directory,name),JSON.stringify(content,null,2)+'\n')
 }

@@ -130,3 +130,34 @@ B参数保持原值：三轴等权；低<=.35，高>=.65；低/高中心.2/.8；
 
 待决仅为专家主模型/适用范围冻结及后续P6共享接口协调；不阻塞独立内核、包解析与首切片开发。尚无测试/性能/正式CI/合并/云端装载/生产部署成功主张。
 
+## 11. 首个实现检查点（待接口协调，不是闭环交付）
+
+设计提交：35c31f5522277d5d7d09c6be1764208029c58a6d。后续本地实现目前完成：
+- package2严格联合分支、profile.json正常loader/write/generate；旧package1内容hash公式不变。
+- 同族引擎精确注册1.1.0；独立候选B的原参数、六型、硬规则/L1、绝对拒判/近邻/边界。
+- 精确数学来源C哈希：ASE `ea8cd4535b0c80c64bf6c93e538f2d33b282860136bcb153ac053b06d9f9da2d`；VC `931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3`。来源Git blob也与研究原文吻合。
+- 原量尺/派生标签/教育行动/方法的独立受众投影；真实教师源策略下WITHHELD，API投影无P4及候选、原型中心或行动。
+- 发布/再准入复用现有签名review，Profile额外核对原有cross_source_condition claim；没有新审批系统。
+- 16项有界静态配置缓存，只存冻结包，不存个人结果/权限。
+
+接口方案进一步缩小：**无需修改CanonicalUnitResult、ScaleResult、BundleFrozenScaleSource公共类型**。新增 `profile/sources.ts` 使用已有canonical core及bridge构造本子能力局部交叉类型；旧sources projector与旧分析hash均保持原字节。在真实analysis中仅package2调用此适配器即可。
+
+仍待DOT协调的最小改动：
+1. `bundle-product/service.ts`：Profile声明的年级Context字段同时生成现有canonical gradeLevel表单；同一答案供原单项eligibility和Profile使用，不扩权限。不必新增通用Context字段或修改授权核心。
+2. `bundle-product/analysis.ts`：package2读取新局部source适配器，保存Profile payload；使用既有逐slot admission policy附加ProfileView。辅助无效不能把合格核心强制降为整体无效；不改package1语义。
+3. `BundleReport.tsx`及必要局部组件：消费服务端白名单、中文原量尺图与状态；不在浏览器重算Profile或权限。
+
+这些接口尚未修改；ProfileView目前只是经过测试的服务端函数，尚未暴露真实GET。未完成UI、真实FINAL、恢复、四入口P6、正式CI或可合并资格。新包仍DRAFT，不能把本检查点作为已可运行产品发布。
+
+### 实际验证与失败历史
+
+主执行环境 Node24.21.0，已激活云端官方安装环境；不使用Mac或生产DB。
+- 首个原生包check失败：参考包三指标unit=mean_item_response，当前依赖验证要求points。仅修正原生传输unit标签，原分/均分/量尺/转换未变。
+- package2定向CLI check成功，四种contract fixture与静态精确依赖成功，内容hash `441d7cdafc4e3851e711eaabe26dbbbab29f96564fa4e59b6bdeed0311b1c8ff`。
+- 43项定向Vitest通过（新Profile23 + 原合同18 + 原loader2），后续缓存/严格四fixture补验2项通过；不是旧参考42项，也不是全系统验收。保留JSON/TAP前的原stdout与exit。
+- 首次后端noEmit类型检查失败：fixtures expectedProfile两处unknown、admin-authoring fixture string索引一处，共3诊断。修复联合fixture形状并保持严格四种fixture；没有改admin-authoring生产文件。
+- 缩小到上述两个消费者的TS API复验，因缺Express全局augmentation出现13诊断；原日志保留。补入真实auth/requestId/pagination声明及原config的.d.ts后，1558源闭包、0诊断。原编译选项和全部诊断保留，无过滤、无生产tsconfig改动。
+- 隔离baseline原旅程先因旧test库缺account_domain/survey_tool_policies失败；仅对本云端test库部署现有main迁移成功。后续分别因缺ASE reference集合及DEPLOYMENT_BINDING_MISSING失败；**未到FINAL，不存在成功耗时/SQL/CPU baseline**。停止重复旅程，静态定位需正常installScaleInstrument + plan/publishStandardScale安装两项工具（含原参照、deployment/轴快照/入口policy）以及canonical gradeLevel上下文。未放宽标准量表准入。
+- baseline使用的临时fixture与所有失败日志已保留在仓库外 `/workspace/bundle-inputs/`；未将临时诊断fixture加入正式suite或当作平台PASS。
+
+后续只补实际缺失旅程；已通过纯算法输入未变时不重复全套。类型补验与正式CI复用能力须由真实route决定，不能把本地未签名结果冒称官方CI。当前没有启动正式CI或PR，连续正式CI失败次数为0。

@@ -1,0 +1,102 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "learning_motivation_math_support",
+    "bundleVersion": "0.1.0",
+    "status": "DRAFT",
+    "category": "scale_self",
+    "name": "数学学习动机支持画像｜理论试验版",
+    "description": "用数学学业自我效能、重要性/用途价值、时间/取舍成本生成有证据路径的暂定组合解释；非诊断、非自然类别。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "STUDENT_COURSE"
+    ],
+    "population": {
+      "subjectPopulation": "youth"
+    },
+    "slots": [
+      {
+        "slotKey": "ase",
+        "unitType": "SCALE",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "academic_self_efficacy_mathematics_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "academic_self_efficacy"
+        ]
+      },
+      {
+        "slotKey": "vc",
+        "unitType": "SCALE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "value_cost_mathematics_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "value",
+          "cost"
+        ]
+      },
+      {
+        "slotKey": "context",
+        "unitType": "FORM",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "learning_motivation_math_context",
+        "instrumentVersion": "0.1.0",
+        "respondentType": "SELF"
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.1.0"
+    },
+    "contextDefinitionKey": "learning_motivation_math_context",
+    "contextDefinitionVersion": "0.1.0",
+    "reportDefinitionKey": "learning_motivation_math_support_report",
+    "reportDefinitionVersion": "0.1.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "academic_self_efficacy_mathematics_zh_cn",
+        "value_cost_mathematics_zh_cn"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "仅限获准适用的7—12年级数学学生自评；具体适用性由单项冻结admission及Bundle审核共同决定。",
+      "数学ASE-5为PILOT学科替换版本，未建立exact-version本地经验验证。",
+      "V不等于纯兴趣；C不覆盖完整情绪成本；禁止Value-Cost抵消或构造动机总分。",
+      "规则、阈值、原型和名称为专家理论候选，未验证自然类别或个体干预效应。",
+      "教师/研究者个体解释受现有源披露策略限制，不得越权。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "profile": "profile.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": [],
+  "packageSchemaVersion": 2
+}
