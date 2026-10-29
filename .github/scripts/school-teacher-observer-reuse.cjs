@@ -205,7 +205,14 @@ async function reuse(kind, b, d) {
     const mr = await d.officialApi('/actions/runs/' + mainToolingSast.run), mj = await d.officialApi('/actions/jobs/' + mainToolingSast.job)
     assert.equal(mr.id, mainToolingSast.run); assert.equal(mr.head_sha, mainToolingSast.head); assert.equal(mr.head_branch, mainToolingSast.branch)
     assert.equal(mr.path, '.github/workflows/ci.yml'); assert.equal(mr.event, 'pull_request'); assert.equal(mr.run_attempt, 1)
-    assert.equal(mr.status, 'completed'); assert.equal(mr.conclusion, 'success'); assert(mr.pull_requests.some(p => p.number === 386))
+    assert.equal(mr.status, 'completed'); assert.equal(mr.conclusion, 'success')
+    // GitHub clears run.pull_requests after merge. Resolve the exact merged PR
+    // instead of treating that legitimate empty array as failed evidence.
+    assert(mr.pull_requests.every(p => p.number === 386))
+    const mp = await d.officialApi('/pulls/386')
+    assert.equal(mp.merged, true); assert.equal(mp.merge_commit_sha, fixed.currentBase)
+    assert.equal(mp.head.sha, mainToolingSast.head); assert.equal(mp.head.ref, mainToolingSast.branch)
+    assert.equal(mp.head.repo.full_name, 'caohuibj/eduK12-new-version')
     assert.equal(mj.id, mainToolingSast.job); assert.equal(mj.run_id, mr.id); assert.equal(mj.head_sha, mr.head_sha)
     assert.equal(mj.name, 'codeql (javascript/typescript SAST)'); assert.equal(mj.status, 'completed'); assert.equal(mj.conclusion, 'success')
     const age = Date.now() - Date.parse(mj.completed_at); assert(Number.isFinite(age) && age >= 0 && age <= 86400000)
