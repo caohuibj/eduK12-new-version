@@ -5,7 +5,7 @@ import {AdminPermissionError,assertEntryAdmin} from '../admin-permissions/servic
 import {libraryActor} from '../scale-library-governance/authority'
 import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
 import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
-import {EDUCATION_STANDARD_USE_ACTION,educationStandardUseMetadata,readEducationStandardUseBinding,type EducationConfigurationScope} from './education-standard-use'
+import {EDUCATION_STANDARD_USE_ACTION,EDUCATION_STANDARD_REVOKE_ACTION,educationStandardUseMetadata,readEducationStandardUseBinding,type EducationConfigurationScope} from './education-standard-use'
 import {selectedConfigurationPointer} from './standard-configuration-binding'
 import {readSelectedConfigurationBinding} from './selected-configuration'
 import {listEducationAuthoringMemberCandidates} from '../organization/educationProductAccess'
@@ -78,7 +78,7 @@ export async function educationStandardManagementPreview(actorId:string,scope:Ed
 }
 
 export async function educationStandardManagementGrants(actorId:string,scope:EducationConfigurationScope,combinationId:string,raw:unknown){
- const input=z.object({page:query.shape.page,userId:id.optional()}).strict().parse(raw),size=100
+ const input=z.object({page:query.shape.page,userId:id.optional(),requestId:id.optional()}).strict().parse(raw),size=100
  id.parse(combinationId)
  return prisma.$transaction(async tx=>{
   await assertEducationConfigurationManager(tx,actorId,scope)
@@ -87,6 +87,7 @@ export async function educationStandardManagementGrants(actorId:string,scope:Edu
    FROM content_capability_grants g JOIN users u ON u.id=g.subject_id JOIN assessment_management_events e ON e.id=g.id AND e.action=${EDUCATION_STANDARD_USE_ACTION}
    WHERE g.issuer_id=${actorId} AND g.product=${scope.product} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${scope.organizationId}
     AND e.actor_id=${actorId} AND e.resource_id=${combinationId} ${input.userId?Prisma.sql`AND g.subject_id=${input.userId}`:Prisma.empty}
+    ${input.requestId?Prisma.sql`AND g.id=${input.requestId}`:Prisma.empty}
    ORDER BY g.created_at,g.id LIMIT ${size+1} OFFSET ${(input.page-1)*size}`)
   return {page:input.page,hasMore:rows.length>size,list:rows.slice(0,size).map(row=>{
    const metadata=educationStandardUseMetadata.parse(row.metadata),stored=readSelectedConfigurationBinding(metadata.selectedBinding)
@@ -104,5 +105,40 @@ export async function educationStandardManagementRecipients(actorId:string,scope
  return prisma.$transaction(async tx=>{
   await assertSelectable(tx,actorId,scope,combinationId,z.string().regex(/^[a-f0-9]{64}$/).parse(combinationHash))
   return listEducationAuthoringMemberCandidates({product:scope.product==='SCHOOL'?'HUISCHOOL':'HUITEACHER',organizationId:scope.organizationId,...input},tx)
+ },options)
+}
+
+/** Exact request readback, including after source/root withdrawal. A missing
+ * request permits only the same idempotent request to be retried, never a
+ * silent new request ID or a different target/configuration. */
+export async function educationStandardManagementOperation(actorId:string,scope:EducationConfigurationScope,combinationId:string,requestId:string){
+ id.parse(combinationId);id.parse(requestId)
+ return prisma.$transaction(async tx=>{
+  await assertEducationConfigurationManager(tx,actorId,scope)
+  const [row]=await tx.$queryRaw<Array<{action:string;metadata:unknown;originalMetadata:unknown;grantId:string;userId:string;version:number;revokedAt:Date|null;validFrom:Date;expiresAt:Date;resourceKeys:string[]}>>(Prisma.sql`
+   SELECT e.action,e.metadata,original.metadata AS "originalMetadata",g.id AS "grantId",g.subject_id AS "userId",g.version,g.revoked_at AS "revokedAt",
+    g.valid_from AS "validFrom",g.expires_at AS "expiresAt",g.resource_keys AS "resourceKeys"
+   FROM assessment_management_events e JOIN content_capability_grants g ON g.id=CASE WHEN e.action=${EDUCATION_STANDARD_USE_ACTION} THEN e.id ELSE e.metadata->>'grantId' END
+   JOIN assessment_management_events original ON original.id=g.id AND original.action=${EDUCATION_STANDARD_USE_ACTION}
+    AND original.actor_id=${actorId} AND original.resource_id=${combinationId}
+   WHERE e.id=${requestId} AND e.actor_id=${actorId} AND e.resource_id=${combinationId} AND e.action IN (${EDUCATION_STANDARD_USE_ACTION},${EDUCATION_STANDARD_REVOKE_ACTION})
+    AND g.issuer_id=${actorId} AND g.product=${scope.product} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${scope.organizationId}
+    AND g.resource_kind='material' AND g.capabilities=ARRAY['material.use']::text[] AND g.parent_grant_id IS NULL AND g.ancestry=ARRAY[g.id]::text[]
+    AND g.remaining_delegation_depth=0 AND g.delegable_capabilities=ARRAY[]::text[]`)
+  if(!row)return null
+  if(row.resourceKeys.length!==1)throw new AdminPermissionError(409,'原精确配置审计身份不完整')
+  const original=educationStandardUseMetadata.parse(row.originalMetadata),selected=readEducationStandardUseBinding(row.originalMetadata,
+   {id:row.grantId,issuerId:actorId,recipientId:row.userId,scope,resourceKey:row.resourceKeys[0]})
+  const {configuration,authorization}=selected.binding
+  if(configuration.kind!=='STANDARD_COMBINATION'||configuration.combinationId!==combinationId)throw new AdminPermissionError(409,'原配置与请求来源不一致')
+  const grant={id:row.grantId,version:row.version,revokedAt:row.revokedAt}
+  if(row.action===EDUCATION_STANDARD_USE_ACTION)return {kind:'ISSUE' as const,grant,request:{requestId:row.grantId,userId:row.userId,
+   combinationHash:configuration.combinationHash,authorityGrantId:authorization.authority[1].id,expectedAuthorityVersion:authorization.authority[1].revision,
+   validFrom:row.validFrom.toISOString(),expiresAt:row.expiresAt.toISOString(),...(original.configurationName?{configurationName:original.configurationName}:{})}}
+  const revoked=z.object({schemaVersion:z.literal(1),grantId:id,requestIntentHash:z.string().regex(/^[a-f0-9]{64}$/),previousVersion:z.number().int().positive(),
+   version:z.number().int().positive(),reason:z.string().min(1),scope:z.object({product:z.enum(['SCHOOL','TEACHER']),organizationId:id}).strict()}).strict().parse(row.metadata)
+  if(revoked.grantId!==row.grantId||revoked.version!==revoked.previousVersion+1||row.version!==revoked.version||!row.revokedAt
+   ||revoked.scope.product!==scope.product||revoked.scope.organizationId!==scope.organizationId)throw new AdminPermissionError(409,'撤销请求证据不完整')
+  return {kind:'REVOKE' as const,grant,request:{requestId,expectedVersion:revoked.previousVersion,reason:revoked.reason}}
  },options)
 }

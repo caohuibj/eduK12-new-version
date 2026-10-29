@@ -29,6 +29,7 @@ const deny:(message:string)=>never=(message)=>{throw new AdminPermissionError(40
 const conflict:(message:string)=>never=(message)=>{throw new AdminPermissionError(409,message)}
 const entry=(product:EducationConfigurationScope['product'])=>product==='SCHOOL'?'HUISCHOOL' as const:'HUITEACHER' as const
 export const EDUCATION_STANDARD_USE_ACTION='EDUCATION_STANDARD_CONFIGURATION_USE_GRANTED'
+export const EDUCATION_STANDARD_REVOKE_ACTION='EDUCATION_STANDARD_CONFIGURATION_USE_REVOKED'
 
 /** Internal service, not a new permission centre or mounted endpoint. The
  * platform router may expose it only together with typed consumer validation.

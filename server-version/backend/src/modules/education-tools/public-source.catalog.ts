@@ -165,7 +165,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
     ...(choice.ambiguous?{allowedActions:[],unavailableReason:'存在多条同名或未命名配置，请管理员明确使用配置名称。'}:{})}))
    if(header.legacyUseAvailable&&titleMatches)return [{...summary,authorizationMode:'LEGACY' as const},...exact]
    if(exact.length)return exact
-   return [{...summary,allowedActions:[],unavailableReason:configured.overflow?'当前精确授权较多，请缩小搜索范围或请管理员整理配置。':'原授权的管理资格、分发依据或入口批准已变化，请管理员重新配置。'}]
+   return [{...summary,allowedActions:[],unavailableReason:summary.unavailableReason??(configured.overflow?'当前精确授权较多，请缩小搜索范围或请管理员整理配置。':'原授权的管理资格、分发依据或入口批准已变化，请管理员重新配置。')}]
   }),nextCursor:candidates.length>40?selected.at(-1)!.key:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }

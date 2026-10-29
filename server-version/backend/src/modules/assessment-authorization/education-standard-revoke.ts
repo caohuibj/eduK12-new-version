@@ -5,11 +5,10 @@ import {AdminPermissionError} from '../admin-permissions/service'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {lockEducationAssessmentUsers} from '../education-tools/assessment-resource.locks'
 import {assertEducationConfigurationManager} from './education-standard-management'
-import {EDUCATION_STANDARD_USE_ACTION,readEducationStandardUseBinding,type EducationConfigurationScope} from './education-standard-use'
+import {EDUCATION_STANDARD_USE_ACTION,EDUCATION_STANDARD_REVOKE_ACTION,readEducationStandardUseBinding,type EducationConfigurationScope} from './education-standard-use'
 
 const id=z.string().guid()
 export const educationStandardRevokeInput=z.object({requestId:id,expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(500)}).strict()
-export const EDUCATION_STANDARD_REVOKE_ACTION='EDUCATION_STANDARD_CONFIGURATION_USE_REVOKED'
 /** Reduces only this manager's original exact school/source use. A source or
  * original distribution withdrawal must not prevent clean-up or rewrite T1. */
 export async function revokeEducationStandardConfigurationUse(actorId:string,scope:EducationConfigurationScope,combinationId:string,grantId:string,raw:unknown){
