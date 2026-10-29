@@ -421,3 +421,18 @@ B模型仍0.1.0、映射/包0.1.1、模板0.1.0、model hash87f889c9…40a3f。�
 预算：原始证据/边界接纳1—2分钟；两组件构建并行各2—4分钟；安全扫描/审计依赖官方下载，通常各2—4分钟；CodeQL一次3—6分钟。缺失且获准的精确浏览器另2—5分钟。5分钟作为具体等待项通报阈值，不能因下载超时弱化TLS、扩大等待或换SHA清零。正式失败目标累计一次后收敛；本次无新正式失败，不抹掉首次CI-003。
 
 此节为明确可审计划，不是已实现route或已获正式资格；需要DOT在自然节点就这组有限文件/接纳边界集中判断后实施。新生产/测试源码可先正常提交推送Draft；禁止跳过CodeQL、伪造gate、抢跑merge或更换保护。生产部署仍未授权。
+
+
+### Survey自然提交与收尾证据（第18—19节增量）
+
+完整Survey切片已提交/推送并回读 `347abae8b0c593b8bae6985b17bf1ec0dd00a328`，tree `401d0875c8f59f249a2365fdb44bdd4ce4707978`，main仍e65d87222。新正式 [run40934585880](https://github.com/caohuibj/eduK12-new-version/actions/runs/40934585880) 全部实际selected Draft checks SUCCESS，publication40934585793 SUCCESS；不是Ready/CodeQL/运行时扫描资格。原正式CI-003失败保留，未新增正式失败。
+
+代表Survey真实浏览器在正式require_escalated审批下已PASS。使用原正常openWave邀请与START发放的合成匿名私密凭据恢复到实际页面，真实general API显示P4、三轴图表、两份单项反馈，行动按原权限为空；刷新再次独立读取同factsHash59876591…42aae9，390px无文档溢出，无pageerror/外部站点访问。保存截图已实际查看，source公共报告消费者是347abae8b，未重做作答/计分。首轮误用未设置VITE_DEV_PRODUCT的localhost，未进入Survey应用、未读报告；保留首错，改为仓库已有survey.localhost开发入口后PASS。未mock task/report/score/权限，不以HTTP代替浏览器，不关闭sandbox或TLS校验，不修改owner/mode。此为受试者恢复/阅读旅程，不冒充研究者注册/编制全浏览器验收。
+
+最后自审发现新native header读取期间输入仍可编辑、异步响应可能与用户后续来源编辑错位。只给来源输入、Context选择与取消按钮增加原busy锁，保持已发请求的身份与显示一致，不改授权/参数/报告输出。只复验受影响的原生编制UI1例，实际PASS；没有重跑已过PG、原43+2或三入口整浏览器。后续这份一行UI保护与文档形成独立小提交；347的正式成功保留自身source，后续head按实际Draft同步结果单列。
+
+新增UNKNOWN权限用例已通过；曾误要求隐藏其他独立获准构念数字的断言已明确纠正为该核心数字与完整Profile/方法不可读，其他本来获准的单项数字可以保留。研究者整体R不匹配仍无任何构念数字。原失败历史不清零、不冒称为生产漏洞。
+
+当前实际能力矩阵更新：Training、School现有授权整源分发、Survey现有整包U三条EVC试验链已具备真实FINAL/单项＋综合、受众边界、保存/恢复和代表阅读浏览器证据。Teacher成人SELF仍明确不适用本B，未修改年龄范围；一般人口匹配的包仍消费现有合同，但本轮没有另造一个成人科学模型或宣称已跑通成人示范。P6公共native包目录U仍是另一来源入口未接通，不能以此否定已经独立验证的现有整源分发/Survey整包U，也不能冒称P6已完成。
+
+CI checklist已有本次提交/fixture首错/原CI修复成功和下一轮边界增量写回；Notion09自然节点交接随后以最终远端head和当前真实结果为准。第19节qualification路由改动仍只是待集中review计划，没有新增workflow/改gate/移除CodeQL，尚未合main或部署。
