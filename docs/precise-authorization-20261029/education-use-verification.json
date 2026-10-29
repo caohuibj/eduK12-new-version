@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "baseHead": "f70468f6bb2655d317004e75a7820a7d1d724a11",
+  "recordedAt": "2026-10-29T16:26:53.736090+00:00",
+  "environment": {
+    "kind": "isolated cloud",
+    "node": "24.21.0",
+    "postgres": "localhost55439",
+    "redis": "localhost56389",
+    "runtimeRoleQualification": false,
+    "productionAccessed": false
+  },
+  "inputs": [
+    {
+      "path": "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+      "sha256": "234bc22c1a8d997178b26ede68218c783d834ed874eb838acaf34f2547ded278"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+      "sha256": "19369e7df493d42bde29acfc8688f0a185cbe19404cbc1635f6c6e4b0415d233"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+      "sha256": "e9bc9487bb388e208c27b42c2f5729e4d1cd8fbdffe2d5f398d55be4477a417a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-use-current.ts",
+      "sha256": "3963f71c44968e3ed3d5c3d14f706f43f1b6fbad7e795d58f0f2ceb21b4869c4"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-use.postgres.integration.test.ts",
+      "sha256": "8f6f1bb339980572ff2a8e7aa238d23eb3ce67712006ccdb1df52eb9b40f4691"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-binding.test.ts",
+      "sha256": "dc4047aff924b6ec634164153b6778f5fa2b1945f4375605407ba6278b4f7a21"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.postgres.integration.test.ts",
+      "sha256": "63b41f1f198ae92d5881c12bffad50332a7cddba8747777ae69cc5b9e13b3a61"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.test.ts",
+      "sha256": "60432f8ddd04c30b74221a51994ff2ef47f3df5a87cc1679dc97bced3aaac6b6"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/field-expert-public-sources.test.ts",
+      "sha256": "00ac237f48bdfc2569de341d3e635113a55e9134dc9bd3af4bf88c799bc5b409"
+    }
+  ],
+  "reports": [
+    {
+      "file": "education-standard-use-initial.json",
+      "sha256": "74b0a9bf427ca17e3a3089c2ad124aa1b50e88d0e1ad3589b2d9bb0f3a594cd9",
+      "passed": 7,
+      "failed": 0,
+      "pendingByExplicitNameFilter": 0
+    },
+    {
+      "file": "education-standard-current-joined.json",
+      "sha256": "e6ff51ae3b0035ac00db6777ed633f27da0ad2937614013a2a894421a857faaa",
+      "passed": 4,
+      "failed": 0,
+      "pendingByExplicitNameFilter": 0
+    },
+    {
+      "file": "education-standard-current-forged.json",
+      "sha256": "e557b30b7aba3bb09bc2617374b706b5a1f6d0410dbc47f1bd9ea9a283865746",
+      "passed": 3,
+      "failed": 0,
+      "pendingByExplicitNameFilter": 4
+    },
+    {
+      "file": "education-standard-current-queries.json",
+      "sha256": "5229276f94766e64dd6d48deba5ec10d6b1a616f87e3cf1234e43b6228d91a3f",
+      "passed": 1,
+      "failed": 0,
+      "pendingByExplicitNameFilter": 4
+    },
+    {
+      "file": "education-legacy-public-use-joined.json",
+      "sha256": "07eb4e5f556c9f07b638fed42543914637fe6d6b68331b4d56aad1ce168c6d8e",
+      "passed": 2,
+      "failed": 0,
+      "pendingByExplicitNameFilter": 0
+    },
+    {
+      "file": "education-source-consumer-regression.json",
+      "sha256": "0a3718854dc71bc6c05a2f5e874fc23d7d093ac8a03a38c5999d3893c1176903",
+      "passed": 41,
+      "failed": 0,
+      "pendingByExplicitNameFilter": 0
+    }
+  ],
+  "typeExitCode": 0,
+  "uniqueSuccessfulCases": {
+    "t1Postgres": 4,
+    "bindingUnit": 3,
+    "currentPostgres": 4,
+    "forgedOriginalRevisionPostgres": 1,
+    "batchUnit": 2,
+    "legacyPostgres": 2,
+    "observerSourceUnit": 41,
+    "total": 57
+  },
+  "queries": {
+    "legacyProtectedUse": 2,
+    "typedProtectedUseSchoolTwoGrants": 4,
+    "typedProtectedUseTeacherOneGrant": 4,
+    "newRigidBudget": false,
+    "latencyQualified": false
+  },
+  "evidence": [
+    {
+      "file": "education-standard-use-runtime-equivalence.json",
+      "sha256": "67e186b23b411099ea6886dd013c6351f26b62ac115bd0723c9c1b7898bdc823"
+    },
+    {
+      "file": "education-standard-use-http-initial.json",
+      "sha256": "cecffe8d585bc35686cc4c5d6401a3a49aa25578c6b0b9162fca53345b400434"
+    },
+    {
+      "file": "education-standard-current-joined-readback.json",
+      "sha256": "65f14b70be79d3ed16018b1cb8b1ab7878d5ab5e88c5ab92efce5a477d7a0866"
+    },
+    {
+      "file": "education-standard-current-forged-readback.json",
+      "sha256": "717dae63f2645e0ebe571cc2171640d86c516876065c9e1b15a00f21d93d970c"
+    },
+    {
+      "file": "education-standard-current-query-readback.json",
+      "sha256": "f4f6341271ed66bb904fee9e0f1f427d0499782b6082d7b07ac2168ad87ee6b2"
+    },
+    {
+      "file": "education-standard-use-types-qualification-status.json",
+      "sha256": "1916c7c111d978f18e369eff5e5e0f3d48c7d256b4cbb8b4113a5b59824060ae"
+    },
+    {
+      "file": "education-standard-use-types-qualification.log",
+      "sha256": "0c5e2568b4c79c13debcc497cf347b98e7a01e636ae2bed42cf3faa742048c94"
+    },
+    {
+      "file": "education-standard-use-migration.log",
+      "sha256": "e52ba45e6035e17f253e4e641d98e2a7b6760c9355c7a2daccdfdb3c29a5d934"
+    },
+    {
+      "file": "education-legacy-v2-migration.log",
+      "sha256": "a0c45d53dbfa6ef617ace7630dcab844a46d777e0947654e378c30ec001a96e9"
+    },
+    {
+      "file": "education-legacy-public-use-current.json",
+      "sha256": "92868fcb78b315eeffddf4aae9478d0d10f0688927083fdc49461928e385e3ed"
+    },
+    {
+      "file": "education-legacy-public-use-current.log",
+      "sha256": "ba8b026f78d9d77814ba6559acb615c5fa9c29417ccc72785be66ed43c2c4973"
+    },
+    {
+      "file": "education-standard-current-final.json",
+      "sha256": "9453c3b266bc9d6be52cd3dcd10ea08b76c9c10e29cbc9e48f5010b9e918dfc4"
+    },
+    {
+      "file": "education-standard-current-final.log",
+      "sha256": "18a5040e547dd25e305e9243eac1ab4acf5d1014ab8fc0057857af99c0e982df"
+    }
+  ],
+  "initialFailuresRetained": {
+    "legacy": "Added query violated existing exact-two contract, and the interrupted case left its fixture grant active. Repaired with audit-header join; original assertion unchanged; final test ran in separate v2 DB.",
+    "currentRead": "10s import/setup hook timeout; no business cases ran. This new fixture hook is explicitly bounded at 30s; subsequent selected cases passed."
+  },
+  "routeMounted": false,
+  "notExecuted": [
+    "education precise draft/publication/admission pointer closure",
+    "manager UI",
+    "browser end-to-end",
+    "same-environment latency/performance baseline",
+    "formal GitHub CI",
+    "production deployment"
+  ]
+}
