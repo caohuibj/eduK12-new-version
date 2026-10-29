@@ -6,10 +6,11 @@
     "oldC": "1.0.0",
     "newC": "1.0.1",
     "reason": "Legacy definition hashes include R. New C identity explicitly adds existing versionAxes metadata; preserve exact items/scoring/P, DRAFT status and disclosure. No runtime/schema/permission change.",
-    "originalReportArtifact": "/workspace/shared/scale-task3-batch-s-reports.json",
     "originalSourceSha256": "0492391ef4ddb707dfe5981d344e5eaeaf0eec96143346f5df8d84c6a7940d7a",
     "newSourceSha256": "71052c16031ed62ac161fea1e250f9ed0bce441d6a7a54c95b218a6978a70d94",
-    "presentationContract": "ADULT_SELF/student/en describes the report prose only; actual disclosure remains researcher-only. No access expansion or human/QC approval claim."
+    "presentationContract": "ADULT_SELF/student/en describes the report prose only; actual disclosure remains researcher-only. No access expansion or human/QC approval claim.",
+    "originalSourceArchive": "docs/scale-intake/dual-reports-final-20261029/ctas2_cognitive_en/original-c1.0.0-source.json",
+    "originalReportArchive": "docs/scale-intake/dual-reports-final-20261029/ctas2_cognitive_en/report-materials.json#oldReport"
   },
   "oldReport": {
     "reportVersion": "1.0.0",
