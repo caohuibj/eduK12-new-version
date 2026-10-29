@@ -1,0 +1,38 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {cognitiveTaskRoot as root,selectCognitiveIntake,readCognitiveIntakeDiff,cognitiveIntakeToolingInputs,cognitiveIntakeToolingChanged} from './cognitive-intake-scope.mjs';
+const repo=path.resolve(import.meta.dirname,'../..');
+const actual=task=>fs.readFileSync(path.join(repo,root,task,'task-package.json'),'utf8');
+const entry=(file,more={})=>({file,oldMode:'100644',newMode:'100644',status:'M',...more});
+const select=(entries,{current=actual,previous=actual}={})=>selectCognitiveIntake(entries,file=>current(file.slice(root.length).split('/')[0]),{readBaseFile:file=>previous(file.slice(root.length).split('/')[0])});
+test('four literal declaration paths select data per exact task',()=>{for(const name of ['seeds.ts','participant-presentation.ts','governance.ts','scientific.ts']){const p=select([entry(root+'reaction/'+name)]);assert.equal(p.selected,true);assert.equal(p.mode,'data');assert.deepEqual(p.tasks,['reaction']);}});
+test('backend task implementation and fixture select task, never data',()=>{for(const name of ['definitions.ts','package.ts','fixtures/1.0.0-1.1.0.json'])assert.equal(select([entry(root+'reaction/'+name)]).mode,'task');});
+test('all current standard packages keep their real pre-existing shared suites',()=>{const tasks=fs.readdirSync(path.join(repo,root)).filter(t=>fs.existsSync(path.join(repo,root,t,'task-package.json')));assert.ok(tasks.length>=25);for(const task of tasks)assert.equal(select([entry(root+task+'/seeds.ts')]).selected,true,task);});
+test('frontend runner UI and stimuli require unsupported real browser',()=>{for(const file of ['server-version/frontend/src/modules/cognitive/tasks/reaction/ReactionTask.tsx',root+'reaction/assets/stimulus.webp','server-version/frontend/src/modules/cognitive/generated/runners.ts']){const p=select([entry(root+'reaction/seeds.ts'),entry(file)]);assert.equal(p.status,'UNSUPPORTED_SELECTED_BROWSER');assert.deepEqual(p.browserTasks,['reaction']);}});
+test('new engine or new task cannot enter backend-only intake',()=>{
+  const current=task=>{const p=JSON.parse(actual(task));p.identities.push({...p.identities[0],engineVersion:'2.0.0'});return JSON.stringify(p);};
+  assert.equal(select([entry(root+'reaction/task-package.json')],{current}).status,'UNSUPPORTED_SELECTED_BROWSER');
+  assert.equal(select([entry(root+'reaction/task-package.json')],{previous:()=>null}).status,'NOT_SELECTED');
+  const own=task=>{const p=JSON.parse(actual(task));p.acceptance.frontendSuites=['src/modules/cognitive/tasks/reaction/Reaction.test.tsx'];return JSON.stringify(p);};
+  assert.equal(select([entry(root+'reaction/task-package.json')],{previous:()=>null,current:own}).status,'UNSUPPORTED_SELECTED_BROWSER');
+});
+test('existing suite removal substitution and unrelated new suite reject',()=>{for(const suites of [[],['src/modules/cognitive/tasks/stroop/Foo.test.tsx'],[...JSON.parse(actual('reaction')).acceptance.frontendSuites,'src/modules/cognitive/Other.test.tsx']]){const current=t=>JSON.stringify({...JSON.parse(actual(t)),acceptance:{frontendSuites:suites}});assert.equal(select([entry(root+'reaction/task-package.json')],{current}).selected,false);}});
+test('shared core schemas dependencies control and mixed domains cannot use intake',()=>{for(const file of ['server-version/backend/src/modules/cognitive/schemas/reaction.config.ts','server-version/backend/src/modules/cognitive/tasks/shared/helper.ts','server-version/backend/package-lock.json','.github/scripts/merge-gate.mjs','server-version/backend/src/modules/scale/instruments/a/1.0.0/instrument.ts'])assert.equal(select([entry(root+'reaction/seeds.ts'),entry(file)]).selected,false);});
+test('unknown generated paths and generated-only disguise reject',()=>{assert.equal(select([entry('server-version/backend/src/modules/cognitive/generated/execution.ts')]).selected,false);assert.equal(select([entry(root+'reaction/seeds.ts'),entry('server-version/backend/src/modules/cognitive/generated/unknown.ts')]).selected,false);assert.equal(select([entry(root+'reaction/seeds.ts'),entry('server-version/backend/src/modules/cognitive/generated/seeds.ts')]).mode,'task');});
+test('raw scope rejects deletion symlink executable duplicate and malformed paths',()=>{for(const e of [entry(root+'reaction/seeds.ts',{newMode:'120000'}),entry(root+'reaction/seeds.ts',{newMode:'100755'}),entry(root+'reaction/seeds.ts',{status:'D',newMode:'000000'}),entry(root+'reaction/../seeds.ts')])assert.equal(select([e]).selected,false);assert.equal(select([entry(root+'reaction/seeds.ts'),entry(root+'reaction/seeds.ts')]).selected,false);});
+test('real complete Git diff binds actual checkout and detects dirty index/worktree',t=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'cognitive-scope-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
+  const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const put=(file,text)=>{const p=path.join(dir,file);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,text);};
+  git('init','-q');git('config','user.name','Test');git('config','user.email','test@example.invalid');put(root+'reaction/task-package.json',actual('reaction'));put(root+'reaction/seeds.ts','export const seeds=[]');git('add','.');git('commit','-qm','base');const base=git('rev-parse','HEAD');
+  put(root+'reaction/seeds.ts','export const seeds=[1]');git('add','.');git('commit','-qm','candidate');const head=git('rev-parse','HEAD');
+  assert.equal(readCognitiveIntakeDiff(base,head,{cwd:dir}).mode,'data');assert.throws(()=>readCognitiveIntakeDiff(head,base,{cwd:dir}),/identity/);
+  put(root+'reaction/seeds.ts','dirty');assert.throws(()=>readCognitiveIntakeDiff(base,head,{cwd:dir}),/Dirty/);git('add','.');assert.throws(()=>readCognitiveIntakeDiff(base,head,{cwd:dir}),/Dirty/);
+  git('reset','--hard',head);put('unrelated.txt','leave untracked');assert.equal(readCognitiveIntakeDiff(base,head,{cwd:dir}).selected,true);
+  put('server-version/backend/package-lock.json','{}');git('add','.');git('commit','-qm','mixed');assert.equal(readCognitiveIntakeDiff(base,git('rev-parse','HEAD'),{cwd:dir}).selected,false);
+});
+test('tooling inputs are a fixed pure contract',()=>{assert.equal(cognitiveIntakeToolingChanged(['server-version/backend/src/scripts/cognitive-onboarding-check.ts']),true);assert.equal(cognitiveIntakeToolingChanged(['server-version/backend/src/index.ts']),false);assert.equal(new Set(cognitiveIntakeToolingInputs).size,cognitiveIntakeToolingInputs.length);});
