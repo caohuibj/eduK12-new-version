@@ -27,7 +27,7 @@ jobs:
         env:
           SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-package-scope
         run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
-      - name: require unchanged strict Chrome preflight and a real active sandbox
+      - name: verify the sandbox and only the repaired locator against synthetic DOM
         run: |
           node <<'NODE'
           'use strict'
@@ -52,6 +52,24 @@ jobs:
               report.sandbox = await verifyChromeSandbox(browser)
               const checked = validateChromeEvidence({ options: CHROME_LAUNCH_OPTIONS, preflight: report.preflight, sandbox: report.sandbox })
               if (!checked.ok) { report.code = checked.code; return }
+              stage = 'SELECTOR_SYNTHETIC_DOM'
+              const assert = require('node:assert/strict')
+              const source = fs.readFileSync(path.join(repo, 'server-version/e2e/education-self-questionnaire.cjs'), 'utf8')
+              assert.equal(createHash('sha256').update(source).digest('hex'), '9d1fa6d1ac6fdbc56bbbb8a63d956515fe33346d18e82785898f7fa26d680dc5')
+              const line = source.split('\n').find(row => row.includes("catalog.locator('article').filter(") && row.includes("name:'加入共用量表'"))
+              const expression = line.trim().slice('await '.length, line.trim().indexOf(".getByRole('button'"))
+              const p = await browser.newPage(), title = '合成获授权共用量表 精确来源', f = { library: { title } }
+              await p.setContent(`<section aria-label="普通问卷编制"><section aria-label="获授权共用量表"><article><strong>${title} 附录</strong><button data-source="decoy" onclick="window.picked.push(this.dataset.source)">加入共用量表</button></article><article><strong>${title}</strong><button data-source="expected" onclick="window.picked.push(this.dataset.source)">加入共用量表</button></article></section></section><section aria-label="其他目录"><article><strong>${title}</strong><button data-source="outside" onclick="window.picked.push(this.dataset.source)">加入共用量表</button></article></section><script>window.picked=[]</script>`)
+              const catalog = p.getByRole('region', { name: '普通问卷编制', exact: true }).getByRole('region', { name: '获授权共用量表', exact: true })
+              const oldMatches = await catalog.locator('article').filter({ has: catalog.locator('strong').filter({ hasText: title }) }).count()
+              const card = new Function('catalog', 'p', 'f', 'return (' + expression + ')')(catalog, p, f)
+              const correctedMatches = await card.count()
+              report.selectorDom = { scope: 'SYNTHETIC_DOM_ONLY', sourceCommit: '9b0aec2b576405b4eabdd2fcffe79f78b8520282', helperSha256: createHash('sha256').update(source).digest('hex'), oldMatches, correctedMatches }
+              assert.equal(oldMatches, 0); assert.equal(correctedMatches, 1)
+              await card.getByRole('button', { name: '加入共用量表', exact: true }).click()
+              report.selectorDom.clicked = await p.evaluate(() => window.picked)
+              assert.deepEqual(report.selectorDom.clicked, ['expected']); report.selectorDom.status = 'PASS'
+              await p.close()
               report.status = 'ENVIRONMENT_READY'; report.code = 'CHROME_ENVIRONMENT_VERIFIED'
             } catch (error) {
               report.code = 'CHROME_ENVIRONMENT_OPERATION_FAILED'
