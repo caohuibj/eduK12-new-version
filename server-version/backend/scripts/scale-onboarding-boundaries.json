@@ -18,6 +18,9 @@
     "src/modules/scale/instruments/sdq_teacher_zh_cn/1.0.0/instrument.ts": [
       "../../../packages/sdq-teacher-en-t4-10-v1",
       "../../../packages/sdq-teacher-impact-scorer"
+    ],
+    "src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts": [
+      "../../../packages/spane12-balance-scorer"
     ]
   },
   "immutableScorers": [
@@ -27,6 +30,13 @@
       "path": "src/modules/scale/packages/sdq-teacher-impact-scorer.ts",
       "sha256": "1966ada4007cc6383b669dd5797144c7a722109cabc0eb217452889b8c2d982a",
       "exportName": "sdqTeacherT410Scorer"
+    },
+    {
+      "key": "spane12.balance.v1",
+      "version": "1.0.0",
+      "path": "src/modules/scale/packages/spane12-balance-scorer.ts",
+      "sha256": "c3f68bbbd829375e79e18a1050997ce9ef120e57c9891abccf5bd93e7c48bcfd",
+      "exportName": "spane12BalanceScorer"
     }
   ]
 }

@@ -1,0 +1,117 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "number": 1,
+      "en": "Complete tasks successfully.",
+      "zh": "我能成功完成任务。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_01"
+    },
+    {
+      "number": 2,
+      "en": "Excel in what I do.",
+      "zh": "我在所做的事情上表现出色。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_02"
+    },
+    {
+      "number": 3,
+      "en": "Handle tasks smoothly.",
+      "zh": "我能顺利处理任务。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_03"
+    },
+    {
+      "number": 4,
+      "en": "Am sure of my ground.",
+      "zh": "我对自己的判断有把握。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_04"
+    },
+    {
+      "number": 5,
+      "en": "Come up with good solutions.",
+      "zh": "我能想出好的解决办法。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_05"
+    },
+    {
+      "number": 6,
+      "en": "Know how to get things done.",
+      "zh": "我知道怎样把事情办好。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_06"
+    },
+    {
+      "number": 7,
+      "en": "Misjudge situations.",
+      "zh": "我会误判情况。",
+      "reverse": true,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_07"
+    },
+    {
+      "number": 8,
+      "en": "Don't understand things.",
+      "zh": "我弄不明白事情。",
+      "reverse": true,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_08"
+    },
+    {
+      "number": 9,
+      "en": "Have little to contribute.",
+      "zh": "我能作出的贡献很少。",
+      "reverse": true,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_09"
+    },
+    {
+      "number": 10,
+      "en": "Don't see the consequences of things.",
+      "zh": "我看不出事情会带来什么后果。",
+      "reverse": true,
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_10"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "instructions": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+  "rights": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": [
+      "full-item-reproduction",
+      "translation",
+      "online-administration",
+      "commercial-and-noncommercial",
+      "project-authored-feedback"
+    ],
+    "sources": [
+      "https://ipip.ori.org/newPermission.htm",
+      "https://www.ipip.ori.org/"
+    ]
+  }
+}

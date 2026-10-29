@@ -1,0 +1,5 @@
+# MAIA-2 37-item independent Chinese working derivative
+
+© 2018 Mehling et al. (Wolf E. Mehling, Michael Acree, Anita Stewart, Jonathan Silas, Alexander Jones). Mehling, W. E., Acree, M., Stewart, A., Silas, J., & Jones, A. (2018). The Multidimensional Assessment of Interoceptive Awareness, Version 2 (MAIA-2). PLoS ONE, 13(12), e0208034. https://doi.org/10.1371/journal.pone.0208034. 固定题文取自原出版商Table 2完整37项，CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），表内未发现单独排除声明。中文题文、选项与指导语为EDUK12.TOP独立工作翻译，报告为平台原创；改动为语言转换与保守成人/缺失使用约定，未经作者认可。与庞娇艳/李惠2020官方既有37题译文、Teng等2022删为31题的验证版本均独立，不复制其题文或继承其验证。原论文称MAIA-2 public domain；UCSF题本仍署版权，并请求修改/新译后向作者提供记录副本。本稿基于Table2的CC授权，不将该记录请求改写为预先批准条件；本轮未联系作者或提交译本。署名、来源、许可链接及改动说明须随再分发保留。
+
+Original item carrier: [2018 publisher Table2](https://doi.org/10.1371/journal.pone.0208034.t002). [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). All 37 English items follow Table2, including item9 ending in “something”. No wording is silently repaired from body text or another carrier. The MAIA-2 full instrument name and source attribution are retained. No author endorsement, approved translation or local validation is claimed.

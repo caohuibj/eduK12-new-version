@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "djgls6_zh_cn_research",
+    "name": "De Jong Gierveld 简式孤独感量表（6题）（中文研究译稿）",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "43b8ce04ab1d9702859fa1063ecbd374ff9d492ec31fa0e7125068574381f892",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "DJGLS6_01",
+      "responseValue": "middle",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "DJGLS6_02",
+      "responseValue": "middle",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "DJGLS6_03",
+      "responseValue": "middle",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "DJGLS6_04",
+      "responseValue": "middle",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "DJGLS6_05",
+      "responseValue": "middle",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "DJGLS6_06",
+      "responseValue": "middle",
+      "baseScore": 1,
+      "score": 1
+    }
+  ],
+  "scores": [
+    {
+      "key": "loneliness",
+      "type": "total",
+      "label": "联结不足的感受",
+      "description": "联结不足的感受的题项线索汇总；较高分表示更多联结不足感受，不是人格或社交评价。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 6,
+      "range": {
+        "min": 0,
+        "max": 6
+      },
+      "expectedItems": [
+        "DJGLS6_01",
+        "DJGLS6_02",
+        "DJGLS6_03",
+        "DJGLS6_04",
+        "DJGLS6_05",
+        "DJGLS6_06"
+      ],
+      "answeredItems": [
+        "DJGLS6_01",
+        "DJGLS6_02",
+        "DJGLS6_03",
+        "DJGLS6_04",
+        "DJGLS6_05",
+        "DJGLS6_06"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "emotional",
+      "type": "dimension",
+      "label": "亲近与陪伴的不足感",
+      "description": "亲近与陪伴的感受的题项线索汇总；较高分表示更多联结不足感受，不是人格或社交评价。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 3,
+      "range": {
+        "min": 0,
+        "max": 3
+      },
+      "expectedItems": [
+        "DJGLS6_01",
+        "DJGLS6_02",
+        "DJGLS6_03"
+      ],
+      "answeredItems": [
+        "DJGLS6_01",
+        "DJGLS6_02",
+        "DJGLS6_03"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "social",
+      "type": "dimension",
+      "label": "可依靠联结的不足感",
+      "description": "可依靠的联结的题项线索汇总；较高分表示更多联结不足感受，不是人格或社交评价。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 3,
+      "range": {
+        "min": 0,
+        "max": 3
+      },
+      "expectedItems": [
+        "DJGLS6_04",
+        "DJGLS6_05",
+        "DJGLS6_06"
+      ],
+      "answeredItems": [
+        "DJGLS6_04",
+        "DJGLS6_05",
+        "DJGLS6_06"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "loneliness",
+      "headline": "你想要的联结，和眼下感受到的联结",
+      "label": null,
+      "interpretation": "孤独感不只取决于身边有多少人：有时缺的是一位能说心里话的人，有时缺的是遇事可以依靠的支持。回答汇总越高，表示这次呈现的联结不足线索越多，不是给你贴上不合群的标签。比如，身处热闹的聚会也可能觉得无人理解，而一次安静的谈话却可能让人安心。请把结果当成理解自己需要的起点，不必把交朋友的数量当任务，也不用责怪自己为什么会有这些感受。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "现在更想要的是有人陪伴、有人理解，还是遇事有人可依靠？"
+        },
+        {
+          "category": "support",
+          "text": "从一个小动作开始：约信任的人聊近况，或参加一项愿意重复去的活动。重视关系质量，不给自己规定朋友数量。"
+        }
+      ],
+      "limitations": [
+        "本中文为独立工作译稿，尚待人工审校和本地验证，仅供成人非商业研究。",
+        "原研究的参考分界或统计分组另有来源档案，本报告不把它们直接用于这份中文译稿，不作诊断、排名或风险分档。",
+        "6题都需完整有效回答才提供完整报告；漏答不补零、不猜测，不承诺保留部分维度反馈。",
+        "结果只是本次回答的记录，不代表永久状态；不用于选拔、学生筛选或教师考核。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "emotional",
+      "headline": "有没有可以说心里话的亲近感？",
+      "label": null,
+      "interpretation": "这一部分关注空虚、缺少陪伴和被拒绝的感受。回答汇总越高，表示这些体验在本次回答中出现得更多，但它不说明别人一定不喜欢你，也不是对你社交能力的判断。有时经历搬家、关系变化或忙碌的一段时间，熟悉的亲近感会暂时变少。先承认自己想被理解、被接纳的需要，再看谁能提供一点合适的陪伴，往往比强迫自己立刻热闹起来更温和。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "最近有没有一次谈话让你觉得被理解？那个人或那种相处方式有什么特别？"
+        },
+        {
+          "category": "support",
+          "text": "可以向一个可信的人表达一个具体需要，例如想聊十分钟，或希望对方先听你说完；也可以选择适合自己的支持渠道。"
+        }
+      ],
+      "limitations": [
+        "本中文为独立工作译稿，尚待人工审校和本地验证，仅供成人非商业研究。",
+        "原研究的参考分界或统计分组另有来源档案，本报告不把它们直接用于这份中文译稿，不作诊断、排名或风险分档。",
+        "6题都需完整有效回答才提供完整报告；漏答不补零、不猜测，不承诺保留部分维度反馈。",
+        "结果只是本次回答的记录，不代表永久状态；不用于选拔、学生筛选或教师考核。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "social",
+      "headline": "遇到事情时，有哪些联结可以依靠？",
+      "label": null,
+      "interpretation": "这一部分关注你是否感到有人可信、亲近，以及遇到困难时有谁可以依靠。回答汇总越高，表示本次回答中的可依靠联结不足线索更多，并不是说身边人数越多就一定越好。比如，不同的人可能分别适合聊工作、分享心情或帮一个实际的小忙。支持不必都由一个人提供，也不是只靠你单方面努力就能得到；寻找合适的关系和环境，需要时间与双方的回应。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "当你需要聊天、具体帮助或一起做事时，分别会想到谁？还有哪类支持暂时缺少？"
+        },
+        {
+          "category": "support",
+          "text": "挑一段愿意维护的关系，从一次可行的联系开始。若暂时没有合适的人，可以寻找稳定的社区活动或专业支持，不必一次解决所有关系问题。"
+        }
+      ],
+      "limitations": [
+        "本中文为独立工作译稿，尚待人工审校和本地验证，仅供成人非商业研究。",
+        "原研究的参考分界或统计分组另有来源档案，本报告不把它们直接用于这份中文译稿，不作诊断、排名或风险分档。",
+        "6题都需完整有效回答才提供完整报告；漏答不补零、不猜测，不承诺保留部分维度反馈。",
+        "结果只是本次回答的记录，不代表永久状态；不用于选拔、学生筛选或教师考核。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "本中文为独立工作译稿，尚待人工审校和本地验证，仅供成人非商业研究。",
+    "原研究的参考分界或统计分组另有来源档案，本报告不把它们直接用于这份中文译稿，不作诊断、排名或风险分档。",
+    "6题都需完整有效回答才提供完整报告；漏答不补零、不猜测，不承诺保留部分维度反馈。",
+    "结果只是本次回答的记录，不代表永久状态；不用于选拔、学生筛选或教师考核。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。 De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130. https://link.springer.com/article/10.1007/s10433-010-0144-6 https://creativecommons.org/licenses/by-nc/2.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业研究；不用于心理诊断。"
+}

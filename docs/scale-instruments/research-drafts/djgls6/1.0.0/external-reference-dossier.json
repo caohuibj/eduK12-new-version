@@ -1,0 +1,150 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "parameters": [
+    {
+      "id": "continuous_primary",
+      "clinical_cutoff": null,
+      "note": "2010 original-author study establishes dimensional scores, not a universal clinical diagnosis cutoff."
+    },
+    {
+      "id": "CBS2019_descriptive_optional",
+      "bands": [
+        {
+          "min": 0,
+          "max": 1,
+          "code": "fewer_signals"
+        },
+        {
+          "min": 2,
+          "max": 4,
+          "code": "some_signals"
+        },
+        {
+          "min": 5,
+          "max": 6,
+          "code": "more_signals"
+        }
+      ],
+      "population": "Dutch 2019 Social cohesion & well-being survey n=7398; statistical descriptive categorization; not Chinese clinical norm",
+      "enabled_by_default": false,
+      "note": "CBS English never/sometimes/frequently are survey reporting labels, not added recall frequencies to the item wording. Local report uses non-diagnostic descriptions. Do not transfer 11-item thresholds."
+    },
+    {
+      "id": "CBS2019_subscale_descriptive_optional",
+      "scoreKeys": [
+        "emotional",
+        "social"
+      ],
+      "bands": [
+        {
+          "min": 0,
+          "max": 0,
+          "originalLabel": "never lonely"
+        },
+        {
+          "min": 1,
+          "max": 2,
+          "originalLabel": "sometimes lonely"
+        },
+        {
+          "min": 3,
+          "max": 3,
+          "originalLabel": "frequently lonely"
+        }
+      ],
+      "source": "https://www.cbs.nl/en-gb/news/2020/13/nearly-1-in-10-dutch-people-frequently-lonely-in-2019/loneliness-survey-technical-explanation",
+      "population": "Dutch2019 survey n7398",
+      "runtimeSelected": false,
+      "purpose": "Statistical descriptions only; labels do not add item recall frequencies or Chinese clinical norms"
+    }
+  ],
+  "scoring": {
+    "method": "sum binary recodes, not a three-point Likert sum",
+    "range": [
+      0,
+      6
+    ],
+    "higher_means": "more loneliness signals",
+    "subscales": {
+      "emotional": {
+        "items": [
+          1,
+          2,
+          3
+        ],
+        "range": [
+          0,
+          3
+        ]
+      },
+      "social": {
+        "items": [
+          4,
+          5,
+          6
+        ],
+        "range": [
+          0,
+          3
+        ]
+      }
+    },
+    "reverse_items_note": "Positive items4–6 use no=1,middle=1,yes=0. Never apply a simple 2-x transform; middle always1 on every item.",
+    "missing": "2010 source explicitly does not compute loneliness scale scores when item scores missing. Require all6 for total and corresponding3 for each subscale. No imputation.",
+    "parameters": [
+      {
+        "id": "continuous_primary",
+        "clinical_cutoff": null,
+        "note": "2010 original-author study establishes dimensional scores, not a universal clinical diagnosis cutoff."
+      },
+      {
+        "id": "CBS2019_descriptive_optional",
+        "bands": [
+          {
+            "min": 0,
+            "max": 1,
+            "code": "fewer_signals"
+          },
+          {
+            "min": 2,
+            "max": 4,
+            "code": "some_signals"
+          },
+          {
+            "min": 5,
+            "max": 6,
+            "code": "more_signals"
+          }
+        ],
+        "population": "Dutch 2019 Social cohesion & well-being survey n=7398; statistical descriptive categorization; not Chinese clinical norm",
+        "enabled_by_default": false,
+        "note": "CBS English never/sometimes/frequently are survey reporting labels, not added recall frequencies to the item wording. Local report uses non-diagnostic descriptions. Do not transfer 11-item thresholds."
+      }
+    ]
+  },
+  "references": [
+    {
+      "citation": "De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130.",
+      "doi": "10.1007/s10433-010-0144-6",
+      "url": "https://link.springer.com/article/10.1007/s10433-010-0144-6",
+      "use": "English item wording, grouped order, scoring, missing rule, rights, adult validation"
+    },
+    {
+      "citation": "De Jong Gierveld J, Van Tilburg TG. A 6-item scale for overall, emotional, and social loneliness: confirmatory tests on survey data. Research on Aging. 2006;28:582–598.",
+      "url": "https://publ.nidi.nl/output/2006/roa-28-05-dejonggierveld.pdf",
+      "use": "Original development reference; not license basis for copied wording"
+    },
+    {
+      "citation": "Statistics Netherlands (CBS). Loneliness survey – technical explanation. 2019 Social cohesion & well-being survey, n=7398.",
+      "url": "https://www.cbs.nl/en-gb/news/2020/13/nearly-1-in-10-dutch-people-frequently-lonely-in-2019/loneliness-survey-technical-explanation",
+      "use": "Optional Dutch statistical bands, not clinical thresholds"
+    }
+  ],
+  "existingChineseValidationNotOurForm": {
+    "citation": "Leung GTY, De Jong Gierveld J, Lam LCW. Validation of the Chinese translation of the 6-item De Jong Gierveld loneliness scale in elderly Chinese. Int Psychogeriatr.2008;20:1262–1272.",
+    "note": "Cited by original2010 authors. Existing validated Chinese text not copied; our independent working translation is not that validated version."
+  },
+  "currentTranslationValidated": false,
+  "noClinicalInference": true
+}

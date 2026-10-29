@@ -1,0 +1,151 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "sourceEdition": "Author measure and user guide v.03-22-20; current 2025 author webpage confirms same 16-item identity and CC BY 4.0; current OSF download could not be retrieved",
+  "items": [
+    {
+      "id": 1,
+      "en": "I get excited about learning new things in class.",
+      "zh_draft": "在课堂上学到新东西让我感到兴奋。",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "en": "I feel like I belong at my school.",
+      "zh_draft": "我觉得自己是学校的一分子。",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "en": "I feel like the things I do at school are important.",
+      "zh_draft": "我觉得自己在学校做的事情很重要。",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "en": "I am a successful student.",
+      "zh_draft": "我觉得自己是一名表现出色的学生。",
+      "reverse": false
+    },
+    {
+      "id": 5,
+      "en": "I am really interested in the things I am doing at school.",
+      "zh_draft": "我对自己在学校做的事情很感兴趣。",
+      "reverse": false
+    },
+    {
+      "id": 6,
+      "en": "I can really be myself at school.",
+      "zh_draft": "在学校，我能够真实地做自己。",
+      "reverse": false
+    },
+    {
+      "id": 7,
+      "en": "I think school matters and should be taken seriously.",
+      "zh_draft": "我认为学校生活很重要，应该认真对待。",
+      "reverse": false
+    },
+    {
+      "id": 8,
+      "en": "I do good work at school.",
+      "zh_draft": "我在学校的学习任务做得好。",
+      "reverse": false
+    },
+    {
+      "id": 9,
+      "en": "I enjoy working on class projects and assignments.",
+      "zh_draft": "我喜欢完成课堂项目和作业。",
+      "reverse": false
+    },
+    {
+      "id": 10,
+      "en": "I feel like people at my school care about me.",
+      "zh_draft": "我觉得学校里的人关心我。",
+      "reverse": false
+    },
+    {
+      "id": 11,
+      "en": "I feel it is important to do well in my classes.",
+      "zh_draft": "我觉得在课堂学习中表现好很重要。",
+      "reverse": false
+    },
+    {
+      "id": 12,
+      "en": "I do well on my class assignments.",
+      "zh_draft": "我的课堂作业完成得好。",
+      "reverse": false
+    },
+    {
+      "id": 13,
+      "en": "I feel happy when I am working and learning at school.",
+      "zh_draft": "在学校做事和学习时，我感到快乐。",
+      "reverse": false
+    },
+    {
+      "id": 14,
+      "en": "I am treated with respect at my school.",
+      "zh_draft": "在学校，我受到尊重。",
+      "reverse": false
+    },
+    {
+      "id": 15,
+      "en": "I believe the things I learn at school will help me in my life.",
+      "zh_draft": "我相信在学校学到的东西会对我的生活有帮助。",
+      "reverse": false
+    },
+    {
+      "id": 16,
+      "en": "I get good grades in my classes.",
+      "zh_draft": "我各门课的成绩不错。",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Almost Never",
+      "zh": "几乎从不"
+    },
+    {
+      "value": 2,
+      "en": "Sometimes",
+      "zh": "有时"
+    },
+    {
+      "value": 3,
+      "en": "Often",
+      "zh": "经常"
+    },
+    {
+      "value": 4,
+      "en": "Almost Always",
+      "zh": "几乎总是"
+    }
+  ],
+  "instructions": "下面的问题涉及你在学校的想法、感受和行为。请阅读每句话，选择最符合你过去一个月情况的答案。",
+  "license": {
+    "id": "CC-BY-4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "authority_url": "https://www.tyrenshaw.org/User-Guide-for-the-Student-Subjective-Wellbeing-Questionnaire-26e7ff8c2ebd806c81c7d9f5c9355090",
+    "authority_last_updated": "2025-09-24",
+    "permissions": [
+      "copy",
+      "share",
+      "translate/adapt",
+      "online administration",
+      "redistribute in software with attribution",
+      "commercial or noncommercial reuse"
+    ],
+    "conditions": [
+      "Credit Tyler L. Renshaw and source",
+      "Link license",
+      "Identify Chinese translation and online formatting as modifications",
+      "No endorsement claim",
+      "Do not impose additional restrictions inconsistent with license"
+    ],
+    "noncommercial_only": false
+  },
+  "attribution": "中文为依据 Renshaw (2020) SSWQ 的独立翻译和线上排版改编，依据 CC BY 4.0 使用；非作者审定中文版。",
+  "translationChanges": [
+    "第8/12题删除我能的潜能暗示，保留原文对实际表现的自述；未复制验证中文版。"
+  ]
+}

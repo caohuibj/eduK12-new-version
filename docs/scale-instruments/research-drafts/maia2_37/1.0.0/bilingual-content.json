@@ -1,0 +1,394 @@
+{
+  "identity": {
+    "instrumentKey": "maia2_37_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "originalIdentity": {
+    "title": "Multidimensional Assessment of Interoceptive Awareness, Version 2 (MAIA-2)",
+    "year": 2018,
+    "carrier": "Original publisher Table2",
+    "locale": "en",
+    "itemCount": 37,
+    "dimensions": 8
+  },
+  "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0208034&type=manuscript",
+  "sourceSha256": "dc9bbd5654a68cc14090002747a468e74e5d9b0edf8fd7071ec7fdefd97157f1",
+  "textNormalization": "XML text content; leading item number removed; layout whitespace collapsed only; punctuation/case retained. No wording merged from PDF, body text, S1 or any Chinese version.",
+  "administrationOriginal": "Below you will find a list of statements. Please indicate how often each statement applies to you generally in daily life. Circle one number on each line.",
+  "administrationOriginalCarrier": "S1 Questionnaire and UCSF2018 PDF; independent guidance separate from Table2 item wording.",
+  "administrationZh": "下面列出一些陈述。请根据一般日常生活中的情况，指出每项陈述符合你的频率，每行选择一个数字：0表示“从不”，5表示“总是”；中间选项保留数字1、2、3、4。",
+  "options": [
+    {
+      "value": 0,
+      "originalLabel": "Never",
+      "zhLabel": "从不"
+    },
+    {
+      "value": 1,
+      "originalLabel": null,
+      "zhLabel": "1"
+    },
+    {
+      "value": 2,
+      "originalLabel": null,
+      "zhLabel": "2"
+    },
+    {
+      "value": 3,
+      "originalLabel": null,
+      "zhLabel": "3"
+    },
+    {
+      "value": 4,
+      "originalLabel": null,
+      "zhLabel": "4"
+    },
+    {
+      "value": 5,
+      "originalLabel": "Always",
+      "zhLabel": "总是"
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "original": "When I am tense, I notice where the tension is located in my body.",
+      "dimensionKey": "noticing",
+      "reverse": false,
+      "itemCode": "MAIA2_01",
+      "zh": "紧张时，我会注意到身体哪个部位紧绷。",
+      "dimensionLabel": "觉察身体的感觉"
+    },
+    {
+      "number": 2,
+      "original": "I notice when I am uncomfortable in my body.",
+      "dimensionKey": "noticing",
+      "reverse": false,
+      "itemCode": "MAIA2_02",
+      "zh": "身体不舒服时，我会注意到。",
+      "dimensionLabel": "觉察身体的感觉"
+    },
+    {
+      "number": 3,
+      "original": "I notice where in my body I am comfortable.",
+      "dimensionKey": "noticing",
+      "reverse": false,
+      "itemCode": "MAIA2_03",
+      "zh": "我会注意到身体哪些部位感觉舒服。",
+      "dimensionLabel": "觉察身体的感觉"
+    },
+    {
+      "number": 4,
+      "original": "I notice changes in my breathing, such as whether it slows down or speeds up.",
+      "dimensionKey": "noticing",
+      "reverse": false,
+      "itemCode": "MAIA2_04",
+      "zh": "我会注意到呼吸的变化，例如变慢或变快。",
+      "dimensionLabel": "觉察身体的感觉"
+    },
+    {
+      "number": 5,
+      "original": "I ignore physical tension or discomfort until they become more severe.",
+      "dimensionKey": "not_distracting",
+      "reverse": true,
+      "itemCode": "MAIA2_05",
+      "zh": "我会忽略身体的紧绷或不适，直到它们变得更严重。",
+      "dimensionLabel": "不急于转移身体感受"
+    },
+    {
+      "number": 6,
+      "original": "I distract myself from sensations of discomfort.",
+      "dimensionKey": "not_distracting",
+      "reverse": true,
+      "itemCode": "MAIA2_06",
+      "zh": "我会转移注意力，不去感觉身体的不适。",
+      "dimensionLabel": "不急于转移身体感受"
+    },
+    {
+      "number": 7,
+      "original": "When I feel pain or discomfort, I try to power through it.",
+      "dimensionKey": "not_distracting",
+      "reverse": true,
+      "itemCode": "MAIA2_07",
+      "zh": "感到疼痛或不适时，我会试着硬撑过去。",
+      "dimensionLabel": "不急于转移身体感受"
+    },
+    {
+      "number": 8,
+      "original": "I try to ignore pain",
+      "dimensionKey": "not_distracting",
+      "reverse": true,
+      "itemCode": "MAIA2_08",
+      "zh": "我会试着忽略疼痛",
+      "dimensionLabel": "不急于转移身体感受"
+    },
+    {
+      "number": 9,
+      "original": "I push feelings of discomfort away by focusing on something",
+      "dimensionKey": "not_distracting",
+      "reverse": true,
+      "itemCode": "MAIA2_09",
+      "zh": "我会把注意力集中到某件事情上，来推开不舒服的感觉",
+      "dimensionLabel": "不急于转移身体感受"
+    },
+    {
+      "number": 10,
+      "original": "When I feel unpleasant body sensations, I occupy myself with something else so I don’t have to feel them.",
+      "dimensionKey": "not_distracting",
+      "reverse": true,
+      "itemCode": "MAIA2_10",
+      "zh": "感到身体不舒服时，我会让自己忙于别的事情，这样就不用感觉到它们。",
+      "dimensionLabel": "不急于转移身体感受"
+    },
+    {
+      "number": 11,
+      "original": "When I feel physical pain, I become upset.",
+      "dimensionKey": "not_worrying",
+      "reverse": true,
+      "itemCode": "MAIA2_11",
+      "zh": "感到身体疼痛时，我会心烦意乱。",
+      "dimensionLabel": "面对不适时少些担忧"
+    },
+    {
+      "number": 12,
+      "original": "I start to worry that something is wrong if I feel any discomfort.",
+      "dimensionKey": "not_worrying",
+      "reverse": true,
+      "itemCode": "MAIA2_12",
+      "zh": "只要感觉有任何不适，我就开始担心是不是出了什么问题。",
+      "dimensionLabel": "面对不适时少些担忧"
+    },
+    {
+      "number": 13,
+      "original": "I can notice an unpleasant body sensation without worrying about it.",
+      "dimensionKey": "not_worrying",
+      "reverse": false,
+      "itemCode": "MAIA2_13",
+      "zh": "我能注意到身体不舒服的感觉，而不为此担忧。",
+      "dimensionLabel": "面对不适时少些担忧"
+    },
+    {
+      "number": 14,
+      "original": "I can stay calm and not worry when I have feelings of discomfort or pain.",
+      "dimensionKey": "not_worrying",
+      "reverse": false,
+      "itemCode": "MAIA2_14",
+      "zh": "感到不适或疼痛时，我能保持平静而不担忧。",
+      "dimensionLabel": "面对不适时少些担忧"
+    },
+    {
+      "number": 15,
+      "original": "When I am in discomfort or pain I can’t get it out of my mind",
+      "dimensionKey": "not_worrying",
+      "reverse": true,
+      "itemCode": "MAIA2_15",
+      "zh": "感到不适或疼痛时，我无法把它从脑海中放下",
+      "dimensionLabel": "面对不适时少些担忧"
+    },
+    {
+      "number": 16,
+      "original": "I can pay attention to my breath without being distracted by things happening around me.",
+      "dimensionKey": "attention_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_16",
+      "zh": "我能把注意力放在呼吸上，而不被周围发生的事情分心。",
+      "dimensionLabel": "调节对身体的注意"
+    },
+    {
+      "number": 17,
+      "original": "I can maintain awareness of my inner bodily sensations even when there is a lot going on around me.",
+      "dimensionKey": "attention_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_17",
+      "zh": "即使周围有很多事情发生，我仍能觉察到身体内部的感觉。",
+      "dimensionLabel": "调节对身体的注意"
+    },
+    {
+      "number": 18,
+      "original": "When I am in conversation with someone, I can pay attention to my posture.",
+      "dimensionKey": "attention_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_18",
+      "zh": "与人交谈时，我能留意自己的姿势。",
+      "dimensionLabel": "调节对身体的注意"
+    },
+    {
+      "number": 19,
+      "original": "I can return awareness to my body if I am distracted.",
+      "dimensionKey": "attention_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_19",
+      "zh": "分心后，我能重新把觉察带回身体。",
+      "dimensionLabel": "调节对身体的注意"
+    },
+    {
+      "number": 20,
+      "original": "I can refocus my attention from thinking to sensing my body.",
+      "dimensionKey": "attention_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_20",
+      "zh": "我能把注意力从思考重新转向感受身体。",
+      "dimensionLabel": "调节对身体的注意"
+    },
+    {
+      "number": 21,
+      "original": "I can maintain awareness of my whole body even when a part of me is in pain or discomfort.",
+      "dimensionKey": "attention_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_21",
+      "zh": "即使身体某个部位疼痛或不适，我仍能觉察整个身体。",
+      "dimensionLabel": "调节对身体的注意"
+    },
+    {
+      "number": 22,
+      "original": "I am able to consciously focus on my body as a whole.",
+      "dimensionKey": "attention_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_22",
+      "zh": "我能有意识地把身体作为一个整体来关注。",
+      "dimensionLabel": "调节对身体的注意"
+    },
+    {
+      "number": 23,
+      "original": "I notice how my body changes when I am angry.",
+      "dimensionKey": "emotional_awareness",
+      "reverse": false,
+      "itemCode": "MAIA2_23",
+      "zh": "生气时，我会注意到身体怎样变化。",
+      "dimensionLabel": "觉察身体与情绪的联系"
+    },
+    {
+      "number": 24,
+      "original": "When something is wrong in my life, I can feel it in my body.",
+      "dimensionKey": "emotional_awareness",
+      "reverse": false,
+      "itemCode": "MAIA2_24",
+      "zh": "生活中出了问题时，我能在身体里感觉到。",
+      "dimensionLabel": "觉察身体与情绪的联系"
+    },
+    {
+      "number": 25,
+      "original": "I notice that my body feels different after a peaceful experience.",
+      "dimensionKey": "emotional_awareness",
+      "reverse": false,
+      "itemCode": "MAIA2_25",
+      "zh": "经历平静之后，我会注意到身体的感觉有所不同。",
+      "dimensionLabel": "觉察身体与情绪的联系"
+    },
+    {
+      "number": 26,
+      "original": "I notice that my breathing becomes free and easy, when I feel comfortable.",
+      "dimensionKey": "emotional_awareness",
+      "reverse": false,
+      "itemCode": "MAIA2_26",
+      "zh": "感觉舒服时，我会注意到呼吸变得轻松自在。",
+      "dimensionLabel": "觉察身体与情绪的联系"
+    },
+    {
+      "number": 27,
+      "original": "I notice how my body changes when I feel happy / joyful.",
+      "dimensionKey": "emotional_awareness",
+      "reverse": false,
+      "itemCode": "MAIA2_27",
+      "zh": "感到高兴或喜悦时，我会注意到身体怎样变化。",
+      "dimensionLabel": "觉察身体与情绪的联系"
+    },
+    {
+      "number": 28,
+      "original": "When I feel overwhelmed, I can find a calm place inside.",
+      "dimensionKey": "self_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_28",
+      "zh": "感到难以应付时，我能在内心找到一处平静。",
+      "dimensionLabel": "借助身体安顿自己"
+    },
+    {
+      "number": 29,
+      "original": "When I bring awareness to my body, I feel a sense of calm.",
+      "dimensionKey": "self_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_29",
+      "zh": "把觉察带到身体上时，我会感到平静。",
+      "dimensionLabel": "借助身体安顿自己"
+    },
+    {
+      "number": 30,
+      "original": "I can use my breath to reduce tension.",
+      "dimensionKey": "self_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_30",
+      "zh": "我能通过呼吸减轻紧张。",
+      "dimensionLabel": "借助身体安顿自己"
+    },
+    {
+      "number": 31,
+      "original": "When I am caught up in thoughts, I can calm my mind by focusing on my body/breathing.",
+      "dimensionKey": "self_regulation",
+      "reverse": false,
+      "itemCode": "MAIA2_31",
+      "zh": "陷入思绪时，我能通过关注身体或呼吸让心静下来。",
+      "dimensionLabel": "借助身体安顿自己"
+    },
+    {
+      "number": 32,
+      "original": "I listen for information from my body about my emotional state.",
+      "dimensionKey": "body_listening",
+      "reverse": false,
+      "itemCode": "MAIA2_32",
+      "zh": "我会倾听身体提供的信息，了解自己的情绪状态。",
+      "dimensionLabel": "倾听身体的提示"
+    },
+    {
+      "number": 33,
+      "original": "When I am upset, I take time to explore how my body feels.",
+      "dimensionKey": "body_listening",
+      "reverse": false,
+      "itemCode": "MAIA2_33",
+      "zh": "心烦时，我会花时间探索身体的感觉。",
+      "dimensionLabel": "倾听身体的提示"
+    },
+    {
+      "number": 34,
+      "original": "I listen to my body to inform me about what to do.",
+      "dimensionKey": "body_listening",
+      "reverse": false,
+      "itemCode": "MAIA2_34",
+      "zh": "我会倾听身体，以了解自己该怎样做。",
+      "dimensionLabel": "倾听身体的提示"
+    },
+    {
+      "number": 35,
+      "original": "I am at home in my body.",
+      "dimensionKey": "trusting",
+      "reverse": false,
+      "itemCode": "MAIA2_35",
+      "zh": "待在自己的身体里，我感到自在。",
+      "dimensionLabel": "在身体里感到安心"
+    },
+    {
+      "number": 36,
+      "original": "I feel my body is a safe place.",
+      "dimensionKey": "trusting",
+      "reverse": false,
+      "itemCode": "MAIA2_36",
+      "zh": "我感觉身体是一个安全的地方。",
+      "dimensionLabel": "在身体里感到安心"
+    },
+    {
+      "number": 37,
+      "original": "I trust my body sensations.",
+      "dimensionKey": "trusting",
+      "reverse": false,
+      "itemCode": "MAIA2_37",
+      "zh": "我信任身体的感觉。",
+      "dimensionLabel": "在身体里感到安心"
+    }
+  ],
+  "relatedVersions": [
+    "MAIA2012 original32: not used",
+    "MAIA-Y youth: not used",
+    "UCSF-hosted Pang/Li2020 Chinese37: not copied, independent language version",
+    "Teng2022 Chinese31/7factors: not used, validation not transferred"
+  ],
+  "translationStatus": "Independent working translation; expert review PENDING, China validation NOT_ESTABLISHED"
+}

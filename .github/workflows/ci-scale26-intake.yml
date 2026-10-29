@@ -1,0 +1,96 @@
+# CI admission for the exact 26-scale source, not a new installer or deployer.
+# The caller's source scope and the stable merge gate remain authoritative.
+name: Scale26 exact lightweight intake
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+env:
+  CI: 'true'
+  NODE_ENV: test
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  JWT_SECRET: scale26-isolated-test-jwt-secret-12345678901234567890
+  DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+
+jobs:
+  exact-consumers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      SCALE26_PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: verify the same checkout and frozen source, not the caller's claims alone
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          const p=JSON.parse(process.env.SCALE26_PLAN);
+          const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+          assert.equal(p.route,'scale26-intake');
+          assert.equal(p.pr,379);
+          assert.equal(p.base,'9801107019d51a4af7ddb651789b674867539d24');
+          assert.equal(p.source,'191a187439af026f33d46fbdc2f9d7958340f789');
+          assert.equal(p.sourceTree,'cffae9ecd3b0a3a786008b5e5a857785eb9bd1ff');
+          assert.equal(p.head,process.env.GITHUB_SHA);
+          assert.equal(p.tree,git('rev-parse','HEAD^{tree}'));
+          assert.equal(p.originalPaths,266);
+          assert.equal(p.ciControlPaths,6);
+          assert.equal(git('rev-parse','HEAD:server-version/backend/src/modules/scale/onboarding/instruments.generated.ts'),
+            'de1f0d395c1ef6b712f89c5516642eccc139adcd');
+          assert.equal(git('rev-parse','HEAD:server-version/backend/src/modules/scale/packages/spane12-balance-scorer.ts'),
+            '2e7c5f46dec510d86cc64d4b3a0f28d924dc4024');
+          JS
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
+      - name: install only backend dependencies and generate client
+        working-directory: server-version/backend
+        run: |
+          npm ci --ignore-scripts
+          npx prisma generate
+      - name: verify registered source versions and immutable plugin links
+        working-directory: server-version/backend
+        run: npm run scale:instruments:check
+      - name: run directly affected scorer and source contracts
+        working-directory: server-version/backend
+        run: npx vitest run src/__tests__/scale/instrument-source.test.ts src/__tests__/scale/scale-scorer-registry.test.ts --no-file-parallelism
+      - name: backend TypeScript contract
+        working-directory: server-version/backend
+        run: npx tsc --noEmit
+      - name: install locked frontend dependencies
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: frontend app TypeScript contract
+        working-directory: server-version/frontend
+        run: npx tsc -p tsconfig.app.json --noEmit
+      - name: directly affected report and Teacher Scale consumers
+        working-directory: server-version/frontend
+        run: npx vitest run src/modules/reporting/__tests__/ScaleUnitReportCard.metadata.test.tsx src/huiteacher/HuiteacherMyScaleTasks.test.tsx --maxWorkers=2
+      - name: save exact source receipt, without implying CI gate or DB writes
+        if: always()
+        run: |
+          printf '%s\n' "$SCALE26_PLAN" > /tmp/scale26-intake-plan.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale26-intake-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/scale26-intake-plan.json
+          if-no-files-found: warn
+          retention-days: 7

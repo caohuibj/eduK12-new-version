@@ -1,0 +1,691 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip_attending_emotions10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "IPIP情绪关注10题（研究译稿）",
+      "abbreviation": "IPIP_ATTENDING_EMOTIONS10",
+      "instrumentFamily": "International Personality Item Pool"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "PERSONALITY"
+      ],
+      "constructDefinition": "Self-reported tendency to notice, attend to and reflect on emotions; not emotion-recognition accuracy, regulation skill, or emotional intelligence.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ipip_attending_emotions10",
+        "emotional_tendency",
+        "adult_self_report",
+        "self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:emotion_attention",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目前通常状态；无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方项目顺序；1–5符合度锚点。",
+        "项目采用全10题完整作答才求和，不把缺失当零。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "基于IPIP官方Barchard(2001)构念题库的AI辅助中文工作译稿，不是官方中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文专家译审、认知访谈和目标人群心理测量验证待完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_attending_emotions10-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_attending_emotions10-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_attending_emotions10-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "IPIP 官方声明题项公有领域，可复制、改编、翻译及电子施测；权利许可不代表此中文译稿已经验证。",
+      "https://ipip.ori.org/newPermission.htm"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "IPIP Attending to Emotions",
+        "citation": "Barchard (2001), as attributed by the official IPIP key; do not claim a complete emotional-intelligence battery.",
+        "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "IPIP public domain: https://ipip.ori.org/newPermission.htm ; translation remains unvalidated."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ipip_attending_emotions10_accuracy",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "介于不符合与符合之间",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_01",
+          "content": "我会思考自己产生情绪的原因。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_02",
+          "content": "我很关注自己的感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_03",
+          "content": "我通常能觉察到自己当下的感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_04",
+          "content": "我会留意自己的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_05",
+          "content": "我常常停下来分析自己的感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_06",
+          "content": "我很少思考自己有什么感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_07",
+          "content": "我很少分析自己的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_08",
+          "content": "我不太能觉察到自己的感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_09",
+          "content": "我经常忽略自己的感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_ATTENDING_EMOTIONS10_10",
+          "content": "我很少留意自己的情绪反应。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ipip_attending_emotions10_accuracy",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "ipip_attending_emotions10",
+            "type": "total",
+            "label": "情绪关注",
+            "description": "分数概括你对自己情绪进行留意和思考的自述倾向。较高分数不等于情绪调节更好，较低分数也不意味着能力不足。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_ATTENDING_EMOTIONS10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "ipip_attending_emotions10"
+        ],
+        "scoreOrder": [
+          "ipip_attending_emotions10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_attending_emotions10",
+            "headline": "情绪关注：你会不会留意心里的变化",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项关注你是否留意、思考自己的情绪。分数越高，表示这次更认可关注情绪的描述。它有点像注意到心里的“天气”正在变化，但不测你能否把天气变晴。关注得多，不一定调节得更好；关注得少，也不能直接说能力不足。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次情绪变化：你先注意到身体的感觉、脑中的想法，还是想做某件事的冲动？"
+              },
+              {
+                "category": "strategy",
+                "text": "用一个词给当下感受命名，如“有些紧张”或“有点期待”，再把注意力带回眼前的一件小事。不必追着每种情绪反复分析。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+          "目前没有可靠依据划分高低或排名；这项结果也不代表整体情绪能力或调节能力。",
+          "原英文研究的数据不能当作本中文版本已经验证的证明。",
+          "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。情绪关注不是整体情绪智力或调节能力。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T14:41:00Z",
+            "basis": "AI editorial check: adult descriptive self-report, no ability/character diagnosis or unsupported norm transfer; not human expert translation review."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ipip_attending_emotions10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_attending_emotions10": 30
+          },
+          "totalScoreKeys": [
+            "ipip_attending_emotions10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_attending_emotions10": 50
+          },
+          "totalScoreKeys": [
+            "ipip_attending_emotions10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_ATTENDING_EMOTIONS10_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_attending_emotions10": 10
+          },
+          "totalScoreKeys": [
+            "ipip_attending_emotions10"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/bilingual-content.json#/instructions (项目平台适配工作译稿；b92c69aefa2472775fa7ee86b9c208366886c908；非人工审批声明)"
+  }
+}

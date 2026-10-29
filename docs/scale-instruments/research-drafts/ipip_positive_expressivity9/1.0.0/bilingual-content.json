@@ -1,0 +1,112 @@
+{
+  "status": "AI_WORKING_TRANSLATION_REVIEW_PENDING",
+  "instructions": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+  "items": [
+    {
+      "id": "q1",
+      "position": 1,
+      "en": "Express my affection physically.",
+      "zh": "我会用身体接触来表达亲近和喜爱。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01"
+    },
+    {
+      "id": "q2",
+      "position": 2,
+      "en": "Laugh out loud if something is funny.",
+      "zh": "遇到有趣的事，我会放声笑出来。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02"
+    },
+    {
+      "id": "q3",
+      "position": 3,
+      "en": "Express my happiness in a childlike manner.",
+      "zh": "我会像孩子一样表达自己的快乐。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03"
+    },
+    {
+      "id": "q4",
+      "position": 4,
+      "en": "Sometimes laugh out loud when reading or watching TV.",
+      "zh": "看书或看电视时，我有时会放声笑出来。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04"
+    },
+    {
+      "id": "q5",
+      "position": 5,
+      "en": "Hug my close friends.",
+      "zh": "我会拥抱亲密的朋友。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05"
+    },
+    {
+      "id": "q6",
+      "position": 6,
+      "en": "Show my feelings when I'm happy.",
+      "zh": "开心时，我会把自己的感受表现出来。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06"
+    },
+    {
+      "id": "q7",
+      "position": 7,
+      "en": "Find it difficult showing people that I care about them.",
+      "zh": "我觉得很难向别人表达我在乎他们。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07"
+    },
+    {
+      "id": "q8",
+      "position": 8,
+      "en": "Have difficulty showing affection.",
+      "zh": "我难以表达亲近和喜爱。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08"
+    },
+    {
+      "id": "q9",
+      "position": 9,
+      "en": "Keep my happy feelings to myself.",
+      "zh": "我把开心的感受留在心里，不表现出来。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "非常不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "非常符合"
+    }
+  ],
+  "license": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": "IPIP items/scales/inventories, commercial and noncommercial use; official homepage explicitly permits copying, editing and translation",
+    "permissionUrl": "https://ipip.ori.org/newPermission.htm",
+    "translationPermissionUrl": "https://ipip.ori.org/",
+    "note": "This applies to these exact IPIP items, not every proprietary measure with a similar name."
+  }
+}

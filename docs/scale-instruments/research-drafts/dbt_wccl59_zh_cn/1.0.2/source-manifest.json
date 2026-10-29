@@ -1,0 +1,714 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "dbt_wccl59_zh_cn_research",
+    "instrumentVersion": "1.0.2"
+  },
+  "source": {
+    "authors": "Neacsiu, Rizvi, Vitaliano, Lynch, Linehan",
+    "year": 2010,
+    "doi": "10.1002/jclp.20685",
+    "englishOfficial": "https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL.pdf",
+    "traditionalChineseOfficial": "https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL-Chinese.pdf",
+    "officialScoring": "https://depts.washington.edu/uwbrtc/wp-content/uploads/Scoring-description-for-the-DBT-WCCL.pdf",
+    "licensePage": "https://depts.washington.edu/uwbrtc/resources/assessment-instruments/",
+    "notionArchive": "https://app.notion.com/p/404d27635a3881a39f65e308d920130a",
+    "registeredLocale": "zh-CN",
+    "englishVersion": "ORIGINAL_59_REVIEWED",
+    "traditionalVersion": "UW_HOSTED_59_REVIEWED",
+    "simplifiedChinese": "ENGLISH_DIRECT_INDEPENDENT_REVIEWED_EXPERT_USER_ATTESTED",
+    "originalTraditionalRegistryPath": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+    "originalTraditionalBlobSha": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+    "adaptationProcedure": "UW英文59题直接翻译；复审只修订12道存在语义补充/减弱或大陆语言习惯问题的中文题文，其他47题保持1.0.1；繁体版及1.0.0均非此次英文直译依据。",
+    "primaryTranslationLocale": "en",
+    "usedTraditionalAsTranslationSource": false,
+    "usedPreviousZhCnAsTranslationSource": false,
+    "predecessorCandidate": "dbt_wccl59_zh_cn_research@1.0.1"
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "DBTWC01",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 1,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 2,
+      "itemCode": "DBTWC02",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 2,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 3,
+      "itemCode": "DBTWC03",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 3,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 4,
+      "itemCode": "DBTWC04",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 4,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 5,
+      "itemCode": "DBTWC05",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 5,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 6,
+      "itemCode": "DBTWC06",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 6,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 7,
+      "itemCode": "DBTWC07",
+      "officialFacet": "dcs2",
+      "reverse": false,
+      "englishSourceItemNumber": 7,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 8,
+      "itemCode": "DBTWC08",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 8,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 9,
+      "itemCode": "DBTWC09",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 9,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 10,
+      "itemCode": "DBTWC10",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 10,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 11,
+      "itemCode": "DBTWC11",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 11,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 12,
+      "itemCode": "DBTWC12",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 12,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 13,
+      "itemCode": "DBTWC13",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 13,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 14,
+      "itemCode": "DBTWC14",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 14,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 15,
+      "itemCode": "DBTWC15",
+      "officialFacet": "dcs2",
+      "reverse": false,
+      "englishSourceItemNumber": 15,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 16,
+      "itemCode": "DBTWC16",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 16,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 17,
+      "itemCode": "DBTWC17",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 17,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 18,
+      "itemCode": "DBTWC18",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 18,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 19,
+      "itemCode": "DBTWC19",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 19,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 20,
+      "itemCode": "DBTWC20",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 20,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 21,
+      "itemCode": "DBTWC21",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 21,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 22,
+      "itemCode": "DBTWC22",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 22,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 23,
+      "itemCode": "DBTWC23",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 23,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 24,
+      "itemCode": "DBTWC24",
+      "officialFacet": "dcs2",
+      "reverse": false,
+      "englishSourceItemNumber": 24,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 25,
+      "itemCode": "DBTWC25",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 25,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 26,
+      "itemCode": "DBTWC26",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 26,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 27,
+      "itemCode": "DBTWC27",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 27,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 28,
+      "itemCode": "DBTWC28",
+      "officialFacet": "dcs2",
+      "reverse": false,
+      "englishSourceItemNumber": 28,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 29,
+      "itemCode": "DBTWC29",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 29,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 30,
+      "itemCode": "DBTWC30",
+      "officialFacet": "dcs2",
+      "reverse": false,
+      "englishSourceItemNumber": 30,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 31,
+      "itemCode": "DBTWC31",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 31,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 32,
+      "itemCode": "DBTWC32",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 32,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 33,
+      "itemCode": "DBTWC33",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 33,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 34,
+      "itemCode": "DBTWC34",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 34,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 35,
+      "itemCode": "DBTWC35",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 35,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 36,
+      "itemCode": "DBTWC36",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 36,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 37,
+      "itemCode": "DBTWC37",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 37,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 38,
+      "itemCode": "DBTWC38",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 38,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 39,
+      "itemCode": "DBTWC39",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 39,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 40,
+      "itemCode": "DBTWC40",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 40,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 41,
+      "itemCode": "DBTWC41",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 41,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 42,
+      "itemCode": "DBTWC42",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 42,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 43,
+      "itemCode": "DBTWC43",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 43,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 44,
+      "itemCode": "DBTWC44",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 44,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 45,
+      "itemCode": "DBTWC45",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 45,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 46,
+      "itemCode": "DBTWC46",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 46,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 47,
+      "itemCode": "DBTWC47",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 47,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 48,
+      "itemCode": "DBTWC48",
+      "officialFacet": "dcs2",
+      "reverse": false,
+      "englishSourceItemNumber": 48,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 49,
+      "itemCode": "DBTWC49",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 49,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 50,
+      "itemCode": "DBTWC50",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 50,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 51,
+      "itemCode": "DBTWC51",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 51,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 52,
+      "itemCode": "DBTWC52",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 52,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 53,
+      "itemCode": "DBTWC53",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 53,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 54,
+      "itemCode": "DBTWC54",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 54,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 55,
+      "itemCode": "DBTWC55",
+      "officialFacet": "dcs1",
+      "reverse": false,
+      "englishSourceItemNumber": 55,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 56,
+      "itemCode": "DBTWC56",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 56,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 57,
+      "itemCode": "DBTWC57",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 57,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 58,
+      "itemCode": "DBTWC58",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 58,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    },
+    {
+      "number": 59,
+      "itemCode": "DBTWC59",
+      "officialFacet": "dss",
+      "reverse": false,
+      "englishSourceItemNumber": 59,
+      "translationMethod": "DIRECT_ENGLISH_TO_ZH_CN"
+    }
+  ],
+  "response": {
+    "min": 0,
+    "max": 3,
+    "recall": "last_month",
+    "originalAnchors": [
+      "Never used",
+      "Rarely used",
+      "Sometimes used",
+      "Regularly used (4–5 times/week or more)"
+    ]
+  },
+  "scoring": {
+    "version": "1.0.0",
+    "reverseItems": [],
+    "globalTotal": null,
+    "dimensions": [
+      {
+        "key": "dss",
+        "itemNumbers": [
+          1,
+          2,
+          4,
+          6,
+          9,
+          10,
+          11,
+          13,
+          16,
+          18,
+          19,
+          21,
+          22,
+          23,
+          26,
+          27,
+          29,
+          31,
+          33,
+          34,
+          35,
+          36,
+          38,
+          39,
+          40,
+          42,
+          43,
+          44,
+          47,
+          49,
+          50,
+          51,
+          53,
+          54,
+          56,
+          57,
+          58,
+          59
+        ],
+        "aggregation": "mean",
+        "range": [
+          0,
+          3
+        ],
+        "officialMinimumAnswered": 30,
+        "platformMissingPolicy": "complete_required"
+      },
+      {
+        "key": "dcs1",
+        "itemNumbers": [
+          3,
+          5,
+          8,
+          12,
+          14,
+          17,
+          20,
+          25,
+          32,
+          37,
+          41,
+          45,
+          46,
+          52,
+          55
+        ],
+        "aggregation": "mean",
+        "range": [
+          0,
+          3
+        ],
+        "officialMinimumAnswered": 10,
+        "platformMissingPolicy": "complete_required"
+      },
+      {
+        "key": "dcs2",
+        "itemNumbers": [
+          7,
+          15,
+          24,
+          28,
+          30,
+          48
+        ],
+        "aggregation": "mean",
+        "range": [
+          0,
+          3
+        ],
+        "officialMinimumAnswered": 4,
+        "platformMissingPolicy": "complete_required"
+      }
+    ],
+    "optionalOriginalDCSCombined": "SPSS MEAN.4 available but not emitted as current dimension"
+  },
+  "versions": {
+    "measurement": "1.0.2",
+    "scoring": "1.0.0",
+    "localization": "1.0.2",
+    "report": "1.0.3",
+    "reference": null,
+    "catalogManifestVersion": 2
+  },
+  "rights": {
+    "allowedNoncommercialUses": [
+      "RESEARCH",
+      "CLINICAL",
+      "EDUCATIONAL"
+    ],
+    "commercial": "FORBIDDEN_BY_UW",
+    "digitalDisplay": "ADMIN_REVIEW",
+    "publicGitHubRedistribution": "ADMIN_REVIEW",
+    "simplifiedTranslation": "ADMIN_REVIEW",
+    "translatorIdentity": "NOT_VERIFIED",
+    "nonCommercialTag": "license:noncommercial",
+    "chineseSearchTerm": "非商用",
+    "userVerifiedExpertLanguageReview": "APPROVED",
+    "translation": "ADMIN_REVIEW_LEGAL_SCOPE"
+  },
+  "checks": {
+    "English59OfficialItems": "STATIC_VISUAL_AND_SCORING_PDF_REVIEWED",
+    "perItemMapping": "STATIC_ITEM_ORDER_MATCH_59",
+    "scoringDiffFrom100": "UNCHANGED_STATIC",
+    "goldenCases": 12,
+    "responseAnchors": "STATIC_0_1_2_3",
+    "translationExpertReview": "APPROVED_USER_ATTESTED_NO_EXTERNAL_REPORT",
+    "backTranslation": "NOTRUN",
+    "cognitiveInterviews": "NOTRUN",
+    "vitest": "NOTRUN",
+    "typeScript": "NOTRUN",
+    "realScoring": "NOTRUN",
+    "CI": "NOTRUN",
+    "database": "NOTRUN",
+    "deployment": "NOTRUN",
+    "sourceEnglishFormScreenshots": "STATIC_READ",
+    "sourceEnglishScoring": "STATIC_READ",
+    "itemReview": "59_ITEM_STATIC_REVIEW",
+    "languageChanges": 12,
+    "scoringParityWith101": "STATIC_EQUAL",
+    "policyVersions": "dbt_wccl59_zh_cn_research-1.0.2",
+    "authorApproval": "NOTRUN",
+    "linguisticExpertReview": "APPROVED_USER_ATTESTED_NO_EXTERNAL_REPORT",
+    "reportAudienceContract": "STATIC_SHAPE_PRESENT_ADULT_SELF_STUDENT_ZH_CN",
+    "reportFeedbackVersion": "1.0.3_STATIC_NOT_EXECUTED"
+  },
+  "translationReview": {
+    "status": "USER_CONFIRMED_EXPERT_APPROVED",
+    "anchorOriginal": "https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL.pdf",
+    "scoringOriginal": "https://depts.washington.edu/uwbrtc/wp-content/uploads/Scoring-description-for-the-DBT-WCCL.pdf",
+    "changedItemNumbers": [
+      6,
+      10,
+      20,
+      22,
+      24,
+      29,
+      31,
+      33,
+      38,
+      40,
+      48,
+      49
+    ],
+    "itemCount": 59,
+    "untouchedItemCount": 47,
+    "checks": [
+      "EN meaning preserved",
+      "no new time constraint",
+      "no new valence",
+      "no action-to-intention change",
+      "original scoring parity",
+      "no new clinical interpretation"
+    ],
+    "translationExpertReview": "COMPLETED_USER_ATTESTATION",
+    "backTranslation": "NOTRUN",
+    "cognitiveDebriefing": "NOTRUN",
+    "scientificValidity": "NOTRUN",
+    "reviewerIdentity": "NOT_PROVIDED",
+    "externalReviewDocument": "NOT_PROVIDED",
+    "actualReviewTime": "NOT_PROVIDED",
+    "approvalRecordedAt": "2026-10-27T06:53:22Z",
+    "attestedBy": "PROJECT_ADMIN_USER_CURRENT_CONVERSATION",
+    "distinction": "PILOT scientificMaturity retained; linguistic expert review approved does not imply psychometric validation"
+  },
+  "publicationPreparation": {
+    "packageReleaseStatus": "PUBLISHED",
+    "catalogStatus": "ACCEPTED",
+    "databasePublication": "NOTRUN",
+    "realProductAvailability": "NOTRUN",
+    "recordedAt": "2026-10-27T06:53:22Z",
+    "scope": "NON_COMMERCIAL_ONLY",
+    "note": "Publication-ready content status only; CI, installation, proofHash-based application publication and production deployment are separate"
+  }
+}

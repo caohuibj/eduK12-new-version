@@ -1,0 +1,84 @@
+{
+  "identity": {
+    "instrumentKey": "brcs4_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "status": "DRAFT_CANDIDATE",
+  "familyCitation": "Sinclair, V. G., & Wallston, K. A. (2004). The development and psychometric evaluation of the Brief Resilient Coping Scale. Assessment, 11(1), 94–101. https://doi.org/10.1177/1073191103258144.",
+  "wordingSource": "López-Pina, J.-A., Meseguer-Henarejos, A.-B., Gascón-Cánovas, J.-J., Navarro-Villalba, D.-J., Sinclair, V. G., & Wallston, K. A. (2016). Measurement properties of the brief resilient coping scale in patients with systemic lupus erythematosus using rasch analysis. Health and Quality of Life Outcomes, 14, 128. https://doi.org/10.1186/s12955-016-0534-3.",
+  "sourceLocator": "Appendix Table 6, PDF page 7 of 8",
+  "sourcePdfSha256": "65e415c77423e1c279ea341976f24a401fc74aa06525ef270e1b54606786a07d",
+  "formatProvenance": "2016作者共同发表CC BY 4.0附录Table 6英文4题；五点1–5形式按2016正文原版说明及2017正文独立编排，仅标端点，中间为数字；不是2016四点改编版的直接译本。",
+  "originalEnglishInstruction": "Consider how well the following statements describe your behavior and actions",
+  "platformChineseInstruction": "请想一想自己通常面对困难时的行为和做法，再判断下面的说法有多符合自己。选项从1（完全不符合我）到5（非常符合我），2、3、4表示两端之间逐渐增加的符合程度。请根据自己的实际情况作答，没有对错。",
+  "instructionIdentity": {
+    "instructionVersion": "1.0.0",
+    "runtimeStatus": "PREPARED_NOT_RUNTIME_CONNECTED"
+  },
+  "questions": [
+    {
+      "itemCode": "BRCS_01",
+      "originalEnglish": "I look for creative ways to alter difficult situations.",
+      "platformChinese": "我会寻找有创意的办法来改变困难的处境。",
+      "reverse": false,
+      "weight": 1,
+      "translationNote": "creative保留创造性办法，不改成“我总能解决”。"
+    },
+    {
+      "itemCode": "BRCS_02",
+      "originalEnglish": "Regardless of what happens to me, I believe I can control my reaction to it.",
+      "platformChinese": "无论遇到什么事，我相信自己能够控制对这件事的反应。",
+      "reverse": false,
+      "weight": 1,
+      "translationNote": "control修饰自身反应，不改写成控制外界结果。"
+    },
+    {
+      "itemCode": "BRCS_03",
+      "originalEnglish": "I believe that I can grow in positive ways by dealing with difficult situations.",
+      "platformChinese": "我相信，通过应对困难的处境，我能获得积极的成长。",
+      "reverse": false,
+      "weight": 1,
+      "translationNote": "grow不暗示必须从苦难获益；that保留在英文追溯文本。"
+    },
+    {
+      "itemCode": "BRCS_04",
+      "originalEnglish": "I actively look for ways to replace the losses I encounter in life.",
+      "platformChinese": "面对生活中遇到的损失，我会积极寻找办法来作出弥补。",
+      "reverse": false,
+      "weight": 1,
+      "translationNote": "replace losses译为弥补损失，不理解成抹去经历或要求马上恢复。"
+    }
+  ],
+  "response": {
+    "sourceOriginalFivePointEndpointFact": "2016正文Instruments明确原版五点1–5及两端；2017正文同序4题明确总分4–20。",
+    "platformOptions": [
+      {
+        "value": "1",
+        "label": "完全不符合我",
+        "score": 1
+      },
+      {
+        "value": "2",
+        "label": "2",
+        "score": 2
+      },
+      {
+        "value": "3",
+        "label": "3",
+        "score": 3
+      },
+      {
+        "value": "4",
+        "label": "4",
+        "score": 4
+      },
+      {
+        "value": "5",
+        "label": "非常符合我",
+        "score": 5
+      }
+    ],
+    "intermediateLabels": "Only numeric 2/3/4; no borrowed Neutral or frequency labels",
+    "excludedVersion": "2016 Appendix response coding 0/1/2/3 (item 2 printed 4); deliberately not adopted"
+  }
+}
