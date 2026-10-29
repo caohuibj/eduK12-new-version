@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "sourceHead": "ca7cef4b0dbaf943eb61d925b4883bf6de2dfbdc",
+  "integratedMain": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+  "frontendTree": "9045d9a83f47b3609790ef881ba364e6568bc612",
+  "recordedAt": "2026-10-29T23:48:52.555531+00:00",
+  "scope": "One changed-combined-source frontend production build plus eight explicit read-only compiled administrator selection cases",
+  "buildExit": 0,
+  "buildElapsedSeconds": 24.470914,
+  "casesPassed": 8,
+  "browserExit": 0,
+  "unknownApiCount": 0,
+  "authorizationWrites": 0,
+  "externalAssets": 0,
+  "manifest": {
+    "file": "main-dc0f-built-ui-artifact.json",
+    "sha256": "155ad7dd2094d91621ed4b199e1fed696abde7c85de1c9dc43619e976b097605"
+  },
+  "raw": {
+    "file": "main-dc0f-built-ui-raw.json",
+    "sha256": "d569a7e7fa2f74857ff5531159a22596e808cb0da045fcae2f8408ce9a84c860"
+  },
+  "harnessSha256": "8a9fdefbb83639dc2fe9e0679637d670763a9503517955e30fe261c780e086e1",
+  "evidenceLimit": "Unsigned local static presentation evidence. System Chromium 151.0.7922.173 / Playwright1.62.1. Real API authority, MFA, mutation and per-product theme parity not certified. No dependency install, backend build, new seed or platform CI."
+}

@@ -1,5 +1,7 @@
 # 实施记录与公共边界
 
+最新汇总见[当前状态](current-status.md)；以下初始记录及各阶段证据保留其原始时点，不能据旧段落推定现状。
+
 基线：`2de32609e1888cf28b73cb26e2c0cf38b11ff875`。本文件随实现更新；
 [规范](specification.md)及[素材 manifest](source-manifest.json)保留来源和当前缺件。
 
@@ -24,6 +26,8 @@
 [真实受限运行角色](runtime-role-progress.md)在新克隆按原仓库契约验证角色/255 迁移、账本写入拒绝、Training 后续精确修订和原冻结报告读取，不改写此前 owner 证据的身份。
 [main dc0f 交界核对](main-dc0f-integration-progress.md)记录正常整合已合入的 Bundle/native 工作、四入口保存结果回读及当前前后端类型；不把旧编译产物改称新 main 资格。
 [同环境读取成本](read-performance-progress.md)给出实际 A/B/B/A 目录样本和候选报告成本，并明确 main 无法读取新格式 FINAL 的不可比较与回退边界。
+[当前组合编译页面](main-dc0f-built-ui-progress.md)补 main dc0f 整合后的单次前端产物及四入口八个只读页面检查。
+[量表 CommonJS 初始化](scale-commonjs-progress.md)补 38 个变更根的实际编译闭包及四个独立路由入口冷加载；[CI 独立复核准备](scale-ci-review-preparation.md)保留当前 platform 路由阻碍。
 以下共同契约和撤权矩阵是初始基线记录；当前新增源码仍在独立开发分支，未合入 main。
 
 ## 当前共同契约
