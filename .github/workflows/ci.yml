@@ -1503,6 +1503,15 @@ jobs:
           if-no-files-found: error
           retention-days: 3
 
+      - name: retain fixed observer application and main tooling SAST verification
+        if: always() && needs.scope.outputs.application_route == 'school-teacher' && fromJSON(needs.scope.outputs.school_teacher_plan || '{}').continuation == 'observer-run2'
+        uses: actions/upload-artifact@v4
+        with:
+          name: school-teacher-observer-sast-${{ github.sha }}
+          path: school-teacher-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+
   miniprogram:
     name: mini program / foundation contract and page smoke
     needs: scope

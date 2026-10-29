@@ -696,7 +696,7 @@
     ".github/scripts/school-teacher-self-baseline.sql": "41aa7034b492471e930d4fa1b52f156c1184ddf3",
     ".github/scripts/school-teacher-self.test.mjs": "41193eb2371d265deb9f78128c0dd04b64ba9804",
     ".github/workflows/ci-school-teacher.yml": "63dfd260b83aa7126242cdcf0c40d3c105571c89",
-    ".github/workflows/ci.yml": "6ad0cc434a7e40e008b1da6206f0ee4145ab792a",
+    ".github/workflows/ci.yml": "98d79b83475ddfc8b35d5ab9e0c9a547358e3a02",
     "server-version/e2e/education-self-questionnaire.cjs": "e35445243a7a923f0c90624b1e2a2e0ea547da2f",
     "server-version/e2e/school-teacher-chrome-permissions.cjs": "dfb51e4ebe91247000e045cbaf09dc1bc495c2e5",
     "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "e69cab5e5f1ba8eaa182bef67529278232380f1d",
