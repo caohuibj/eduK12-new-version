@@ -1,0 +1,70 @@
+{
+  "phase": "resume",
+  "sourceCommit": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+  "target": "ISOLATED_DRAFT_ONLY",
+  "node": "v24.22.1",
+  "startedAt": "2026-10-29T08:36:35.231Z",
+  "steps": [
+    {
+      "name": "read-back-before-any-write",
+      "counts": {
+        "configs": 1,
+        "events": 1
+      },
+      "configId": "312f54aa-1143-406b-8050-177ec5f19a97",
+      "status": "DRAFT"
+    },
+    {
+      "name": "resume-preview",
+      "result": {
+        "schemaVersion": 1,
+        "mode": "PREVIEW",
+        "rows": [
+          {
+            "testType": "hearts-flowers",
+            "configVersion": "0.1.0",
+            "engineVersion": "0.1.0",
+            "scoringVersion": "0.1.0",
+            "action": "ALREADY_PRESENT",
+            "reasons": [],
+            "configId": "312f54aa-1143-406b-8050-177ec5f19a97",
+            "status": "DRAFT",
+            "sourceHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985"
+          }
+        ],
+        "hasBlocked": false
+      }
+    },
+    {
+      "name": "intentional-idempotency-check",
+      "result": {
+        "schemaVersion": 1,
+        "mode": "APPLY",
+        "rows": [
+          {
+            "testType": "hearts-flowers",
+            "configVersion": "0.1.0",
+            "engineVersion": "0.1.0",
+            "scoringVersion": "0.1.0",
+            "action": "ALREADY_PRESENT",
+            "reasons": [],
+            "configId": "312f54aa-1143-406b-8050-177ec5f19a97",
+            "status": "DRAFT",
+            "sourceHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985"
+          }
+        ],
+        "hasBlocked": false
+      }
+    },
+    {
+      "name": "no-duplicate-no-status-drift",
+      "counts": {
+        "configs": 1,
+        "events": 1
+      },
+      "rowUnchanged": true
+    }
+  ],
+  "status": "PASS",
+  "finishedAt": "2026-10-29T08:36:35.299Z"
+}

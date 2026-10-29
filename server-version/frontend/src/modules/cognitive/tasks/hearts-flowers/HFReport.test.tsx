@@ -1,6 +1,6 @@
 import React from 'react'
 import {afterEach,describe,expect,it} from 'vitest'
-import {cleanup,render,screen} from '@testing-library/react'
+import {cleanup,fireEvent,render,screen} from '@testing-library/react'
 import {HFReport} from './HFReport'
 import {HF_IDENTITY} from './generated/protocol'
 import {HF_GROUPS,HF_INPUTS,hfPlanned,hfDifferences,type GroupKey,type HFGroup,type HFReport as Report} from './generated/report'
@@ -20,6 +20,9 @@ describe('Hearts and flowers report reading',()=>{
   const partial=reportFor({heartOnly:[2,2,0],flowerOnly:[2,0,1],mixed:[3,1,1],mixedSwitch:[1,0,1],mixedRepeat:[1,0,0],mixedFirst:[1,1,0]})
   const {rerender}=render(<HFReport report={partial}/> )
   expect(screen.getByText('本次记录了7题的结果：答对3题，答错2题，2题未回应。')).toBeTruthy()
+  expect(firstScreen()).toContain('谢谢你完成这次记录')
+  expect(firstScreen()).not.toContain('心同侧共2题')
+  expect(screen.getByRole('table').closest('details')?.open).toBe(false)
   expect(screen.getByText('心同侧共2题，答对2题；花对侧共2题，答对0题；混合规则共3题，答对1题。')).toBeTruthy()
   expect(screen.getByRole('status').textContent).toContain('未完成的题目不按答错处理')
   expect(firstScreen()).not.toMatch(/完整回应窗口|实际分母|null|n=|\[图形出现/)
@@ -40,7 +43,8 @@ describe('Hearts and flowers report reading',()=>{
   expect(screen.getAllByText('尚无可用记录')).toHaveLength(2)
   const planned=hfPlanned('experience'),zero=reportFor(Object.fromEntries(HF_GROUPS.map(key=>[key,[planned[key],0,planned[key]]])) as Counts)
   rerender(<HFReport report={zero}/> )
-  expect(screen.getByText('本次记录了32题的结果：答对0题，答错0题，32题未回应。')).toBeTruthy();expect(screen.getByRole('table')).toBeTruthy()
+  expect(screen.getByText('本次记录了32题的结果：答对0题，答错0题，32题未回应。')).toBeTruthy();expect(screen.getByRole('table').closest('details')?.open).toBe(false)
+  fireEvent.click(screen.getByText('查看用时、计算方式与研究说明'));expect(screen.getByRole('table')).toBeTruthy()
   expect(screen.getAllByText('0.0%')).toHaveLength(3)
   const empty=reportFor({})
   for(const language of ['zh','en'] as const){rerender(<HFReport report={empty} language={language}/> );expect(screen.queryByRole('table')).toBeNull();expect(screen.queryByRole('group')).toBeNull();expect(firstScreen()).not.toMatch(/本次记录了0|recorded results for 0/)}

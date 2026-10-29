@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+  "target": "ISOLATED_DRAFT_ONLY",
+  "database": "dot_cognitive_intake_resume_test",
+  "identity": {
+    "testType": "hearts-flowers",
+    "configVersion": "0.1.0",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0"
+  },
+  "actorId": "439029fb-25d5-45ec-8726-2709bf45f58f",
+  "configId": "312f54aa-1143-406b-8050-177ec5f19a97",
+  "sourceHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985",
+  "status": "DRAFT",
+  "accessPolicy": "GRANT",
+  "createdAt": "2026-10-29T08:36:34.477Z",
+  "updatedAt": "2026-10-29T08:36:34.477Z",
+  "counts": {
+    "configs": 1,
+    "events": 1
+  },
+  "recordedAt": "2026-10-29T08:36:34.484Z"
+}

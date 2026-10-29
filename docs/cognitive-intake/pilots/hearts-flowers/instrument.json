@@ -1,0 +1,302 @@
+{
+  "recordType": "cognitive-intake-instrument",
+  "workflowVersion": "0.1.0",
+  "key": "hearts-flowers",
+  "name": "心与花",
+  "locale": "zh/en",
+  "sources": [
+    {
+      "kind": "fixed-source",
+      "url": "https://github.com/caohuibj/eduK12-new-version/pull/368"
+    },
+    {
+      "kind": "literature-reference-retained-not-reread-this-run",
+      "doi": "10.1037/pas0000725"
+    }
+  ],
+  "sourceCommit": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+  "sourceHash": null,
+  "existingImplementation": "PR368, already reviewed candidate; this is workflow pilot, not first-ever audit",
+  "deduplication": {
+    "status": "EXISTING_CANDIDATE_CONFIRMED",
+    "conflicts": []
+  },
+  "profiles": {
+    "experience": {
+      "status": "RUNTIME_CONFIG_INSPECTED",
+      "formalTrials": 32,
+      "blocks": [],
+      "conditions": {
+        "heartOnly": 8,
+        "flowerOnly": 8,
+        "mixed": 16
+      },
+      "practiceTrials": 8,
+      "practiceCriterion": "7/8, max 3 rounds, reread full instructions on incomplete/failure",
+      "estimatedMinutes": [
+        4,
+        6
+      ],
+      "measuredMinutes": null,
+      "timingConfigHash": null,
+      "randomization": "fixed algorithm and deterministic seed checked for this sample",
+      "supportedInputs": [
+        "keyboard",
+        "touch",
+        "mouse",
+        "pen",
+        "assistive"
+      ],
+      "deviationsFromSource": [
+        "Touch input, self-drawn SVG, teaching and mixed balancing are project variations, as disclosed in the existing report."
+      ],
+      "stableProfileKey": "experience",
+      "frozenVersionBinding": {
+        "measurement": "0.1.0",
+        "config": "0.1.0",
+        "scoring": "0.1.0",
+        "report": "0.1.0",
+        "presentation": "0.1.0",
+        "parameters": "none"
+      },
+      "visualEvidence": [],
+      "behaviorEvidence": []
+    },
+    "research": {
+      "status": "RUNTIME_CONFIG_INSPECTED",
+      "formalTrials": 57,
+      "blocks": [],
+      "conditions": {
+        "heartOnly": 12,
+        "flowerOnly": 12,
+        "mixed": 33
+      },
+      "practiceTrials": 8,
+      "practiceCriterion": "7/8, max 3 rounds, reread full instructions on incomplete/failure",
+      "estimatedMinutes": [
+        6,
+        9
+      ],
+      "measuredMinutes": null,
+      "timingConfigHash": null,
+      "randomization": "fixed algorithm and deterministic seed checked for this sample",
+      "supportedInputs": [
+        "keyboard",
+        "touch",
+        "mouse",
+        "pen",
+        "assistive"
+      ],
+      "deviationsFromSource": [
+        "Touch input, self-drawn SVG, teaching and mixed balancing are project variations, as disclosed in the existing report."
+      ],
+      "stableProfileKey": "research",
+      "frozenVersionBinding": {
+        "measurement": "0.1.0",
+        "config": "0.1.0",
+        "scoring": "0.1.0",
+        "report": "0.1.0",
+        "presentation": "0.1.0",
+        "parameters": "none"
+      },
+      "visualEvidence": [],
+      "behaviorEvidence": []
+    }
+  },
+  "sharedImplementationPath": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers",
+  "versions": {
+    "measurement": "0.1.0",
+    "config": "0.1.0",
+    "engine": "0.1.0",
+    "scoring": "0.1.0",
+    "parameters": {
+      "policy": "none",
+      "references": []
+    },
+    "report": "0.1.0",
+    "presentation": "0.1.0",
+    "catalog": null
+  },
+  "audit": {
+    "design": "READ_CURRENT_PROTOCOL",
+    "actualVisuals": "OLD_SCREENSHOTS_READ; NEW_RENDERED_SSR_ONLY; NEW_BROWSER_BLOCKED",
+    "interaction": "SOURCE_AND_PRIOR_EVIDENCE_READ_NO_NEW_BROWSER",
+    "instructionsAndPractice": "READ_CURRENT_SOURCE_AND_SCREENSHOT",
+    "scoring": "READ_PRIOR_RAW_CALCULATION_AND_CURRENT_FORMULAS",
+    "parameters": "NONE_VERIFIED_NO_NORMS_INVENTED",
+    "reportTextAndCharts": "READ_REAL_REPORT_CODE_AND_PRIOR_RENDER",
+    "issues": [
+      {
+        "severity": "NONBLOCKING_UX",
+        "finding": "Phone instructions contain long dense paragraphs; can group rules/examples/practice/save guidance without changing the approved protocol. No change applied."
+      },
+      {
+        "severity": "STATUS_METADATA",
+        "finding": "package/metadata retain preintegration wording, while PR368 native integration evidence exists; distinguish source metadata from actual installation."
+      }
+    ],
+    "changes": [
+      {
+        "scope": "instructions",
+        "change": "Chinese/English four-section reading layout, same four examples and all approved counts/timing/input/practice rules; deduplicated save warning"
+      },
+      {
+        "scope": "report-presentation",
+        "change": "Use existing warm copy; move repeated condition summary/table into native details, retain chart and true counts; balance reading heading. No scorer/protocol/generated/report schema change."
+      }
+    ],
+    "evidence": []
+  },
+  "designConfirmation": {
+    "requiredForChanges": [],
+    "status": "APPROVED_EXISTING_PROTOCOL_UNCHANGED",
+    "existingEvidence": [
+      "User approved research57 (12+12+33), experience32 (8+8+16), practice8 and full explanation/example retry; current change only reading presentation."
+    ]
+  },
+  "tags": {},
+  "notes": {
+    "researchMaturity": "UNKNOWN",
+    "commercialUse": "UNKNOWN",
+    "rightsByMaterial": []
+  },
+  "verification": {
+    "inputDependencies": [],
+    "reusedEvidence": [
+      {
+        "evidenceType": "source-hash-comparison",
+        "artifactPath": "prior-evidence-source-comparison.json",
+        "result": "20/22 MATCH; 2 shared consumers changed and have separate completion-integration evidence; not blanket acceptance"
+      },
+      {
+        "evidenceType": "historical-isolated-install",
+        "artifactPath": "PR368 docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/installation-continued.json",
+        "result": "DRAFT ALREADY_PRESENT in old disposable database, now destroyed; NOT new target installation"
+      }
+    ],
+    "newChecks": [
+      {
+        "evidenceType": "runtime-profile-inspection",
+        "artifactPath": "profile-runtime-check.json",
+        "environment": "dot Node v24.22.1",
+        "result": "PASS",
+        "scope": "32/57 trials, 8 practice, condition counts and same seed determinism"
+      },
+      {
+        "evidenceType": "real-postgresql-resume",
+        "artifactPath": "resume-20261029/resume-result.json",
+        "result": "PASS",
+        "scope": "install→receipt→process and database restart→readback first→same identity no-op; config=1/event=1/row unchanged"
+      },
+      {
+        "evidenceType": "instruction-component",
+        "artifactPath": "reading-20261029/instruction-tests/vitest.json",
+        "result": "PASS",
+        "scope": "4 zh/en x experience/research cases; single run"
+      },
+      {
+        "evidenceType": "report-component",
+        "artifactPath": "reading-20261029/report-tests-r2.log",
+        "result": "PASS",
+        "scope": "2 report tests; original jsdom details role assumption failure preserved"
+      },
+      {
+        "evidenceType": "affected-runner-consumers",
+        "artifactPath": "reading-20261029/affected-consumers.log",
+        "result": "PASS",
+        "scope": "2 selected practice/retry/final/report consumers; 2 filtered not passed"
+      },
+      {
+        "evidenceType": "selected-type-closure",
+        "artifactPath": "reading-20261029/types.log",
+        "result": "PASS",
+        "scope": "changed instruction/report/test dependency closure, not full app"
+      }
+    ],
+    "notRun": [
+      "new browser execution",
+      "publication/public visibility/allocation",
+      "main integration and formal CI",
+      "production deployment",
+      "runtime report persistence/COS archive"
+    ],
+    "evidenceRecordFields": [
+      "sourceCommit",
+      "dependencyHashes",
+      "profile",
+      "environment",
+      "commandOrReadMethod",
+      "result",
+      "artifactPath",
+      "invalidatedBy",
+      "evidenceType",
+      "recordedAt",
+      "inputHash"
+    ]
+  },
+  "delivery": {
+    "gitCommit": null,
+    "pushReadback": "NOT_RUN",
+    "merged": "UNKNOWN",
+    "environment": "DOT isolated PostgreSQL 17.11: dot_cognitive_intake_resume_test (stopped after verification)",
+    "loadedCodeSha": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+    "isolatedInstall": "PASS_CREATED_DRAFT_AND_RESTART_RESUMED",
+    "targetInstall": "NOT_RUN_MAIN_CONTENT_NOT_MERGED_OR_DEPLOYED",
+    "publication": "NOT_RUN",
+    "allocation": "NOT_RUN",
+    "allowedProducts": [],
+    "configId": "312f54aa-1143-406b-8050-177ec5f19a97",
+    "releaseId": null,
+    "readback": {
+      "status": "PASS",
+      "configRows": 1,
+      "installEvents": 1,
+      "afterDatabaseRestart": true,
+      "updatedAtUnchanged": true
+    },
+    "configStatus": "DRAFT",
+    "accessPolicy": "GRANT",
+    "configSourceHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985"
+  },
+  "storageEvidence": {
+    "reportSaved": "NOT_RUN",
+    "rawArchiveAcknowledged": "NOT_RUN",
+    "storeKind": "UNKNOWN",
+    "downloadAvailable": "NOT_RUN"
+  },
+  "operationReceipts": [
+    {
+      "operation": "isolated-install-and-resume",
+      "environment": "DOT_SYNTHETIC_PG17",
+      "sourceCommit": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+      "status": "PASS",
+      "firstAction": "CREATED_DRAFT",
+      "resumeAction": "ALREADY_PRESENT",
+      "configId": "312f54aa-1143-406b-8050-177ec5f19a97",
+      "sourceHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985",
+      "evidencePath": "resume-20261029/resume-result.json",
+      "readbackAt": "2026-10-29T08:36:35.299Z",
+      "scope": "Draft config persistence/idempotency only; no publication, public library, runtime or COS claims"
+    }
+  ],
+  "notion": {
+    "pageId": null,
+    "syncStatus": "NOT_RUN"
+  },
+  "blockedBy": [
+    "Formal target has not loaded/merged candidate code; main currently lacks this native candidate registration.",
+    "Content/UI/report review remains incomplete; isolated DRAFT does not authorize public use.",
+    "New browser visual verification blocked: local Chromium socket sandbox failure; elevated launch failed before process with read-only environment; cloud browser disallows file URLs and cannot reach isolated localhost. No security settings changed."
+  ],
+  "nextAction": "Use preserved draft config and receipts; finish content/report/UI audit and selected changed-consumer evidence, integrate reviewed candidate into current main before any formal target install. Do not rerun the successful install/resume test unless its real inputs change.",
+  "materials": {
+    "requiredAssets": [
+      "HFShape.tsx"
+    ],
+    "actualPoolHash": null,
+    "availability": "SOURCE_SVG_PRESENT",
+    "evidenceKind": "ORIGINAL_GEOMETRIC_SVG",
+    "realAssetCoverage": null,
+    "missingAssets": []
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "recordType": "cognitive-intake-batch",
+  "workflowVersion": "0.1.1",
+  "workflowGitSha": null,
+  "mode": "WORKFLOW_DESIGN_ONLY",
+  "repository": "caohuibj/eduK12-new-version",
+  "baseSha": null,
+  "authorizedActions": [],
+  "targetEnvironment": null,
+  "items": [],
+  "sharedEvidence": [],
+  "pendingQuestions": [],
+  "notionIndex": null,
+  "status": "DRAFT"
+}
