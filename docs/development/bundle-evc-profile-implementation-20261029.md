@@ -495,3 +495,33 @@ native集成控制9例实际PASS，Python编译上下文/沿用runtime recipe控
 | 正式qualified与stable gate | 上述实际结果齐备后的原workflow/原stable gate；当前Draft成功只表示控制预检。 |
 
 预算修正：控制边界/原件核验约1—2分钟；两个producer各预计2—4分钟并行，runtime包装/扫描受官方下载影响应保留原30分钟作业上限并报告实际等待项。CodeQL需保守按接近20分钟或更久准备，原job上限30分钟；此前第19节3—6分钟不是保证。五分钟是报告具体等待项的阈值，不是超时后削弱检查的理由。本切片不启动Ready重型任务，不改成人EVC适用性，不部署。
+
+## 21. 原件对应、main只读观察与失败产物保留
+
+DOT已核对Survey原ZIP的92份长度/hash和具体case；本节不将该审阅扩大成所有应用证据已接纳。业务源码仍72078d2cc，本切片不修改任何量表、业务入口、科学参数、依赖、schema或权限角色。本轮完整raw边界更新为98路径（85产品＋13控制），26项关键保护输入；其余传递文件仍由固定base及完整diff约束。
+
+### 最小证据对应清单
+
+另交付15组逐行为清单：M01数值模型/原配置；M02核心质量/cache；M03显式适用条件；M04 setup；T01 Training原生FINAL/单项与综合；T02保存/恢复；T03实际页面；S01 School整源/年龄/权限；S02原发布及FINAL/重放；S03恢复/错误actor；S04实际页面；V01 Survey指标/受众；V02整包U/冻结/作答FINAL；V03最新Context/旧hash/R单项reader；V04学生浏览器及编制UI。每组保留原reporter/exit路径、报告hash、确切suite/行/case、source身份类型、静态import闭包的旧/新blob、锁/schema关系和具体限制。历史失败/filtered不改写；原完整argv未留存的明确标记缺失，不能把复现命令当历史执行记录。
+
+静态核对发现：原B profile0.1.0与最终0.1.1的数据只差三个runtimeDefinitionHash及mappingVersion；matchProfileConstructs函数体、两个数学instrument.ts/source.json字节完全相同。这支持数值内核的独立审阅，不自动证明修改后的来源身份、质量或适用条件分支；后者列独立原件。原43例中的8个配置拒绝行同fullName，保留原报告hash＋suite/行号；可以沿既有inspectHistoricalCase的按索引方式审，不改名补造唯一case，不直接套要求所有名称唯一的读取器。
+
+Training与School原始文字记录此前没有上传，现首次交付；Survey原ZIP身份和字节不变，不复制其92份原件。浏览器的sourceCommit来自runner中的声明值，并非当时API进程/dist的认证，已如实标记。Training UI完整静态图ce5→720无blob变化；School UI图d58→720同样无变化。Survey学生PublicApp/feedback链未随720研究者单项reader修复改变；该reader的403由实际720保存读case单独覆盖。UI图不能替代后端闭包：Training的db=prisma可选参数和instance函数搬移、School只读服务、Survey来源/旧hash/R读消费者均列明差异。保守import图含type-only和未执行分支，不凭一个图hash放行全部变化，也不因图里有其他量表材料变更便重跑全部工具。
+
+仅需DOT集中决定：是否接纳这些明确局限下的reviewed-local-evidence；是否以原失败栈/已到达阶段及实际保存行审阅School原发布阶段；是否需要一个既有合成任务的只读身份/INITIAL/单项/综合/无重算补充；是否接纳声明source的原浏览器，或仅补一个受影响的最终产物报告重开。不预设全15组重跑，不新建成人EVC。所有组仍PENDING_DOT_REVIEW；requireNativeEvidence保持明确阻塞，本切片没有接纳器状态文字解锁。
+
+### main push只观察精确通过的PR
+
+a263的原实现虽只在main做正常双亲/source-tree核对、不会启动School heavy job，但尚未读取该精确PR的正式成功。本切片在既有content-scope CLI的native main分支增加只读官方观察，普通PR/Draft路径不访问它：必须是同仓PR388、同branch/source、已合并且非Draft、merge commit精确等于当前main双亲合并；再读取该source最新一次官方pull_request CI run，要求当前attempt实际完成成功。没有“找较早绿run”回退。分页核真实jobs，必须scope、全部6个native作业、qualified、真实CodeQL及stable gate逐一唯一且success，Draft的4个绿色job不能替代。原失败/跳过/排队或错SHA明确拒绝。
+
+main返回只读观察坐标，不构建、不审计、不扫描、不重放业务。原School workflow caller仍只允许pull_request；手动/full/未知输入拒绝，保护与必需上下文未改。新增两个控制case已PASS，涵盖错误PR/source/merge、缺失/跳过CodeQL及runtime、新run失败不回退和producer重试拒绝；未重复原9控制或业务矩阵。实际只读核现有Draft API形状：同head run查询有效，jobs总数134，需原分页读取，未误把这份Draft run称Ready证明。
+
+### 同run编译产物与失败后的边界
+
+frontend/backend-self各自独立producer完成后，原dist manifest与runtime context由原upload-artifact保留3天；context receipt保存原head/component tree/runId/producer attempt/archiveSHA，既有成功producer不因下游native-runtime失败失去身份。失败consumer的安全命令退出/hash及扫描JSON按always保留；不会把失败job整体标为通过。
+
+当前只消费同run/同attempt，不承诺已实现跨attempt或跨commit自动续用。新增producer attempt守卫在实际编译前拒绝第二次尝试，防止“rerun all”默认重建原成功产物。runtime失败后先诊断、核原成功producer/job/artifact/原receipt与字节，再由DOT选择仅缺失consumer的精确continuation小补丁；不能重写manifest为新SHA/attempt，也不通过改source清零失败。保留期到期或原件不可用应报告缺口，不偷偷回退重建。runtime job内部部分镜像阶段成功不自动等同完整job资格；本草稿尚无任意部分image跨runner恢复功能，不能假称已支持。
+
+### node_modules链接与解包兼容
+
+只读检查本环境的实际node_modules和同样GNU tar头：14,119个member、展开356,842,863字节；28个内部相对symlink、1个hardlink，其target是已出现的同node_modules根regular文件（esbuild两个入口）。没有设备/越界/特权mode/重复路径/在链接下写入；低于safe_extract既有150,000 member/4GiB上限。逐规则与现有safe_extract的prior-regular、内部相对symlink、无link-parent写入及Python data filter合同对应，没有放松解包校验，没有为此完整解包368MB、构建或扫描。该记录是本地锁定依赖安装的兼容性观察，不是未来CI原件，正式producer仍须绑定实际原件及完整hash。

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
-import {nativeBinding,nativeSastConfig,validateNativeBoundary,requireNativeQualification,requireNativeEvidence,NATIVE_BRANCH,NATIVE_MARKER,NATIVE_JOBS} from './school-teacher-native.mjs';
+import {nativeBinding,nativeSastConfig,validateNativeBoundary,requireNativeQualification,requireNativeEvidence,observeNativeMain,requireNativeProducerAttempt,NATIVE_BRANCH,NATIVE_MARKER,NATIVE_JOBS} from './school-teacher-native.mjs';
 import {binding,schoolTeacherPlan,schoolTeacherOutputs,requireSuccess,BRANCH,SELF_BRANCH,JOBS,SELF_JOBS} from './school-teacher-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8');
@@ -105,4 +105,27 @@ test('Draft control preflight cannot authorize Ready or omit any selected result
  const nested=Object.fromEntries([...new Set([...JOBS,...SELF_JOBS,...NATIVE_JOBS])].map(id=>[id,{result:id==='admission'?'success':'skipped'}]));
  assert(requireSuccess(plan,nested));assert.throws(()=>requireSuccess({...plan,preflightOnly:false},nested));assert.throws(()=>requireSuccess(plan,{...nested,frontend:{result:'success'}}));
  for(const id of ['frontend','security','native-evidence','native-runtime'])assert(job(id).includes('preflightOnly != true'));
+});
+test('main observes only the exact merged PR and newest successful official full qualification, with no older-green fallback',async()=>{
+ const plan={candidate:'native-bundle',postMerge:true,requiredJobs:NATIVE_JOBS,sourceHead:'a'.repeat(40),head:'b'.repeat(40)};
+ const pr={number:388,merged:true,state:'closed',draft:false,head:{ref:NATIVE_BRANCH,sha:plan.sourceHead,repo:{full_name:'caohuibj/eduK12-new-version'}},base:{ref:'main',repo:{full_name:'caohuibj/eduK12-new-version'}},merge_commit_sha:plan.head};
+ const run={id:7,run_attempt:1,head_sha:plan.sourceHead,head_branch:NATIVE_BRANCH,event:'pull_request',path:'.github/workflows/ci.yml',repository:{full_name:'caohuibj/eduK12-new-version'},status:'completed',conclusion:'success'};
+ const names=['classify changed content',...NATIVE_JOBS.map(id=>'school-teacher / '+id),'school-teacher / qualified','codeql (javascript/typescript SAST)','merge gate / ready PR'];
+ const jobs=names.map((name,i)=>({id:i+10,name,run_id:7,head_sha:plan.sourceHead,run_attempt:1,status:'completed',conclusion:'success'}));
+ const fixture={pr,runs:[run],jobs};
+ const api=f=>async path=>{
+  if(path==='/pulls/388')return f.pr;
+  if(path==='/actions/workflows/ci.yml/runs?event=pull_request&head_sha='+plan.sourceHead+'&per_page=100')return {total_count:f.runs.length,workflow_runs:f.runs};
+  assert.equal(path,'/actions/runs/7/attempts/1/jobs?per_page=100&page=1');return {total_count:f.jobs.length,jobs:f.jobs};
+ };
+ assert.equal((await observeNativeMain(plan,api(fixture))).applicationExecuted,false);
+ for(const mutate of [f=>f.pr.draft=true,f=>f.pr.merged=false,f=>f.pr.head.sha='c'.repeat(40),f=>f.pr.merge_commit_sha='c'.repeat(40),f=>f.runs[0].conclusion='failure',f=>f.runs[0].status='in_progress',f=>f.runs.push({...run,id:8,conclusion:'failure'}),f=>f.jobs.pop(),f=>f.jobs[0].head_sha='c'.repeat(40),f=>f.jobs[0].run_attempt=2,f=>f.jobs.find(j=>j.name.includes('native-runtime')).conclusion='skipped',f=>f.jobs.find(j=>j.name.startsWith('codeql')).conclusion='skipped']){
+  const changed=structuredClone(fixture);mutate(changed);await assert.rejects(()=>observeNativeMain(plan,api(changed)));
+ }
+ const classifier=readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');assert(classifier.includes('schoolTeacher.mainObservation=await observeNativeMain(schoolTeacher)'));
+ assert(ci.includes("github.event_name == 'pull_request' && (github.event.pull_request.draft == false || fromJSON(needs.scope.outputs.school_teacher_plan"));
+});
+test('a failed runtime consumer cannot silently cause producers to build again under a later attempt',()=>{
+ requireNativeProducerAttempt('1');for(const attempt of ['2','0','',undefined])assert.throws(()=>requireNativeProducerAttempt(attempt));
+ const checks=readFileSync(new URL('./school-teacher-checks.mjs',import.meta.url),'utf8');assert(checks.indexOf('requireNativeProducerAttempt(process.env.GITHUB_RUN_ATTEMPT)')<checks.indexOf("freshBuild(kind);nativeContext(kind)"));
 });

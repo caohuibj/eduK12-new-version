@@ -54,7 +54,7 @@ export function validateNativeBoundary(b,o,{draftPreflight=false}={}){
  assert(Object.keys(b.protectedInputs).length>10,'Runtime/config closure missing');
  assert.deepEqual(o.protectedInputs,b.protectedInputs,'Locked dependency/schema/runtime/control dependency drift');
  return {schema:1,route:'school-teacher',candidate:'native-bundle',base:b.base,head:o.checkoutHead,sourceHead:o.sourceHead,sourceTree:o.sourceTree,
-  product:b.productHead,productTree:b.productTree,components:{frontend:b.frontendTree,backend:b.backendTree},...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
+  product:b.productHead,productTree:b.productTree,components:{frontend:b.frontendTree,backend:b.backendTree},...(o.event==='push'?{postMerge:true}:{}),...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
   inputsSha256:hash(JSON.stringify({source:b.source,controls:b.controls,protectedInputs:b.protectedInputs,execution:b.execution}))};
 }
 export function nativePlan(entries,base,head,read,env,b=nativeBinding()){
@@ -85,4 +85,41 @@ export function requireNativeEvidence(b){
  assert.equal(b.evidence.status,'PENDING_INDEPENDENT_REVIEW');
  assert(Array.isArray(b.evidence.obligations)&&b.evidence.obligations.length>0);
  throw Error('Native application assertions not admitted: '+b.evidence.obligations.join(', '));
+}
+export function requireNativeProducerAttempt(attempt){
+ assert.equal(attempt,'1','Native producer retry requires diagnosis and an exact continuation; never rebuild an existing successful artifact by default');
+}
+export async function nativeOfficialApi(path,env=process.env){
+ assert(env.GH_TOKEN,'Official read token required');
+ const r=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version'+path,{headers:{Authorization:'Bearer '+env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(30000)});
+ assert.equal(r.status,200,'Native main observation unavailable');return r.json();
+}
+export async function observeNativeMain(plan,api=nativeOfficialApi){
+ assert.equal(plan.candidate,'native-bundle');assert.equal(plan.postMerge,true);assert.notEqual(plan.preflightOnly,true);assert.deepEqual(plan.requiredJobs,NATIVE_JOBS);
+ const pr=await api('/pulls/388');
+ assert.equal(pr.number,388);assert.equal(pr.merged,true);assert.equal(pr.state,'closed');assert.equal(pr.draft,false);
+ assert.equal(pr.head.ref,NATIVE_BRANCH);assert.equal(pr.head.repo.full_name,'caohuibj/eduK12-new-version');assert.equal(pr.head.sha,plan.sourceHead);
+ assert.equal(pr.base.ref,'main');assert.equal(pr.base.repo.full_name,'caohuibj/eduK12-new-version');assert.equal(pr.merge_commit_sha,plan.head);
+ const listing=await api('/actions/workflows/ci.yml/runs?event=pull_request&head_sha='+plan.sourceHead+'&per_page=100');
+ assert(listing.total_count>0&&listing.total_count<=100);assert.equal(listing.workflow_runs.length,listing.total_count);
+ // Inspect the newest run for this exact source, never search backwards for
+ // an older green result when a newer attempt is pending or failed.
+ const run=[...listing.workflow_runs].sort((a,b)=>b.id-a.id)[0];
+ assert.equal(run.head_sha,plan.sourceHead);assert.equal(run.head_branch,NATIVE_BRANCH);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
+ assert.equal(run.repository.full_name,'caohuibj/eduK12-new-version');assert.equal(run.status,'completed');assert.equal(run.conclusion,'success');
+ assert(Number.isSafeInteger(run.id)&&run.id>0&&Number.isSafeInteger(run.run_attempt)&&run.run_attempt>0);
+ const rows=[];let total;
+ for(let page=1;page<=2;page++){
+  const response=await api('/actions/runs/'+run.id+'/attempts/'+run.run_attempt+'/jobs?per_page=100&page='+page);
+  assert(Number.isSafeInteger(response.total_count)&&response.total_count>0&&response.total_count<=200);
+  total??=response.total_count;assert.equal(response.total_count,total);rows.push(...response.jobs);if(rows.length===total)break;
+ }
+ assert.equal(rows.length,total);assert.equal(new Set(rows.map(j=>j.id)).size,rows.length);
+ const required=['classify changed content',...NATIVE_JOBS.map(id=>'school-teacher / '+id),'school-teacher / qualified','codeql (javascript/typescript SAST)','merge gate / ready PR'];
+ const jobs=required.map(name=>{
+  const found=rows.filter(j=>j.name===name);assert.equal(found.length,1,'Missing/ambiguous exact native job '+name);const j=found[0];
+  assert.equal(j.run_id,run.id);assert.equal(j.head_sha,plan.sourceHead);assert.equal(j.run_attempt,run.run_attempt);assert.equal(j.status,'completed');assert.equal(j.conclusion,'success',name+' did not qualify');
+  return {id:j.id,name:j.name};
+ });
+ return {kind:'EXACT_MERGED_PR_OBSERVATION',pr:388,sourceHead:plan.sourceHead,mergeHead:plan.head,runId:run.id,attempt:run.run_attempt,jobs,applicationExecuted:false};
 }

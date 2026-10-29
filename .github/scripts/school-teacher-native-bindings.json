@@ -364,13 +364,17 @@
     }
   },
   "controls": {
+    ".github/scripts/content-scope.mjs": {
+      "before": "fb826d2008be6c47ffaf5d0c85e4feab005ddf50",
+      "after": "01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9"
+    },
     ".github/scripts/merge-gate.mjs": {
       "before": "5dea59f321ddef5fe975ef74d02708cc3113affe",
       "after": "53c7f80151c32c99f56570f18de7246769858fe9"
     },
     ".github/scripts/school-teacher-checks.mjs": {
       "before": "3ab008be96c779e282d101f8d9c8277ad4659b71",
-      "after": "1f1e54b1c5bd2e20ec77d9fe79e281893652b54f"
+      "after": "c65d528e70250048f7867bdede9e597dc6d90c3c"
     },
     ".github/scripts/school-teacher-native-bindings.json": {
       "before": null,
@@ -386,11 +390,11 @@
     },
     ".github/scripts/school-teacher-native.mjs": {
       "before": null,
-      "after": "633488b001f1f9f3a1a80dbf34e13d5af56f2713"
+      "after": "994f2721c8e03b5181793cd9726c98a7741d1efb"
     },
     ".github/scripts/school-teacher-native.test.mjs": {
       "before": null,
-      "after": "29e77e6e45d535a2184b81813113318bd67cd46e"
+      "after": "7dc0a6f1e2b3bbc809986bfe44ecbe17af02684c"
     },
     ".github/scripts/school-teacher-scope.mjs": {
       "before": "41e85a871dcc046937cbaf21547415132b5d6343",
@@ -410,7 +414,7 @@
     },
     "docs/development/bundle-evc-profile-implementation-20261029.md": {
       "before": null,
-      "after": "9e3fa23fd6d6b34f4bceea86a42f426497f02b92"
+      "after": "2f78b188f56497e18abebfb8f1c7fca43ac15322"
     }
   },
   "protectedInputs": {
@@ -418,7 +422,6 @@
     ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e",
     ".github/release-tools/package.json": "1913b93fbd582fbbd28398488e8e91d6bb9865d5",
     ".github/scripts/ci-artifact.mjs": "113e99e003bd376bb7a25d617dc299ae54418671",
-    ".github/scripts/content-scope.mjs": "fb826d2008be6c47ffaf5d0c85e4feab005ddf50",
     ".github/scripts/exact-candidate-runtime.py": "cd0e30282a029194c25f471963be44f41e9d06c9",
     ".github/scripts/school-teacher-bindings.json": "cd0ff6c2c87b3c124ea528ebff3abd77224b66b2",
     ".github/scripts/school-teacher-evidence.json": "6f358e2ad7aefaa32c294f19cbb050b73c34b7c3",
