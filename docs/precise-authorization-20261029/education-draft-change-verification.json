@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "base": "523cc301b938e60b218279b6f52aba20d1f3e126",
+  "main": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "scope": "Education T2 source slot identity audit in existing update transaction; no runtime/permission change",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost55439 test owner role",
+    "database": "precise_education_replacement_test_20261029",
+    "productionAccessed": false
+  },
+  "results": {
+    "newUnit": 3,
+    "filteredOriginalUnit": 5,
+    "newPostgres": 3,
+    "finalBackendTypesExit": 0
+  },
+  "raw": {
+    "file": "education-draft-change-raw.json",
+    "sha256": "b4014173e5f1b18a0ec407cc4087826bec09a0ccd672c375f8742df166211abc"
+  },
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-draft-replacement-audit.postgres.integration.test.ts",
+      "sha256": "c9a3ec075babbd7cbee17dd41a713fd1f8c6e49de3bf10e3e6ea366ee7ae9b77"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/selected-source-binding.test.ts",
+      "sha256": "b13d208066ae88ff4bccd7fd293cc292a9fa8f3c05fd346a10ddfc9ee97c9ca2"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+      "sha256": "a66a33af6e6870b1935a933b5b1d0fa67602fa06b1ea73592cdd79e8fcc9d9f5"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/selected-source-binding.ts",
+      "sha256": "d1fd7a9ece372e8f5714450ef385309d4372b92d1cad257525625e76cd7bb75e"
+    }
+  ],
+  "inputCapture": {
+    "at": "2026-10-29T19:03:47.152052+00:00",
+    "kind": "Post-execution direct inventory; not signed CI or contemporaneous full dependency manifest"
+  },
+  "failurePreserved": "First PG invocation3FAIL because canonicalHash import absent; dependent operations stopped. Actual readback9grants/3drafts/2versions/0events and waiting revision2 preceded import fix/retry. Initial tsc also flagged fresh-object excess instruction property in new unit; same-value variable fixes types without changing tested projection.",
+  "reuseBoundary": "New pure projection3 passed before same-value test refactor; not replayed. Affected writer imports repaired, only previously failed DB3 and types rerun. No old lifecycle/scoring or frontend/CI replay.",
+  "notExecuted": [
+    "School-specific new audit journey",
+    "Participant execution/report",
+    "Legacy migration or backfill",
+    "Representative performance",
+    "Formal CI",
+    "Production/runtime role"
+  ]
+}

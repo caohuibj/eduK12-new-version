@@ -5,6 +5,7 @@ import {readEducationPublicSourceHeaders,educationPublicRequiredContextKeys} fro
 import {compilePrivateFormRuntime} from './private-tool.form-runtime-adapter'
 import {EducationPrivateToolError} from './private-tool.contracts'
 import {randomUUID} from 'node:crypto'
+import {canonicalHash} from '../assessment-runtime/canonical'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -26,7 +27,7 @@ import {educationPublicSourceKey} from './public-source.identity'
 import {educationBlockPublicSource} from './public-source.identity'
 import {compositionLeafKey} from './private-tool.composition-compiler'
 import {lockOwnedDraftNativeSources} from './native-source.locks'
-import {assertSelectedSourceBindingsUnchanged,selectedSourceBindingsFromBlocks} from './selected-source-binding'
+import {assertSelectedSourceBindingsUnchanged,selectedSourceBindingsFromBlocks,selectedSourceBindingChanges} from './selected-source-binding'
 
 type Tx=Prisma.TransactionClient
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const
@@ -110,9 +111,11 @@ export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unkno
   const row=await readOwned(tx,c,id,true)
   if(row.revision!==input.expectedRevision)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
   const definition=privateToolDefinition(row.kind as PrivateToolKind,input.definition)
+  let sourceChanges:ReturnType<typeof selectedSourceBindingChanges>=null
   if(row.kind==='COMPOSITION'){
    const previous=row.definition as unknown as PrivateCompositionDefinition,next=definition as PrivateCompositionDefinition
    assertSelectedSourceBindingsUnchanged(previous.blocks,next.blocks)
+   sourceChanges=selectedSourceBindingChanges(previous.blocks,next.blocks)
    const pins=selectedSourceBindingsFromBlocks(next.blocks)
    if(pins.size){
     const allowed=await readEducationPublicUse(tx,c,[...pins.keys()],true,pins)
@@ -125,6 +128,12 @@ export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unkno
    data:{title:input.title,definition:definition as Prisma.InputJsonValue,contentHash,revision:{increment:1}}})
   if(result.count!==1)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
   await syncPrivateToolDraftImages(tx,id,media)
+  if(sourceChanges){
+   const change={schemaVersion:1,entry:c.entry,organizationId:c.organizationId,previousRevision:row.revision,revision:row.revision+1,
+    previousContentHash:row.contentHash,contentHash,...sourceChanges}
+   await tx.assessmentManagementEvent.create({data:{id:randomUUID(),actorId:c.principal.userId,resourceId:id,
+    action:'EDUCATION_PRIVATE_SOURCE_BINDINGS_CHANGED',metadata:{...change,changeHash:canonicalHash(change)}}})
+  }
   return {id,revision:row.revision+1,contentHash,...boundary}
  },false,true)
 }

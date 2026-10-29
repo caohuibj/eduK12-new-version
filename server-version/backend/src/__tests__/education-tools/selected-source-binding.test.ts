@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest'
-import {readSelectedSourceBindings,selectedSourceBindingsFromBlocks,assertSelectedSourceBindingsUnchanged} from '../../modules/education-tools/selected-source-binding'
+import {readSelectedSourceBindings,selectedSourceBindingsFromBlocks,assertSelectedSourceBindingsUnchanged,selectedSourceBindingChanges} from '../../modules/education-tools/selected-source-binding'
 import {privateCompositionSourceSchema} from '../../modules/education-tools/private-tool.composition-contracts'
 import {privateToolContentHash} from '../../modules/education-tools/private-tool.definition'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
@@ -37,5 +37,24 @@ describe('education immutable selected source pointer',()=>{
   const definition={blocks:[{blockId:id(4),source}]}
   expect(privateToolContentHash('COMPOSITION','Fixed',definition)).not.toBe(privateToolContentHash('COMPOSITION','Fixed',{
    blocks:[{blockId:id(4),source:{...source,selectedBinding:{...pointer,authorizationRevision:2}}}]}))
+ })
+})
+describe('education selected-source change audit facts',()=>{
+ it('ignores plain edits, reordering and legacy sources without manufacturing a binding',()=>{
+  const blocks=[{blockId:id(4),source},{blockId:id(5),source:{...source,selectedBinding:undefined}}]
+  const edited={...blocks[0],instruction:'Changed prose'}
+  expect(selectedSourceBindingChanges(blocks,[blocks[1],edited])).toBeNull()
+  expect(selectedSourceBindingChanges([{blockId:id(4),source:{...source,selectedBinding:undefined}}],[])).toBeNull()
+ })
+ it('records exact removed and added slot identities, without carrying unrelated executable or report content',()=>{
+  const next={...source,versionId:id(8),selectedBinding:{...pointer,authorizationId:id(9),bindingHash:'d'.repeat(64)}}
+  expect(selectedSourceBindingChanges([{blockId:id(4),source:{...source,report:'never copy'}}],[{blockId:id(5),source:next}])).toEqual({
+   removed:[{blockId:id(4),...source}],added:[{blockId:id(5),...next}]})
+ })
+ it('records explicit add/drop independently and rejects a provided malformed pointer',()=>{
+  const block={blockId:id(4),source}
+  expect(selectedSourceBindingChanges([],[block])).toEqual({removed:[],added:[{blockId:id(4),...source}]})
+  expect(selectedSourceBindingChanges([block],[])).toEqual({removed:[{blockId:id(4),...source}],added:[]})
+  expect(()=>selectedSourceBindingChanges([block],[{...block,source:{...source,selectedBinding:null}}])).toThrow()
  })
 })

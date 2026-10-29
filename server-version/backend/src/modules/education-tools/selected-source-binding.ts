@@ -8,6 +8,7 @@ export type SelectedSourcePointer=z.infer<typeof selectedConfigurationPointerSch
 export type SelectedSourceBindings=ReadonlyMap<string,readonly SelectedSourcePointer[]>
 const sourceSchema=z.object({provider:z.literal('STANDARD_SCALE'),versionId:z.string().guid(),
  contentHash:z.string().regex(/^[a-f0-9]{64}$/),selectedBinding:selectedConfigurationPointerSchema}).strict()
+const changeSourceSchema=sourceSchema.extend({blockId:z.string().guid()})
 
 /** Headers projected from the original immutable version, never the latest
  * grant or a current default. No executable/report body is needed at START. */
@@ -34,4 +35,18 @@ export function assertSelectedSourceBindingsUnchanged(previous:ReadonlyArray<{bl
   if(source.selectedBinding!==undefined&&replacement&&canonicalHash(replacement.source)!==canonicalHash(source))
    privateToolFail('SELECTED_CONFIGURATION_REPLACEMENT_REQUIRED',409)
  }
+}
+
+/** Draft audit facts only. Reordering/text edits are not a source replacement;
+ * explicit slot removal/addition keeps both exact original identities. Bodies,
+ * report prose, current permissions and latest defaults are never copied. */
+export function selectedSourceBindingChanges(previous:ReadonlyArray<{blockId:string;source:unknown}>,next:ReadonlyArray<{blockId:string;source:unknown}>){
+ const project=(blocks:typeof previous)=>z.array(changeSourceSchema).max(50).parse(blocks.flatMap(block=>{
+  if(!block.source||typeof block.source!=='object')return []
+  const s=block.source as Record<string,unknown>
+  return s.provider==='STANDARD_SCALE'&&s.selectedBinding!==undefined?[{blockId:block.blockId,provider:s.provider,versionId:s.versionId,contentHash:s.contentHash,selectedBinding:s.selectedBinding}]:[]
+ })).sort((a,b)=>a.blockId<b.blockId?-1:a.blockId>b.blockId?1:0)
+ const before=project(previous),after=project(next),oldIds=new Set(before.map(value=>canonicalHash(value))),newIds=new Set(after.map(value=>canonicalHash(value)))
+ const removed=before.filter(value=>!newIds.has(canonicalHash(value))),added=after.filter(value=>!oldIds.has(canonicalHash(value)))
+ return removed.length||added.length?{removed,added}:null
 }
