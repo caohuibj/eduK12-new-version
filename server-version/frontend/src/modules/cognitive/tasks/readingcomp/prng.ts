@@ -2,7 +2,8 @@ import { READINGCOMP_BANK } from './bank'
 
 export interface ReadingcompStimulus {
   itemId: string
-  stem: string
+  passage: string
+  question: string
   options: [string, string, string, string]
 }
 

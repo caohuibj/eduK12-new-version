@@ -51,7 +51,7 @@ export const TrustgameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trial
     return () => document.removeEventListener('visibilitychange', onVisibilityChange)
   }, [phase])
 
-  const submitFormal = useCallback(async (response: 'accept' | 'reject') => {
+  const submitFormal = useCallback(async (response: 'accept' | 'reject' | null) => {
     if (phase !== 'formal' || subPhase !== 'choice' || submittingRef.current) return
     submittingRef.current = true
     const payload: TrustgameTrialPayload = {

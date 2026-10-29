@@ -92,16 +92,16 @@ type GeneratedSpec = { shapeRule: AttributeRule; fillRule: AttributeRule; countR
 
 const specFor = (seed: string, index: number): GeneratedSpec => {
   const random = mulberry32(xmur3(`${seed}:icarmatrix:spec:${index}`)())
-  const rules: AttributeRule[] = ['progression', 'distribution', 'progression']
-  const pick = (a: number, b: number): AttributeRule => rules[a % rules.length] === b ? rules[(a + 1) % rules.length] : rules[a % rules.length]
-  const varyingA = index % 3
-  const varyingB = (index + 1) % 3
-  const constant = 2
-  const ruleFor = (position: number): AttributeRule => (position === constant ? 'constant' : position === varyingA ? pick(index, 'progression') : 'distribution')
+  const rulePool: AttributeRule[][] = [
+    ['progression', 'distribution', 'constant'],
+    ['distribution', 'progression', 'constant'],
+    ['constant', 'progression', 'distribution'],
+  ]
+  const ruleSet = rulePool[index % rulePool.length]
   return {
-    shapeRule: ruleFor(0),
-    fillRule: ruleFor(1),
-    countRule: ruleFor(2),
+    shapeRule: ruleSet[0],
+    fillRule: ruleSet[1],
+    countRule: ruleSet[2],
     s0: Math.floor(random() * SHAPE_COUNT),
     f0: Math.floor(random() * FILL_COUNT),
     c0: Math.floor(random() * 3),
