@@ -769,7 +769,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     !detail?.anonymousStudy && !detail?.anonymousStudyId && !detail?.assignmentRef &&
     !detail?.deliveryPolicy && !detail?.selectionPolicy && !detail?.routingPolicy && !detail?.randomizationPolicy
   const draft = id === 'new' || detail?.status === 'DRAFT'
-  const standardCombinationChoices: Array<{id:string;name:string;scaleId:string;instrumentVersion:string;version:string;code:string;profile:string;combination:{releaseId:string;combinationHash:string}}> = trainingDesign&&kind==='COURSE'&&!formTemplate
+  const standardCombinationChoices: Array<{id:string;name:string;scaleId:string;instrumentVersion:string;version:string;code:string;profile:string;combination:{releaseId:string;combinationHash:string}}> = trainingDesign&&!formTemplate
     ? (catalog.standardCombinations??[]).map((choice:any)=>{
       const axes=choice.axisVersions
       const version=axes?standardVersionLabel(axes):choice.instrumentVersion
@@ -1048,7 +1048,6 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                       )}
                     </select>
                   </label>
-                  {type==='SCALE'&&trainingDesign&&kind!=='COURSE'&&(catalog.standardCombinations??[]).length>0&&<p className="qt-content-availability">精确批准组合目前适用于课程问卷。</p>}
                   {type !== 'FORM' ? (
                     trainingDesign ? <><Suspense fallback={<p role="status">正在加载工具…</p>}><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} /></Suspense>{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
                       选择测评

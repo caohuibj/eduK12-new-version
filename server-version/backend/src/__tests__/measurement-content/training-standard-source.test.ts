@@ -28,6 +28,23 @@ describe('Training consumes one exact shared combination through one user Materi
   expect(second.reference.authority).toEqual(first.reference.authority)
   expect(second.referenceHash).toBe(first.referenceHash);expect(f.h.writes).toEqual([])
  })
+ it('pins the same exact grant in an owned anonymous GENERAL draft without borrowing a course',async()=>{
+  const f=trainingSourceHarness();f.h.composite.questionnaireType='GENERAL';f.h.composite.questionnaireCourses=[]
+  f.h.composite.publicEnabled=true
+  const source=await run(f)
+  expect(source.reference.authority.useGrantId).toBe(ids.leaf)
+  expect(source.reference.ownerId).toBe(ids.owner)
+  expect(source.reference.combination.combinationHash).toBe(f.h.row.combination_hash)
+  expect(f.h.calls.some((sql:string)=>sql.includes('FROM courses WHERE id IN'))).toBe(false)
+ })
+ it.each(['foreign-course','legacy-course','legacy-container','unknown-type'])('rejects mixed or legacy anonymous scope: %s',async kind=>{
+  const f=trainingSourceHarness();f.h.composite.questionnaireType='GENERAL';f.h.composite.questionnaireCourses=[]
+  if(kind==='foreign-course')f.h.composite.questionnaireCourses=[{courseId:tid(90)}]
+  if(kind==='legacy-course')f.h.composite.courseId=tid(91)
+  if(kind==='legacy-container')f.h.composite.productKind='LEGACY_COMPOSITE'
+  if(kind==='unknown-type')f.h.composite.questionnaireType='OTHER'
+  await expect(run(f)).rejects.toThrow('COMPOSITE_UNAVAILABLE')
+ })
  // The merged entry contract (PR355, per the 2026-10-25 daily-release rules):
  // a CURRENT formal Training entry admin distributes without per-content
  // re-approval; anyone else must present the exact delegated 21B root.

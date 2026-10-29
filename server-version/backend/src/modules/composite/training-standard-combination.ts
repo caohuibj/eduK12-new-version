@@ -33,13 +33,14 @@ export class TrainingStandardSourceError extends ContentReleaseError {readonly s
 function fail(code:string):never{throw new TrainingStandardSourceError('CONTENT_TRAINING_STANDARD_'+code)}
 type Purpose='NEW_REFERENCE'|'COLLECTION'
 
-/** Course ownership is a business boundary, not another use-grant scope. Only
+/** Course/public ownership is a business boundary, not another use-grant scope. Only
  * server-loaded composites/items may reach this helper. New and frozen use both
  * resolve the user's one exact MaterialGrant, never legacy canUseScale as well. */
 export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionClient,actorId:string,composite:any,
  item:{id:string;scaleId:string},selection:{releaseId:string;combinationHash:string},purpose:Purpose='NEW_REFERENCE',useGrantId?:string,useGrantVersion?:number){
  const pointer=standardCombinationPointerSchema.parse({releaseId:selection.releaseId,combinationHash:selection.combinationHash})
- if(composite.productKind!=='QUESTIONNAIRE'||composite.questionnaireType!=='COURSE'
+ if(composite.productKind!=='QUESTIONNAIRE'||!['COURSE','GENERAL'].includes(composite.questionnaireType)
+  ||composite.questionnaireType==='GENERAL'&&(composite.courseId!=null||(composite.questionnaireCourses??[]).length>0)
   ||purpose==='NEW_REFERENCE'&&!['DRAFT','PUBLISHED'].includes(composite.status))fail('COMPOSITE_UNAVAILABLE')
  const [header]=await tx.$queryRaw<Array<{tool_key:string;instrument_version:string;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
   SELECT tool_key,snapshot->>'instrumentVersion' AS instrument_version,measurement_release FROM survey_standard_releases WHERE id=${pointer.releaseId}`)

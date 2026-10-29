@@ -3,6 +3,7 @@ import {trainingReinterpretationsRouter} from './reinterpretation.routes'
 import {trainingReferencesRouter} from '../training-analysis/reference.routes'
 import {trainingContentReportsRouter} from './content-report.routes'
 import {grantTrainingStandardCombinationUse,revokeTrainingStandardCombinationUse} from '../measurement-content/standard-combination-use'
+import {trainingStandardManagementCatalog,trainingStandardManagementGrants} from '../measurement-content/standard-combination-management'
 import {platformSurveyOriginGuard} from '../survey/originGuard'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -26,6 +27,10 @@ const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, 
 const pagination = z.object({ page: z.coerce.number().int().min(1).max(500).default(1), pageSize: z.coerce.number().int().min(1).max(50).default(25) })
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), handle(req => service.available(req.user!.userId)))
 // The same current 21B entry distribution authority; no course approval route.
+router.get('/standard-combinations/catalog',authenticate,platformSurveyOriginGuard,
+  handle(req=>trainingStandardManagementCatalog(req.user!.userId,req.query.page)))
+router.get('/standard-combinations/:combinationId/use-grants',authenticate,platformSurveyOriginGuard,
+  handle(req=>trainingStandardManagementGrants(req.user!.userId,req.params.combinationId,req.query)))
 router.post('/standard-combinations/:combinationId/use-grants',authenticate,platformSurveyOriginGuard,
   handle(req=>grantTrainingStandardCombinationUse(req.user!.userId,req.params.combinationId,req.body)))
 router.post('/standard-combination-use-grants/:grantId/revoke',authenticate,platformSurveyOriginGuard,
