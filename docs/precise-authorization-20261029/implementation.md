@@ -7,6 +7,7 @@
 [教育精确组合批准范围](education-admission-progress.md)、[三份基本素材装载](scale-materials-readback.md)。
 [Training T1→T2/T3 接线](training-binding-progress.md)给出共同契约的轻量指针及 legacy 兼容。
 [教育 T1 与原委托校验](education-use-progress.md)和[教育原授权指针](education-selected-source-progress.md)及[教育固定配置目录](education-selected-catalog-progress.md)记录后续实现；新发行服务尚未挂路由。
+[教育管理员内部服务](education-manager-services-progress.md)记录可复用管理读取、接收者与自身 use 撤销；仍待路由/页面。
 以下共同契约和撤权矩阵是初始基线记录；当前新增源码仍在独立开发分支，未合入 main。
 
 ## 当前共同契约
