@@ -1,0 +1,201 @@
+{
+  "instrument": "ipip_attending_emotions10_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "mainSHA": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "files": [
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "079effd9c0b6457af13556e9d471fcee118060ce",
+      "sha256": "79c1977eec784fed5fd974a7c55a2a4fe5f5b9ceee99b7fa4f0ca58aec41a555"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/README.md",
+      "gitBlob": "3b04dc541999e0422372107b081ea1abac4fa6bb",
+      "sha256": "0d7c451a6fa1cef295205c6e1f918a51862730025bea88ca2b1154d8c39a9023"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/bilingual-content.json",
+      "gitBlob": "87207a1e12eb92238364d94c16274975e86761c2",
+      "sha256": "3d951cb5850e2e4fec0be5e97c8af52aa1b30bd8a6669093ccc2baa0914ffe7d"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "9d342f7403ffb8ccbfff13d0f63f07fc536c9e0e",
+      "sha256": "7eb55b56b924f741eb200cf740ecf62cb9f62a6c1a657a6a34208013c097c1c6"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/references.md",
+      "gitBlob": "fd5cfae2b437a99d0d23cd01070a93d0edff26e2",
+      "sha256": "a300fcc22e87731333c8f9b71fbf4c137a7569515a48dbe555d33251075b8543"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/report-example.md",
+      "gitBlob": "1b5b882eb25dfed2d28185110adbfb271de0c5a1",
+      "sha256": "b397c881a574f36ba1aea81ada2b4e2628c3e3bf41915bc7d26136ea3120e615"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/synthetic-report-example.json",
+      "gitBlob": "1480971f3f428709350280828bd25399d2c84524",
+      "sha256": "bba8f5d7596b0cde8cac9a6d4db2ef499dd5c9d323ce2a6b8cfe602c6d9ebd64"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/report-revisions/1.0.1/change-record.json",
+      "gitBlob": "83e6b6acdf91c6b1abe75d1da658eda6a3b86504",
+      "sha256": "7d3c39dca3fe071b14cab179e0ca27d267df077985cb06ba7a27657ae2fb187d"
+    },
+    {
+      "commit": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+      "path": "server-version/backend/src/modules/scale/onboarding/types.ts",
+      "gitBlob": "ceed5febc6b2e67496ff4b47a87aeba5d289132b",
+      "sha256": "7e6b6b4c69114a7480dde09581402ed637bc0fb22eab282ae4c13176aa0d1974"
+    }
+  ],
+  "items": [
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_01",
+      "english": "Think about the causes of my emotions.",
+      "chinese": "我会思考自己产生情绪的原因。",
+      "key": "positive",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。"
+    },
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_02",
+      "english": "Pay a lot of attention to my feelings.",
+      "chinese": "我很关注自己的感受。",
+      "key": "positive",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。"
+    },
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_03",
+      "english": "Am usually aware of the way that I'm feeling.",
+      "chinese": "我通常能觉察到自己当下的感受。",
+      "key": "positive",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。 中文“当下”较原文显式限定当前时刻，作为工作译稿记录供人工审阅，不静默修改。"
+    },
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_04",
+      "english": "Notice my emotions.",
+      "chinese": "我会留意自己的情绪。",
+      "key": "positive",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。"
+    },
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_05",
+      "english": "Often stop to analyze how I'm feeling.",
+      "chinese": "我常常停下来分析自己的感受。",
+      "key": "positive",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。"
+    },
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_06",
+      "english": "Rarely think about how I feel.",
+      "chinese": "我很少思考自己有什么感受。",
+      "key": "negative",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。"
+    },
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_07",
+      "english": "Rarely analyze my emotions.",
+      "chinese": "我很少分析自己的情绪。",
+      "key": "negative",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。"
+    },
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_08",
+      "english": "Am not in touch with my feelings.",
+      "chinese": "我不太能觉察到自己的感受。",
+      "key": "negative",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。 中文“不太能觉察”对原文“不与感受相接触”有解释性和程度语气，供独立译审，不静默改题。"
+    },
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_09",
+      "english": "Often ignore my feelings.",
+      "chinese": "我经常忽略自己的感受。",
+      "key": "negative",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。"
+    },
+    {
+      "code": "IPIP_ATTENDING_EMOTIONS10_10",
+      "english": "Rarely notice my emotional reactions.",
+      "chinese": "我很少留意自己的情绪反应。",
+      "key": "negative",
+      "conclusion": "与官方题序、键向和研究包对应，中文基本保留题意；待独立译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "官方 Barchard/IPIP 情绪关注分量表十题顺序及01–05正向、06–10反向与双语和运行源一致；1–5符合度锚点与官方含义一致，中点不是不知道。03“当下”和08“不太能觉察”为译文细节，应由独立译审评估；没有证据支持静默更动成熟题义。",
+    "scoring": "正向x、反向6−x，十题等权求和，范围10–50，无均分分母；全部作答、漏答不补不算为项目保守实现而非冒称官方缺失规则。无可用中文常模/阈值，referencePolicy none，references空；历史英文alpha女性.81 (N=432)、男性.83 (N=317) 仅原表群体数据，不迁移给中文。",
+    "report": "reportVersion 1.0.1、locale zh-CN、ADULT_SELF/student技术角色；score_only，higher_is_more，无bands或常模排序。说明留意情绪不等于调节能力、情绪智力或诊断；语气通俗，提供反思和命名感受、回到眼前小事的行动，不必强改。"
+  },
+  "instruction": {
+    "existingText": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+    "source": {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/bilingual-content.json",
+      "gitBlob": "87207a1e12eb92238364d94c16274975e86761c2",
+      "sha256": "3d951cb5850e2e4fec0be5e97c8af52aa1b30bd8a6669093ccc2baa0914ffe7d"
+    },
+    "jsonPointer": "/instructions",
+    "corroboratingSource": {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "9d342f7403ffb8ccbfff13d0f63f07fc536c9e0e",
+      "sha256": "7eb55b56b924f741eb200cf740ecf62cb9f62a6c1a657a6a34208013c097c1c6"
+    },
+    "corroboratingPointer": "/administration/instructionZh",
+    "provenance": "项目工作译稿中的平台适配文字，不冒充官方或人工审查。",
+    "existingState": "固定source.json缺独立 instruction 字段。",
+    "proposedSchemaMapping": {
+      "field": "source.instruction",
+      "schemaVersion": 1,
+      "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/ipip_attending_emotions10/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908"
+    },
+    "note": "主干 types.ts 确有以上可选字段，版本与原文来源如实标识；此建议不声称专家批准，不新增自动内容门禁。"
+  },
+  "rights": {
+    "sourceDefinition": "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/source.json#/executable/definition/license",
+    "separateLicenseFile": "本量表固定源目录未见单独 license 文件",
+    "officialPermission": "https://ipip.ori.org/newPermission.htm",
+    "officialHome": "https://ipip.ori.org/",
+    "scope": "IPIP项目对自身题项、量表与清单声明公有领域、商业及非商业用途，官方首页包括复制、编辑和翻译；不泛化到其他类似名称的专有量表或第三方材料，亦不证明中文译稿有效。"
+  },
+  "minimalOrdinaryEdits": [
+    {
+      "action": "按主干 schema 将研究材料原有指导语绑定到 source.instruction，标注路径、固定提交及项目适配来源。",
+      "reason": "source缺该字段但有可追溯现成文字，不修改题目与计分。"
+    }
+  ],
+  "humanItems": [
+    "专家独立译审、认知访谈与中文目标人群心理测量验证待完成；03和08翻译细节留待审阅。",
+    "不以英文原样本信度声称中文已验证；仅成人研究与自我了解，不推定青少年适用。",
+    "实质题义、锚点、算法、阈值及构念如拟修改须由root协调用户确认并遵守版本规则。"
+  ],
+  "eligibility": "可作为本批 DRAFT/CANDIDATE/PILOT 候选并按既有人工状态推进；不代表专家批准、研究级成熟或发布授权。现有报告不需强改。",
+  "notExecuted": [
+    "未改仓库文件、切分支、commit或push；未派子代理。",
+    "未执行 UI、四入口、浏览器、安装、幂等、数据库、CI、全库、golden 或新效度研究。"
+  ],
+  "officialSources": [
+    "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+    "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+    "https://ipip.ori.org/newScoringInstructions.htm",
+    "https://ipip.ori.org/newPermission.htm"
+  ]
+}

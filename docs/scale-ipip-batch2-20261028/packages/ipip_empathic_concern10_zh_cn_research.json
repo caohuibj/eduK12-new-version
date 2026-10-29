@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip_empathic_concern10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "sourceRef": "content/dot-local-scales-20261025",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/README.md",
+      "blob": "3755ad236b524c89add8f542fc943eb0300a8e13",
+      "sha256": "226bc7e3d492fe0f2f82594cdd593b9d8c828d422789bbef4acc4897c1bdf586"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/bilingual-content.json",
+      "blob": "7b5b2b38b346470aed32577f93d9b42fcfa91d97",
+      "sha256": "f8edbb9d40ef34b30f61c137feb5ea86e02a434f9997719e4557e34c7c87b1a9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/external-reference-dossier.json",
+      "blob": "1d9cfcdf3a96b788a62ff63dc525453bce414940",
+      "sha256": "ac45cd6f4b7b37be3d13ca00d24a52e1b3cd2b19959c8bc83549626fb58d47be"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/local-test-output.txt",
+      "blob": "adc0e4859e703136e17853ad07c4eb6786f4a838",
+      "sha256": "7a5031098e2cd72c8ad83904b133d2ac94e54e1d43a2872d8b4aa6b24d3a6d13"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/local-validation.json",
+      "blob": "1335ca2c50ac03ecfc92f10a9052ec43e4b4ab1b",
+      "sha256": "348446220bebddcb6c61db3d17596adfbb83fd38d45f354da10ed5ef7c24c88b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/references.md",
+      "blob": "2176600b839da53dd8da415c37bfed6936af4965",
+      "sha256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/report-example.json",
+      "blob": "6856abcd5f7875b56306dfeea8d14b5af5d019ee",
+      "sha256": "04e7f71de513a6c4e509b1df7de241c8b857e5bb74aba19bb0219b3a972f0b34"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/report-example.md",
+      "blob": "9ea320e179ba1db6dee4390a3b58218bc843f945",
+      "sha256": "cf8016f5235740d59d7d326f4c39fbd297284ceaa248cf2444645c9994246c92"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/reviewed-source-pack.json",
+      "blob": "7fcc4d48a8d46240cf10efd94d19016fbe6db420",
+      "sha256": "e138ad529ffecdba24f9d597c7a8c5f728e6c5372ed73c52d95c9d4aded6ac26"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/runtime-check.json",
+      "blob": "ea9cb04d7adbf7e5ac8a1ea6ff8ca882b00c7037",
+      "sha256": "213fafa3feb84db00be232134473dcbc03dc80f8f4cdf6ccdd94a7d0c639eacb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/scoring-and-thresholds.md",
+      "blob": "b9a1d049eda38b870bbfbfd6cdc27c2d0fa08315",
+      "sha256": "d316030cce6275dab27bc1e14d1780eb6b7d61401f44a7336cf55b49ff86bfcf"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+      "blob": "5f47c77530afb7874b3f9414ff9cf294f0aa71e8",
+      "sha256": "c2e2c8c60c091ba6c3e85c2c25721c44d9915365afd4a3067f4798b18d92e4ef"
+    }
+  ],
+  "sourceChange": {
+    "path": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+    "beforeBlob": "5f47c77530afb7874b3f9414ff9cf294f0aa71e8",
+    "beforeSHA256": "c2e2c8c60c091ba6c3e85c2c25721c44d9915365afd4a3067f4798b18d92e4ef",
+    "afterSHA256": "d8fae0cdb000b3089f194b07636b22a5a3673a173193e3da26913a1b57370993",
+    "jsonChanges": [
+      {
+        "op": "add",
+        "path": "/instruction",
+        "value": {
+          "schemaVersion": 1,
+          "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "source": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/bilingual-content.json#/instructions (项目平台适配工作译稿；b92c69aefa2472775fa7ee86b9c208366886c908；非人工审批声明)"
+        }
+      },
+      {
+        "op": "replace",
+        "path": "/executable/releaseStatus",
+        "from": "DRAFT",
+        "value": "PUBLISHED"
+      }
+    ],
+    "unchanged": [
+      "complete executable definition (items/options/scoring/report/version axes/license/source)",
+      "goldenCases",
+      "references",
+      "catalog",
+      "localization",
+      "applicability",
+      "disclosure",
+      "usageRequirements",
+      "scientificReview remains absent"
+    ]
+  },
+  "versions": {
+    "instrument": "1.0.0",
+    "scoring": "1.0.0",
+    "report": "1.0.0",
+    "localization": "1.0.0",
+    "instruction": "1.0.0"
+  },
+  "counts": {
+    "items": 10,
+    "goldenCases": 5
+  },
+  "state": {
+    "sourceRegistration": "prepared on content branch; generated existing index",
+    "technicalRelease": "PUBLISHED candidate, pending independent review; not scientific approval or database publication",
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translationReview": "PENDING",
+    "databaseInstall": "NOT_EXECUTED_THIS_BATCH",
+    "databasePublish": "NOT_EXECUTED_THIS_BATCH",
+    "production": "NOT_TOUCHED"
+  },
+  "audit": "audits/audit-ipip-empathic-concern10-batch2.json",
+  "history": "Copied research materials and their historical DRAFT/check records remain original facts, not current execution evidence."
+}

@@ -1,0 +1,120 @@
+{
+  "status": "AI_WORKING_TRANSLATION_REVIEW_PENDING",
+  "items": [
+    {
+      "id": "q1",
+      "position": 1,
+      "en": "Think about the causes of my emotions.",
+      "zh": "我会思考自己产生情绪的原因。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_01"
+    },
+    {
+      "id": "q2",
+      "position": 2,
+      "en": "Pay a lot of attention to my feelings.",
+      "zh": "我很关注自己的感受。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_02"
+    },
+    {
+      "id": "q3",
+      "position": 3,
+      "en": "Am usually aware of the way that I'm feeling.",
+      "zh": "我通常能觉察到自己当下的感受。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_03"
+    },
+    {
+      "id": "q4",
+      "position": 4,
+      "en": "Notice my emotions.",
+      "zh": "我会留意自己的情绪。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_04"
+    },
+    {
+      "id": "q5",
+      "position": 5,
+      "en": "Often stop to analyze how I'm feeling.",
+      "zh": "我常常停下来分析自己的感受。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_05"
+    },
+    {
+      "id": "q6",
+      "position": 6,
+      "en": "Rarely think about how I feel.",
+      "zh": "我很少思考自己有什么感受。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_06"
+    },
+    {
+      "id": "q7",
+      "position": 7,
+      "en": "Rarely analyze my emotions.",
+      "zh": "我很少分析自己的情绪。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_07"
+    },
+    {
+      "id": "q8",
+      "position": 8,
+      "en": "Am not in touch with my feelings.",
+      "zh": "我不太能觉察到自己的感受。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_08"
+    },
+    {
+      "id": "q9",
+      "position": 9,
+      "en": "Often ignore my feelings.",
+      "zh": "我经常忽略自己的感受。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_09"
+    },
+    {
+      "id": "q10",
+      "position": 10,
+      "en": "Rarely notice my emotional reactions.",
+      "zh": "我很少留意自己的情绪反应。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_ATTENDING_EMOTIONS10_10"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "非常不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "非常符合"
+    }
+  ],
+  "instructions": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+  "license": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": "IPIP items/scales/inventories, commercial and noncommercial use; official homepage explicitly permits copying, editing and translation",
+    "permissionUrl": "https://ipip.ori.org/newPermission.htm",
+    "translationPermissionUrl": "https://ipip.ori.org/",
+    "note": "This applies to these exact IPIP items, not every proprietary measure with a similar name."
+  }
+}

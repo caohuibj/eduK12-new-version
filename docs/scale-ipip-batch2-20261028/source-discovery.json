@@ -1,0 +1,288 @@
+{
+  "scope": "live remote main and branch names containing scale/public-library, available Git objects only; PR328/362 heads separately confirmed live",
+  "refs": [
+    {
+      "sha": "8c56b5f7da3fdc16eca054fdf5f4c1612c421aea",
+      "ref": "refs/heads/ci/scale-authoring-browser-diagnostic-20261021",
+      "objectAvailable": true
+    },
+    {
+      "sha": "94923318dc89d6e7a9d5f2991111b9882690fe53",
+      "ref": "refs/heads/ci/scale-authoring-evidence-20261021",
+      "objectAvailable": true
+    },
+    {
+      "sha": "312cfdc95e53b243b2de0bea9beb5ca3a3132a81",
+      "ref": "refs/heads/ci/scale-authoring-feedback-20261021",
+      "objectAvailable": true
+    },
+    {
+      "sha": "6737aae5cfdca3094d673ecff33bc1e37906c4c2",
+      "ref": "refs/heads/ci/scale-content-fast-path",
+      "objectAvailable": true
+    },
+    {
+      "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "ref": "refs/heads/content/dot-local-scales-20261025",
+      "objectAvailable": true
+    },
+    {
+      "sha": "bfd6dcbca24567219ec24979481f3da8e0137984",
+      "ref": "refs/heads/content/scale-bps9-intake-20261028",
+      "objectAvailable": true
+    },
+    {
+      "sha": "f3e12b551b6e8afa748b2f59f52d6439039d9924",
+      "ref": "refs/heads/content/scale-expansion",
+      "objectAvailable": true
+    },
+    {
+      "sha": "75b956cbd4c45f75beee606fb53257494adc1ca0",
+      "ref": "refs/heads/content/scale-ipip-batch1-20261028",
+      "objectAvailable": true
+    },
+    {
+      "sha": "fccc98c43ba42947052875f5cbbe5caf359e3de6",
+      "ref": "refs/heads/content/scale-structural-batch1-20261028",
+      "objectAvailable": true
+    },
+    {
+      "sha": "57909890479147f9840ad38a12ac026d762ac023",
+      "ref": "refs/heads/content/teacher-scale-batch-1",
+      "objectAvailable": true
+    },
+    {
+      "sha": "0a520e7e614043a2851ddc0e5369d1c2a9f54085",
+      "ref": "refs/heads/content/teacher-scales-pilot-batch-1-v2",
+      "objectAvailable": true
+    },
+    {
+      "sha": "3a800796a29bb14065cdf5478d5b88930646925b",
+      "ref": "refs/heads/feat/fe-03c-scale-reference-journey",
+      "objectAvailable": true
+    },
+    {
+      "sha": "f8a2bae9578ae9d09a31963d75b3cd465443f1fb",
+      "ref": "refs/heads/feat/media-2-scale-form-image-adapter",
+      "objectAvailable": true
+    },
+    {
+      "sha": "60c0339b97a37ce5f24bb3e5867ad0689c92ed18",
+      "ref": "refs/heads/feat/media-6-scale-form-video-adapter",
+      "objectAvailable": true
+    },
+    {
+      "sha": "305f8c3b946da840fdbce2600e0d0a3aaf18a879",
+      "ref": "refs/heads/feat/scale-assessment-v2-foundation",
+      "objectAvailable": true
+    },
+    {
+      "sha": "af5e1cd934ae0054ea02526a7ffd0bfcf6845ed8",
+      "ref": "refs/heads/feat/scale-library-catalog-v1",
+      "objectAvailable": true
+    },
+    {
+      "sha": "e9fa178fe995e7f8735ce9b59e29b4a25b0fa9f3",
+      "ref": "refs/heads/feat/scale-library-pilot-governance-v1",
+      "objectAvailable": true
+    },
+    {
+      "sha": "894c2040a479d140171160b0b004852faf9a73eb",
+      "ref": "refs/heads/feat/scale-library-wave0-mvp",
+      "objectAvailable": true
+    },
+    {
+      "sha": "59296d57a45e4fdfb462476498a130ab8d5c3544",
+      "ref": "refs/heads/feat/scale-onboarding-closeout",
+      "objectAvailable": true
+    },
+    {
+      "sha": "3f74fb530d8db33bbd0990f18f98d210b7a20f12",
+      "ref": "refs/heads/feat/scale-onboarding-pr2",
+      "objectAvailable": true
+    },
+    {
+      "sha": "1488d284aede8e42a001e57c1e3483c591d4df15",
+      "ref": "refs/heads/feat/scale-onboarding-pr3",
+      "objectAvailable": true
+    },
+    {
+      "sha": "48306d72c0614a62b4dfe735194c1894e97ac0a2",
+      "ref": "refs/heads/feat/scale-onboarding-pr3-check",
+      "objectAvailable": true
+    },
+    {
+      "sha": "4c5c6a1cba167f008750443487a4ed03ef181399",
+      "ref": "refs/heads/feat/scale-onboarding-pr4",
+      "objectAvailable": true
+    },
+    {
+      "sha": "04e151075575bfaedbc5f57d044df80c0549ca5e",
+      "ref": "refs/heads/feat/scale-response-device-provenance-v1",
+      "objectAvailable": true
+    },
+    {
+      "sha": "80bb63c69927d2d52ef74a476ee23e433f834df4",
+      "ref": "refs/heads/feat/scale-wave1-content",
+      "objectAvailable": true
+    },
+    {
+      "sha": "bd41a3f962f911261a9ffefb738559d279da3ebd",
+      "ref": "refs/heads/feat/scale-wave1-governance",
+      "objectAvailable": true
+    },
+    {
+      "sha": "8ab7309a1fc75a24c4d12daf37e4efba1a81d9ad",
+      "ref": "refs/heads/feat/scale-wave1-reports",
+      "objectAvailable": true
+    },
+    {
+      "sha": "0c685fe360f9580af32ce17cbee1b265de09f494",
+      "ref": "refs/heads/feat/survey-timed-scale-20261012",
+      "objectAvailable": true
+    },
+    {
+      "sha": "76fa50ff801221411bda63c5021660d28d4303e3",
+      "ref": "refs/heads/fix/scale-auto-advance",
+      "objectAvailable": true
+    },
+    {
+      "sha": "7d8bd1b4bff7574483b3eac583163d7500b37c1e",
+      "ref": "refs/heads/fix/scale-onboarding-extensible-regression",
+      "objectAvailable": true
+    },
+    {
+      "sha": "5ba98b693407c7ce349bcd5ee9a8c32e6eaaf619",
+      "ref": "refs/heads/fix/scale-onboarding-wave0-test-scope",
+      "objectAvailable": true
+    },
+    {
+      "sha": "774b34bdb8a93a73911d1f1fb8f844373d50446a",
+      "ref": "refs/heads/frontend/product-convergence-scale-slice",
+      "objectAvailable": true
+    },
+    {
+      "sha": "5ec9a8be2842957248e65dac6f0dc18126888485",
+      "ref": "refs/heads/integration/scale-onboarding-main",
+      "objectAvailable": true
+    },
+    {
+      "sha": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+      "ref": "refs/heads/main",
+      "objectAvailable": true
+    },
+    {
+      "sha": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a",
+      "ref": "refs/heads/public-library/cognitive-20261022",
+      "objectAvailable": false
+    },
+    {
+      "sha": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "ref": "refs/heads/public-library/scales-20261022",
+      "objectAvailable": true
+    },
+    {
+      "sha": "a5effd7f86249a77b7c82606130e5db6f89aae45",
+      "ref": "refs/heads/public-library/sjt-20261022",
+      "objectAvailable": false
+    },
+    {
+      "sha": "06011969da7ca704c39397e14cb1a53724a25be9",
+      "ref": "refs/heads/refactor/scale-onboarding-pr1",
+      "objectAvailable": true
+    },
+    {
+      "sha": "6c4e253d3401d3dc735900791c8a065fb8dc79c5",
+      "ref": "refs/heads/scale-library-structure-20261027",
+      "objectAvailable": true
+    },
+    {
+      "sha": "11681a6977a1b1845089799be6afce7bc30fdb3f",
+      "ref": "refs/heads/scale/zh-cn-sdq-texi-draft",
+      "objectAvailable": true
+    },
+    {
+      "sha": "9cd87e7f76833aafa50f2f0840975335d00b7a09",
+      "ref": "refs/heads/validation/scale-onboarding-pr2",
+      "objectAvailable": true
+    },
+    {
+      "sha": "1488d284aede8e42a001e57c1e3483c591d4df15",
+      "ref": "refs/heads/validation/scale-onboarding-pr3",
+      "objectAvailable": true
+    },
+    {
+      "sha": "4c5c6a1cba167f008750443487a4ed03ef181399",
+      "ref": "refs/heads/validation/scale-onboarding-pr4",
+      "objectAvailable": true
+    },
+    {
+      "sha": "60094809e02cd4383613d34b99aabd717cb9d177",
+      "ref": "refs/heads/work/scale-authoring-feedback-20261021",
+      "objectAvailable": true
+    },
+    {
+      "sha": "0d24f1e65d484f0b221b30424891680e9380f0e4",
+      "ref": "refs/heads/work/scale-library-governance-20261021",
+      "objectAvailable": true
+    }
+  ],
+  "packages": [
+    {
+      "identity": "ipip_opt10_zh_cn_research:1.0.0",
+      "variants": [
+        {
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "ref": "refs/heads/content/dot-local-scales-20261025",
+          "objectAvailable": true,
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/source.json",
+          "blob": "666bb410051d1caa22a042abb5f43af4a7b0d2a8",
+          "sha256": "1327accb2a02d8909fbac4512e7cc8323f4388073256f7e9e9a23d6f77f97cf0"
+        }
+      ],
+      "conflictingSourceHashes": false
+    },
+    {
+      "identity": "ipip_empathic_concern10_zh_cn_research:1.0.0",
+      "variants": [
+        {
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "ref": "refs/heads/content/dot-local-scales-20261025",
+          "objectAvailable": true,
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+          "blob": "5f47c77530afb7874b3f9414ff9cf294f0aa71e8",
+          "sha256": "c2e2c8c60c091ba6c3e85c2c25721c44d9915365afd4a3067f4798b18d92e4ef"
+        }
+      ],
+      "conflictingSourceHashes": false
+    },
+    {
+      "identity": "ipip_attending_emotions10_zh_cn_research:1.0.0",
+      "variants": [
+        {
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "ref": "refs/heads/content/dot-local-scales-20261025",
+          "objectAvailable": true,
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/source.json",
+          "blob": "079effd9c0b6457af13556e9d471fcee118060ce",
+          "sha256": "79c1977eec784fed5fd974a7c55a2a4fe5f5b9ceee99b7fa4f0ca58aec41a555"
+        }
+      ],
+      "conflictingSourceHashes": false
+    }
+  ],
+  "unknownRefs": [
+    {
+      "sha": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a",
+      "ref": "refs/heads/public-library/cognitive-20261022",
+      "objectAvailable": false
+    },
+    {
+      "sha": "a5effd7f86249a77b7c82606130e5db6f89aae45",
+      "ref": "refs/heads/public-library/sjt-20261022",
+      "objectAvailable": false
+    }
+  ],
+  "PR328": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+  "PR362": "2612a9f5bf22c1370ec786f3d6feb50805003065"
+}

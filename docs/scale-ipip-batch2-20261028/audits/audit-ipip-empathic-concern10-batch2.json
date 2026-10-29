@@ -1,0 +1,235 @@
+{
+  "instrument": "ipip_empathic_concern10_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "main_baseline": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "source_paths": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+      "blob": "5f47c77530afb7874b3f9414ff9cf294f0aa71e8",
+      "sha256": "c2e2c8c60c091ba6c3e85c2c25721c44d9915365afd4a3067f4798b18d92e4ef"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/README.md",
+      "blob": "3755ad236b524c89add8f542fc943eb0300a8e13",
+      "sha256": "226bc7e3d492fe0f2f82594cdd593b9d8c828d422789bbef4acc4897c1bdf586"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/bilingual-content.json",
+      "blob": "7b5b2b38b346470aed32577f93d9b42fcfa91d97",
+      "sha256": "f8edbb9d40ef34b30f61c137feb5ea86e02a434f9997719e4557e34c7c87b1a9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/reviewed-source-pack.json",
+      "blob": "7fcc4d48a8d46240cf10efd94d19016fbe6db420",
+      "sha256": "e138ad529ffecdba24f9d597c7a8c5f728e6c5372ed73c52d95c9d4aded6ac26"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/external-reference-dossier.json",
+      "blob": "1d9cfcdf3a96b788a62ff63dc525453bce414940",
+      "sha256": "ac45cd6f4b7b37be3d13ca00d24a52e1b3cd2b19959c8bc83549626fb58d47be"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/scoring-and-thresholds.md",
+      "blob": "b9a1d049eda38b870bbfbfd6cdc27c2d0fa08315",
+      "sha256": "d316030cce6275dab27bc1e14d1780eb6b7d61401f44a7336cf55b49ff86bfcf"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/references.md",
+      "blob": "2176600b839da53dd8da415c37bfed6936af4965",
+      "sha256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/report-example.md",
+      "blob": "9ea320e179ba1db6dee4390a3b58218bc843f945",
+      "sha256": "cf8016f5235740d59d7d326f4c39fbd297284ceaa248cf2444645c9994246c92"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/report-example.json",
+      "blob": "6856abcd5f7875b56306dfeea8d14b5af5d019ee",
+      "sha256": "04e7f71de513a6c4e509b1df7de241c8b857e5bb74aba19bb0219b3a972f0b34"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/local-validation.json",
+      "blob": "1335ca2c50ac03ecfc92f10a9052ec43e4b4ab1b",
+      "sha256": "348446220bebddcb6c61db3d17596adfbb83fd38d45f354da10ed5ef7c24c88b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/local-test-output.txt",
+      "blob": "adc0e4859e703136e17853ad07c4eb6786f4a838",
+      "sha256": "7a5031098e2cd72c8ad83904b133d2ac94e54e1d43a2872d8b4aa6b24d3a6d13"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/runtime-check.json",
+      "blob": "ea9cb04d7adbf7e5ac8a1ea6ff8ca882b00c7037",
+      "sha256": "213fafa3feb84db00be232134473dcbc03dc80f8f4cdf6ccdd94a7d0c639eacb"
+    }
+  ],
+  "main_source_exists": false,
+  "third_party_license": "固定源该量表包不存在 THIRD_PARTY_LICENSE.md；source.json、研究包及官方IPIP声明记录权利。",
+  "three_parts": {
+    "items_and_administration": {
+      "items": [
+        {
+          "position": 1,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_01",
+          "en": "Am concerned about others.",
+          "zh": "我关心别人。",
+          "key": "positive",
+          "runtime_matches_zh": true,
+          "transform": "identity",
+          "assessment": "关心别人，对应关切。"
+        },
+        {
+          "position": 2,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_02",
+          "en": "Feel sympathy for those who are worse off than myself.",
+          "zh": "我同情处境比自己更困难的人。",
+          "key": "positive",
+          "runtime_matches_zh": true,
+          "transform": "identity",
+          "assessment": "对比自身更困难的人，保留相对处境。"
+        },
+        {
+          "position": 3,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_03",
+          "en": "Sympathize with the homeless.",
+          "zh": "我同情无家可归的人。",
+          "key": "positive",
+          "runtime_matches_zh": true,
+          "transform": "identity",
+          "assessment": "同情无家可归者，保留原意。"
+        },
+        {
+          "position": 4,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_04",
+          "en": "Believe that criminals should receive help rather than punishment.",
+          "zh": "我认为犯罪者应该得到帮助，而不是惩罚。",
+          "key": "positive",
+          "runtime_matches_zh": true,
+          "transform": "identity",
+          "assessment": "帮助而非惩罚的价值判断忠实保留原题，社会观点敏感，不能作为道德评判。"
+        },
+        {
+          "position": 5,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_05",
+          "en": "Believe that the poor deserve our sympathy.",
+          "zh": "我认为贫困的人值得我们同情。",
+          "key": "positive",
+          "runtime_matches_zh": true,
+          "transform": "identity",
+          "assessment": "对贫困者同情，原意基本保留。"
+        },
+        {
+          "position": 6,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_06",
+          "en": "Feel little concern for others.",
+          "zh": "我很少关心别人。",
+          "key": "negative",
+          "runtime_matches_zh": true,
+          "transform": "reverse",
+          "assessment": "英文 little concern 表示关切程度少，“很少关心”可能读为频率少；人工译审，任何改义需协调。"
+        },
+        {
+          "position": 7,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_07",
+          "en": "Have no sympathy for criminals.",
+          "zh": "我不同情犯罪者。",
+          "key": "negative",
+          "runtime_matches_zh": true,
+          "transform": "reverse",
+          "assessment": "不同情犯罪者保留否定，社会态度可影响作答。"
+        },
+        {
+          "position": 8,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_08",
+          "en": "Look down on any weakness.",
+          "zh": "我看不起任何软弱。",
+          "key": "negative",
+          "runtime_matches_zh": true,
+          "transform": "reverse",
+          "assessment": "看不起任何软弱对应原文但表达略生硬，需人工译审，不能静默改义。"
+        },
+        {
+          "position": 9,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_09",
+          "en": "Don't like to get involved in other people's problems.",
+          "zh": "我不喜欢卷入别人的问题。",
+          "key": "negative",
+          "runtime_matches_zh": true,
+          "transform": "reverse",
+          "assessment": "不喜欢卷入他人问题，与原文一致；此项亦可能反映个人界限。"
+        },
+        {
+          "position": 10,
+          "itemCode": "IPIP_EMPATHIC_CONCERN10_10",
+          "en": "Have little sympathy for the unemployed.",
+          "zh": "我很少同情失业者。",
+          "key": "negative",
+          "runtime_matches_zh": true,
+          "transform": "reverse",
+          "assessment": "英文 little sympathy 表示同情程度少，“很少同情”可能读为频率少；人工译审，任何改义需协调。"
+        }
+      ],
+      "official": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm 当前官方Empathic Concern十项及键与双语材料对应；官方Barchard (2001)归属，独立构念非完整情绪智力电池或专有IRI分量表。",
+      "anchors": "非常不符合、比较不符合、介于不符合与符合之间、比较符合、非常符合，分别1–5；方向符合 https://ipip.ori.org/newScoringInstructions.htm。",
+      "instruction": {
+        "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/bilingual-content.json",
+            "blob": "7b5b2b38b346470aed32577f93d9b42fcfa91d97",
+            "sha256": "f8edbb9d40ef34b30f61c137feb5ea86e02a434f9997719e4557e34c7c87b1a9",
+            "field": "/instructions"
+          },
+          {
+            "path": "docs/scale-instruments/research-drafts/ipip_empathic_concern10/1.0.0/reviewed-source-pack.json",
+            "blob": "7fcc4d48a8d46240cf10efd94d19016fbe6db420",
+            "sha256": "e138ad529ffecdba24f9d597c7a8c5f728e6c5372ed73c52d95c9d4aded6ac26",
+            "field": "/administration/instructionZh"
+          }
+        ],
+        "status": "同文项目中文工作指导语，不是官方中文版或人工审校证明；source顶层 instruction 缺失。",
+        "mapping": "建议按现有 source 顶层 instruction: schemaVersion=1, text=上述原文, language=zh-CN, version=1.0.0, source=固定研究文件及字段并注明工作稿；实际集成由root负责。",
+        "runtime": "未核验运行展示。"
+      },
+      "language_audience": "zh-CN 项目AI辅助工作译稿；仅成人自陈研究及自我反思，minAge=18；student为技术受众角色，非未成年人证据。"
+    },
+    "scoring_and_parameters": {
+      "method": "一项total，10题等权求和，1–5正向，6–10反向6−x；完整范围10–50。",
+      "missing": "10题required、complete_required，无插补或按已答分母折算；这是项目保守政策，不冒称IPIP原版缺失规则。",
+      "thresholds": "无分界、常模、百分位或高低分档；30为理论中点而非人群均值。",
+      "reliability": "官方原英文组女性N=432 alpha .64、男性N=317 alpha .80；非中文信度证明、常模或个体精确度。https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+      "metadata": "10题、1 total；源定义无 dimension 类型，研究包 dimensionCount=1可理解为单一构念，不能误当运行维度数。"
+    },
+    "report": {
+      "direction": "higher_is_more：这些题目的自报同情关怀更强，不证明实际帮助、客观能力或道德。",
+      "guidance": "具体询问对方希望倾听还是共同想办法，同时允许自身边界；已有温暖描述，无需强改。",
+      "limits": "指出犯罪、贫困、失业及社会观念措辞可能带来不适；不诊断、筛选或排名；中文验证待完成。",
+      "versions_references": "instrument、scoring、report、localization版本1.0.0；referencePolicy none，references空，外部统计不作为报告规范。"
+    }
+  },
+  "rights": {
+    "declared": "PUBLIC_DOMAIN，verified，允许再分发，商业与非商业",
+    "official": "https://ipip.ori.org/newPermission.htm 和 https://ipip.ori.org/ 允许IPIP条目、量表和题本使用、复制、修改翻译；不延伸为同名专有IRI或第三方其他文字的许可。",
+    "translation": "独立中文AI工作稿，授权不等于验证。"
+  },
+  "ordinary_revision_suggestions": [
+    "若root集成指导语，逐字使用已有工作稿并准确引用上述字段，不创造审批状态；不需要重写已有报告。",
+    "研究包 dimensionCount=1 与运行 source 中 total 而无 dimension 的语义区分可在公开元数据说明，避免误标实际维度数量。"
+  ],
+  "substantive_issues_for_coordination": [
+    "第6、10题 little 的程度与“很少”的频率歧义需独立人工译审；第8题中文自然度及含义也需审查。任何修改题意、锚点、构念、计分或阈值由root协调版本及科研决策。"
+  ],
+  "human_review_status": "专家译审 PENDING；认知访谈 NOT_ESTABLISHED；本地目标人群心理测量验证待完成。AI编辑检查不是人工审校。",
+  "not_performed": [
+    "未修改仓库、切分支、commit/push或操作数据库、安装、幂等、CI、生产。",
+    "未执行UI、四入口、浏览器、全库、golden或任何计分测试；未进行新效度研究。",
+    "历史报告/检查文件仅作为源材料，未将其自述转为本次执行结果。"
+  ],
+  "assessment": "可作为成人研究候选由root统筹静态集成；保留上述语言审查事项，不声明已获得科研或翻译审查、运行验证或发布批准。"
+}

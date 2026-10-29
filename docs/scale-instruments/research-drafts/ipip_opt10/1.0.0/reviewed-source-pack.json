@@ -1,0 +1,153 @@
+{
+  "status": "CONTENT_DRAFT_NOT_VALIDATED_NOT_PUBLISHED",
+  "checked_at": "2026-10-25",
+  "translation_status": "项目中文工作译稿；未声称为既有经验证中文版；需独立译审及目标人群认知访谈",
+  "rights": {
+    "type": "public_domain",
+    "source": "https://www.ipip.ori.org/",
+    "electronic_and_translation_source": "https://www.ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "summary": "IPIP官方允许复制、编辑、翻译及任何用途，包括网上施测；仍保留来源署名。"
+  },
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "instructions_zh": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+  "item_source": "https://www.ipip.ori.org/newSingleConstructsKey.htm",
+  "scoring_source": "https://www.ipip.ori.org/newScoringInstructions.htm",
+  "scoring": {
+    "method": "sum",
+    "positive": "response",
+    "negative": "6-response",
+    "range": [
+      10,
+      50
+    ],
+    "secondary_mean": {
+      "formula": "sum/10",
+      "range": [
+        1,
+        5
+      ]
+    },
+    "total_requires_all_items": true,
+    "missing_policy": "项目实现选择：不对缺失补零或推算；未完成时不给总分。未检到官方缺失插补标准。"
+  },
+  "reference": {
+    "clinical_cutoffs": null,
+    "norm_percentiles": null,
+    "reference_status": "NO_VERIFIED_TARGET_POPULATION_NORMS",
+    "source": "https://www.ipip.ori.org/newNorms.htm",
+    "note": "IPIP官方不提供通用常模，提醒按适当样本建立本地参照。不能用量尺等分点或任意均值±SD冒称经验阈值；不移植所对应原版权量表常模。"
+  },
+  "audience": "优先成人/教师研究与自我了解；青少年适用性尚需该中文版证据，不能把原英文统计移植为中文信效度。",
+  "illustration_plan": "仅报告后配原创解释图，不在题干旁加入暗示性图片；图应有替代文本，不使用病理红黄绿分区。",
+  "code": "IPIP_OPT10",
+  "name_zh": "乐观倾向（IPIP 10题表征版）",
+  "name_en": "IPIP representation of Optimism",
+  "tags": [
+    "人格与个体差异",
+    "积极心理",
+    "乐观倾向",
+    "自评",
+    "非诊断",
+    "10题",
+    "工作译稿"
+  ],
+  "items": [
+    {
+      "id": "IPIP_OPT10_01",
+      "en": "Just know that I will be a success.",
+      "zh_draft": "我确信自己会取得成功。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_OPT10_02",
+      "en": "Feel comfortable with myself.",
+      "zh_draft": "我对自己感到自在。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_OPT10_03",
+      "en": "Seldom feel blue.",
+      "zh_draft": "我很少感到情绪低落。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_OPT10_04",
+      "en": "Look at the bright side of life.",
+      "zh_draft": "我会看到生活中积极的一面。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_OPT10_05",
+      "en": "Have a dark outlook on the future.",
+      "zh_draft": "我对未来的看法很悲观。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_06",
+      "en": "Feel that my life lacks direction.",
+      "zh_draft": "我觉得自己的生活缺少方向。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_07",
+      "en": "Dislike myself.",
+      "zh_draft": "我不喜欢自己。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_08",
+      "en": "Often feel blue.",
+      "zh_draft": "我常常感到情绪低落。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_09",
+      "en": "See difficulties everywhere.",
+      "zh_draft": "我觉得处处都是困难。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_10",
+      "en": "Am often in a bad mood.",
+      "zh_draft": "我经常心情不好。",
+      "reverse": true
+    }
+  ],
+  "source_statistics": {
+    "official_reported_alpha": 0.86,
+    "status": "官方英文构念页历史统计，不是当前中文版本信度；本包不把它作为常模参数"
+  },
+  "report": {
+    "summary": "本量表反映你对未来、生活积极面及自身状态的整体看法。得分较高表示你的回答更偏向积极预期；它不是抑郁筛查，也不代表你必须一直保持积极。",
+    "interpretation": "本次总分为{score}/50，题均分为{mean}/5。当前没有与你的人群和中文版本匹配的可靠常模，因此不提供人群排名或“高/中/低”判定。",
+    "action": "可以把一个当前担忧分为“我能做一点什么”与“我暂时无法控制什么”，选择一个小行动，同时允许难受的感受存在。分数只是一种反思线索，不是对性格好坏的评价。",
+    "limitations": "该IPIP表征含情绪低落、自我感受和生活方向等内容，不是LOT-R原版；不得移用LOT-R分数阈值或替代专业评估。",
+    "display_condition": "全部10题有效作答后才显示总分、题均分和得分解释；不完整时仅提示尚未完成，不作高低或阴性判定。"
+  }
+}
