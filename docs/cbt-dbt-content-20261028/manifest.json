@@ -4,12 +4,12 @@
   "actualDatabaseImport": false,
   "published": false,
   "ciTriggered": false,
-  "toolFamilies": 9,
-  "exactVersions": 10,
-  "executableDrafts": 10,
+  "toolFamilies": 10,
+  "exactVersions": 11,
+  "executableDrafts": 11,
   "catalogOnly": 0,
-  "nativeGoldenCases": 40,
-  "reportSamples": 10,
+  "nativeGoldenCases": 44,
+  "reportSamples": 11,
   "tools": [
     {
       "family": "atq30",
@@ -175,6 +175,24 @@
           "key": "pbqsf65",
           "version": "1.0.0",
           "itemCount": 65,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "sas60",
+      "name": "SAS 社会依赖-自主性量表",
+      "category": "CBT人格构念/社会依赖与自主性（成人）",
+      "fullTextSource": "https://beckinstitute.org/wp-content/uploads/2021/06/SAS-Full-Documents.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "c5d6152",
+      "versions": [
+        {
+          "key": "sas60",
+          "version": "1.0.0",
+          "itemCount": 60,
           "locale": "en",
           "executable": true
         }

@@ -52,6 +52,11 @@
       "family": "pbqsf65",
       "commit": "3896664",
       "message": "content(scale): stage PBQ-SF 65-item en draft with official 10-scale key, scan-verified verbatim items, golden cases and report sample [skip ci]"
+    },
+    {
+      "family": "sas60",
+      "commit": "c5d6152",
+      "message": "content(scale): stage SAS 60-item 1983-form en draft with packet-article factor keys, golden cases and report sample [skip ci]"
     }
   ]
 }

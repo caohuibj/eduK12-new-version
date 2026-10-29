@@ -148,7 +148,28 @@
         },
         "missing-borderline": "invalid (dependent & borderline null)"
       }
+    },
+    {
+      "family": "sas60",
+      "instrumentKey": "sas60@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedTotals": {
+        "all-keyed-min": {
+          "sociotropy": 0,
+          "autonomy": 0
+        },
+        "all-keyed-max": {
+          "sociotropy": 120,
+          "autonomy": 120
+        },
+        "sample-soc2-aut3": {
+          "sociotropy": 60,
+          "autonomy": 90
+        },
+        "missing-sociotropy": "invalid (sociotropy null)"
+      }
     }
   ],
-  "goldenCaseTotal": 40
+  "goldenCaseTotal": 44
 }

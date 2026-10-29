@@ -78,6 +78,16 @@
       "newFamily": "pbqsf65",
       "existing": "bsl23",
       "relation": "PBQ-SF 边缘型信念量表与 BSL-23 症状强度分属信念层与症状层，均限成人临床研究情境，不得互推或用于学生筛查。"
+    },
+    {
+      "newFamily": "sas60",
+      "existing": "dasa40",
+      "relation": "DAS 测量失调态度总体强度，SAS 测量社会依赖/自主性两个人格构念维度；同属 CBT 信念层但结构不同（SAS 无反向题、双独立维度），不合并。"
+    },
+    {
+      "newFamily": "sas60",
+      "existing": "pbqsf65",
+      "relation": "SAS 的社会依赖维度与 PBQ-SF 的依赖/回避量表相邻；SAS 为双总分六分量表结构，PBQ-SF 为十量表结构，构念组织不同，不互相替代。"
     }
   ]
 }
