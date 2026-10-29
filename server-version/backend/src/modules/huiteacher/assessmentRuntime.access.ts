@@ -127,7 +127,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
    if(identity.origin.entry!=='TEACHER'||identity.origin.variantKey!==(audience==='STUDENT_EVALUATION'?'TEACHER:STUDENT_REPORT':'TEACHER:SELF'))fail()
    if(row.status!=='COMPLETED')await assertCompositionCollection(db,identity,row.status==='ASSIGNED'?'NEW_START':'BOUND_COLLECTION')
    return {task:taskDto(row,identity.title),identity,row,runtimeCompositeId:identity.compositeId,
-    units:identity.units.map(unit=>({itemId:unit.itemId,family:'SCALE' as const}))}
+    units:identity.units.map(unit=>({itemId:unit.itemId,family:unit.family}))}
   }
   if(audience==='STUDENT_EVALUATION')fail()
   const identity=await source.readIdentity(db,{resourceKey:row.resourceKey,version:row.resourceVersion,purpose:row.status==='ASSIGNED'?'NEW_USE':'HISTORY'})

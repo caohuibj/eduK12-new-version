@@ -1,6 +1,7 @@
 import {Prisma} from '@prisma/client'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {readEducationLibrarySourceUses,type EducationLibrarySourceUse} from './library-source.catalog'
+import {lockEducationNativeSourceIds} from './native-source.locks'
 
 export type LockedEducationLibraryUses={readonly kind:'LOCKED_EDUCATION_LIBRARY_U'}
 type Facts={tx:Prisma.TransactionClient;scope:string;uses:ReadonlyMap<string,EducationLibrarySourceUse>}
@@ -37,13 +38,14 @@ export async function assertLockedLibraryUseTime(tx:Prisma.TransactionClient,pro
 /** Exact owned immutable questionnaires plus any legacy entry IDs in the same
  * batch. All issuer/ancestor Users are selected together before the org fence. */
 export async function lockCompositionLibraryUses(tx:Prisma.TransactionClient,c:PrivateToolContext,keys:readonly string[],additionalEntryIds:readonly string[]=[]){
- const rows=keys.length?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT DISTINCT b->>'versionId' AS id
+ const rows=keys.length?await tx.$queryRaw<Array<{id:string;provider?:string}>>(Prisma.sql`SELECT DISTINCT b->>'versionId' AS id,b->>'sourceProvider' AS provider
   FROM composite_assessments parent JOIN education_private_tool_versions v ON parent.creation_key=
    'education-composition:'||v.entry||':'||v.id||':'||(v.definition#>>'{administration,population}')||':'||(v.definition#>>'{administration,responseMode}')||':'||(v.definition->>'adapterVersion')
   CROSS JOIN LATERAL jsonb_array_elements(parent.training_content_snapshot#>'{educationBinding,manifest}') b
   WHERE parent.creation_key IN (${Prisma.join([...new Set(keys)])}) AND v.entry=${c.entry} AND v.organization_id=${c.organizationId}
-   AND v.owner_user_id=${c.principal.userId} AND b->>'sourceProvider'='LIBRARY_SCALE'`):[]
- const ids=[...new Set([...additionalEntryIds,...rows.map(row=>row.id)])]
+   AND v.owner_user_id=${c.principal.userId} AND b->>'sourceProvider' IN ('LIBRARY_SCALE','SJT_RELEASE')`):[]
+ await lockEducationNativeSourceIds(tx,rows.filter(row=>row.provider==='SJT_RELEASE').map(row=>row.id))
+ const ids=[...new Set([...additionalEntryIds,...rows.filter(row=>!row.provider||row.provider==='LIBRARY_SCALE').map(row=>row.id)])]
  return ids.length?lockEducationLibraryUses(tx,c,ids):undefined
 }
 

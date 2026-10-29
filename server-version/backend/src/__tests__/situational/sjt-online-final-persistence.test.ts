@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const state = vi.hoisted(() => ({ runtime: null as any, rawCreate: vi.fn(), update: vi.fn(), transaction: vi.fn(), envelope: vi.fn(), events: [] as string[] }))
+const state = vi.hoisted(() => ({ runtime: null as any, rawCreate: vi.fn(), update: vi.fn(), transaction: vi.fn(), envelope: vi.fn(), education:vi.fn(),events: [] as string[] }))
+vi.mock('../../modules/assessment-run/educationPrivateFormExecution',()=>({assertPrivateFormFinalCurrent:(...args:any[])=>state.education(...args)}))
 vi.mock('../../config/database', () => ({ prisma: {} }))
 vi.mock('../../modules/composite/training-variant-child-scope', () => ({ requiresTrainingFlowFinalLock: () => false, lockTrainingFlowFinalAdmission: async () => { state.events.push('host-lock'); return () => { state.events.push('host-admission') } } }))
 vi.mock('../../services/unitSubmitAdmission', () => ({ withUnitSubmitAdmission: (run: () => unknown) => run() }))
@@ -34,6 +35,7 @@ function setup(required = false) {
 beforeEach(() => {
   vi.clearAllMocks()
   state.events.length = 0
+  state.education.mockReset()
   process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
   state.update.mockImplementation(async ({ data }: any) => { Object.assign(state.runtime.row, data); return { count: 1 } })
   state.rawCreate.mockResolvedValue({})
@@ -45,6 +47,17 @@ beforeEach(() => {
 })
 
 describe('online FINAL persistence through the shared service', () => {
+  it.each([false,true])('rechecks the education Run inside FINAL before child writes, including replay=%s',async replay=>{
+    const {body}=setup(),row=state.runtime.row
+    row.compositeAttemptId='education-parent';row.compositeAttempt={id:'education-parent',compositeAssessment:{creationKey:'education-composition:TEACHER:fixed:TEACHER:SELF:1.0.0'}}
+    if(replay){const prepared=prepareSituationalFinalSubmission(body,state.runtime);Object.assign(row,{status:'COMPLETED',submissionId:body.submissionId,submissionPayloadHash:prepared.payloadHash})}
+    const denied=Object.assign(new Error('current education participation withdrawn'),{statusCode:403})
+    state.education.mockRejectedValue(denied)
+    await expect(submitSituationalAttemptFinal(body)).rejects.toBe(denied)
+    expect(state.education).toHaveBeenCalledExactlyOnceWith(expect.any(Object),{attemptId:'education-parent',actorUserId:'owner'})
+    expect(state.update).not.toHaveBeenCalled();expect(state.rawCreate).not.toHaveBeenCalled()
+    expect(state.events).not.toContain('child-lock')
+  })
   it('accepts all-optional empty FINAL with null scores and one raw-v2 row; identical replay never writes again', async () => {
     const { body } = setup()
     const first: any = await submitSituationalAttemptFinal(body)

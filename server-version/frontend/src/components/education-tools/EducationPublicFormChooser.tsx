@@ -4,14 +4,15 @@ import {privateToolBase,privateToolError,type PrivateToolApi} from './privateToo
 import type {EducationPublicFormSummary} from './educationPublicFormClient'
 import type {CompositionResponseMode,ExpertTargetKind} from './educationCompositionAdministration'
 
-type Props={api:PrivateToolApi;entry:'SCHOOL'|'TEACHER';organizationId:string;actorId:string;kind?:'FORM'|'SCALE';catalog?:'PUBLIC'|'LIBRARY';responseMode?:CompositionResponseMode;targetKind?:ExpertTargetKind;disabled?:boolean;onChoose:(source:EducationPublicFormSummary)=>void}
+type Props={api:PrivateToolApi;entry:'SCHOOL'|'TEACHER';organizationId:string;actorId:string;kind?:'FORM'|'SCALE'|'COGNITIVE'|'SJT';catalog?:'PUBLIC'|'LIBRARY';responseMode?:CompositionResponseMode;targetKind?:ExpertTargetKind;disabled?:boolean;onChoose:(source:EducationPublicFormSummary)=>void}
 export function EducationPublicFormChooser(props:Props){
  const scope=useRef({...props,epoch:0})
  if(scope.current.responseMode!==props.responseMode||scope.current.targetKind!==props.targetKind||scope.current.catalog!==props.catalog||scope.current.kind!==props.kind||scope.current.api!==props.api||scope.current.entry!==props.entry||scope.current.organizationId!==props.organizationId||scope.current.actorId!==props.actorId)scope.current={...props,epoch:scope.current.epoch+1}
  return <ChooserSession key={scope.current.epoch} {...props}/>
 }
 function ChooserSession({api,organizationId,disabled,onChoose,kind='FORM',catalog='PUBLIC',responseMode='SELF',targetKind}:Props){
- const label=catalog==='LIBRARY'?'共用量表':kind==='FORM'?'公共表单':'公共量表'
+ const label=catalog==='LIBRARY'?'共用量表':kind==='FORM'?'公共表单':kind==='COGNITIVE'?'认知任务':kind==='SJT'?'情境任务':'公共量表'
+ const [profiles,setProfiles]=useState<Record<string,'experience'|'standard'|'research'>>({})
  const [query,setQuery]=useState(''),[search,setSearch]=useState(''),[cursor,setCursor]=useState<string|null>(null),[next,setNext]=useState<string|null>(null)
  const [rows,setRows]=useState<EducationPublicFormSummary[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState('')
  useEffect(()=>{
@@ -30,7 +31,9 @@ function ChooserSession({api,organizationId,disabled,onChoose,kind='FORM',catalo
   {error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在读取{label}…</p>}
   {!busy&&!rows.length&&!error&&<p>当前没有获授权的{label}。</p>}
   {rows.map(row=><article key={row.catalogKey}><strong>{row.title}</strong><span> · 固定版本 {row.versions.content}{row.language?' · '+row.language:''}{kind==='SCALE'?' · P '+(row.versions.parameters??'未配置')+' · R '+(row.versions.report??'未配置'):''}</span>{!!row.requiredContextKeys?.length&&<p>原版要求背景字段：{row.requiredContextKeys.map(key=>assessmentContextLabels[key as AssessmentContextKey]??key).join('、')}。请在问卷背景信息中显式配置。</p>}
-   {!!row.referenceContextKeys?.length&&<p>参考参数匹配所需信息：{row.referenceContextKeys.map(key=>assessmentContextLabels[key as AssessmentContextKey]??key).join('、')}。未提供或不匹配时不套用该参考。</p>}{row.unavailableReason&&<p>{row.unavailableReason}</p>}<button disabled={disabled||busy||!row.allowedActions.includes('REFERENCE_FIXED_VERSION')} onClick={()=>onChoose(row)}>加入{label}</button></article>)}
+   {!!row.referenceContextKeys?.length&&<p>参考参数匹配所需信息：{row.referenceContextKeys.map(key=>assessmentContextLabels[key as AssessmentContextKey]??key).join('、')}。未提供或不匹配时不套用该参考。</p>}{row.unavailableReason&&<p>{row.unavailableReason}</p>}
+   {row.kind==='COGNITIVE'&&<label>任务版本<select aria-label={row.title+'任务版本'} value={profiles[row.catalogKey]??''} disabled={disabled||busy} onChange={event=>setProfiles(old=>({...old,[row.catalogKey]:event.target.value as 'experience'|'standard'|'research'}))}><option value="">选择任务版本</option>{(row.versions.profiles??[]).map(profile=><option key={profile} value={profile}>{{experience:'体验版',standard:'正式版',research:'科研版'}[profile]}</option>)}</select></label>}
+   <button disabled={disabled||busy||!row.allowedActions.includes('REFERENCE_FIXED_VERSION')||row.kind==='COGNITIVE'&&!profiles[row.catalogKey]} onClick={()=>onChoose({...row,...(row.kind==='COGNITIVE'?{profile:profiles[row.catalogKey]}:{})})}>加入{label}</button></article>)}
   {next&&<button disabled={busy||disabled} onClick={()=>setCursor(next)}>加载更多{label}</button>}
  </section>
 }

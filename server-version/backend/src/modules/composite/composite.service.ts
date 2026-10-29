@@ -3,6 +3,8 @@ import {freezeExactStandardScaleDefinition} from './training-standard-combinatio
 import {readVerifiedEducationStart,readVerifiedCompositionStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 import {readVerifiedFieldStart,fieldCompositionBinding,type VerifiedFieldStart} from '../huiteacher/fieldComposition.contract'
 import {resolveEducationAssessmentSituationalItems} from '../education-tools/assessment-resource.source'
+import {readEducationSjtSources} from '../education-tools/native-source.sjt'
+import {admitEducationNativeCognitive} from '../education-tools/native-source.cognitive'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
@@ -2434,7 +2436,7 @@ const resolvedCompositeCognitiveConfig = (assignment: any) => {
   } catch { throw compositeBadRequest('认知任务冻结的 Profile 配置不可用') }
 }
 
-const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: string | null, prepared?: PreparedCognitiveVariantRuntime, preparedAssignment?: Awaited<ReturnType<typeof prepareTeacherPublishedAssignment>>, runtimeReference?:string) => {
+const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: string | null, prepared?: PreparedCognitiveVariantRuntime, preparedAssignment?: Awaited<ReturnType<typeof prepareTeacherPublishedAssignment>>, runtimeReference?:string,educationAttempt?:VerifiedEducationAttempt) => {
   assertCognitiveModuleEnabled()
   let assignment = item.cognitiveAssignment
   if (attempt.deliveryCourseId && assignment) {
@@ -2473,7 +2475,11 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
     scoringVersion: config.scoringVersion,
     config: sessionConfig,
   })
-  if (userId) await admitCognitiveAttempt(db, userId, assignment.id)
+  if(userId){
+    const native=attempt.trainingContentBinding?.units?.some((unit:any)=>unit.itemId===item.id&&unit.source.educationNative?.provider==='COGNITIVE_CONFIG')
+    if(native)await admitEducationNativeCognitive(db as Prisma.TransactionClient,{proof:educationAttempt,parent:attempt,actorUserId:userId,itemId:item.id,assignmentId:assignment.id,configId:config.id})
+    else await admitCognitiveAttempt(db,userId,assignment.id)
+  }
   return db.cognitiveSession.create({
     data: {
       userId,
@@ -2507,7 +2513,8 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
   // A composition may reference several sources in different orders. Always
   // acquire their locks in the same order to avoid cross-composition deadlocks.
   if (userId && !prepared) {
-    const sources = await Promise.all(items.filter(item => item.type === 'COGNITIVE').map(item => cognitiveQuotaSource(db, item.cognitiveAssignmentId)))
+    const nativeIds=new Set(attempt.trainingContentBinding?.units?.filter((unit:any)=>unit.source.educationNative?.provider==='COGNITIVE_CONFIG').map((unit:any)=>unit.itemId)??[])
+    const sources = await Promise.all(items.filter(item => item.type === 'COGNITIVE'&&!nativeIds.has(item.id)).map(item => cognitiveQuotaSource(db, item.cognitiveAssignmentId)))
     for (const id of [...new Set(sources.map(source => source.id))].sort()) await lockCognitiveQuota(db, userId, id)
   }
   const runtime = {
@@ -2575,7 +2582,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
         })
       }
     } else if (item.type === 'COGNITIVE') {
-      const session = await createCognitiveChild(db, attempt, item, userId, prepared?.cognitive.get(item.id), prepared?.assignments.get(item.id), prepared?.references?.get(item.id))
+      const session = await createCognitiveChild(db, attempt, item, userId, prepared?.cognitive.get(item.id), prepared?.assignments.get(item.id), prepared?.references?.get(item.id),educationAttempt)
       if (attempt.runtimeGeneration === 'UNIFIED_V1') {
         const snapshot = prepared?.cognitive.get(item.id)?.snapshot ?? (await cognitiveSessionService.loadCognitiveSessionConfig(session.configSnapshotEncrypted,db as any)).snapshot
         if (!snapshot?.compiledRuntime) throw new Error('Unified Cognitive session runtime snapshot is missing')
@@ -2875,7 +2882,9 @@ const createAttempt = async (
     for(const assignment of cognitive){if(assignment.status!=='PUBLISHED'||assignment.config.status!=='PUBLISHED')throw compositeForbidden('候选分卷的认知配置已不可用');assertCognitiveProductEligible(assignment.config.testType);validateCognitiveConfig(assignment.config)}
 
   }
-  const situationalReleases = educationProduct
+  const nativeSjtUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationNative?.provider==='SJT_RELEASE'):[]
+  const nativeSjt=nativeSjtUnits.length?await readEducationSjtSources(db as Prisma.TransactionClient,nativeSjtUnits.map(unit=>({provider:'SJT_RELEASE',kind:'SJT',versionId:unit.source.educationNative!.sourceId,contentHash:unit.source.educationNative!.contentHash})),educationProduct!):null
+  const situationalReleases = nativeSjt?new Map([...nativeSjt.values()].map(source=>[situationalReleaseKey(source),source.resolved])):educationProduct
     ? await resolveEducationAssessmentSituationalItems(db as Prisma.TransactionClient,composite.items.filter((item:any)=>item.type==='SITUATIONAL').map(situationalItemIdentity),educationProduct)
     : await resolveCompositeSituationalItems(composite.items, db, true, compositeSjtGrantScope(composite))
   if ([...situationalReleases.values()].some(release => release.snapshot.authorizationReceipt)) {

@@ -39,4 +39,10 @@ export function readVerifiedEducationAttempt(proof:VerifiedEducationAttempt|unde
  if(!facts||facts.tx!==tx||facts.attemptId!==attemptId||facts.respondentUserId!==userId)throw new Error('EDUCATION_START_CONTEXT_MISMATCH')
  return facts.product
 }
+export function readVerifiedCompositionAttempt(proof:VerifiedEducationAttempt|undefined,tx:object,attemptId:string,userId:string|null,expected:{compositeId:string;assignmentRef:string}){
+ if(!readVerifiedEducationAttempt(proof,tx,attemptId,userId))return undefined
+ const facts=attempts.get(proof!)!
+ if(facts.compositeId!==expected.compositeId||facts.assignmentRef!==expected.assignmentRef)throw new Error('EDUCATION_START_CONTEXT_MISMATCH')
+ return facts.composition
+}
 import type {EducationCompositionPolicyBinding} from '../education-tools/private-tool.composition-contracts'

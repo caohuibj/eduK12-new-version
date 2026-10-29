@@ -14,6 +14,7 @@ import type {CompiledPrivateComposition,CompositionLeaf} from './private-tool.co
 import {compositionLeafKey} from './private-tool.composition-compiler'
 import {materializeEducationLibraryScale} from './library-source.scale'
 import {isExpertComposition} from './expert-observation.contract'
+import {materializeEducationCognitive} from './native-source.cognitive'
 
 type Tx=Prisma.TransactionClient
 const identitySelect={id:true,creationKey:true,creationHash:true,createdBy:true,status:true,publishedAt:true,productKind:true,
@@ -125,6 +126,16 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
     {kind:'SCALE',id:scale.id,ownerId:leaf.version.ownerUserId,privateVersionId:leaf.version.id},
     measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash},
     ...(derived?{referencePolicy:derived.referencePolicy,...(derived.report?{report:derived.report}:{})}:{})})
+  }else if(leaf.kind==='COGNITIVE'){
+   const native=await materializeEducationCognitive(tx,c,leaf.native),itemId=randomUUID()
+   itemIds.push(itemId);items.push({id:itemId,compositeAssessmentId:parent.id,type:'COGNITIVE',position:items.length,required:true,cognitiveAssignmentId:native.assignment.id})
+   units.push({itemId,family:'COGNITIVE',source:native.source,measurement:{releaseId:native.measurement.releaseId,contentHash:native.measurement.contentHash,measurementHash:native.measurement.content.measurementHash}})
+  }else if(leaf.kind==='SJT'){
+   const native=leaf.native,itemId=randomUUID()
+   itemIds.push(itemId);items.push({id:itemId,compositeAssessmentId:parent.id,type:'SITUATIONAL',position:items.length,required:true,
+    situationalInstrumentKey:native.instrumentKey,situationalInstrumentVersion:native.instrumentVersion})
+   units.push({itemId,family:'SJT',source:{...native.source,educationNative:{provider:'SJT_RELEASE',sourceId:leaf.version.id,contentHash:leaf.version.contentHash}},
+    measurement:{releaseId:native.measurement.releaseId,contentHash:native.measurement.contentHash,measurementHash:native.measurement.content.measurementHash}})
   }else for(const page of leaf.form.sections){
    const sectionId=randomUUID();sectionIds.push(sectionId)
    sections.push({id:sectionId,compositeAssessmentId:parent.id,title:page.title,description:page.description,position:sections.length,contextSection:false})
@@ -155,5 +166,5 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
  // mapping and hash. Only this final write attaches the sealed namespace.
  await tx.compositeAssessment.update({where:{id:parent.id},data:{code:key,creationKey:key,creationHash:canonicalHash(origin),
   trainingContentSnapshot:snapshot as unknown as Prisma.InputJsonValue,trainingContentSnapshotHash:manifestHash}})
- return {compositeId:parent.id,resourceKey:key,version:'1.0.0' as const,manifestHash,origin,status:'DRAFT' as const,identityOnly:true as const,canPublish:false as const}
+ return {compositeId:parent.id,resourceKey:key,version:origin.adapterVersion,manifestHash,origin,status:'DRAFT' as const,identityOnly:true as const,canPublish:false as const}
 }

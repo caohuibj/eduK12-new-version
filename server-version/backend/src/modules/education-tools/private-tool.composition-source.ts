@@ -11,6 +11,7 @@ import {readEducationPublicUse} from './public-source.catalog'
 import {parseEducationPublicSourceKey} from './public-source.identity'
 import {readEducationPublicSourceHeaders} from './public-source.headers'
 import {assertEducationLibraryHeaders} from './library-source.catalog'
+import {assertEducationCognitiveOriginalUse} from './native-source.cognitive'
 import {assertEducationLibraryUses,type LockedEducationLibraryUses} from './library-source.use'
 import {educationCompositionKey,educationCompositionOriginSchema,educationCompositionResourceKeySchema,educationCompositionVariant,
  educationCompositionPolicyBindingSchema,type EducationCompositionOrigin} from './private-tool.composition-contracts'
@@ -18,7 +19,7 @@ import {educationCompositionKey,educationCompositionOriginSchema,educationCompos
 type Tx=Prisma.TransactionClient
 type Ref={family:string;key:string;version:string}
 const leafSummarySchema=z.array(z.object({blockId:z.string().guid(),versionId:z.string().guid(),contentHash:z.string(),
- kind:z.enum(['SCALE','FORM']),audience:z.string().nullable(),metricKeys:z.array(z.string()).max(100),sourceProvider:z.string().optional(),
+ kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']),audience:z.string().nullable(),metricKeys:z.array(z.string()).max(100),sourceProvider:z.string().optional(),
  reportRespondent:z.string().nullable().optional(),subjectNumeric:z.boolean().nullable().optional(),reportScoreKeys:z.array(z.string()).nullable().optional()}).strict()).min(1).max(50)
 type Row={id:string;key:string;creationHash:string;createdBy:string;status:string;publishedAt:Date|null;productKind:string;
  publicEnabled:boolean;copyable:boolean;manifestHash:string;versionId:string;toolId:string;entry:string;organizationId:string;
@@ -50,26 +51,28 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider'='LIBRARY_SCALE') AS "librarySources",
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','versionId',b->>'versionId','contentHash',b->>'contentHash','kind',b->>'kind',
     'sourceProvider',b->>'sourceProvider',
-    'audience',COALESCE(s.definition#>>'{report,audienceContract,audience}',std.snapshot#>>'{definition,report,audienceContract,audience}',library.snapshot#>>'{compiledDefinition,report,audienceContract,audience}'),
+    'audience',CASE WHEN b->>'sourceProvider' IN ('COGNITIVE_CONFIG','SJT_RELEASE') THEN CASE v.entry WHEN 'SCHOOL' THEN 'student' ELSE 'teacher' END ELSE COALESCE(s.definition#>>'{report,audienceContract,audience}',std.snapshot#>>'{definition,report,audienceContract,audience}',library.snapshot#>>'{compiledDefinition,report,audienceContract,audience}') END,
     'reportRespondent',COALESCE(s.definition#>>'{report,audienceContract,respondent}',std.snapshot#>>'{definition,report,audienceContract,respondent}',library.snapshot#>>'{compiledDefinition,report,audienceContract,respondent}'),
     'reportScoreKeys',COALESCE(s.definition#>'{report,scoreOrder}',std.snapshot#>'{definition,report,scoreOrder}',library.snapshot#>'{compiledDefinition,report,scoreOrder}'),
     'subjectNumeric',std.snapshot#>'{parts,CONTENT,reference,metadata,disclosure,audiences,subject,numericScores}',
-    'metricKeys',CASE WHEN b->>'sourceProvider'='LIBRARY_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(library.snapshot#>'{compiledDefinition,scoring,scores}') score) WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(std.snapshot#>'{definition,scoring,scores}') score) WHEN s.kind='SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]')
+    'metricKeys',CASE WHEN b->>'sourceProvider' IN ('COGNITIVE_CONFIG','SJT_RELEASE') THEN (SELECT COALESCE(jsonb_agg(metric->>'metricKey'),'[]') FROM jsonb_array_elements(native_m.content->'metrics') metric) WHEN b->>'sourceProvider'='LIBRARY_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(library.snapshot#>'{compiledDefinition,scoring,scores}') score) WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(std.snapshot#>'{definition,scoring,scores}') score) WHEN s.kind='SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]')
       FROM jsonb_array_elements(s.definition#>'{scoring,scores}') score) ELSE '[]'::jsonb END) ORDER BY ordinal)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') WITH ORDINALITY blocks(b,ordinal)
    LEFT JOIN education_private_tool_versions s ON s.id=b->>'versionId' AND b->>'sourceProvider'='PRIVATE_VERSION'
    LEFT JOIN survey_standard_releases std ON std.id=b->>'versionId' AND b->>'sourceProvider'='STANDARD_SCALE' AND std.combination_hash=b->>'contentHash'
    LEFT JOIN scale_library_entries library_entry ON library_entry.id=b->>'versionId' AND b->>'sourceProvider'='LIBRARY_SCALE'
-   LEFT JOIN scale_library_submissions library ON library.id=library_entry.submission_id AND library.snapshot_hash=b->>'contentHash') AS leaves,
+   LEFT JOIN scale_library_submissions library ON library.id=library_entry.submission_id AND library.snapshot_hash=b->>'contentHash'
+   LEFT JOIN LATERAL (SELECT value AS unit FROM jsonb_array_elements(c.training_content_snapshot->'units') WHERE value->>'itemId'=b->'itemIds'->>0) native_u ON b->>'sourceProvider' IN ('COGNITIVE_CONFIG','SJT_RELEASE')
+   LEFT JOIN measurement_content_releases native_m ON native_m.id=native_u.unit#>>'{measurement,releaseId}') AS leaves,
   NOT EXISTS(SELECT 1 FROM jsonb_array_elements(c.training_content_snapshot->'units') u
-   LEFT JOIN scales s ON s.id=u#>>'{source,id}' LEFT JOIN measurement_content_releases r ON r.id=u#>>'{measurement,releaseId}'
-   WHERE s.status IS DISTINCT FROM 'PUBLISHED' OR r.status IS DISTINCT FROM 'PUBLISHED'
+   LEFT JOIN scales s ON u->>'family'='SCALE' AND s.id=u#>>'{source,id}' LEFT JOIN measurement_content_releases r ON r.id=u#>>'{measurement,releaseId}'
+   WHERE (u->>'family'='SCALE' AND s.status IS DISTINCT FROM 'PUBLISHED') OR r.status IS DISTINCT FROM 'PUBLISHED'
     OR EXISTS(SELECT 1 FROM scale_library_emergency_stops stop
      WHERE stop.target_kind='RELEASE' AND stop.target_id=r.id OR stop.target_kind='TRAINING_SCALE' AND stop.target_id=s.id)) AS available,
-  ARRAY(SELECT u#>>'{measurement,releaseId}' FROM jsonb_array_elements(c.training_content_snapshot->'units') u) AS "releaseIds",
-  ARRAY(SELECT u#>>'{source,id}' FROM jsonb_array_elements(c.training_content_snapshot->'units') u) AS "scaleIds",
-  ARRAY(SELECT 'education-source:'||CASE b->>'sourceProvider' WHEN 'PUBLIC_FORM' THEN 'FORM' ELSE 'STANDARD_SCALE' END||':'||(b->>'versionId')||':'||(b->>'contentHash')
-   FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider' IN ('PUBLIC_FORM','STANDARD_SCALE')) AS "publicKeys"
+  ARRAY(SELECT u#>>'{measurement,releaseId}' FROM jsonb_array_elements(c.training_content_snapshot->'units') u UNION SELECT u#>>'{source,educationNative,sourceMeasurementReleaseId}' FROM jsonb_array_elements(c.training_content_snapshot->'units') u WHERE u#>>'{source,educationNative,provider}'='COGNITIVE_CONFIG') AS "releaseIds",
+  ARRAY(SELECT u#>>'{source,id}' FROM jsonb_array_elements(c.training_content_snapshot->'units') u WHERE u->>'family'='SCALE') AS "scaleIds",
+  ARRAY(SELECT 'education-source:'||CASE b->>'sourceProvider' WHEN 'PUBLIC_FORM' THEN 'FORM' ELSE b->>'sourceProvider' END||':'||(b->>'versionId')||':'||(b->>'contentHash')
+   FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider' IN ('PUBLIC_FORM','STANDARD_SCALE','COGNITIVE_CONFIG','SJT_RELEASE')) AS "publicKeys"
   FROM composite_assessments c JOIN education_private_tool_versions v ON c.creation_key=
    'education-composition:'||v.entry||':'||v.id||':'||(v.definition#>>'{administration,population}')||':'||(v.definition#>>'{administration,responseMode}')||':1.0.0'
   WHERE c.creation_key IN (${Prisma.join(keys)}) AND v.kind='COMPOSITION' AND v.entry=${c.entry}
@@ -89,6 +92,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
  }
  const publicKeys=[...new Set(rows.flatMap(row=>row.publicKeys))]
  if(publicKeys.length){
+  await assertEducationCognitiveOriginalUse(tx,c,publicKeys.map(key=>parseEducationPublicSourceKey(key)!).filter(source=>source.kind==='COGNITIVE_CONFIG').map(source=>source.id),options.lockForUse)
   const headers=await readEducationPublicSourceHeaders(tx,publicKeys.map(key=>parseEducationPublicSourceKey(key)!),options.lockForUse),allowed=await readEducationPublicUse(tx,c,publicKeys,options.lockForUse)
   if(allowed.size!==publicKeys.length||headers.size!==publicKeys.length)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
  }
@@ -104,7 +108,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   const variant=educationCompositionVariant(origin),none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
  const student=isStudentComposition(origin)
  const binding=educationCompositionPolicyBindingSchema.parse({origin,manifestHash:row.manifestHash,
-   unitReports:leafSummarySchema.parse(row.leaves).filter(leaf=>leaf.kind==='SCALE').map(leaf=>({blockId:leaf.blockId,versionId:leaf.versionId,
+   unitReports:leafSummarySchema.parse(row.leaves).filter(leaf=>leaf.kind!=='FORM').map(leaf=>({blockId:leaf.blockId,versionId:leaf.versionId,
     contentHash:leaf.contentHash,respondent:variant.responseMode==='SELF'&&leaf.audience===(origin.entry==='SCHOOL'?'student':'teacher')
      ?{mode:'INDIVIDUAL_SUMMARY',metricKeys:leaf.metricKeys,longitudinalMetricKeys:[]}:none,
     ...(student?{subject:studentCompositionSubjectCeiling(leaf)}:{})}))})

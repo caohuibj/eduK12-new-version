@@ -3,6 +3,19 @@ import {describe,it,expect,vi} from 'vitest'
 import {createEducationAssessmentFeedback} from './educationAssessmentFeedbackAdapter'
 import type {EducationReportApi} from './EducationScalePersonalReport'
 describe('shared education application feedback adapter',()=>{
+ it('renders saved native profile and narrative cards while withholding a closed native block',async()=>{
+  const cognitive={title:'固定认知报告',profileLabel:'科研版',qualityState:'limited',conclusion:'原版固定科研反馈',headline:[],user:[],detail:[],quality:[],method:{testType:'reaction',engineVersion:'1.0.0',scoringVersion:'1.0.0',configVersion:'exact',protocolSignature:'exact',profile:'research'},disclaimer:'原版认知限制',practicalTips:[]}
+  const api=vi.fn().mockResolvedValue({schemaVersion:1,kind:'EDUCATION_FEEDBACK',mode:'COMPOSITION',state:'READY',units:[
+   {blockId:'cog',kind:'COGNITIVE',title:'认知任务',state:'READY',nativeCognitiveReport:cognitive},
+   {blockId:'sjt',kind:'SJT',title:'情境任务',state:'READY',nativeSituationalReport:{itemId:'sjt-item',type:'SITUATIONAL',kind:'situational',label:'原版情境反馈',metrics:[],narrative:{version:'sjt-narrative-v1',paragraphs:['固定本人情境叙事']},qualityState:'interpretable',disclaimer:'原版情境限制'}},
+   {blockId:'closed',kind:'COGNITIVE',title:'关闭的认知任务',state:'WITHHELD',nativeCognitiveReport:{...cognitive,conclusion:'不得显示的研究指标'}},
+  ]})
+  const renderer=createEducationAssessmentFeedback({api:api as EducationReportApi,entry:'TEACHER'})
+  render(<>{renderer({executionId:'own-native',mode:'COMPOSITION'})}</>)
+  expect(await screen.findByText('原版固定科研反馈')).toBeInTheDocument();expect(screen.getByText('固定本人情境叙事')).toBeInTheDocument()
+  expect(screen.getByText('原版情境限制')).toBeInTheDocument();expect(screen.queryByText('不得显示的研究指标')).not.toBeInTheDocument()
+  expect(api).toHaveBeenCalledExactlyOnceWith('/run-executions/own-native/feedback')
+ })
  it.each(['SCHOOL','TEACHER'] as const)('%s uses ordinary execution feedback and renders each block without exposing an injected NONE same-key result',async entry=>{
   const unit={itemId:'visible',type:'SCALE',kind:'scale',scaleName:'允许块',scaleCode:'private',caveats:[],disclaimer:'仅描述性反馈',completedAt:null,totalTime:0,
    rawScoreFeedback:[{scoreKey:'total',rangeKey:'r',text:'允许块固定解释'}]}

@@ -38,10 +38,10 @@ export async function readSealedCompositionContent(tx:Prisma.TransactionClient,i
  * PLATFORM label, client receipt, or a second source compilation. */
 export async function assertCompositionPublicContent(tx:Prisma.TransactionClient,input:{compositeId:string;ownerId:string;unit:Unit;release:StoredRelease;measurementOnly?:boolean}){
  const content=await readSealedCompositionContent(tx,input),actual=content.units.get(input.unit.itemId),source=input.unit.source.educationStandard
- if((!source&&!input.unit.source.educationLibrary)||!actual||(input.measurementOnly?canonicalHash({itemId:actual.itemId,family:actual.family,source:actual.source,measurement:actual.measurement})!==canonicalHash(input.unit):canonicalHash(actual)!==canonicalHash(input.unit)))privateToolFail('PRIVATE_COMPOSITION_CONTENT_INVALID')
+ if((!source&&!input.unit.source.educationLibrary&&!input.unit.source.educationNative)||!actual||(input.measurementOnly?canonicalHash({itemId:actual.itemId,family:actual.family,source:actual.source,measurement:actual.measurement})!==canonicalHash(input.unit):canonicalHash(actual)!==canonicalHash(input.unit)))privateToolFail('PRIVATE_COMPOSITION_CONTENT_INVALID')
  const {release}=input,pointer=release.layer==='MEASUREMENT'?actual.measurement:release.layer==='REPORT'?actual.report:
   actual.referencePolicy?.choices.find(choice=>choice.releaseId===release.releaseId)
- if(!pointer||pointer.releaseId!==release.releaseId||pointer.contentHash!==release.contentHash||release.family!=='SCALE')
+ if(!pointer||pointer.releaseId!==release.releaseId||pointer.contentHash!==release.contentHash||release.family!==actual.family)
   privateToolFail('PRIVATE_COMPOSITION_CONTENT_INVALID')
  if(source&&release.layer!=='MEASUREMENT'&&(release.provenance.standardCombinationId!==source.releaseId||release.provenance.combinationHash!==source.combinationHash
   ||release.provenance.parametersAxisHash!==source.parametersAxisHash||release.provenance.reportAxisHash!==source.reportAxisHash))

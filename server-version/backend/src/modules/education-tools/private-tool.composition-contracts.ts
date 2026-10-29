@@ -4,6 +4,7 @@ import {z} from 'zod'
 import {resultAudiencePolicySchema} from '../assessment-policy/result-disclosure'
 import {compileEducationApplicability} from '../scale-library-governance/education-applicability'
 import {expertCompositionAdministrationSchema,expertTargetKindSchema,isExpertComposition} from './expert-observation.contract'
+import {educationCognitiveSourceSchema,educationSjtSourceSchema} from './native-source.contracts'
 
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 // P1 consumes immutable author-private leaves. Public/native providers are added
@@ -13,6 +14,7 @@ export const privateCompositionSourceSchema=z.discriminatedUnion('provider',[
  z.object({provider:z.literal('LIBRARY_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash}).strict(),
  z.object({provider:z.literal('STANDARD_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash}).strict(),
  z.object({provider:z.literal('PUBLIC_FORM'),kind:z.literal('FORM'),versionId:id,contentHash:hash}).strict(),
+ educationCognitiveSourceSchema,educationSjtSourceSchema,
 ])
 export const educationCompositionResponseModeSchema=z.enum(['SELF','PARENT_REPORT','TEACHER_REPORT','STUDENT_REPORT','EXPERT_REPORT'])
 const v1AdministrationSchema=z.discriminatedUnion('population',[
@@ -33,6 +35,7 @@ export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.union(
  if(isExpertComposition(value)?value.schemaVersion!==2||value.adapterVersion!=='2.0.0':value.schemaVersion!==1||value.adapterVersion!=='1.0.0')
   ctx.addIssue({code:'custom',message:'专家观察必须使用独立的 V2 合同，既有施测方式保持 V1'})
  if(isExpertComposition(value)&&value.contextFields?.length)ctx.addIssue({code:'custom',message:'专家背景不能作为受评教师的计分背景'})
+ if(value.administration.responseMode!=='SELF'&&value.blocks.some(block=>['COGNITIVE','SJT'].includes(block.source.kind)))ctx.addIssue({code:'custom',message:'认知与 SJT 只能本人作答'})
  if(value.contextFields&&new Set(value.contextFields.map(field=>field.contextKey)).size!==value.contextFields.length)ctx.addIssue({code:'custom',path:['contextFields'],message:'背景字段不能重复'})
  if(new Set(value.blocks.map(block=>block.blockId)).size!==value.blocks.length)
   ctx.addIssue({code:'custom',path:['blocks'],message:'问卷工具块身份不能重复'})
@@ -65,8 +68,8 @@ export function matchesEducationCompositionRespondent(origin:Pick<z.infer<typeof
   &&(variant.responseMode==='SELF')===(assignment.subjectUserId===assignment.respondentUserId)
 }
 export const educationCompositionBindingSchema=z.object({schemaVersion:z.literal(1),origin:educationCompositionOriginSchema,
- sealed:z.literal(true),context:z.object({sectionId:id,itemIds:z.array(id).min(1).max(5)}).strict().optional(),manifest:z.array(z.object({blockId:id,instruction:z.string().max(16000),kind:z.enum(['SCALE','FORM']),versionId:id,contentHash:hash,
-  sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE']),sourceInstruction:z.string().max(16000).optional(),
+ sealed:z.literal(true),context:z.object({sectionId:id,itemIds:z.array(id).min(1).max(5)}).strict().optional(),manifest:z.array(z.object({blockId:id,instruction:z.string().max(16000),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']),versionId:id,contentHash:hash,
+  sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE','COGNITIVE_CONFIG','SJT_RELEASE']),sourceInstruction:z.string().max(16000).optional(),
   toolId:id,itemIds:z.array(id).min(1).max(1000),sectionIds:z.array(id).max(500)}).strict()).min(1).max(50),
 }).strict().superRefine((binding,ctx)=>{
  const {manifest}=binding
@@ -74,10 +77,12 @@ export const educationCompositionBindingSchema=z.object({schemaVersion:z.literal
   const values=manifest.flatMap(block=>field==='blockId'?[block.blockId]:block[field])
   if(new Set(values).size!==values.length)ctx.addIssue({code:'custom',message:'封存映射身份重复'})
  }
- if(manifest.some(block=>block.kind==='SCALE'?(block.itemIds.length!==1||block.sectionIds.length!==0):block.sectionIds.length===0))
+ if(manifest.some(block=>block.kind!=='FORM'?(block.itemIds.length!==1||block.sectionIds.length!==0):block.sectionIds.length===0))
   ctx.addIssue({code:'custom',message:'工具映射与原始类型不匹配'})
  if(manifest.some(block=>['STANDARD_SCALE','LIBRARY_SCALE'].includes(block.sourceProvider)&&block.kind!=='SCALE'))ctx.addIssue({code:'custom',message:'标准量表不能冒充其他工具'})
  if(manifest.some(block=>block.sourceProvider==='PUBLIC_FORM'&&block.kind!=='FORM'))ctx.addIssue({code:'custom',message:'公共表单不能冒充计分工具'})
+ if(manifest.some(block=>block.sourceProvider==='COGNITIVE_CONFIG'?block.kind!=='COGNITIVE':block.sourceProvider==='SJT_RELEASE'?block.kind!=='SJT':['COGNITIVE','SJT'].includes(block.kind)))ctx.addIssue({code:'custom',message:'原生单元必须保留精确来源类型'})
+ if(!binding.origin.variantKey.endsWith(':SELF')&&manifest.some(block=>['COGNITIVE','SJT'].includes(block.kind)))ctx.addIssue({code:'custom',message:'原生认知和 SJT 不能作为他评'})
  if(manifest.reduce((sum,block)=>sum+block.itemIds.length,0)>1000)
   ctx.addIssue({code:'custom',message:'问卷运行单元过多'})
 })

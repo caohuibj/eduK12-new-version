@@ -89,7 +89,7 @@ export async function assertPrivateFormFinalCurrent(tx:Prisma.TransactionClient,
  await lockExecutionEnvelope(tx,execution.id)
  if(composition){
   const source=await readCompositionExecutionSource(tx,{executionId:execution.id,parentAttemptId:parent.id,actorUserId:input.actorUserId,compositeId:parent.compositeAssessmentId})
-  await assertCompositionCollection(tx,source.identity,'BOUND_COLLECTION')
+  await assertCompositionCollection(tx,source.identity,'BOUND_COLLECTION',true)
  }else await readPrivateFormExecutionSource(tx,{executionId:execution.id,parentAttemptId:parent.id,actorUserId:input.actorUserId,compositeId:parent.compositeAssessmentId})
  await assertCurrentRunStartAuthority(tx,execution.id,{accountMode:'DETECT_EDUCATION_LIBRARY',operation:'BOUND_FINAL'})
  await createRelationalRuntimeConsentAuthority({db:tx as any,assignments:createSqlRelationalAssignmentRepository(tx as any)})

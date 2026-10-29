@@ -1,4 +1,8 @@
 import {readSealedCompositionContent} from '../education-tools/private-tool.composition-content'
+import {lockExecutionNativeSources} from '../education-tools/native-source.locks'
+import {educationNativeDescriptorSchema} from '../education-tools/native-source.contracts'
+import {educationBlockPublicSource} from '../education-tools/public-source.identity'
+import {assertEducationCognitiveOriginalUse} from '../education-tools/native-source.cognitive'
 import {isStudentComposition,validStudentCompositionPolicy} from '../huiteacher/studentComposition.policy'
 import {studentEvaluationTrackConfigSql} from '../huiteacher/studentCompositionResource'
 import {Prisma} from '@prisma/client'
@@ -19,10 +23,10 @@ import {issueVerifiedEducationStart} from './education-start-context'
 import type {RunResourcePolicy} from './resourceAuthority'
 
 type Tx=Prisma.TransactionClient
-const manifestSchema=z.array(z.object({blockId:z.string().guid(),kind:z.enum(['SCALE','FORM']),versionId:z.string().guid(),
- sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE']),contentHash:z.string(),itemIds:z.array(z.string().guid()),sectionIds:z.array(z.string().guid()),title:z.string()}).strict()).min(1).max(50)
-const unitsSchema=z.array(z.object({itemId:z.string(),scaleId:z.string(),versionId:z.string().guid(),contentHash:z.string(),
- releaseId:z.string().guid(),definitionHash:z.string(),measurementHash:z.string()}).strict()).max(50)
+const manifestSchema=z.array(z.object({blockId:z.string().guid(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']),versionId:z.string().guid(),
+ sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE','COGNITIVE_CONFIG','SJT_RELEASE']),contentHash:z.string(),itemIds:z.array(z.string().guid()),sectionIds:z.array(z.string().guid()),title:z.string()}).strict()).min(1).max(50)
+const unitsSchema=z.array(z.object({itemId:z.string(),family:z.enum(['SCALE','COGNITIVE','SJT']).default('SCALE'),scaleId:z.string().nullable(),versionId:z.string().guid(),contentHash:z.string(),
+ releaseId:z.string().guid(),definitionHash:z.string(),measurementHash:z.string(),native:educationNativeDescriptorSchema.optional()}).strict()).max(50)
 
 /** Frozen policy comes from an actual server-loaded Run track. The DB seal and
  * immutable version/children prove content correspondence; this reader checks
@@ -41,17 +45,20 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  const [row]=await tx.$queryRaw<Array<{title:string;manifest:unknown;units:unknown}>>(Prisma.sql`SELECT c.name AS title,
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','kind',b->>'kind','versionId',b->>'versionId','contentHash',b->>'contentHash','sourceProvider',b->>'sourceProvider',
-   'itemIds',b->'itemIds','sectionIds',b->'sectionIds','title',COALESCE(v.title,g.title,std.snapshot->>'title',library.snapshot->>'title')) ORDER BY ordinal)
+   'itemIds',b->'itemIds','sectionIds',b->'sectionIds','title',COALESCE(v.title,g.title,std.snapshot->>'title',library.snapshot->>'title',cog.name,sjt.package#>>'{definition,source,title}',static.instrument_key)) ORDER BY ordinal)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') WITH ORDINALITY blocks(b,ordinal)
    LEFT JOIN education_private_tool_versions v ON v.id=b->>'versionId' AND b->>'sourceProvider'='PRIVATE_VERSION'
    LEFT JOIN survey_governed_tools g ON g.id=b->>'versionId' AND g.family='FORM' AND g.snapshot_hash=b->>'contentHash' AND b->>'sourceProvider'='PUBLIC_FORM'
    LEFT JOIN survey_standard_releases std ON std.id=b->>'versionId' AND std.combination_hash=b->>'contentHash' AND b->>'sourceProvider'='STANDARD_SCALE'
    LEFT JOIN scale_library_entries library_entry ON library_entry.id=b->>'versionId' AND b->>'sourceProvider'='LIBRARY_SCALE'
-   LEFT JOIN scale_library_submissions library ON library.id=library_entry.submission_id AND library.snapshot_hash=b->>'contentHash') AS manifest,
-  (SELECT COALESCE(jsonb_agg(jsonb_build_object('itemId',u->>'itemId','scaleId',s.id,'versionId',COALESCE(u#>>'{source,privateVersionId}',u#>>'{source,educationStandard,releaseId}',u#>>'{source,libraryEntryId}'),
-   'contentHash',u#>>'{measurement,contentHash}','releaseId',u#>>'{measurement,releaseId}','definitionHash',COALESCE(u#>>'{source,educationStandard,nativeDefinitionHash}',u#>>'{source,educationLibrary,nativeDefinitionHash}',s.definition_hash),
-   'measurementHash',u#>>'{measurement,measurementHash}')),'[]'::jsonb)
-   FROM jsonb_array_elements(c.training_content_snapshot->'units') u JOIN scales s ON s.id=u#>>'{source,id}') AS units
+   LEFT JOIN scale_library_submissions library ON library.id=library_entry.submission_id AND library.snapshot_hash=b->>'contentHash'
+   LEFT JOIN cognitive_test_configs cog ON cog.id=b->>'versionId' AND b->>'sourceProvider'='COGNITIVE_CONFIG'
+   LEFT JOIN sjt_author_releases sjt ON sjt.id=b->>'versionId' AND b->>'sourceProvider'='SJT_RELEASE'
+   LEFT JOIN static_sjt_measurement_mappings static ON static.id=b->>'versionId' AND b->>'sourceProvider'='SJT_RELEASE') AS manifest,
+  (SELECT COALESCE(jsonb_agg(jsonb_build_object('itemId',u->>'itemId','family',u->>'family','scaleId',s.id,'versionId',COALESCE(u#>>'{source,privateVersionId}',u#>>'{source,educationStandard,releaseId}',u#>>'{source,libraryEntryId}',u#>>'{source,educationNative,sourceId}'),
+   'contentHash',u#>>'{measurement,contentHash}','releaseId',u#>>'{measurement,releaseId}','definitionHash',COALESCE(u#>>'{source,educationStandard,nativeDefinitionHash}',u#>>'{source,educationLibrary,nativeDefinitionHash}',s.definition_hash,u#>>'{source,educationNative,contentHash}'),
+   'measurementHash',u#>>'{measurement,measurementHash}')||CASE WHEN u#>'{source,educationNative}' IS NOT NULL THEN jsonb_build_object('native',u#>'{source,educationNative}') ELSE '{}'::jsonb END),'[]'::jsonb)
+   FROM jsonb_array_elements(c.training_content_snapshot->'units') u LEFT JOIN scales s ON u->>'family'='SCALE' AND s.id=u#>>'{source,id}') AS units
   FROM composite_assessments c WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.creation_key=${input.key}
    AND c.creation_hash=${canonicalHash(origin)} AND c.training_content_snapshot_hash=${binding.manifestHash}
    AND c.created_by=${origin.ownerUserId} AND c.status='PUBLISHED' AND c.published_at IS NOT NULL
@@ -67,24 +74,27 @@ export type FrozenCompositionIdentity=Awaited<ReturnType<typeof readFrozenCompos
  * while emergency stops still fence collection. Ordinary role withdrawal does
  * not destroy an entered attempt or historical report. */
 export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenCompositionIdentity,'origin'>&{
- units:ReadonlyArray<{releaseId:string;scaleId:string}>;manifest:ReadonlyArray<{sourceProvider:string;versionId:string;contentHash:string}>
+ units:ReadonlyArray<{releaseId:string;scaleId?:string|null;native?:{provider:string;sourceMeasurementReleaseId?:string}}>;manifest:ReadonlyArray<{sourceProvider:string;versionId:string;contentHash:string}>
 },purpose:'NEW_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
  if(isStudentComposition(identity.origin)&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)
  const c={entry:identity.origin.entry,organizationId:identity.origin.organizationId,principal:{userId:identity.origin.ownerUserId,accountDomain:'SCHOOL' as const}}
  if(purpose==='NEW_START')await authorizePrivateTool(tx,c)
- const releases=[...new Set(identity.units.map(unit=>unit.releaseId))],scales=[...new Set(identity.units.map(unit=>unit.scaleId))]
+ const releases=[...new Set(identity.units.flatMap(unit=>[unit.releaseId,...(unit.native?.sourceMeasurementReleaseId?[unit.native.sourceMeasurementReleaseId]:[])]))],scales=[...new Set(identity.units.flatMap(unit=>unit.scaleId?[unit.scaleId]:[]))]
  if(lock)await assertScaleLibraryCollectionAllowed(tx,releases,scales)
  const [row]=await tx.$queryRaw<Array<{stopped:boolean;unavailable:boolean}>>(Prisma.sql`SELECT
   EXISTS(SELECT 1 FROM scale_library_emergency_stops s WHERE s.target_kind='RELEASE' AND s.target_id=ANY(${releases}::text[])
    OR s.target_kind='TRAINING_SCALE' AND s.target_id=ANY(${scales}::text[])) AS stopped,
   (EXISTS(SELECT 1 FROM measurement_content_releases WHERE id=ANY(${releases}::text[]) AND status<>'PUBLISHED')
-   OR EXISTS(SELECT 1 FROM scales WHERE id=ANY(${scales}::text[]) AND status<>'PUBLISHED')) AS unavailable`)
+   OR EXISTS(SELECT 1 FROM scales WHERE id=ANY(${scales}::text[]) AND status<>'PUBLISHED')
+   OR EXISTS(SELECT 1 FROM measurement_content_releases m JOIN cognitive_assignments a ON a.id=m.scope->>'resourceId'
+    WHERE m.id=ANY(${releases}::text[]) AND m.family='COGNITIVE' AND m.scope->>'product'=${identity.origin.entry} AND a.status<>'PUBLISHED')) AS unavailable`)
  if(row.stopped||purpose==='NEW_START'&&row.unavailable)privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
  if(purpose==='NEW_START'){
+  await assertEducationCognitiveOriginalUse(tx,c,identity.manifest.filter(block=>block.sourceProvider==='COGNITIVE_CONFIG').map(block=>block.versionId),lock)
   const libraries=identity.manifest.filter(block=>block.sourceProvider==='LIBRARY_SCALE')
   await assertEducationLibraryUses(tx,c,libraries.map(source=>source.versionId),{locked:libraryUses,requireLocked:lock})
   await assertEducationLibraryHeaders(tx,libraries,lock)
-  const sources=identity.manifest.filter(block=>['PUBLIC_FORM','STANDARD_SCALE'].includes(block.sourceProvider)).map(block=>({kind:block.sourceProvider==='PUBLIC_FORM'?'FORM' as const:'STANDARD_SCALE' as const,id:block.versionId,hash:block.contentHash}))
+  const sources=identity.manifest.map(block=>educationBlockPublicSource({...block,provider:block.sourceProvider})).filter((source):source is NonNullable<typeof source>=>source!==null)
   const keys=[...new Set(sources.map(educationPublicSourceKey))]
   if(keys.length){
    const headers=await readEducationPublicSourceHeaders(tx,sources,lock),allowed=await readEducationPublicUse(tx,c,keys,lock)
@@ -151,6 +161,7 @@ export async function admitCompositionStart(tx:Tx,input:{executionId:string;comp
  * only. An unavailable U is recorded, not thrown here: concurrent reconciliation
  * may discover an already-entered attempt, which keeps its completion right. */
 export async function lockCompositionStartLibraryUses(tx:Tx,input:{executionId:string;actorUserId:string}){
+ await lockExecutionNativeSources(tx,input)
  const [row]=await tx.$queryRaw<Array<{entry:'SCHOOL'|'TEACHER';organizationId:string;ownerId:string;entryIds:string[]}>>(Prisma.sql`
   SELECT v.entry,v.organization_id AS "organizationId",v.owner_user_id AS "ownerId",
    ARRAY(SELECT DISTINCT b->>'versionId' FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b

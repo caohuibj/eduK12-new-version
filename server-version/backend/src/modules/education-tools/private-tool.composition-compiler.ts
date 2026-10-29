@@ -15,7 +15,10 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import type {GovernedArtifact} from '../survey/governed-tool.model'
 import {governedMediaBlocker,governedMediaRefs} from '../survey/governed-tool.media'
 import {compileEducationApplicability,educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
-import {educationPublicSourceKey} from './public-source.identity'
+import {educationPublicSourceKey,educationBlockPublicSource} from './public-source.identity'
+import {readEducationCognitiveSources,educationCognitiveLeafKey,type EducationCognitiveLeaf} from './native-source.cognitive'
+import {readEducationSjtSources,type EducationSjtLeaf} from './native-source.sjt'
+import {assertEducationNativeSourceLocks} from './native-source.locks'
 import {readEducationPublicUse} from './public-source.catalog'
 import {readEducationLibrarySources,type EducationLibraryLeaf} from './library-source.scale'
 import {readEducationLibrarySourceUses} from './library-source.catalog'
@@ -25,8 +28,10 @@ import {assertAssessmentAssetReferencesReady} from '../assessment-media/assessme
 export type CompositionLeaf={provider:'LIBRARY_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;library:EducationLibraryLeaf}|{provider:'STANDARD_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;standard:EducationStandardLeaf}|({provider:'PRIVATE_VERSION';version:EducationPrivateToolVersion}&(
  {kind:'SCALE';definition:ScaleDefinitionV2}|{kind:'FORM';form:ReturnType<typeof compilePrivateFormRuntime>}))|
  {provider:'PUBLIC_FORM';kind:'FORM';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;
-  sourceInstruction?:string;form:ReturnType<typeof compilePrivateFormRuntime>}
-export const compositionLeafKey=(source:{provider:string;versionId:string})=>source.provider+':'+source.versionId
+  sourceInstruction?:string;form:ReturnType<typeof compilePrivateFormRuntime>}|
+ {provider:'COGNITIVE_CONFIG';kind:'COGNITIVE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;native:EducationCognitiveLeaf}|
+ {provider:'SJT_RELEASE';kind:'SJT';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;native:EducationSjtLeaf}
+export const compositionLeafKey=(source:{provider:string;versionId:string;profile?:string})=>source.provider+':'+source.versionId+(source.profile?':'+source.profile:'')
 export type CompiledPrivateComposition={definition:PrivateCompositionDefinition;leaves:Map<string,CompositionLeaf>;publicUseExpiresAt?:Date}
 
 /** Already-authorized request only. One bounded source read, one optional media
@@ -48,14 +53,28 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
  const libraryUses=libraryIds.length?(options.purpose==='FREEZE'?readLockedEducationLibraryUses(tx,c,options.libraryUses):
   await readEducationLibrarySourceUses(tx,c,libraryIds)):new Map()
  if(libraryIds.some(id=>!libraryUses.has(id)))privateToolFail('LIBRARY_SOURCE_USE_REQUIRED',403)
- const publicSources=definition.blocks.filter(block=>['PUBLIC_FORM','STANDARD_SCALE'].includes(block.source.provider)).map(block=>block.source)
- const publicKeys=publicSources.map(source=>educationPublicSourceKey({kind:source.provider==='PUBLIC_FORM'?'FORM':'STANDARD_SCALE',id:source.versionId,hash:source.contentHash}))
+ const publicSources=definition.blocks.map(block=>block.source).filter(source=>educationBlockPublicSource(source)!==null)
+ const publicKeys=publicSources.map(source=>educationPublicSourceKey(educationBlockPublicSource(source)!))
  const publicUse=await readEducationPublicUse(tx,c,publicKeys,true)
  if(publicUse.size!==new Set(publicKeys).size)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
  const ids=[...new Set(definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION').map(block=>block.source.versionId))]
  const rows=ids.length?await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...privateToolScope(c),kind:{in:['SCALE','FORM']}}}):[]
  const byId=new Map(rows.map(row=>[row.id,row])),leaves=new Map<string,CompositionLeaf>()
- for(const block of definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION')){
+ const cognitiveSources=definition.blocks.flatMap(block=>block.source.provider==='COGNITIVE_CONFIG'?[block.source]:[])
+ const cognitive=await readEducationCognitiveSources(tx,c,cognitiveSources)
+ for(const source of cognitiveSources){
+  const native=cognitive.get(educationCognitiveLeafKey(source))!
+  leaves.set(compositionLeafKey(source),{provider:'COGNITIVE_CONFIG',kind:'COGNITIVE',version:{id:source.versionId,toolId:source.versionId,title:native.config.name,contentHash:source.contentHash},native})
+ }
+ const sjtSources=definition.blocks.flatMap(block=>block.source.provider==='SJT_RELEASE'?[block.source]:[])
+ assertEducationNativeSourceLocks(tx,sjtSources.map(source=>source.versionId))
+ const sjt=await readEducationSjtSources(tx,sjtSources,c.entry)
+ for(const source of sjtSources){
+  const native=sjt.get(source.versionId)!
+  leaves.set(compositionLeafKey(source),{provider:'SJT_RELEASE',kind:'SJT',version:{id:source.versionId,toolId:source.versionId,title:native.title,contentHash:source.contentHash},native})
+ }
+ for(const block of definition.blocks){
+  if(block.source.provider!=='PRIVATE_VERSION')continue
   const row=byId.get(block.source.versionId)
   if(!row||row.kind!==block.source.kind||row.contentHash!==block.source.contentHash)
    privateToolFail('PRIVATE_COMPOSITION_SOURCE_NOT_FOUND',404)
@@ -134,7 +153,7 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
  }
  const count=definition.blocks.reduce((n,block)=>{
   const leaf=leaves.get(compositionLeafKey(block.source))!
-  return n+(leaf.kind==='SCALE'?1:leaf.form.sections.reduce((sum,page)=>sum+page.items.length,0))
+  return n+(leaf.kind!=='FORM'?1:leaf.form.sections.reduce((sum,page)=>sum+page.items.length,0))
  },0)
  if(count>1000)privateToolFail('PRIVATE_COMPOSITION_RUNTIME_TOO_LARGE',400)
  const deadlines=[...[...publicUse.values()].map(use=>use.expiresAt),...[...libraryUses.values()].map(use=>use.expiresAt).filter((date):date is Date=>date instanceof Date)]

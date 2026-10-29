@@ -5,11 +5,11 @@ import {CompositionOutline} from '../../modules/assessment-core/composition/Comp
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
 import {PrivateToolPreview,type PrivateToolPreviewValue} from './PrivateToolPreview'
 import {EducationPublicFormChooser} from './EducationPublicFormChooser'
-import {educationPublicFormPreviewMedia,publicFormPreviewPath,publicStandardPreviewPath,libraryScalePreviewPath} from './educationPublicFormClient'
+import {educationPublicFormPreviewMedia,publicNativePreviewPath,publicFormPreviewPath,publicStandardPreviewPath,libraryScalePreviewPath} from './educationPublicFormClient'
 import {createEducationPrivateImageAdapter} from './educationPrivateImageAdapter'
 import {EducationMaterialPreview} from './EducationMaterialPicker'
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateToolVersion,type PrivateTool,type PrivateDraftState} from './privateToolClient'
-import {compositionTitle,type CompositionTool,type CompositionSummary,type CompositionReference} from './educationCompositionClient'
+import {compositionTitle,type CompositionTool,type CompositionSummary,type CompositionReference,type CompositionSource} from './educationCompositionClient'
 import {compositionAdministrationForEntry,compositionAdministrationLabel,type CompositionResponseMode} from './educationCompositionAdministration'
 import type {ProfessionalAnswer} from '../../modules/assessment-core/form/types'
 import '../../survey/survey-composition-studio.css'
@@ -37,7 +37,8 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  const [versionsCursor,setVersionsCursor]=useState<string|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
  const [uncertain,setUncertain]=useState(false),[preview,setPreview]=useState(false),[previewIndex,setPreviewIndex]=useState(0)
  const [previewTool,setPreviewTool]=useState<PrivateToolPreviewValue|null>(null),[previewError,setPreviewError]=useState(''),[previewInstruction,setPreviewInstruction]=useState('')
- const [sourceView,setSourceView]=useState<'PRIVATE'|'PUBLIC_FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE'>('PRIVATE')
+ const [sourceView,setSourceView]=useState<'PRIVATE'|'PUBLIC_FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE'|'COGNITIVE_CONFIG'|'SJT_RELEASE'>('PRIVATE')
+ const [nativePreview,setNativePreview]=useState<{kind:'COGNITIVE'|'SJT';profile?:'experience'|'standard'|'research';instruction?:string}|null>(null)
  const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
  const mounted=useRef(true),epoch=useRef(0),locked=useRef(false)
  const dirty=tool?fingerprint(tool)!==saved:Boolean(title.trim()),dirtyRef=useRef(dirty);dirtyRef.current=dirty
@@ -84,7 +85,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
   if((tool.definition.blocks.length||['STUDENT_REPORT','EXPERT_REPORT'].includes(responseMode)&&tool.definition.contextFields?.length)
    &&!window.confirm('更改作答方式需要重新选择适用的固定工具。确定清空当前工具列表及不适用的个人背景字段吗？'))return
   const {contextFields,...definition}=tool.definition
-  setReferences([]);setAnswers({});change({definition:{...definition,schemaVersion:responseMode==='EXPERT_REPORT'?2:1,adapterVersion:responseMode==='EXPERT_REPORT'?'2.0.0':'1.0.0',
+  setReferences([]);setAnswers({});setSourceView('PRIVATE');change({definition:{...definition,schemaVersion:responseMode==='EXPERT_REPORT'?2:1,adapterVersion:responseMode==='EXPERT_REPORT'?'2.0.0':'1.0.0',
    ...(!['STUDENT_REPORT','EXPERT_REPORT'].includes(responseMode)&&contextFields?{contextFields}:{}),administration,blocks:[]}})
  }
  const save=()=>{if(!tool||!tool.title.trim())return;void operate(async current=>{
@@ -109,7 +110,13 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  const targetKind=tool?.definition.administration.responseMode==='EXPERT_REPORT'?tool.definition.administration.targetKind:undefined
  const reference=block?references.find(row=>row.sourceProvider===block.source.provider&&row.id===block.source.versionId&&row.contentHash===block.source.contentHash):undefined
  useEffect(()=>{
-  let current=true;setPreviewTool(null);setPreviewError('');setPreviewInstruction('');setAnswers({})
+  let current=true;setPreviewTool(null);setNativePreview(null);setPreviewError('');setPreviewInstruction('');setAnswers({})
+  if(block&&reference&&(block.source.provider==='COGNITIVE_CONFIG'||block.source.provider==='SJT_RELEASE')){
+   const selected=block.source
+   void api<{id:string;kind:'COGNITIVE'|'SJT';contentHash:string;profile?:'experience'|'standard'|'research';instruction?:string}>(publicNativePreviewPath(organizationId,selected))
+    .then(value=>{if(current){if(value.id!==selected.versionId||value.contentHash!==selected.contentHash||value.kind!==selected.kind||selected.provider==='COGNITIVE_CONFIG'&&value.profile!==selected.profile)throw new Error('固定原生工具身份已不匹配。');setNativePreview(value)}}).catch(reason=>{if(current)setPreviewError(privateToolError(reason))})
+   return()=>{current=false}
+  }
   if(block&&reference)void api<{id:string;kind:'SCALE'|'FORM';title:string;contentHash:string;definition:PrivateTool['definition'];instruction?:string}>(
    reference.sourceProvider==='PRIVATE_VERSION'?`${base}/${reference.toolId}/versions/${block.source.versionId}`:reference.sourceProvider==='PUBLIC_FORM'?publicFormPreviewPath(organizationId,reference.id,reference.contentHash,responseMode,targetKind):reference.sourceProvider==='LIBRARY_SCALE'?libraryScalePreviewPath(organizationId,reference.id,reference.contentHash,responseMode,targetKind):publicStandardPreviewPath(organizationId,reference.id,reference.contentHash,responseMode,targetKind))
    .then(value=>{if(current){
@@ -119,7 +126,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
   return()=>{current=false}
  },[api,base,organizationId,block,reference,responseMode,targetKind])
  const previewToolId=previewTool?.id
- const publicMedia=useMemo(()=>block&&block.source.provider!=='PRIVATE_VERSION'?educationPublicFormPreviewMedia({api,entry,organizationId,actorId,versionId:block.source.versionId,contentHash:block.source.contentHash,provider:block.source.provider}):undefined,
+ const publicMedia=useMemo(()=>block&&(block.source.provider==='PUBLIC_FORM'||block.source.provider==='STANDARD_SCALE'||block.source.provider==='LIBRARY_SCALE')?educationPublicFormPreviewMedia({api,entry,organizationId,actorId,versionId:block.source.versionId,contentHash:block.source.contentHash,provider:block.source.provider}):undefined,
   [api,entry,organizationId,actorId,block?.source.provider,block?.source.versionId,block?.source.contentHash])
  const imageAdapter=useMemo(()=>publicMedia?.imageAdapter??(previewToolId?createEducationPrivateImageAdapter({api,entry,organizationId,toolId:previewToolId,actorId}):undefined),
   [publicMedia,api,entry,organizationId,previewToolId,actorId])
@@ -128,7 +135,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
   if(current()){setVersions(old=>merge(old,page.list));setVersionsCursor(page.nextCursor)}
  })}
  return <section className={'education-private-tools education-private-tools--'+entry.toLowerCase()+' '+(entry==='SCHOOL'?'hs-panel':'ht-panel')+' education-composition-studio education-composition-studio--'+entry.toLowerCase()} aria-label="普通问卷编制">
-  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单、获授权公共量表与表单编成一份{entry==='SCHOOL'?'学生自评或家长、教师观察':'教师自评或学生评教'}问卷，各项保留独立计分与反馈。</p></div></header>
+  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单、获授权公共量表与表单编成一份{entry==='SCHOOL'?'学生自评或家长、教师观察':'教师自评或学生评教'}问卷，各项保留独立计分与反馈。本人作答还可加入获授权的认知与情境任务。</p></div></header>
   {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {!tool?<>
    <form onSubmit={event=>{event.preventDefault();create()}}><label>问卷名称<input value={title} maxLength={200} onChange={event=>setTitle(event.target.value)} disabled={busy}/></label><button type="submit" disabled={busy||uncertain||!title.trim()}>新建普通问卷</button></form>
@@ -166,18 +173,22 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
      }}/>{labels[key]}</label>
     })}
    </fieldset>
-   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceViewActual==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" aria-pressed={sourceViewActual==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button><button type="button" aria-pressed={sourceViewActual==='STANDARD_SCALE'} onClick={()=>setSourceView('STANDARD_SCALE')}>获授权公共量表</button><button type="button" aria-pressed={sourceViewActual==='LIBRARY_SCALE'} onClick={()=>setSourceView('LIBRARY_SCALE')}>获授权共用量表</button></nav>
+   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceViewActual==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" aria-pressed={sourceViewActual==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button><button type="button" aria-pressed={sourceViewActual==='STANDARD_SCALE'} onClick={()=>setSourceView('STANDARD_SCALE')}>获授权公共量表</button><button type="button" aria-pressed={sourceViewActual==='LIBRARY_SCALE'} onClick={()=>setSourceView('LIBRARY_SCALE')}>获授权共用量表</button><button type="button" disabled={responseMode!=='SELF'} aria-pressed={sourceViewActual==='COGNITIVE_CONFIG'} onClick={()=>setSourceView('COGNITIVE_CONFIG')}>获授权认知任务</button><button type="button" disabled={responseMode!=='SELF'} aria-pressed={sourceViewActual==='SJT_RELEASE'} onClick={()=>setSourceView('SJT_RELEASE')}>获授权情境任务</button></nav>
     {sourceViewActual==='PRIVATE'?<EducationPrivateVersionChooser key={tool.id+':'+responseMode+':'+(tool.definition.administration.responseMode==='EXPERT_REPORT'?tool.definition.administration.targetKind:'')} api={api} organizationId={organizationId} disabled={busy||tool.definition.blocks.length>=50}
      onSelect={value=>{if(value.kind==='COMPOSITION')return;if(value.kind==='SCALE'&&tool.definition.administration.responseMode==='EXPERT_REPORT'&&tool.definition.administration.targetKind!=='PERSON'){setError('非人员观察目标只支持表单');return}const leaf={...value,kind:value.kind,sourceProvider:'PRIVATE_VERSION' as const};setReferences(old=>mergeReferences(old,[leaf]));change({definition:{...tool.definition,blocks:[...tool.definition.blocks,
       {blockId:crypto.randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:value.kind,versionId:value.id,contentHash:value.contentHash}}]}})}}/>:
-     <EducationPublicFormChooser key={sourceViewActual+':'+responseMode} kind={sourceViewActual==='PUBLIC_FORM'?'FORM':'SCALE'} catalog={sourceViewActual==='LIBRARY_SCALE'?'LIBRARY':'PUBLIC'} responseMode={responseMode} targetKind={targetKind} api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
+     <EducationPublicFormChooser key={sourceViewActual+':'+responseMode} kind={sourceViewActual==='PUBLIC_FORM'?'FORM':sourceViewActual==='COGNITIVE_CONFIG'?'COGNITIVE':sourceViewActual==='SJT_RELEASE'?'SJT':'SCALE'} catalog={sourceViewActual==='LIBRARY_SCALE'?'LIBRARY':'PUBLIC'} responseMode={responseMode} targetKind={targetKind} api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
       if(value.kind==='SCALE'&&targetKind&&targetKind!=='PERSON'){setError('非人员观察目标只支持表单');return}
-      const provider=value.sourceProvider==='LIBRARY_SCALE'?'LIBRARY_SCALE' as const:value.kind==='SCALE'?'STANDARD_SCALE' as const:'PUBLIC_FORM' as const
+      if((value.kind==='COGNITIVE'||value.kind==='SJT')&&responseMode!=='SELF'){setError('认知与情境任务仅支持本人作答。');return}
+      if(value.kind==='COGNITIVE'&&!value.profile){setError('请选择明确的认知任务版本。');return}
+      const provider=value.sourceProvider==='FORM'?'PUBLIC_FORM' as const:value.sourceProvider
+      const common={versionId:value.sourceId,contentHash:value.contentHash}
+      const source:CompositionSource=provider==='COGNITIVE_CONFIG'?{...common,provider,kind:'COGNITIVE',profile:value.profile!}:provider==='SJT_RELEASE'?{...common,provider,kind:'SJT'}:provider==='LIBRARY_SCALE'?{...common,provider,kind:'SCALE'}:provider==='STANDARD_SCALE'?{...common,provider,kind:'SCALE'}:{...common,provider:'PUBLIC_FORM',kind:'FORM'}
       setReferences(old=>mergeReferences(old,[{id:value.sourceId,sourceProvider:provider,kind:value.kind,title:value.title,contentHash:value.contentHash,version:value.versions.content,versions:value.versions,requiredContextKeys:value.requiredContextKeys}]))
-      change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source:value.sourceProvider==='LIBRARY_SCALE'?{provider:'LIBRARY_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:value.kind==='SCALE'?{provider:'STANDARD_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:{provider:'PUBLIC_FORM',kind:'FORM',versionId:value.sourceId,contentHash:value.contentHash}}]}})
+      change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source}]}})
      }}/>}</div>
     <CompositionOutline items={tool.definition.blocks.map(row=>({id:row.blockId,title:compositionTitle(row,references),
-     detail:(row.source.provider==='LIBRARY_SCALE'?'共用量表':row.source.provider==='STANDARD_SCALE'?'公共量表':row.source.provider==='PUBLIC_FORM'?'公共表单':row.source.kind==='SCALE'?'量表':'表单')+' · 固定版本 '+referenceVersion(references.find(ref=>ref.sourceProvider===row.source.provider&&ref.id===row.source.versionId&&ref.contentHash===row.source.contentHash))}))} max={50} disabled={busy}
+     detail:(row.source.provider==='LIBRARY_SCALE'?'共用量表':row.source.provider==='STANDARD_SCALE'?'公共量表':row.source.provider==='PUBLIC_FORM'?'公共表单':row.source.kind==='COGNITIVE'?'认知任务 · '+{experience:'体验版',standard:'正式版',research:'科研版'}[row.source.profile]:row.source.kind==='SJT'?'情境任务':row.source.kind==='SCALE'?'量表':'表单')+' · 固定版本 '+referenceVersion(references.find(ref=>ref.sourceProvider===row.source.provider&&ref.id===row.source.versionId&&ref.contentHash===row.source.contentHash))}))} max={50} disabled={busy}
      onMove={(index,offset)=>{const blocks=[...tool.definition.blocks];[blocks[index],blocks[index+offset]]=[blocks[index+offset],blocks[index]];change({definition:{...tool.definition,blocks}})}}
      onRemove={index=>change({definition:{...tool.definition,blocks:tool.definition.blocks.filter((_,i)=>i!==index)}})}
      renderItemEditor={(_,index)=><label className="education-composition-block-instruction">工具衔接说明 {index+1}<textarea value={tool.definition.blocks[index].instruction} maxLength={16000} disabled={busy}
@@ -187,7 +198,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
    {preview&&<section aria-label="问卷内容预览"><h3>问卷内容预览</h3><p>试填仅保留在本页，不计分或保存为正式作答。</p><p>{tool.definition.instruction}</p>{!!tool.definition.contextFields?.length&&<aside aria-label="背景信息预览"><h4>背景信息（问卷第一屏）</h4>{tool.definition.contextFields.map(field=><p key={field.contextKey}>{field.formLabel}（必答）{field.formOptions.length?'：'+field.formOptions.map(option=>option.label).join('、'):'：YYYY-MM'}</p>)}</aside>}
     <div><button disabled={previewIndex===0} onClick={()=>setPreviewIndex(index=>index-1)}>上一工具</button><span>{previewIndex+1} / {tool.definition.blocks.length}</span>
      <button disabled={previewIndex===tool.definition.blocks.length-1} onClick={()=>setPreviewIndex(index=>index+1)}>下一工具</button></div>
-    <h4>{block?compositionTitle(block,references):''}</h4>{block?.instruction&&<p className="whitespace-pre-wrap">{block.instruction}</p>}{previewInstruction&&<p className="whitespace-pre-wrap">{previewInstruction}</p>}{previewError?<p role="alert">{previewError}</p>:!reference?<p>当前固定工具不可读取，请重新核对来源。</p>:!previewTool?<p role="status">正在读取当前固定工具…</p>:
+    <h4>{block?compositionTitle(block,references):''}</h4>{block?.instruction&&<p className="whitespace-pre-wrap">{block.instruction}</p>}{previewInstruction&&<p className="whitespace-pre-wrap">{previewInstruction}</p>}{previewError?<p role="alert">{previewError}</p>:!reference?<p>当前固定工具不可读取，请重新核对来源。</p>:nativePreview?<aside aria-label="原生任务预览"><p>{nativePreview.kind==='COGNITIVE'?'认知任务 · '+({experience:'体验版',standard:'正式版',research:'科研版'}[nativePreview.profile!]):'情境任务'}</p>{nativePreview.instruction&&<p>{nativePreview.instruction}</p>}<p>任务将在正式分配后，按固定版本的原生作答流程呈现。</p></aside>:!previewTool?<p role="status">正在读取当前固定工具…</p>:
      <PrivateToolPreview tool={previewTool} answers={answers} onAnswer={(key,value)=>setAnswers(old=>({...old,[key]:value}))} imageAdapter={imageAdapter}
       renderMaterials={items=>items?.map(item=><EducationMaterialPreview key={item.asset.assetId} api={api} organizationId={organizationId} toolId={previewTool.id} item={item} loadContent={publicMedia?.loadContent}/>)}/>}
    </section>}

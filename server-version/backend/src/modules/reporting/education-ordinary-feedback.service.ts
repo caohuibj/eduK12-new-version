@@ -1,4 +1,5 @@
 import {readOrdinaryDeclaredFeedback,type OrdinaryStoredContent} from './education-ordinary-declared-feedback'
+import {readOrdinaryNativeFeedback} from './education-ordinary-native-feedback'
 import {loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
@@ -82,14 +83,19 @@ async function readOrdinaryFeedback(input:ScopedInput){
   if(own.relationshipKind!=='SELF')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
    state:'COMPLETION_ONLY' as const,title:identity.title,units:identity.manifest.map(block=>({blockId:block.blockId,kind:block.kind,title:block.title,
     state:block.kind==='FORM'?'COMPLETION_ONLY' as const:'WITHHELD' as const}))}
-  const sources:NativeEducationFeedbackSource[]=[],declaredBlocks=new Set<string>()
+  const sources:NativeEducationFeedbackSource[]=[],declaredBlocks=new Set<string>(),nativeBlocks=new Set<string>()
+  for(const block of identity.manifest.filter(block=>block.kind==='COGNITIVE'||block.kind==='SJT')){
+   const ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)
+   if(!ceiling||ceiling.versionId!==block.versionId||ceiling.contentHash!==block.contentHash)hidden()
+   if(ceiling.respondent.mode==='INDIVIDUAL_SUMMARY')nativeBlocks.add(block.blockId)
+  }
   for(const block of identity.manifest.filter(block=>block.kind==='SCALE')){
    const ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)
    if(!ceiling||ceiling.versionId!==block.versionId||ceiling.contentHash!==block.contentHash||block.itemIds.length!==1)hidden()
    if(ceiling.respondent.mode!=='INDIVIDUAL_SUMMARY')continue
    if(block.sourceProvider==='STANDARD_SCALE'){declaredBlocks.add(block.blockId);continue}
    const unit=identity.units.find(unit=>unit.itemId===block.itemIds[0]&&unit.versionId===block.versionId)
-   if(!unit)hidden()
+   if(!unit||unit.family!=='SCALE'||!unit.scaleId)hidden()
    const none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
    const contract:ResultDisclosureContractV1={schemaVersion:1,policyKey:'EDUCATION_PRIVATE_TOOL_V1',minimumRespondents:null,
     audiences:{RESPONDENT:ceiling.respondent,SUBJECT:none,TEACHER:none,PARENT:none,PROFESSIONAL:none,ORGANIZATION:none,RESEARCH:none}}
@@ -97,8 +103,9 @@ async function readOrdinaryFeedback(input:ScopedInput){
     resultDisclosure:contract,...(block.sourceProvider==='LIBRARY_SCALE'?{approvedLibrary:{approvedSnapshotHash:block.contentHash}}:
      {privateVersion:{versionId:block.versionId,contentHash:block.contentHash}})})
   }
-  const slots=(sources.length||declaredBlocks.size)&&own.frozenSlots?await loadFrozenActiveSlotSet(own.frozenSlots,tx):undefined
-  if((sources.length||declaredBlocks.size)&&(!slots||slots.snapshotHash!==own.frozenSlotsHash||slots.attemptEpoch!==own.attemptEpoch))hidden()
+  const slots=(sources.length||declaredBlocks.size||nativeBlocks.size)&&own.frozenSlots?await loadFrozenActiveSlotSet(own.frozenSlots,tx):undefined
+  if((sources.length||declaredBlocks.size||nativeBlocks.size)&&(!slots||slots.snapshotHash!==own.frozenSlotsHash||slots.attemptEpoch!==own.attemptEpoch))hidden()
+  const native=nativeBlocks.size?await readOrdinaryNativeFeedback(tx,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots:slots!,actorUserId:input.actorUserId,blockIds:nativeBlocks}):new Map()
   const declared=declaredBlocks.size?await readOrdinaryDeclaredFeedback(tx,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots:slots!,blockIds:declaredBlocks}):new Map()
   const reports=await readNativeEducationScaleFeedback(tx,{actorUserId:input.actorUserId,parent:{id:own.parentId!,status:own.parentStatus!,
    userId:input.actorUserId,subjectUserId:input.actorUserId,respondentUserId:input.actorUserId,attemptEpoch:own.attemptEpoch!,
@@ -106,6 +113,10 @@ async function readOrdinaryFeedback(input:ScopedInput){
   const units=identity.manifest.map(block=>{
    const base={blockId:block.blockId,kind:block.kind,title:block.title}
    if(block.kind==='FORM')return {...base,state:'COMPLETION_ONLY' as const}
+   if(block.kind==='COGNITIVE'||block.kind==='SJT'){
+    const report=native.get(block.itemIds[0])
+    return report?{...base,state:'READY' as const,...report}:{...base,state:'WITHHELD' as const}
+   }
    if(block.sourceProvider==='STANDARD_SCALE'){
     const report=declared.get(block.itemIds[0])
     return report?.status==='READY'&&report.rendered?{...base,state:'READY' as const,declaredReport:report.rendered,...(report.message?{message:report.message}:{})}:{...base,state:'WITHHELD' as const}
