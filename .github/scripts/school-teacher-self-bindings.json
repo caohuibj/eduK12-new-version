@@ -6,9 +6,9 @@
   "enabled": true,
   "base": "9801107019d51a4af7ddb651789b674867539d24",
   "frozenDevelopmentHead": "9fa3c51e5deb882beb4a0d56f1ebe44dae8f76f5",
-  "productHead": "7561f5bbe77ded60ae180c3b299a2f0b1dc54f3e",
-  "frontendTree": "1a579c18c0a4e889c643d65f75ef127f50cc5801",
-  "backendTree": "2a553867b262a39dc77686005028d0be33218a66",
+  "productHead": "9f65b298ffe17700638f1a55bca6a91973c17189",
+  "frontendTree": "2907eedb6ad9d1bdc5559f3e61b1f6145ac8b39b",
+  "backendTree": "296b66b01b9b282110bd1939049fcee05643717e",
   "source": {
     "docs/development/education-self-first-batch-ci.md": {
       "before": "",
@@ -148,7 +148,7 @@
     },
     "server-version/backend/src/__tests__/integration/educationPublicSourceUse.postgres.integration.test.ts": {
       "before": "",
-      "after": "ee9f98276dd47f3b481e975fb949b0ffae5dd8a5"
+      "after": "5ff372869443f38cece3bf9d24b47f9ca4631567"
     },
     "server-version/backend/src/__tests__/integration/educationPublicStandardComposition.postgres.integration.test.ts": {
       "before": "",
@@ -504,7 +504,7 @@
     },
     "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx": {
       "before": "",
-      "after": "2e66c75c9e7edce9a28342300f5f36eb14819745"
+      "after": "91aee3f61d8ec16a61c993ef3cffe332e4a95844"
     },
     "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx": {
       "before": "",
@@ -678,9 +678,10 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "DOT independently read the scope/binding selector, exact control-after blobs, selected six jobs and root gates, unique producers/artifact consumers, nonempty PG upgrade/restore, real SELF browser consumers, selected case sets and raw local control/precheck evidence at fb8489caf. Authorized one actual PR-event CI qualification; not PR approval or merge authorization. Historical local results remain unadmitted.",
-    "basisCommit": "fb8489caf91e09fb9ca7183bef5d0c7a49e0ad7e",
-    "reviewer": "DOT independent parent review"
+    "note": "DOT independently reviewed fb8489caf wiring and the exact two test-only repairs at 9f65b298f, authorized the minimum stable formal continuation. Existing official reuse functions are fixed to earlier PR338 identities; current fresh executor forbids historical manifests/receipts and requires the actual current SHA/run. Configuration alone cannot admit run40800152983. No executor/workflow/acceptance logic change: retain its original failed invocations and run the existing bounded qualification of current source. This is not PR approval or merge authorization.",
+    "basisCommit": "9f65b298ffe17700638f1a55bca6a91973c17189",
+    "reviewer": "DOT independent parent review",
+    "wiringBasisCommit": "fb8489caf91e09fb9ca7183bef5d0c7a49e0ad7e"
   },
   "requiredJobs": [
     "admission",
@@ -919,14 +920,14 @@
               },
               {
                 "path": "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
-                "blob": "2e66c75c9e7edce9a28342300f5f36eb14819745"
+                "blob": "91aee3f61d8ec16a61c993ef3cffe332e4a95844"
               },
               {
                 "path": "server-version/frontend/vitest.config.ts",
                 "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
               }
             ],
-            "sha256": "d88169f14b9f361fbdd52c1a303c5466a8090f12934a373e82d214d2b0e13276"
+            "sha256": "9ea190eea57256f5552f90d09565dee11d8aa192a00053ac7e4a2a73c3e73f3f"
           }
         },
         {
@@ -1191,14 +1192,14 @@
         "trees": [
           {
             "path": "server-version/frontend",
-            "tree": "1a579c18c0a4e889c643d65f75ef127f50cc5801"
+            "tree": "2907eedb6ad9d1bdc5559f3e61b1f6145ac8b39b"
           },
           {
             "path": "server-version/backend",
-            "tree": "2a553867b262a39dc77686005028d0be33218a66"
+            "tree": "296b66b01b9b282110bd1939049fcee05643717e"
           }
         ],
-        "sha256": "af3794ceb0bc017bb748de30b495197f9ec3ed14b3bfbbaa9a1e195b80a8ad53"
+        "sha256": "50997194b95383bbf995c21cabe877ca7031e1c3c8c6a700b64f47c46cf4a6f7"
       },
       "types": true,
       "lintFiles": [
@@ -1556,7 +1557,7 @@
               },
               {
                 "path": "server-version/backend/src/__tests__/integration/educationPublicSourceUse.postgres.integration.test.ts",
-                "blob": "ee9f98276dd47f3b481e975fb949b0ffae5dd8a5"
+                "blob": "5ff372869443f38cece3bf9d24b47f9ca4631567"
               },
               {
                 "path": "server-version/backend/src/__tests__/integration/educationScientificHash.postgres.integration.test.ts",
@@ -1571,7 +1572,7 @@
                 "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
               }
             ],
-            "sha256": "549cc4168688445bbd3fb8f46137512cd3ddebd20eff66b43f3713105722dd1c"
+            "sha256": "7a43b625f645e483322bba0a56f65fe06f33c677352281df68c4ed203da379d5"
           }
         }
       ],
@@ -1593,10 +1594,10 @@
         "trees": [
           {
             "path": "server-version/backend",
-            "tree": "2a553867b262a39dc77686005028d0be33218a66"
+            "tree": "296b66b01b9b282110bd1939049fcee05643717e"
           }
         ],
-        "sha256": "c7c3d51195bf90ece4e5d57703982d066d3466fcd0a09b4472b00593e1e9a3d9"
+        "sha256": "9c9ea29dcd0e834d1b1b5aea27d328c6d4189ac7066bda03cd2b809ef3f7b2d4"
       }
     },
     "migration": {
@@ -1644,7 +1645,15 @@
       "frontend",
       "backend"
     ],
-    "browserHelper": "server-version/e2e/education-self-questionnaire.cjs"
+    "browserHelper": "server-version/e2e/education-self-questionnaire.cjs",
+    "continuationDecision": {
+      "previousRun": 40800152983,
+      "previousCheckout": "8cc3c8cca55c5b181724de526454b12fd1203245",
+      "previousSource": "c1c5787e54a51a1c758fc41fbcf17c28ee9ddbbb",
+      "officialReuse": "NOT_SUPPORTED_BY_EXISTING_FRESH_EXECUTOR",
+      "reason": "Official legacy consumers bind PR338 and fixed run/job/build identities; fresh artifacts require current SHA/run and reject old receipts. Parameter-only substitution cannot preserve those invariants.",
+      "method": "Existing bounded fresh jobs; no general admission system and no changed gate logic. Failed PG service has no qualified dump, so actual new result/restore inputs are necessary."
+    }
   },
   "blockers": []
 }
