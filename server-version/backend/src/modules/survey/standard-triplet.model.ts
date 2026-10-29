@@ -1,6 +1,7 @@
 import {frozenScaleInstructionSchema,type FrozenScaleInstruction} from '../assessment-runtime/frozen-scale-instruction'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {standardAxisHashes,standardCombinationHash,compileStandardCombinationReport} from '../measurement-content/standard-combination'
+import {standardReportParameterBlockers} from '../measurement-content/standard-report-parameters'
 import {getScaleInstrumentSource,listScaleInstrumentSources} from '../scale/onboarding/instrument-registry'
 import {snapshotScaleInstrumentSource} from '../scale/onboarding/source-snapshot'
 import {validateScaleDefinition,hashScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
@@ -55,9 +56,8 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
  if(parameters.referencePolicy.type==='declared')for(const choice of parameters.referencePolicy.selections){
   const entry=parameters.references.find(r=>r.referenceVersion===choice.referenceVersion)?.entries.find(e=>e.scoreKey===choice.scoreKey&&e.referenceKind===choice.referenceKind)
   if(!entry)blockers.push('参数选择缺少对应的精确参考版本：'+choice.referenceVersion)
-  const report=definition.report.interpretations.find(r=>r.scoreKey===choice.scoreKey)
-  if(entry?.statistics.thresholds?.some(t=>!report?.bands.some(b=>b.key===t.key)))blockers.push('报告区间与参数阈值编码不匹配：'+choice.scoreKey)
  }
+ blockers.push(...standardReportParameterBlockers(definition,parameters.references,parts.REPORT.payload!==null))
  const {template,blockers:reportBlockers}=compileStandardCombinationReport(source.catalog.identity.canonicalName,definition,parts.REPORT.payload!==null)
  blockers.push(...reportBlockers)
  const reference=toolReference('SCALE',key,{content:parts.CONTENT.reference,parameters:parts.PARAMETERS.reference,report:parts.REPORT.reference})
