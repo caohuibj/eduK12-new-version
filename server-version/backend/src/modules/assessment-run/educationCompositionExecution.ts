@@ -79,6 +79,9 @@ export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenComp
  if(isStudentComposition(identity.origin)&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)
  const c={entry:identity.origin.entry,organizationId:identity.origin.organizationId,principal:{userId:identity.origin.ownerUserId,accountDomain:'SCHOOL' as const}}
  if(purpose==='NEW_START')await authorizePrivateTool(tx,c)
+ // The native retirement writer updates config before measurement. Hold the
+ // existing current-use check in that same order before collection locks.
+ if(purpose==='NEW_START')await assertEducationCognitiveOriginalUse(tx,c,identity.manifest.filter(block=>block.sourceProvider==='COGNITIVE_CONFIG').map(block=>block.versionId),lock)
  const releases=[...new Set(identity.units.flatMap(unit=>[unit.releaseId,...(unit.native?.sourceMeasurementReleaseId?[unit.native.sourceMeasurementReleaseId]:[])]))],scales=[...new Set(identity.units.flatMap(unit=>unit.scaleId?[unit.scaleId]:[]))]
  if(lock)await assertScaleLibraryCollectionAllowed(tx,releases,scales)
  const [row]=await tx.$queryRaw<Array<{stopped:boolean;unavailable:boolean}>>(Prisma.sql`SELECT
@@ -90,7 +93,6 @@ export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenComp
     WHERE m.id=ANY(${releases}::text[]) AND m.family='COGNITIVE' AND m.scope->>'product'=${identity.origin.entry} AND a.status<>'PUBLISHED')) AS unavailable`)
  if(row.stopped||purpose==='NEW_START'&&row.unavailable)privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
  if(purpose==='NEW_START'){
-  await assertEducationCognitiveOriginalUse(tx,c,identity.manifest.filter(block=>block.sourceProvider==='COGNITIVE_CONFIG').map(block=>block.versionId),lock)
   const libraries=identity.manifest.filter(block=>block.sourceProvider==='LIBRARY_SCALE')
   await assertEducationLibraryUses(tx,c,libraries.map(source=>source.versionId),{locked:libraryUses,requireLocked:lock})
   await assertEducationLibraryHeaders(tx,libraries,lock)

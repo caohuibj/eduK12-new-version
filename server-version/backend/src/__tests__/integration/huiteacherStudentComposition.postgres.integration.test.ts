@@ -19,8 +19,12 @@ import {generateToken} from '../../utils/jwt'
 import {csrfProtection} from '../../middleware/csrf'
 import {HUITEACHER_AUTH_COOKIE_NAME,HUITEACHER_CSRF_COOKIE_NAME,CSRF_HEADER_NAME} from '../../utils/authCookies'
 import type {FormDraft} from '../../modules/assessment-core/form/definition'
+import {installStudentStandardFixtures} from './studentStandardSource.fixture'
+import {issueAdminContentRoot} from '../../modules/measurement-content/admin-authority.service'
+import {educationPublicSourceKey} from '../../modules/education-tools/public-source.identity'
+import {listEducationPublicSources} from '../../modules/education-tools/public-source.catalog'
 
-// Execution belongs to R on a migrated, disposable real PostgreSQL database.
+// Runs only on an explicitly selected migrated, disposable real PostgreSQL DB.
 // Only identities/verified roster are seeded; source freeze, configuration,
 // assignment, START, native FINAL, completion, reporting and ledger use services.
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
@@ -41,7 +45,7 @@ suite('Teacher student ordinary Scale/Form questionnaire (isolated PostgreSQL)',
   server=await new Promise<Server>(resolve=>{const listener=app.listen(0,'127.0.0.1',()=>resolve(listener))})
   base=`http://127.0.0.1:${(server.address() as {port:number}).port}/api/huiteacher`
  })
- afterAll(async()=>{server?.closeAllConnections();if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));vi.unstubAllEnvs();await db.$disconnect()})
+ afterAll(async()=>{server?.closeAllConnections();if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));vi.restoreAllMocks();vi.unstubAllEnvs();await db.$disconnect()})
  async function request(userId:string,path:string,body?:unknown){
   const user=await db.user.findUniqueOrThrow({where:{id:userId}}),csrf='synthetic-student-composition-csrf'
   const token=generateToken({userId,username:user.username,role:user.role,accountDomain:'SCHOOL',sessionProduct:'HUITEACHER',tokenVersion:user.tokenVersion,mfaVerifiedAt:Math.floor(Date.now()/1000)})
@@ -49,7 +53,8 @@ suite('Teacher student ordinary Scale/Form questionnaire (isolated PostgreSQL)',
    cookie:`${HUITEACHER_AUTH_COOKIE_NAME}=${token}; ${HUITEACHER_CSRF_COOKIE_NAME}=${csrf}`,[CSRF_HEADER_NAME]:csrf},...(body===undefined?{}:{body:JSON.stringify(body)})})
   const value:any=await response.json();return {status:response.status,value,data:value.data}
  }
- it('fixes the exact teacher/class/source, enforces publication floor, collects canonical zero+Form finals and protects feedback',async()=>{
+ it.each(['PRIVATE_VERSION','STANDARD_SCALE'] as const)('%s fixes the teacher/class/source, enforces publication floor, collects canonical zero+Form finals and protects feedback',async provider=>{
+  const standard=provider==='STANDARD_SCALE'?await installStudentStandardFixtures():null
   const user=(role:'TEACHER'|'STUDENT')=>db.user.create({data:{username:'p3_'+randomUUID().replace(/-/g,''),passwordHash:'synthetic-only',accountDomain:'SCHOOL',role,teacherApproved:true}})
   const [manager,teacher,outsider]=await Promise.all([user('TEACHER'),user('TEACHER'),user('STUDENT')])
   const org=await db.organization.create({data:{id:randomUUID(),name:'Synthetic P3 '+randomUUID(),productDomain:'SCHOOL',createdByUserId:manager.id}})
@@ -85,9 +90,21 @@ suite('Teacher student ordinary Scale/Form questionnaire (isolated PostgreSQL)',
   // Explicit native observer declaration on this new synthetic version, before freeze.
   scale.respondentType='observer_report'
   scale.report.audienceContract={schemaVersion:1,respondent:'OBSERVER_REPORT',audience:'teacher',locale:'zh-CN'}
-  const [scaleVersion,formVersion]=[await fixed('SCALE','Observed support',scale),await fixed('FORM','Unscored classroom Form',form)]
+  const scaleSource=standard?standard.declared:await fixed('SCALE','Observed support',scale).then(source=>({provider:'PRIVATE_VERSION',kind:'SCALE',versionId:source.id,contentHash:source.contentHash})),formVersion=await fixed('FORM','Unscored classroom Form',form)
+  if(standard){
+   await issueAdminContentRoot(standard.system,{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:'synthetic-student-standard-strong-session'},
+    {requestId:randomUUID(),expectedVersion:0,reason:'Synthetic declared and generic exact observer U',grant:{subjectId:manager.id,scope:{product:'TEACHER',scopeKind:'ORGANIZATION',scopeId:org.id,resourceKind:'material',
+     resourceKeys:[standard.declared,standard.generic].map(row=>educationPublicSourceKey({kind:'STANDARD_SCALE',id:row.versionId,hash:row.contentHash}))},capabilities:['material.use'],delegableCapabilities:[],remainingDelegationDepth:0,
+     validFrom:new Date(Date.now()-60000).toISOString(),expiresAt:new Date(Date.now()+3600000).toISOString()}})
+   const catalogue=await listEducationPublicSources(context,{kind:'SCALE',responseMode:'STUDENT_REPORT'})
+   expect(catalogue.list.find(row=>row.sourceId===standard.declared.versionId)).toMatchObject({allowedActions:['REFERENCE_FIXED_VERSION']})
+   expect(catalogue.list.find(row=>row.sourceId===standard.generic.versionId)).toMatchObject({allowedActions:[]})
+   await expect(fixed('COMPOSITION','Generic OBSERVER is not student authority',{schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'TEACHER',responseMode:'STUDENT_REPORT'},instruction:'',
+    blocks:[{blockId:randomUUID(),instruction:'',source:standard.generic}]})).rejects.toMatchObject({code:'PUBLIC_STANDARD_STUDENT_DECLARATION_REQUIRED'})
+  }
   const definition={schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'TEACHER',responseMode:'STUDENT_REPORT'},instruction:'Observe the assigned teacher',
-   blocks:[scaleVersion,formVersion].map(source=>({blockId:randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:source.kind,versionId:source.id,contentHash:source.contentHash}}))}
+   blocks:[scaleSource,
+    {provider:'PRIVATE_VERSION',kind:'FORM',versionId:formVersion.id,contentHash:formVersion.contentHash}].map(source=>({blockId:randomUUID(),instruction:'',source}))}
   const composition=await fixed('COMPOSITION','Fixed student questionnaire',definition)
   const campaign={organizationId:org.id,eventId:event.id,actorUserId:manager.id},selection={...campaign,classUnitId:cls,staffAssignmentId:staff,privateComposition:{versionId:composition.id,contentHash:composition.contentHash}}
   await expect(configureHuiteacherStudentEvaluation({...selection,privateComposition:{...selection.privateComposition,contentHash:'f'.repeat(64)}})).rejects.toThrow()
