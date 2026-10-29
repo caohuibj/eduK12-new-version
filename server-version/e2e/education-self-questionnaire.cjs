@@ -74,8 +74,8 @@ async function authorQuestionnaire(s,f,{suffix,toolsPage,report,out}) {
  const catalog=studio.getByRole('region',{name:'获授权共用量表',exact:true})
  await catalog.locator('article').filter({has:p.getByText(f.library.title,{exact:true})}).getByRole('button',{name:'加入共用量表',exact:true}).click()
  const instruction='合成固定问卷说明 '+suffix
- await studio.getByLabel('问卷说明',{exact:true}).fill(instruction)
- for(let n=1;n<=3;n++)await studio.getByLabel('工具衔接说明 '+n,{exact:true}).fill('合成固定工具说明 '+n)
+ await studio.getByRole('textbox',{name:'问卷说明',exact:true}).fill(instruction)
+ for(let n=1;n<=3;n++)await studio.getByRole('textbox',{name:'工具衔接说明 '+n,exact:true}).fill('合成固定工具说明 '+n)
  const uri=base+'/'+draft.id
  await s.click(studio.getByRole('button',{name:'保存问卷草稿',exact:true}),uri,'PUT')
  const saved=await s.api(uri)
@@ -97,10 +97,10 @@ async function authorQuestionnaire(s,f,{suffix,toolsPage,report,out}) {
  assert.ok(version.id&&version.contentHash)
  await studio.getByRole('button',{name:'返回普通问卷列表',exact:true}).click()
  await p.getByRole('button',{name:'编辑 '+title,exact:true}).click()
- await studio.getByLabel('问卷说明',{exact:true}).waitFor()
- assert.equal(await studio.getByLabel('问卷说明',{exact:true}).inputValue(),instruction)
+ await studio.getByRole('textbox',{name:'问卷说明',exact:true}).waitFor()
+ assert.equal(await studio.getByRole('textbox',{name:'问卷说明',exact:true}).inputValue(),instruction)
  // Preserve a later draft without changing the fixed version used below.
- await studio.getByLabel('问卷说明',{exact:true}).fill('后续草稿不应成为已固定作答说明')
+ await studio.getByRole('textbox',{name:'问卷说明',exact:true}).fill('后续草稿不应成为已固定作答说明')
  await s.click(studio.getByRole('button',{name:'保存问卷草稿',exact:true}),uri,'PUT')
  const file='screenshots/'+s.product.toLowerCase()+'-ordinary-author.png'
  assert.equal(await p.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count(),0)
