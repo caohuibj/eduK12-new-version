@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "9225de562dc45d4fa58dc3da308a131d6c6bebd597d0b66092be62a0030ed0bf",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "task_self_discipline"
+    ],
+    "scoreOrder": [
+      "task_self_discipline"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "task_self_discipline",
+        "headline": "从“想做”到“开始做”：你的日常节奏",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项关注你怎样开始任务、做好准备并落实计划。分数越高，表示这次更认可容易开始、较少拖延的描述。比如，同样是整理资料，第一步清楚时可能很快动手，任务含糊或疲惫时则可能卡住。结果不能把你分成勤快或懒惰的人，也不能判断是否有注意力或执行功能方面的障碍；理解当时的任务和支持条件更有帮助。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想一件最近容易开始的事和一件拖着没做的事：第一步是否清楚？材料、时间、体力或情绪有什么不同？"
+          },
+          {
+            "category": "strategy",
+            "text": "为眼前一件事写一个小到可以立即着手的动作，比如“打开文档，写下标题”，并提前放好所需材料。观察哪种安排更容易开始，不拿问卷分数责备自己。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文研究译稿仍待人工审校和适用人群验证，目前只供成人研究和自我了解。",
+      "没有可靠依据划分高低或排名，也不能借用Grit、BSCS或其他工具的分界。",
+      "任务不清楚、疲劳、情绪和可用支持都可能影响回答；不能据此评价人品、努力程度或做临床诊断。",
+      "10题都需完整回答；漏答不当作零分，也不代填。不用于学生筛选、教师考核或重要选拔。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、道德评价或高风险选择。本工具是独立IPIP-NEO C5公共领域表征，不是专有NEO-PI-R或完整人格评估。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T15:04:00Z",
+        "basis": "AI editorial check: everyday task-initiation examples, no laziness/moral/clinical labels; not human expert translation review."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "task_self_discipline"
+    ],
+    "scoreOrder": [
+      "task_self_discipline"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "task_self_discipline",
+        "headline": "从想做，到找到一个能开始的入口",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这十题回顾你通常怎样准备、开始任务和落实计划，也涉及推迟行动或决定的体验。统一计分方向后，总分范围10–50；数值越大，表示这次整体更认可及时着手、做好准备和执行计划的描述。它记录的是你的自我感受，不是对实际效率的一次测验。\n\n例如，同样是整理报销材料，“把票据放到一起”可能容易着手，而“把所有事情都处理好”就让人不知道先做什么。开始卡住时，也可能碰上材料缺失、精力不足、不断被打断或任务要求不清。问卷不能从一个总分分清原因，更不能把困难归成懒惰或意志不够。\n\n如果你已有容易进入状态的安排，可以保留；若某件事总拖着，不妨先检查第一步与现实条件，而不是先责备自己。下面是供你核对的生活例子与行动选项，并非系统已经判断你需要哪一种办法。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "比较两个开头：想一件容易开始和一件卡住的事，看看第一步、材料、时间和体力有什么不同。先描述差异，不把它们换算成“我够不够自律”。"
+          },
+          {
+            "category": "strategy",
+            "text": "把第一步写成看得见的动作：例如把“整理材料”改成“把三张票据放进同一文件夹”，再把要用的东西放到手边。先试能否进入，不要求一下做完整件事。"
+          },
+          {
+            "category": "support",
+            "text": "按实际条件调整安排：若缺信息就问清要求，若负担超出精力就缩小范围、重新商量时间或寻求协助。完成一点后看看哪种安排管用，不把休息或求助当成失败。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本还在研究完善，没有可用的人群分档或排名。十题需答完整才计算，漏答不是0分，也不按最低分代填。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、道德评价或高风险选择。本工具是独立IPIP-NEO C5公共领域表征，不是专有NEO-PI-R或完整人格评估。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:28:34Z",
+        "basis": "本次只读审阅ipip_neo_c5_self_discipline10_zh_cn_research C1.0.0当前source、既有材料及新R1.1.0文字，核得分方向/范围、通常性时窗、固定解释与条件式例子、适配行动和短提示。保持source/bands/scoreKeys和受众权限，不继承旧审核日期，不声称本中文验证、作者批准或本轮golden/PG/CI通过。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "task_self_discipline"
+    ],
+    "scoreOrder": [
+      "task_self_discipline"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "task_self_discipline",
+        "headline": "先找到门把手，不必一直推那扇门",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：把“我怎么还没开始”换成“第一步到底是什么”。\n\n把任务想成一扇门：有时不是你推得不够用力，而是还没看清门把手在哪里。这份十题问卷回看准备、启动和落实计划的通常习惯，合计10–50分；数值越大，表示这次整体更认可容易着手和较少拖延的描述，不是给意志力发奖牌。\n\n假设你面对一堆资料。脑中的任务写着“全部整理完”，眼前却没有一个清楚入口；如果先换成“把文件按日期放在一起”，也许更容易试着开始。这里只是在举例，问卷并没有看到你的桌面，更不能据分数认定你卡在哪里。\n\n如果有一套顺手的启动方式，就继续用；若需要的其实是睡一觉、确认要求、减少干扰或有人搭把手，也值得认真处理。不是所有启动困难都能靠把步骤缩小解决，更不需要靠反复责备自己来开门。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找门把手：只写下一件事的第一个可见动作，例如打开已有文件、放好材料或问清一个要求。不要把“做好整件事”伪装成第一步。"
+          },
+          {
+            "category": "environment",
+            "text": "少设一道门槛：看看能否提前找到资料、关掉一个无关干扰，或约定一段不被打断的时间。选一处调整即可，不必先把环境整理完美。"
+          },
+          {
+            "category": "strategy",
+            "text": "开了一点，就看看怎么继续：做完第一步后决定继续、换办法还是暂停补资源。把有效条件记下来；若仍卡住，就找具体缺口，不给自己贴勤懒标签。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本还在研究完善，没有可用的人群分档或排名。十题需答完整才计算，漏答不是0分，也不按最低分代填。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、道德评价或高风险选择。本工具是独立IPIP-NEO C5公共领域表征，不是专有NEO-PI-R或完整人格评估。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:28:34Z",
+        "basis": "本次只读审阅ipip_neo_c5_self_discipline10_zh_cn_research C1.0.0当前source、既有材料及新R1.2.0文字，核得分方向/范围、通常性时窗、固定解释与条件式例子、适配行动和短提示。保持source/bands/scoreKeys和受众权限，不继承旧审核日期，不声称本中文验证、作者批准或本轮golden/PG/CI通过。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

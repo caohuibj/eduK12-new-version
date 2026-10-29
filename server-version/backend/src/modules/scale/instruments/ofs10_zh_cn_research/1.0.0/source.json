@@ -1,0 +1,1029 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ofs10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "面向未来开放性量表（OFS成人10题，平台中文研究工作稿）",
+      "abbreviation": "OFS-10-ZH",
+      "instrumentFamily": "Openness to the Future Scale (Botella et al. 2018); independent Chinese research working translation"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [
+        "RESILIENCE",
+        "SELF_EFFICACY"
+      ],
+      "constructDefinition": "自述对未来保留积极期待、规划与应对信心并接纳不确定的整体态度；最终单因子，不是五项独立能力，不预言未来、评价人格或诊断情绪障碍。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:wellbeing_strength",
+        "domain:stress_work",
+        "construct:optimism",
+        "construct:wellbeing",
+        "orientation:CBT",
+        "population:adult_research",
+        "population:ages_18_unspecified",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot",
+        "construct:openness_to_future",
+        "construct:positive_future_expectations",
+        "construct:acceptance_of_uncertainty",
+        "construct:future_planning",
+        "construct:future_coping_confidence",
+        "construct:single_factor_total",
+        "orientation:cognitive_theory",
+        "orientation:transdiagnostic_research",
+        "orientation:not_therapy_specific",
+        "population:source_spanish_community",
+        "population:source_spanish_clinical",
+        "population:platform_adult_boundary",
+        "population:not_k12_validated",
+        "response:10_items",
+        "response:five_point_agreement",
+        "response:all_five_anchors",
+        "response:reverse_item_6",
+        "response:fixed_order",
+        "response:no_fixed_recall_period",
+        "response:sum_10_50",
+        "use:score_only",
+        "use:no_chinese_cutoff",
+        "use:not_selection",
+        "use:not_individual_treatment_monitoring_validated",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:source_allows_redistribution",
+        "license:source_allows_adaptation",
+        "license:source_allows_commercial_use",
+        "license:retain_2017_credit_line",
+        "language_validation:validated_source_es",
+        "language_validation:author_english_translation",
+        "language_validation:english_validation_not_established",
+        "language_validation:independent_platform_translation",
+        "language_validation:cognitive_debrief_not_established",
+        "面向未来",
+        "未来开放性",
+        "未来积极态度",
+        "未来期待",
+        "憧憬",
+        "计划与行动",
+        "面对不确定",
+        "应对信心",
+        "成人自评",
+        "西语原研究",
+        "中文研究工作稿",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "2018原研究为西班牙语社区n=890与临床n=412，总n=1302，总体平均27.49±10.11岁；社区为大学生及亲属且未排除心理问题，临床为情绪障碍192和B/C组人格障碍220。原文未给硬年龄范围；18岁为本平台保守成人边界，非作者验证界值。英文为作者翻译/回译附件，实际验证仅西语。此独立中文稿尚无本地验证，不继承三题hope研究或IPIP乐观证据。"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "对未来与生活的通常想法；原件没有限定过去一周或一个月",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定正式10题顺序，完整1–5五个文字锚点；仅第6题反向6−x，总和10–50。",
+        "主冻结依据为正式英文Additional file 1，西语Additional file 2用于消歧；第5题illusions对照ilusiones为憧憬，不作病理性误译。",
+        "第8题采用英文“我知道自己能克服生活中遇到的障碍”表述，不拼入西语中“生活会带来障碍，但我相信...”的前半句；英西差异在双语档案披露。",
+        "原作者未提供个人缺失折算规则；本平台保守要求10题齐答，complete_required是平台政策，不补零或外推。",
+        "原西语ROC37.5/38仅作研究事实，不导入此中文稿评级/诊断或百分位。",
+        "独立完整三段工作指导语已逐字绑定到顶层instruction，来源见research-drafts/ofs10/1.0.0/administration-sidecar.prepared.json；不塞入首题，不增加固定回顾期。绑定不等于人工译审或本地验证完成。",
+        "完成时间为平台估计，不是原作者实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原西语科学证据可追溯；本中文工作译稿需译审、认知访谈和本地验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "只结合处境回顾面向未来的想法，不以总分评价人格或健康高低。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ofs-botella-2018-spanish-structural",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "西班牙社区890人及临床412人（情绪障碍192、B/C组人格障碍220）",
+        "ageRange": "总体平均27.49±10.11岁；未报告统一最小/最大年龄",
+        "locale": "es",
+        "territory": "ES",
+        "sampleSize": 1302,
+        "studyDesign": "Cross-sectional development; CFA/IRT and clinical/community measurement invariance; ROC group discrimination",
+        "rating": "MIXED",
+        "citation": "Botella, C., Molinari, G., Fernández-Álvarez, J., Guillén, V., García-Palacios, A., Baños, R. M., & Tomás, J. M. (2018). Development and validation of the openness to the future scale: a prospective protective factor. Health and Quality of Life Outcomes, 16, 72. https://doi.org/10.1186/s12955-018-0889-8.",
+        "doi": "10.1186/s12955-018-0889-8",
+        "url": "https://link.springer.com/article/10.1186/s12955-018-0889-8",
+        "notes": "原35题筛至10题、单因子；临床/社区alpha .82/.87。无重测或变化敏感性。作者英文回译未在英语样本验证。此记录不是中文效度或中国常模，不自动启用原ROC37.5/38。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Botella等2018正式英文Additional file 1完整10题/指导语/五锚点独立工作翻译；以西语Additional file 2交叉核对。实际原研究验证语言是es，作者英语回译仅为载体，不冒称已验证英文或中文。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "独立中文研究身份；第5题illusions依西语ilusiones消歧为憧憬，第8题冻结英文I know I can overcome the obstacles I encounter in life，不拼接西语不同句式。未复制任何已发表中文三题hope或其他中译本；未获作者中文认可。内容、计分、本地化、参数计划和报告各自追踪版本。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ofs10_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ofs10_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ofs10_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© The Author(s) 2018: Botella, Molinari, Fernández-Álvarez, Guillén, García-Palacios, Baños and Tomás. Botella, C., Molinari, G., Fernández-Álvarez, J., Guillén, V., García-Palacios, A., Baños, R. M., & Tomás, J. M. (2018). Development and validation of the openness to the future scale: a prospective protective factor. Health and Quality of Life Outcomes, 16, 72. https://doi.org/10.1186/s12955-018-0889-8. 正式英文Additional file 1和西语Additional file 2随CC BY 4.0文章发表（https://creativecommons.org/licenses/by/4.0/）；BMC出版方明确文章及supplementary material默认CC BY。两附件末同作者信用行“Permission of Botella et al. (2017)”及“Reproducido con permiso de Botella et al. (2017)”予以保留，未见研究专用/非商业/第三方排除。允许署名再分发、翻译改编与商用，须保留作者、2018论文、许可链接和修改说明。中文题文、指导语、五锚点为EDUK12.TOP据正式英文独立工作翻译，并以西语消歧；报告为平台原创，不是作者认可或已验证中文版。英文题本SHA-256：305d93d48fbf5c40d59dff2e8a977ca46b10be5e435dde73f47cc2d0c0aad500；西语题本SHA-256：13e525cc17b8336d53001605f14472a007915d8ac5328ad3321569098ca90f52。",
+      "标签只作事实检索，不授予系统使用/发布权限；DRAFT/CANDIDATE不激活产品入口。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "Openness to the Future Scale (2018); official Additional file 1 English form with Spanish Additional file 2 cross-check",
+        "citation": "Botella, C., Molinari, G., Fernández-Álvarez, J., Guillén, V., García-Palacios, A., Baños, R. M., & Tomás, J. M. (2018). Development and validation of the openness to the future scale: a prospective protective factor. Health and Quality of Life Outcomes, 16, 72. https://doi.org/10.1186/s12955-018-0889-8.",
+        "url": "https://link.springer.com/article/10.1186/s12955-018-0889-8",
+        "publicationYear": 2018
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© The Author(s) 2018: Botella, Molinari, Fernández-Álvarez, Guillén, García-Palacios, Baños and Tomás. Botella, C., Molinari, G., Fernández-Álvarez, J., Guillén, V., García-Palacios, A., Baños, R. M., & Tomás, J. M. (2018). Development and validation of the openness to the future scale: a prospective protective factor. Health and Quality of Life Outcomes, 16, 72. https://doi.org/10.1186/s12955-018-0889-8. 正式英文Additional file 1和西语Additional file 2随CC BY 4.0文章发表（https://creativecommons.org/licenses/by/4.0/）；BMC出版方明确文章及supplementary material默认CC BY。两附件末同作者信用行“Permission of Botella et al. (2017)”及“Reproducido con permiso de Botella et al. (2017)”予以保留，未见研究专用/非商业/第三方排除。允许署名再分发、翻译改编与商用，须保留作者、2018论文、许可链接和修改说明。中文题文、指导语、五锚点为EDUK12.TOP据正式英文独立工作翻译，并以西语消歧；报告为平台原创，不是作者认可或已验证中文版。英文题本SHA-256：305d93d48fbf5c40d59dff2e8a977ca46b10be5e435dde73f47cc2d0c0aad500；西语题本SHA-256：13e525cc17b8336d53001605f14472a007915d8ac5328ad3321569098ca90f52。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ofs_agreement_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有些不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "既不同意也不反对",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "有些同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常同意",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "OFS_01",
+          "content": "制定计划时，我确信自己能够完成这些计划。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "OFS_02",
+          "content": "我通常相信事情会有好的结果。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "OFS_03",
+          "content": "我觉得自己对人生的走向有足够的掌控。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "OFS_04",
+          "content": "未来的机会和挑战让我很振奋。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "OFS_05",
+          "content": "我对未来有许多憧憬和计划。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "OFS_06",
+          "content": "有时，一想到生活可能带来什么，我就会害怕，觉得自己正在失去掌控。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "OFS_07",
+          "content": "我能平静地接受生活中会有好事，也会有坏事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "OFS_08",
+          "content": "我知道自己能克服生活中遇到的障碍。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "OFS_09",
+          "content": "对我来说，每一天都是新的一天。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "OFS_10",
+          "content": "对于未来可能带来的事情，我心怀希望。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ofs_agreement_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "OFS_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "OFS_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "OFS_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "OFS_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "OFS_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "OFS_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "OFS_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "OFS_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "OFS_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "OFS_10",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "openness_to_future",
+            "type": "total",
+            "label": "此刻怎样面向未来",
+            "description": "第6题按6−原答分转换后，10题等权求和10–50；更多表示本次自述较积极地面向未来，不是未来结果、临床健康或固定能力判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "OFS_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "OFS_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "OFS_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "OFS_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "OFS_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "OFS_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "OFS_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "OFS_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "OFS_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "OFS_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "openness_to_future"
+        ],
+        "scoreOrder": [
+          "openness_to_future"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "openness_to_future",
+            "headline": "为未来保留一个可能，也容纳尚未确定",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "可以带走的一点：不必先消除所有不确定，才允许自己有一点期待。\n\n这十题把对未来的期待、计划与应对信心，以及能否接受好事坏事都可能发生的态度汇在一起。总分10–50，数值越大，表示这次整体更认可积极面向未来的描述。它只有一个总分，不是五项能力，也不能预言未来一定顺利。\n\n例如，你想重新参加一次喜欢的活动，却不确定时间和精力是否允许。可以保留这个愿望，同时了解条件、给计划留调整余地；若眼前更需要休息或处理压力，也不必用有没有大计划衡量自己。\n\n如果某个期待愿意继续保留，可以看看它与现实有哪些连接；若暂时没有方向，也值得先照顾最迫切的需要。下面的例子和选项是通用反思提示，不是系统已从分数判断你的未来或困难原因。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "挑一个仍愿意保留的可能：可以是一段关系、一个兴趣或一种生活安排。问自己期待的究竟是什么，不要求立刻写出完整人生计划。"
+              },
+              {
+                "category": "strategy",
+                "text": "把愿望与不确定一起放进计划：哪些条件可以了解，哪些只能暂时等待？允许设一个备选安排，不把调整计划看成希望落空的证明。"
+              },
+              {
+                "category": "support",
+                "text": "先照顾挡在眼前的实际压力：若负担让你难以想未来，可以先休息、处理迫切需要或找人商量。获得支持不需要先表现得很乐观。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文工作版本仍在研究完善，没有可用的中文等级或排名；本次回答不能预言未来。十题需答完整才计算，漏答不是0分。"
+        ],
+        "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T16:04:01Z",
+            "basis": "本次只读审阅ofs10_zh_cn_research C1.0.0精确source、既有固定方法证据及新R1.1.0文字，核情境/构念/组别方向/时窗/人群、0与null、固定例子及可选行动；不继承旧日期，不声称作者批准、平台科学验证或新schema/scorer/PG/CI通过。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ofs10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "OFS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "openness_to_future": 10
+          },
+          "totalScoreKeys": [
+            "openness_to_future"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "OFS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "openness_to_future": 50
+          },
+          "totalScoreKeys": [
+            "openness_to_future"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "OFS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "openness_to_future": 30
+          },
+          "totalScoreKeys": [
+            "openness_to_future"
+          ]
+        }
+      },
+      {
+        "name": "raw_all_one",
+        "answers": [
+          {
+            "itemCode": "OFS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "openness_to_future": 14
+          },
+          "totalScoreKeys": [
+            "openness_to_future"
+          ]
+        }
+      },
+      {
+        "name": "raw_all_five",
+        "answers": [
+          {
+            "itemCode": "OFS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "openness_to_future": 46
+          },
+          "totalScoreKeys": [
+            "openness_to_future"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "OFS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "OFS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "OFS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "OFS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "OFS_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "openness_to_future": 34
+          },
+          "totalScoreKeys": [
+            "openness_to_future"
+          ]
+        }
+      },
+      {
+        "name": "mixed_reverse_high",
+        "answers": [
+          {
+            "itemCode": "OFS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "OFS_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "OFS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "OFS_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "OFS_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "OFS_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "OFS_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "openness_to_future": 26
+          },
+          "totalScoreKeys": [
+            "openness_to_future"
+          ]
+        }
+      },
+      {
+        "name": "one_missing",
+        "answers": [
+          {
+            "itemCode": "OFS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "OFS_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "openness_to_future": null
+          },
+          "totalScoreKeys": [
+            "openness_to_future"
+          ]
+        }
+      },
+      {
+        "name": "empty",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "openness_to_future": null
+          },
+          "totalScoreKeys": [
+            "openness_to_future"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面是一些陈述，你可能会在不同程度上认同它们。请根据以下选项，选择你对每项陈述的同意或不同意程度。\n\n选项为：1＝非常不同意，2＝有些不同意，3＝既不同意也不反对，4＝有些同意，5＝非常同意。\n\n答案没有对错，重要的是你的想法。不必花很长时间琢磨句子的确切意思，请选择第一时间最符合你想法的答案。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/ofs10/1.0.0/bilingual-content.json#/instructions/platformChinese @ b92c69aefa2472775fa7ee86b9c208366886c908（既有平台中文工作指导语；非人类专家审批声明）"
+  }
+}

@@ -1,0 +1,799 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip_negative_expressivity10_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "IPIP消极情绪表达10题（研究译稿）",
+      "abbreviation": "IPIP_NEGATIVE_EXPRESSIVITY10",
+      "instrumentFamily": "International Personality Item Pool"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "PERSONALITY"
+      ],
+      "constructDefinition": "Self-reported outward expression versus concealment of negative emotions; not symptom severity, aggression diagnosis, emotional regulation skill or a universally desirable direction.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ipip_negative_expressivity10",
+        "adult_self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:negative_expressivity",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目前通常状态；无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持当前官方题目顺序及1–5符合度锚点，不混旧题数版本。",
+        "项目采用全10题完整作答才求和，不把缺失当零。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "基于IPIP官方Barchard(2001)构念题库的AI辅助中文工作译稿，不是官方中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文专家译审、认知访谈和目标人群心理测量验证待完成。 项目作答说明置于首题之前，原题干顺序保留；不是原作者标准化指导语审定。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_negative_expressivity10-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_negative_expressivity10-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_negative_expressivity10-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "IPIP 官方声明题项公有领域，可复制、改编、翻译及电子施测；权利许可不代表此中文译稿已经验证。",
+      "https://ipip.ori.org/newPermission.htm"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "IPIP Negative Expressivity",
+        "citation": "Barchard (2001), as attributed by the official IPIP key; do not claim a complete emotional-intelligence battery.",
+        "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "IPIP public domain: https://ipip.ori.org/newPermission.htm ; translation remains unvalidated."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ipip_negative_expressivity10_accuracy",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "介于不符合与符合之间",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+          "content": "生气时，我会大喊大叫。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+          "content": "发生不好的事情时，我会不由自主地显露出难受的样子。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+          "content": "我会把害怕的感受表现出来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+          "content": "难过时，我觉得自己的表情会流露出这种感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+          "content": "我会把悲伤的感受表现出来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+          "content": "不管有多不开心，我都把感受藏在心里。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+          "content": "我很难向别人表现出我在生他们的气。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+          "content": "不管有多害怕，我都把感受藏在心里。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+          "content": "我很少表现出愤怒。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+          "content": "我希望自己能更容易地表达消极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ipip_negative_expressivity10_accuracy",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "ipip_negative_expressivity10",
+            "type": "total",
+            "label": "消极情绪的外在表达",
+            "description": "消极情绪更容易外露的自述倾向，不等于症状更严重，也没有统一的优劣方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "ipip_negative_expressivity10"
+        ],
+        "scoreOrder": [
+          "ipip_negative_expressivity10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_negative_expressivity10",
+            "headline": "看见表达方式，不把它当成全部的难受",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "可以带走的一点：别人看得到多少，不等于你心里经历了多少。\n\n这十题关注难过、害怕或生气时，感受通常如何外露或被藏住。统一计分方向后的总分范围10–50；数值越大，表示整体更认可消极情绪容易向外表达的描述。它不是情绪严重程度，也不表示表达多就好、表达少就更平静。\n\n例如，同样听到一条不好的消息，有人会哭出来，有人暂时沉默。旁人能看到的样子，未必完整反映当事人的感受。若你希望被理解，可以考虑哪些表达能传递意思；若当时不愿公开或关系不安全，也可以先保留空间。\n\n如果某种表达方式已经让你和对方更清楚彼此需要，可以继续用；若常出现“我想说的”和“别人听到的”不同，可以选择一次具体经历回看。这里的例子和行动不代表系统已从分数判断你的情绪控制情况。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先想希望传递什么：选一次愿意回看的经历，分清心里的感受、希望对方理解的内容，以及实际表达出来的样子，不给自己贴“情绪化”标签。"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试把意思说得更具体：如“刚才这件事让我有些生气，我希望先把安排说清楚”。可用语言、文字或其他安全方式，不要求靠吼叫或压住全部感受来证明自己。"
+              },
+              {
+                "category": "support",
+                "text": "把表达与安全一起考虑：情绪很强时可以先暂停，等合适时机再决定说多少；不威胁或伤害别人，也不为了练习表达强迫自己向不安全的人披露。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文版本还在研究完善，没有可用的人群分档或排名。十题需答完整才计算；漏答不是0分，外露多少也不是痛苦或控制能力的等级。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T15:54:20Z",
+            "basis": "本次只读审阅ipip_negative_expressivity10_zh_cn_research C1.0.1精确source及已有材料与新R1.1.0文字；核范围/方向/通常时窗、构念边界、固定例子与可选行动、null不作0及必要短提示。不继承旧日期、不改变受众权限，不声称新译审、中文验证或schema/scorer/PG/CI通过。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ipip_negative_expressivity10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_negative_expressivity10": 30
+          },
+          "totalScoreKeys": [
+            "ipip_negative_expressivity10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_negative_expressivity10": 10
+          },
+          "totalScoreKeys": [
+            "ipip_negative_expressivity10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_negative_expressivity10": 50
+          },
+          "totalScoreKeys": [
+            "ipip_negative_expressivity10"
+          ]
+        }
+      },
+      {
+        "name": "all-one",
+        "answers": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_negative_expressivity10": 30
+          },
+          "totalScoreKeys": [
+            "ipip_negative_expressivity10"
+          ]
+        }
+      },
+      {
+        "name": "all-five",
+        "answers": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_negative_expressivity10": 30
+          },
+          "totalScoreKeys": [
+            "ipip_negative_expressivity10"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+    "language": "zh-CN",
+    "version": "1.0.1",
+    "source": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json#/executable/definition/items/0/content (既有指导语前缀原文拆分，题干原文保留) @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+  }
+}
