@@ -52,6 +52,7 @@ import { seeds as task49 } from '../tasks/pursuitrotor/seeds'
 import { seeds as task50 } from '../tasks/readingcomp/seeds'
 import { seeds as task51 } from '../tasks/proofread/seeds'
 import { seeds as task52 } from '../tasks/visualwm/seeds'
+import { seeds as task53 } from '../tasks/cogest/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -94,6 +95,7 @@ export const cognitiveSeeds = [
   task35[0],
   task36[0],
   task37[0],
+  task53[0],
   task47[0],
   task51[0],
   task50[0],

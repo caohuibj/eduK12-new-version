@@ -1025,3 +1025,26 @@ export type VisualwmTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Cogest 冻结 config（与后端 cogest.config schema 一致）。 */
+export interface CogestConfig {
+  totalTrials: number
+  stimulusSetVersion: string
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Cogest 单 trial payload（与后端 cogest.trial schema 一致）。 */
+export type CogestTrialPayload = {
+  itemId: string
+  responseIndex: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
