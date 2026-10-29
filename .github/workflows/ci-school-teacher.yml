@@ -253,86 +253,21 @@ jobs:
       run: node .github/scripts/school-teacher-checks.mjs cleanup
   postgres-self:
     if: fromJSON(inputs.plan).candidate == 'education-self'
+    needs: [admission, backend-self]
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
-    services:
-      postgres:
-        image: postgres:16.15-bookworm
-        env:
-          POSTGRES_DB: school_teacher_browser_ci_test
-          POSTGRES_USER: ptool
-          POSTGRES_PASSWORD: synthetic-actions-disposable
-        ports:
-        - 5432/tcp
-        options: --health-cmd "pg_isready -U ptool -d school_teacher_browser_ci_test" --health-interval 5s --health-timeout
-          5s --health-retries 20
-      redis:
-        image: redis:7.4-bookworm
-        ports:
-        - 6379/tcp
-        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
-    env:
-      NODE_ENV: test
-      SCHOOL_TEACHER_ISOLATED_DB: '1'
-      PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
-      ASSESSMENT_COMPACT_FACTS_ENABLED: 'false'
-    needs:
-    - admission
-    - backend-self
+    timeout-minutes: 5
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
         persist-credentials: false
     - name: fetch only the fixed original observer merge checkout
-      if: fromJSON(inputs.plan).continuation == 'observer-run2'
       run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
     - uses: actions/setup-node@v4
       with:
         node-version: 24.21.0
-    - name: bind disposable endpoints after service initialization
-      env:
-        DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-        SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432]
-          }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-        RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432]
-          }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-        REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
-        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-        SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
-      run: |
-        export UPLOAD_DIR="$RUNNER_TEMP/school-teacher-checks-private/uploads"
-        mkdir -p "$UPLOAD_DIR"
-        chmod 700 "$RUNNER_TEMP/school-teacher-checks-private" "$UPLOAD_DIR"
-        for key in JWT_SECRET ASSET_SIGNING_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY CAMPUS_ELIGIBILITY_HMAC_KEY CAMPUS_MFA_ENCRYPTION_KEY; do
-          printf -v "$key" '%s' "$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
-          export "$key"
-          printf '::add-mask::%s\n' "${!key}"
-          printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
-        done
-        for key in JWT_SECRET UPLOAD_DIR DATABASE_URL SCHOOL_TEACHER_TEST_DATABASE_URL RELEASE_INTEGRATION_DATABASE_URL REDIS_URL CI_POSTGRES_SERVICE_ID SCHOOL_TEACHER_PRIVATE_DIR; do
-          printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
-        done
-    - run: npm ci --ignore-scripts --prefix .github/release-tools
-    - run: bash server-version/scripts/ci-install-canvas-deps.sh
-    - working-directory: server-version/backend
-      run: npm ci
-    - working-directory: server-version/backend
-      run: |
-        node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
-        node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
-    - uses: actions/download-artifact@v4
-      with:
-        name: school-teacher-backend-${{ github.sha }}
-        path: server-version/backend/dist
-    - run: node .github/scripts/school-teacher-checks.mjs verify-backend-artifact
-    - name: prove nonempty upgrade from this candidate exact main baseline
-      if: fromJSON(inputs.plan).continuation != 'observer-run2'
-      run: node .github/scripts/school-teacher-checks.mjs migrate
-    - name: verify fixed official backend and PostgreSQL assertions or execute fresh inputs
+    - name: verify original PG assertions and completed official restore without executing them again
       run: node .github/scripts/school-teacher-checks.mjs postgres
-    - name: execute only missing restore from the frozen synthetic real-service input
-      run: node .github/scripts/school-teacher-checks.mjs postgres-restore
     - uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -340,9 +275,10 @@ jobs:
         path: school-teacher-evidence/*.json
         if-no-files-found: error
         retention-days: 3
-    - name: remove private test material on every outcome
+    - name: remove private proof archives on every outcome
       if: always()
       run: node .github/scripts/school-teacher-checks.mjs cleanup
+
   browser-self:
     if: fromJSON(inputs.plan).candidate == 'education-self'
     runs-on: ubuntu-24.04

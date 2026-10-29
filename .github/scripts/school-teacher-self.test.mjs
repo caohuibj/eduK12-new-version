@@ -56,13 +56,12 @@ test('SELF exact needs accepts only selected successes and deliberately skipped 
  assert.throws(()=>requireSuccess({requiredJobs:SELF_JOBS},{...n,connected:{result:'success'}}));assert.throws(()=>requireSuccess({requiredJobs:SELF_JOBS},{...n,unexpected:{result:'success'}}));
  const legacy=Object.fromEntries(JOBS.map(id=>[id,{result:'success'}]));for(const id of SELF_JOBS.filter(id=>!JOBS.includes(id)))legacy[id]={result:'skipped'};assert.equal(requireSuccess({requiredJobs:JOBS},legacy),true);
 });
-test('separate producers build once while PG and browser verify same-run artifacts and restore only qualified PG facts once',()=>{
+test('separate producers reuse unchanged results while the missing browser alone consumes both builds',()=>{
  assert.deepEqual(needs('backend-self'),['admission']);assert.deepEqual(needs('postgres-self'),['admission','backend-self']);assert.deepEqual(needs('browser-self'),['admission','frontend','backend-self','postgres-self']);
  assert(job('backend-self').includes('school-teacher-checks.mjs backend'));assert(job('backend-self').includes('school-teacher-backend-${{ github.sha }}'));
- for(const id of ['postgres-self','browser-self']){const text=job(id);assert(text.includes('school-teacher-backend-${{ github.sha }}'));assert(text.includes('school-teacher-checks.mjs verify-backend-artifact'));assert(!text.includes('school-teacher-checks.mjs backend\n'));assert(text.includes('CAMPUS_ELIGIBILITY_HMAC_KEY CAMPUS_MFA_ENCRYPTION_KEY'));assert(text.includes("ASSESSMENT_COMPACT_FACTS_ENABLED: 'false'"));assert(!text.includes('EDUCATION_MATERIAL_CAPACITY_PROBE_STUB'));}
- assert(job('postgres-self').includes('school-teacher-checks.mjs migrate'));assert(job('postgres-self').includes('school-teacher-checks.mjs postgres-restore'));
- assert(job('browser-self').includes('school-teacher-checks.mjs browser-report'));assert(job('browser-self').includes('school-teacher-checks.mjs verify-frontend-artifact'));
- assert(!job('browser-self').includes('school-teacher-checks.mjs restore'));assert(!job('browser-self').includes('school-teacher-checks.mjs migrate'));assert(job('browser-self').includes('migrate deploy'));
+ const pg=job('postgres-self');assert(pg.includes('school-teacher-checks.mjs postgres'));assert(!pg.includes('services:'));assert(!pg.includes('npm ci'));assert(!pg.includes('school-teacher-checks.mjs migrate'));assert(!pg.includes('school-teacher-checks.mjs postgres-restore'));
+ const text=job('browser-self');assert(text.includes('school-teacher-backend-${{ github.sha }}'));assert(text.includes('school-teacher-checks.mjs verify-backend-artifact'));assert(text.includes('CAMPUS_ELIGIBILITY_HMAC_KEY CAMPUS_MFA_ENCRYPTION_KEY'));assert(text.includes("ASSESSMENT_COMPACT_FACTS_ENABLED: 'false'"));assert(!text.includes('EDUCATION_MATERIAL_CAPACITY_PROBE_STUB'));
+ assert(text.includes('school-teacher-checks.mjs browser-report'));assert(text.includes('school-teacher-checks.mjs verify-frontend-artifact'));assert(!text.includes('school-teacher-checks.mjs restore'));assert(text.includes('migrate deploy'));
  assert(!/continue-on-error|no-sandbox|ignoreHTTPSErrors|sysctl|workflow_dispatch/.test(workflow));assert.equal(frontendTypeCommand({branch:SELF_BRANCH}).exe,'npm');assert.deepEqual(frontendTypeCommand({branch:SELF_BRANCH}).args,['run','typecheck']);
 });
 test('collected selections require nonzero exact passes, exact filtering and successful teardown; private results remain unadmitted',()=>{

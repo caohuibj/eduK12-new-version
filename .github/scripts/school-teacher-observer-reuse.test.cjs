@@ -10,7 +10,7 @@ const b = () => JSON.parse(fs.readFileSync('.github/scripts/school-teacher-self-
 const hash = bytes => createHash('sha256').update(bytes).digest('hex')
 
 test('PR385 continuation pins completed source, whole consumer trees and exact invocation inputs', () => {
-  assert.deepEqual(reuse.verifyInputs(b(), git), { frontend: reuse.fixed.frontendTree, backend: reuse.fixed.currentBackendTree, unchangedAssertionsExceptUnconsumedCli: reuse.fixed.toolingPath })
+  assert.deepEqual(reuse.verifyInputs(b(), git), { frontend: reuse.fixed.frontendTree, backend: reuse.fixed.currentBackendTree, unchangedAssertionsExceptUnconsumedCli: reuse.fixed.toolingPath, initializationOnlyRepair: reuse.fixed.schemaPath })
   for (const mutate of [x => x.base = 'a'.repeat(40), x => x.execution.officialContinuation.run++,
     x => x.execution.backend.batches[1].expectedPassed.pop(), x => x.execution.migration.restoreTables.pop()]) {
     const changed = b(); mutate(changed); assert.throws(() => reuse.verifyInputs(changed, git))

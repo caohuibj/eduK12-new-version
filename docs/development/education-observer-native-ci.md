@@ -6,7 +6,7 @@ P6 whole-package runtime remains separate and is not declared complete.
 
 Current base is merged main #386,
 `f39a00f12fed2e1b8e1d3cc45185969262925ed8`; product anchor
-`f9639a79f7b79d61a7a2edb2f45db9a6ed1b4869`. Main #382/#384 and #386 are retained
+`25606ccd895c7059e8b391ee7570e932140e0568`. Main #382/#384 and #386 are retained
 by normal merges. Both scientific forward migrations and the V1 admission row
 lock remain intact. The full raw diff, modes, source/control blobs, component
 and transitive input closures remain frozen in the existing School/Teacher
@@ -85,3 +85,33 @@ missing restore and production browser, with changed-control CodeQL in parallel.
 Expected 3–5 minutes restore, 5–10 browser, 2–4 backend compile; retain existing
 job caps. A new error stops dependents and invalidates only relevant evidence.
 No deployment, production data access or tool activation.
+
+
+## Compiled initialization repair and final browser position
+
+Run `40859479182` completed the fresh changed-input backend build, official
+frontend/audit reuse, real restore (32 nonempty/default-empty storage tables,
+full-row hashes, DDL and restricted runtime/schema), and 78-second changed-control
+CodeQL. Browser stopped before launch while preparing an approved synthetic
+source. The actual compiled artifact reproduced `Cannot access
+education_applicability_1 before initialization`: two value imports were below
+top-level Zod construction. This is our production initialization error and a
+missed compiled-entry check, not evidence that the existing TS/ESM assertions
+failed. Its original safe diagnostics, reporter and artifact remain retained.
+
+The repair only moves those two imports to the header. Exact old/new schema
+blobs and equality of its entire remaining body are checked. One-file CommonJS
+compilation loads both the schema and executable registry; the same actual
+approved-source service path then passes for both School/Teacher (0.633 seconds)
+using an explicit local diagnostic overlay on the original dist. That overlay
+is not a qualified build. A static pass over all 78 changed production TS files
+found no other top-level use before its value import; no business matrix rerun.
+
+Reuse run40859479182's completed restore through exact run/job/artifact/digest,
+commands, fixed input and 32 table receipts. The PG job is now proof-only: no
+Postgres/Redis containers, dependency install, migration, tests or restore replay.
+Data schema, restore role/DDL code and input are unchanged by this import move.
+Fresh backend compilation remains necessary for the changed CJS input; new
+CodeQL includes the repaired schema plus changed controls. Original 58/200/14,
+frontend and lock-bound audits remain reused. The missing browser journey is
+the only new behavioral gate; current required gates remain real successes.

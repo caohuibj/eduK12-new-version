@@ -14,7 +14,10 @@ const fixed = Object.freeze({
   branch: 'release/education-observer-native-20261029',
   frontendTree: '8a10fe0cd4b78cf0fff76b77c5e76afbd801ef6a',
   backendTree: '3988da0f103f76f9b0fcfeb1f9f0d4e785986286',
-  currentBackendTree: '4294e657f5ebcc9a96d6215875cf581248f6eb79',
+  currentBackendTree: '3a3efff9479ab3964a5b6af0963bcc643866b802',
+  schemaPath: 'server-version/backend/src/modules/scale/onboarding/schema.ts',
+  oldSchemaBlob: 'adc03abde8f83a3324f2a4a9dec8147a1e6a8a8c',
+  repairedSchemaBlob: 'b85c05bd0eaf8d05cae670f233bd5d16fb2c01cf',
   toolingPath: 'server-version/backend/src/scripts/cognitive-onboarding-check.ts',
   oldToolingBlob: '975168fed2f76fe37d50c6373070b024ab16aa80',
   currentToolingBlob: 'e6366a7f90bfc64142055c7710bbd39e1335fa07',
@@ -28,6 +31,9 @@ const fixed = Object.freeze({
   },
 })
 const mode = 'fixed-official-observer-continuation'
+const completedRestore = { run: 40859479182, head: '80b29c02237f1087a261abc3dafa23871b4bb94f',
+  checkout: '77de05fabd0b2a431e6d6faea1fc4c119c1c2b65', job: 123399824713,
+  artifact: 12890134519, digest: '860b99dce70f033d31a8796608576e15c2476d209756c3971aff6903d9ec9455' }
 const mainToolingSast = {
   run: 40856204332, head: 'd612c0981603b835774ee489991ec040e94e76c0',
   checkout: 'd23ac56880e188e350cc24e33d7d41601fd6d32d', job: 123387826227,
@@ -44,7 +50,7 @@ const controlPaths = [
   'server-version/e2e/school-teacher-browser.cjs', 'server-version/e2e/school-teacher-ui.cjs',
   'server-version/e2e/school-teacher-chrome-permissions.cjs', 'server-version/e2e/school-teacher-chrome-permissions.test.cjs',
 ]
-const controlSastPaths = 'paths: [.github/scripts/school-teacher-checks.mjs, .github/scripts/school-teacher-scope.mjs, .github/scripts/school-teacher-self.test.mjs, .github/scripts/school-teacher-observer-reuse.cjs, .github/scripts/school-teacher-observer-reuse.test.cjs, server-version/e2e/school-teacher-browser.cjs, server-version/e2e/school-teacher-ui.cjs, server-version/e2e/school-teacher-chrome-permissions.cjs, server-version/e2e/school-teacher-chrome-permissions.test.cjs]'
+const controlSastPaths = 'paths: [server-version/backend/src/modules/scale/onboarding/schema.ts, .github/scripts/school-teacher-checks.mjs, .github/scripts/school-teacher-scope.mjs, .github/scripts/school-teacher-self.test.mjs, .github/scripts/school-teacher-observer-reuse.cjs, .github/scripts/school-teacher-observer-reuse.test.cjs, server-version/e2e/school-teacher-browser.cjs, server-version/e2e/school-teacher-ui.cjs, server-version/e2e/school-teacher-chrome-permissions.cjs, server-version/e2e/school-teacher-chrome-permissions.test.cjs]'
 const hash = v => createHash('sha256').update(v).digest('hex')
 
 function verifyInputs(b, git) {
@@ -55,9 +61,16 @@ function verifyInputs(b, git) {
   // PR386 changed precisely one standalone CLI that none of these application
   // assertions imports. Pin both blobs and all remaining backend bytes. The CLI
   // is compiled in the backend distribution, so its BUILD is fresh, never reused.
-  assert.equal(git('diff', '--name-only', fixed.head, 'HEAD', '--', 'server-version/backend'), fixed.toolingPath)
+  assert.equal(git('diff', '--name-only', fixed.head, 'HEAD', '--', 'server-version/backend'), [fixed.schemaPath, fixed.toolingPath].sort().join('\n'))
   assert.equal(git('rev-parse', fixed.head + ':' + fixed.toolingPath), fixed.oldToolingBlob)
   assert.equal(git('rev-parse', 'HEAD:' + fixed.toolingPath), fixed.currentToolingBlob)
+  assert.equal(git('rev-parse', fixed.head + ':' + fixed.schemaPath), fixed.oldSchemaBlob)
+  assert.equal(git('rev-parse', 'HEAD:' + fixed.schemaPath), fixed.repairedSchemaBlob)
+  const withoutMovedImports = text => text.split('\n').filter(line => ![
+    "import {expertSourceApplicabilitySchema} from '../../education-tools/expert-observation.contract'",
+    "import {educationApplicabilitySchema} from '../../scale-library-governance/education-applicability'",
+  ].includes(line)).join('\n')
+  assert.equal(withoutMovedImports(git('show', fixed.head + ':' + fixed.schemaPath)), withoutMovedImports(git('show', 'HEAD:' + fixed.schemaPath)), 'Schema body and declarations must remain identical')
   function unchangedAssertionClosure(value) {
     const next = structuredClone(value)
     function visit(v) {
@@ -86,12 +99,12 @@ function verifyInputs(b, git) {
   assert.deepEqual(b.execution.migration, migration, 'Only the false nonempty legacy-table requirement changes')
   const changed = git('diff', '--name-only', fixed.head, 'HEAD').split('\n').filter(Boolean)
   const mainChanges = new Set(git('diff', '--name-only', fixed.base, fixed.currentBase).split('\n'))
-  assert(changed.length > 0); for (const p of changed) if (!controlPaths.includes(p)) {
+  assert(changed.length > 0); for (const p of changed) if (p !== fixed.schemaPath && !controlPaths.includes(p)) {
     assert(mainChanges.has(p), 'Unexpected continuation input ' + p)
     assert.equal(git('ls-tree', '-r', 'HEAD', '--', p), git('ls-tree', '-r', fixed.currentBase, '--', p), 'Merged main control changed: ' + p)
     assert.equal(git('ls-tree', '-r', fixed.head, '--', p), git('ls-tree', '-r', fixed.base, '--', p))
   }
-  return { frontend: fixed.frontendTree, backend: fixed.currentBackendTree, unchangedAssertionsExceptUnconsumedCli: fixed.toolingPath }
+  return { frontend: fixed.frontendTree, backend: fixed.currentBackendTree, unchangedAssertionsExceptUnconsumedCli: fixed.toolingPath, initializationOnlyRepair: fixed.schemaPath }
 }
 function verifyJob(run, job, kind, now = Date.now()) {
   assert(Object.hasOwn(fixed.jobs, kind))
@@ -182,6 +195,24 @@ async function reuse(kind, b, d) {
     const failure = read('phase-postgres-restore-failure.json'); assert.equal(failure.status, 'FAILED')
     assert.equal(failure.rawSha256, '800079ec637dc4b7951d448619415417f2cc30ba0cdde2ed5d5c5c43808a08c2')
     result.migration = migration; result.originalJobQualified = false; result.restoreExecuted = false
+    const rr = await d.officialApi('/actions/runs/' + completedRestore.run), rj = await d.officialApi('/actions/jobs/' + completedRestore.job)
+    assert.equal(rr.id, completedRestore.run); assert.equal(rr.head_sha, completedRestore.head); assert.equal(rr.head_branch, fixed.branch)
+    assert.equal(rr.event, 'pull_request'); assert.equal(rr.path, '.github/workflows/ci.yml'); assert.equal(rr.run_attempt, 1)
+    assert.equal(rr.status, 'completed'); assert.equal(rr.conclusion, 'failure'); assert(rr.pull_requests.some(p => p.number === 385))
+    assert.equal(rj.id, completedRestore.job); assert.equal(rj.run_id, rr.id); assert.equal(rj.head_sha, rr.head_sha)
+    assert.equal(rj.name, 'school-teacher / postgres-self'); assert.equal(rj.status, 'completed'); assert.equal(rj.conclusion, 'success')
+    const age = Date.now() - Date.parse(rj.completed_at); assert(Number.isFinite(age) && age >= 0 && age <= 86400000)
+    const rz = await d.officialZip(completedRestore.artifact, completedRestore.digest, 'school-teacher-postgres-' + completedRestore.checkout, completedRestore.run, completedRestore.head)
+    const restored = d.jsonZip(rz), proof = restored('restore.json')
+    for (const stage of ['restore-fixture-schema', 'dump-current', 'restore-current', 'remove-private-dump']) {
+      const c = restored('command-' + stage + '.json'); assert.equal(c.status, 'COMMAND_SUCCEEDED'); assert.equal(c.exitCode, 0)
+    }
+    assert.equal(proof.status, 'PASSED'); assert.equal(proof.sourceHead, completedRestore.checkout); assert.equal(proof.runId, String(completedRestore.run))
+    assert.deepEqual(proof.input, restoreInput); assert.equal(proof.restrictedRuntimeRole, true); assert.equal(proof.releaseSchemaVerified, true)
+    assert.equal(proof.originalBusinessAssertionsReexecuted, false); assert.deepEqual(proof.preserved.map(r => r.table), b.execution.migration.restoreTables)
+    for (const row of proof.preserved) { assert.match(row.sha256, /^[a-f0-9]{64}$/); assert(row.columns.length > 0); assert(row.table === 'assessment_result_facts' ? row.expectEmpty === true && row.count === 0 : row.count > 0) }
+    d.receipt('official-restore-reuse', { status: 'VERIFIED_OFFICIAL_RESTORE', currentHead: d.git('rev-parse', 'HEAD'), currentRun: process.env.GITHUB_RUN_ID,
+      original: completedRestore, originalRestore: proof, currentRestoreExecuted: false })
   } else if (kind === 'audit') {
     const audit = d.jsonZip(await artifact('audit'))('audit.json')
     assert.deepEqual(audit, { status: 'PASSED', threshold: 'HIGH/CRITICAL', components: [{ component: 'frontend', status: 'PASSED' }, { component: 'backend', status: 'PASSED' }] })
@@ -277,4 +308,4 @@ async function restore(b, d) {
     sourceHead: d.git('rev-parse', 'HEAD'), runId: process.env.GITHUB_RUN_ID,
     preserved, restrictedRuntimeRole: true, releaseSchemaVerified: true })
 }
-module.exports = { fixed, mode, controlPaths, controlSastPaths, buildManifests, restoreInput, mainToolingSast, verifyInputs, verifyJob, verifyCases, verifyBuildReceipt, reuse, verifyArtifact, restore }
+module.exports = { fixed, mode, controlPaths, controlSastPaths, buildManifests, restoreInput, completedRestore, mainToolingSast, verifyInputs, verifyJob, verifyCases, verifyBuildReceipt, reuse, verifyArtifact, restore }
