@@ -1002,3 +1002,26 @@ export type ProofreadTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Visualwm 冻结 config（与后端 visualwm.config schema 一致）。 */
+export interface VisualwmConfig {
+  totalTrials: number
+  studyMs: number
+  retentionMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Visualwm 单 trial payload（与后端 visualwm.trial schema 一致）。 */
+export type VisualwmTrialPayload = {
+  setSize: number
+  isChange: boolean
+  response: 'same' | 'change' | null
+  rtMs: number | null
+  interrupted: boolean
+}

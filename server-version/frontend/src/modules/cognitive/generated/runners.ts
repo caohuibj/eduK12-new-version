@@ -51,4 +51,5 @@ import { seriescompleteRegistryEntry as task48 } from '../tasks/seriescomplete/s
 import { pursuitrotorRegistryEntry as task49 } from '../tasks/pursuitrotor/pursuitrotor.registry'
 import { readingcompRegistryEntry as task50 } from '../tasks/readingcomp/readingcomp.registry'
 import { proofreadRegistryEntry as task51 } from '../tasks/proofread/proofread.registry'
-export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40, task41, task42, task43, task44, task45, task46, task47, task48, task49, task50, task51]
+import { visualwmRegistryEntry as task52 } from '../tasks/visualwm/visualwm.registry'
+export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40, task41, task42, task43, task44, task45, task46, task47, task48, task49, task50, task51, task52]
