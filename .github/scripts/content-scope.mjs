@@ -1,3 +1,4 @@
+import {selectScaleIntake} from './scale-intake-scope.mjs';
 import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
 import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
 import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
@@ -73,7 +74,7 @@ export function domainFor(file) {
       || file === `${modules}scale/instruments/learning-motivation-wave1-data.json`
       || file === `${modules}scale/onboarding/instruments.generated.ts`
       || file.startsWith('server-version/backend/src/__tests__/scale/instruments/')
-      || file.startsWith('docs/scale-instruments/')) return 'scale';
+      || file.startsWith('docs/scale-instruments/') || /^docs\/scale-intake\/[a-zA-Z0-9_./-]+\.(md|json|txt)$/.test(file)) return 'scale';
   if (new RegExp(`^${modules}situational/instruments/[^/]+/[^/]+/(instrument|publication|scientific)\\.json$`).test(file)
       || file === `${modules}situational/onboarding/instruments.generated.ts`) return 'situational';
   if (new RegExp(`^${modules}cognitive/tasks/[^/]+/(seeds|participant-presentation|governance|scientific)\\.ts$`).test(file)) return 'cognitive';
@@ -263,6 +264,7 @@ export function classifyChanges(entries, forceFull = false) {
     maintenance: !forceFull && result.maintenance && maintenanceChanges,
     documentation: !forceFull && result.documentation && regularChanges,
     content: !forceFull && result.content && regularChanges,
+    scale_intake_light: !forceFull && result.content && regularChanges && Boolean(selectScaleIntake(entries)),
     presentation: !forceFull && result.presentation && regularChanges,
     frontend: !forceFull && result.frontend && regularChanges,
     frontend_test: !forceFull && frontendTestOnly(entries.map(entry => entry.file)) && regularChanges,
@@ -479,7 +481,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     documentation: result.documentation, codeql, scenario,
     frontend_build:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
-    scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
+    scale_intake_light: result.scale_intake_light === true, scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };

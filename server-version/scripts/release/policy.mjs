@@ -80,7 +80,14 @@ export function classify(changes,read){
 }
 // Tooling-only C is not an application release. Its exact diff must leave both
 // component trees unchanged; unknown files/modes and mixed app changes escalate.
+const selectedScaleControlFiles=new Set(['server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts']);
 const releaseToolFiles=new Set([
+ '.github/scripts/scale-intake-scope.mjs','.github/scripts/scale-intake-scope.test.mjs',
+ '.github/scripts/admin-permissions-functional.test.mjs','.github/scripts/ci-topology.test.mjs',
+ '.github/scripts/content-workflows.test.mjs','.github/scripts/maintenance-routing.test.mjs',
+ '.github/workflows/scale-onboarding-boundary.yml',
+ ...selectedScaleControlFiles,
+ 'docs/development/scale-intake-ci-20261029.md',
  'server-version/ops/nginx/nginx.production.conf','server-version/ops/nginx/eduk12-products.conf','server-version/ops/nginx/eduk12-school.conf','server-version/ops/nginx/renew-school.sh',
  '.github/PULL_REQUEST_TEMPLATE.md','.github/release-tools/package.json','.github/release-tools/package-lock.json',
  '.github/workflows/ci.yml','.github/workflows/ci-scoped-release.yml','.github/workflows/ci-release-tools.yml','.github/workflows/ci-maintenance.yml',
@@ -94,7 +101,7 @@ export function toolingOnly(entries){return entries.length>0&&entries.every(e=>r
 export function componentFingerprint(sha,component){
  const roots=component==='frontend'?[front]:['server-version/backend/'];
  const files=git('ls-tree','-r',sha,'--',...roots).trim().split('\n').filter(Boolean);
- return hash(files.join('\n'));
+ return hash(files.filter(row=>!selectedScaleControlFiles.has(row.split('\t')[1])).join('\n'));
 }
 function toolFingerprint(sha,files){try{return hash(files.map(f=>`${f}\0${readAt(sha,f)}`).join('\0'));}catch{return null;}}
 export function plan(base,head){

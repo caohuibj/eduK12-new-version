@@ -441,6 +441,9 @@ export function failedChecks(needs, draft) {
     return [...new Set(failed)];
   }
   if (scope.application_route && scope.application_route !== 'legacy') failed.push('scope');
+  if(scope.scale_intake_light !== undefined && (!['true','false'].includes(scope.scale_intake_light)
+    || scope.scale_intake_light === 'true' && (scope.content !== 'true' || scope.frontend === 'true' || scope.scenario !== 'content')))
+    failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
   const scenarios = {'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
