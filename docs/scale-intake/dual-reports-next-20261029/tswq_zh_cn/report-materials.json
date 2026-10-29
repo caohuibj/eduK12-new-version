@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "tswq_zh_cn",
+  "instrumentVersion": "1.0.1",
+  "originalSourceSha256": "25c1aafcdcf46ddbc3baa74a317b10fbe3e0a9438fa8a59afb547bf223a1ee9a",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "scoreOrder": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "school_connectedness",
+        "headline": "在学校有没有“自己人”的感觉",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。例如，遇到难题时是否有人愿意听你说，表达不同意见时能否仍被尊重。一次不顺利的互动不能代表整个月，也不应让一个结果定义你与学校的关系。这是一张观察近况的便条，不是给自己贴标签的结论。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在学校里，谁或哪种场景最让你感到被支持？还有哪种支持你希望获得？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一位可信同事，从一次简短交流开始，具体说说最近需要什么帮助。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "teaching_efficacy",
+        "headline": "你对自己教学的信心与成就感",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。例如，一次讲解终于让学生明白，或一个尝试暂时没有达到预期，都可能影响当下的信心。可以回看具体经历，同时留意教学资源与同伴支持，而不是把感受当成绩。这是一张观察近况的便条，不是给自己贴标签的结论。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "过去一个月，有没有一个学生理解了新内容、一次互动更顺畅的小片段？"
+          },
+          {
+            "category": "strategy",
+            "text": "记下一件具体有效的小做法，下周有机会再试一次；需要时与同伴讨论教学支持。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "teacher_subjective_wellbeing",
+        "headline": "这个月的教师生活，感觉怎么样",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。例如，你可能对教学很有成就感，却仍希望在学校里得到更多支持；也可能归属感不错，但最近教学遇到了挑战。分开观察这两部分，比寻找一条及格线更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "你更想先改善支持感，还是找回教学中的小成就？"
+          },
+          {
+            "category": "strategy",
+            "text": "只选一个可以改变的小环节，过一段时间再回顾它对自己的影响。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+      "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+      "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+      "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+    ],
+    "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T16:47:00Z",
+        "basis": "AI editorial check only: adult workplace self-report, plain language, no diagnostic or teacher-performance inference; pending human review."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "scoreOrder": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "school_connectedness",
+        "headline": "学校归属：能否在工作中被接纳和尊重",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份报告带走一句话：把学校支持与教学自我感受分开看，不用一个数字评价教师价值。\n\n这份问卷由教师本人回顾过去一个月，不是学生或家长评价老师。学校归属四题相加4–16，越大表示这次更常报告属于学校、能真实做自己、被关心和被尊重等体验。它不是受欢迎程度或融入能力。\n\n例如，提出不同看法时仍被认真听完，可能让人更安心；也有人对课堂工作投入，却在团队中很少找到支持。这里是回顾例子，不是系统已判定你的学校环境。\n\n已有可靠的联系可以保留。若感到孤立或不被尊重，也不是只要自己更主动就该解决；工作安排、同伴互动和学校支持同样重要，不需要勉强披露私人感受来换取归属。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "想一想眼下需要哪种支持：有人听、一起备课、问清资源，还是讨论工作安排。选择安全且合适的人或渠道提出一个具体需要；不必一次讲出全部私人情况，也不要求独自改变整个环境。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "teaching_efficacy",
+        "headline": "教学效能体验：感到有成就，不等于实际绩效分",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这四题相加4–16。越大表示过去一个月，你更常自述自己教学成功、能帮助学生学习、已有成就或教学有效。它整理的是教师自己的效能体验，不是对实际教学质量的考试，也不代替学生学习证据。\n\n例如，一次讲解终于让某个概念更清楚，可能让人有成就；同一时期另一项尝试仍可能需要调整。例子不是系统已观察到的课堂，也不说明结果都由教师一个人决定。\n\n已有有用的做法可以保留，遇到挑战时也可以找示例、材料和同伴支持。资源、任务与班级情境值得一起看，不能把信心变化等同于教师不胜任。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一次真实教学片段，记下采用了什么做法、有哪些可观察反馈、什么仍不清楚。需要时与合适同伴讨论一个具体问题或资源；既不只靠自我感觉认定有效，也不因一次未达预期就否定整段工作。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "teacher_subjective_wellbeing",
+        "headline": "整体教师体验：分别看支撑，不找及格线",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "八题总和8–32，越大表示这次整体更频繁报告学校归属与教学效能方面的积极体验。总分来自上述两组，不是第三种独立能力，也没有中文及格线、风险档或学校排名。\n\n例如，对教学有成就感、却仍缺少学校支持，和有人可依靠、但教学正遇到挑战，可能得到相近总数。一个整体数字无法决定应当先支持哪一部分；请结合真实工作回顾，而不是从例子认领个人画像。\n\n若已有适合自己的支持和做法，可以继续保留；若某一面很吃力，也可以只先关注这一面。支持不需要等总分变小，工作处境也不只靠个人调整心态。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从过去一个月选一件想保留的事，或一项最需要支持的工作条件。先选最重要的一项即可，不要求两边都写，也不把报告变成新的绩效记录。"
+          },
+          {
+            "category": "environment",
+            "text": "与合适的人商量一个具体可行的变化，例如澄清一项要求、共享一种资源或减少一项可避免的来回。之后看真实工作是否更可承受，不只追求分数上升；结果不用于考核本人、同事或学校。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "独立中文教师工作稿尚未验证，无本地分档；不评价教学能力，不用于绩效、人事或学校排名。"
+    ],
+    "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:06:07Z",
+        "basis": "本次AI文字自审对应tswq_zh_cn的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "scoreOrder": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "school_connectedness",
+        "headline": "在学校有支持，不靠把自己变成“更合群”",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：这张便条帮你看工作体验，不给老师发好坏证书。\n\n由教师本人回顾过去一个月，学校归属四题合计4–16；越大表示更常觉得属于这里、能真实做自己，被关心与尊重。它不数熟人，也不是“人气值”；不是学生给老师打分。\n\n假设在讨论里能把不同意见说完而不被轻视，可能让人安心；也可能课堂投入不少，却很难找到可以商量的人。这里只是例子，系统没从分数替学校写评价。\n\n现有可靠的支持可以继续用。如果没有，也不意味着你只差一点社交技巧。工作安排与学校环境都重要，不用把所有需要包装成“我再适应一下”。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "给支持起个具体名字：备课资源、一次倾听、一个清楚的要求，还是能商量安排的机会？选安全合适的人或渠道问一件事；不用为了被接纳而一次交代所有私人感受。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "teaching_efficacy",
+        "headline": "给教学留一个具体片段，不给自己盖总章",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "教学效能四题合计4–16，越大表示过去一个月，你更常认为自己教学有效、能帮助学生、感到成功或有成就。它不是绩效积分，也不是客观课堂测验。\n\n比如一个讲解有了可见回应，另一项活动仍没按预期展开，这些都可能影响感受。例子不是系统已看过你的课堂，学生学习也不由老师的信心单独决定。\n\n好用的做法可以留下，没弄清的环节可以找材料、示例或同伴。一次挑战不需要升级成“我不是好老师”，一次顺利也不代替具体反馈。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "存一条“教学续点”：记一次具体做法、一个观察到的反馈，以及下一次想问清的问题。愿意时找合适同伴讨论，不只写一句“效果很好”或“我不行”；找支持不是能力不够的证明。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "teacher_subjective_wellbeing",
+        "headline": "总览不是考核表，先看哪一边需要支撑",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "总分8–32来自八题，越大表示整体更常报告学校归属和教学效能上的积极体验。它不是第三项独立能力，也没有好老师达标线。\n\n同一个总数，可能一边有支撑、一边仍吃力：对教学有成就，却希望得到更多理解；或者同伴支持不少，教学任务却很有挑战。这是帮助阅读的例子，不是系统给你的工作画像。\n\n想保留的部分可以保留，需要帮助的部分也可以单独说。总分不会决定你是否值得支持，更不负责给同事、教师或学校排座次。先松动一个现实环节，可能比再给自己一项“积极心态作业”更合适。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "圈一个真正想谈的点：想继续用的做法，或希望改变的工作条件，选一项就够。它是自我回顾，不是需要交给谁验收的成绩。"
+          },
+          {
+            "category": "environment",
+            "text": "让改变小到能讨论：问清一项要求、共享一个资源，或协商一次安排。之后看看真实工作是否更顺一些、负担是否更可承受，不把数字上升当成新的绩效目标。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "独立中文教师工作稿尚未验证，无本地分档；不评价教学能力，不用于绩效、人事或学校排名。"
+    ],
+    "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:06:07Z",
+        "basis": "本次AI文字自审对应tswq_zh_cn的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

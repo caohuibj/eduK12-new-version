@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "wibps7_adolescent_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "1eb56b270429cd5e79bf88e01a0004569bc17db679259c404f5323f0cb91e42b",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "while_in_bed_procrastination"
+    ],
+    "scoreOrder": [
+      "while_in_bed_procrastination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "while_in_bed_procrastination",
+        "headline": "上床后，还在做些什么",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "已经上床，可能还想看看视频、听听音乐，或回一条消息。这份回答帮你回顾入睡前常做哪些活动，并不表示这些活动一定有问题，也不能直接告诉我们它们让你晚睡了多久。比如听音乐，有时是放松，也可能让人继续忙下去，需要结合自己的体验来看。你可以挑一个最常出现的活动，留意它什么时候自然结束、什么时候又多延长了一会儿，再试一个适合自己的暂停办法。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "上床后的哪件事最容易越做越久？它是在帮你放松，还是让你更难停下来？"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一个活动试着留到明天继续，比如把还想看的内容记下来，再观察自己是否更容易收尾。"
+          },
+          {
+            "category": "support",
+            "text": "如果作息常被功课、家里安排或其他事情挤占，可以和信任的人一起找一个更可行的安排。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。",
+      "不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。",
+      "中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。",
+      "没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。"
+    ],
+    "disclaimer": "供青少年回顾上床后、入睡前的活动；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+        "reviewedAt": "2026-10-26T04:56:09.986Z",
+        "basis": "2020作者论文2.2节与Table 2（PDF第7页），完整独立7题；不是同文BPS8；年龄与语言证据独立约束，报告不套用常模或临床阈值。"
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "while_in_bed_procrastination"
+    ],
+    "scoreOrder": [
+      "while_in_bed_procrastination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "while_in_bed_procrastination",
+        "headline": "上床后的活动，哪些是你愿意保留或调整的",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份报告带走一句话：活动频率不等于推迟睡眠多久，先看自己是否有想调整的具体环节。\n\n先读懂这个总分\n\n七项按1–5原值相加，范围7–35。数值越大，表示这次整体更常报告上床后、入睡前进行所列的视频、电视、影视、音乐、沟通、游戏或吃点心等活动。它不是每晚活动分钟数，也不能单独证明你在拖延、每项活动都妨碍睡眠，或已经出现失眠和网络使用问题。问卷回顾平时习惯，没有固定最近7天或30天窗口。\n\n同样一种活动，也可能有不同的体验\n\n例如，听一段音乐可能让人觉得放松，也可能一段接一段、超过原来想结束的时间。这是帮助你观察的例子，不是总分已判断音乐对你有害；问卷也不能仅凭活动频率分清你为什么做、是否因此晚睡。\n\n如果已有轻松、不会挤占自己需要的休息的方式，可以保留。若某一环常常很难结束，可以选它试着调整，而不是一次禁止全部活动。功课、家里安排、居住环境和与他人联系的需要也值得考虑，不能把责任全推成不自律。\n\n下面的行动可以选一个，也可以先只观察，不以把分数降到最低为目标。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "只回顾一个平常的晚上：上床后做了什么、原来想什么时候结束、后来有没有比自己愿意的更久。分清活动本身、实际延长和现实需要，不把总分当作这晚的记录。"
+          },
+          {
+            "category": "strategy",
+            "text": "若有一项确实想调整，试着给它一个可继续的位置：保存视频、记下游戏下次从哪里接上，或与聊天对象说明稍后再回复。先试一个双方和现实条件都接受的收尾方式，不保证因此就能马上睡着。"
+          },
+          {
+            "category": "support",
+            "text": "如果晚间时间主要被功课、照护、家庭安排或其他要求挤占，可以与信任的人商量更可行的分工和节奏。需要睡眠方面帮助时，也不只用这份活动总分解释问题；不要为减少活动而忽略真实的饥饿、照护或安全需要。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "仅用于现有15–20岁范围，独立中文尚未验证；活动频率不能判断失眠、自律或造成的睡眠损害。"
+    ],
+    "disclaimer": "供青少年回顾上床后、入睡前的活动；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:06:07Z",
+        "basis": "本次AI文字自审对应wibps7_adolescent_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "while_in_bed_procrastination"
+    ],
+    "scoreOrder": [
+      "while_in_bed_procrastination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "while_in_bed_procrastination",
+        "headline": "已经上床，不代表今天已经按下结束",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：先给一个活动留个续点，不把自己变成“自律考试”的考生。\n\n看的是活动，不是睡眠判决\n\n七项合计7–35，越大表示这次更常报告上床后、睡着前做这些视频、影视、音乐、沟通、游戏或点心活动。它不是“晚睡分钟数”，也不证明每一项都在害你睡不好；问的是平时，没有固定一周或一月的窗口。\n\n“再来一段”，也可以先问问自己\n\n假设听一段音乐后觉得舒服，另一晚却一段接着一段，超过自己想结束的时间。同样叫听音乐，体验未必相同。这里是例子，不是报告已经判定你哪一项停不下来，也没有查明原因。\n\n愿意保留、适合自己的部分可以继续；确实想改的环节再选一个小办法。不是把手机、音乐或点心一口气都列为敌人，也不是只要停活动就能睡好。功课、居住环境、家庭安排和联系需要，也可能影响这个晚上。\n\n下面不是新的睡前打卡表，先选一小件即可。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "给一个晚上画条简单路线：上床后做了什么、想何时收尾、实际有没有超出自己的打算。只看一次真实经历，不用拿总分替这晚计时，也不逐项批评自己。"
+          },
+          {
+            "category": "strategy",
+            "text": "给“还想继续”存个档：保存一段内容、留一个游戏续点，或说明消息明天再回。只调整一项自己真想调整的事；能不能更容易收尾，试后再看，不拿它保证立刻入睡。"
+          },
+          {
+            "category": "support",
+            "text": "如果时间本来就不够，先找能松动的条件：和信任的人商量功课、家庭安排或分担。需要吃东西、必要联系或照护时不必硬删；睡眠困扰也不该全由一个活动分数承担解释。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "仅用于现有15–20岁范围，独立中文尚未验证；活动频率不能判断失眠、自律或造成的睡眠损害。"
+    ],
+    "disclaimer": "供青少年回顾上床后、入睡前的活动；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:06:07Z",
+        "basis": "本次AI文字自审对应wibps7_adolescent_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "cbi_zh_cn",
+  "instrumentVersion": "1.0.1",
+  "originalSourceSha256": "67acdea802b6e82c3d48a132cbef1c8ce03415a3217b9f44dd24c7b3afa6473a",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "scoreOrder": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "personal_burnout",
+        "headline": "整体的身体与情绪疲惫",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。例如，一天还没结束就觉得精力见底，或明明停下来了，身心仍难以恢复。它提醒你关注恢复条件，但不能单凭这些回答确定原因。这是一张观察近况的便条，不是给自己贴标签的结论。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近哪些时段最容易没电？休息后是否稍有恢复？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一个最容易坚持的恢复时段，先保护十分钟；若疲惫持续或影响生活，可寻求专业评估。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "work_related_burnout",
+        "headline": "工作带来的消耗",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。例如，下班后脑子仍被工作占满，原本留给生活的力气所剩不多。可以把任务量、可支配时间和可获得的支持一起考虑，而不只要求自己再努力一点。这是一张观察近况的便条，不是给自己贴标签的结论。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最消耗你的，是任务量、节奏，还是总要保持在线？"
+          },
+          {
+            "category": "strategy",
+            "text": "记录一项最消耗精力的工作，与可信同事或负责人商量减量、调整优先级或增加支持。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "client_related_burnout",
+        "headline": "与服务对象互动时的消耗",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。例如，连续回应学生或其他服务对象的需求后，会格外需要安静和休息。这种体验不等于你不关心他们，关注互动中的支持条件往往更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "哪些互动后你最需要缓一缓？什么支持能让你更好地恢复？"
+          },
+          {
+            "category": "strategy",
+            "text": "尝试在高负荷互动后留一个短暂停顿，并讨论可获得的同伴支持与合理边界。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+      "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+      "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+      "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+      "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+    ],
+    "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T16:47:00Z",
+        "basis": "AI editorial check only: adult workplace self-report, plain language, no diagnostic or teacher-performance inference; pending human review."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "scoreOrder": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "personal_burnout",
+        "headline": "整体疲惫：先看需要，不急着归因",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份报告带走一句话：疲惫值得被照顾，改善不必只靠自己再努力。\n\n三个方面分别是0–100的编码均分，不是百分比，也不合成19题总分。数值越大表示相关疲惫自述更多：有的题问频率，有的问程度。原版没有固定回顾天数。\n\n整体疲惫这一项关注身体、情绪、精力与恢复，不限于工作。例如，停下来后仍觉得身心很累，是可回顾的情境，不是系统查明了你的近况。工作安排、健康、睡眠和生活照护责任可能交织，问卷不能确定原因。已有能恢复一点的安排可以保留；若缺少时间或支持，也值得调整现实条件，而不把疲惫当个人失败。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "只选一次想了解的疲惫经历，看看当时的负担、休息条件和已有帮助。无需找出唯一原因，也不用向任何人证明自己已经足够累。"
+          },
+          {
+            "category": "support",
+            "text": "在可行处争取一项恢复条件，如暂缓非必要任务或请人分担。若疲惫持续、明显影响生活或令人担忧，可以寻求合适专业评估，不必先靠自我调整解决。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "work_related_burnout",
+        "headline": "工作相关疲惫：把工作要求也放进来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项七题按方向整理后取0–100均分，越大表示这次更常或更强地把疲惫、挫败与工作联系起来；不是问卷已经证实工作是全部原因，也不是教学能力评分。\n\n例如，下班后原本留给生活的精力很少，可以一起看任务量、节奏、工作时间和可获支持。这一项已统一计分方向，较大仍表示更多消耗，不是精力更足。\n\n已有合理边界可以保留；遇到持续超量或要求冲突时，需要的可能是减量、协调与资源，而不只是个人提高效率。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "挑一项最耗力的工作，说清需要调整的是数量、时限、优先级还是支持。安全可行时与有协调权限的人讨论；不便直接提出时，可先找可信支持，不要求独自承担改变。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "client_related_burnout",
+        "headline": "服务互动疲惫：照顾自己，不责怪对方",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "六题0–100均分，越大表示更常或更强地自述与服务对象互动相关的疲惫、挫败或消耗。它描述你的体验，不证明对方有问题，也不衡量你是否关心他们。\n\n在学校情境中服务对象可以是学生；例如，连续回应需求后格外需要安静，只是一个可能场景，不是问卷已判断学生造成负担。工作分工、支持与互动安排同样值得看。\n\n没有相应服务关系时，不能把缺答当成零消耗。已有合适支持可保留，也不必靠增加情感投入来证明负责。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "选一个高负荷互动后的现实需要，如短暂交接、同伴协助或合理的回应时段；安全可行时共同商量。保护必要服务与对方尊重，也给照顾者留恢复条件，不要求强行亲近。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本独立中文工作稿尚未验证，不作等级、诊断或绩效判断；限成人工作情境，服务互动项需有相应经历。 有漏答但仍能计算时，只依据已答题，解释需更谨慎；漏答不算零分。"
+    ],
+    "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:34:16Z",
+        "basis": "本次AI文字自审对应cbi_zh_cn的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "scoreOrder": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "personal_burnout",
+        "headline": "看三扇窗，不领一张“能扛证”",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：先给疲惫找一点支持，不给自己再加一场努力考试。\n\n这里有三扇观察窗，每项都是0–100的编码均分，不是电量百分比，更不是19题总成绩。数字越大表示相应疲惫报告得更多；题目分别用频率或程度作答，没有固定回顾天数。\n\n整体这一窗不限工作：例如，事情停了，身体和情绪却没跟着缓下来。这只是帮助回想的场景，报告没读到你的日程，也不知道原因。工作、健康、休息和生活责任可以交织。已有能让自己缓一点的办法就留下；没有空隙时，也可以把缺少的时间、资源或分担当成正经需要，不怪自己不会休息。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "只看一个片段：当时最费力的是什么，有没有让你稍缓一点的条件？不必把所有疲惫整理成一份完整检讨。"
+          },
+          {
+            "category": "support",
+            "text": "给现实留一个可求助的位置：减一件非必要事、争取分担或合适休息。若疲惫持续影响生活或令人担忧，也可找合适专业人士，不用先完成一套恢复打卡。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "work_related_burnout",
+        "headline": "工作日不必靠加速键撑完",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "工作相关七题均分0–100，越大表示更常或更强地自述工作相关疲惫与挫败，不是工作能力更差。数字大表示更多消耗，不是精力更多。\n\n例如，下班后想做点自己的事，却感觉没余力，是一个可能场景，不是报告认定的你。任务、时限、节奏和可获得的帮助都可一起看，不能全推给自律。\n\n有用的边界继续用；要求确实超量时，不需要再加速证明负责，协调或减量也值得讨论。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "从最耗力的一项里选一个请求：少一点数量、清楚一点优先级，或多一点协助。安全可行再找有权限的人谈；不适合直接谈时先找可信支持，不把改变全压在你身上。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "client_related_burnout",
+        "headline": "互动后要缓一缓，不等于不关心",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "服务互动六题均分0–100，越大表示更常或更强地自述这类互动的消耗，不是给学生、客户或任何服务对象打分。\n\n连续回应需求后想安静一下，是一种可以理解的需要；这只是场景，不说明你的实际关系。分工、节奏和支持条件同样重要，不能由问卷把困难归到对方身上。\n\n有支持就保留，没有相应服务情境时也别把缺答读成“完全不累”。关心别人，不需要拿取消自己的恢复来证明。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "给一次高负荷互动配一个现实缓冲：可行的交接、同伴协助或合理回应时段，选一个即可。尊重服务对象并保留必要服务，也不强迫自己额外投入亲密互动。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本独立中文工作稿尚未验证，不作等级、诊断或绩效判断；限成人工作情境，服务互动项需有相应经历。 有漏答但仍能计算时，只依据已答题，解释需更谨慎；漏答不算零分。"
+    ],
+    "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:34:16Z",
+        "basis": "本次AI文字自审对应cbi_zh_cn的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

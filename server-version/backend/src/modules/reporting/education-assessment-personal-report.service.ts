@@ -1,3 +1,4 @@
+import {readEducationNativeBundleFeedback} from '../bundle-product/education-adapter'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -21,7 +22,7 @@ export type EducationAssessmentReportInput={actorUserId:string;executionId:strin
 /** Minimum source seam. This internal reader proves immutable source identity,
  * never caller report authority. The root adapter owns publication/source rights. */
 export type EducationAssessmentReportIdentity={identityOnly:true;origin:EducationAssessmentOrigin;
-  entry:RelationalProductEntryV1;runtime:{id:string;formSections?:ReadonlyArray<unknown>;items?:ReadonlyArray<{type:string}>};releases:ReadonlyMap<string,StoredRelease>;authority:ReadonlyArray<unknown>}
+  entry:RelationalProductEntryV1;runtime:{id:string;bundleInstance?:Parameters<typeof readEducationNativeBundleFeedback>[0]['instance']|null;formSections?:ReadonlyArray<unknown>;items?:ReadonlyArray<{type:string}>};releases:ReadonlyMap<string,StoredRelease>;authority:ReadonlyArray<unknown>}
 export type EducationAssessmentReportDependencies<Source extends EducationAssessmentReportIdentity=EducationAssessmentReportIdentity>={
   /** Optional stricter education opening policy, read from the actual frozen
    * task/source settings. Null means no additional opening-time restriction. */
@@ -183,9 +184,10 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
     const available=new Set(Array.isArray(summary.metricKeys)?summary.metricKeys:[])
     const reports=projectEducationAssessmentReports({product:input.product,origin,binding,receipt,references,releases:source.releases,facts,
       metricKeys:new Set(rule.metricKeys.filter(key=>available.has(key)))})
+    const nativeBundle=origin.nativeBundle&&source.runtime.bundleInstance?await readEducationNativeBundleFeedback({db:tx,attemptId:parent.id,instance:source.runtime.bundleInstance,identity:origin.nativeBundle,availableItemIds:new Set(reports.filter(r=>r.status==='READY').map(r=>r.itemId)),metricKeys:new Set(rule.metricKeys.filter(key=>available.has(key)))}):undefined
     await recheck()
     return {schemaVersion:1 as const,kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT' as const,state:'READY' as const,mode:'INDIVIDUAL_SUMMARY' as const,
-      message:'以下反馈依据本次作答冻结、且当前获准开放的工具与报告版本展示。',reports}
+      message:'以下反馈依据本次作答冻结、且当前获准开放的工具与报告版本展示。',reports,...(nativeBundle?{nativeBundle}:{})}
   })
 }
 export type EducationAssessmentReportReader=ReturnType<typeof createEducationAssessmentReportReader>

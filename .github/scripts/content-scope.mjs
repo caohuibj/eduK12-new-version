@@ -374,7 +374,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const sharedAuthoring=sharedAuthoringPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(sharedAuthoring){const output=sharedAuthoringOutputs(sharedAuthoring);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const schoolTeacher=schoolTeacherPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(schoolTeacher){const output=schoolTeacherOutputs(schoolTeacher);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
+  if(schoolTeacher){
+    if(schoolTeacher.candidate==='native-bundle'&&schoolTeacher.postMerge){const {observeNativeMain}=await import('./school-teacher-native.mjs');schoolTeacher.mainObservation=await observeNativeMain(schoolTeacher);}
+    const output=schoolTeacherOutputs(schoolTeacher);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);
+  }
   const surveyWorkspace=surveyWorkspacePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(surveyWorkspace){const output=surveyWorkspaceOutputs(surveyWorkspace);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const appearance=trainingAppearancePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

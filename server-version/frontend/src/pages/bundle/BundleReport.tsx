@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
 import api from '../../api/client'
+import BundleProfileSummary from './BundleProfileSummary'
 import { ProductButton, ProductStatus } from '../../components/product-ui'
 import { ReportCoreSummary, ReportDetails, ReportSection } from '../../modules/reporting/ReportPrimitives'
 
@@ -125,17 +126,18 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
 
       {view && (
         <>
-          <ReportCoreSummary label={report.reportDefinition.sections.summary || '结果概览'}>
+          {view.profileView && <BundleProfileSummary view={view.profileView}/>}
+          {!view.profileView && <ReportCoreSummary label={report.reportDefinition.sections.summary || '结果概览'}>
             <p className="text-sm font-normal">
               {summaryLabels[view.engineSummary?.domainStatus] || view.engineSummary?.reportingMode || view.engineSummary?.reason || '请结合各项证据和解释范围阅读。'}
             </p>
-          </ReportCoreSummary>
+          </ReportCoreSummary>}
 
-          <ReportSection title={report.reportDefinition.sections.quality || '数据质量'} eyebrow="解释前提">
+          {!view.profileView && <ReportSection title={report.reportDefinition.sections.quality || '数据质量'} eyebrow="解释前提">
             <p className="text-sm text-gray-700">{qualityLabels[view.quality?.overall] || '暂无质量信息'}</p>
-          </ReportSection>
+          </ReportSection>}
 
-          <ReportSection title={report.reportDefinition.sections.evidence || '证据'} eyebrow="冻结结果">
+          {!view.profileView && <ReportSection title={report.reportDefinition.sections.evidence || '证据'} eyebrow="冻结结果">
             <ul className="space-y-2 text-sm text-gray-700">
               {view.evidence?.filter((value: any) => value.sourceKind !== 'CONTEXT_FACT').map((value: any) => (
                 <li key={value.evidenceKey} className="report-feedback">
@@ -144,7 +146,7 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
                 </li>
               ))}
             </ul>
-          </ReportSection>
+          </ReportSection>}
 
           {view.limitations?.length > 0 && (
             <ReportSection title={report.reportDefinition.sections.limitations || '限制'} eyebrow="阅读限制">

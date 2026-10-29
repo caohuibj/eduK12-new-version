@@ -1,3 +1,4 @@
+import BundleProfileSummary,{type BundleProfileView} from '../pages/bundle/BundleProfileSummary'
 import {clearSurveySituationalSessions,rememberSurveySituationalSession} from './survey-situational-local'
 import {deferredPage} from '../components/page-loading/deferredPage'
 const SurveySituationalUnit=deferredPage(async()=>({default:(await import('./SurveySituationalUnit')).SurveySituationalUnit}))
@@ -45,7 +46,8 @@ type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string;r
 type ParticipantFeedback=ParticipantFeedbackBase&(
   {feedbackKind:'RAW_METRICS';measurementReleaseId:string;metrics:{key:string;label:string;value:number|null;unit:null;status:string}[]}
   |{feedbackKind?:undefined;measurementDigest:string;maturity:'PILOT';metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]})
-type General={kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
+type NativeFeedback={importId:string;title:string;status:string;factsHash:string|null;profileView:BundleProfileView|null}
+type General={nativeBundles?:NativeFeedback[];kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
 type FinalResponse={status:string;attemptId?:string;receiptId?:string;completedAt?:string;
   idempotent?:boolean;generalReceipt?:unknown;participantFeedbackReceipt?:unknown}
 // Only the first, unambiguous committed FINAL may supply this submission-time
@@ -70,7 +72,7 @@ function firstFinalParticipantFeedback(result:FinalResponse,attemptId:string):Ge
   const receipt=value as Record<string,unknown>
   if(receipt.text!==general.text||receipt.disclaimer!==general.disclaimer||receipt.completedAt!==general.completedAt)return null
   if(receipt.kind==='GENERAL_ONLY')return Object.keys(receipt).sort().join(',')==='completedAt,disclaimer,kind,text'?general:null
-  if(receipt.kind!=='DESCRIPTIVE'||Object.keys(receipt).sort().join(',')!=='completedAt,disclaimer,kind,measurements,pending,text'
+  if(receipt.kind!=='DESCRIPTIVE'||Object.keys(receipt).filter(k=>k!=='nativeBundles').sort().join(',')!=='completedAt,disclaimer,kind,measurements,pending,text'
     ||typeof receipt.pending!=='boolean'||!Array.isArray(receipt.measurements))return null
   const valid=receipt.measurements.every(value=>{
     if(!value||typeof value!=='object'||Array.isArray(value))return false
@@ -94,7 +96,9 @@ function firstFinalParticipantFeedback(result:FinalResponse,attemptId:string):Ge
     })))return false
     return true
   })
-  return valid?{...general,kind:'DESCRIPTIVE',pending:receipt.pending,measurements:receipt.measurements as ParticipantFeedback[]}:null
+  const native=receipt.nativeBundles
+  if(native!==undefined&&(!Array.isArray(native)||native.some(v=>!v||typeof v!=='object'||typeof v.importId!=='string'||typeof v.title!=='string'||typeof v.status!=='string'||(v.factsHash!==null&&typeof v.factsHash!=='string')||(v.profileView!==null&&(!v.profileView||typeof v.profileView!=='object'||v.profileView.schemaVersion!=='bundle-profile-view-v1'||!Array.isArray(v.profileView.constructs)||!Array.isArray(v.profileView.actions))))))return null
+  return valid?{...general,kind:'DESCRIPTIVE',pending:receipt.pending,measurements:receipt.measurements as ParticipantFeedback[],...(native?{nativeBundles:native as NativeFeedback[]}:{})}:null
 }
 const feedbackQualityText=(value:string)=>({interpretable:'本次结果可作参考',limited:'本次结果仅供有限参考',invalid:'本次作答不足以形成有效解释'} as Record<string,string>)[value]??'本次结果暂无法解释'
 const feedbackMetricStatusText=(value:string)=>({OK:'已计算',calculated:'已计算',INSUFFICIENT_DATA:'有效作答不足',insufficient_data:'有效作答不足',INVALID:'本次数据无效',invalid:'本次数据无效',not_calculable:'暂无法计算',limited:'仅供有限参考'} as Record<string,string>)[value]??'暂无法说明'
@@ -1190,6 +1194,7 @@ export default function SurveyPublicApp(){
             </section>)}
           </article>)}
         </section>}
+        {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
         <p className="survey-completion-time">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
         {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">
           <button type="button" className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>

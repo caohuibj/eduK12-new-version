@@ -1,0 +1,1906 @@
+{
+  "schemaVersion": 1,
+  "kind": "bounded-native-bundle-reviewed-local-evidence",
+  "review": {
+    "recordId": "PR388-DOT-reviewed-local-evidence-20261029",
+    "scope": "DOT reviewed the original passed-case scope, reached School publication stage and development browser limits. Exact row map is prepared within that scope; final candidate and new supplement activation remain pending.",
+    "originalExecutionSigned": false,
+    "originalEnvironmentFullyBound": false,
+    "limitations": [
+      "Missing historical shell exits remain null, never fabricated as0.",
+      "Historical browser source is a declared runner value, not final image qualification.",
+      "Current Git roots bind current consumers, never backfill a historical environment.",
+      "Failed/filtered rows remain original; reached publication is not whole failed-command success."
+    ]
+  },
+  "reviewSha256": "7aa937f418091080e689fc3305f2504a488f501f95d3e060b1efc5d9da41c2cf",
+  "inputClosure": {
+    "kind": "CURRENT_APPLICATION_ROOTS_AND_REVIEWED_BRANCHES_NOT_HISTORICAL_ENVIRONMENT",
+    "productSource": "72078d2ccd1546abe4ca915366b694a18433c44a",
+    "trees": {
+      "backend": "0e2ef32d7467de7b7da6f1700918c510a7ca7554",
+      "frontend": "5a2676e3fea15901e55cd320c4b015678a49528a"
+    },
+    "files": {
+      "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "server-version/backend/prisma/schema.prisma": "8beef2106fff0996ba42c9b9bfc3dd94a6e337d6"
+    },
+    "branches": {
+      "M01": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored.",
+      "M02": "Selected core quality uses selected score.status/value; an unselected invalid auxiliary remains excluded. Cache uses immutable package hash, bounded size and the same compiler family; new0.1.1 package identity is a new key, not a changed numerical model.",
+      "M03": "Explicit rules.applicability false/unknown returns before profile/modifier execution. Engine and these two branches are unchanged after0d3548; later School/Survey adapters do not participate.",
+      "M04": "Existing native setup preview reads the package model/claims; same required cross_source_condition. Later School/Survey consumer additions do not change the preview selection.",
+      "T01": "Reanalysis appends0.1.1 and preserves original0.1.0 UNAVAILABLE/hash. Later instance extraction keeps readInstance body; readReport db parameter defaults to the same prisma. This is upgrade/history evidence, not the later fresh INITIAL HTTP attempt.",
+      "T02": "Reads saved frozen payload/target, not current template or scorer. Default db=prisma keeps original Training branch; new source/runtime adapters are not called. Count2 belongs to the original reanalysis attempt, not fresh HTTP task.",
+      "S01": "All slot/context identities are remapped together; incomplete source/policy refuses. Age guard still rejects youth B for adult Teacher. Survey code cannot grant School source permission.",
+      "S02": "Continuation consumes the actually published source. School ORG+native path uses existing INITIAL finalize and saved read; processInitial terminal early return and unique INITIAL prevent second profile. Later changes are Survey-only; generated other-scale registry rows are not source scores for these saved math results.",
+      "S03": "Restored School saved read uses original definition/admission policies and stored payload; no new source admission, FINAL, score or matcher. Later Survey branch is not part of School execution.",
+      "V01": "Maps already-scored Survey privateScoring into exact native identities. Core unknown/R audience intersection is enforced; two initial cases remain selected, extended UNKNOWN case uses its later corrected reporter only.",
+      "V02": "Uses whole-package U and explicit student R, exactly three declared Context fields.720 extra-field rejection leaves that complete valid source unchanged; legacy missing-audience omission does not apply to explicit student R. New researcher single-reader branch is covered separately by V03.",
+      "V03": "Actual720 negative source membership, legacy missing-audience hash and researcher single-reader403 cases. Final application tree is unchanged since720; new CI controls are not runtime consumers.",
+      "V04": "Student feedback reader and SurveyPublicApp output stay unchanged347→720. Busy source controls affect authoring only and have a distinct selected case. Researcher403 is V03, never inferred from student browser.",
+      "UI": "Original-range profile chart/table consumes projected ProfileView; no score or model inference in UI. Mixed alternatives are a separate branch, not covered by this original matched/withheld row.",
+      "AUDIT": "One actual READ ONLY transaction links existing Training/School rows. No publication, answer, FINAL, restore or scoring. Runtime Node/source/script hash captured; full historical argv/environment remains missing. Original failed codec invocation is retained but not admitted."
+    },
+    "historicalEnvironmentComplete": false
+  },
+  "inputClosureSha256": "85a9b64a1a737c9f1b74ee58fbea9f92d5d877b96ed04694b175eaefadd9692e",
+  "files": {
+    "profile-unit-first.json": {
+      "sha256": "c673aeff81e1336247d2be9a7b6343aa79589f84e254425d869abc0a5de2786c",
+      "bytes": 14575,
+      "gzipBase64": "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"
+    },
+    "profile-core-quality.json": {
+      "sha256": "70679b0ea5a12023796ce4ce9fc72fcebcb066575689c4ffecda9e691422c7c9",
+      "bytes": 8040,
+      "gzipBase64": "H4sIAAAAAAACA+2ZTW8bNxCG/wqxZ9myPqO4p+aQS9oiSJxTYBjc5UhizCW3/JCrBP7vfYe7duQP2E4tA4IrncQhObPvoyE51P4obKpPXJTmhEL8nHSkUByPemz+KEMgddf+Xmpz037UjiertF3c7bj2D8twfMs3bINbbu/zyFNHnTflfo4KVjZh6WJx/KOQSpHK1jl8JU/F8VyaQGjDdfj9Zzc3P1HtVvcY/tAB3r6edtYvtpaxWm4O/NIoGTvDZmdknflbsjBW5539uvWB1uHd+j18tAHSDd9pw63Sqo3SSbiE0ih9PNE1TIM3b0fD2Ww2no2mb9CTqooCeESfIBbk4ycKyTCir8AC1D5qZ28YLaZE5090NPxLfS20VdQAONkoKgnwHF68E1ZGvSLReMfiC+aSjPlL8oM8cZJoZQYRl+Q8RV1JIz4OxIWOS5cwcyntAj80JjbSw3MkH4osOSY8XBHOddMADcTx88LyHz12ifEncMlF1g096JXIHzCOcpFtl72dIDTcOqHhKyM02jqh0SsjNN46ofErIzTZOqHJKyM03Tqh6asgJDanQIfCPFMlI/m0FXPnxeejcU94ibEeE6RlL6UstdFxLazztTT6ex7+ZIhbDrqznANxPqCYERZze5C9wnMrwUWO+E7e9ThhokY6/Z1k1sYwNPvlRq1DpvYw2C1G2VmSsgQAbUNOjqgp9AQqT6fIoOAW9E/0VJOoXF1qm9MCAzDHmQRvVwKzbJ/grnTJKunXD4N9uaA7y1kHoXj7qrXFHUJXEKywBINLviLhPDdY0FIGAGiMrnQUSnuq8tL1NDft14fJbjPMzrI8J2oCNrELCNI4H6Q58DgoSGB5JqxWFshHyNIZhZYxYOLhQAkjSzJt2skqYs2KSLLivbBxYPFI2r5o3N3NXMunLrICGbMiv8a69NRl1G/YGWtorLJ2UqnKyxX6Gs7BEHjtCiBdb55Mj6TwS8TbWbqevmWp0kA18Xltnc11EEasyPLTiJLmzEAq2UTOGe++PWUzeLbvZ1G7JbSR1Tmc8K7eoKetOG4xe8oU9FIgv8J66/oHfAoH6CvXsVuFXAph3Eq7FDAdGZXrobDkJVijHnoY3LZC7CQ/z6dl9Lppt6irwa2yuET3YpnVtdXgtRfjJLazRzLuub53k9jVOkI9skj8e2MfTzakpnE+Iity6cJJMEe/l7+wMn/N457Ons6ezp7Ons6ezp7O/53OTd3t5VRmoYYi/0fGV3ku+7m+37yOuDk/2VV3yP3dH1ibIpv8HvbO/XcLIdQVgOPx0eFsOh3P3raf2WzydCan9773nAwms6Negee4bZ8Oc7DJfRLrNhhMaNiWaP/C+fOABKI+bpofBsMDSxcHuJLyLbOfLwj+ulkizxCzH3zVPzvj16zh7Kxfohw2dOBs6aTn19X9Li8PecRhDMXl6eW/Md0LDGgfAAA="
+    },
+    "profile-cache.json": {
+      "sha256": "77507eebdc360413710e15c196f841c13b473bc4082413b49407ecc15676e4d3",
+      "bytes": 1296,
+      "gzipBase64": "H4sIAAAAAAACA7VUTXPaMBT8KxqfAwYTYuDWHnJJ2+mk5JRhGNl6gIoteaSnpEyG/96VoXwU+nFofdJbybtv109+S0yop5ZlNSXPX4Jm8smkfxPhz9J7Upf4vdTVOd7bnSejtFlebhz4gWQ/UR+gI+s1whMuZY+AN7LxK8vJ5C2RSpFq0QWogqNkspCVJ9Rg9u+O27F8pNq+XAE+aA+259kefTK15HJ1evCpUZL3wOkmR5ftKhiA5XqPH6oH2vj3m3tw7ATCGXc4oVVa7VT2FrZwytLxVNeA+vl4kI3yQX7XH46xE8qSPPJgF2AWufMj+VDFiJ4RC5J2rK05Aw1eYeummqv4nVq/oao+ySiQFDYY5QU0WZeitooq4Sh4ErxyNixXQtd1YFlUJEprmAwLaRTOfKWSvdCmtHVTEZNY6G+MbyE8Qbq1wQGCSdNOABCOLfxXTRWcjAEgudvucDAe5KPe7hneHYblIyKUyx9Z1MQSM4XcWS5bbHvzx9ReyOmFJo+GSRh6FbxpSIlGlmswZ4e2CgeilZALJic0Wo+NYyocvDRSu9/G9A9Fjrlko26W9fJxts8lv/37XGa/mM1xb3ST4AJf4MN+K3bNZL0TA4TC7FJNX61be/ijlFR46GcduO4gBo/WU8w2loeyQAzQTL0r0/k8XgU/n6cFJquijjWFlS7+UdLG2XiXO6XE/evGc12Myna2/Q4gdl0uEAUAAA=="
+    },
+    "profile-applicability.json": {
+      "sha256": "6f5f4bf4ef6e0b1a77ff35590fc2244c045f57e69112810c3efcf369a9d9432c",
+      "bytes": 8553,
+      "gzipBase64": "H4sIAAAAAAACA+2ayW4bORCGX4XQWbZW25LnNDnkkplBkDgnwzCo7pLEiE32cJFGCfzu8xdbmxfYyrgNCB75JBbJKv5fF7du/2yYWFzZIPUV+fA1qkC+cdlrsvmz9J7yx/aPUun79nbVnkyuzORxxcY/LN3zB77Z9sDtUx65WX/lLbfbVt7I0k9taFz+bMg8pzxZx/AVHTUux1J7Qhmu/e/bai5+ocLOnzD8oTy8Xd+srN9MIUM23W34rcxlWBl2KwPrTL+igTGbreyb0ida+g/Lj/BRBYj3fMcdt7nKqygrCXdQGqQLV6qAqXMx7HWH7c75xaA9QE3MMvLgEVyEWJAPX8hHzYiugQWoXVDW3DMadAnWXamg+UldN5TJqQRwMkFkEuA5vPggjAxqTqJ0lsU3mEvU+i/JA9mzk6hkehGmZB0FlUktPnfEQoWpjeg5lWaCB42OpXTwHMj5RpIcIgbX8DNVlkADcTxeWP6jx1Vi/AlccpJ0Qw9qJfIHjIOcJNtd8yAIdWsn1H1nhHq1E+q9M0L92gn13xmhs9oJnb0zQue1Ezp/F4TEbhfoyNFPZ1FL3m3F2Drxtd1vCifR1qGDNOxlJEdKq7AUxrpCavUjNd8bYs1BD5azJ84HHGaEQd8mZM8x7lzwIUf8IGebnDBBIZ3+jjJpYxiK/XKhUD5Rex5sjVEOlqQcAYAyPiVHUOSbAidPm5PGgVvQP8FRQSKzxUiZlBZogD5WR3hbC0yyXYS7kY0ml275PNi3C3qwnJUXOS9fhTK4Q6gMgnNMQW+jy0hYxwUWNJUeAEqtMhVErhxlaeo6Guvq5/Nk6wxzsCxnRKXHIraAIIX9QeoTh42CBKZnxGxlgbyFTK3OUdIaTBwc5ELLEekq7WQWMGdFIJnxWlhasHghbd807uFmruFdF1mBjJmTW2JeOlpl1G9YGQtozJJ2ymOWpiv0lZyD3vPcFUC63N2ZXkjht4h3sHQdfU9SpYZq4v3aWJPOQWgxJ8OjESMaMwOZyzJwzjj7fZ/F4NW+X0XtgdBSZjM44VW9RE114njAbJ8uqCVPbo75tqrv8C7soW+0DKtZyEchtJsrGz26I6PSechPeQoWOA89D66uEAfJz/FuGZwqqyVq3bhSFqaonkyTuuo0uPGircRy9kLGvdb3YRJbzyOcRyaRnzfW8Wh8LEvrArIiHV04Ccaod/IXZuaveTzSOdI50jnSOdI50jnS+b/Tua+7upzKJFRT4HdkfJXnYz+f73evI3bMI1tX+1S/eoG1zwW4hhj1yd7etzdvtEyCrcYK10ixmJLZJIEs+Y3H+m2nwoWcv5/uai7Tt+cdyfX4z9dP/LLXOe22B+32YFj99S8Oh0Y0M2MX5g15bCNsiZydDru9Tr9T8RhcdPYHcvP0l+/hoD9sNpCIj+yDFOwpfUUVCyYUTEWztbBu5iGGWpTHT53uiaHFyRwyMfBWuiG6TXEEzQjZ8i5r3d7yd3Z/e9sa4T6k6cSakZWO/1+htcJ2yi1Og2/c3dz9C9ucMA1pIQAA"
+    },
+    "profile-applicability.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "profile-native-setup.json": {
+      "sha256": "2a45420789fe3be95f3c2173f82a2db4ff2644224c17fd7620320aee79c487bc",
+      "bytes": 1016,
+      "gzipBase64": "H4sIAAAAAAACA7WTTW/bMAyG/4rhcx1/FEXj3LZDL22HoUtPRRAwFpsIlSVPpJIGRf77KDtLk9XX+WQ+lF+KL+mP1IZ27hjMHIl/Bc1I6ay8ivgnEKH6yu9Am0teDOfRKm3XXxMn/RHpEdUxwTMt5T4BWeho4zidfaSgFKqevopU8JjOXsEQSizK9O0zHcMnbN12BDxoErWXxZE+2xa42ZwffO4U8BGcJzl22b8FK7B5O/JTdI97+r6/E42hQLjQDmeySquhyrGFg3TK4HmuW0HlbX1dTeuqrKpyKpnQNEjiB/sgzYrv/IQUTLToRWwRpz1rZy+glU/Y+blmE+fU9xuM+QGxQIrvnSOkhDeYWGC9xaR1Ck0CViUefwftUcWs8/ukMaBbCbwL603/Cb6LiTK4hJBDl3Qetxp3ad8EBymXdv38hXC8wH+sqIKH2Ly4VtxM6rKeXt/W/TM97cmjuAfrvza0yCDrJJYzrHt2WIzaXxXT+uYqlR39h5dFUUzqaqzddiglSAI7mJ3vnH+jDhrMUYX7ssos7rItepJ75zI8eT2FK5BNsion3+TLZZw1LZf5KlhlMHN25cDHXybvvIvLmg1eZr0tk3h8IhtwWBz+AByqKhD4AwAA"
+    },
+    "profile-native-setup.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "profile-continuation-first.json": {
+      "sha256": "6bdf33398ce533d051263af01fecb89198be5dd0aeade7fdd559eb2355ad64e2",
+      "bytes": 1055,
+      "gzipBase64": "H4sIAAAAAAACA72TQU/jMBCF/4qVM01oS5PQG6y20goWrdjCBVXVNB5SL4kd2eMihPrfd5xkS7vkTE+Zz8kbvzfT90j7emkIqiU6+u0VoYvm47OAf4FzKD/zBajqlJ9376OWSpefDw76A9IDqkOCR1rSfACnoXFbQ9H8PQIpUbb0maW8xWj+DJVDrlnZXX0ch/Iea7MbALfKsdrTqqcPugYqtscvPjQSqAfHhxRctk9eMyxeen6obvDNXb8tWKNr4E+0/ZGsVLLr0lvYs1MCS0tVMxpnl9NJnl+k6SxL+cQXBTrOg6xns5w73aPzVYjoiWPhpC0po0+g5k/I2KWiKsyp9eur6g5Cg6gwmpT26ARtUTjgXMT3x29i8ePu6lZ4x0MRIDS+Cg2kdihqaJoWaikai9xx139srCqVhkpY/INFuEfUmiHPbaOm3QMmFC7yBZ2lt9A+zvM0j7PJdDo7vwy/PDvszU9OE8p/sdRIwOvFIyAoW7ZfDY4jy7I8P4t4Z//jeTpLQ6uLIeN114wRF7qLP3k19sU1UGCC0t+MJyM2PNqhdXzzpLVoD+UGeLe0TJwtkvU6TN+t18nGa1nhyOiNARv+REljTVjfUZ9wm0LcGEclpxYrTVh20cRBI+ZF2a/2fwGbItgMHwQAAA=="
+    },
+    "profile-restore.json": {
+      "sha256": "29debffa155869eb70449616b6d942568086dab6462747754bb96894fac1ccd4",
+      "bytes": 1021,
+      "gzipBase64": "H4sIAAAAAAACA7WTQW/bMAyF/4rgcxM37jI7uW3Deuk2DF26SxEEjMU4Qm3KkKgEXZH/PspO02T1dT6Jn+T3zCf6JaHQLCxDvUDPv4Jh9Ml8chXxT/Ae9Xt+C6a+5Nf9eSRtqHq/cdIfkB5QHRI809L2DXiC1m8tJ/OXBLRG3dGNSAWHyXwDtUepRdl/etuO5T02djcAvhkvao/LI32gBrjcnh98aDXwEZxvcuyyWwUSWD4d+am6w2f/+flWNHqDcKEdzmS10b3LsYWDdMrgeGEaQZN8dpMV8kxvprnshLJEL3mwC9Ks5M736EMdI3qUWCRpx8bSBSR5ha1bGK7jPXX9hrr+AdEgcQjaK96iImCzw5HrTqNWG2f/IKmvv78oh611rPaGtzawAuWxtKQVUmUIlaGdLSEaJ93XcxCfpO0uXghH5/9hpYPrl/NsUow/TD/meTbrnqI4jcZ3CQyq184bZJAJkpQZqo4dloOJz/KsmF0lMpb/8ul1Hr2KoVab3kyQFNQnnO6te/ItlJiiDneTbES4H+3Qefn0VG5MlqdyDTI+pFPvynS1ihfsV6t0HUjXOLK0tuDif5K2zsYJfY1w3FrPlRRjQ4xVH8s4vj6WMTgsD38BUAfhOv0DAAA="
+    },
+    "profile-ui-first.json": {
+      "sha256": "5cc199e90ea0a18139fac21eac1aa0a7adcbb9abe9a88fde4ab50a0fe729c479",
+      "bytes": 1897,
+      "gzipBase64": "H4sIAAAAAAACA8VT227iMBD9FSvPlEBCSsLb9qFaqe2qaulThZCxB7Bw7KwvUFTx7ztOKJdtpEWq1I2EyBw7M3POnHmPlC/H2lE5BuuevXBgo1HaCfAjtRb4Z/yWCnmO95r7oLhQi88Hh/wtqVuytiU8ycX1EbCKVnapXTR6jyjnwGt0jqm8gWg0p9ICxpjZ/jgeh/AJSr1uAe6FxWyvkz36okrq2PL04kvFqdsDp4cusKzfvEKQrfb4IbqDrb3Z3mKOpoA/y+1P0nLBmyp7Cjtk6qhxY1Ei1B8WaZLn/WFe9As88YyBRT2c8UgWdXdPYL0MEr2iLKi0cUKrM1DhJ06bsXAyzKnm66X8RUOByKDwYCwR+FeFd+WINmIhFJXEULUAS6ji+CPw24s1leGGozMJHeKWoAjTyvoSr2FEsIE1mKuNcMslSE7WAjZRTcl5LB5VtRsQcaGdb6vPvaFBmGiUDHrdfn+Q9LJe8+QHEz2gtHTxoVEJjqLXcB6OLmpsN2mdTd5Ls6wTYe9/41mRhVppG/+yKYYQBqqZRbzRZmUryiAG7u/6yZWCzRXysdh6vKf2Ec6NVg6LxtawuAp9xzOvuIR4Og3GsNNpfFMDj0YHNz/7sqRm2w2HXWffol3nUstEC1BgBCMcmKRByjUQA5U2jjQDxN2Nzo11ySfkY/o4Xa9WSm8UQforZEPCCLV35Of44Z7AGzAf2kRvEHq4M0ODsOVF/vpqhaODrpNuMkyzpFfUTz64vtxBne8VNwAWeVtfhVfgZCY1W1lkW0nBsIPtP8S7LMNRnCzvFtd5Pkz325V+fbvysKIt21UkoVbxn5frqZboZKkmuz8qRIT5aQcAAA=="
+    },
+    "education-adapter-error-status.json": {
+      "sha256": "2619ec9b3e761d298e16b067897a2395a4f9436c953365d412b83d4f991b3151",
+      "bytes": 1949,
+      "gzipBase64": "H4sIAAAAAAACA71VTVPbMBD9Kzs+kw87IYlza2fKBdrpQDgxTEaxNrGKLHmkFSFl+O9d2WkSIG05QH3wWE/Svn1Pq/VjYkI1syT0DD1dBUXok2l6EuHvwnuUr/EzofRzvN+uRyOVWb2e2MVnZPgi9A7aRz0W8CCWtHvAG1H70lIyfUyElCgbdMmhgsNkuhTaI485sv+0n47DS6zs/RHgQnmOdnO7Ra9NJagoDxde11LQFjicpKiy+QqGweJui+9G57jxnzdnHKMlCM9ih4OwUsmWZSvhiZWScDRTFUPpOB9k+ei0n48nOc+EokDPfpALLJZ9p0v0QUeLbtgWdtqRsuYZaHgLWTdTpOM5NXqD1t9EJEgcklDGA5UIha1qjYRgnVopIzTUorgTKwRhJDis+AQA79FtwGtLvcIawgeCtaLSBoKiFIb3rUCRB4lLZVTMJmkkUWDypG6qgRGK6fw3fhmcaD6nWdYdpZNBP+u3z+R0V0Rf2Vom23pUcWJca3weJFYN9nTyBjd/YMHkvtaKWAZU6gEleBsc7zuBdcklAWLh0RCUKkZSBes0nN09gpKMK9pAKTwYC2vHd+sf9n0I4d6vdNQdZMNRNszbZ/yedsWDK62WfpePWaJD3sSJo+Fj30AwEp3exGP1/GI1DmvrGrGFdQjMzJpARQEEInAtOPWzcenPvn00897AQdadjE7HaX9rYPaeBkqLLblDLRaoQcCGb0L5W1VlZQQ96wEhuSfADAX3IQdXXy7OILrifcU18Fez3pPloLL63TzLxvlka8zw7cbcHm2SadrcZv6TvMTT0Thy5cdEVi0ZQzwwra29tXV3npsP9lCG8zTrGFx3uPF4zrzHTZY/d8MF9yjm7HlX9Obz2JP9fN5bcPVo7FizsMLFX1uMVDTSO0KKmtB149out+mn26dfcqZcvp0HAAA="
+    },
+    "education-adapter-error-status.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "education-native-typed-runtime.json": {
+      "sha256": "4faca5ff20d706dc9436cd55596bfcda9d61ca9da896380a4288f6504ed36b54",
+      "bytes": 1054,
+      "gzipBase64": "H4sIAAAAAAACA7WTy27bMBBFf0XQunpYflXetYts0hZF4qwCw6DFiUSEIgXO0IER+N87lFTHbrStVuIhdYf3zug9Nr7dWhJ6C0iPXhFgvJl9Cfi3QAT5md8JpW95PpwHI5WpP29c9CekJ1SnBK+0pP0AaESHjaV48x4LKUH29IWlvIN48yI0Aq9ZGb99bIflA7T2OAF+KGS1591In0wrqGquDz51UtAIrjcpuOzfvGFYvY78srqHE34/3bHGUMDfaPsrWankUGW0cGanJBxtVctoti7nRblYlkWxChn4qgLkPMh5Nsu50wOg1yGiZ46Fk3akrLmBhj8h67aKdOhT79dr/UuEAnFlDSnjASNqIBLagZCnqPMHrZDvGxlB6gjRY9VYqyMHaL2rgA876+smahUi9y1ynmVaiFgOfQsO494Hea4Yd/0IMKFwh/9bVHonQgTxpljPvqb5cl6uyrx/lpdx+ckhivpvGi2Q4Kni5EnUPTvvprqwyhfzIMKj+g9f58WcSy2mPLdDLUa8MEPo2Zt1r9iJCjKQ/n5WJAbekiM74Jtn3ER+vSwPgifKyAxdle33oee432cHb6SGxJqDFS78OkGp6q0nQ3zJmHLP0s4i1ZxkqgxBPWSUBrGU5+S8O/8B/h2xmR4EAAA="
+    },
+    "education-native-typed-runtime.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "education-native-transaction-read.json": {
+      "sha256": "2d5af4f08d0c650e64f15b4c732c35193ff62e68086822dd5ca43c1fa952f743",
+      "bytes": 1095,
+      "gzipBase64": "H4sIAAAAAAACA8WTwW7iQAyGX2WUc0MIXdKFW/eAtGq3WrX0VCFkMgZGJDPR2AOqKt59PQmloOa+nMbfDL/t385HYkM9dwzVHIlfgmGkZJrfRPwXiFB/5zMw1TUfdu/RamM33y/O+j3SPap9ghda2n0BstDQ1nEy/UhAa9QtXYtU8JhM11ARSizKdP91HcNnrN2+BzwaErW3xYm+2hq43F4+fG008AlcXnLssj0FK7Dcnfg5esB3+vU+E40uQbjSDhey2uguy6mFo3TK4HluakH53eR2NBmPh8XP/E5uQlkiiR/sgzQrvvMzUqiiRW9iizjt2Th7Ba38hZ2fG67inNp+Q1U9QUyQeHQNWlIW2OxRvZRb5yq1RtQrKHc3SqM1SAqs4y16BaVISaSVx6aCd1Kz30/3j+pgeOsCK1BUOi8P5VXjXXRRGbt3JcS6krY5DlJG0rR7IYRjYf+hEh18d5zmeTEeFPntuBgN29/4vFh/xG7YfPpWI4Psn8yIYdOy46J3Xvnkx0REZKmv+WhYFMM2VZ8TdZdMkAS2m092cH5HDZSYoQ4P+Si1eEj36ElKz2TecjyH0SjJmZEvs+Uyrgctl9kqWF1h6uzKgY9fWVTqbEg7s1MC+R5Sj6AHjSPeeKSBsYybzqJBlBrIQh0Xx3+CoRyMRwQAAA=="
+    },
+    "education-native-transaction-read.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "school-restored/saved-read.json": {
+      "sha256": "ce40a5e53fd5b6fe72db4fc8dccd4664478490d0010d958654fc2654ec97d4d7",
+      "bytes": 1094,
+      "gzipBase64": "H4sIAAAAAAACA8WTwW7iQAyGX2WUMyFL2ELh1j0grdqtVi09VQiZjIERyUw09oBQxbuvJ2EpbHNfTuNvht/2b+cjsaGaO4ZyjsSvwTBSMh30Iv4NRKi/8hmY8pZ/a9+j1cZuvl5c9DukO1S7BK+0tPsEZKGmreNk+pGA1qgbuhap4DGZrqEklFiU6eHzOoYvWLl9B3gyJGrvizN9sxVwsb1++FZr4DO4vuTYZXMKVmCxO/NL9IhH+nGciUabINxohytZbXSb5dzCSTpl8Dw3laDBeDLMJ3d396M8/y43oSiQxA/2QZoV3/kFKZTRonexRZz2bJy9gVb+ws7PDZdxTk2/oSyfISZIPLoaLSkLbPaoXoutc6VaI+oVFLue0mgNkgLreIteQSFSEmnlsS7hSGr28/nhSR0Mb11gBYoK5+WhvKq9iy4qY/eugFhX0jTHQcpI6mYvhHAs7D9UooNvj9NBng/7+XicD+8nze+yV7/Ebdj8ta1CBlk/GRHDpmGnRee4JqPRYNRLZKf/4eP74SRmGnYZUbXJBElg2/FkB+d3VEOBGerwOMhTi4d0j56k8kzGLcdLGH2SnBn5Ilsu43bQcpmtgtUlps6uHPj4kUWl1oW09TolkM8h9Qi6XzvijUfqG8u4aR3qR6m+7NNpcfoDnRnb9EYEAAA="
+    },
+    "school-restored/saved-read.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "survey-native-projection-complete.json": {
+      "sha256": "52649bedd8f345743cccc86e2c785d2e2d90bca23cad0604592ccacbf28da4e6",
+      "bytes": 1728,
+      "gzipBase64": "H4sIAAAAAAACA71VTW/bMAz9K4LPzYed1Il76w4FhnbF0KanoQgYi0m0ylIgUU6zIv99lJ0laRt0GDDUF5tP0iP5SNEviQnVxBLoCXq6D4rQJxfpWYS/g/co3+NXoPRrvN/uRyOVWbxf2PMzMnhDvYcOrKcIj7ikPQDewMovLSUXLwlIibJB50wVHCYXc9Ae2WZmf3lYjuYdVrY+Adwoz2w/Hnfog6mAyuXxxoeVBNoBx4sUs2y+gmGwfNrhe+saN/7L5oo5WgfhFXc4opVKtl52KWw5UwJHE1UxlI6KQVaMB6O0yMe8EsoSPetBLnCyrDvdoQ86SvSDZWGlHSlrXoGGj5B1E0U61qnJN2h9C9FBsnL2J5bkBWiHIDfCYWkd6yfug6txI66+3l7eiDnEPbR0NiyW/Ebh+bwwQKpGUVmJWoCRYu4Qf6EXkrVVpiQBQSqMISRNYhR8dNr0BCMUg/rkKGRwEEVidftpNxsOhmlWxCc/T/cN9Y1lhsUfvSok4L7j2hAsGmx79ldlnxBXXlTKe25sUVpD+EwiGKjZBcw0NqG2ifI+0HPrKs7YM4BiF4dYK1raQEKZGrTiRolkR2p8KOunhXDQNCu646J/PtpJWgzH/1NTabmqxpLghqkscfzCwVp41Nw97J9jJMugVPM5OjQk7va1F9YJfF5Z35xiL06VfAv5iFS1kgF0m/eHin5SAEc9mnfz82KUp/34ZHn6D3o+npolw6zI8/ws4YH7Fh+nw8bZKQGq1hlDbJi2Gr21dU9+BSX2UIbrNOsYXHdqdJ5D7/Es4s+9OQMejEb2vCt702kcXX467c2CkRo71swsuPgH6PnmwnfaO92N+7rcYtvH7W/kQh09wAYAAA=="
+    },
+    "survey-native-projection-complete.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "survey-native-unknown-policy-corrected.json": {
+      "sha256": "e285807697419939d1f2c0467e5b769ed8f200b20bbae2de16c5da68c8669940",
+      "bytes": 1669,
+      "gzipBase64": "H4sIAAAAAAACA71UTW8aMRD9K9aeQ7ZAoIRbeohUJY2qhJyiCA3rWXDx2ivPeAmN+O+d/SghCWp7qMKF9fP4zbzn8TwnLhYzz2BnSHwXDSMl0/5JDX8HItTv8Usw9jX+qY1Hp41bvt/Y8wsyfEN9hPUYoWCDjkv7lyByUNLKczJ9TkBr1A2aC1UMmExzsISyFma6eNmul7dY+OoIcG1I2B4eO/TeFcDZ6jDwvtTAHXC4ybXK5is6AbN1h+9XV7ilL9tL4WgTxFfc8YBWG91m6STsRClD4JkpBOp/Ph8Ozs/Ho9FkLKZQzDIk8YNDFLHiO98iRVtb9CC2iNOBjXevQCdH2IeZYVvfU6M3WnsDdYKkDP4HZkwKbEDQWxUw80H8U3cxVLhVl19vLq5VDnUMr4KPy5X8oyI5rxywqVAVXqNV4LTKA+JPJKXFW+MyVhC1wbqEpBHGUUpIaG3KUgwQCXVVH1xG1zPfxElY/rakQAZpLbGfYdlgu5O/mrdGLEkVhkh6V2XeMT6xig4qSQELi00xrRSJA5v7UIgmEgBVV4faGF75yMq4CqyRXqjJDvT+2bkPq+H/2aa9XI3zrOTWC89SoQqwUYRWWkDaV6pgL6A2eY4BHavb/QUqHxQ+lZ6aU5IlmEzekhzRpjI6gm2VHZpWNiPowLMPKkDHADVdMp2cnY4Gk8l4/Kn5jcb/bufj0YEwHp4NZZjK1HyLj/qjJtcx/UWbTCBZuPYy0o0PayohwxR1vOoPeg43vQoDSeWpDBT53C8XINPN6ZRCls7n9fyh+TxdRKct9rxbeAj1GE+pebS99l2e1nGn0kO7x90v6oBl44UGAAA="
+    },
+    "survey-native-unknown-policy-corrected.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "survey-native-postgres-contract-checked.json": {
+      "sha256": "70e192484fa35c429c5d6beda71e151898e76301e3f533326a5dfccab120731d",
+      "bytes": 1135,
+      "gzipBase64": "H4sIAAAAAAACA81TwW7iQAz9lVHOhRBoCXDbHnrpdrVq6alCyGQMjEhmorEHhCr+fT0JS2GbD9ic4mfPs/1sfyY2VHPHUM6R+C0YRkpm2V2EfwMR6u/4E5jyFh+08Wi1sZvvjgt/B3UHaxfhFZd2XwBZqGnrOJl9JqA16gZdC1XwmMzWUBKKLcz048sdzVes3L4D+GlI2D4WZ/TdVsDF9jrwvdbAZ+DaybHL5i9YAYvdGb9Yz3ikx+OTcLQJwg13uKLVRrdZzi2cpFMGz3NTCZTl09FwOskfssH9g3hCUSCJHuyDNCu68ytSKKNEHyKLKO3ZOHsDWnnCzs8Nl3FOTb+hLH9BTJDUYVUa2iIpUIetK1FZYLNH9Rb8Ho/qMVhd4p2qPQr5XuJI5iRha0S9gmKnwGpFED0QtEFJ15NY9qaQHuWdi1Kqg+GtC6zEVTgvFMpZMUCnHusSjknTNweKNTUrIwjHmv+vInXwECVOZsPpuJ9leZ5Nm28yyi/r+CJDgs1ftStkkK2VyTJsGuy06JzyeDCayIXIKfyLj/O8ydUlUtUmE0gM2041PTi/oxoKTFGH52zYs3jo7dGTlJ42GvmLGQWSnCn5Il0u41LRcpmuGk17zq4c+HibKTVi91rp+7Uj3ohQfWMZN60o/fi4L4t3Wpz+AD5L3P9vBAAA"
+    },
+    "survey-native-postgres-contract-checked.exit": {
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1,
+      "gzipBase64": "H4sIAAAAAAACAzMAACHf2/QBAAAA"
+    },
+    "survey-restored/saved-read.json": {
+      "sha256": "51f17edfea173a458b3acc9b62b9f61bafac11b717dd8af83868100645cd8468",
+      "bytes": 1417,
+      "gzipBase64": "H4sIAAAAAAACA8VUwW7bMAz9FcHnOE7crG162w69dBuGNj0VRcBIjKPFlgyRShEU+fdRdpYmbQ69DPNJeqQfyacnvWYuNjPPUM+Q+CFaRspuxoME/wIiNB/xW7D1KT7q89EZ66qPgQO/IOU76jOs5wgPaTNv/FsSOWhp5Tm7ec3AGDQduhSqGDC7WUJNKHthpq9v4bS9x8ZvzgDfLQnb0/MefXQNsF4dJz62BngPHAc5TdmtohNQr/f4YXeHW/q2vRWOvkA84Y5HtMaavsp+hJ1MyhB4ZhuBxlfTi3I6LccX5Wgikag1kujBIcqwojvfI8U6SfQksojSga13J6CTX9iHmeU6nVM3b6zrn5AKZAHBkApdChrlgO0G1UMMG9yqJaJZgF6rZfCNsk0TGRY1KgKRTy1BMw3Ui+WVcl6RFoYwUG3wSTyFrrIOlQ9KxxDQsSIfg0ZVe7+ObdYNylFaytrOI4JwavI/d2VigCSiqD+5Hl5cXZaXk1H3Tb4cDPdDjgGqv3o2yCC+lLNjqDpsN/iE8r9RWlXU1pZTQwF9MHg0r/aOU4fgjNIrcJWE9t1aIwHLW7XApQyotCjGcoEkV4l7bFLhWGFa27Z9J/G/L/9ZsZ7Pml6+a3kJ5GV4j0/KaXcw5yzU9MUEko3rpS5efFhTCxoLNPFuXOYOX/INBpJzLuTSyPKwTdaSmgUFXczn6Y7RfF4sojM15t4tPIT0VBXUuTHvxco78+XJt8PWE1fi3aEV/areTMPEM5QruXve/QE9sToIiQUAAA=="
+    },
+    "survey-restored/saved-read.exit": {
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1,
+      "gzipBase64": "H4sIAAAAAAACAzMAACHf2/QBAAAA"
+    },
+    "survey-native-context-exactness.json": {
+      "sha256": "87dc58021d12704f125e26e19dcf9d6702abc3c63e683a31e39c623440a5bd7b",
+      "bytes": 1417,
+      "gzipBase64": "H4sIAAAAAAACA8VUwW7iMBD9FStnIAlpS8tt99BLd1erlp4qhIw9BC+JHXnGIFTx7ztOUgoth15Wm1P8ZvJm3vNMXhMb6pkjWc0A6SkYAkym+SDCvyUi6M/4vTTVOZ51+WC1seXnwJGfkfEH6guslwiPaTOn3XsSWtng2lEyfU2k1qBbdMVUwUMyXckKgc/MjN/ew/H4CLXbXgB+GGS2l3mPPttaklqfJj43WlIPnAYpqmzfgmVQbXr8eHqAPX7f3zNHVyCccYcTWm10V6WXcGClJD3NTM1QPrkriiy7zseTmwlHglKA7Af5wGLZd3oEDFW06IVtYac9GWfPQMufkPMzQ1W8p1ZvqKpfMhZIPEiNwrcpoIWVZLYgnoLfwl6sAPRSqo1YeVcLU9eB5LICgZLtEyupCAdiZ2gtrBOomMEPRONdNE+ALY0F4bxQwXuwJNAFr0BUzm1Ck7RCKXBLCW5M07AhLCl2+Z/b6mfqJzstyzfLaiDJo8fXQ7JsscPgC+b+AW5GYFMZiiU9OK/hRJFylmIP0mqh1tKWHOr7MZoDhvZiCSuWIBR7QrwjnCt4QEzUeWpi0y7amYf/vroOXsaJ420vJqPitri6u8nap7j9upPzi0M/zvJJMUj4z/ARv8qzWOv6kvq6K8YQH2x3D+nO+Q02UkEKOjzk46GF3XALHrn1lJeGX4/HOFlcM0Wv0sUi7hguFukyWF3B0Nmlkz7+qlJsh3HYWTlsZ28Yx3bUOKSSR3dk2N2y82cUeUa8kof54S8qQ/8CiQUAAA=="
+    },
+    "survey-native-context-exactness.exit": {
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1,
+      "gzipBase64": "H4sIAAAAAAACAzMAACHf2/QBAAAA"
+    },
+    "survey-native-legacy-scale-footprint.json": {
+      "sha256": "e6a4fa9927d772cac786a111b7b08da40da59384c20e391d0b1a8e4d7eb4ec9c",
+      "bytes": 1970,
+      "gzipBase64": "H4sIAAAAAAACA71VwU4bMRD9FWvPhCQEUsiNHpAqKKognCoUTdaziRuvvfKME1KUf+94dxuSEtEeKFyCn+2Z996MZ58zF8uxZ7BjJL6PhpGyUf8owd+ACPVr/AqM3cd7zXl02rjZ641tfEFO/wh9IOqhgIIN2ljavxwiBxXNPWej5wy0Rl2jhYSKAbNRAZZQ1hKZLl+20/IOS788ANwYkmjfH1v0wZXA+Xz34EOlgVtgd5OTyvq/6ATMFy2+XV3jmj6vryRGkyDuxY47YbXRTZZWwkaUMgQem1Kg/qeLwaDXO+/1hmdD2Yl5jiR+cIgiVnznO6Rok0XfxRZxOrDxbg90coV9GBu2qU613mjtLaQEWRX8D8yZFNiAoNcqYO6D+KfuY1jiWl19ub28UQWkMzwPPs7m8ouK5L5ywGaJqvQarQKnVREQfyIpLd4al7OCqA0mClktjKNQyGhhqkoMEAmJ1QfTaHvmqzgJs9+WlMggrSX2M8xqbHP0V/MWiBWp0hBJ76rcO8YnVtHBUlLA1GJNppEi58AWPpSiiQRA1fJQK8NzH1kZtwRrpBdSsB29bzv3YRzezzbtpTTOs5Kql56FoQqwUoRWWkDaV1iwF1CbosCAjtXdtoDKB4VPlaf6lmQJJpe3JFe0WRodwTbK3jbtgxi8n2WVJEJ5CFQ3PT5JTZTFGeRrNZNZFlyqaDshVeE9V0EkqNUcnejcZb8CSvStySXTyzvb9auqR/be6/z/2XUMkKzPRmfHZ6fD4fnJRfo7Hw6H/27k48Hp2R8M+xJEPjGv8JN+neyQ+LJJJpAsXFOG7sqHBVWQYxd1vO6fdByuOuIACfNu7VHYLqcgnwKnuxTy7mSShjVNJt1pdNpix7uph5C+eV2qJ1ynGWLH6dyxPLjN4+YXTMOcVLIHAAA="
+    },
+    "survey-native-legacy-scale-footprint.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "survey-native-r-reader-fixed.json": {
+      "sha256": "95a2bd0811807b851a30c4db30ff9c166026287c36ba4136d4324618852a6415",
+      "bytes": 1416,
+      "gzipBase64": "H4sIAAAAAAACA8VUTW/bMAz9K4LPcWzH2Udz2w69dBuGNj0VRaBItKPFlgyRShAU+e+j7DRN0hx6GeaT9Ug/ko9PfklsaOeOZDMHpIdgCDCZFaMI/5aIoN/jt9I053g+5IPVxtbvA0d+RiYX1FdYrxEe0+ZOu7cktLLDlaNk9pJIrUH3aMVUwUMyq2SDwGdmxm9v4Xi8h9ZtrgA/DDLb0/MBfbStJLU6TXzstKQDcBqkOGX/FiyDan3Aj6c72OH33S1zDAXCGXc4odVGD1UOI+x5UpKe5qZlqPhyU5Z5UZZlUbAoGJQCZD3IBx6Wdad7wNBEiZ5YFlbak3H2DLT8CTk/N9TEPfXzhqb5JWOBxIPUKHyfAlpYSWYD4iH4DexEBaCXUq1F5V0rTNsGkssGBEqWT1RSEY7E1tBKWCdQMYMfic67KJ4AWxsLwnmhgvdgSaALXoFonFuHLukHpcAtJV3vEUYoNvmfu9LByygiG3g6GRf59GYyzeNTFJOj4X7yGmT9qmcLJNmXvDuSdY/tRx9Q/g9wqwK7xlBsyIPzGk7mVc5S7FBaLdRK2ppDh26N5oChnVhCxQMKxYoRXyDOFeweE1U4VRjXpusuJP735T8q1vNV00+/5p9Zcf4zXOJlPuXFfLrmoHaoxRAf7KB0tnV+jZ1UkIEOd8UktbBNN+CR15zxneHX4zE6i0tm6FW2WMQrhotFtgxWN5A6u3TSxz9Vhr0Z00GrtPdeGm077hxSzdYdG5avHrw0jjxjvpH75/1fCSPMl4gFAAA="
+    },
+    "survey-native-r-reader-fixed.exit": {
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1,
+      "gzipBase64": "H4sIAAAAAAACAzMAACHf2/QBAAAA"
+    },
+    "survey-native-ui.json": {
+      "sha256": "6770580d8ac397dcfd0b9d133abae134a828fb0e4a92d366cb99d7385db5c708",
+      "bytes": 22889,
+      "gzipBase64": "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"
+    },
+    "survey-native-ui.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "survey-native-authoring-locked.json": {
+      "sha256": "075fca14dea58b7f3bca925caa3fcb8b689ed2e7940cf4309f4f8830c3d76f0c",
+      "bytes": 3002,
+      "gzipBase64": "H4sIAAAAAAACA91WTU8cMQz9K9GcgWX5hlt7aFX1QxVd1APiECbe3YhMMoodli3iv/d5ZoCFIlSpFKm9Td44z/az4+S6iqWZJLFhQizfihfi6mhrTeGvlpncr/g768NDfLO3p+h8nP36444fyN4jakDjR6xPEQLbHbhcujfiaFueJ6mOrivrHLkOnYKqZKqOpjYwYQ1mfnP/W5fH1KTLJ4BPnsF2ejagJ7GxUs9XDU9aZ2UAVn+KZtl9lQiwvhjwu9VHWvLb5Ttw9A7KA+6yQuu8670MKdwgU7FZJr4BNN4/3N7e3Bwf7BzuHeBPqWti6CG5IFnoLsfEJahEp5AFSmfxKT4AI7ZIyhMvQet0Ws2QfI7kjKQUzMkHU5jY0FUbfO3FZLKOjY3O+KYpYs8DmcU8BVpvbX1hZ2RsrU64UuVKCF+shvpitMYl7ItJDJfzxsuasW2bQW5SNrNso4BlKXO0CwgoGl54aKvLSIv1qW18WBo44KrTUgqyrvjCty00h2oqBJCXdDO04WcUB5lwX/SGxKJbUVGxsw67WfsX66FbrMdHRuDZ12hdw6nkmsx5SGj3zAbazFMRU89tnKlG2c/mwqol20sFbK8zMzifL8xf8fdfV4gpUI3sZT5YYEebsgp3a+qjmforACk7yh1rIHsJfwm7chcCw0rA+Xx5Xt7Zf12bkNRSYwZZJlUKMkTMjhTv+XrrjhBY4m40dZ9ZtKltQb9n/8P2Zp3182X6q37/pGIPdc64+PVAazfh9oLo6yvHPsIvJjIQsrnW1rn0tLg7/V3Iw2GX4ggzGyNcr26Nfcjid8R6xSheTrr+3tIuhBPw38bZH8pMU0JaGJoap2lQYguupalTFLqSruaoNVoj2JoaDbtOzbmPd/2yqlnbPeNWx8AreHcld41XHe0cbm+M9/d29g9/X8Gzp59Se9tbeIai4I/xg/GO+th9KuumdwYIi9jrP1qkfME47zQiVz6Ot9b1YYDe0StnNLTR7XKaNfHoRpzrUatxj6xrfBy9HwbNRGfi91vGDX3bbQhfVTdnNz8BQkhEvLoLAAA="
+    },
+    "survey-native-authoring-locked.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "native-readonly-link-audit.report.json": {
+      "sha256": "0ed016c009d241cbd3233f035395687300011cc769d69b6e9e186bdc08e52c75",
+      "bytes": 1057,
+      "gzipBase64": "H4sIAAAAAAACA82SwU7jMBCGXyXymTaBVDTtDQ5IFSxaQTihHobYba0648ges9tFffcdO6W0Sx5gc8p8Tv7x/898CAxtbQlMrTw9B03Ki/nlRcQ/wXslv/M70OacF/33CqXG9feDo/6A9IDqkOCJlrRfwCN0fmNJzD8ESKlkoiuWCk6J+QqMV1yzsr/5Oo7lk2rt+wB40J7VXpcH+oItULM5/fClk0AHcHpI0WV6C8iw2R74sbpXO3+7u2ONvkE40w4nslLLvsvBwp6dEjiqdcvocjory6K6nlbTImYQmkZ5zoNcYLOcOz0pH0yM6JVj4aQdaYtnEPkXsq7WZOKckt9gzCPEBgKC1OQz9ZvD4AFktQON8QVQZs/NxlqTdeHN6Aaicr5y9o/CkbfBNSpfPC7qxc1D7vkPo0ZOddZR3jkb48uMxq3PNGYWVeYUyJFFs8vIAXpoopxIbinwvUSXFoUJxZv+D1eTwSVlMb8qJ+NZMSnL61n/TI6r94MHAuvPZFtFwBvKUyRYJ7ZfDk60qqbV7ELw2v/DZ8VVmXoNRdP2zRhxgf0E81/WbX0H7PktoGSvGrtAPke+/Ht0DjKaG6U882OZIhjHHRrzquyX+79Eh5AvIQQAAA=="
+    },
+    "evc-browser-result.json": {
+      "sha256": "aa703a464cc83c3c93a6b858f4306d2e4601444f987d751da9726a769ba89237",
+      "bytes": 664,
+      "gzipBase64": "H4sIAAAAAAACA6WQMW/cMAyF9/yKg+cQ0J1sn52tKAJkLJCx6EBJVCycbBqSfLmg6H8v7YuD7t2kx4/vPfD3w+FQ5YJlydXTofrx7fW1ely1ecBMq2R5nCMVusuZl2TpO49jKNuUGqfak2nPqjs2te2972sy6lxTp5U21LeqbzvzuY2TM3yTxZIW2iQ7kL2s2T/lJ/9EGMEyXwJBppwDTxD5LUybw1qsBjuEibLMl3HE9AFlSETAKQgm2wmnNxIIU8kgiVDQRNr3w+TCNbhlBWnmlUlUUBzdjpBbLBZJFgbt+sjwHsowUPxiLvRhGJMDus2SkWGSjSvBSGVgB261jHmnE0VGJ0EoZMaRYKaUQy7kwEtEBjn3sNO6V/Pts906gInBsV1GmgrwlZKP/F4J+2s74R18EQP655CtVUc8o6+Nr73yXa3bHkmZxnUee+x1o7XCXp1OzVHrum2Md458S05Ly0bvZf7b56unlTtypOeUOG1F77KJbC/knm+FklxcBurhz19CvSoimAIAAA=="
+    },
+    "school-native-browser-result.json": {
+      "sha256": "542cf0646688c9eebf5e01251e871c3adee586eadd1abf21b583bd4682fd0193",
+      "bytes": 653,
+      "gzipBase64": "H4sIAAAAAAACA6WQvY7bMBCE+3sKQ3UIUJREWdcFwQEpA1wZpFiSK4uwzBX44zMS5N2zlGMjfSqSs/ONRvvr5XBoEpVo8QtdLj43r4fGDUc0w3QczaiU1v3UTRrVKFucQCo9WjuC0kfdfNrpDLmkyn37/P5+17YFElbJ0mVbMeNfKwRn6MaDHAvukl3Qniv9nV/8jgirSHYhWoUlOnsUCVPyFPaIGvIY3pOdyJDOgjYMSeANbcls5ghWnAiQ/RXF1j/ovEREQdGffOAvRQgnFHaBmNPT8kECSl7Y9JMjfHD+6l2pbtyIjXxm8AHdgwgkSli95QoMoCsWagkmwNbLMzpi7ck8uCS8w5C9rf8LV+ZmNj+d3SS3m+BgR7Zc2CjoinFe6aNhw499dzvwFdKC/yxwOPazkkaCcrPGVg9d1xpjlNEo584NbpokqrZzRg6z7Id+GsdunGHqbNu3Sj0K/HfOs+YGJ3yLkeLe8q6ZlewZ3dstY+Q98UC+/P4DL6uxso0CAAA="
+    },
+    "survey-native-browser-result.json": {
+      "sha256": "25c7b2ead0f74d67dfd2a9641e7795f9360d725a9aa89bb6266f476ee97d3886",
+      "bytes": 635,
+      "gzipBase64": "H4sIAAAAAAACA6VQu47bMBDs7ysM1SGgpyVeFwQHpAxwZZBiSY4swhIp8GE7CfLvWcmxkz7d7uzM7Oz+fDkciuhz0Pjkl8Wm4vVQNG1PijCoUneyUQPXRzl0qurVWEGXxpQlNfVQfNjViVKOm+7Lx/f3O7ZOFLFB2i/rjIQ/VHJG+RsPUsjYIT1Bnzf1V+64D6BZ2BgzjCDn3ffF5yh0gIFLlmcBMS93vwedcpp8sD9YcoJD2KDVCkfJXiDW9kFOUwAEM0/WbU7kThB6opDik3L1wjpjL9ZkpoyAUaTPYuW1CBeYBxEma/b3mxHprYjiatM0YTZ/w82eDCcmE4XdD9BMj8Q+YmTVc20jy/UmnBfGa77OJeEvCOPsrwUTvu2f2gWfKU74512dHPpjJ6uqIlPXZT92bTPWXat6A1SyMrqFrNvjKHv0cuybppHHduCqrYkgHwH+2+cZc6UT3kLwYU95x9Ts9Rnm7ZYQ+GE8KF9+/Qa9LbaCewIAAA=="
+    },
+    "evc-http-scales.log": {
+      "sha256": "24470c034687cd12190cd68a2a02f10c026acd7fb899fe674422441a36e27f34",
+      "bytes": 578,
+      "gzipBase64": "H4sIAAAAAAACA2VSwWrcMBC99yuMzt5gS7Jsp6dtUtgSli7dpZeSw9gatSKy5FoyZQn5944cUlqq23tvZjTvSc8sJkhrZLfstD+fWcnSAj7OYUlELQiuiBijDb44XC6n94UPxbCEXxGX4v7zsfi5grPGjpCohLohJZzm9ElT92BgNKoWu7aRsJMtVLu+GuVODXzgqm2b1nTUYqwHd6QNpFQ3vOWci/71yDJvoLPWdze9aDvFq+3UdZZGtHMi8dszgdnBFelaAy7iS/k/9Vj+RaVlxQ2T0Qe85iHM6mwf4tOZ3ERj8V8M45vHmCOZ0GebJfMwYWZ98NcprPEu6IzHMM0OE+p9ymNCAnexW+UA49P3JaxefwW3YiRq9TZ92ZbJaF6CXsf0YH2eP1Chw1eVPW6qsQ7P9G5IKR/3l7vDx3v2R9iyP8mcLK0cDxB/EKHGqoYWjByMNJXppFA9YDU0ujPQQy8aISroK86bWgipmsFojUahFvQEjWA5LfoXPuKHa6Klb+uOt93Lu98i2pVmQgIAAA=="
+    },
+    "evc-http-scales.cjs": {
+      "sha256": "953ec7c88a59470ad4b60872c52b83d60fda2cbc4df867e394da7b3a0a2112e2",
+      "bytes": 3049,
+      "gzipBase64": "H4sIAAAAAAACA4VWbW/bNhD+3l/hAQUkITTlpOsKyNOKNHGRrEkTxEmxIQhWWjrFXGRSI6m4hqD/viMpv8Zt4Q+WyOPd89xzd1QmhTa9QqcK/qu5gjAQMoek0EFEmNagzM6OX4y1UTwzaNQoJnI5u7s7P213TDO1qIx0NrgO2mwYxHOpnnTFMoghrz8dHvUFzPvPoDSXIsYQ+Lh6nbDsCUQeW6//zGRel6DjqmSLueKPU9PPpIIgGr4KmV6ILIzSP5pXvcwxU1KadDPapBZ5CX0uqtroOCCaPUOe/jm++kwrpjSEhaYKWP6RlzC23qyHgwCes/7UmKqf1UqBMPRfLUUQRYTnqXNBmTEwqwzlOZkwDRg0k7NKam6gb5Om9QzP6bizw9gHPB8ucWbmW8rmjCNinyuK+TiRwsA3EzbW4d3NRRJYCEkcHx69owP8HSZvBoMBkjBSsUcYG2Yg8YAdWBsVE9ivFH/GLQ+aoEvFzm5vr8+QJ6Y4aa4wj1zscf/28N2bgAR/9UdepOMsk7Uw/S8c5kESfLgbn38ejcdB22L6ey79vaIWmcGoPVbxsCI5MyxqSjC9qQ+XNu2QF6Fd/yVNUQ4ouIA8arpMdHnAjNBHMFgq6CdmtZnGmVYFltNkaeH4hNHQ1yTFxLEyzKjGNNQ6jMjRYBANu6j3SOJkfPOxfyuxloKHdEItAmp9uqVhu6qZNYJ7a5NuoHwfICZkjsKa4MGDCw4q0lBKwxfGTZs0drGNSAcD8+SDLEmovSTUFgny9XVTtUnPatZ73aw3W3yb0BmqjOq3X3ecTGiGDUNWx3dsFZhaiZ7Pg2VvNbKeoYNm9bOVF5GSadPhRgOcCRWoQqoZExlQIecIU0EGHMs6vX/ASsDN0LoT6WAofj8aioODCHuyS3AtuEldJNq10zn2xDZ4a0PNogISjE+OL0bBMnHYTzOdum2dsRKoSza3FUfd3rYft0RLEI9mSgSqM3j/Nnlnq7UD4yZB2uh6MuOuW87zZD3TkFnXsKNKZtPEo95cIuv4Z0xPE4dse41kvpHHglV6Ko2z6/i/3CFM6LltSw99xqow5OQJp1rY2KUTO1s5XT5i5nWFTOALK2tIxjiYxWPomd4fEf9783D/9JC8jdooatfUcaZWkguTWpUPgtgFxLnkKPAcV1yGY5cb834ZKO20DqwnWxpps/REXDbbIQ5RnM0GvjdF7ak+poiV3UxyA1g77LxYhHYf742ZpTqQvw0G7YZiaqM+twPbovZlSKtaT0O8eOw1AagoXT4S3zzJsovQ896ix3itHWkbteQl88dIcHJ1eX0xuh2drkrTEbrUL7uj77pmNew9lI2Ali5dUXFvHZ/tqeDOrZkYVTuc3UQBDAp7W7OS2LPb/FBcv75Cb2+9veC9Y9vVP1HVO9yvqN8joi5LcvRS2l2e1o+/qm/8yzLrN6Pj079XmCslCwST7jvxjHcU7QzsfbUbpdtynnHKXB7fnpw5Mfdadf/nOQmuf10b5QDVaMuQuctPk/uHaENwWYH4gQI79K31NpkC3Wo3HfZRXe2uQ8IzzwE1xMnm6z24PsaLGmsGx4s9lAQoeNnrPhHc3TLsCdmbKDlHML3Tq8uehcMLnjFLKVhOQhyQ+JHTFTvxZbOa/2TdcjvV6oF/goVOrib/QmboEz53Ykeky5//htnWZpX75KUaK+rJDxOzmpIfFgZ08qEuClB0gi8X7moI95arn5Y/L3tdl98p+6UMy8L3hSuRQikfw+8Yo9X6GyjnCBy/S1HaNgojimJk0xDwG3fpCZTC69YlK3uKhpibDEWl8I0be0Gkh7bD/gc2R4G86QsAAA=="
+    },
+    "native-readonly-link-audit.json": {
+      "sha256": "1eae1e6eef0c9ddaccdbc9bd6b5c03430d0e805d025514348a956c7a85928f79",
+      "bytes": 6374,
+      "gzipBase64": "H4sIAAAAAAACA+1Y224bRxJ991cYek4Lfam+6U2WlbWwiiRIygbJIiD6Ur3imiIFcqjECPzve2ZIidTFyhpGnAU2TyRnuqu7qk7VOcXfXr1+vbMoV3yd/sHzxXg23dl7rb4ZnnapWy7wc+ds/+JiZ3j2fjyt/ZOTwx9G54f7b0enJ8c/jvD69OBo//Lo9GS0//3bo8vRyenl6N3RxeXp+dHB/vHo3eXlGdafHe//uLIzywue33Ld73prWmonlBQ6Xmq1p8KejLtS0U+rtWVWGat+w3f8uuI03CCw0pUzRW5ekSvWNRu8clUXmYhUUllXl9tgA/tyKu95Wi/n3Bvbkay5GV09OV/ZZ1+Ta8pLGVUoVsnkS/LW0t32Np9Nu639NmnnHZvGSdkoFVtbqtGyUJbKOh8SRatD2sH2j4Mb05UbO7eadrXalSvnFmU2H0//dZAmkz7Ucnh4M5+18YQfPVzmybikDik6nX87nqbJD/Nxx/2CliYLHhbNEZ3T6eRDfxBSOTyrqUs5LYbDuS7fKz3Ctm4dXLzoTfxzcHMV49UN6rIMybk83z86OTr52zoSeJm6jq9vuqMhD7ml0pwywltKgnySIiIKwmWdESJvfQubrWV2fTNb4NqrzU5G62JwwuviBNUSRSpFCmKK2cekPaJ9v3kxW84LH4+n7+/hMDy/AyVgeHhx8d3hyeXozfcnb48P77d+4ck9fJbTOuG/8xDZCaf5FFkbXc+68e2QktF16q5Gi+XNzWzePd24qa0duat21faKOcPegg8GgHXv0uKqX2bIaRuIskclMMmYSBuOkVk3o1ptOjRTSTWnY3VkdIo6MC6uFaVID04YoLO44t7zbr7k9ZuP95Gt3MbTce/H3fG2cJUt6lqD51Y4e+dz880qbVF3PjorkzVBU2spGROcbqG/nCoyu5Q3WcvIDmK1uLMcis81O21sUSqWWK2NtlpfoySlpGEUlbbOhgybRYVcpPWRg6shVk1uG0yI2K/3EVNUK6oSIUBYPLvqgqFqSabgOBtYRUWHxpJ0bsQBxpU35HF3p+DHFtAms+5gtpz2+Ncb2KPkPizGixWAgBBtsw8iss6CqLDIMCW8dKUWTTIUvbE4RDdN7oyqzVHTdLO42hxnNm8QtAmfcw+op5dZvd1U7nb1PjC8um0tbBA9FqWSFqRrFiGSEWR88IER1vtWd+ftAo1hcQ1ErixoYEqnkkRw5AU1B8+1T0L15c9K6pT1QwtzXiwn99lBzHNquvioUVs6RI/gp5A5FUBW52xUxRWb8UYS0k8N7Vv5LEvjoqR/aPsZwKI4jNVOcvWF2BL7mlstzuMQVEko1EpxxIVSIgYdFGe8YjQrVYCsh/b7tvwouo8jvFm37gq3abLkB2aGJavHe6/tkzcbgi1pUpaT1HF9ur/0XX4OT9+kaV0dNV1OJg+Wffzmv79mmS26P+mWW79+fvXM3V8AMFtgo1YrcilKkKtK5Nqi8Cb22CscpHsZwDEElaNOAnhrKAFmESvqIOUYfDUUgIuXABwpE/qvDX1t62LZBxMDZ9YRMC3sDdqV0VR8Qm8h7ahkNPCWrde+lPx7AA4wn312znOFmiDvWs22AZyZ0ei10z5HEGpzKdZSrfGxadM86iOY5M2XAxjVXfl6XEYLnrQRtwa5UT58Git6V399tKy//XzfCaE/untycUWq5FMjdPgmWyADPmCZbQ0txYQOYYxMUWptlQHFWrQIpMJxNVBOdhPEOw22ws4ZbZFDh4jVb+9OBbOP2/ieWjfktJzPgb2LblnxcTaf/ZtLt5YAMPdqC/rPqa6Lg3enp8ef0Fxw0ZJuUuDiEZpLepFA00KySyTBfonSJzUXAe5UHQso5CIoh4g6sCRiJsktWuW3muEnNRfANbxZ2QzFUCQnRZAeF4owlyw7kZuUlDSj8rYb+NrqwZdJsjk4cXz92MpnuQcrSM78wz2JQNFkKo49BUiDJjlkLSOkkPMlBgXJkBNkfgWlGFk16rJW1bBapmStflZ0PZlxlN+Tdo9o10b300MleDvmX17aQTY+2AFtxTcYS+DF+bD5EQz7uQP69BbBwZJx9+FBFv9Y5beV6Td/lAZ8VmF6tOIsWzIw7jDOtVSRNwwlfd5Mhk/WQmPUrKI0faI9nK1ItXRaBtt2nuOmHf6Vy3JdwQ9COB5wJwGBHEFLaNkoAROkAJKqgMwI0C+csnpML8vpupwz0BM4QVC1XpIB/XAcHBUyBI0vrvhH0qqbY5pdb/ayD30QwTvoUHCCyEbKXqHZ6FPMrrkn5/Z1s87JObfPbimPOv3B6Xdnx4eXh2+f0OeQ/DW7YPRcTa9iw8x7qza3B8AlhWYsUENgd2WKAG0mUZ1XUsrmokl7n9lktm6wNX1h8Mbo/YRO/pxR6IuB+qlRyFRoBCVzJekoZ/A6+Rhr4EHvJjAjGTYZIgPlFpynYlo1xff/WGQU4+eNQpJyJJCoSFUmJKZ4QB/fdGN0XZ1Juf+hUagfQUyu6KulYZDJKosI2AmFcdGhSJWs6mUl6byGDlRVZG4ouWANiMoG1EqOJUFZOONeUpKkg1UFLYLQGlpAiqPT6HqUFKjFAjuo+MhFqxi1axYgLzKWjAYY2Gv11yj0fz0KEbSs68uNMElDJ2kwDapYONR507powPt3ABzRrVpWAnK4N+N79mCFOsBEHmMrKZuXAFw4oV+kAuUTFBRRIkz0BlrN2+TAFVyqIoC1Ud/XOLbgi4oJSz1Qqctfo9BXGIX62VNLSAtd+z9oHCYflXPW2bFsptoaY68cTM3SNrAMRdCRx5QENiKl9VcehV6tHUEa5uOb7uIKjdQNwYM6hDrwspYEdS5l8h50ZWTrB2/rIaJVrg4CyvSwtNJA5esENuZoo4b9j6/+Ay0yFQzmGAAA"
+    },
+    "native-readonly-command.json": {
+      "sha256": "5627f9c279e1dc92561c883657f5206d598ddc4a3b91fc9b88e57e027fd64d7c",
+      "bytes": 1563,
+      "gzipBase64": "H4sIAAAAAAACA41U247bNhB9368g/Ly2daNkZZEHYy/NookdON4URVEYI3JkMyuRBknZMYL8e4eSvbstiqIPhily5syZM4f8ccXY6FlpOXrHRqv72+Xq7v5uc/u0Wt0v1pv5093jenO7/PRpvrjbLJbrzep+vVrOb9ePX+83H9brz5v56pevo+uAAnZ7IJQ/aE1f2kjs92k9PRr77PYgcIqy+zVOxhqP4wNap4yeOrS0fPmsQDyjltMAsGmN7Bp004Py6Pz5b9J+cxdo2+nLcjwWRtdqe/k+Bw+bk9a710CLe2M92vffnHmTbzq/7/yDavD9G8pVp2WDY6XpzE01eHVAQgBpdHMaN0o/j6GTyk8G1EmPSZB/9qqIYy/t/8broQZB8bvyt0HGdyzqN4IkKxTGSpSPet5HEvYhySZJPImGLGc6K/4l7MfQ5Y4KhaQZxonEKiuxLuIsFzyv+ayIc5mICLIshrhKZF7VF3XOY1lbDHxGESZYp4kssryQWFSFhLyOiygq45ngcQSFgILz7JJeW6P9m3wOSV7kmNYIMS+jGDkXMk0ikVVRzPNiBlnJkxkEIX/2fYVhfvkwT3ge8kUpeQ1UUApIZ1VEBQuR1mlUJ2Vc8IKXeVzJHGaYIqQ1j9Ka8CDJaix5mQy8RoM3XlGjDEQZyyzOZ2loALHi1JOQWM+grlNiyrM04zzCrCaC2aysCi6qIsohjyA5T0CYPQ73aX7HlouPvzMapfNKb5k7ab9DrwRbW1A6bIGW7IvYGdMwa47uhmnD9l3VKEHWMPqaPTwu5h+vGcHaEG8ss6SFscP9Gu2tMvYByLXyH7MeDBmY/Idra2Xd3717HlmwH+XGl5uGEA4J7Eiz3DJhtloFVCZR2NOeCLGafsA6rWqFkgnQRlMXTdjxDPUBG1Lmhokd6C0FePMqzBnkachdddqrFj/DqTHk1zMFCR4qcPip8700RKaGxuGLRxrVquHIvb5ES6u2ShOL8F4xt8OmCWU9qdjSCByxe9bmqCeXMr/tTIPs7fvDqpNHpqgBTW2e+pEBwZgLNPWmSJWWztkBrIIqZB3RBhxPWpH5W1IYNJrONSfSZu87i/Kl6HqnHMW1bcC2/e1lw84+TJbRBWoZWYeB8B1VFJ21oZoPviFmZnDLDbODdGx4B6YLamPqhFV7z3bgdgyI06U6JQ6YwQnBVV3jJ/3bdfXz6i+29bSfGwYAAA=="
+    },
+    "native-readonly-audit/readonly-links.test.ts": {
+      "sha256": "c9d5fa170dca38b00a77c3f30f2917575961bd6a8e3ea3f503f952a24fe95924",
+      "bytes": 10508,
+      "gzipBase64": "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"
+    },
+    "native-readonly-audit/vitest.config.mts": {
+      "sha256": "04ac91d416837ca7eeb5700cdef8aff35905434550e4f495489b75cb706a60a2",
+      "bytes": 290,
+      "gzipBase64": "H4sIAAAAAAACAz2PTUvEMBCG7/6KveXSNq4HD7n5UaUoq7hVF0RKbKYQO50smaRbKf3vZldwDsO8M/DwDEx758PKQKcjhtXsgR2OoGaNVrOaRxuAgxLy4HzPe92CBBMf1hc5wSEfwbN1JBl8Gv/jl257ICPJGWgGZyICyz+SNDY1Swam4pvFsmQn/mypxWhAfQgP2jjCnxwt9Vwcz0Vg8ZkBjdY7GoCSzxEtjis13zzdb6q6eiubutzWzV21q19fym1Tbq6uH8tbJYKPIJZs0NN7eiI5qnXWWYRn7TUioOVBdRoZTi61HcDFoC7PUy3L2S/q7YbmIgEAAA=="
+    },
+    "native-readonly-package-link.json": {
+      "sha256": "ab99a9b7c49478fbb2d91444ec95deb809b217bffe68f78e7efbb0598dca4292",
+      "bytes": 154,
+      "gzipBase64": "H4sIAAAAAAACAw3OsQ6CMBCA4d3H6OxArydSt6YQJRAwWAan5qRXMURjFCfju8sD/F/+r5hujyB24uSMK623fdcVjfNHYyuzL7xrfVeY3LdNffamz0vn67KpxFo8aZjoygd6j0uuMIVNhnjZJhIZE00IirVmhqhkDBGyqALKmIIOKSogDRlrApBIGuUC3mkeRl5e5teHf6s/wTha75oAAAA="
+    },
+    "education-native-executed-first.log": {
+      "sha256": "39af072bfa552763df0d7622716810c43d56f134c8e3cb688f2d63ab6304e550",
+      "bytes": 279105,
+      "gzipBase64": "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"
+    },
+    "education-native-executed-first.json": {
+      "sha256": "f575b94128204b008ca588ec6bf536f21dd37c103ad9f445ba81db0b3059b983",
+      "bytes": 1950,
+      "gzipBase64": "H4sIAAAAAAACA8VVy27TQBT9lZFXVGri2Gke9YoSUoH6oEpTWJQqmngm9pDxjDWPpKGKBEsWrNiy5i/4nErwF9yxg+tCVqgqUaR4ztx77sv35MYTNhtLg/mYanNumaHai4JdB59hrSmp460CP8SM38c39lQQJpK/HSr+LdRbWLcR1riIvAO0wLlOpfGiGw8TQkmBzoDKKupFM8w1hTMw64O7a3cc0UwutgDHTAPb5dUGvRAZNnFaN7zICTYboH5pXJXFkxUAxvMNXp2O6Eo/Wx0CRxnA3uO2NVrCSBllU8IaKjVYmTHLAAp6++0Qvr2w22nDjY1jqnVVLTTejKi23PXoEvoCrVaGSXEPFOBjpBozw92gioIt56fYRfAUNZgJjbBA9DrnLAazFSLQG8WmFtJEy1RyioavB0hLq2KKTKqkTVJ0HqdScpTbKbhhF3cXHb48PTgGMoJyqrQUmKMZpWSK47lXlGYs5FDMDToAJbisHjsNYlVh50X9TtAMO639bqflPkFQvVIn0GicFA3zXqkEC/a+8HkuM0h0qJRUEfr59cOPbx9vv3+5/fQZjYcHgxfDETorI74VCD7YoHIqA6sUFeaEZlO4T1m+MUNP/KVUc53jmPqU2KMgbAi6bCzgGsL54AuP1dFVALviaxX7mSQWRurLWnp+zCHeiPLi5OLoptFRN4iCYKdK6TFCBnvdqFdFPFPyetWcGIWFxrEzfMNMOsCcO/p/bIKQhE5+p/Q0V0xnGLJh0GdfWWFgh3zOpgqrVfMdZNRuRX2Y8k59NCwR5wbPZmM5cGU8zjiCvU4UhA8wj8nEaYCeTPypFYTThhRTiZXTUsdUrkNDwM+CNnOpTaKobjJhaFKuQNP5u5R6rSis8nHqF/n+Awxl4f4dimkIqny3z36cWjFvgMaxGbwJxWD2W+0obHmgTBnoAEg8yKDBSaFW66utktgPun2QRIj4Bx522nuw08E2tcnKpQYIDqIUwP/fe299tf4FOnLjHp4HAAA="
+    },
+    "native-readonly-link-audit.first.report.json": {
+      "sha256": "3aa65838daab1f8e1ccb3b2acf88fabc0f04b0069b91bb4958f59c455d260fff",
+      "bytes": 1750,
+      "gzipBase64": "H4sIAAAAAAACA81UXU/bMBT9K1a0h00icdO0jOZpDA0JwSYERXtgKHLj29bDsSN/FDLU/77rtKTp1qeJh+XJ9zg+955z7fsSKV9NtWNyCtbdeuHARnl6FOBrZi3wPj5o8XMm5D6+/R8UF2rx94GO/wD1AdZDhD0urneAVay2S+2i/CVinANv0TlSeQNRPmfSAsbIbE932yG8gUqvDgBXwiLb/cMWvVMVc+Wy/+NdzZnbAv1NF1S2K68QLB+3eBddQmM/N+fIsUng97h9j5YLvsmylbBGpY4ZNxUVQunHSZYNTsbj4fEowx1flmBtpxaNdzdgvQwe3aMvaLVxQqs9UOEZp81UOBka1Qr2Un5jIUPEPBfOEnhGN7ADZGqYUGHBFCe35VJrSWo/k6JkgZnOjf4FKrbamxLoxbeL6cXpFbV4QkJsoNbG0dro4B+RQj1aIhTRCogBxmOtZEOcYcqyMtBFrVznsa62l+gKygqV/g+lcW9aZmzEYJSkWTYcTgbtNxl1d+8rdoQtWmejL8Zok5M7ZX0d0gEn2pBK2FAEKfVCCSdWQECtQOoayAqMxQQ/FMGPOcKhNE3tzl7/vGaN1IyT9/RJm0dbMxQG3F+mw1jBU7w9TrHtuOzCGcNLqDi1pqSV5h77Trvku1ViofRGuCZxNj8Z5Wn6oSukKFb4rgtrTSGqIKUYFUVSG2Erlrzr2ZQ4vKnau70SZ15x9Fyo2jtLFQvZ4uByMDlu+0q7sG1FEu5yqGOU5eNeHddGPzdJ0Uv4XbjlGZMyiPxHX5TmULwa82kjipZSgMKyvAqKqBQzw0yT/LR5mg3yE2z6rqq3kToc5+m44wzXMqf0DQSFztlWiQJDOb4eWi69eoxxrog5utiKmgyyfDiIcBpU4BiOVRw9ji3aCbF+ODiGjseDbHwUYcY/8TSbhPeRHXrO1eaBIISB2kydNzEwWj+sfwPndfJb1gYAAA=="
+    },
+    "native-readonly-link-audit.first.exit": {
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "gzipBase64": "H4sIAAAAAAACAzPkAgBT/FFnAgAAAA=="
+    },
+    "native-readonly-audit/readonly-links.first.test.ts.txt": {
+      "sha256": "0d3867b51c80a5fbe04e4f7b61ef6ce19c1069a1f208dcd429cd8ceb7e41677e",
+      "bytes": 10365,
+      "gzipBase64": "H4sIAAAAAAACA7Uaa2/btvZ7f4VWDJB8R8tJ9rgX6tTCcdzFa2IHtrNiyA08RaJjLTLlkVQSz/B/v4cvibKVNLjpGqCwqMPzfpJKl6uccmeTcoQfVzjm6D7dOnOaLx33PuWYcfdNqmDmTK+TPMHBnJUvNjHFEcenEVtsbZCYrlc8r8DwI44/phmerElcB1ykWTJb0TzGzEK7oilbRk7EnOTGwHcecnrHVlGMOzgpPh0etQl+aN9jytKcdBim8LN8vIniO0ySDqNxJ87JPL3tJBGPbiKGKyrAezLG4veraSzzpMgw69wUJMlwGwRKiph3IhJla5ayOs0BYTwiMf6nqKYaf0U1wdIivfyWpDy9xxfROsuj5KsxEBvE1S+f4bigKV9bzhKRnKRxlNn+8mraEWPgO0tMeJsWhKdLYMIQsjwqogz3zPol8DjGrMh4n9zjLF/hf5KdAqi1qSRnhQSYKuKApVtuGNH0NiWTeIGX0Vfjp6TT5nme1fnDLC9ojH2IEE6juOLuXyL0WJxTfC7RfC1mGOgeq//bAn1Kbus0wYXnkCe+LlVLZBUpHU2ms4x4vKhzMAc9sH+aPpVZpy1puW9A/Yw7NM95aBPTUZ2SVcFZx0ViU/g8NwbXnywnoUcCxoWKW+H7XyejoS9jwJszXyQhk449Qfc7gtyCz//jtloawwJCNPRuguNiPscUMFSZ3nPZIjr68Se35RcryKrYu2n5SXoLFcNzF/jRbb1J4VdUJClnDn5MGQcmnCmNUiJ+RCRxwMnBG51VcZOlyj07oOy/MWkrl+wMhoPpoHvWYbADlKAUZuzmZCm5Y05KnJxgR0jTzkm2dsCJCQOdCk2giAnpgPPNG0fJVNAsBGU5l+MzT5ccH5N7/6Q77R53J/0ZvPim9U5VQ+/KzXJw1EUOhRC5h0f/9g/g79C9bvk870HEgDgeoPQFBImWuNwpFlcRX8hFAD7GniuMdXd4NJN1tYS0uRiOTvqz/vA3s0NBGt651l4oTOu5+D5uLzhf6bTii1W3hZhUq4EpI59EIiPvwEKaie9WeUr4U/AVhN5jmJGZIbxPfbZaj4hnJQrkyoeJiHDwj2Ue3w2WqwwL55e4PWkRvqD5g9OnNKeeO+53T2aj4dnvs+7lyWA6O7+cTGfD0XQ26Y3Gfbe1Lelq81eUa+kCuZBwj2XQXKj1V3Nw3p32Tm0OMIEMbTFgZQvkAjd/glUVC6qx+Cgj/LVsjPsX49HHwZlWBqfr0qdVYITRQ5RyaJb8b60Y8GQIOPxRxoCjYPij/61oxwqOx9HDJcDOwdkm/akzHXeHk25vOhgNHcGKI1gRRtekrhjmIpKvwwrTXwWma8Dzc5fSaP2zbG9GEIo687wzTZd+3r5//8ekf9bvTR1oDijoYqaRgr9XjM8EmpkIabfldCfOW4P2LTLbDGJPApinP4BZHVoar4im/l9FlHkVb65IDyVnrh2Z20rcGF6y8OoaFuZgHa0D3WMh6FBzep3PnasrFxQH6Wr4i4tMlF6jK3fSOx2Nzlwdk9fXUFskjpawhXHoSAhT6TPOoRIxaL6rpqDLOV6uuD9PSQJtCyh8RKfCa7zNwwJTHGzSJJDc+JECHSRblJI4K6C/3jRghB3mrSoxph8NOC0wAtglkz+38E/ow6hUcesDMC+YSVO90fnFWX/aP7GymoJrIL2z9+Ly+GwwORV7K52Y7jV8Bk2d728MYbNV4Z/Sgi/WXuudwrtRBQbdgCLBRGwb2r14tdcSWO3woXvOIhqpxjm+i27xB5/JLu03VXa1PEetXUY0o3UwF6oI1BFLZDUmgLeVjqD2dfX4II1/HpF1afPS1IHWUpogvdZf5fHCLNtrdWMamoKp0+gen0Fq4wvv0KgrFW18lIUG7urgupJOvoI2AryR8U94bSTTVdtt7YLW7S6yy+/7QDyit5if4LlcyIloNvSWUqFJ/W2lQ4ULJ2I51FEahmEVnB9McPoyaQu4QMWmr+qdytvV2132yheaJ5uixQgDZSYy74dPjF0lxpV67hMJhpOq+aiNSl6FslXqY5cniwESrdgi55Y7VR2omHwmGmDfrapY+3/8C+U0wfR4HWxYlgu3CNyIxW7d70rudhzv+1L2EsLH0NauPRa+Zz7HdJmCK07AkbCwq5V3tE5EyrLVIDtHncGtFG7QO5C8K1LQLgAJRUvMa9P1SpKZ9Lqi7KqkXdZc0UeFXxopvafMb6j6pZXNxtIPpBxGZbpvW4kswjiGMID+5h4TGRCqXy7tpXVRkth9/a6OUzRrGqYx7nbwnOxHn6mW4iCnyeGeL1xP8blFDGfApwSSZanBNevrA1g2iyrd6CJW06Xk099HpuUtvb2KRLnhNTVPFlQQcAlhG75PATk41g4fivk9T97xAFUVjmmaqBIExmMf/EwGkNr6i5zSQM8R8Q4UCh0H/qqATLIxCh9YuhexXbILLxRvsKrIykypOahWUD0TB896ClK8Bg1yfKPlUGba2plCMb6TJ46sENcNNxDRnled6FWWhJGEQ7NDYIoDsoItnCD+WGtsSjzPFyoL7ovFYH/LfYofPvh6ZPkNHsTWc3ECMboRMGAckdwCV04d4FxIw4JJ3IsfYKKVeFhwda2UlWHIZlLbZzAPBwW5I/kDCTd3EHHBMw6pq+MnALPC57ktEJCCYDr3rMqqG9xaarxKcJaKrP3ckCDiXo0HOk7Nk5RlVtKfVYD6KK3xHfBH18EYgxslP6s1pHXxXr2cLaSHKnB1kJHMbtazgmFqE8HCRM+/inhwAtvfyZMLtmgErt5paGvsAX9UQqMGaVGTmEiKgCpB0L4EqIF1ZPGMmthFNp/Ox/Ho3CmPAGZVQphpk6aYOZ9P++M+yBB+u7EOB8w5InjJH3bWMr7wdNf/bg9yXyl6m0XPUNvf3qS/emZvdO4n2q4SrdS9Sc71VWmRVqPUDTbZGUxetINATq0T3rf/Pqomg7+UesS/AGk7Th3USgW5PM0Ov3DOrQ8l60r1y00KdB+tGEyeGZqfbzoaXMmamBtm4p0ewrDwjF/rVlNhNwNtuW93fK0NovVNDYRr44p1vrFTkJ8YmXTeOdZTsKrdNZL+jfUO2Q8VTnt1a5vnSp0tAbGXVQCI2EH5IC4h7ga7SV+zOsbzKhsrjsWIsbOkR+3GAmOlYSwaAyzyBcSFOmISjLyFNcmEWdUcvVWwMrdo0WcUz83GOpcCWOf4KjfO7vBaH2WVvL+13+sT/BqMFuatSs5WShZ8l4pmDnZ+HQ2GuwCSd+ZwZzR0RCMU2rINT2BNiR9WepCrOb2NSPq3qgPy9c6KLgNCh1AI9AxdsrNbBcoX/p6mnmy6rT2VuvYLgf3y6a07py+H4hzf1b1x2T2Fm6qKBWU2EtVaLvasNqkM46pg917YRakqLkOpoYxUBbnLg8ZkW9Z0G8Cu86BavMJEtLtjuazmIZUxBmI55eugIY+gUm+y09vijOGNbcaX9ZNGyd3JpD+ZnPeH09nx5fBEjNC1ATrDEcPJ7nmXPl0bq9fPJHEFDmaf1Q7YrBfBzhEcLKE6bPMZ3baaPK0hEokbUhBVWk4ulFY5XqsFWql7p1wYab/cBpWQFvbmUlxCKrINRdh2bTkQNNjkxd0/erVekea4ZymyFMLSbqVYpcpyKJTH8XqINYfwTaegLxapUhB6YeX8cilUfvKoxCupyyVz6KZqcJbzXg65IzC7fbHE9CyPzHcjIIM56QPR9E+18RCZiVs9f4/UvKzGX7VmRn+NVT+i6vzTnlp3p03GYSxXp47iNdgxnafYnLqoa5iJmqwvyiFXbpXuL4xGMS8ocaxbIXUp45uF6hbGvDELSNobkGzRRmTYvODBDz8eHBygZfT4GbJGcAgPB4KUOS4QxwimXRYHBscYk16UZTjx7AleyPglMHXN9xSUuXuL8wSHmwXIEtgfOHnubcpddOVCbLZle+si97TfPXGv0SZ+SAJxZweVALaDxIG6eN9CCNN06bWQ/oJgSjF+Gdqg+ROEl1GbUxl7ryBnMLyIHhh0zvwHCsFY/wDBLe+oo0Rc/LXFFX9bfkOgLp+R/IRBNXLpfO1tajcwIhxUunYvIM+5SKW8Yf/zzLpVnUxGvUFXXHDqG1ZxuXo6mExH40GvezY7nU4vxGXrWfd3F+U3UlBRasVHA2KO90SeHUxGE8kFaE94AJIfspmbfK0VpL9uES7DggMTW+Vj9d3DiH4UzcRnoRIWzCOou8j3fXWvC2houuIT+b1FIHqE5s839rQnFdepKVOcoTNwZ+a2WltEiixDR63v3P+CajdLIcJB/pMKqO1ccJStNzKk5N31GMt0ABGiJdlZVQGzs1hdSicpoCJEhBa4AND4H45pj4d9KAAA"
+    }
+  },
+  "reports": [
+    {
+      "group": "M01",
+      "file": "profile-unit-first.json",
+      "report": {
+        "sha256": "c673aeff81e1336247d2be9a7b6343aa79589f84e254425d869abc0a5de2786c",
+        "cases": [
+          {
+            "name": "declarative package authoring contract accepts unknown identities without authorizing release",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract canonicalizes object order and excludes only lifecycle request from content identity",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects version range",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects unknown operator",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects path traversal",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects duplicate evidence",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects unknown selector",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects unknown evidence",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects incorrect type",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects missing provenance",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects missing report rule",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects unsupported claim",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects unknown block",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects untrusted approval flag",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects missing context",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects condition depth",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects oversize input",
+            "status": "passed"
+          },
+          {
+            "name": "declarative package authoring contract rejects accessors before executing them",
+            "status": "passed"
+          },
+          {
+            "name": "content discovery and core-diff guard discovers new names deterministically while handwritten modules remain byte-identical",
+            "status": "passed"
+          },
+          {
+            "name": "content discovery and core-diff guard rejects executable files, symlinks, incorrect directory identities and unknown dependencies",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P1 without changing B parameters",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P2 without changing B parameters",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P3 without changing B parameters",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P4 without changing B parameters",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P5 without changing B parameters",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P6 without changing B parameters",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile matches the independent hand calculation for S04, rather than probability normalization",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile separates null, invalid true zero, partial quality and identity mismatch",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile abstains for ties, unmodelled extreme combinations, absolute mismatch and rule boundary",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile is deterministic under source order and has explicit direction reflection",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile keeps raw original-range values and withholds all derived labels for actual teacher policy",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile intersects every core source; numeric and educational permissions stay independent",
+            "status": "passed"
+          },
+          {
+            "name": "independent candidate B native profile rejects altered canonical provenance before adapter projection",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility preserves package1 parsed bytes and the previous content hash formula",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility roundtrips all profile bytes through the normal package loader",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "passed"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "caseBranches": {
+        "20": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This row uses complete self-consistent synthetic E/V/C sources, then the unchanged L1 normalization/distance/absolute threshold/margin kernel; row26 is the independent S04 arithmetic, rows20-25 the six fixed centers.",
+        "21": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This row uses complete self-consistent synthetic E/V/C sources, then the unchanged L1 normalization/distance/absolute threshold/margin kernel; row26 is the independent S04 arithmetic, rows20-25 the six fixed centers.",
+        "22": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This row uses complete self-consistent synthetic E/V/C sources, then the unchanged L1 normalization/distance/absolute threshold/margin kernel; row26 is the independent S04 arithmetic, rows20-25 the six fixed centers.",
+        "23": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This row uses complete self-consistent synthetic E/V/C sources, then the unchanged L1 normalization/distance/absolute threshold/margin kernel; row26 is the independent S04 arithmetic, rows20-25 the six fixed centers.",
+        "24": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This row uses complete self-consistent synthetic E/V/C sources, then the unchanged L1 normalization/distance/absolute threshold/margin kernel; row26 is the independent S04 arithmetic, rows20-25 the six fixed centers.",
+        "25": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This row uses complete self-consistent synthetic E/V/C sources, then the unchanged L1 normalization/distance/absolute threshold/margin kernel; row26 is the independent S04 arithmetic, rows20-25 the six fixed centers.",
+        "26": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This row uses complete self-consistent synthetic E/V/C sources, then the unchanged L1 normalization/distance/absolute threshold/margin kernel; row26 is the independent S04 arithmetic, rows20-25 the six fixed centers.",
+        "27": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Null/zero/limited/invalid/mismatched-version/missing-identity paths terminate before matching. The later unselected-aux quality correction is not substituted for these selected-core failures; it has M02 coverage.",
+        "28": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Tie/uncovered-pattern/absolute-distance/rule-boundary branches use the unchanged numerical kernel. Absolute mismatch still precedes relative margin; no fitted probabilities or norm are inferred.",
+        "29": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Source order and DIRECT/REFLECT transformations execute on aligned synthetic source metadata; source identity rename is mapped consistently, not treated as proof of the old real producer hash.",
+        "30": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This row executes audience/numeric/interpretation/educational capability intersection. The later alternatives field is confined to interpretable MIXED state and cannot grant labels/actions to these withheld sources.",
+        "31": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This row executes audience/numeric/interpretation/educational capability intersection. The later alternatives field is confined to interpretable MIXED state and cannot grant labels/actions to these withheld sources.",
+        "32": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Tampered canonical provenance is rejected by the source-envelope/hash parser before Profile projection; the valid full-runtime identity is supplied by separate0.1.1 durable evidence.",
+        "33": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. This is the package1/schema1 branch: original content identity and version mismatch behavior are unchanged; optional profile identity fields belong only to schema2.",
+        "34": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Roundtrip/hash sensitivity uses the package selected by the fixture. Added runtime hash/mapping bytes remain frozen content; this row is serialization identity, not native admission or scientific recalibration.",
+        "35": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Duplicate contributionGroup is rejected by uniqueness before matching.",
+        "36": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Zero weight is rejected by positive finite weight schema.",
+        "37": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. A center contradicting its declared theoretical band is rejected by model validation.",
+        "38": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Unknown evidenceKey is rejected by package dependency validation.",
+        "39": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Missing support reference is rejected by provenance validation.",
+        "40": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Unknown modifier rule id is rejected by frozen rule reference validation.",
+        "41": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. online-lpa algorithm is rejected by the deterministic algorithm enum.",
+        "42": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored. Engine1.0.0 cannot run a schema2 Profile package requiring1.1.0."
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "branchReview": "Fixture sources are self-consistent with the selected package. Current profile data changes only three runtimeDefinitionHash fields and mappingVersion; numerical matchProfileConstructs body and the two math source bytes are identical. Runtime source identity/selected-quality and applicability deltas have separate M02/M03 and durable audit coverage. No unrelated registry material is scored."
+    },
+    {
+      "group": "M02",
+      "file": "profile-core-quality.json",
+      "report": {
+        "sha256": "70679b0ea5a12023796ce4ce9fc72fcebcb066575689c4ffecda9e691422c7c9",
+        "cases": [
+          {
+            "name": "independent candidate B native profile matches theoretical P1 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P2 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P3 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P4 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P5 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P6 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches the independent hand calculation for S04, rather than probability normalization",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile separates null, invalid true zero, partial quality and identity mismatch",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile abstains for ties, unmodelled extreme combinations, absolute mismatch and rule boundary",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile is deterministic under source order and has explicit direction reflection",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile keeps raw original-range values and withholds all derived labels for actual teacher policy",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile intersects every core source; numeric and educational permissions stay independent",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile rejects altered canonical provenance before adapter projection",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility preserves package1 parsed bytes and the previous content hash formula",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility roundtrips all profile bytes through the normal package loader",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "keeps a complete selected core independent of unselected score quality",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        23
+      ],
+      "caseBranches": {
+        "23": "Selected core quality uses selected score.status/value; an unselected invalid auxiliary remains excluded. Cache uses immutable package hash, bounded size and the same compiler family; new0.1.1 package identity is a new key, not a changed numerical model. "
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "branchReview": "Selected core quality uses selected score.status/value; an unselected invalid auxiliary remains excluded. Cache uses immutable package hash, bounded size and the same compiler family; new0.1.1 package identity is a new key, not a changed numerical model."
+    },
+    {
+      "group": "M02",
+      "file": "profile-cache.json",
+      "report": {
+        "sha256": "77507eebdc360413710e15c196f841c13b473bc4082413b49407ecc15676e4d3",
+        "cases": [
+          {
+            "name": "bounds static model reuse through immutable content and rejects incomplete fixture sets",
+            "status": "passed"
+          },
+          {
+            "name": "verifies the new typed package2 fixture branch after its compiler repair",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0,
+        1
+      ],
+      "caseBranches": {
+        "0": "Selected core quality uses selected score.status/value; an unselected invalid auxiliary remains excluded. Cache uses immutable package hash, bounded size and the same compiler family; new0.1.1 package identity is a new key, not a changed numerical model. ",
+        "1": "Selected core quality uses selected score.status/value; an unselected invalid auxiliary remains excluded. Cache uses immutable package hash, bounded size and the same compiler family; new0.1.1 package identity is a new key, not a changed numerical model. "
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "branchReview": "Selected core quality uses selected score.status/value; an unselected invalid auxiliary remains excluded. Cache uses immutable package hash, bounded size and the same compiler family; new0.1.1 package identity is a new key, not a changed numerical model."
+    },
+    {
+      "group": "M03",
+      "file": "profile-applicability.json",
+      "report": {
+        "sha256": "6f5f4bf4ef6e0b1a77ff35590fc2244c045f57e69112810c3efcf369a9d9432c",
+        "cases": [
+          {
+            "name": "independent candidate B native profile matches theoretical P1 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P2 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P3 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P4 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P5 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches theoretical P6 without changing B parameters",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile matches the independent hand calculation for S04, rather than probability normalization",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile separates null, invalid true zero, partial quality and identity mismatch",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile abstains for ties, unmodelled extreme combinations, absolute mismatch and rule boundary",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile is deterministic under source order and has explicit direction reflection",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile keeps raw original-range values and withholds all derived labels for actual teacher policy",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile intersects every core source; numeric and educational permissions stay independent",
+            "status": "skipped"
+          },
+          {
+            "name": "independent candidate B native profile rejects altered canonical provenance before adapter projection",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility preserves package1 parsed bytes and the previous content hash formula",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility roundtrips all profile bytes through the normal package loader",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "native profile package compatibility rejects ambiguous or unsupported model configuration",
+            "status": "skipped"
+          },
+          {
+            "name": "keeps a complete selected core independent of unselected score quality",
+            "status": "skipped"
+          },
+          {
+            "name": "withholds profile and modifiers when package applicability is false",
+            "status": "passed"
+          },
+          {
+            "name": "withholds profile and modifiers when package applicability is unknown",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        24,
+        25
+      ],
+      "caseBranches": {
+        "24": "Explicit rules.applicability false/unknown returns before profile/modifier execution. Engine and these two branches are unchanged after0d3548; later School/Survey adapters do not participate. The false explicit comparison applicability result returns UNAVAILABLE before profile or modifier evaluation.",
+        "25": "Explicit rules.applicability false/unknown returns before profile/modifier execution. Engine and these two branches are unchanged after0d3548; later School/Survey adapters do not participate. The unknown missing evidence applicability result returns UNAVAILABLE before profile or modifier evaluation."
+      },
+      "shellExitFile": "profile-applicability.exit",
+      "originalShellExit": 0,
+      "branchReview": "Explicit rules.applicability false/unknown returns before profile/modifier execution. Engine and these two branches are unchanged after0d3548; later School/Survey adapters do not participate."
+    },
+    {
+      "group": "M04",
+      "file": "profile-native-setup.json",
+      "report": {
+        "sha256": "2a45420789fe3be95f3c2173f82a2db4ff2644224c17fd7620320aee79c487bc",
+        "cases": [
+          {
+            "name": "exposes the native model and required theory claim through the existing setup preview",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Existing native setup preview reads the package model/claims; same required cross_source_condition. Later School/Survey consumer additions do not change the preview selection. "
+      },
+      "shellExitFile": "profile-native-setup.exit",
+      "originalShellExit": 0,
+      "branchReview": "Existing native setup preview reads the package model/claims; same required cross_source_condition. Later School/Survey consumer additions do not change the preview selection."
+    },
+    {
+      "group": "T01",
+      "file": "profile-continuation-first.json",
+      "report": {
+        "sha256": "6bdf33398ce533d051263af01fecb89198be5dd0aeade7fdd559eb2355ad64e2",
+        "cases": [
+          {
+            "name": "continues the saved EVC FINAL using a new native mapping and preserves the original rejection",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Reanalysis appends0.1.1 and preserves original0.1.0 UNAVAILABLE/hash. Later instance extraction keeps readInstance body; readReport db parameter defaults to the same prisma. This is upgrade/history evidence, not the later fresh INITIAL HTTP attempt. "
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "branchReview": "Reanalysis appends0.1.1 and preserves original0.1.0 UNAVAILABLE/hash. Later instance extraction keeps readInstance body; readReport db parameter defaults to the same prisma. This is upgrade/history evidence, not the later fresh INITIAL HTTP attempt."
+    },
+    {
+      "group": "T02",
+      "file": "profile-restore.json",
+      "report": {
+        "sha256": "29debffa155869eb70449616b6d942568086dab6462747754bb96894fac1ccd4",
+        "cases": [
+          {
+            "name": "reads the native-restored frozen EVC report without a second engine invocation",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Reads saved frozen payload/target, not current template or scorer. Default db=prisma keeps original Training branch; new source/runtime adapters are not called. Count2 belongs to the original reanalysis attempt, not fresh HTTP task. "
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "branchReview": "Reads saved frozen payload/target, not current template or scorer. Default db=prisma keeps original Training branch; new source/runtime adapters are not called. Count2 belongs to the original reanalysis attempt, not fresh HTTP task."
+    },
+    {
+      "group": "UI",
+      "file": "profile-ui-first.json",
+      "report": {
+        "sha256": "5cc199e90ea0a18139fac21eac1aa0a7adcbb9abe9a88fde4ab50a0fe729c479",
+        "cases": [
+          {
+            "name": "renders independent original ranges and an equivalent table, then consumes the server-withheld view",
+            "status": "passed"
+          },
+          {
+            "name": "generic declarative report rendering renders an unknown package without HTML execution or a package branch",
+            "status": "passed"
+          },
+          {
+            "name": "generic declarative report rendering reports unsupported blocks explicitly",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Original-range profile chart/table consumes projected ProfileView; no score or model inference in UI. Mixed alternatives are a separate branch, not covered by this original matched/withheld row. This original row renders MATCHED and WITHHELD original ranges/table only. It does not execute MIXED alternatives UI; no backend inference or current image is claimed."
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "branchReview": "Original-range profile chart/table consumes projected ProfileView; no score or model inference in UI. Mixed alternatives are a separate branch, not covered by this original matched/withheld row."
+    },
+    {
+      "group": "S01",
+      "file": "education-adapter-error-status.json",
+      "report": {
+        "sha256": "2619ec9b3e761d298e16b067897a2395a4f9436c953365d412b83d4f991b3151",
+        "cases": [
+          {
+            "name": "retains the complete original package and remaps every slot/context without changing its definition",
+            "status": "passed"
+          },
+          {
+            "name": "rejects split or mixed sources, while absent historical native identity has no write",
+            "status": "passed"
+          },
+          {
+            "name": "withholds native inference when any underlying single report or core metric is not authorized",
+            "status": "passed"
+          },
+          {
+            "name": "does not relabel a youth native model as an adult Teacher SELF assessment",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "caseBranches": {
+        "0": "All slot/context identities are remapped together; incomplete source/policy refuses. Age guard still rejects youth B for adult Teacher. Survey code cannot grant School source permission. ",
+        "1": "All slot/context identities are remapped together; incomplete source/policy refuses. Age guard still rejects youth B for adult Teacher. Survey code cannot grant School source permission. ",
+        "2": "All slot/context identities are remapped together; incomplete source/policy refuses. Age guard still rejects youth B for adult Teacher. Survey code cannot grant School source permission. ",
+        "3": "All slot/context identities are remapped together; incomplete source/policy refuses. Age guard still rejects youth B for adult Teacher. Survey code cannot grant School source permission. "
+      },
+      "shellExitFile": "education-adapter-error-status.exit",
+      "originalShellExit": 0,
+      "branchReview": "All slot/context identities are remapped together; incomplete source/policy refuses. Age guard still rejects youth B for adult Teacher. Survey code cannot grant School source permission."
+    },
+    {
+      "group": "S02",
+      "file": "education-native-typed-runtime.json",
+      "report": {
+        "sha256": "4faca5ff20d706dc9436cd55596bfcda9d61ca9da896380a4288f6504ed36b54",
+        "cases": [
+          {
+            "name": "continues the already published native School resource through missing runtime consumers",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Continuation consumes the actually published source. School ORG+native path uses existing INITIAL finalize and saved read; processInitial terminal early return and unique INITIAL prevent second profile. Later changes are Survey-only; generated other-scale registry rows are not source scores for these saved math results. "
+      },
+      "shellExitFile": "education-native-typed-runtime.exit",
+      "originalShellExit": 0,
+      "branchReview": "Continuation consumes the actually published source. School ORG+native path uses existing INITIAL finalize and saved read; processInitial terminal early return and unique INITIAL prevent second profile. Later changes are Survey-only; generated other-scale registry rows are not source scores for these saved math results."
+    },
+    {
+      "group": "S02",
+      "file": "education-native-transaction-read.json",
+      "report": {
+        "sha256": "2d5af4f08d0c650e64f15b4c732c35193ff62e68086822dd5ca43c1fa952f743",
+        "cases": [
+          {
+            "name": "reopens native School feedback, denies another actor and replays FINAL without a scorer or profile invocation",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Continuation consumes the actually published source. School ORG+native path uses existing INITIAL finalize and saved read; processInitial terminal early return and unique INITIAL prevent second profile. Later changes are Survey-only; generated other-scale registry rows are not source scores for these saved math results. "
+      },
+      "shellExitFile": "education-native-transaction-read.exit",
+      "originalShellExit": 0,
+      "branchReview": "Continuation consumes the actually published source. School ORG+native path uses existing INITIAL finalize and saved read; processInitial terminal early return and unique INITIAL prevent second profile. Later changes are Survey-only; generated other-scale registry rows are not source scores for these saved math results."
+    },
+    {
+      "group": "S03",
+      "file": "school-restored/saved-read.json",
+      "report": {
+        "sha256": "ce40a5e53fd5b6fe72db4fc8dccd4664478490d0010d958654fc2654ec97d4d7",
+        "cases": [
+          {
+            "name": "reopens native School feedback, denies another actor and replays FINAL without a scorer or profile invocation",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Restored School saved read uses original definition/admission policies and stored payload; no new source admission, FINAL, score or matcher. Later Survey branch is not part of School execution. "
+      },
+      "shellExitFile": "school-restored/saved-read.exit",
+      "originalShellExit": 0,
+      "branchReview": "Restored School saved read uses original definition/admission policies and stored payload; no new source admission, FINAL, score or matcher. Later Survey branch is not part of School execution."
+    },
+    {
+      "group": "V01",
+      "file": "survey-native-projection-complete.json",
+      "report": {
+        "sha256": "52649bedd8f345743cccc86e2c785d2e2d90bca23cad0604592ccacbf28da4e6",
+        "cases": [
+          {
+            "name": "projects already recorded Survey FINAL facts through the same native model and freezes distinct audiences",
+            "status": "passed"
+          },
+          {
+            "name": "keeps missing context unavailable and records malformed score failure without invalidating FINAL facts",
+            "status": "passed"
+          },
+          {
+            "name": "does not promote a raw selection into a different R audience or expose a restricted individual score",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0,
+        1
+      ],
+      "caseBranches": {
+        "0": "Maps already-scored Survey privateScoring into exact native identities. Core unknown/R audience intersection is enforced; two initial cases remain selected, extended UNKNOWN case uses its later corrected reporter only. ",
+        "1": "Maps already-scored Survey privateScoring into exact native identities. Core unknown/R audience intersection is enforced; two initial cases remain selected, extended UNKNOWN case uses its later corrected reporter only. "
+      },
+      "shellExitFile": "survey-native-projection-complete.exit",
+      "originalShellExit": 0,
+      "branchReview": "Maps already-scored Survey privateScoring into exact native identities. Core unknown/R audience intersection is enforced; two initial cases remain selected, extended UNKNOWN case uses its later corrected reporter only."
+    },
+    {
+      "group": "V01",
+      "file": "survey-native-unknown-policy-corrected.json",
+      "report": {
+        "sha256": "e285807697419939d1f2c0467e5b769ed8f200b20bbae2de16c5da68c8669940",
+        "cases": [
+          {
+            "name": "projects already recorded Survey FINAL facts through the same native model and freezes distinct audiences",
+            "status": "skipped"
+          },
+          {
+            "name": "keeps missing context unavailable and records malformed score failure without invalidating FINAL facts",
+            "status": "skipped"
+          },
+          {
+            "name": "does not promote a raw selection into a different R audience or expose a restricted individual score",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        2
+      ],
+      "caseBranches": {
+        "2": "Maps already-scored Survey privateScoring into exact native identities. Core unknown/R audience intersection is enforced; two initial cases remain selected, extended UNKNOWN case uses its later corrected reporter only. "
+      },
+      "shellExitFile": "survey-native-unknown-policy-corrected.exit",
+      "originalShellExit": 0,
+      "branchReview": "Maps already-scored Survey privateScoring into exact native identities. Core unknown/R audience intersection is enforced; two initial cases remain selected, extended UNKNOWN case uses its later corrected reporter only."
+    },
+    {
+      "group": "V02",
+      "file": "survey-native-postgres-contract-checked.json",
+      "report": {
+        "sha256": "70e192484fa35c429c5d6beda71e151898e76301e3f533326a5dfccab120731d",
+        "cases": [
+          {
+            "name": "publishes a whole native Survey Bundle, preserves single feedback and saves audience-restricted profile without rescoring on read/replay",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Uses whole-package U and explicit student R, exactly three declared Context fields.720 extra-field rejection leaves that complete valid source unchanged; legacy missing-audience omission does not apply to explicit student R. New researcher single-reader branch is covered separately by V03. "
+      },
+      "shellExitFile": "survey-native-postgres-contract-checked.exit",
+      "originalShellExit": 0,
+      "branchReview": "Uses whole-package U and explicit student R, exactly three declared Context fields.720 extra-field rejection leaves that complete valid source unchanged; legacy missing-audience omission does not apply to explicit student R. New researcher single-reader branch is covered separately by V03."
+    },
+    {
+      "group": "V03",
+      "file": "survey-restored/saved-read.json",
+      "report": {
+        "sha256": "51f17edfea173a458b3acc9b62b9f61bafac11b717dd8af83868100645cd8468",
+        "cases": [
+          {
+            "name": "reads restored native Survey feedback from immutable saved facts, with no scorer, profile engine or current source lookup",
+            "status": "passed"
+          },
+          {
+            "name": "rejects split or reordered native content and changed source identity before creating an artifact",
+            "status": "skipped"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Actual720 negative source membership, legacy missing-audience hash and researcher single-reader403 cases. Final application tree is unchanged since720; new CI controls are not runtime consumers. Reads stored student feedback and denies researcher single-report R after original data authorization. Source DB latest case covers the new403 branch; earlier restored student read covers immutable rows and no scorer/source lookup."
+      },
+      "shellExitFile": "survey-restored/saved-read.exit",
+      "originalShellExit": 0,
+      "branchReview": "Actual720 negative source membership, legacy missing-audience hash and researcher single-reader403 cases. Final application tree is unchanged since720; new CI controls are not runtime consumers."
+    },
+    {
+      "group": "V03",
+      "file": "survey-native-context-exactness.json",
+      "report": {
+        "sha256": "87dc58021d12704f125e26e19dcf9d6702abc3c63e683a31e39c623440a5bd7b",
+        "cases": [
+          {
+            "name": "reads restored native Survey feedback from immutable saved facts, with no scorer, profile engine or current source lookup",
+            "status": "skipped"
+          },
+          {
+            "name": "rejects split or reordered native content and changed source identity before creating an artifact",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        1
+      ],
+      "caseBranches": {
+        "1": "Actual720 negative source membership, legacy missing-audience hash and researcher single-reader403 cases. Final application tree is unchanged since720; new CI controls are not runtime consumers. Only source admission changes: reject extra/missing/duplicate/reordered Context or changed native identity before import; no saved FINAL is recalculated."
+      },
+      "shellExitFile": "survey-native-context-exactness.exit",
+      "originalShellExit": 0,
+      "branchReview": "Actual720 negative source membership, legacy missing-audience hash and researcher single-reader403 cases. Final application tree is unchanged since720; new CI controls are not runtime consumers."
+    },
+    {
+      "group": "V03",
+      "file": "survey-native-legacy-scale-footprint.json",
+      "report": {
+        "sha256": "e6a4fa9927d772cac786a111b7b08da40da59384c20e391d0b1a8e4d7eb4ec9c",
+        "cases": [
+          {
+            "name": "projects already recorded Survey FINAL facts through the same native model and freezes distinct audiences",
+            "status": "skipped"
+          },
+          {
+            "name": "keeps missing context unavailable and records malformed score failure without invalidating FINAL facts",
+            "status": "skipped"
+          },
+          {
+            "name": "does not promote a raw selection into a different R audience or expose a restricted individual score",
+            "status": "skipped"
+          },
+          {
+            "name": "preserves the exact legacy governed snapshot footprint when no R audience was explicitly recorded",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        3
+      ],
+      "caseBranches": {
+        "3": "Actual720 negative source membership, legacy missing-audience hash and researcher single-reader403 cases. Final application tree is unchanged since720; new CI controls are not runtime consumers. Only absent R audience omits the optional metadata key, preserving the prior hash. Explicit student R in the completed demo retains its existing field."
+      },
+      "shellExitFile": "survey-native-legacy-scale-footprint.exit",
+      "originalShellExit": 0,
+      "branchReview": "Actual720 negative source membership, legacy missing-audience hash and researcher single-reader403 cases. Final application tree is unchanged since720; new CI controls are not runtime consumers."
+    },
+    {
+      "group": "V03",
+      "file": "survey-native-r-reader-fixed.json",
+      "report": {
+        "sha256": "95a2bd0811807b851a30c4db30ff9c166026287c36ba4136d4324618852a6415",
+        "cases": [
+          {
+            "name": "reads restored native Survey feedback from immutable saved facts, with no scorer, profile engine or current source lookup",
+            "status": "passed"
+          },
+          {
+            "name": "rejects split or reordered native content and changed source identity before creating an artifact",
+            "status": "skipped"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "Actual720 negative source membership, legacy missing-audience hash and researcher single-reader403 cases. Final application tree is unchanged since720; new CI controls are not runtime consumers. Reads stored student feedback and denies researcher single-report R after original data authorization. Source DB latest case covers the new403 branch; earlier restored student read covers immutable rows and no scorer/source lookup."
+      },
+      "shellExitFile": "survey-native-r-reader-fixed.exit",
+      "originalShellExit": 0,
+      "branchReview": "Actual720 negative source membership, legacy missing-audience hash and researcher single-reader403 cases. Final application tree is unchanged since720; new CI controls are not runtime consumers."
+    },
+    {
+      "group": "V04",
+      "file": "survey-native-ui.json",
+      "report": {
+        "sha256": "6770580d8ac397dcfd0b9d133abae134a828fb0e4a92d366cb99d7385db5c708",
+        "cases": [
+          {
+            "name": "Survey first-success GENERAL receipt consumption shows frozen instructions on the default one-by-one recovery path without adding an answer field",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption blocks all-at-once image answers and FINAL until actual decode, and keeps restored choices through failure/retry",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption renders the controlled first-success receipt without another HTTP request or persisting it",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for legacy server",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for idempotent response",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for missing first-commit marker",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for different attempt",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for different completion time",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for missing disclaimer",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for invalid completion time",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for uncontrolled result fields",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption reauthorizes GENERAL after an ambiguous retry even if that retry creates the first FINAL",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (400)",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (403)",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (409)",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (503)",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption clears the embedded receipt and recovery state on explicit withdrawal",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption reauthorizes GENERAL for a restored sealed retry instead of using its embedded receipt",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey first-success GENERAL receipt consumption does not reuse a first-success receipt after refresh when current GENERAL authorization is denied",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle returns to the exact earlier Flow Form after a validation rejection and permits correction",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle reveals the earlier Form when a sequential timed Wave rejects one of its answers",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle never reopens server-frozen prerequisites after a definitive FINAL rejection",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle reconciles a committed screen-out after a lost response and reload without replaying answers",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle dismisses the same-tab restored notice without changing recovered answers",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle announces recovery while the task request is pending",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle focuses the missing SJT question using the existing required rule",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle returns to the first missing timed item without discarding other answers",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle keeps optional timed items optional when locating incomplete answers",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle prepares answers and timings only for the first FINAL, not its immutable retry",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle restores a completed projection without draft parsing, fresh submission identity, or duplicate cleanup",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle retries exact sealed answers and timing after an uncertain response",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle explains native network failure Failed to fetch while retaining the exact sealed retry",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle explains native network failure Load failed while retaining the exact sealed retry",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle explains native network failure NetworkError when attempting to fetch resource. while retaining the exact sealed retry",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle keeps completion authoritative when General fails and retries only the receipt",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle writes the live foreground interval and interruption synchronously on pagehide",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle unseals a rejected validation request and submits corrected answers with continued timing",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle blocks answer edits and duplicate form submits while FINAL is in flight",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle does not reopen an already completed task when its receipt cannot load",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle preserves observed unanswered exposure and interruption through same-tab recovery",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle retains the exact sealed request through background events and a STARTED reload",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle reconciles an uncertain submission as completed on reload without another FINAL",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle keeps legitimate answer edits before the first FINAL",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle does not count hidden time twice across visibilitychange and pagehide",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle makes the sealed retry reachable after a multi-tool reload resets navigation",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle returns to linked waves and starts a different attempt without the previous seal",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle clears the completed receipt state when linked future access is revoked",
+            "status": "skipped"
+          },
+          {
+            "name": "Survey authoritative FINAL and timing lifecycle keeps the foreground clock running when beforeunload does not actually leave the page",
+            "status": "skipped"
+          },
+          {
+            "name": "participant stored raw feedback display renders /general SCALE raw metrics without milliseconds or pilot labeling",
+            "status": "skipped"
+          },
+          {
+            "name": "participant stored raw feedback display renders /general SJT raw metrics without milliseconds or pilot labeling",
+            "status": "skipped"
+          },
+          {
+            "name": "participant stored raw feedback display preserves cognitive ratio percent, millisecond units and existing pilot labeling",
+            "status": "skipped"
+          },
+          {
+            "name": "fetches currently authorized raw feedback on first successful FINAL instead of the general receipt shortcut",
+            "status": "skipped"
+          },
+          {
+            "name": "keeps an unfinished native SJT mounted before a timed scale until its server receipt is verified",
+            "status": "skipped"
+          },
+          {
+            "name": "first committed descriptive feedback receipt shows permitted first feedback without GET and reauthorizes after reopening",
+            "status": "skipped"
+          },
+          {
+            "name": "first committed descriptive feedback receipt keeps deferred feedback pending rather than loading hidden metrics",
+            "status": "skipped"
+          },
+          {
+            "name": "first committed descriptive feedback receipt falls back to the authorized reader for malformed inline metric values",
+            "status": "skipped"
+          },
+          {
+            "name": "shows saved native Bundle feedback alongside single reports and reauthorizes it after reopening",
+            "status": "passed"
+          },
+          {
+            "name": "governed tool UI uses explicit reads and immutable whole-package actions does not submit, approve or grant anything when switching new-family tabs",
+            "status": "skipped"
+          },
+          {
+            "name": "governed tool UI uses explicit reads and immutable whole-package actions explains restricted source blockers without changing rights or saving a submission",
+            "status": "skipped"
+          },
+          {
+            "name": "governed tool UI uses explicit reads and immutable whole-package actions selects the whole imported package in fixed order and leaves other tools intact",
+            "status": "skipped"
+          },
+          {
+            "name": "governed tool UI uses explicit reads and immutable whole-package actions loads stored reports only on explicit action and exposes no export or authorization action",
+            "status": "skipped"
+          },
+          {
+            "name": "renders the server-restricted native researcher view without exposing a student profile or export action",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        56,
+        61
+      ],
+      "caseBranches": {
+        "56": "Student feedback reader and SurveyPublicApp output stay unchanged347→720. Busy source controls affect authoring only and have a distinct selected case. Researcher403 is V03, never inferred from student browser. This selected UI row consumes the server-projected report or exact authoring contract. Busy input lock changes only intake controls; student public report cannot prove researcher403, which is V03.",
+        "61": "Student feedback reader and SurveyPublicApp output stay unchanged347→720. Busy source controls affect authoring only and have a distinct selected case. Researcher403 is V03, never inferred from student browser. This selected UI row consumes the server-projected report or exact authoring contract. Busy input lock changes only intake controls; student public report cannot prove researcher403, which is V03."
+      },
+      "shellExitFile": "survey-native-ui.exit",
+      "originalShellExit": 0,
+      "branchReview": "Student feedback reader and SurveyPublicApp output stay unchanged347→720. Busy source controls affect authoring only and have a distinct selected case. Researcher403 is V03, never inferred from student browser."
+    },
+    {
+      "group": "V04",
+      "file": "survey-native-authoring-locked.json",
+      "report": {
+        "sha256": "075fca14dea58b7f3bca925caa3fcb8b689ed2e7940cf4309f4f8830c3d76f0c",
+        "cases": [
+          {
+            "name": "governed tool UI uses explicit reads and immutable whole-package actions does not submit, approve or grant anything when switching new-family tabs",
+            "status": "skipped"
+          },
+          {
+            "name": "governed tool UI uses explicit reads and immutable whole-package actions explains restricted source blockers without changing rights or saving a submission",
+            "status": "skipped"
+          },
+          {
+            "name": "governed tool UI uses explicit reads and immutable whole-package actions selects the whole imported package in fixed order and leaves other tools intact",
+            "status": "skipped"
+          },
+          {
+            "name": "governed tool UI uses explicit reads and immutable whole-package actions loads stored reports only on explicit action and exposes no export or authorization action",
+            "status": "skipped"
+          },
+          {
+            "name": "renders the server-restricted native researcher view without exposing a student profile or export action",
+            "status": "skipped"
+          },
+          {
+            "name": "submits an exact native whole reference with mandatory context and no replacement combined report",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        5
+      ],
+      "caseBranches": {
+        "5": "Student feedback reader and SurveyPublicApp output stay unchanged347→720. Busy source controls affect authoring only and have a distinct selected case. Researcher403 is V03, never inferred from student browser. This selected UI row consumes the server-projected report or exact authoring contract. Busy input lock changes only intake controls; student public report cannot prove researcher403, which is V03."
+      },
+      "shellExitFile": "survey-native-authoring-locked.exit",
+      "originalShellExit": 0,
+      "branchReview": "Student feedback reader and SurveyPublicApp output stay unchanged347→720. Busy source controls affect authoring only and have a distinct selected case. Researcher403 is V03, never inferred from student browser."
+    },
+    {
+      "group": "AUDIT",
+      "file": "native-readonly-link-audit.report.json",
+      "report": {
+        "sha256": "0ed016c009d241cbd3233f035395687300011cc769d69b6e9e186bdc08e52c75",
+        "cases": [
+          {
+            "name": "audits existing Training and School publication/frozen-source/INITIAL/single-report/profile links in one read-only transaction",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "caseBranches": {
+        "0": "One actual READ ONLY transaction links existing Training/School rows. No publication, answer, FINAL, restore or scoring. Runtime Node/source/script hash captured; full historical argv/environment remains missing. Original failed codec invocation is retained but not admitted. "
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "branchReview": "One actual READ ONLY transaction links existing Training/School rows. No publication, answer, FINAL, restore or scoring. Runtime Node/source/script hash captured; full historical argv/environment remains missing. Original failed codec invocation is retained but not admitted."
+    }
+  ],
+  "observations": [
+    {
+      "id": "T-BROWSER",
+      "kind": "development-report-browser",
+      "file": "evc-browser-result.json",
+      "expected": {
+        "status": "PASS",
+        "phase": "complete",
+        "sourceCommit": "ce5d062b6708154c9ff94eb074e8303be960968b",
+        "sandbox": true,
+        "checks": [
+          "real-cookie-session-login",
+          "p4-chinese-summary-three-original-range-charts-and-table",
+          "individual-reports-retained",
+          "educational-actions-withheld",
+          "keyboard-expands-native-method-details",
+          "reload-reads-same-persisted-facts-hash",
+          "390px-report-has-no-document-overflow"
+        ],
+        "reportHashes": [
+          "6c01a7af4bf4f0f84369ae0b5d8fa9a935330a90225133465bfddef6ed3ead53",
+          "6c01a7af4bf4f0f84369ae0b5d8fa9a935330a90225133465bfddef6ed3ead53"
+        ],
+        "consoleErrors": [],
+        "blockedExternal": 0
+      },
+      "scope": "Only actually observed development report open/reload/samehash/mobile width; not final image qualification. sourceCommit is declared, not authenticated process identity."
+    },
+    {
+      "id": "S-BROWSER",
+      "kind": "development-report-browser",
+      "file": "school-native-browser-result.json",
+      "expected": {
+        "sourceCommit": "d58eb5987b7226649396e2701e9a0267cc7a2686",
+        "status": "PASS",
+        "phase": "complete",
+        "sandbox": true,
+        "checks": [
+          "real-school-cookie-session",
+          "school-completed-task-opens-execution-scoped-native-p4",
+          "three-original-range-charts",
+          "two-authorized-individual-reports-retained",
+          "no-unlicensed-educational-actions",
+          "reopen-reads-identical-saved-facts",
+          "390px-no-document-overflow"
+        ],
+        "factsHashes": [
+          "584f20b0a2df6e165331bbb2b6e0f3d5d990e213db05f045497737fa93c14122",
+          "584f20b0a2df6e165331bbb2b6e0f3d5d990e213db05f045497737fa93c14122"
+        ],
+        "pageErrors": [],
+        "blockedExternal": 0
+      },
+      "scope": "Only actually observed development report open/reload/samehash/mobile width; not final image qualification. sourceCommit is declared, not authenticated process identity."
+    },
+    {
+      "id": "V-BROWSER",
+      "kind": "development-report-browser",
+      "file": "survey-native-browser-result.json",
+      "expected": {
+        "sourceCommit": "347abae8b0c593b8bae6985b17bf1ec0dd00a328",
+        "status": "PASS",
+        "phase": "complete",
+        "sandbox": true,
+        "checks": [
+          "real-issued-anonymous-credential-resume",
+          "real-authorized-general-api-native-p4",
+          "three-original-range-charts",
+          "two-individual-feedback-preserved",
+          "educational-actions-withheld",
+          "reload-reads-identical-saved-facts",
+          "390px-no-document-overflow"
+        ],
+        "factsHashes": [
+          "5987659111ad2207f543f254b7dee191dc4e9246f97e79f733396489f742aae9",
+          "5987659111ad2207f543f254b7dee191dc4e9246f97e79f733396489f742aae9"
+        ],
+        "pageErrors": [],
+        "blockedExternal": 0
+      },
+      "scope": "Only actually observed development report open/reload/samehash/mobile width; not final image qualification. sourceCommit is declared, not authenticated process identity."
+    },
+    {
+      "id": "T-HTTP",
+      "kind": "original-training-http",
+      "file": "evc-http-scales.log",
+      "runner": "evc-http-scales.cjs",
+      "expected": {
+        "status": "PASS",
+        "transport": "real session HTTP; no browser DOM qualification",
+        "attemptId": "bfacf613-754a-47a0-90c4-6b2b267757f8",
+        "finalMs": 446.27222399999994,
+        "readMs": 98.93786200000011,
+        "receipts": [
+          {
+            "replayed": false
+          },
+          {
+            "replayed": false
+          }
+        ],
+        "replayed": true,
+        "reportKeys": [
+          "id",
+          "taskSatisfied",
+          "taskSatisfaction",
+          "assessmentId",
+          "name",
+          "anonymousCode",
+          "completedAt",
+          "totalTime",
+          "backgroundValues",
+          "unitReports",
+          "productKind",
+          "bundleReport"
+        ],
+        "profileState": "MATCHED",
+        "profileId": "P4",
+        "factsHash": "6c01a7af4bf4f0f84369ae0b5d8fa9a935330a90225133465bfddef6ed3ead53",
+        "responseBytes": 18278
+      },
+      "originalShellExit": null,
+      "scope": "Two scale submissions, replay and report reopen actually asserted by this retained script/log. Seven later DB fields are excluded from this original observation and supplied only by new audit."
+    },
+    {
+      "id": "LINKS",
+      "kind": "new-read-only-links",
+      "file": "native-readonly-link-audit.json",
+      "expected": {
+        "schemaVersion": 1,
+        "status": "PASS",
+        "kind": "NEW_READ_ONLY_ASSOCIATION_AUDIT_NOT_HISTORICAL_HTTP_REPLAY",
+        "observedAt": "2026-10-29T21:18:09.014Z",
+        "code": {
+          "head": "8e12deb49ef7146c56f58716d2c0a441a1b2d6bf",
+          "backendTree": "0e2ef32d7467de7b7da6f1700918c510a7ca7554",
+          "frontendTree": "5a2676e3fea15901e55cd320c4b015678a49528a"
+        },
+        "node": "v24.21.0",
+        "scoringCalls": 0,
+        "profileCalls": 0,
+        "publicationOrFinalWrites": false,
+        "readOnly": "on",
+        "database": "eduk12_test",
+        "cases": [
+          {
+            "product": "TRAINING",
+            "attemptId": "bfacf613-754a-47a0-90c4-6b2b267757f8",
+            "compositeId": "60956986-72c6-4dc9-acc0-4e49b79a27ee",
+            "sourceLink": {
+              "kind": "ASSESSMENT_BUNDLE",
+              "compositeId": "60956986-72c6-4dc9-acc0-4e49b79a27ee",
+              "bundleKey": "learning_motivation_math_support",
+              "bundleVersion": "0.1.1",
+              "releaseContentHash": "34625844b7014e409a423e99ee2f31fdf28f3d41f629d6432a928e9a2214a941",
+              "published": true
+            },
+            "definitionHash": "5ced0f92dd87efceb767bf7f51252de79650a53824ffaa33862f89ee21c0b6ab",
+            "bindingsHash": "8c7bdb6235c119c9d5595d57d9041103ee3f25658b862c18bc0579e86d89d246",
+            "contextHash": "14dda269a2d417e6d6834d540a86eb33f2a758fe042bf4e82c1173473866124f",
+            "slotCount": 2,
+            "analysisId": "a2725b78-9e2b-44ce-b738-706cdc2408c2",
+            "initialCount": 1,
+            "snapshotCount": 3,
+            "singleReportCount": 2,
+            "singles": [
+              {
+                "snapshotId": "dce39d2e-cd42-42db-8943-437878e24654",
+                "assessmentId": "29412aca-8647-4f68-927a-1acf6e102ab2",
+                "resultHash": "2bfbaf2c79227e2897173a8beac2212bb31d39df373045654f2d617b0cfec107",
+                "definitionHash": "53e935260ed7c4e54e7dbfdc67a8b1f68c4fcc64ec4aa4ebacc6371e90c1c89d",
+                "scores": [
+                  {
+                    "scoreKey": "value",
+                    "value": 5,
+                    "status": "calculated",
+                    "criterionBandKey": null
+                  },
+                  {
+                    "scoreKey": "cost",
+                    "value": 5,
+                    "status": "calculated",
+                    "criterionBandKey": null
+                  }
+                ]
+              },
+              {
+                "snapshotId": "e59dfdd5-bcc1-46d1-bdf9-739102ace806",
+                "assessmentId": "9881b92a-c22f-42ee-9ddb-ab987d3484aa",
+                "resultHash": "94b4e995824082c5e78398ebe2917bce7362c324c7ae824264cb584fb5727ccb",
+                "definitionHash": "8b4eb7b667ede55476fdb5f1c8be3d42627b9677f6a9dcd5379f23f7cfe83a73",
+                "scores": [
+                  {
+                    "scoreKey": "academic_self_efficacy",
+                    "value": 2.2,
+                    "status": "calculated",
+                    "criterionBandKey": null
+                  }
+                ]
+              }
+            ],
+            "factsHash": "6c01a7af4bf4f0f84369ae0b5d8fa9a935330a90225133465bfddef6ed3ead53",
+            "profileId": "P4",
+            "storedFactsHashVerified": true,
+            "currentStudentProjection": "P4"
+          },
+          {
+            "product": "SCHOOL",
+            "attemptId": "1a7542f0-f6e9-4707-a87e-0e6a40d41a4a",
+            "compositeId": "49874d6e-a1bc-4b89-9d54-9b40ef95179d",
+            "sourceLink": {
+              "resourceId": "8c349460-8079-4954-a5e6-bf004a2e81b7",
+              "sourceCompositeId": "60956986-72c6-4dc9-acc0-4e49b79a27ee",
+              "runtimeCompositeId": "49874d6e-a1bc-4b89-9d54-9b40ef95179d",
+              "entryHash": "5538b4c6e748734f0e8b209ed067c9812c1bad32d8b130d23d4dd1f7480aa552",
+              "publishedAt": "2026-10-29T17:05:44.596Z",
+              "reviewedAt": "2026-10-29T17:05:44.459Z",
+              "independentReview": true,
+              "nativeIdentity": {
+                "definitionHash": "5ced0f92dd87efceb767bf7f51252de79650a53824ffaa33862f89ee21c0b6ab",
+                "sourceBindingsHash": "8c7bdb6235c119c9d5595d57d9041103ee3f25658b862c18bc0579e86d89d246",
+                "bindingsHash": "7736b0fa3c11618cfadc1b0c42d8b3bfce55045db1903487372ddde8b062085f"
+              },
+              "execution": {
+                "id": "080ab9d1-5f19-4380-b4cd-cc68c10eab1a",
+                "runId": "1b0aa8ea-92f3-43c6-8b8f-48b5267c6c72",
+                "trackId": "170e21c8-876b-49f2-b300-4f6597a9b6f6",
+                "runtimeBindingRef": "1a7542f0-f6e9-4707-a87e-0e6a40d41a4a",
+                "status": "COMPLETED",
+                "resourceKey": "education-assessment:SCHOOL:d0fa165b-5521-413c-b57a-d671000f693a:8c349460-8079-4954-a5e6-bf004a2e81b7",
+                "resourceVersion": "1.0.0"
+              }
+            },
+            "definitionHash": "5ced0f92dd87efceb767bf7f51252de79650a53824ffaa33862f89ee21c0b6ab",
+            "bindingsHash": "7736b0fa3c11618cfadc1b0c42d8b3bfce55045db1903487372ddde8b062085f",
+            "contextHash": "3da9d10bd4064bbcad4799d8e1e90caf0f43e3b5474118674c3fd3c7528abd55",
+            "slotCount": 2,
+            "analysisId": "04b94ef6-ad0a-49c7-b40a-2fe9b42b4162",
+            "initialCount": 1,
+            "snapshotCount": 3,
+            "singleReportCount": 2,
+            "singles": [
+              {
+                "snapshotId": "2c793bd0-2cf7-4b1b-9552-16836b1a10d1",
+                "assessmentId": "6729951d-befb-4853-ac58-0eb9ca251636",
+                "resultHash": "42851c438468cf85049621034a132d589e6c79ec219926f55e6c09cb9e88e721",
+                "definitionHash": "53e935260ed7c4e54e7dbfdc67a8b1f68c4fcc64ec4aa4ebacc6371e90c1c89d",
+                "scores": [
+                  {
+                    "scoreKey": "value",
+                    "value": 5,
+                    "status": "calculated",
+                    "criterionBandKey": null
+                  },
+                  {
+                    "scoreKey": "cost",
+                    "value": 5,
+                    "status": "calculated",
+                    "criterionBandKey": null
+                  }
+                ]
+              },
+              {
+                "snapshotId": "4d8f6ef6-4227-4d20-b118-6bcaf22c293b",
+                "assessmentId": "69382fb1-3536-4278-87e1-953a899fcab3",
+                "resultHash": "cea3fdac1f7811baa47e23cc075a6d41ecd14e88f41161e9f87c19a11b72602c",
+                "definitionHash": "8b4eb7b667ede55476fdb5f1c8be3d42627b9677f6a9dcd5379f23f7cfe83a73",
+                "scores": [
+                  {
+                    "scoreKey": "academic_self_efficacy",
+                    "value": 2.2,
+                    "status": "calculated",
+                    "criterionBandKey": null
+                  }
+                ]
+              }
+            ],
+            "factsHash": "584f20b0a2df6e165331bbb2b6e0f3d5d990e213db05f045497737fa93c14122",
+            "profileId": "P4",
+            "storedFactsHashVerified": true,
+            "currentStudentProjection": "P4"
+          }
+        ],
+        "scriptSha256": "c9d5fa170dca38b00a77c3f30f2917575961bd6a8e3ea3f503f952a24fe95924"
+      },
+      "command": "native-readonly-command.json",
+      "runner": "native-readonly-audit/readonly-links.test.ts",
+      "config": "native-readonly-audit/vitest.config.mts",
+      "staticPackageLink": "native-readonly-package-link.json",
+      "scope": "Current read-only association proof, not reconstructed old HTTP execution."
+    },
+    {
+      "id": "PUB-SCHOOL",
+      "kind": "reached-school-publication",
+      "file": "education-native-executed-first.log",
+      "reportFile": "education-native-executed-first.json",
+      "publicationLine": 1736,
+      "commitLine": 1769,
+      "scope": "Only publication UPDATE, subsequent read and COMMIT before Persona error. Whole original invocation remains failed; current source/task identity is independently linked by new read-only audit."
+    }
+  ],
+  "coverage": {
+    "EVC-B-model-boundaries-and-applicability": [
+      "M01",
+      "M02",
+      "M03",
+      "M04",
+      "UI"
+    ],
+    "deterministic-source-permissions-and-cache": [
+      "M01",
+      "M02",
+      "S01",
+      "V01"
+    ],
+    "Training-FINAL-replay-saved-restore-browser": [
+      "T01",
+      "T02",
+      "T-HTTP",
+      "T-BROWSER",
+      "LINKS"
+    ],
+    "School-native-source-FINAL-replay-saved-restore-browser": [
+      "S01",
+      "S02",
+      "S03",
+      "S-BROWSER",
+      "PUB-SCHOOL",
+      "LINKS"
+    ],
+    "Survey-whole-U-frozen-R-FINAL-replay-saved-restore-browser": [
+      "V01",
+      "V02",
+      "V03",
+      "V-BROWSER"
+    ],
+    "Survey-native-authoring-and-legacy-projections": [
+      "V03",
+      "V04"
+    ]
+  }
+}

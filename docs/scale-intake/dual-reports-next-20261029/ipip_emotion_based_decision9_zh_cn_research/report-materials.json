@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip_emotion_based_decision9_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "originalSourceSha256": "d1d4c30638767c0bb85499c129dfe015d15e8d5f71c393f4b8cddd2b7efb044e",
+  "oldReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "ipip_emotion_based_decision9"
+    ],
+    "scoreOrder": [
+      "ipip_emotion_based_decision9"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_emotion_based_decision9",
+        "headline": "做决定时，你会怎样参考感受与事实",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "做决定时，你更容易先问“我有什么感受”，还是“事实和理由是什么”？这份回答描述你通常偏向哪种参考方式，不评判哪种方式更聪明。分数越高，表示你越倾向依据感受做决定；较低则更倾向依据事实与逻辑。两者都可能提供有用信息，结果不是决策能力的好坏标签。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想一想最近一次选择：当时有哪些事实？又有哪些感受或期待？它们是互相支持，还是指向不同方向？"
+          },
+          {
+            "category": "strategy",
+            "text": "下次面对一个日常小选择，可以分别写下“已知事实”和“我的感受”，再看看是否还有需要了解的信息。无需强迫自己只选一种依据。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+      "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+      "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+      "9题需完整回答；漏答不当作零分，也不代填。"
+    ],
+    "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T16:18:00Z",
+        "basis": "AI editorial check only: descriptive adult reflection, no norms, diagnostic/ability/moral labels or therapy claims; not human expert translation or psychometric review."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "ipip_emotion_based_decision9"
+    ],
+    "scoreOrder": [
+      "ipip_emotion_based_decision9"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_emotion_based_decision9",
+        "headline": "做选择时，让感受与事实都被说清楚",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "可以带走的一点：听见自己的感受，也给事实一次核对的机会。\n\n这九题关注做决定时，相较于逻辑推理与事实，你通常多大程度依赖感受或灵感。统一方向后总分范围9–45；数值越大，表示整体更认可相对依赖感受的描述。它不是决策水平的考试，也不能说明你一定冲动，或用了某种方式就一定会选得对。\n\n例如，面对一个聚会邀请，你心里不太想去，同时也担心拒绝会影响关系。感受可以告诉你当下的偏好；聚会时间、是否必须参加、对方实际说了什么，则需要另外核实。感受与事实可能一致，也可能指向不同方向。\n\n如果你习惯从感受出发，可以保留这条信息并补上关键事实；若你习惯列理由，也可以看看自己的真实意愿是否被漏掉。下面的例子不是系统已从总分判断你该换一种决策方式。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把三件事分别写清：我有什么感受或偏好、已经确认哪些事实、哪些只是自己的预测。例如“担心对方不高兴”和“对方说必须参加”不是同一条信息。"
+          },
+          {
+            "category": "strategy",
+            "text": "核实一个最影响选择的未知条件：先问清时间、要求或可选范围，不用一遍遍猜测代替信息，也不要求把所有感受都消掉。"
+          },
+          {
+            "category": "strategy",
+            "text": "给非紧急选择留一个回看点：信息更清楚后，再看看原来的偏好和理由是否仍适用。目标是理解这个选择，不是把自己练成只凭感觉或只凭逻辑的人。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本还在研究完善，没有可用的人群分档或排名；偏好不等于决策质量。九题需答完整才计算，漏答不是0分。"
+    ],
+    "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:54:20Z",
+        "basis": "本次只读审阅ipip_emotion_based_decision9_zh_cn_research C1.0.1精确source及已有材料与新R1.1.0文字；核范围/方向/通常时窗、构念边界、固定例子与可选行动、null不作0及必要短提示。不继承旧日期、不改变受众权限，不声称新译审、中文验证或schema/scorer/PG/CI通过。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "ipip_emotion_based_decision9"
+    ],
+    "scoreOrder": [
+      "ipip_emotion_based_decision9"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_emotion_based_decision9",
+        "headline": "让感受入席，也让事实带上证据",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：感受可以有座位，不必独自拍板。\n\n把一次选择想成一场小圆桌：感受说“我想要什么”，事实带着已经确认的信息，推理再看看理由是否站得住。这九题只回看你相较逻辑更依赖感受的通常偏好，总分9–45；数值越大表示更认可这类描述，不会把你分成“感性派”或“理性派”。\n\n假设收到一个邀请，你心里想拒绝，又脑补对方会失望。圆桌上可以先让这份不安说完，再问：对方真的提出了什么要求？我还缺哪条信息？不必把不安赶出去，也不必把它当成事情已经发生的证据。\n\n如果你已会把不同信息放在一起看，可以保留；若习惯先听其中一种声音，也可以试着补听另一种。比喻不是新的决策能力模型，问卷也没有算出“多少理性、多少感性”的比例。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "先给每句话标清来源：这是我的感受、已知事实，还是尚未发生的预测？不需要因此否定感受，只是把桌上的材料摆清楚。"
+          },
+          {
+            "category": "strategy",
+            "text": "让一条事实真正到场：选一个重要未知点去确认，例如邀请有没有其他时间。不要让猜想拿着“事实”的名牌坐下。"
+          },
+          {
+            "category": "strategy",
+            "text": "散会前留一次检查：对于非紧急选择，可以等信息补齐后再确认意愿与理由。问卷分数不替你投票，也不要求每个决定按固定比例分配感觉与逻辑。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本还在研究完善，没有可用的人群分档或排名；偏好不等于决策质量。九题需答完整才计算，漏答不是0分。"
+    ],
+    "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:54:20Z",
+        "basis": "本次只读审阅ipip_emotion_based_decision9_zh_cn_research C1.0.1精确source及已有材料与新R1.2.0文字；核范围/方向/通常时窗、构念边界、固定例子与可选行动、null不作0及必要短提示。不继承旧日期、不改变受众权限，不声称新译审、中文验证或schema/scorer/PG/CI通过。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

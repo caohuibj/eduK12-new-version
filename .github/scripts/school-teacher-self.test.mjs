@@ -50,7 +50,7 @@ test('known SELF branch refuses marker loss dispatch ambiguity or fallback, and 
  assert(ci.includes("application_route == 'school-teacher' && 'paths: [server-version/backend/src, server-version/frontend/src, server-version/e2e, .github/scripts]'"));
 });
 test('SELF exact needs accepts only selected successes and deliberately skipped legacy job',()=>{
- assert.deepEqual(needs('qualified'),['admission','frontend','connected','backend-self','postgres-self','browser-self','security']);
+ assert.deepEqual(needs('qualified'),['admission','frontend','connected','backend-self','postgres-self','browser-self','native-evidence','native-runtime','security']);
  const n=Object.fromEntries(SELF_JOBS.map(id=>[id,{result:'success'}]));n.connected={result:'skipped'};assert.equal(requireSuccess({requiredJobs:SELF_JOBS},n),true);
  for(const id of SELF_JOBS)for(const result of ['skipped','cancelled','failure',undefined]){const changed=structuredClone(n);changed[id].result=result;assert.throws(()=>requireSuccess({requiredJobs:SELF_JOBS},changed));}
  assert.throws(()=>requireSuccess({requiredJobs:SELF_JOBS},{...n,connected:{result:'success'}}));assert.throws(()=>requireSuccess({requiredJobs:SELF_JOBS},{...n,unexpected:{result:'success'}}));

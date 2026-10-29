@@ -1,3 +1,4 @@
+import {computeSurveyNativeReports} from '../bundle-product/survey-native'
 import {loadSurveyTaskReceipts,assertSurveyReachedTaskReceipts} from './task-receipts'
 import { SURVEY_NATIVE_SJT_PROTOCOL,type SurveySituationalReceiptReference } from './situational-native.contract'
 import {persistGovernedPackageReports} from './governed-package.reports'
@@ -172,6 +173,7 @@ export async function submitResearchFinal(input:FinalInput){
     const interpretation=await interpretSurveyFinal(tx,{projectId:known.projectId,waveId:wave.id,attemptId:attempt.id,
       publicationId:publication.id,definitionDigest:publication.definitionDigest,selectedSnapshot,calculated})
     if(interpretation)calculated.interpretation=interpretation
+    if(selectedSnapshot.governedPackages?.some(p=>p.nativeBundle))calculated.nativeBundleReports=computeSurveyNativeReports(selectedSnapshot,calculated)
     // Reuse the existing JSON normalization for hashing and first feedback so
     // the in-memory view matches what an independent saved-result read sees.
     calculated=JSON.parse(JSON.stringify(calculated)) as SurveyComputedFinal
@@ -204,7 +206,7 @@ export async function submitResearchFinal(input:FinalInput){
       try{
         const end=wave.finishUntil??wave.closesAt
         const projected=projectSurveyParticipantFeedback(selectedSnapshot.units,calculated,
-          wave.hardStopAt!==null||(end!==null&&end<=new Date()))
+          wave.hardStopAt!==null||(end!==null&&end<=new Date()),selectedSnapshot.governedPackages)
         if(projected)participantFeedbackReceipt={...general,...projected}
       }catch{ /* Accepted FINAL remains authoritative; the GET path reports unavailable feedback. */ }
     }
@@ -250,7 +252,7 @@ export async function readGeneralForOwnAttempt(input:{
     const collectionEnd=attempt.wave.finishUntil??attempt.wave.closesAt
     const collectionClosed=attempt.wave.hardStopAt!==null||
       (collectionEnd!==null&&collectionEnd<=new Date())
-    const projected=projectSurveyParticipantFeedback(valid.compiledSnapshot.units,result,collectionClosed)
+    const projected=projectSurveyParticipantFeedback(valid.compiledSnapshot.units,result,collectionClosed,valid.compiledSnapshot.governedPackages)
     if(!projected)blocked('研究反馈工具来源缺失')
     return {...generalReceipt(attempt.wave.generalText,final.completedAt),...projected}
   })

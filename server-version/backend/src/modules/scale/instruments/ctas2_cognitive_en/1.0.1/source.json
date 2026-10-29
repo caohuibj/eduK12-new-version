@@ -1,0 +1,1143 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ctas2_cognitive_en",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Cognitive Test Anxiety Scale — Second Edition (English)",
+      "abbreviation": "CTAS-2",
+      "instrumentFamily": "Cognitive Test Anxiety Scale (Cassady)"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "MOTIVATION"
+      ],
+      "constructDefinition": "考试准备与考试进行阶段的认知性焦虑、自我怀疑、失败预期及干扰性思维；不是儿童CTAS的第二版。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "cognitive_test_anxiety",
+        "exam_worry",
+        "self_report",
+        "university_population_validated"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "原作者提供英文24题；Severity Standards在大学生中验证，未发现中国K12青少年相同版本的本土证据。本候选限成人及大学生研究场景；不得自动用于小学/中学生施测。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 24,
+      "estimatedMinutes": 7,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "General experiences across test preparation and test taking; no fixed recall window in author's form",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持作者原英文24题顺序、四点英文选项和1–4编码；研究使用必须按作者主页要求署名。",
+        "该量表与Wren/Benson儿童CTAS系列不同，不得混合计分或共享参考阈值。",
+        "作者官网允许科研及专业在线共享；商业性公开部署和中国K12人群使用需进一步确认。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "限已有证据的人群与作者明确授权的研究/专业范围。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "只做原始分与认知考试焦虑构念描述，不采用大学生cutoffs评估中国K12学生。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ctas2-cassady-author-form",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原作者英文研究工具；已公开面向研究人员与专业使用",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "作者提供CTAS-2 24题题本、统一响应选项与总分求和说明；本条是原文来源证据，不构成独立内容效度研究",
+        "rating": "UNKNOWN",
+        "citation": "Cassady, J. C. Cognitive Test Anxiety Scale – 2nd Edition. Academic Anxiety Resource Center, Ball State University.",
+        "url": "https://sites.bsu.edu/aarc/research/cognitive-test-anxiety-scale-2nd-edition/",
+        "notes": "作者明确许可科研及专业在线复制分享，须恰当引用；本记录不替代部署场景的InstrumentAuthorization。"
+      },
+      {
+        "evidenceId": "ctas2-thomas-cassady-finch-2018",
+        "evidenceType": "CRITERION",
+        "population": "美国大学生验证样本",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "潜在类别与聚类分析推导严重程度区间",
+        "rating": "SUFFICIENT",
+        "citation": "Thomas, C. L., Cassady, J. C., & Finch, W. H. (2018). Identifying Severity Standards on the Cognitive Test Anxiety Scale. Journal of Psychoeducational Assessment, 36(5).",
+        "doi": "10.1177/0734282916686004",
+        "url": "https://doi.org/10.1177/0734282916686004",
+        "notes": "24–43/44–66/67+为大学生的研究切点；不转移至K12，当前运行版本referencePolicy=none。"
+      },
+      {
+        "evidenceId": "ctas2-university-reliability-2024",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "大学生/高等教育学习者研究",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "研究文献报告CTAS-2较高内部一致性",
+        "rating": "SUFFICIENT",
+        "citation": "The Collective Influence of Intolerance of Uncertainty, Cognitive Test Anxiety, and Academic Self-Handicapping on Learner Outcomes: Evidence for a Process Model. (2024).",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10886387/",
+        "notes": "文献综述报告Cronbach α≈0.96及McDonald's ω≈0.96；非中国K12常模。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Exact 24-item English author-hosted PDF: https://espace.bsu.edu/aarc/wp-content/uploads/sites/142/2016/09/Cognitive-Test-Anxiety-Scale-2nd-Edition-3.pdf",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "ctas2-cassady-author-form",
+      "ctas2-thomas-cassady-finch-2018",
+      "ctas2-university-reliability-2024"
+    ],
+    "reviewStatus": "PENDING",
+    "notes": "本版本不提供中文译文；作者PDF的4个选项原文保持不变；版式/原条目需在安装前再次核对。"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "Please complete the following items using the four-point scale below. Select the response that best describes you for each statement.",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "Author-hosted CTAS-2 form; introductory second sentence is a neutral digital administration clarification, pending display validation."
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ctas2-research-draft-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Author grants reproduction, online presentation and professional sharing for research with attribution: https://sites.bsu.edu/aarc/research/cognitive-test-anxiety-scale-2nd-edition/",
+      "Potential commercial use, territory/school reach and production authorization are not established by this GitHub source; InstrumentAuthorization governs actual usage."
+    ]
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ctas2-research-draft-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ctas2-research-draft-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Cognitive Test Anxiety Scale – 2nd Edition",
+        "citation": "Cassady, J. C. Cognitive Test Anxiety Scale – 2nd Edition; Thomas, C. L., Cassady, J. C., & Finch, W. H. (2018). Journal of Psychoeducational Assessment.",
+        "url": "https://sites.bsu.edu/aarc/research/cognitive-test-anxiety-scale-2nd-edition/"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Source author grants reproducibility/online professional sharing for research with appropriate citation. Commercial/open product use remains subject to separately verified rights scope."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ctas2_1_4_original",
+          "options": [
+            {
+              "value": "1",
+              "label": "Not at all typical of me",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "Somewhat typical of me",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "Quite typical of me",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "Very typical of me",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CTAS2-01",
+          "content": "I lose sleep over worrying about examinations.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-02",
+          "content": "I worry more about doing well on tests than I should.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-03",
+          "content": "I get distracted from studying for tests by thoughts of failing.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-04",
+          "content": "I have difficulty remembering what I studied for tests.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-05",
+          "content": "While preparing for a test, I often think that I am likely to fail.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-06",
+          "content": "I am not good at taking tests.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-07",
+          "content": "When I first get my copy of a test, it takes me a while to calm down to the point where I can begin to think straight.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-08",
+          "content": "At the beginning of a test, I am so nervous that I often can't think straight.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-09",
+          "content": "When I take a test that is difficult, I feel defeated before I even start.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-10",
+          "content": "While taking an important examination, I find myself wondering whether the other students are doing better than I am.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-11",
+          "content": "I tend to freeze up on things like intelligence tests and final exams.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-12",
+          "content": "During tests, I find myself thinking of the consequences of failing.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-13",
+          "content": "When I take a test, my nervousness causes me to make careless errors.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-14",
+          "content": "My mind goes blank when I am pressured for an answer on a test.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-15",
+          "content": "During tests, the thought frequently occurs to me that I may not be too bright.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-16",
+          "content": "During a course examination, I get so nervous that I forget facts I really know.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-17",
+          "content": "I do not perform well on tests.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-18",
+          "content": "During tests, I have the feeling that I am not doing well.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-19",
+          "content": "I am a poor test taker in the sense that my performance on a test does not show how much I really know about a topic.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-20",
+          "content": "After taking a test, I feel I should have done better than I actually did.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-21",
+          "content": "My test performances make me believe that I am not a good student.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 20,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-22",
+          "content": "I often realize mistakes I made right after turning in a test.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 21,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-23",
+          "content": "When I finish a hard test, I am afraid to see the score.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 22,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CTAS2-24",
+          "content": "I don’t seem to have much control over my test scores.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 23,
+          "responseSetKey": "ctas2_1_4_original",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CTAS2-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CTAS2-24",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "cognitive_test_anxiety",
+            "type": "total",
+            "label": "Cognitive test anxiety (raw total)",
+            "description": "Sum of all 24 original items, range 24–96; higher scores indicate more cognitive test anxiety, not clinical diagnosis.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CTAS2-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CTAS2-24",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "cognitive_test_anxiety"
+        ],
+        "scoreOrder": [
+          "cognitive_test_anxiety"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "cognitive_test_anxiety",
+            "headline": "Exam-related thoughts: room for the next step / 考试相关念头：给下一步留一点空间",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "Take-home: choose one useful next step; you do not have to eliminate worry to deserve support.\n\nThe raw total sums the 24 response scores and ranges from 24 to 96. A larger total means that, overall, these exam-related worries, self-doubts and perceived difficulties were described as more typical of you. It is not a count of worrying episodes or a test of intelligence. The form does not set a fixed number of days to recall.\n\nFor example, thoughts about failing might interrupt revision, or attention might shift to how others seem to be doing during a test. These are reflection prompts, not findings about your answers. The same total can come from different experiences; it cannot identify your most difficult phase or predict your grade. Preparation conditions, sleep, the importance of an exam and available support are useful context to consider; the score does not tell you what caused the experience.\n\nKeep arrangements that already help. If a situation feels difficult, look for one manageable action or one practical source of support, rather than forcing optimism or blaming yourself. There is no low, moderate or high label here, and no score you must reach before a concern deserves attention.\n\n中文对照：带走一句话：先选一个有用的下一步，不必消除担心才值得获得支持。\n\n总分是24题相加，范围24–96；越大表示这次整体更觉得考试担忧、自我怀疑及相关困难的描述符合自己，不是担忧发生次数或智力测验。原题没有固定最近几天的回顾窗口。\n\n例如，想到可能考不好而打断复习，或考试时注意到别人做得怎样，只是回顾提示，不是系统已判断你的作答模式。相同总分可来自不同经历，不能确定哪个阶段最困难，也不能预测成绩。准备条件、睡眠、考试重要性和支持值得一起看，但不是分数已经查明的原因。\n\n已有好用的安排可以保留；遇到困难时，可以找一个可行行动或现实支持，不强迫乐观，也不全怪自己。这里不分低、中、高，不需要达到某个数字，困扰才算值得被认真对待。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Recall one ordinary moment before, during or after a test. Separate the thought that appeared from one manageable action, such as checking a concept or asking a clear question. Notice what support or condition would help; you do not have to replace worry with a positive statement first. / 只回顾一次考前、考中或考后的普通片段，把出现的担心与一个可做动作分开，如核对一个概念或问清一个问题。也看看缺少什么条件或支持，不必先把担心改成积极的话。"
+              },
+              {
+                "category": "strategy",
+                "text": "In low-pressure practice, choose one restart step for getting stuck: identify the question, note what you know and, only where rules allow, decide whether to move on and return. Alternatively, after a test, record one verifiable adjustment and then return to rest or daily life. Choose what fits; neither step guarantees a result or requires perfect calm. / 在低压力练习里，只选一个卡住后的接续动作：看清问题、写出已知条件，并仅在规则允许时决定先往下做再回来。也可以改选考后记下一项可核实的调整，再回到休息或日常生活。不必全做，也不保证成绩或要求立刻平静。"
+              },
+              {
+                "category": "support",
+                "text": "If exam-related worry keeps disrupting sleep, preparation or daily life, discuss one concrete example with a trusted educator, learning-support professional or qualified mental-health professional. Choose a safe, appropriate person; no score threshold is needed, and asking for help is not evidence of poor effort. / 若考试担忧持续影响睡眠、准备或日常生活，可把一个具体例子带给可信的教育工作者、学习支持人员或合适心理健康专业人士讨论。选择安全、合适的对象，不必达到分数线，也不表示不够努力。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Adult research candidate, mainly university evidence; self-description only—not diagnosis, ability, grade prediction or severity grading. / 仅成人研究候选，证据主要来自大学情境；自述非诊断、能力、成绩预测或严重分级。"
+        ],
+        "disclaimer": "Research-oriented description only. This draft is not for diagnosis, school ranking, high-stakes selection or unsupervised deployment.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ctas2_cognitive",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all-minimum",
+        "answers": [
+          {
+            "itemCode": "CTAS2-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CTAS2-24",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_test_anxiety": 24
+          },
+          "totalScoreKeys": [
+            "cognitive_test_anxiety"
+          ]
+        }
+      },
+      {
+        "name": "all-middle-2",
+        "answers": [
+          {
+            "itemCode": "CTAS2-01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-13",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-14",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-16",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-18",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-21",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CTAS2-24",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_test_anxiety": 48
+          },
+          "totalScoreKeys": [
+            "cognitive_test_anxiety"
+          ]
+        }
+      },
+      {
+        "name": "all-maximum",
+        "answers": [
+          {
+            "itemCode": "CTAS2-01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-21",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CTAS2-24",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_test_anxiety": 96
+          },
+          "totalScoreKeys": [
+            "cognitive_test_anxiety"
+          ]
+        }
+      }
+    ]
+  }
+}

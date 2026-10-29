@@ -1,0 +1,353 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "bat23_2020_en",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "917e7778794a7662fe954cc1d6cfb79551f7913750f48ee52df022b076f70728",
+  "oldReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "burnout_core"
+    ],
+    "scoreOrder": [
+      "burnout_core",
+      "exhaustion",
+      "mental_distance",
+      "cognitive_impairment",
+      "emotional_impairment"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "burnout_core",
+        "headline": "Looking back at your working days / 回看一段时间的工作体验",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A higher overall score means you reported these core work-related difficulties more often. It is not a measure of better work performance or a diagnosis.\n\nYour answers bring together how work has felt recently: your energy, your connection with the job, and your experiences with attention and emotions. A demanding schedule, recovery time, caring responsibilities and other parts of life can all shape these experiences. Think of one recent working day and notice which parts felt draining and which felt a little easier. You could choose one small change that is within reach, such as leaving a short gap between meetings. These answers do not identify every cause, make a diagnosis, or decide your ability or value.\n\n中文对照：整体分数越高，表示你在这次回答中越常报告这些工作中的困难，不表示工作表现更好，也不能据此作出诊断。这份回答整理的是你在工作中的整体感受，包括精力、与工作的距离，以及注意和情绪上的体验。有时下班后仍难缓过来，开始一项任务也比平时费劲；这些感受可能和工作安排、恢复时间以及生活中的其他负担交织在一起。可以先挑一个最近的工作日，想想哪些时刻最吃力、哪些安排让自己稍微轻松。结果只是本次自述，不能替你解释全部原因，也不决定你的能力或价值。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Which part of a recent working day used the most energy? Was there a moment that felt easier? / 最近一个工作日，最消耗你的是哪段经历？有没有一小段时间稍微轻松一些？"
+          },
+          {
+            "category": "strategy",
+            "text": "Choose one small, feasible change to your working day, then notice whether it helps you recover. / 选一个能调整的小环节，例如给连续会议之间留一小段缓冲，再观察自己是否更好恢复。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "exhaustion",
+        "headline": "Making room to recover / 给恢复留一点位置",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A higher score means you reported feeling exhausted and having difficulty recovering more often.\n\nThis part looks at the effort work takes and how easy it feels to recover afterwards. Familiar tasks may take more energy, or you may still feel drained after getting home. Busy periods, sleep, health and responsibilities outside work can all contribute; a questionnaire cannot separate those causes. Recall when your energy began to dip during a recent day and what was happening around you. If possible, find a small space to pause or adjust one demand. Feeling tired does not mean you have failed or are not trying hard enough.\n\n中文对照：这一项分数越高，表示你越常报告工作中的疲惫与恢复困难，不是越能吃苦或越努力。这一部分关注工作时需要付出多少精力，以及工作结束后能不能缓过来。例如，平时顺手的事如今要花更多力气，或回家后仍觉得被掏空。短时忙碌、睡眠安排、身体状况和照护责任都可能影响这些体验，单凭回答无法分清原因。可以回想精力开始下降的时间点，看看当时是否连续处理了太多事情，再找一个可行的恢复空隙，不必把疲惫归结为自己不够努力。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "When during the day is recovering your energy hardest, and what demands are you managing then? / 你通常在什么时候最难恢复精力？当时还有哪些现实安排需要兼顾？"
+          },
+          {
+            "category": "strategy",
+            "text": "If your situation allows, leave one short recovery gap or discuss a workload adjustment with someone who can help. / 在可行的情况下，给一段高消耗工作后留一个短暂停顿，并看看它对你是否有帮助。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "mental_distance",
+        "headline": "Noticing your connection with work / 留意与工作的连接感",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A higher score means you reported feeling detached from work or struggling to engage more often.\n\nThis part concerns how connected or distant you feel towards your work. You may notice less enthusiasm, feel detached, or find yourself going through the motions. Workload, fairness, support, personal priorities and the fit between a job and your needs may all matter. One set of answers cannot tell which explanation fits, and it does not define your character. Think of a recent moment when your connection with work changed. You could identify one need or question to discuss, without making a major decision on the strength of a score.\n\n中文对照：这一项分数越高，表示你越常报告与工作疏远、难以投入的体验，不代表你不负责。这一部分整理你与工作之间的距离感。有时人还在做事，心里却已经很难投入，或只是按熟悉的步骤机械地完成任务。这种体验可能随任务内容、团队互动和工作节奏而变化，不能据此判断你是否负责，也不说明你必须喜欢每项工作。可以选一件曾经愿意投入的事情，想想现在和以前有什么不同，再寻找一个能够讨论或调整的具体环节。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "When did you last feel more connected with, or more distant from, a task at work? What was different? / 哪类工作最容易让你觉得只是机械地完成？其中是否有不清楚或难以认同的安排？"
+          },
+          {
+            "category": "strategy",
+            "text": "Write down one need or question about that situation and consider a suitable person with whom to discuss it. / 挑一个具体困难和可信任的同事或负责人讨论，例如任务的意义、优先级或可调整的做法。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "cognitive_impairment",
+        "headline": "Giving your attention some support / 让注意与思路少受打扰",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A higher score means you reported more frequent difficulties with attention, clear thinking or keeping track of tasks; it does not mean stronger cognitive ability.\n\nThis part looks at keeping track of tasks and thinking clearly while working. Frequent interruptions, switching between tasks and low energy can make it harder to remember where you were or decide what comes next. These answers cannot diagnose a memory problem or judge your working ability. Recall one recent interruption and consider what was happening in the task and the surroundings. You could make the next step visible with a brief note, or reduce one avoidable interruption where possible. The aim is to find useful support for your situation, rather than blame yourself.\n\n中文对照：这一项分数越高，表示你越常报告注意难以维持、思路不清或忘记任务等困难，不是认知能力更强。这一部分关注工作时保持注意、理清思路和记住事情的体验。例如，读过一段文字却难以接上思路，或被打断后忘记原来做到哪一步。连续任务、频繁切换和精力不足都可能带来类似感受，这份回答不能用来判断认知疾病或工作能力。可以回想最近一个分心的片段，看看哪些干扰来自环境，哪些任务能够拆开，再尝试让下一步更清楚一些。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "What was happening around you the last time you lost track of a task? Were you handling several things at once? / 最近一次思路被打断时，周围发生了什么？你当时是否同时处理了好几件事？"
+          },
+          {
+            "category": "strategy",
+            "text": "For one task, write down the next step and reduce one interruption that is within your control. / 选一段需要专注的工作，把下一步写下来，并在条件允许时减少一个可控的打扰来源。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_impairment",
+        "headline": "Leaving a little space before responding / 给工作中的情绪一个缓冲",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A higher score means you reported more frequent difficulty managing or expressing emotions at work; it does not judge your character.\n\nThis part concerns emotions at work and how they are expressed. A reaction may feel stronger than usual, or you may feel upset without immediately knowing why. Pressure, communication, available support and life outside work can all play a part; this questionnaire cannot identify the cause or make a diagnosis. Think about what happened just before one recent emotional moment and what you needed then. If circumstances allow, a brief pause before replying may create room to decide how to respond. You can also seek support or discuss a practical need.\n\n中文对照：这一项分数越高，表示你越常报告工作中情绪难以调节或反应超出自己预期的体验，不是对人品的评价。这一部分整理工作时情绪出现和表达的体验。有时事情没有照预想进行，反应比平时更强烈，过后又觉得那不像自己；也可能说不清为什么突然难过。工作压力、沟通方式和生活处境都可能参与其中，单凭问卷无法认定原因或作出诊断。可以先回想情绪起伏前发生了什么，给自己留一点辨认和缓冲的空间，再考虑是否需要表达需求或寻求支持。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "What happened just before a recent reaction that surprised you, and what did you need at that moment? / 最近一次情绪反应让你意外时，之前发生了哪些具体事情？你当时最需要什么？"
+          },
+          {
+            "category": "strategy",
+            "text": "When you notice emotions rising, pause briefly if possible, then consider one need you could express or one source of support. / 下次察觉情绪在上升时，若情境允许，先暂停片刻再回应；之后记录一个你希望调整的沟通环节。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+      "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+      "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+      "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+    ],
+    "disclaimer": "For adults reflecting on their work context; not a diagnosis or a judgment of ability. / 供成年人结合工作处境反思，不是诊断或能力评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+        "reviewedAt": "2026-10-26T06:55:07.744973Z",
+        "basis": "Original published English BAT-C23, English-primary plain-language feedback with Chinese parallel explanation. Editorial self-check only, not human expert approval or language validation."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "burnout_core"
+    ],
+    "scoreOrder": [
+      "burnout_core",
+      "exhaustion",
+      "mental_distance",
+      "cognitive_impairment",
+      "emotional_impairment"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "burnout_core",
+        "headline": "Notice the load, not your worth / 留意负担，不用分数衡量自己",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Take-home: look for one useful change in demands or support, not a verdict on your ability.\n\nThe overall mean uses all 23 answers on a 1–5 scale. A larger value means these work-related difficulties were reported more often. It is not the simple average of the four facet means. There is no fixed recall period and no severity band here.\n\nFor example, a day of back-to-back demands might leave little energy for the next task. This is a reflection prompt, not a finding about your day. Work arrangements, health, recovery time and responsibilities outside work may all matter; the score does not identify causes. If something already helps, keep it. If a difficulty persists, practical support or an appropriate professional conversation may be more useful than trying harder alone.\n\n中文对照：带走一句话：先找一个可调整的负担或可获得的支持，不用分数给能力下结论。\n\n整体是23题等权均分1–5，越大表示越常自述这些工作相关困难，不是四个侧面均分再简单平均。问卷没有固定回顾天数，这里也不划严重等级。例如，连续处理任务后，开始下一件事格外费劲；这只是回顾提示，不是系统已经判断你的工作日。工作安排、健康、恢复条件和生活责任都可能参与，分数不能确定原因。已有帮助可保留；持续困难时，可以先争取现实支持，不把所有调整都变成个人努力的任务。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose one working situation you want to understand: what was required, what support was available, and what could realistically change? / 只选一个想了解的工作片段，分别看当时的要求、已有支持和现实可调整之处，不必把整天都复盘。"
+          },
+          {
+            "category": "support",
+            "text": "If safe and feasible, ask for one concrete adjustment, such as a clearer priority, a revised deadline or help sharing a task. Ongoing difficulty may also warrant appropriate professional support. / 在安全、可行时提出一个具体需求，如明确优先级、调整时限或分担任务。若困难持续影响生活或工作，也可寻求合适专业支持；不是必须先提高自我管理能力。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "exhaustion",
+        "headline": "Exhaustion: recovery needs room / 耗竭体验：恢复需要条件",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This eight-item mean ranges from 1 to 5. A larger value means more frequent exhaustion, effort and difficulty recovering, not greater dedication or poorer ability.\n\nFor example, familiar tasks may feel unusually effortful and rest after work may not feel sufficient. The questionnaire cannot tell whether workload, sleep, health, caring duties or other circumstances explain that experience. This example is not an assessment of your life. Keep recovery arrangements that suit you; where space is missing, reducing or sharing a demand may matter more than adding another self-care task.\n\n中文对照：八题均分1–5，越大表示越常报告疲惫、做事费力和难恢复，不是更敬业或能力更差。例如，熟悉的任务也格外耗力，下班停下来仍没缓过来。问卷不能分清工作量、睡眠、健康或照护责任各占多少，例子也不是个人结论。合适的恢复安排可以保留；没有空间时，减少或分担一项要求，可能比再添一项“自我照顾作业”更实际。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "Identify one demanding stretch and consider a feasible pause, workload adjustment or shared responsibility. If fatigue persists or causes concern, consider appropriate health support rather than relying only on breaks. / 找一段高消耗时段，考虑可行的停顿、任务调整或分担。疲惫持续或令人担忧时，也可获得合适健康支持，不要求只靠休息自行解决。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "mental_distance",
+        "headline": "Distance from work: understand the context / 距离感：先了解发生了什么",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This five-item mean is 1–5. A larger value means more frequent distance, aversion or difficulty engaging with work. It is not a judgment of responsibility or loyalty.\n\nFor example, someone may complete tasks while feeling little connection with them. Workload, fairness, task meaning and available support are possible things to explore, not causes proved by the score. If some tasks still feel worthwhile, that is worth noticing too. You do not have to force enthusiasm, accept unfair treatment or make a major career decision because of a number.\n\n中文对照：五题均分1–5，越大表示越常自述疏远、反感或难投入工作，不是责任心或忠诚度评价。例如，事情仍在完成，心里却很难连接到它的意义。任务量、公平、内容和支持都可了解，但不是分数已经证实的原因。仍有愿意投入的部分也值得留意；不必强迫热情、接受不公，或仅凭数字决定去留。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Recall one task that felt more distant or more meaningful. Name one question about its purpose, workload or support that could be explored safely; no major decision is required. / 对比一件较疏远和一件仍有意义的事，选一个关于任务目的、负担或支持的问题，在合适且安全时了解；不要求马上作重大决定。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "cognitive_impairment",
+        "headline": "Attention and thinking: support the task / 注意与思路：让任务得到支持",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This five-item mean is 1–5. A larger value means more frequent reported difficulty concentrating, thinking clearly or keeping track of work. It is not a cognitive-ability test or a diagnosis.\n\nFor example, after several interruptions it may be hard to recall the next step. That example does not identify your actual performance. Energy, interruptions, task switching and unclear requirements are useful context to check. A note or quieter interval may help in some situations, while unrealistic demands need a change in conditions rather than more self-blame.\n\n中文对照：五题均分1–5，越大表示越常自述难专注、思路不清或忘记任务，不是认知能力测验或诊断。例如，被多次打断后，难以接上下一步；这不是系统评定的实际表现。可以一起看精力、干扰、任务切换和要求是否清楚。便条或较少打扰的时段是可选支持；要求不切实际时，也需要改善条件，而不只责怪自己。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "For one task, make the next step visible and, where possible, reduce one interruption or clarify one requirement. Difficulty that persists despite support can be discussed with an appropriate professional. / 只为一件任务写清下一步，条件允许时减少一个打扰或澄清一个要求。已有支持仍持续困难时，也可以找合适专业人士讨论，不用独自证明能扛住。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_impairment",
+        "headline": "Emotions at work: leave room for a response / 情绪体验：留一点回应空间",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This five-item mean is 1–5. A larger value means more frequent reported emotional reactions that feel difficult to manage or unlike your usual responses. It is not a character judgment.\n\nFor example, a frustrating exchange may bring a stronger reaction than expected. Pressure, treatment by others and available support all deserve attention; the score does not assign a cause. A pause can be an option when safe, but it is not a demand to suppress feelings or tolerate harmful behaviour. Necessary action and boundaries still matter.\n\n中文对照：五题均分1–5，越大表示越常报告情绪难调节、反应出乎自己预期的体验，不是人品评价。例如，一次令人挫败的交流引起比预想更强的反应。压力、他人的对待和支持条件都值得看，分数不能归因。安全时短暂停顿是一个选择，不是要求压住感受、忍受伤害；必要行动和边界仍应保留。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "If safe, pause before a non-urgent reply, name one practical need and choose a suitable support person or channel. Do not delay necessary protection or force yourself to discuss feelings with someone unsafe. / 安全时可在非紧急回复前停一下，说清一个实际需要，再选合适的支持人或渠道。不要因此耽误必要保护，也不必向不安全的人解释内心。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "This English form with independent bilingual feedback is not a validated Chinese questionnaire; no severity bands or employee comparisons. / 英文题本配独立双语反馈，不是已验证中文版；不分严重等级、不作员工比较。"
+    ],
+    "disclaimer": "For adults reflecting on their work context; not a diagnosis or a judgment of ability. / 供成年人结合工作处境反思，不是诊断或能力评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:34:16Z",
+        "basis": "本次AI文字自审对应bat23_2020_en的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "burnout_core"
+    ],
+    "scoreOrder": [
+      "burnout_core",
+      "exhaustion",
+      "mental_distance",
+      "cognitive_impairment",
+      "emotional_impairment"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "burnout_core",
+        "headline": "Read the workday, not a report card / 读工作日，不读能力成绩单",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Take-home: make room for one useful adjustment, not another test of how much you can endure.\n\nThe overall number is the mean of all 23 answers, from 1 to 5. Larger means these difficulties were reported more often; it is not a staff ranking or the unweighted mean of four facets. The questionnaire does not set a fixed number of days or a pass mark.\n\nImagine a calendar with no gaps between demands. A score cannot tell who filled it or what needs to change. That is only an example, not a reading of your schedule. Existing support is worth keeping. Where a demand is unrealistic, asking for resources, a changed deadline or shared responsibility may be more relevant than adding a resilience task.\n\n中文对照：一句带走的话：给调整留位置，不再考自己有多能扛。\n\n整体数字是23题均分1–5，越大表示越常自述这些困难；不是员工排名，也不是四个侧面均分的简单平均。问卷没有规定固定天数或及格线。想象日程里任务之间没有空隙，分数并不知道是谁排的、怎样才可改变；这只是场景，不是读取了你的日历。已有支持值得留下；要求不现实时，争取资源、调整期限或共同分担，也比追加一项“锻炼韧性任务”更贴近问题。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Pick one part of a working day, not the whole calendar. What demand or missing support would be useful to name? / 只翻工作日的一页：选一个片段，说清一项要求或缺少的支持，不必把整张日历逐格检讨。"
+          },
+          {
+            "category": "support",
+            "text": "Choose one realistic request, if safe: clarify a priority, share a task or discuss a deadline. Persistent difficulties may need broader or professional support; one small adjustment is not a promised cure. / 安全可行时只提一个现实请求：问清优先级、分担任务或讨论期限。困难持续时也可需要更广泛或专业支持，一个小调整不是治愈承诺。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "exhaustion",
+        "headline": "Recovery is not a prize to earn / 恢复不是表现好才有的奖励",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "The eight-item mean is 1–5. Larger means more frequent exhaustion and difficulty recovering, not more commitment.\n\nA familiar task taking unusual effort is one possible example, not something the report has found about you. Work, health, rest and responsibilities outside work can overlap. If a helpful pause already exists, protect it where possible. If there is no room, the issue may be the load and available help, not a failure to rest correctly.\n\n中文对照：八题均分1–5，越大表示越常报告耗竭和恢复困难，不是投入更多的奖章。例如，顺手的任务也变费劲，只是一个可能场景，报告没查明你的具体经历。工作、健康、休息和生活责任可能交织。有用的恢复空隙可以保留；根本挤不出空间时，也可能该看负担和支持，不是你没把休息做对。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "Give one demanding period a realistic support option: a pause, a reduced demand or help sharing it. If tiredness persists or worries you, appropriate health support remains an option. / 给一段高消耗工作配一个现实支持：可行的停顿、减量或分担。疲惫持续或让你担忧时，可寻求合适健康支持，不用把恢复当成独自完成的项目。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "mental_distance",
+        "headline": "You do not have to perform enthusiasm / 不必再加演“我很热爱”",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This five-item mean is 1–5. Larger means more frequent feelings of distance or aversion towards work, not proof of poor responsibility.\n\nSomeone might finish a task without feeling connected to it. This example does not describe your actual attitude. The task, fairness, workload and support are worth exploring. There may also be parts you still value. The score does not require you to love every task, stay in an unfair situation or decide immediately whether to leave.\n\n中文对照：五题均分1–5，越大表示越常自述与工作疏远或反感，不是“不负责”的证据。例如，任务完成了，却感受不到连接；这不是报告认定的你的态度。内容、公平、工作量和支持都可了解，也可能仍有珍视的部分。不必喜欢每项任务、留下忍受不公，也不必凭数字马上决定离开。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Set one question beside the task: is its purpose clear, its demand realistic, or its support sufficient? Explore what is useful and safe, without forcing a career decision. / 给一件事留一个问题：目的是否清楚、负担是否现实、支持是否够用？选合适且安全的方式了解，不把报告变成去留催促单。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "cognitive_impairment",
+        "headline": "Leave a bookmark for the next step / 给下一步留个书签",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This five-item mean is 1–5. Larger means more frequent reported attention or thinking difficulties, not a lower intelligence score.\n\nAfter interruptions, a visible next-step note may be useful. That example is a possible support, not proof that you are forgetful. Energy, working conditions and task requirements matter too. A bookmark can support a task; it cannot make an impossible workload reasonable.\n\n中文对照：五题均分1–5，越大表示越常自述注意或思路上的困难，不是智力更低。例如，被打断前留一句下一步，可能便于接续；这是支持办法，不是报告证明你健忘。精力、环境和任务要求也要看。书签可以帮接上任务，却不能把不可能的工作量变合理。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "For one task, write the next action and consider reducing an interruption or clarifying a requirement. If difficulty continues, seek suitable support rather than making the note-taking system ever more demanding. / 只为一件任务留一句下一步，再看能否减一个打扰或问清一个要求。持续困难可找合适支持，不用不断升级记事系统来证明自己努力。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_impairment",
+        "headline": "A pause is an option, not a mute button / 缓冲是选择，不是静音键",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This five-item mean is 1–5. Larger means more frequent emotional reactions that feel hard to manage, not a verdict on your character.\n\nA reply feeling stronger than intended is one possible scene, not a behaviour the report has identified. A pause may create room to choose, but unfair treatment and heavy demands still need attention. You do not have to mute feelings or explain them to someone unsafe. Boundaries and necessary action come before an ideal calm response.\n\n中文对照：五题均分1–5，越大表示越常报告情绪难调节，不是人品判决。例如，回复比自己预想强烈，只是一个场景，不是报告已识别的行为。停一下可以留选择，受到不当对待或负担过重仍需处理。不必把感受静音，也不用向不安全的人解释。边界和必要行动，比表现得始终平静更重要。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "If safe, delay one non-urgent response briefly, identify a practical need and choose a trusted support route. Do not delay protection or urgent action to appear calm. / 安全时可给一次非紧急回应留点间隔，找一个实际需要与可信支持渠道；不要为了显得平静而耽误保护或必要行动。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "This English form with independent bilingual feedback is not a validated Chinese questionnaire; no severity bands or employee comparisons. / 英文题本配独立双语反馈，不是已验证中文版；不分严重等级、不作员工比较。"
+    ],
+    "disclaimer": "For adults reflecting on their work context; not a diagnosis or a judgment of ability. / 供成年人结合工作处境反思，不是诊断或能力评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:34:16Z",
+        "basis": "本次AI文字自审对应bat23_2020_en的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

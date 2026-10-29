@@ -1,6 +1,7 @@
 import type { BundleEngineInputV1, BundleEngineResultV1 } from '../registry'
 import type { EvidenceItemV1 } from '../types'
-import { parseDeclarativePackage, type Condition } from './contract'
+import { runBundleProfile } from '../profile/match'
+import { parseDeclarativePackage, type DeclarativePackage, type Condition } from './contract'
 export type Truth = true | false | 'unknown'
 export function evaluateCondition(c: Condition, evidence: EvidenceItemV1[]): Truth {
   if (c.op === 'all' || c.op === 'any') {
@@ -46,15 +47,17 @@ export function mapDeclarativeEvidence(input: BundleEngineInputV1): EvidenceItem
     const raw = 'metrics' in source ? source.metrics[mapping.selector] : score?.value
     const missing = raw === undefined || raw === null
     const invalid = !missing && (typeof raw !== mapping.valueType || (typeof raw==='number' && !Number.isFinite(raw)))
-    const quality = invalid || source.qualityState==='invalid' ? 'invalid' as const : missing || score?.status==='not_calculable' ? 'unavailable' as const : source.qualityState==='limited' || score?.status==='limited' ? 'limited' as const : 'interpretable' as const
+    // Package2 binds a strict generic item-mean scorer and classifies the
+    // selected core scores. Another score's missingness cannot invalidate it.
+    const perScore=pack.schemaVersion===2 && slot.unitType==='SCALE'
+    const quality = invalid || !perScore && source.qualityState==='invalid' ? 'invalid' as const : missing || score?.status==='not_calculable' ? 'unavailable' as const : !perScore && source.qualityState==='limited' || score?.status==='limited' ? 'limited' as const : 'interpretable' as const
     const kind = slot.unitType==='SCALE' ? 'SCALE_SCORE' as const : slot.unitType==='COGNITIVE' ? 'COGNITIVE_METRIC' as const : 'SITUATIONAL_METRIC' as const
     return { evidenceKey:mapping.evidenceKey, constructKey:mapping.construct, role:mapping.role,
       source:kind==='SCALE_SCORE'?{kind,slotKey:slot.slotKey,scoreKey:mapping.selector,sourceResultHash:source.sourceResultHash}:{kind,slotKey:slot.slotKey,metricKey:mapping.selector,sourceResultHash:source.sourceResultHash},
       value:invalid?{state:'invalid' as const}:missing?{state:'missing' as const}:{state:'present' as const,value:raw as number|string|boolean,unit:mapping.unit},quality,criterionBandKey:score?.criterionBandKey??null }
   })
 }
-export function runDeclarativeEvidence(input: BundleEngineInputV1): BundleEngineResultV1 {
-  const pack = parseDeclarativePackage(input.declarativePackage)
+function runRules(input: BundleEngineInputV1,pack:DeclarativePackage): BundleEngineResultV1 {
   if (pack.manifest.definition.bundleKey!==input.snapshot.bundleKey || pack.manifest.definition.bundleVersion!==input.snapshot.bundleVersion) throw new Error('DECLARATIVE_PACKAGE_IDENTITY_MISMATCH')
   if (pack.rules.applicability && evaluateCondition(pack.rules.applicability,input.evidence)!==true) return {kind:'UNAVAILABLE',reason:'DECLARATIVE_NOT_APPLICABLE_OR_UNKNOWN'}
   const conclusions = [...pack.rules.items].sort((a,b)=>a.ruleId.localeCompare(b.ruleId)).filter(rule => {
@@ -65,4 +68,28 @@ export function runDeclarativeEvidence(input: BundleEngineInputV1): BundleEngine
     })
   }).map(rule=>({ruleId:rule.ruleId,ruleVersion:pack.rules.version,kind:rule.kind,text:rule.text,evidenceKeys:[...rule.evidenceKeys].sort(),supportRefs:[...rule.supportRefs].sort()}))
   return {kind:'COMPUTED',payload:{schemaVersion:'declarative-report-v1',status:'declarative',conclusions}}
+}
+
+export function runDeclarativeEvidence(input:BundleEngineInputV1):BundleEngineResultV1{
+  const pack=parseDeclarativePackage(input.declarativePackage)
+  if(pack.schemaVersion!==1)throw new Error('DECLARATIVE_ENGINE_PACKAGE_VERSION_MISMATCH')
+  return runRules(input,pack)
+}
+export function runProfileEvidence(input:BundleEngineInputV1):BundleEngineResultV1{
+  const pack=parseDeclarativePackage(input.declarativePackage)
+  if(pack.schemaVersion!==2)throw new Error('DECLARATIVE_ENGINE_PACKAGE_VERSION_MISMATCH')
+  const base=runRules(input,pack)
+  // Package applicability governs the entire profile and its modifiers.
+  if(base.kind==='UNAVAILABLE')return base
+  const profile=runBundleProfile(pack.profile,input)
+  const modifiers=pack.profile.modifierRuleIds.map(ruleId=>{
+    const rule=pack.rules.items.find(r=>r.ruleId===ruleId)!
+    const rows=rule.evidenceKeys.map(k=>input.evidence.find(e=>e.evidenceKey===k))
+    const unknown=rows.some(e=>!e || e.quality!=='interpretable' || e.value.state!=='present')
+    return {ruleId,state:profile.state!=='MATCHED'?'NOT_TRIGGERED':unknown?'UNKNOWN':evaluateCondition(rule.when,input.evidence)===true?'TRIGGERED':'NOT_TRIGGERED',
+      evidenceKeys:[...rule.evidenceKeys].sort(),sourceResultHashes:[...new Set(rows.flatMap(e=>e && e.source.kind!=='CONTEXT_FACT'?[e.source.sourceResultHash]:[]))].sort()}
+  })
+  // Native Profile states remain available even when the core evidence abstains.
+  return {kind:'COMPUTED',payload:{schemaVersion:'declarative-profile-report-v1',status:profile.state,
+    conclusions:(base.payload as {conclusions:unknown[]}).conclusions,profile,modifiers}}
 }

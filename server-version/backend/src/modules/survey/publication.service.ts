@@ -1,3 +1,4 @@
+import type {SurveyNativeBundle} from '../bundle-product/survey-native'
 import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
 import type {SituationRuntimeDefinition} from '../situational/situation-runtime-definition'
 import {surveyNativeSituationalRequiresStageNotice,type FrozenSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
@@ -38,6 +39,7 @@ import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy }
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
+  nativeBundleReport?:{definitionHash:string;audience:'student'|'researcher'|null;policy:import('../scale/projection/types').EffectiveScaleDisclosureSnapshot}
   executionProtocol?:'SITUATIONAL_NATIVE_V1'
   /** Catalog previews carry an unbound header; persisted publication adds time/epoch.
    * Native runtime and receipt consumers must use the strict frozen parser. */
@@ -62,7 +64,7 @@ export interface ResearchFrozenUnit {
   compiledDefinition:unknown
   displayDefinition:unknown
 }
-export interface FrozenGovernedPackage {schemaVersion:1;importId:string;toolId:string;hash:string;title:string;family:'COMBINATION'|'BUNDLE';parentGrantId:string;report:PackageReport|null;slots:Array<{slotKey:string;draftId:string;instrumentKey:string;kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE'}>}
+export interface FrozenGovernedPackage {nativeBundle?:SurveyNativeBundle;schemaVersion:1;importId:string;toolId:string;hash:string;title:string;family:'COMBINATION'|'BUNDLE';parentGrantId:string;report:PackageReport|null;slots:Array<{slotKey:string;draftId:string;instrumentKey:string;kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE'}>}
 export interface ResearchFrozenPublication {
   governedPackages?:FrozenGovernedPackage[]
   schemaVersion:1

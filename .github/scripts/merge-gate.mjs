@@ -105,7 +105,10 @@ export function requiredChecks(needs, draft) {
   if(scope.application_route==='training-manual-ui')return ['scope','training-manual-ui','codeql'];
   if(scope.application_route==='survey-manual-ui')return ['scope','survey-manual-ui','codeql'];
   if(scope.application_route==='shared-authoring')return ['scope','shared-authoring','codeql'];
-  if(scope.application_route==='school-teacher')return ['scope','school-teacher','codeql'];
+  if(scope.application_route==='school-teacher'){
+    if(draft){try{const p=JSON.parse(scope.school_teacher_plan||'{}');if(p.candidate==='native-bundle'&&p.preflightOnly===true)return ['scope','school-teacher'];}catch{/* Invalid scope is rejected by failedChecks. */}}
+    return ['scope','school-teacher','codeql'];
+  }
   if(scope.application_route==='survey-workspace')return ['scope','survey-workspace','codeql'];
   if(scope.application_route==='training-appearance')return ['scope','training-appearance','codeql'];
   if(scope.application_route==='survey-cloud')return ['scope','survey-cloud','codeql'];
@@ -255,7 +258,7 @@ export function failedChecks(needs, draft) {
     return [...new Set(failed)];
   }
   if(scope.application_route==='school-teacher'){
-    try{const p=JSON.parse(scope.school_teacher_plan);if(draft||Object.entries(schoolTeacherOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    try{const p=JSON.parse(scope.school_teacher_plan);if((draft?!(p.candidate==='native-bundle'&&p.preflightOnly===true):p.preflightOnly===true)||Object.entries(schoolTeacherOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
   }
   if(scope.application_route==='survey-workspace'){

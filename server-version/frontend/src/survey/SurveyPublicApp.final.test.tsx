@@ -748,3 +748,13 @@ describe('first committed descriptive feedback receipt',()=>{
   await screen.findByText('感谢参与');expect(generalCalls()).toHaveLength(1);expect(screen.queryByText(/not-a-number/)).toBeNull()
  })
 })
+
+it('shows saved native Bundle feedback alongside single reports and reauthorizes it after reopening',async()=>{
+ const native={importId:'native',title:'数学学习动机整包',status:'READY',factsHash:'f'.repeat(64),profileView:{schemaVersion:'bundle-profile-view-v1',state:'MATCHED',title:'综合解释示例',explanation:'仅供研究试验参考',profileId:'P4',constructs:[{key:'e',label:'学习把握',raw:2.2,min:1,max:5,referenceCenter:1.8}],candidates:[],alternatives:[],actions:[],methods:null,limitation:'非诊断或概率'}}
+ const receipt={...firstSuccess().generalReceipt,kind:'DESCRIPTIVE',pending:false,measurements:[{feedbackKind:'RAW_METRICS',instrumentKey:'scale',title:'原单项报告',measurementReleaseId:'release',quality:'interpretable',metrics:[{key:'total',label:'原始总分',value:7,unit:null,status:'OK'}]}],nativeBundles:[native]}
+ taskOverrides={reportMode:'DESCRIPTIVE'};finalReply=()=>response(firstSuccess({participantFeedbackReceipt:receipt}))
+ const view=await openTask();fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+ expect(await screen.findByText('综合解释示例')).toBeInTheDocument();expect(screen.getByText('原始总分：7（已计算）')).toBeInTheDocument();expect(generalCalls()).toHaveLength(0)
+ view.unmount();taskValue={...taskValue,status:'COMPLETED'};generalReply=()=>response(null,403,'研究身份已失效')
+ render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}));await screen.findByText('研究身份已失效');expect(screen.queryByText('综合解释示例')).toBeNull()
+})

@@ -1,0 +1,868 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "csacs9_zh_cn",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "中文以己为景量表（C-SACS，最终9题版）",
+      "abbreviation": "C-SACS-9",
+      "instrumentFamily": "Self-as-Context Scale"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "ACT以己为景过程：在想法与情绪变化中保持观察视角与应对空间；不是完整心理灵活性、人格、临床诊断或ACT掌握程度。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "csacs9_zh_cn",
+        "domain:psychological_flexibility",
+        "construct:self_as_context",
+        "construct:centering",
+        "construct:transcending",
+        "orientation:ACT",
+        "population:adult_university_student",
+        "population:chinese_university_source_evidence",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:published_chinese_items",
+        "language_validation:digital_presentation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "原2022中国大学生便利样本17–25岁；当前候选限定18–25岁在校大学生自我了解/研究，不将结论外推中小学生、所有成年人或临床人群。年龄范围由applicability约束；在校大学生身份仍需施测组织者核实，目录描述不代表系统已自动核验该身份。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "minAge": 18,
+      "maxAge": 25
+    },
+    "administration": {
+      "itemCount": 9,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "原文未指定固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留最终九题原编号1、2、3、4、5、6、8、9、10，严格按原顺序；原7按2022研究明确删除。",
+        "平台作答说明通过独立instruction字段在作答前提供，不再嵌入首题；说明及两端中文锚点为平台界面译注，中间2–6仅数字，不声称源研究已验证该指导语。",
+        "2022只说明沿用原计分且报告总/分量表；本实现以原作者加总说明为依据采用等权sum，不声称2022另列了9题sum公式或常模单位。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "2022中文大学生研究提供源版本结构与可靠性证据；本次数字呈现和平台报告仍待治理审核。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "csacs9-fang2022-structural",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "中国三所大学非临床便利样本；17–25岁，158男/550女；非中国成人常模",
+        "ageRange": "17–25",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "sampleSize": 708,
+        "studyDesign": "横断面EFA/CFA各354；最终9题两因子模型",
+        "rating": "MIXED",
+        "citation": "Fang S, Huang M, Wang Y (2022). Measuring self-as-context in Chinese college students: Validity and reliability of the Chinese version of self-as-context scale (C-SACS). Frontiers in Psychology 13:1051661. doi:10.3389/fpsyg.2022.1051661.",
+        "doi": "10.3389/fpsyg.2022.1051661",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2022.1051661/full",
+        "notes": "源研究有支持，但便利样本/性别不均衡且不证明本次平台版式、原创报告或临床/K12适用。非诊断阈值或常模。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Fang、Huang、Wang(2022) Appendix 1 已发表中文题文，按最终9题模型去原7；本项目没有重新翻译题干。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "csacs9-fang2022-structural"
+    ],
+    "reviewStatus": "PENDING",
+    "notes": "源论文已报告经原作者同意翻译修订、专家讨论、20名学生理解性评估；此处待审状态指本次数字呈现和新增报告，不否定原中文源研究。两端选项及独立instruction为平台界面译注/文案，未声明原作者审定；发表中文九题原文保持不变。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "csacs9_zh_cn-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216,
+        "maxExclusive": 312
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "csacs9_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "csacs9_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Fang S, Huang M, Wang Y (2022). Measuring self-as-context in Chinese college students: Validity and reliability of the Chinese version of self-as-context scale (C-SACS). Frontiers in Psychology 13:1051661. doi:10.3389/fpsyg.2022.1051661. 中文附录 CC BY4.0：https://creativecommons.org/licenses/by/4.0/；原工具 Zettle RD et al.(2018), doi:10.1016/j.jcbs.2018.08.010。保留原中文题干，按2022Table2删除原7并数字呈现，通俗反馈为本项目新增；作者未背书本系统。",
+      "CC BY4允许公开再分发，保留署名/许可/改动说明，不额外施加非商业许可限制。",
+      "限定大学生非诊断研究/自我了解；不是心理治疗、完整ACT过程评估或临床处置。",
+      "聚合披露：2022 Table4仅相关系数，不能据其判断sum/mean；项目依据正文沿用原计分+原作者sum说明，采用最终9题及4/5题维度等权sum，未绑定任何参考分单位。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "C-SACS final nine-item Chinese form (Fang et al.,2022)",
+        "citation": "Fang S, Huang M, Wang Y (2022). Measuring self-as-context in Chinese college students: Validity and reliability of the Chinese version of self-as-context scale (C-SACS). Frontiers in Psychology 13:1051661. doi:10.3389/fpsyg.2022.1051661.",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2022.1051661/full"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Fang S, Huang M, Wang Y (2022). Measuring self-as-context in Chinese college students: Validity and reliability of the Chinese version of self-as-context scale (C-SACS). Frontiers in Psychology 13:1051661. doi:10.3389/fpsyg.2022.1051661. 中文附录 CC BY4.0：https://creativecommons.org/licenses/by/4.0/；原工具 Zettle RD et al.(2018), doi:10.1016/j.jcbs.2018.08.010。保留原中文题干，按2022Table2删除原7并数字呈现，通俗反馈为本项目新增；作者未背书本系统。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "csacs_agreement",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CSACS_ORIG_01",
+          "content": "当我心烦意乱时，我能在自己的心中找到一个平静的地方。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "csacs_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CSACS_ORIG_02",
+          "content": "我对生活有一种领悟，可以让我应对生活中的不如意，而不会被它们压倒。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "csacs_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CSACS_ORIG_03",
+          "content": "尽管我的人生发生了许多变化，但有一个最基本的“我”保持不变。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "csacs_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CSACS_ORIG_04",
+          "content": "回顾迄今为止的生活，我意识到那个能觉察情绪或想法的“我”一直在那里，陪伴着我。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "csacs_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CSACS_ORIG_05",
+          "content": "我允许我的情绪起伏变化而不挣扎其中。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "csacs_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CSACS_ORIG_06",
+          "content": "我能够注意到自己不断变化的想法而不会陷入其中。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "csacs_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CSACS_ORIG_08",
+          "content": "尽管我的人生发生了很多变化，但我意识到心中有个“观察者”见证了这一切。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "csacs_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CSACS_ORIG_09",
+          "content": "我能够站在一个更高的视角去觉察我的想法、感受和情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "csacs_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CSACS_ORIG_10",
+          "content": "当我回想曾经的生活，我意识到那个能够观察情绪和感觉的“我”依然存在。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "csacs_agreement",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CSACS_ORIG_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CSACS_ORIG_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CSACS_ORIG_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CSACS_ORIG_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CSACS_ORIG_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CSACS_ORIG_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CSACS_ORIG_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CSACS_ORIG_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CSACS_ORIG_10",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "centering",
+            "type": "dimension",
+            "label": "起伏中稳住自己",
+            "description": "对应条目的同意程度总和；反映以己为景的自述体验，不是诊断或客观能力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CSACS_ORIG_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "transcending",
+            "type": "dimension",
+            "label": "退一步看见自己的经历",
+            "description": "对应条目的同意程度总和；反映以己为景的自述体验，不是诊断或客观能力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CSACS_ORIG_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "self_as_context_total",
+            "type": "total",
+            "label": "给念头和情绪留一点空间",
+            "description": "对应条目的同意程度总和；反映以己为景的自述体验，不是诊断或客观能力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CSACS_ORIG_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CSACS_ORIG_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "centering",
+          "transcending",
+          "self_as_context_total"
+        ],
+        "scoreOrder": [
+          "centering",
+          "transcending",
+          "self_as_context_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "centering",
+            "headline": "起伏里留一点站稳的位置，不要求立刻平静",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题和分范围4–28，数字越大，表示你更认同自己能在情绪和想法起伏时找到一点平静、允许变化而不被完全卷入的描述，不是要求每次都冷静。\n\n例如，收到一条不顺心的反馈，既感到失落，也能注意到“我现在正在失落”。如果类似经验对你有帮助，可以看看当时是什么留住了一点空间；如果暂时没有，也不说明你做得不好。这里的重点不是把感受压下去，而是当感受出现时，仍有一点觉察自己和选择回应的余地。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一件负担较小的烦心事，回想感受出现时，你有没有注意到自己正在经历它，以及什么条件曾带来一点缓冲。"
+              },
+              {
+                "category": "strategy",
+                "text": "若愿意，可以先用一句“我注意到自己现在有……的感受”描述当下，再决定需要休息、继续处理还是请人支持；不强迫自己保持平静。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "transcending",
+            "headline": "经历可以变化，观察自己的视角不必只剩一个标签",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这五题和分范围5–35，数字越大，表示你更认同在生活变化中仍能保留观察自己经历的视角，不是在测量有没有更高境界。\n\n例如，回看一段紧张和一段轻松的经历，可能注意到：感受不同，但自己都曾觉察到它们。如果这个说法对你有帮助，可以把一刻的想法看作经历的一部分，而不是自己的全部。它不是要你相信性格永远不变，也不是让你变得疏离、假装没有感受；一时不理解这些句子，也不必逼自己得出哲学答案。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "若愿意，选两个普通、负担不大的生活片段，看看当时的想法和感受怎样不同；不需要回忆让自己难以承受的经历。"
+              },
+              {
+                "category": "strategy",
+                "text": "遇到一句“我就是这样的人”时，可以具体说成“在这件事里，我出现了这样的想法或感受”，给其余经历留位置；不适合时可以停止。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "self_as_context_total",
+            "headline": "不只看有没有烦恼，也看能否为自己留一点观察空间",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "九题总分范围9–63，数字越大，整体表示更认同稳住自己、观察经历的相关描述。它汇总前面两组，不是第三项独立能力，也不表示生活中烦恼更少。\n\n例如，一次不顺利可以让人出现“我什么都做不好”的念头；如果能看见这是此刻的一种自我描述，也许就能继续了解具体发生了什么，而不是立即把整个人定型。这个例子只供回想，不说明你这次已经做到或没有做到。可以保留已有帮助的支持，也可以承认有些处境需要更多信息、休息或陪伴。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "挑一个与你生活贴近的场景，分开写“发生的事、出现的念头、我还在意什么”，不把一个念头当成全部事实或身份。"
+              },
+              {
+                "category": "support",
+                "text": "只选一种自己愿意的观察方式；若向内关注让你更不舒服，可以停止，回到身边的实际活动或寻求合适支持，不以练习感受证明成败。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "目前只用于18–25岁大学生研究与自我了解，无个人高低或诊断分界；两组题数不同，不用原始和分比强弱，漏答不当最低分。"
+        ],
+        "disclaimer": "供18–25岁大学生研究与非诊断自我了解。采用已发表中文题文，但本次数字呈现和平台反馈仍待审核；不用于治疗决策、能力排名或判断心理健康。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial self-review; not human or author approval",
+            "reviewedAt": "2026-10-29T16:58:29Z",
+            "basis": "本次仅审读新R文字与当前源的构念、窗口、分数方向及适龄受众；不运行计分／报告测试，不构成人工译审、作者批准或心理测量验证。保留原自答受众及权限，不扩大适用范围。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "csacs9",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "CSACS_ORIG_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "centering": 4,
+            "transcending": 5,
+            "self_as_context_total": 9
+          },
+          "totalScoreKeys": [
+            "centering",
+            "transcending",
+            "self_as_context_total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "CSACS_ORIG_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CSACS_ORIG_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CSACS_ORIG_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CSACS_ORIG_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CSACS_ORIG_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CSACS_ORIG_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CSACS_ORIG_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CSACS_ORIG_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CSACS_ORIG_10",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "centering": 28,
+            "transcending": 35,
+            "self_as_context_total": 63
+          },
+          "totalScoreKeys": [
+            "centering",
+            "transcending",
+            "self_as_context_total"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "CSACS_ORIG_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CSACS_ORIG_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CSACS_ORIG_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CSACS_ORIG_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CSACS_ORIG_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CSACS_ORIG_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CSACS_ORIG_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CSACS_ORIG_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CSACS_ORIG_10",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "centering": 16,
+            "transcending": 20,
+            "self_as_context_total": 36
+          },
+          "totalScoreKeys": [
+            "centering",
+            "transcending",
+            "self_as_context_total"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "CSACS_ORIG_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CSACS_ORIG_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CSACS_ORIG_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CSACS_ORIG_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "CSACS_ORIG_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CSACS_ORIG_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CSACS_ORIG_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CSACS_ORIG_10",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "centering": 14,
+            "transcending": 17,
+            "self_as_context_total": 31
+          },
+          "totalScoreKeys": [
+            "centering",
+            "transcending",
+            "self_as_context_total"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请选择你对每句话的同意程度：1为非常不同意，7为非常同意，2–6表示其间的程度。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/bilingual-content.json#/platformInstructions @ b92c69aefa2472775fa7ee86b9c208366886c908（复用平台作答说明的作答句；原实现来源元信息移至本source及localization记录。说明与两端中文选项为平台界面译注，非源作者审定指导语）"
+  }
+}

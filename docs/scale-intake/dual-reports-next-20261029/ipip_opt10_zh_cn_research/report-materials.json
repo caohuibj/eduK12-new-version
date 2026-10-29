@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip_opt10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "0d9042ad24058d0a7ccf1122df9c06ac365618295e8f6e75a0d2dc31257a3eb7",
+  "oldReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "optimism"
+    ],
+    "scoreOrder": [
+      "optimism"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "optimism",
+        "headline": "乐观倾向：你怎样看待眼前与未来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项关注你对未来、生活积极面和自身状态的看法。分数越高，表示这次回答更偏向积极预期。期待与担忧可以同时存在，例如，盼着一件事有好结果，也为可能的困难做准备。报告不要求你一直积极，也不能用来判断是否抑郁。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想一件你正在期待或担心的事：哪些判断有事实支持，哪些还只是暂时的猜想？"
+          },
+          {
+            "category": "strategy",
+            "text": "把这件事分成两栏：“我能做一点什么”和“暂时不由我决定什么”。从第一栏选一个小行动，第二栏可以先留着，不急着想通一切。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+      "目前没有足够依据把这个中文版本的结果划分高低或与别人比较。",
+      "题目还涉及心情、自我感受和生活方向；它与另一个常见乐观量表LOT-R不是同一工具，不能借用后者的分界。",
+      "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、重要选拔或评价个人价值。"
+    ],
+    "disclaimer": "仅供研究与描述性自我了解，不用于心理诊断。乐观分数不是人格好坏或必须保持积极的要求。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T14:13:00Z",
+        "basis": "AI editorial check: adult self-reflection, non-diagnostic language, no automatic external norm transfer; not expert translation approval or psychometric validation."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "optimism"
+    ],
+    "scoreOrder": [
+      "optimism"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "optimism",
+        "headline": "看见希望，也认真看待眼前的困难",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这十题不仅问对未来的期待，也涉及你怎样看待生活积极面、自己的状态、心情和方向感。统一计分方向后，总分范围10–50；数值越大，表示这次整体更认可积极预期和相应自我感受的描述。一个总分不能替你说明现实处境，也不是预测事情会成功的概率。\n\n例如，一项期待已久的计划推迟了，你可以既失望、担心，又觉得还有调整的空间。看见希望不要求否认损失，注意风险也不等于没有希望。如果眼前确实缺钱、缺时间或缺支持，需要的可能是资源、协商和帮助，而不是再催自己“想开点”。\n\n如果你已有能让自己愿意继续尝试的期待，可以保留；若当下更多是不顺或难受，也不必为了符合一种积极形象而压住它们。下面是供你核对的生活解释和可选行动，不是系统已从分数判断你的心情原因。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把事实与预期分开：选一件在意的事，分别写下已经发生什么、你希望什么、还在担心什么。先看清信息，不急着把担忧全改成好消息。"
+          },
+          {
+            "category": "strategy",
+            "text": "让希望带一个实际步骤：从能影响的部分选一小步，例如确认一个要求、重新安排一段时间，或联系可以协商的人；同时保留遇到阻碍时调整的余地。"
+          },
+          {
+            "category": "support",
+            "text": "给真实难处找支持：若压力来自安排、资源或关系，就尝试具体说明需要什么帮助。难过时可以先休息、与信任的人聊聊，不用把始终积极当成另一项任务。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本还在研究完善，没有可用的人群分档或排名；总分不能概括全部现实难处。十题需答完整才计算，漏答不是0分。"
+    ],
+    "disclaimer": "仅供研究与描述性自我了解，不用于心理诊断。乐观分数不是人格好坏或必须保持积极的要求。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:28:34Z",
+        "basis": "本次只读审阅ipip_opt10_zh_cn_research C1.0.0当前source、既有材料及新R1.1.0文字，核得分方向/范围、通常性时窗、固定解释与条件式例子、适配行动和短提示。保持source/bands/scoreKeys和受众权限，不继承旧审核日期，不声称本中文验证、作者批准或本轮golden/PG/CI通过。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "optimism"
+    ],
+    "scoreOrder": [
+      "optimism"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "optimism",
+        "headline": "希望可以开着，风险提醒也不用关",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：乐观不必靠删掉坏消息来维持。\n\n想象一份生活计划上同时有“我期待”和“请注意”：保留前者，不需要把后者关掉。这十题综合未来期待、生活积极面及自身心情和方向等看法，总分10–50；数值越大，表示整体更认可积极预期及相关描述，不是成功率，也不是必须笑着面对一切的指令。\n\n假设你很期待一次变化，也知道时间紧、事情多。承认这些条件，可以帮助你决定先做什么、找谁协商；它不会自动把希望取消。相反，只在计划上写“肯定没问题”，也不能替代实际准备。\n\n如果一点期待正帮你往前走，就留着它；如果当下更需要的是处理损失、补资源或有人听你说，也同样值得被认真对待。这里的提醒供你核对生活，不代表分数已经证明了你乐观、悲观或发生困难的原因。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "给计划留两行：一行写“我希望……”，一行写“目前确实有这个限制……”。不用让其中一行删除另一行。"
+          },
+          {
+            "category": "strategy",
+            "text": "给期待接上一根地线：挑一个今天能做的具体动作，例如问清截止时间或确认可用资源，再想好条件改变时怎样调整。让希望有落点，而不是多一句保证。"
+          },
+          {
+            "category": "support",
+            "text": "让难受有地方停一会儿：可以和可靠的人讲讲实际困难，或先留出休息。若方法不合适就换，不把“没有立刻积极起来”当作失败。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本还在研究完善，没有可用的人群分档或排名；总分不能概括全部现实难处。十题需答完整才计算，漏答不是0分。"
+    ],
+    "disclaimer": "仅供研究与描述性自我了解，不用于心理诊断。乐观分数不是人格好坏或必须保持积极的要求。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:28:34Z",
+        "basis": "本次只读审阅ipip_opt10_zh_cn_research C1.0.0当前source、既有材料及新R1.2.0文字，核得分方向/范围、通常性时窗、固定解释与条件式例子、适配行动和短提示。保持source/bands/scoreKeys和受众权限，不继承旧审核日期，不声称本中文验证、作者批准或本轮golden/PG/CI通过。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

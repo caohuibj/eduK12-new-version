@@ -1,0 +1,1463 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ccfq18_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "认知控制与灵活性问卷（CCFQ-18，中文工作译稿）",
+      "abbreviation": "CCFQ-18",
+      "instrumentFamily": "Cognitive Control and Flexibility Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "EXECUTIVE_FUNCTION",
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "成人在一般压力情境中自述的情绪认知控制及评价与应对灵活性，分别以九题均分描述。与CBT中的认知调节和应对有关，但并非CBT专属疗效量表，不等同ACT心理灵活性，也不测诊断或客观执行能力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ccfq18_zh_cn",
+        "domain:stress_coping",
+        "domain:self_regulation",
+        "construct:cognitive_control_over_emotion",
+        "construct:appraisal_and_coping_flexibility",
+        "orientation:CBT_related_not_exclusive",
+        "population:adult",
+        "population:adult_source_evidence",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:unvalidated_chinese",
+        "language_validation:expert_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "当前内容候选限定18岁及以上成人。原开发包含大学生300人、加拿大社区302人、大学生368人及女性实验样本47人；不是中国成人常模，不外推儿童、中小学生或临床诊断。source applicability已声明至少216个月，缺龄返回不确定；此内容包本身不执行注册或部署，真实入口的年龄采集和拦截须另行集成验收。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 18,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "一般/通常的压力情境；无固定近期回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "严格按Table 1题文末括号所列施测顺序1–18，不按表格行首的因子排序编号施测，也不混用初始44题或Table 5。",
+        "独立instruction字段包含完整指导语及共有引导句“通常，在有压力的情境中……”；应在作答前完整展示，不拼接至题1或其他题干。",
+        "保留1–7选项顺序；仅两端有已核实英文锚点，中间2–6纯数字；两端中文均为平台工作翻译。",
+        "预计5分钟是平台粗估，未作施测时长验证。指导语及共有情境句已绑定独立instruction，实际施测与本地安装状态分别记录，不由内容源推定。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "英语源版本有开发研究；当前中文工作译稿尚未验证或完成治理审核。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅描述自述体验；当前DRAFT研究候选不自动开放自测。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ccfq18-gabrys2018-community-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "加拿大社区成人，女性253/男性49；英语最终18题，不是中国常模",
+        "locale": "en",
+        "territory": "CA",
+        "sampleSize": 302,
+        "studyDesign": "原开发Study 1社区样本，对最终18题进行两因子结构检验",
+        "rating": "MIXED",
+        "citation": "Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219",
+        "doi": "10.3389/fpsyg.2018.02219",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.02219/full",
+        "notes": "源研究两因子结构支持不等于当前中文工作翻译或数字呈现已经验证；样本限制和迁移不确定性保留。"
+      },
+      {
+        "evidenceId": "ccfq18-gabrys2018-community-consistency",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "加拿大社区成人302人；英语最终18题",
+        "locale": "en",
+        "territory": "CA",
+        "sampleSize": 302,
+        "studyDesign": "原开发Study 1社区样本内部一致性",
+        "rating": "MIXED",
+        "citation": "Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219",
+        "doi": "10.3389/fpsyg.2018.02219",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.02219/full",
+        "notes": "情绪认知控制α=.90，评价与应对灵活性α=.93；不是重测、响应性、中文信效度或诊断阈值证据。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Gabrys、Tabri、Anisman、Matheson (2018) Table 1最终18题英文与正文指导语；平台按CC BY4.0制作的独立中文工作译稿，无已核实的现成验证中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文题文、两端选项、指导语均未获专家/原作者审定；中间选项仅数字。双语逐题对照及指导语、共有压力情境引导句的来源见专属docs；施测说明已绑定源文件独立instruction字段。英语源证据不登记为localEvidenceRefs。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ccfq18_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ccfq18_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ccfq18_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2018 Gabrys, Tabri, Anisman and Matheson. Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219 原英文最终18题及指导语依据Table 1与正文；CC BY 4.0：https://creativecommons.org/licenses/by/4.0/ 本平台于2026-10-25制作中文工作译稿、数字呈现及原创通俗反馈，均非原作者审定或背书；中文译稿未经验证。改动为英文转中文、只翻译已知两端选项、增加平台报告，不改变原18题顺序和计分。",
+      "CC BY4允许在署名、链接许可及说明改动的条件下公开分发和改编，包括商业使用；不得暗示作者背书。不新增非商业限制。",
+      "原文是新编量表，Table 1无第三方版权排除；许可证据见原出版社Copyright及source-en.handoff.json。目录标签或此说明不替代InstrumentAuthorization部署授权事实。",
+      "本稿DRAFT；此内容包本身不执行注册、安装或发布，不激活ReferenceSet；获授权创建新行时应保持HIDDEN，实际状态须由部署事实确认。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Gabrys et al. (2018) final 18-item English, Table 1 administration ordering",
+        "citation": "Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.02219/full",
+        "publicationYear": 2018
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2018 Gabrys, Tabri, Anisman and Matheson. Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219 原英文最终18题及指导语依据Table 1与正文；CC BY 4.0：https://creativecommons.org/licenses/by/4.0/ 本平台于2026-10-25制作中文工作译稿、数字呈现及原创通俗反馈，均非原作者审定或背书；中文译稿未经验证。改动为英文转中文、只翻译已知两端选项、增加平台报告，不改变原18题顺序和计分。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ccfq_agreement_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CCFQ1",
+          "content": "我会先权衡可选的办法，再决定如何行动。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ2",
+          "content": "我觉得自己失去了对想法和情绪的控制。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ3",
+          "content": "我会从多个角度看待这件事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ4",
+          "content": "我很难放下那些不由自主冒出来的想法或情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ5",
+          "content": "在作出回应之前，我会从多个视角考虑这件事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ6",
+          "content": "在行动之前，我会花时间想出几种尽可能妥善应对这件事的办法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ7",
+          "content": "我发现自己很容易暂且把令人不快的想法或情绪放到一边。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ8",
+          "content": "对我来说，不去理会那些分散注意力的想法很容易。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ9",
+          "content": "在决定如何回应之前，我能很容易地想到多种应对办法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ10",
+          "content": "在作出反应之前，我会花时间从不同角度看待事情。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ11",
+          "content": "令人心烦的想法或感受很容易分散我的注意力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ12",
+          "content": "我会花时间想出不止一种解决问题的办法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ13",
+          "content": "我会通过把事情放在具体背景中理解，来控制自己的想法和感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ14",
+          "content": "我能够保持对自己想法和情绪的控制。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ15",
+          "content": "我很难管理自己的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ16",
+          "content": "我的想法和情绪会妨碍我集中注意力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ17",
+          "content": "我会通过换一种方式理解这件事，来调节自己的想法或感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CCFQ18",
+          "content": "我很难把注意力从消极的想法或感受上移开。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "ccfq_agreement_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CCFQ1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ2",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CCFQ3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ4",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CCFQ5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ6",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ7",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ8",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ9",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ11",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CCFQ12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ15",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CCFQ16",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CCFQ17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CCFQ18",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "cognitive_control_over_emotion",
+            "type": "dimension",
+            "label": "压力情境中注意力与情绪的调节感",
+            "description": "对应九题调整方向后的平均分1–7；分数越高表示越认同自己通常有这种调节或应对空间，不是客观能力、诊断或等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CCFQ2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ7",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ8",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "appraisal_and_coping_flexibility",
+            "type": "dimension",
+            "label": "考虑不同解释与应对办法的灵活感",
+            "description": "对应九题调整方向后的平均分1–7；分数越高表示越认同自己通常有这种调节或应对空间，不是客观能力、诊断或等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CCFQ1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ6",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ9",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CCFQ17",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "cognitive_control_over_emotion",
+          "appraisal_and_coping_flexibility"
+        ],
+        "scoreOrder": [
+          "cognitive_control_over_emotion",
+          "appraisal_and_coping_flexibility"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "cognitive_control_over_emotion",
+            "headline": "压力来了，给注意力和行动留一点余地",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一组九题按原方向整理后的均分在1–7之间。数字越大，表示你更认同自己在通常压力情境中能把注意从困扰的想法、情绪带回来，较有调节空间；它不是客观注意能力或实际成功率。\n\n例如，事情出错后，脑中一直重播刚才的画面，眼前别人在说什么也难听进去；另一些时候，虽然仍不好受，却能暂时把注意带回交流。如果某种条件已帮助你做到这一点，可以保留；如果当下很难，也可以先看疲劳、任务负担和支持是否合适，而不是要求自己立刻控制一切。情绪仍在与继续处理一件事，并不一定互相排斥。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次压力让你分心的经历，分开记下当时的想法、眼前要处理的事，以及有没有某种环境或支持让你容易回来。"
+              },
+              {
+                "category": "strategy",
+                "text": "下次愿意尝试时，先承认“我现在被这件事牵住了”，再选一个眼前可辨认的关注点，例如听清对方的问题；若负担过重，也可以暂停或协调支持，不靠强压情绪完成。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "appraisal_and_coping_flexibility",
+            "headline": "不同解释与不同办法，都需要放回实际条件",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一组九题均分在1–7之间。数字越大，表示你更认同自己通常会换角度理解压力事件、权衡不止一种应对办法；不表示每个决定都正确，也没有跨两个方面的总分。\n\n例如，收到一条简短回复时，“对方不想理我”和“对方正在忙”是不同解释，等一等或找合适的时机问清则是不同做法。若你愿意，可以多留一个可能，同时用事实核对。灵活不是永远想得更多，更不是替不合理的对待找积极借口；有些情境需要直接处理，资源有限时也不必逼自己列满选项。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一个不太棘手的压力事件，分别写出“已知事实、最先想到的解释、另一个可能”，不把猜测直接当事实。"
+              },
+              {
+                "category": "strategy",
+                "text": "为它找两种可行回应，比较时间、资源、安全和自己的意愿，再选一项；想不到时可以请可信任的人一起梳理，不要求每种解释都积极。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是用于18岁以上成人自我观察的中文工作译稿，尚未验证，无高低分界或诊断结论；只呈现两个自述均分，漏答不当最低分。"
+        ],
+        "disclaimer": "仅用于成人研究候选与自我观察；中文工作译稿未经验证，不用于心理诊断或治疗效果判定。两个分量表是自述体验，不是完整ACT心理灵活性。报告解释和建议由平台原创，不是原作者临床方案。© 2018 Gabrys, Tabri, Anisman and Matheson. Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219 原英文最终18题及指导语依据Table 1与正文；CC BY 4.0：https://creativecommons.org/licenses/by/4.0/ 本平台于2026-10-25制作中文工作译稿、数字呈现及原创通俗反馈，均非原作者审定或背书；中文译稿未经验证。改动为英文转中文、只翻译已知两端选项、增加平台报告，不改变原18题顺序和计分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial self-review; not human or author approval",
+            "reviewedAt": "2026-10-29T16:33:46Z",
+            "basis": "本次仅审读新R文字、分数方向与当前源合同一致性；无计分／报告运行测试，不代表专家译审、人工批准或心理测量验证。保留原成人自答受众，student技术槽位不扩大为K12适用。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ccfq18",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "CCFQ1",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ2",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ3",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ4",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ5",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ6",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ7",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ8",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ9",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ18",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_control_over_emotion": 4,
+            "appraisal_and_coping_flexibility": 4
+          },
+          "totalScoreKeys": [
+            "cognitive_control_over_emotion",
+            "appraisal_and_coping_flexibility"
+          ]
+        }
+      },
+      {
+        "name": "maximum_after_reverse",
+        "answers": [
+          {
+            "itemCode": "CCFQ1",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ3",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ4",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ5",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ6",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ7",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ8",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ9",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ12",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ17",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_control_over_emotion": 7,
+            "appraisal_and_coping_flexibility": 7
+          },
+          "totalScoreKeys": [
+            "cognitive_control_over_emotion",
+            "appraisal_and_coping_flexibility"
+          ]
+        }
+      },
+      {
+        "name": "minimum_after_reverse",
+        "answers": [
+          {
+            "itemCode": "CCFQ1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ2",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ3",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ4",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ5",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ6",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ7",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ8",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ9",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ16",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ18",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_control_over_emotion": 1,
+            "appraisal_and_coping_flexibility": 1
+          },
+          "totalScoreKeys": [
+            "cognitive_control_over_emotion",
+            "appraisal_and_coping_flexibility"
+          ]
+        }
+      },
+      {
+        "name": "raw_all_one",
+        "answers": [
+          {
+            "itemCode": "CCFQ1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ3",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ4",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ5",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ6",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ7",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ8",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ9",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CCFQ18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_control_over_emotion": 5,
+            "appraisal_and_coping_flexibility": 1
+          },
+          "totalScoreKeys": [
+            "cognitive_control_over_emotion",
+            "appraisal_and_coping_flexibility"
+          ]
+        }
+      },
+      {
+        "name": "raw_all_seven",
+        "answers": [
+          {
+            "itemCode": "CCFQ1",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ2",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ3",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ4",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ5",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ6",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ7",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ8",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ9",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ12",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ16",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ17",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CCFQ18",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_control_over_emotion": 3,
+            "appraisal_and_coping_flexibility": 7
+          },
+          "totalScoreKeys": [
+            "cognitive_control_over_emotion",
+            "appraisal_and_coping_flexibility"
+          ]
+        }
+      },
+      {
+        "name": "fractional_means",
+        "answers": [
+          {
+            "itemCode": "CCFQ1",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "CCFQ2",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "CCFQ3",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ4",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ5",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ6",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ7",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ8",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ9",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ18",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_control_over_emotion": 3.888888888888889,
+            "appraisal_and_coping_flexibility": 4.111111111111111
+          },
+          "totalScoreKeys": [
+            "cognitive_control_over_emotion",
+            "appraisal_and_coping_flexibility"
+          ]
+        }
+      },
+      {
+        "name": "missing_appraisal_item",
+        "answers": [
+          {
+            "itemCode": "CCFQ2",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ3",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ4",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ5",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ6",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ7",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ8",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ9",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ18",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "cognitive_control_over_emotion": 4,
+            "appraisal_and_coping_flexibility": null
+          },
+          "totalScoreKeys": [
+            "cognitive_control_over_emotion",
+            "appraisal_and_coping_flexibility"
+          ]
+        }
+      },
+      {
+        "name": "missing_control_item",
+        "answers": [
+          {
+            "itemCode": "CCFQ1",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ3",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ4",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ5",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ6",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ7",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ8",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ9",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CCFQ18",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "cognitive_control_over_emotion": null,
+            "appraisal_and_coping_flexibility": 4
+          },
+          "totalScoreKeys": [
+            "cognitive_control_over_emotion",
+            "appraisal_and_coping_flexibility"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "cognitive_control_over_emotion": null,
+            "appraisal_and_coping_flexibility": null
+          },
+          "totalScoreKeys": [
+            "cognitive_control_over_emotion",
+            "appraisal_and_coping_flexibility"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "这份问卷希望了解：当有压力的情境引起消极的想法和情绪时，你通常会怎么想、怎么感受或怎么做。不同情境下你的反应当然可能不同，但请尽量想一想，当你感到有压力或心烦时，你通常的想法、感受或做法。请使用下面的选项，表示你对以下每句话的同意或不同意程度。\n\n通常，在有压力的情境中……",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/administration-and-translation.json#/administration/instructions_zh_working + /administration/stem_zh_working @ b92c69aefa2472775fa7ee86b9c208366886c908（原说明与共有引导句的项目中文工作译稿；非作者审定译本）"
+  }
+}

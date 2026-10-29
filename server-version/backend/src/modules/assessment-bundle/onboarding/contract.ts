@@ -1,5 +1,6 @@
 /** Pure JSON authoring contract. Parsing does not authorize installation or publication. */
 import { z } from 'zod'
+import { profileSchema, validateProfileModel, profileStateSchema } from '../profile/contract'
 import { parseBundleContextDefinition } from '../context'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { assessmentBundleDefinitionSchema, BUNDLE_KEY, EXACT_VERSION, SLOT_KEY } from '../schema'
@@ -29,7 +30,7 @@ const declaration = z.object({ ...assessmentBundleDefinitionSchema.shape,
   respondentTypes: z.tuple([z.literal('SELF')]),
   safetyCapability: z.object({ safetyCapable: z.literal(false), productionTriggerEnabled: z.literal(false) }).strict(),
 }).strict()
-export const packageSchema = z.object({
+const packageV1Schema = z.object({
   schemaVersion: z.literal(1),
   manifest: z.object({
     definition: declaration,
@@ -68,6 +69,23 @@ export const packageSchema = z.object({
   publication: z.object({ requestedStatus: z.enum(['DRAFT', 'PUBLISHED', 'HOLD', 'RETIRED']) }).strict(),
   context: z.unknown().optional(),
 }).strict()
+const packageV2Schema = packageV1Schema.extend({
+  schemaVersion:z.literal(2),
+  manifest:packageV1Schema.shape.manifest.extend({
+    packageSchemaVersion:z.literal(2),
+    definition:declaration.extend({engine:z.object({key:z.literal('declarative-evidence-v1'),version:z.literal('1.1.0')}).strict()}),
+    files:packageV1Schema.shape.manifest.shape.files.extend({profile:z.literal('profile.json')}),
+  }),
+  profile:profileSchema,
+  fixtures:z.record(z.string(),z.object({
+    values:z.record(key,z.discriminatedUnion('state',[
+      z.object({state:z.literal('present'),value:scalar}).strict(),z.object({state:z.literal('missing')}).strict(),
+      z.object({state:z.literal('invalid')}).strict(),z.object({state:z.literal('not_applicable')}).strict(),
+    ])),expectedRuleIds:z.array(key),expectedKind:z.enum(['COMPUTED','UNAVAILABLE']),
+    expectedProfile:z.object({state:profileStateSchema,profileId:z.string().nullable()}).strict(),
+  }).strict()).refine(value=>Object.keys(value).sort().join('|')===['valid','missing','invalid','not-applicable'].sort().join('|'),'exactly four package fixtures required'),
+}).strict()
+export const packageSchema=z.discriminatedUnion('schemaVersion',[packageV1Schema,packageV2Schema])
 export type DeclarativePackage = z.infer<typeof packageSchema>
 
 /** Iterative preflight bounds hostile nesting before recursive schema evaluation. */
@@ -88,8 +106,20 @@ function assertJsonBudget(raw: unknown) {
   }
   if (Buffer.byteLength(JSON.stringify(raw), 'utf8') > PACKAGE_LIMITS.bytes) throw new Error('PACKAGE_SIZE_EXCEEDED')
 }
+// Immutable static configuration only; never cache participant facts or permissions.
+const profilePackageCache=new Map<string,DeclarativePackage>()
+function freezeContent<T>(value:T):T{
+  if(value && typeof value==='object' && !Object.isFrozen(value)){
+    for(const child of Object.values(value))freezeContent(child)
+    Object.freeze(value)
+  }
+  return value
+}
 export function parseDeclarativePackage(raw: unknown): DeclarativePackage {
   assertJsonBudget(raw)
+  const cacheKey=(raw as {schemaVersion?:unknown})?.schemaVersion===2?canonicalHash(raw):null
+  const cached=cacheKey?profilePackageCache.get(cacheKey):null
+  if(cached)return cached
   const value = packageSchema.parse(raw)
   const fail = (path: string, message: string): never => { throw new Error(`${path}: ${message}`) }
   const unique = (items: string[], path: string) => { if (new Set(items).size !== items.length) fail(path, 'duplicate identity') }
@@ -147,11 +177,38 @@ export function parseDeclarativePackage(raw: unknown): DeclarativePackage {
   }
   for (const rule of value.rules.items) if (!value.report.blocks.some(b => b.ruleIds.includes(rule.ruleId))) fail('report.blocks', `missing rule ${rule.ruleId}`)
   if (value.report.key !== definition.reportDefinitionKey || value.report.version !== definition.reportDefinitionVersion) fail('report', 'identity mismatch')
+  if(value.schemaVersion===2 && Boolean(value.manifest.files.profile)!==Boolean(value.profile))fail('profile','file declaration mismatch')
   if (Boolean(value.manifest.files.context) !== (value.context !== undefined)) fail('context', 'file declaration mismatch')
   if (value.context !== undefined) {
     const context = parseBundleContextDefinition(value.context)
     if (context.contextDefinitionKey !== definition.contextDefinitionKey || context.contextDefinitionVersion !== definition.contextDefinitionVersion) fail('context', 'exact identity mismatch')
   } else if (definition.contextDefinitionKey !== null || definition.contextDefinitionVersion !== null) fail('context', 'required context missing')
+  if(value.schemaVersion===2){
+    const profile=value.profile
+    validateProfileModel(profile)
+    const grade=evidence.get(profile.applicability.gradeEvidenceKey)
+    if(!grade || slots.get(grade.slotKey)?.unitType!=='FORM' || grade.valueType!=='number')fail('profile.applicability','declared numeric grade context required')
+    const sourceMetrics:string[]=[]
+    for(const b of profile.bindings){
+      const e=evidence.get(b.evidenceKey),slot=e?slots.get(e.slotKey):undefined
+      if(!e || !slot || slot.unitType!=='SCALE' || !slot.required || e.valueType!=='number' || e.role!=='PRIMARY' || e.qualityPolicy!=='interpretable_only')fail('profile.bindings','required interpretable primary SCALE evidence required')
+      if(e!.construct!==b.constructKey || slot!.instrumentKey!==b.source.instrumentKey || slot!.instrumentVersion!==b.source.instrumentVersion)fail('profile.bindings','exact source/construct mismatch')
+      sourceMetrics.push(e!.slotKey+':'+e!.selector)
+    }
+    unique(sourceMetrics,'profile.bindings.source')
+    if(new Set(profile.bindings.map(b=>evidence.get(b.evidenceKey)!.slotKey)).size<2)fail('profile.bindings','cross-tool profile requires at least two sources')
+    for(const p of profile.profiles)for(const ref of [...p.supportRefs,...p.actions.flatMap(a=>a.supportRefs)])if(!references.get(ref)?.allowedClaims.includes('cross_source_condition'))fail('profile.profiles','support reference must cover cross-source theory claim')
+    for(const id of profile.modifierRuleIds){
+      const rule=value.rules.items.find(r=>r.ruleId===id)
+      if(!rule || !rule.evidenceKeys.some(k=>evidence.get(k)?.role==='SUPPORTING'))fail('profile.modifierRuleIds','modifier requires its own supporting evidence')
+    }
+    if(profile.templateVersion!==value.report.version || profile.key!==definition.bundleKey)fail('profile','exact model/template identity required')
+    if(value.scientific.maturity!=='EXPERIMENTAL')fail('profile','theory model is experimental')
+  }
+  if(cacheKey){
+    if(profilePackageCache.size>=16)profilePackageCache.delete(profilePackageCache.keys().next().value!)
+    profilePackageCache.set(cacheKey,freezeContent(value))
+  }
   return value
 }
 export function hashDeclarativePackage(raw: unknown): string {
