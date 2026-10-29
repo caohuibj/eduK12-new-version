@@ -46,7 +46,7 @@ describe('direct education native Cognitive config/profile',()=>{
   await expect(readEducationCognitiveSources(f.tx,context,[missing as typeof f.source])).rejects.toThrow()
   await expect(readEducationCognitiveSources(f.tx,context,[{...f.source,profile:'other'} as unknown as typeof f.source])).rejects.toThrow()
  })
- it.each([{status:'RETIRED' as const},{tamper:true}])('rejects a stopped or changed original instead of selecting latest',async options=>{
+ it.each([{scenario:'retired',options:{status:'RETIRED' as const}},{scenario:'changed content',options:{tamper:true}}])('rejects a $scenario original instead of selecting latest',async({options})=>{
   const f=fixture(options);await expect(readEducationCognitiveSources(f.tx,context,[f.source])).rejects.toThrow()
  })
  it('requires the original GRANT independently from the new education U, including publication and START recheck',async()=>{
