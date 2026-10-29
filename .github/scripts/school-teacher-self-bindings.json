@@ -6,7 +6,7 @@
   "enabled": true,
   "base": "9801107019d51a4af7ddb651789b674867539d24",
   "frozenDevelopmentHead": "9fa3c51e5deb882beb4a0d56f1ebe44dae8f76f5",
-  "productHead": "9f65b298ffe17700638f1a55bca6a91973c17189",
+  "productHead": "3934a70c889a5482d5d167cfd62b67caeeebca1f",
   "frontendTree": "2907eedb6ad9d1bdc5559f3e61b1f6145ac8b39b",
   "backendTree": "296b66b01b9b282110bd1939049fcee05643717e",
   "source": {
@@ -655,7 +655,9 @@
     ".github/workflows/ci.yml": "78f8d7fe2f3ad38e9388d38f58085b84d3087f56",
     "server-version/e2e/education-self-questionnaire.cjs": "",
     "server-version/e2e/school-teacher-browser.cjs": "530a56f8e456a47718b2a4c00e2b2643b80cf50b",
-    "server-version/e2e/school-teacher-fixture.cjs": "e143fd988330b1c62578b3e43ab85382725a8c3f"
+    "server-version/e2e/school-teacher-fixture.cjs": "e143fd988330b1c62578b3e43ab85382725a8c3f",
+    "server-version/e2e/school-teacher-chrome-permissions.cjs": "4a0b22f2eb8fb778549a1a83495460d0a203bf64",
+    "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "e8ae485de219a08589419d377293b9f005e54d7c"
   },
   "controlAfter": {
     ".github/scripts/admin-permissions-functional.test.mjs": "6c1d1e05c8ab463bc99780a8a042b94d2c729dee",
@@ -668,20 +670,24 @@
     ".github/scripts/school-teacher-self-baseline.sql": "4052c21cfb980282bf72f581a6cd26494021d153",
     ".github/scripts/school-teacher-self.test.mjs": "025e3851ec9e8378d4e9cde1979fe66bccd91062",
     ".github/scripts/school-teacher-storage.postgres.test.mjs": "727cc24474da221fcebb49905c58605f6a166f97",
-    ".github/workflows/ci-school-teacher.yml": "d724ee1ffe4fb850a6fbfc26283412962cda30f2",
+    ".github/workflows/ci-school-teacher.yml": "d6de70a4fc42d933d7841dace9af2937220a0bb4",
     ".github/workflows/ci.yml": "797cc8c87ad01a055663e90ad5e6c8b44b4ed7e0",
     "server-version/e2e/education-self-questionnaire.cjs": "a5164c88c4e8d8f487b94b02b4eb5103e96260d9",
     "server-version/e2e/school-teacher-browser.cjs": "48cfb3c6cc11efe871a16873ddc43154cdc64a8b",
-    "server-version/e2e/school-teacher-fixture.cjs": "cc42e320cbf8a5ec49fbf28c0adf690bd15d223c"
+    "server-version/e2e/school-teacher-fixture.cjs": "cc42e320cbf8a5ec49fbf28c0adf690bd15d223c",
+    "server-version/e2e/school-teacher-chrome-permissions.cjs": "369e29362611b7099989f19fc273f8b9649dc146",
+    "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "4e30bc53738bd7169b0c57d8770ba6dfdfa2a3e5"
   },
   "evidenceSha256": "db20d58fbafe0178969fa8ab3d13cde454131630bfe772beada344f6b4df37db",
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "DOT independently reviewed fb8489caf wiring and the exact two test-only repairs at 9f65b298f, authorized the minimum stable formal continuation. Existing official reuse functions are fixed to earlier PR338 identities; current fresh executor forbids historical manifests/receipts and requires the actual current SHA/run. Configuration alone cannot admit run40800152983. No executor/workflow/acceptance logic change: retain its original failed invocations and run the existing bounded qualification of current source. This is not PR approval or merge authorization.",
-    "basisCommit": "9f65b298ffe17700638f1a55bca6a91973c17189",
+    "note": "DOT independently reviewed wiring fb8489caf, test repairs9f65b298f and the exact three-file opt-only control3934a70c8. Current user permission confirmation authorizes only PR382 temporary runner /opt0777 ->0755. Existing package/byte/owner/inode checks, preflight, sandbox and required gates remain. Formal qualification and final DOT merge check still required; no PR approval or merge authorization.",
+    "basisCommit": "3934a70c889a5482d5d167cfd62b67caeeebca1f",
     "reviewer": "DOT independent parent review",
-    "wiringBasisCommit": "fb8489caf91e09fb9ca7183bef5d0c7a49e0ad7e"
+    "wiringBasisCommit": "fb8489caf91e09fb9ca7183bef5d0c7a49e0ad7e",
+    "testRepairBasisCommit": "9f65b298ffe17700638f1a55bca6a91973c17189",
+    "permissionAuthorization": "User explicitly confirmed current PR382 temporary GitHub runner /opt root:root 0777 ->0755 and continue CI; DOT independently reviewed commit3934a70c8. Already0755 is no-op. No other directory, production environment, package bytes, ownership, sandbox or runtime checks may be changed."
   },
   "requiredJobs": [
     "admission",
@@ -1647,12 +1653,12 @@
     ],
     "browserHelper": "server-version/e2e/education-self-questionnaire.cjs",
     "continuationDecision": {
-      "previousRun": 40800152983,
-      "previousCheckout": "8cc3c8cca55c5b181724de526454b12fd1203245",
-      "previousSource": "c1c5787e54a51a1c758fc41fbcf17c28ee9ddbbb",
+      "previousRun": 40802799510,
+      "previousCheckout": "29db7e852dc3d24b49a263fa2506898a74c03556",
+      "previousSource": "34a25f7480ebbf472a9ee39cbd8e281ae33aa0c7",
       "officialReuse": "NOT_SUPPORTED_BY_EXISTING_FRESH_EXECUTOR",
       "reason": "Official legacy consumers bind PR338 and fixed run/job/build identities; fresh artifacts require current SHA/run and reject old receipts. Parameter-only substitution cannot preserve those invariants.",
-      "method": "Existing bounded fresh jobs; no general admission system and no changed gate logic. Failed PG service has no qualified dump, so actual new result/restore inputs are necessary."
+      "method": "Existing bounded fresh jobs. Retain original successful frontend/backend/audit/PG/restore/CodeQL evidence under its original identity; current fresh executor cannot admit arbitrary new fixed run through configuration alone. No admission framework. Only newly authorized PR382 opt-only preparation precedes unchanged strict preflight."
     }
   },
   "blockers": []
