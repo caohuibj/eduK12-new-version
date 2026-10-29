@@ -1,0 +1,1682 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ffmq15_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "正念五个侧面问卷（FFMQ-15，中文工作稿）",
+      "abbreviation": "FFMQ-15-ZH",
+      "instrumentFamily": "Five Facet Mindfulness Questionnaire, 15-item short form; Baer2012 / Gu2018 author-file identity"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "一般日常经验中观察、描述、觉知行动、不评判内在经验及不立即反应五个侧面的自报倾向；不是正念能力考试、症状筛查或干预疗效判定。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ffmq15_zh_cn_research",
+        "domain:social_emotional",
+        "domain:mindfulness",
+        "domain:self_regulation",
+        "construct:mindfulness_facets",
+        "construct:observing",
+        "construct:describing",
+        "construct:acting_with_awareness",
+        "construct:nonjudging",
+        "construct:nonreactivity",
+        "orientation:mindfulness_processes",
+        "orientation:ACT_DBT_related_not_exclusive",
+        "population:adult_18_plus",
+        "population:source_uk_mdd_remission",
+        "population:not_k12_validated",
+        "response:15_items",
+        "response:seven_reverse_items",
+        "response:five_point_truth",
+        "use:mindfulness_reflection",
+        "use:not_intervention_effect_test",
+        "use:no_cross_time_improvement_claim",
+        "正念五个侧面",
+        "觉察体验",
+        "描述感受",
+        "留意正在做的事",
+        "不急着评价自己",
+        "与想法保持空间",
+        "成人自评",
+        "population:self_report",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:fixed_order",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_high_stakes_selection",
+        "use:not_school_ranking",
+        "use:no_validated_cutoff",
+        "license:cc_by_3_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:source_allows_redistribution",
+        "license:source_allows_adaptation",
+        "license:source_allows_commercial_use",
+        "language_validation:original_en",
+        "language_validation:zh_cn_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:china_validation_not_established",
+        "中文工作译稿",
+        "个人反思",
+        "非诊断",
+        "可署名再分发"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "来源验证为英国PREVENT/SWAD中有反复抑郁发作经历、处于缓解期并完成MBCT的成年人238人；纳入要求18岁以上，实际23–78岁；只施测39题，15题结果由39题中抽取。不是中国人群或一般人群常模。 本平台暂设18岁以上成人自评，是当前使用边界，不代表所有中国成人均已验证。"
+    },
+    "administration": {
+      "itemCount": 15,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般日常习惯或看法；未额外指定最近7天或30天",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "完整保留作者修订题本15题与原题序，五维各三题；7道反向用6减原始值。",
+        "五维分别求和3–15，依据Gu2016方法及Table1。OpenScales均分1–5及总分不作为本包算法。",
+        "保留五维结果，不自动拼全表总分，也不删除观察维度；不把研究中“排除观察后比较”当普适删题规则。",
+        "作者说明干预前后结构不稳定；本包不自动将前后差值解释为改善或疗效，尤其观察维度不可简单比较。",
+        "原研究使用39题后抽取15题；不冒称15题独立施测或中国验证。",
+        "原文未规定缺失插补规则，本平台保守要求每维3题齐答，任何主要维度不足时报告整体不解释；其他可算维度仍保留。",
+        "既有独立工作指导语已逐字绑定到顶层instruction，不塞进第一题，不增加固定回顾时窗；具体页面展示以实际消费者核验为准。",
+        "预计时长为平台估计，不是原作者实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原语言研究可追溯；本中文工作稿独立管理，不继承验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于回顾个人体验与可行小行动，不贴能力、人格或疾病标签。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ffmq15-original-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "来源验证为英国PREVENT/SWAD中有反复抑郁发作经历、处于缓解期并完成MBCT的成年人238人；纳入要求18岁以上，实际23–78岁；只施测39题，15题结果由39题中抽取。不是中国人群或一般人群常模。",
+        "ageRange": "纳入18岁以上，实际23–78岁",
+        "locale": "en",
+        "territory": "GB",
+        "sampleSize": 238,
+        "studyDesign": "来源研究结构结果有明确适用边界，不构成中国常模或本中文版验证。",
+        "rating": "MIXED",
+        "citation": "Baer, R. A., Carmody, J., & Hunsinger, M. (2012). Weekly change in mindfulness and perceived stress in a mindfulness-based stress reduction program. Journal of Clinical Psychology, 68(7), 755–765. https://doi.org/10.1002/jclp.21865. Gu, J., Strauss, C., Crane, C., Barnhofer, T., Karl, A., Cavanagh, K., & Kuyken, W. (2016). Examining the factor structure of the 39-item and 15-item versions of the Five Facet Mindfulness Questionnaire before and after mindfulness-based cognitive therapy for people with recurrent depression. Psychological Assessment, 28(7), 791–802. https://doi.org/10.1037/pas0000263. Exact item/scoring file: Jenny Gu, FFMQ-15 items and scoring information, author upload revised 2018-02-28.",
+        "doi": "10.1037/pas0000263",
+        "url": "https://doi.org/10.1037/pas0000263",
+        "notes": "Gu2016只施测39题后抽取15题；前后结构不稳定，作者2018修订稿保留相同15题。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Jenny Gu作者2018修订PDF第1页完整15题、第2页Scoring Information；2016上传稿题文一致但短版开发引文有更正",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "独立中文工作翻译，原版/作者文件修订与平台版本分别管理，未复制其他中文译本。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ffmq15_zh_cn_research-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ffmq15_zh_cn_research-1.0.1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ffmq15_zh_cn_research-1.0.1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "FFMQ原工具源流：Baer、Smith、Hopkins、Krietemeyer与Toney(2006)；15题版Baer、Carmody与Hunsinger(2012)；复制精确载体为Jenny Gu作者上传的2018修订题本，作者页面明确CC BY 3.0。 Baer, R. A., Carmody, J., & Hunsinger, M. (2012). Weekly change in mindfulness and perceived stress in a mindfulness-based stress reduction program. Journal of Clinical Psychology, 68(7), 755–765. https://doi.org/10.1002/jclp.21865. Gu, J., Strauss, C., Crane, C., Barnhofer, T., Karl, A., Cavanagh, K., & Kuyken, W. (2016). Examining the factor structure of the 39-item and 15-item versions of the Five Facet Mindfulness Questionnaire before and after mindfulness-based cognitive therapy for people with recurrent depression. Psychological Assessment, 28(7), 791–802. https://doi.org/10.1037/pas0000263. Exact item/scoring file: Jenny Gu, FFMQ-15 items and scoring information, author upload revised 2018-02-28. 精确复制源：Jenny Gu作者2018修订PDF第1页完整15题、第2页Scoring Information；2016上传稿题文一致但短版开发引文有更正。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/）；本包由作者公开英文独立译为中文，独立编写指导语与反馈，保留署名、原始出处、许可链接和修改说明，不声称原作者认可、专家译审或中国人群验证。作者PDF SHA-256：f0c7d7875ed6eac280d166b0329ec06d1b788ee00dbaf108b33ece4f1f3d4a2c。",
+      "许可及人群标签服务检索，不自动授予系统权限；本包DRAFT，不授权或激活产品入口。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "Five Facet Mindfulness Questionnaire, 15-item short form; Baer2012 / Gu2018 author-file identity; independently prepared Chinese working version",
+        "citation": "Baer, R. A., Carmody, J., & Hunsinger, M. (2012). Weekly change in mindfulness and perceived stress in a mindfulness-based stress reduction program. Journal of Clinical Psychology, 68(7), 755–765. https://doi.org/10.1002/jclp.21865. Gu, J., Strauss, C., Crane, C., Barnhofer, T., Karl, A., Cavanagh, K., & Kuyken, W. (2016). Examining the factor structure of the 39-item and 15-item versions of the Five Facet Mindfulness Questionnaire before and after mindfulness-based cognitive therapy for people with recurrent depression. Psychological Assessment, 28(7), 791–802. https://doi.org/10.1037/pas0000263. Exact item/scoring file: Jenny Gu, FFMQ-15 items and scoring information, author upload revised 2018-02-28.",
+        "url": "https://www.researchgate.net/publication/303709635_FFMQ-15_items_and_scoring_information",
+        "publicationYear": 2018
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "FFMQ原工具源流：Baer、Smith、Hopkins、Krietemeyer与Toney(2006)；15题版Baer、Carmody与Hunsinger(2012)；复制精确载体为Jenny Gu作者上传的2018修订题本，作者页面明确CC BY 3.0。 Baer, R. A., Carmody, J., & Hunsinger, M. (2012). Weekly change in mindfulness and perceived stress in a mindfulness-based stress reduction program. Journal of Clinical Psychology, 68(7), 755–765. https://doi.org/10.1002/jclp.21865. Gu, J., Strauss, C., Crane, C., Barnhofer, T., Karl, A., Cavanagh, K., & Kuyken, W. (2016). Examining the factor structure of the 39-item and 15-item versions of the Five Facet Mindfulness Questionnaire before and after mindfulness-based cognitive therapy for people with recurrent depression. Psychological Assessment, 28(7), 791–802. https://doi.org/10.1037/pas0000263. Exact item/scoring file: Jenny Gu, FFMQ-15 items and scoring information, author upload revised 2018-02-28. 精确复制源：Jenny Gu作者2018修订PDF第1页完整15题、第2页Scoring Information；2016上传稿题文一致但短版开发引文有更正。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/）；本包由作者公开英文独立译为中文，独立编写指导语与反馈，保留署名、原始出处、许可链接和修改说明，不声称原作者认可、专家译审或中国人群验证。作者PDF SHA-256：f0c7d7875ed6eac280d166b0329ec06d1b788ee00dbaf108b33ece4f1f3d4a2c。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ffmq15_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "从不或极少符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有时符合",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常经常或总是符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "FFMQ15_01",
+          "content": "洗澡或泡澡时，我会留意水接触身体的感觉。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_02",
+          "content": "我很会找到词语来描述自己的感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_03",
+          "content": "因为在做白日梦、担心事情或被其他事分心，我没有注意自己正在做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_04",
+          "content": "我认为自己的一些想法不正常或不好，觉得不该那样想。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_05",
+          "content": "当出现令人苦恼的想法或画面时，我会“退后一步”，觉察它们，而不被它们带着走。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_06",
+          "content": "我会注意食物和饮料怎样影响自己的想法、身体感觉和情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_07",
+          "content": "我很难想到合适的词语，来表达自己对事情的感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_08",
+          "content": "我会自动地做事或完成任务，却没有意识到自己正在做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_09",
+          "content": "我认为自己的某些情绪不好或不合适，觉得不该有这些感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_10",
+          "content": "当出现令人苦恼的想法或画面时，我能够只是注意到它们，而不作出反应。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_11",
+          "content": "我会留意一些感觉，比如风吹动头发，或阳光照在脸上的感觉。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_12",
+          "content": "即使心烦意乱，我也能找到用语言表达感受的方式。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_13",
+          "content": "我发现自己做事时没有留意。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_14",
+          "content": "我会告诉自己，不该有现在这样的感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FFMQ15_15",
+          "content": "当出现令人苦恼的想法或画面时，我只是注意到它们，然后让它们过去。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "ffmq15_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.1",
+        "itemRules": [
+          {
+            "itemCode": "FFMQ15_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "observe",
+            "type": "dimension",
+            "label": "留意身边和身体的感觉",
+            "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FFMQ15_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_11",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "describe",
+            "type": "dimension",
+            "label": "把感受说出来",
+            "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FFMQ15_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "act_aware",
+            "type": "dimension",
+            "label": "留意正在做的事",
+            "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FFMQ15_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_13",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "nonjudge",
+            "type": "dimension",
+            "label": "少一点急着评价自己",
+            "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FFMQ15_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_14",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "nonreact",
+            "type": "dimension",
+            "label": "给想法留一点空间",
+            "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FFMQ15_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FFMQ15_15",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "observe",
+          "describe",
+          "act_aware",
+          "nonjudge",
+          "nonreact"
+        ],
+        "scoreOrder": [
+          "observe",
+          "describe",
+          "act_aware",
+          "nonjudge",
+          "nonreact"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "observe",
+            "headline": "观察感觉：看见不等于必须更放松",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份报告带走一句话：把五个侧面当回顾问题，不把正念变成能力排名。\n\n每侧面三题统一方向后求和3–15，分别看，没有总分。问的是平时习惯或看法，无固定一周或一月窗口；例子不是系统已观察到的个人情况。\n\n观察分越大，表示更常自述留意身体、食物饮料带来的体验及风或阳光等感觉。例如，洗澡时注意到水的温度，只是一种留意，不证明更健康或更放松。已有合适方式可以保留，不需要为了注意更多而持续盯着身体。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "愿意且安全时，短暂留意一个中性的触感或周围感觉，再回到原来的事。不舒服就停或换一个外在对象，不要求自己坚持更久。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "describe",
+            "headline": "描述感受：找到词语，不等于必须说给别人",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "三题统一计分方向后相加为3–15；越大表示更常自述能找到词语表达感受，不是语言能力考试或情绪都很清楚。\n\n例如，只知道“有点不舒服”，还分不清烦躁与委屈，可以先这样记录。这个例子不意味着问卷已判断你表达困难。\n\n已有的词语可以继续用，暂时说不准也可留空或用近似词；描述自己并不要求向不安全或不愿意面对的人公开。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先用一个大致感受词，再补一句“我目前需要什么”。不必一次准确，也不把找不到词当成又一个需要责备自己的问题。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "act_aware",
+            "headline": "觉察行动：高分是较少自动分心",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "三题统一计分方向后相加为3–15。越大表示较少报告走神、自动做事或没留意当前任务，不是分心更严重，也不等于客观注意能力更强。\n\n例如，收拾完才不记得刚才做了哪一步，可以回顾当时任务、疲惫和干扰，而不只责怪自己。例子并非个人结论。\n\n已有让行动清楚的小安排可以保留；并不需要一直专注，或用每次走神证明自己不够认真。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "选一件普通任务，先看清当前一步。发现分心后从能接续的地方回来；确实疲劳、负担过大或要求不清时，先调整条件，不强迫自己靠意志撑住。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonjudge",
+            "headline": "少评判内心：承认感受，不免除行为责任",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "三题统一计分方向后相加为3–15；越大表示较少自述批评自己的想法、认为不该有某种情绪。不是评判更多，也不是所有想法都真实或所有行为都合理。\n\n例如，生气后又责怪“我不该生气”，会出现第二层自责。这里是帮助回顾的场景，不是系统认定你的情绪。\n\n可以承认已经有这个感受，同时仍选择不伤害自己或别人；不要求把不喜欢的念头改成积极的。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "试把“我不该这样”改成“我现在有这个感受”，再看下一步怎样更合适。需要修正行为或处理现实问题时照样处理，不用先审判整个人。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonreact",
+            "headline": "不马上反应：让念头经过，不是把它关掉",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "三题和分3–15，越大表示更常自述能注意到令人苦恼的想法或画面，不立即被它带走，或让它经过。它不是从此没有困扰，也不要求把念头压住。\n\n例如，担心一句话说错，想立刻反复解释，可以先辨认担心，再决定是否需要回应。这是例子，不代表实际行为判断。\n\n已有能停一下的方式可以保留；如果困难很强，也可以先找支持，不必独自证明自己能把所有念头处理好。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "在安全且不耽误必要行动时，给一个念头留短暂停顿，问“眼下需要做什么”。不舒服或反而更纠缠时可停止、换方法或求助，不把不反应等同于忽略实际风险。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "每侧面仅3题，来源样本有限，本中文尚未验证；五项不排能力强弱，也不判断练习疗效。"
+        ],
+        "disclaimer": "供成年人回顾个人体验和习惯，不是考试，也不能用于诊断或证明干预效果。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:18:04Z",
+            "basis": "本次AI文字自审对应ffmq15_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ffmq15",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "references": [],
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "observe": 3,
+            "describe": 3,
+            "act_aware": 3,
+            "nonjudge": 3,
+            "nonreact": 3
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "observe": 15,
+            "describe": 15,
+            "act_aware": 15,
+            "nonjudge": 15,
+            "nonreact": 15
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "observe": 9,
+            "describe": 9,
+            "act_aware": 9,
+            "nonjudge": 9,
+            "nonreact": 9
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_one",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "observe": 3,
+            "describe": 7,
+            "act_aware": 15,
+            "nonjudge": 15,
+            "nonreact": 3
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_max",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "observe": 15,
+            "describe": 11,
+            "act_aware": 3,
+            "nonjudge": 3,
+            "nonreact": 15
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "observe": 3,
+            "describe": 8,
+            "act_aware": 9,
+            "nonjudge": 6,
+            "nonreact": 15
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "only_observe_higher",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "observe": 15,
+            "describe": 3,
+            "act_aware": 3,
+            "nonjudge": 3,
+            "nonreact": 3
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "only_nonreact_higher",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "observe": 3,
+            "describe": 3,
+            "act_aware": 3,
+            "nonjudge": 3,
+            "nonreact": 15
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "missing_first",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "observe": null,
+            "describe": 9,
+            "act_aware": 9,
+            "nonjudge": 9,
+            "nonreact": 9
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "missing_reverse",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "observe": 9,
+            "describe": null,
+            "act_aware": 9,
+            "nonjudge": 9,
+            "nonreact": 9
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "missing_each_dimension",
+        "answers": [
+          {
+            "itemCode": "FFMQ15_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FFMQ15_15",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "observe": null,
+            "describe": null,
+            "act_aware": null,
+            "nonjudge": null,
+            "nonreact": null
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "observe": null,
+            "describe": null,
+            "act_aware": null,
+            "nonjudge": null,
+            "nonreact": null
+          },
+          "totalScoreKeys": [
+            "observe",
+            "describe",
+            "act_aware",
+            "nonjudge",
+            "nonreact"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据平时的情况，选择下面每句话有多符合你。选项从“从不或极少符合”到“非常经常或总是符合”。例如，经常符合可选4，有时符合可选3。没有对错，请按自己的实际情况作答。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/administration.md @ b92c69aefa2472775fa7ee86b9c208366886c908；既有项目改编指导语，与instruction.for-pr356.json正文一致，非人类专家审批声明。"
+  }
+}

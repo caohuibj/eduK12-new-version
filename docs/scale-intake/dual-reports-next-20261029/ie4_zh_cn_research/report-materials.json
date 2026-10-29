@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ie4_zh_cn_research",
+  "instrumentVersion": "1.2.0",
+  "originalSourceSha256": "50a4413f31b7e33c0a0095fece74731b3f5758f8ff8955a074098389c0101d5e",
+  "oldReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "internal",
+      "external"
+    ],
+    "scoreOrder": [
+      "internal",
+      "external"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "internal",
+        "headline": "你怎样看待自己行动的影响",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题关注你是否觉得自己能够作主，以及努力可能带来什么。分数越高，表示这次更认可自己的行动能够影响结果。它不是一张能力成绩单，也不意味着遇到困难就是努力不够；机会、资源和他人的支持同样重要。可以想想最近一件你能做一点改变的事，把注意力放在一个具体、可行的小步骤上。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一次自己作主时，哪些条件帮助了你？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一件可掌握的小事，写出下一步需要的时间、材料或帮助。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "external",
+        "headline": "你怎样看待外部条件的影响",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题关注你觉得别人、命运或环境在多大程度上影响自己的安排。分数越高，表示这次更认可外部力量的影响。现实限制确实可能存在，承认它们并不等于消极或放弃。可以把眼前的事分成“可以商量的”“需要支持的”和“暂时无法改变的”，不要求自己控制一切。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近有什么安排受到了他人或环境影响？哪些限制是真实存在的？"
+          },
+          {
+            "category": "strategy",
+            "text": "先找一个能沟通或能获得支持的环节；暂时无法改变的部分，不必全归到自己身上。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+      "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+      "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+      "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思，不作诊断、选拔、责任判断或能力预测。© Nießen et al. (2022)，CC BY 4.0；中文与报告为独立改编。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T17:49:00Z",
+        "basis": "AI editorial review only; adult self-report research, no ability, blame, clinical or success prediction; expert translation review pending."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "internal",
+      "external"
+    ],
+    "scoreOrder": [
+      "internal",
+      "external"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "internal",
+        "headline": "看到自己可以作主的部分，也不包揽全部责任",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组两题关注你是否觉得自己能作主，以及努力与成功之间的联系。均分范围1–5，数值越大，表示这次整体更认可自己的行动能够影响结果。它描述一种信念，不是实际控制力或能力的测验。\n\n例如，和家人安排一个周末，你可以说出偏好、提出方案，也可能受到轮班和照护安排的限制。能表达自己的选择，与能决定最终结果，是两回事。如果已有能商量、能选择的空间，可以继续使用；若没有得到预期结果，也不必把所有责任揽回自己身上。另一组对外部力量的看法需分开看，不是越少越好。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看一次自己作主的经历：你具体决定了什么？哪些人、规则或资源让这个选择成为可能？把自己的作用与帮助它发生的条件都记在内。"
+          },
+          {
+            "category": "strategy",
+            "text": "在愿意且安全的场合表达一个偏好：例如说清自己希望怎样安排，再听听哪些部分可以协商。把结果看成互动后的信息，不用“成功了才算我有用”给自己下结论。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "external",
+        "headline": "把外部限制说清楚，不把它们都算作自己的失败",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组两题关注别人对安排的影响，以及计划受命运或机遇阻碍的感受。均分范围1–5，数值越大，表示这次整体更认可外部力量的影响；不是越大就越消极，也不等于在推卸责任。\n\n例如，一个人的时间表可能被排班、照护责任或别人能否配合所改变。这些限制可能真实存在，不能只靠“再努力一点”解决。如果有可沟通的部分，可以寻找支持；暂时无法改变的部分，也不必全归咎于自己。两组回答可以同时认可行动与限制，报告不会把它们相减或合成一个“好坏”总分。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把限制从笼统说法变具体：是哪一项安排、谁的决定、什么条件在影响你？同时区分“已经确认的限制”和“尚待问清的情况”。"
+          },
+          {
+            "category": "support",
+            "text": "辨认适合的支持位置：若可协商，可以说明实际需要；若涉及制度、资源或安全问题，考虑谁有相应职责或能提供协助，不要求自己独自改变整个环境。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每组只有两题，这份中文版本仍在研究完善，不提供人群分档或排名。四题答完整才提供整份解释，漏答不是0分。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思，不作诊断、选拔、责任判断或能力预测。© Nießen et al. (2022)，CC BY 4.0；中文与报告为独立改编。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:38:18Z",
+        "basis": "本次只读审阅ie4_zh_cn_research C1.2.0当前source、固定既有材料及新R1.1.0文字，核分组/原方向/时窗/缺失0与null、固定例子和构念适配行动；不改受众权限，不继承旧审核日期，不声称新中文验证、作者批准或新schema/scorer/PG/CI通过。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "internal",
+      "external"
+    ],
+    "scoreOrder": [
+      "internal",
+      "external"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "internal",
+        "headline": "一张安排表上，也给自己留一支笔",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：能写自己的一笔，不等于要为整张表负责。\n\n把生活安排想成一张多人一起填写的表。内控这一组回看你是否相信自己的决定与努力能影响结果，均分1–5，数值越大表示整体更认可这类描述，不是说一支笔能改完所有栏目。\n\n假设周末出行要兼顾几个人的时间：你可以提出喜欢的安排，却不能单独决定别人的班次。若能表达意愿，就珍惜那一笔；若最后没有成行，也不能据此把你整个人判成不够努力。这个比喻供你对照，不是系统从分数找出了你已经掌握的权力。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "看看哪一栏真由你写：回想一次选择，分清自己的决定、别人给予的空间与原有条件，不把支持从自己的经历里删掉。"
+          },
+          {
+            "category": "strategy",
+            "text": "说出一笔具体的意愿：在适合的场合明确一个偏好，再核对能商量到哪里。做一次真实表达，而不是先要求自己控制整个结果。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "external",
+        "headline": "有些栏别人也在写，有些边框确实在那里",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：看清限制，不等于给自己写“失败”。\n\n外控这一组回看你对他人、命运或机遇影响安排的看法，均分1–5，数值越大表示整体更认可这些外部影响。它不是一张“你太被动”的批评条。\n\n一张表上，排班、规则、资源与他人的决定都可能先占了位置。有的可以沟通，有的暂时不能。如果你也认可自己的行动有作用，并不矛盾：一个人可以愿意努力，同时清楚需要什么条件。两组不是同一条尺子的胜负两端，更不是用来裁定困境该怪谁。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "给边框写个名字：把“什么都不由我”换成一项明确限制，再看看哪些已经确认、哪些还有信息空白。不必强行找出一个“其实都能改变”的答案。"
+          },
+          {
+            "category": "support",
+            "text": "能商量的找对人，不能独扛的找支持：例如说明时间冲突、需要的资源或应由谁处理的问题。承认现实，不会自动抹掉你的努力。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每组只有两题，这份中文版本仍在研究完善，不提供人群分档或排名。四题答完整才提供整份解释，漏答不是0分。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思，不作诊断、选拔、责任判断或能力预测。© Nießen et al. (2022)，CC BY 4.0；中文与报告为独立改编。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:38:18Z",
+        "basis": "本次只读审阅ie4_zh_cn_research C1.2.0当前source、固定既有材料及新R1.2.0文字，核分组/原方向/时窗/缺失0与null、固定例子和构念适配行动；不改受众权限，不继承旧审核日期，不声称新中文验证、作者批准或新schema/scorer/PG/CI通过。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "bpses5_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "db2b4fa65e75897ebb6f84e89f276c64bedf545912c2d9770ee5ba2dfa0b6220",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "total"
+    ],
+    "scoreOrder": [
+      "total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "total",
+        "headline": "理解自己引导孩子行为的信心",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这五个回答整理你对引导孩子行为的信心，包括是否觉得自己知道该怎么做、能否付诸行动，以及相信自己的做法能够带来影响。这是你对自身的描述，不能凭此判断实际教养能力，也不能把孩子的表现归因于家长是否足够有信心。压力、支持条件和孩子当时的需要，都可能影响回答。可以回想一次相处较顺利的场景，留意当时你做了什么、有哪些支持。若你愿意，下次选一件可掌握的小事，例如在平静时用一句简短的话说明一项约定，再观察它是否适合你们；遇到困难时也可以和可信任的人商量。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次相处较顺利的场景：当时你做了什么，又得到了哪些支持？"
+          },
+          {
+            "category": "strategy",
+            "text": "若你愿意，在平静时用一句简短的话说明一项约定，之后看看是否适合你们。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+      "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+      "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+      "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+      "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。"
+    ],
+    "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert approval",
+        "reviewedAt": "2026-10-26T10:08:15.255Z",
+        "basis": "2023 original-development Table1 author-selected final five items; original Methods response/recall facts and CORC sum statement. Independent Chinese adult SELF derivative; one nonjudgmental confidence report. Technical student audience slot does not mean child respondent."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "total"
+    ],
+    "scoreOrder": [
+      "total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "total",
+        "headline": "把育儿信心放回一次具体的相处",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "先读懂这份结果\n\n这五题问的是你怎样看待自己引导孩子行为的信心，不是请你替孩子评价自己。五项同意程度相加，范围5–25；数值越大，表示你这次整体更认同自己知道该怎么做、能够行动，并相信自己的做法能有影响。只有一个总分，没有分别测出的三种能力；也没有可用的中文高低分界。\n\n信心与实际条件，要分开看看\n\n例如，准备结束游戏、开始吃饭时，你可能知道想说什么，却因疲惫、赶时间或缺少协助而很难做到。也可能平时很有把握，换一个情境就需要新的信息。这里是回顾的例子，不是系统已知道你遇到了哪种情况；有信心不保证方法合适，暂时没把握也不等于没有养育能力。\n\n如果你已有安全、尊重双方、确实适合的做法，可以看看它需要哪些条件，继续保留。若某次没有按预期进行，也不能把孩子的反应都归在“我还不够有信心”。孩子当时的需要、理解程度、环境和照顾者的资源同样重要。问卷不判断孩子是否有问题，也不评定你是不是好家长。\n\n下面的行动是可选起点，不要求你掌控孩子的每个反应，也不以提高总分为任务。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次相处相对顺利、你愿意回顾的场景，写下自己具体做了什么、孩子当时有什么需要、有哪些条件或他人支持。不必把功劳全归自己，也不必把顺利都说成运气。"
+          },
+          {
+            "category": "strategy",
+            "text": "只选一个安全的小环节，在双方较平静、条件允许时试一条简短清楚的说明或约定。看看彼此是否理解、需要怎样调整；不把孩子立即照做当成唯一成功标准，也不升级成威胁或强迫。"
+          },
+          {
+            "category": "support",
+            "text": "区分当前缺的是信息、一次示范、现实分担，还是能商量的人。向合适的人问一个具体问题，或提出一项协助请求。暂时找不到资源时，可以先减少一项可减少的要求，不把资源不足算成信心不足。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "独立中文工作稿尚未验证，无等级或排名；信心自述不等于实际养育能力，也不判断孩子是否有问题。"
+    ],
+    "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T15:46:21Z",
+        "basis": "本次AI文字自审对应bpses5_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "total"
+    ],
+    "scoreOrder": [
+      "total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "total",
+        "headline": "信心要有落脚点，不只是一句“我得行”",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：找一个能实践的小办法，也给支持留一个位置。\n\n这不是家长资格积分\n\n五题同意程度相加为5–25，越大表示这次更认可自己知道怎样引导孩子、能付诸行动，也相信能产生影响。它是你对自身信心的描述，不是实际技能考试或孩子表现的证明；没有三个独立能力分，更没有中文达标线。\n\n“知道怎么做”和“眼下做得到”之间，可能还差一些条件\n\n假设你知道怎么解释一项约定，但当天很累、很赶，或者没人能搭把手。没顺利完成，不必立刻翻译成“我没有养育能力”。反过来，很有信心时也仍需要看看方法是否安全、是否适合孩子当时的需要。例子不是系统从总分猜到了你家的晚饭现场。\n\n如果已有好用的做法，可以保留具体动作和支持条件；遇到新情境时，也可以补信息、请示范或找人分担。孩子有自己的感受与反应，不是一张用来检验家长信心的答卷。\n\n下面不是“让孩子马上配合”的三步秘籍。选一个顺手的入口就好，也可以先把需要的帮助说清楚。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "留一条“做法记录”，不发好家长奖章：想一次相对顺利的相处，写下你做了什么、当时什么条件有帮助。不要求写成完美故事，也不把所有结果都归给一个人。"
+          },
+          {
+            "category": "strategy",
+            "text": "只试一个小接口：在较平静时，把一项安全约定说得简短、具体，再看看双方有没有听明白。需要调整就调整，不靠提高音量、威胁或强迫来证明自己“有办法”。"
+          },
+          {
+            "category": "support",
+            "text": "把“我要更有信心”拆成实际需要：一个示例、一条信息，还是有人接手一件事务？选一个可以询问的人或资源。暂时没有合适支持时，允许降低不必要的要求，不把生活条件记成个人不合格。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "独立中文工作稿尚未验证，无等级或排名；信心自述不等于实际养育能力，也不判断孩子是否有问题。"
+    ],
+    "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T15:46:21Z",
+        "basis": "本次AI文字自审对应bpses5_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

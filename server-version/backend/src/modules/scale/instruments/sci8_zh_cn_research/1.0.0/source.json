@@ -1,0 +1,882 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "sci8_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "睡眠状况指标（8题）（中文研究译稿）",
+      "abbreviation": "SCI8",
+      "instrumentFamily": "Sleep Condition Indicator"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "过去一个月睡眠质量、睡眠困难和日间影响；原成人筛查工具的研究译稿，非失眠诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "睡眠",
+        "失眠筛查",
+        "成人",
+        "自评",
+        "过去一个月",
+        "非商业",
+        "CC-BY-NC-4.0",
+        "独立中译待验证",
+        "非诊断",
+        "domain:sleep_recovery",
+        "construct:sleep_condition",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:not_diagnostic",
+        "license:noncommercial",
+        "license:cc_by_nc_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "仅限成人非商业研究；原英语题本独立中译尚未验证，不借用其他中文版或儿童常模。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去一个月（第8题询问问题持续时间）",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "SCI8八题各有专属选项，按原得分0–4而非统一同意度；过去月题干嵌入各题。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅非商业研究；中文工作译稿未验证。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "基于原作者公开许可英文题本的项目独立中文工作翻译；非既有验证中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "待人工审校、认知访谈及中文目标人群验证。原SCI量表本身CC BY-NC4，不混论文CC BY-NC3。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "sci8-zh-cn-noncommercial-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "sci8-zh-cn-noncommercial-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "sci8-zh-cn-noncommercial-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183. https://bmjopen.bmj.com/content/4/3/e004183 https://creativecommons.org/licenses/by-nc/4.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 SCI版权归Sleepio Limited；按CC BY-NC 4.0使用。",
+      "仅非商业；署名、来源、许可链接、标明改动。收费平台/学校收费培训不因研究名义自动合规；本tag不替代实际用途审查。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Sleep Condition Indicator — 2014 original Appendix, eight-item version",
+        "citation": "Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183.",
+        "url": "https://bmjopen.bmj.com/content/4/3/e004183",
+        "publicationYear": 2014
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183. https://bmjopen.bmj.com/content/4/3/e004183 https://creativecommons.org/licenses/by-nc/4.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业使用；禁止超出授权用途。 SCI版权归Sleepio Limited；按CC BY-NC 4.0使用。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "sci8_item_1",
+          "options": [
+            {
+              "value": "4",
+              "label": "0—15分钟",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "16—30分钟",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "31—45分钟",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "46—60分钟",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "61分钟或更久",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "sci8_item_2",
+          "options": [
+            {
+              "value": "4",
+              "label": "0—15分钟",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "16—30分钟",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "31—45分钟",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "46—60分钟",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "61分钟或更久",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "sci8_item_3",
+          "options": [
+            {
+              "value": "4",
+              "label": "0—1晚",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "2晚",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "3晚",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "4晚",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "5—7晚",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "sci8_item_4",
+          "options": [
+            {
+              "value": "4",
+              "label": "很好",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "好",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "一般",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "差",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "很差",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "sci8_item_5",
+          "options": [
+            {
+              "value": "4",
+              "label": "完全没有",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "一点点",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "有一些",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "很大",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "非常大",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "sci8_item_6",
+          "options": [
+            {
+              "value": "4",
+              "label": "完全没有",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "一点点",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "有一些",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "很大",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "非常大",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "sci8_item_7",
+          "options": [
+            {
+              "value": "4",
+              "label": "完全没有",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "一点点",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "有一些",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "很大",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "非常大",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "sci8_item_8",
+          "options": [
+            {
+              "value": "4",
+              "label": "没有睡眠问题，或不足1个月",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "1—2个月",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "3—6个月",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "7—12个月",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "超过1年",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SCI8_01",
+          "content": "想一想过去一个月通常一晚的情况：你需要多长时间才能入睡？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "sci8_item_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCI8_02",
+          "content": "想一想过去一个月通常一晚的情况：如果你在夜里醒来，醒着的时间加起来一共有多长？（把各次醒着的时间相加）",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "sci8_item_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCI8_03",
+          "content": "想一想过去一个月通常一晚的情况：你每周有几个晚上遇到睡眠问题？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "sci8_item_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCI8_04",
+          "content": "想一想过去一个月通常一晚的情况：你觉得自己的睡眠质量怎么样？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "sci8_item_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCI8_05",
+          "content": "回想过去一个月：睡眠不好在多大程度上影响了你的心情、精力或人际关系？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "sci8_item_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCI8_06",
+          "content": "回想过去一个月：睡眠不好在多大程度上影响了你集中注意、做事的效率或保持清醒的能力？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "sci8_item_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCI8_07",
+          "content": "回想过去一个月：总的来说，睡眠不好给你带来了多大困扰？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "sci8_item_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCI8_08",
+          "content": "最后，你的睡眠问题持续多久了？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "sci8_item_8",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "SCI8_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCI8_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCI8_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCI8_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCI8_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCI8_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCI8_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCI8_08",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "sleep_condition",
+            "type": "total",
+            "label": "最近的睡眠状况",
+            "description": "较高分表示这次回答呈现较好的睡眠状况，不是诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SCI8_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCI8_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCI8_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCI8_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCI8_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCI8_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCI8_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCI8_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "sleep_condition"
+        ],
+        "scoreOrder": [
+          "sleep_condition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "sleep_condition",
+            "headline": "先说清睡眠怎样影响生活，不急着给自己定级",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份报告带走一句话：先找出最困扰的睡眠环节，帮助不必等到某个分数。\n\n先读懂这份结果\n\n八题各按本题选项计0–4分，相加范围0–32。数值越大，表示这次回答整体呈现较好的睡眠状况，不是睡眠问题越多。前七题主要回顾过去一个月的入睡、夜间醒来、问题频率、睡眠感受及白天影响；最后一题再加入问题持续多久的信息。总分不是睡了多少小时，也不是作息自律分。\n\n把总数放回具体的一晚和一天\n\n例如，有人主要困扰于躺下后很久才睡着，有人夜里醒后难再入睡，也有人更在意白天精力和注意受到影响。相近的总分，可能由不同回答组成；这只是帮助理解的例子，系统没有凭总分判断你的主要困难或原因。\n\n如果已有比较适合自己的安排，可以保留；如果仍有一个环节很难受，即使总分较大，也值得单独照顾。工作、照护、环境和身体状况都可能需要一起了解，不必把困难归成自己不够自律。当前中文稿不按原英文研究界线分档，也不能用它确认或排除失眠障碍。\n\n下面是可选择的观察与支持方式，不是要求你按一个规定钟点睡着，或把每晚睡眠当成必须完成的任务。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "若记录不会增加负担，可以简短记几天：大致何时准备睡、入睡和夜间醒来有什么感受、第二天哪里受影响，以及当时的环境或安排。不必夜里反复看钟，也不要求把每一分钟量准。"
+              },
+              {
+                "category": "environment",
+                "text": "先选一个现实中可协商的小条件，例如减少一项非必要的夜间打扰，或与相关的人商量一次工作、照护安排。重点是看看条件是否更合适，不把所有责任都变成“我还不够会睡觉”。"
+              },
+              {
+                "category": "support",
+                "text": "如果困扰持续、影响日常生活或白天安全，可以带着具体经历与合适的专业人员讨论，不必等分数达到某条线。问卷不能确定原因，也不据此自行开始、停用或调整治疗。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "独立中文工作稿尚未验证，仅供成人非商业研究；不作诊断、风险分档或人群排名。"
+        ],
+        "disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。 Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183. https://bmjopen.bmj.com/content/4/3/e004183 https://creativecommons.org/licenses/by-nc/4.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业研究；不用于心理诊断。 SCI版权归Sleepio Limited；按CC BY-NC 4.0使用。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:06:07Z",
+            "basis": "本次AI文字自审对应sci8_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "sci8",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "SCI8_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "SCI8_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "SCI8_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "SCI8_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "SCI8_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "SCI8_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "SCI8_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "SCI8_08",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "sleep_condition": 0
+          },
+          "totalScoreKeys": [
+            "sleep_condition"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "SCI8_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCI8_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCI8_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCI8_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCI8_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCI8_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCI8_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCI8_08",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "sleep_condition": 32
+          },
+          "totalScoreKeys": [
+            "sleep_condition"
+          ]
+        }
+      },
+      {
+        "name": "all-two",
+        "answers": [
+          {
+            "itemCode": "SCI8_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCI8_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCI8_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCI8_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCI8_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCI8_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCI8_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCI8_08",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "sleep_condition": 16
+          },
+          "totalScoreKeys": [
+            "sleep_condition"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "SCI8_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCI8_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCI8_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCI8_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCI8_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "SCI8_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCI8_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCI8_08",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "sleep_condition": 16
+          },
+          "totalScoreKeys": [
+            "sleep_condition"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "第1—4题，请想一想过去一个月里通常一晚的睡眠情况。第5—7题，请回想过去一个月睡眠不好对你的影响。最后一题询问睡眠问题持续了多久。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/sci8/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908（既有平台中文工作指导语；非人类专家审批声明）"
+  }
+}

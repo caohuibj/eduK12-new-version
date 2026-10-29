@@ -1,0 +1,1202 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "sswq16_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "学生学校幸福感问卷（SSWQ16 中文研究译稿）",
+      "abbreviation": "SSWQ16",
+      "instrumentFamily": "Student Subjective Wellbeing Questionnaire (2020 author guide)"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [
+        "SCHOOL_BELONGING",
+        "MOTIVATION",
+        "SELF_EFFICACY"
+      ],
+      "constructDefinition": "过去一个月在学校的学习乐趣、归属、学习意义及学习表现体验；不是客观成绩或心理风险判断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "学校幸福感",
+        "学习乐趣",
+        "学校归属",
+        "学习意义",
+        "学习表现体验",
+        "青少年",
+        "自评",
+        "CC-BY-4.0",
+        "独立中译待验证",
+        "非诊断",
+        "sswq16",
+        "student_self_report",
+        "grades_6_8",
+        "research",
+        "descriptive_report",
+        "domain:wellbeing_strength",
+        "construct:student_school_wellbeing",
+        "construct:school_connectedness",
+        "population:grades_6_8",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 6,
+        "maxGrade": 8
+      },
+      "populationNotes": "原研究为1002名6–8年级学生；当前独立中文工作译稿限定该年级段研究，尚无本地验证，不将原英语样本证据冒称中文版证据。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 16,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去一个月",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留2020作者指南16题次序与1–4频率选项。",
+        "四维各四题、全部正向；不与教师TSWQ或大学生CSSWQ混同。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "中文为依据 Renshaw (2020) SSWQ 的独立翻译和线上排版改编，依据 CC BY 4.0 使用；非作者审定中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "基于2020作者指南的独立工作译稿及线上排版；待人工译审、认知访谈和本地学生验证。2025官网确认工具身份与许可，未核当前OSF下载字节。 第8/12题改成实际表现自述而非我能的潜能表述。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "sswq16-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [
+      "gradeLevel"
+    ],
+    "subject": {
+      "grades": [
+        "6",
+        "7",
+        "8"
+      ]
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "sswq16-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "sswq16-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "CC BY 4.0：署名Tyler L. Renshaw，保留来源及许可链接、标明独立中文翻译与线上排版，不暗示作者认可。许可允许商业及非商业，不附加非商业限制。",
+      "https://creativecommons.org/licenses/by/4.0/",
+      "https://www.tyrenshaw.org/User-Guide-for-the-Student-Subjective-Wellbeing-Questionnaire-26e7ff8c2ebd806c81c7d9f5c9355090"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Student Subjective Wellbeing Questionnaire — measure and user guide v.03-22-20",
+        "citation": "Renshaw, T. L. (2020). Student Subjective Wellbeing Questionnaire (SSWQ): Measure and user guide. Open Science Framework. https://osf.io/k25yf/",
+        "url": "https://bradfordatrpartnership.co.uk/Resources/3%20Resilience/Student%20and%20Teacher%20Well-being%20Scales/Student%20Wellbeing%20Questionnaire.pdf",
+        "publicationYear": 2020
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "CC BY 4.0; Tyler L. Renshaw (2020); https://osf.io/k25yf/ ; https://creativecommons.org/licenses/by/4.0/ ; independent Chinese translation and online formatting, no author endorsement."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "sswq16_frequency_1_4",
+          "options": [
+            {
+              "value": "1",
+              "label": "几乎从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有时",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "经常",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "几乎总是",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SSWQ16_01",
+          "content": "在课堂上学到新东西让我感到兴奋。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_02",
+          "content": "我觉得自己是学校的一分子。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_03",
+          "content": "我觉得自己在学校做的事情很重要。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_04",
+          "content": "我觉得自己是一名表现出色的学生。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_05",
+          "content": "我对自己在学校做的事情很感兴趣。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_06",
+          "content": "在学校，我能够真实地做自己。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_07",
+          "content": "我认为学校生活很重要，应该认真对待。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_08",
+          "content": "我在学校的学习任务做得好。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_09",
+          "content": "我喜欢完成课堂项目和作业。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_10",
+          "content": "我觉得学校里的人关心我。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_11",
+          "content": "我觉得在课堂学习中表现好很重要。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_12",
+          "content": "我的课堂作业完成得好。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_13",
+          "content": "在学校做事和学习时，我感到快乐。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_14",
+          "content": "在学校，我受到尊重。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_15",
+          "content": "我相信在学校学到的东西会对我的生活有帮助。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SSWQ16_16",
+          "content": "我各门课的成绩不错。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "sswq16_frequency_1_4",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "SSWQ16_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SSWQ16_16",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "school_wellbeing",
+            "type": "total",
+            "label": "最近的学校体验",
+            "description": "最近的学校体验的自述频率汇总；不是风险或能力等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SSWQ16_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_16",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "JL",
+            "type": "dimension",
+            "label": "学习乐趣",
+            "description": "学习乐趣的自述频率汇总；不是风险或能力等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SSWQ16_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_13",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "SC",
+            "type": "dimension",
+            "label": "学校归属",
+            "description": "学校归属的自述频率汇总；不是风险或能力等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SSWQ16_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_14",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "EP",
+            "type": "dimension",
+            "label": "学习意义",
+            "description": "学习意义的自述频率汇总；不是风险或能力等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SSWQ16_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_15",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "AE",
+            "type": "dimension",
+            "label": "学习表现体验",
+            "description": "学习表现体验的自述频率汇总；不是风险或能力等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SSWQ16_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SSWQ16_16",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "school_wellbeing"
+        ],
+        "scoreOrder": [
+          "school_wellbeing",
+          "JL",
+          "SC",
+          "EP",
+          "AE"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "school_wellbeing",
+            "headline": "把学校生活分开看看，不只看一个总数",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷回顾过去一个月在学校的体验。十六题频率得分相加，范围16–64；越大表示这次整体更常报告学习有乐趣、感到被接纳、觉得学习有意义，以及觉得自己在学习任务和成绩上表现良好。它不是考试成绩或好学生等级，也没有可用的中文高低分界。\n\n例如，一个月里，你可能喜欢做某项课堂项目，却仍在小组相处中感到不自在。不同方面可以同时存在，总分不能替你找出哪一件事造成了感受。下面四项分别帮助回顾，不是四种人格或能力标签。\n\n如果有适合你的学习方式、可靠的人或安心的地方，可以继续保留；如果有些部分很难受，也不必都归成自己不够努力。学习安排、同伴相处和学校提供的支持都重要。下面是可以选择的小行动，不需要一次改变全部学校生活。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先回想过去一个月一个想保留的时刻，或一件想得到帮助的事。暂时想不到其中一边时可以留空；用具体经历来读下面四项，不只盯住数字。"
+              },
+              {
+                "category": "support",
+                "text": "从中挑一件现在最要紧的事，找愿意认真听你的老师、家人或学校支持人员一起商量下一步。遇到不被尊重的事也可以直接求助，不需要等分数变小。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "JL",
+            "headline": "学习乐趣：什么时候愿意多了解一点",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题相加范围4–16。越大表示过去一个月，你更常报告对课堂学习和学校活动有兴趣、感到开心或享受其中；不是说你每门课都喜欢，也不是实际成绩。\n\n例如，有个动手项目让你愿意再试一次，另一项任务却让你觉得枯燥。同一个人会有不同体验，这个分数不能定位你最喜欢或最困难的科目。\n\n已有让你好奇的方式可以继续用；暂时没什么兴趣，也不代表你不爱学习。内容、难度、节奏、疲惫和可获得的帮助，都值得一起看看。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "从正在学的内容里选一个还想知道的小问题，试着看一个例子、动手做一小步，或请老师换一种方式说明。看看哪种方式更容易参与，不要求自己马上喜欢整门课。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "SC",
+            "headline": "学校归属：能不能被关心、被尊重地做自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题相加也是4–16。越大表示过去一个月，你更常报告自己是学校的一分子、能真实做自己，并感到被关心和尊重。它不是受欢迎程度，也不取决于朋友有多少。\n\n例如，小组里有人认真听你说完，而不是拿你开玩笑，可能让人更安心；是否有这样的经历，需要你自己结合生活核对，系统并没有看见现场。\n\n若已有可靠的人和安心的地方，可以继续使用这些支持。如果受到排斥或欺负，不是靠你更合群就必须解决；同伴与学校也有责任提供安全、尊重的环境。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "如果有让你不舒服或不安全的具体经历，可以告诉可信任的老师、家人或学校支持人员，说明发生了什么、希望得到什么帮助。一次没被听见时，可以换一位可靠的大人继续说，不必独自处理。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "EP",
+            "headline": "学习意义：它和你在意的事情有什么联系",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题范围4–16。越大表示过去一个月，你更常觉得学校生活、认真学习和学习表现重要，也相信所学内容能帮助自己的生活。它不是要求你给每门课找到宏大理想。\n\n例如，学会比例后看懂一份配方，可能让抽象内容多一点用途；有些内容暂时看不见用处，也可以先保留问题。例子不是问卷认定你已经找到的学习理由。\n\n如果已有自己的理由，可以继续用；如果还没有，也不必把别人的目标照搬过来。理解课程为什么这样安排，也需要老师提供说明和联系生活的机会。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "选一小段正在学的内容，问一句“它能帮助理解或处理什么事情？”可以先找生活例子，也可以请老师说明。暂时没找到联系就记下问题，不把它变成“我不够认真”的结论。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "AE",
+            "headline": "学习表现体验：把笼统评价拆成具体任务",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题相加范围4–16。越大表示过去一个月，你更常自述自己在学习任务、作业和课程成绩方面表现良好。它记录你怎样看待已有表现，不是测潜能、信心或能力上限，也不能代替实际作品、成绩记录和具体反馈。\n\n例如，一次作业有的部分完成得顺利，有的地方需要讲解；遇到卡点不等于“我什么都做不好”。这是帮助回顾的例子，分数不能告诉你错在哪里或原因是什么。\n\n可以保留已有效的方法，也可以把需要支持的地方问得更具体；不用让一个总的自我评价压住整次学习经历。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "挑一份做过的作业或任务，找出一处已做到的地方和一个还不清楚的问题。愿意时请老师给具体反馈，如“这里哪一步需要改、能否看一个示例”，而不是只问自己是不是好学生。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文工作稿尚待验证，仅限6–8年级研究与自我了解；没有中文等级或排名。"
+        ],
+        "disclaimer": "依据 Tyler L. Renshaw (2020) SSWQ，CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），来源 https://osf.io/k25yf/ 。本中文翻译与线上排版为独立改编，非作者审定或认可；仅供6–8年级学生研究与自我了解，不用于心理诊断。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T15:34:00Z",
+            "basis": "本次AI文字自审对应sswq16_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "sswq16",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "SSWQ16_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_16",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "school_wellbeing": 16,
+            "JL": 4,
+            "SC": 4,
+            "EP": 4,
+            "AE": 4
+          },
+          "totalScoreKeys": [
+            "school_wellbeing",
+            "JL",
+            "SC",
+            "EP",
+            "AE"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "SSWQ16_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_16",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "school_wellbeing": 64,
+            "JL": 16,
+            "SC": 16,
+            "EP": 16,
+            "AE": 16
+          },
+          "totalScoreKeys": [
+            "school_wellbeing",
+            "JL",
+            "SC",
+            "EP",
+            "AE"
+          ]
+        }
+      },
+      {
+        "name": "all-two",
+        "answers": [
+          {
+            "itemCode": "SSWQ16_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_13",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_14",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_16",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "school_wellbeing": 32,
+            "JL": 8,
+            "SC": 8,
+            "EP": 8,
+            "AE": 8
+          },
+          "totalScoreKeys": [
+            "school_wellbeing",
+            "JL",
+            "SC",
+            "EP",
+            "AE"
+          ]
+        }
+      },
+      {
+        "name": "distinct-four-domains",
+        "answers": [
+          {
+            "itemCode": "SSWQ16_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SSWQ16_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SSWQ16_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SSWQ16_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SSWQ16_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SSWQ16_14",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SSWQ16_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SSWQ16_16",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "school_wellbeing": 40,
+            "JL": 4,
+            "SC": 8,
+            "EP": 12,
+            "AE": 16
+          },
+          "totalScoreKeys": [
+            "school_wellbeing",
+            "JL",
+            "SC",
+            "EP",
+            "AE"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面的问题涉及你在学校的想法、感受和行为。请阅读每句话，选择最符合你过去一个月情况的答案。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/sswq16/1.0.0/bilingual-content.json#instructions @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+  }
+}
