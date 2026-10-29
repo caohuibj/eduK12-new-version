@@ -8,6 +8,8 @@ export const educationPackageReferenceSchema=z.discriminatedUnion('provider',[
  z.object({provider:z.literal('GOVERNED_PACKAGE'),versionId:id,contentHash:hash}).strict(),
 ])
 export type EducationPackageReference=z.infer<typeof educationPackageReferenceSchema>
+export const educationPackageUseSchema=z.object({sourceRef:educationPackageReferenceSchema,grantId:id,grantVersion:z.number().int().positive()}).strict()
+export type EducationPackageUse=z.infer<typeof educationPackageUseSchema>
 /** One exact whole source. This protocol has no editable items, overrides,
  * flow, parameters, report, leaf selection or additional package fields. */
 export const educationPackageSelectionSchema=z.object({sourceRef:educationPackageReferenceSchema}).strict()

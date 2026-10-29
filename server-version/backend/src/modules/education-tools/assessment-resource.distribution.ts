@@ -6,6 +6,7 @@ import {materialListSchema} from '../assessment-media/material'
 import {educationDistributionSchema,type EducationAssessmentOrigin} from './assessment-resource.contract'
 import {educationManagementFail as fail} from './assessment-resource.issuer'
 import type {StoredRelease} from '../measurement-content/repository'
+import {assertEducationPackageUseCurrent} from './package-reference.access'
 
 export const educationDistributionSelectionSchema=z.array(z.object({resourceId:z.string().guid(),grantId:z.string().guid()}).strict()).min(1).max(1000)
 type Selection=z.infer<typeof educationDistributionSelectionSchema>
@@ -33,13 +34,14 @@ export async function assertEducationAssessmentDistribution(tx:Prisma.Transactio
 }
 /** Root's NEW_USE/START integration must call this within its transaction after
  * validating the identity. Historical FINAL reads deliberately do not call it. */
-export function assertEducationAssessmentDistributionCurrent(tx:Prisma.TransactionClient,origin:Pick<EducationAssessmentOrigin,'product'|'organizationId'|'distribution'>&{
+export async function assertEducationAssessmentDistributionCurrent(tx:Prisma.TransactionClient,origin:Pick<EducationAssessmentOrigin,'product'|'organizationId'|'distribution'|'publicPackage'>&{
  sourceCompositeId?:string;units?:EducationAssessmentOrigin['units'];
 }){
  const pinned=educationDistributionSchema.parse(origin.distribution)
  const required=[...(origin.sourceCompositeId?[origin.sourceCompositeId]:[]),...(origin.units??[]).flatMap(unit=>[
   unit.measurement.releaseId,...unit.references.map(reference=>reference.releaseId),...(unit.report?[unit.report.releaseId]:[])])]
  if(required.some(resourceId=>!pinned.grants.some(grant=>grant.resourceId===resourceId)))fail('EDUCATION_ASSESSMENT_DISTRIBUTION_SELECTION',403)
+ if(origin.publicPackage)await assertEducationPackageUseCurrent(tx,{...origin,actorId:pinned.actorId},origin.publicPackage)
  return assertEducationAssessmentDistribution(tx,{...origin,actorId:pinned.actorId,resourceIds:pinned.grants.map(g=>g.resourceId),
   selection:pinned.grants.map(({resourceId,grantId})=>({resourceId,grantId})),pinned})
 }

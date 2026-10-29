@@ -1,3 +1,4 @@
+import type {EducationPackageRef} from './packageReferenceClient'
 import type {PrivateToolApi} from './privateToolClient'
 export type EducationAssessmentFamily='COGNITIVE'|'SITUATIONAL'|'BUNDLE'
 export type EducationAssessmentLicense={resourceId:string;grantId:string}
@@ -5,7 +6,8 @@ export type EducationAssessmentPointer={releaseId:string;contentHash:string}
 export type EducationAssessmentStatus='DRAFT'|'REVIEWED'|'PUBLISHED'|'RETIRED'
 export type EducationAssessmentPreparation={resourceId:string;product:'SCHOOL'|'TEACHER';organizationId:string;family:EducationAssessmentFamily;
  sourceCompositeId:string;runtimeCompositeId:string;preparationHash:string;title:string;canPublish:false;licenses:EducationAssessmentLicense[];
- units:Array<{itemId:string;family:'SCALE'|'COGNITIVE'|'SJT';measurement:EducationAssessmentPointer&{measurementHash:string}}>}
+ units:Array<{itemId:string;family:'SCALE'|'COGNITIVE'|'SJT';measurement:EducationAssessmentPointer&{measurementHash:string}}>;
+ publicPackage?:EducationPackageRef;fixedSelection?:Pick<EducationAssessmentRegisterInput,'references'|'reports'>}
 export type EducationAssessmentDisclosure={schemaVersion:1;policyKey:string;minimumRespondents:null;
  audiences:Record<'RESPONDENT'|'SUBJECT'|'TEACHER'|'PARENT'|'PROFESSIONAL'|'ORGANIZATION'|'RESEARCH',{
  mode:'NONE'|'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY';metricKeys:string[];longitudinalMetricKeys:[]}>}
@@ -21,8 +23,8 @@ export function educationAssessmentResourceClient(api:PrivateToolApi,organizatio
  const resource=(id:string)=>base+'/'+encodeURIComponent(id)
  return {
   list:(cursor?:string)=>api<{list:Array<{resourceId:string;family:EducationAssessmentFamily;title:string;status:EducationAssessmentStatus;entryHash:string}>;nextCursor:string|null}>(base+(cursor?'?cursor='+encodeURIComponent(cursor):'')),
-  sources:(cursor?:string)=>api<{nextCursor:string|null;list:Array<{sourceCompositeId:string;title:string;canPrepare:boolean;unavailableReason:null|'SOURCE_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY';licenses:EducationAssessmentLicense[];canPublish:false}>}>(base+'/source-candidates'+(cursor?'?cursor='+encodeURIComponent(cursor):'')),
-  prepare:(input:{resourceId:string;sourceCompositeId:string;title:string;family:EducationAssessmentFamily;licenses:EducationAssessmentLicense[]})=>api<EducationAssessmentPreparation&{created:boolean}>(base+'/preparations','POST',input),
+  sources:(cursor?:string,publicPackage?:EducationPackageRef)=>api<{nextCursor:string|null;list:Array<{sourceCompositeId:string;title:string;canPrepare:boolean;unavailableReason:null|'SOURCE_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY';licenses:EducationAssessmentLicense[];canPublish:false}>}>(base+'/source-candidates'+(cursor||publicPackage?'?'+new URLSearchParams({...cursor?{cursor}:{},...publicPackage?{publicPackage:JSON.stringify(publicPackage)}:{}}):'')),
+  prepare:(input:{resourceId:string;sourceCompositeId:string;title:string;family:EducationAssessmentFamily;licenses:EducationAssessmentLicense[];publicPackage?:EducationPackageRef})=>api<EducationAssessmentPreparation&{created:boolean}>(base+'/preparations','POST',input),
   preparation:(id:string)=>api<EducationAssessmentPreparation>(base+'/preparations/'+encodeURIComponent(id)),
   choices:(id:string,cursor?:string)=>api<{nextCursor:string|null;emptySelectionAllowed:true;units:Array<{itemId:string;family:'SCALE'|'COGNITIVE'|'SJT';measurement:EducationAssessmentPointer;
    references:Array<EducationAssessmentPointer&{selectable:boolean;unavailableReason:null|'CONTENT_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY';licenses:EducationAssessmentLicense[];choices:Array<{entryKey:string;metricKey:string;referenceKind:string}>}>;

@@ -11,7 +11,7 @@ import {adminContentRootRequestSchema} from '../../modules/measurement-content/a
 const m=vi.hoisted(()=>({transaction:vi.fn(),author:vi.fn(),nativeAdmission:vi.fn(),governedOnline:vi.fn(),governedDependencies:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:m.transaction}}))
 vi.mock('../../modules/education-tools/private-tool.access',()=>({authorizePrivateTool:m.author}))
-vi.mock('../../modules/bundle-product/package-release',()=>({assertPackageAdmission:m.nativeAdmission}))
+vi.mock('../../modules/bundle-product/package-release',()=>({readPackageReleaseAdmission:m.nativeAdmission}))
 vi.mock('../../modules/survey/governed-tool.service',()=>({assertGovernedOnline:m.governedOnline,assertGovernedDependencies:m.governedDependencies}))
 const id=(n:number)=>`96000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const context={entry:'SCHOOL' as const,organizationId:id(1),principal:{userId:id(2),accountDomain:'SCHOOL' as const}}
@@ -29,7 +29,7 @@ const database=()=>({$queryRaw:vi.fn(async(query:{sql:string})=>{
  if(query.sql.includes('FROM bundle_package_releases p WHERE'))return [header]
  throw new Error('Unexpected metadata query')
 }),bundlePackageRelease:{findUnique:vi.fn(async()=>({id:source.versionId,status:'PUBLISHED',contentHash:hash,content:pack}))}})
-beforeEach(()=>{vi.resetAllMocks();m.nativeAdmission.mockResolvedValue({id:source.versionId,contentHash:hash})})
+beforeEach(()=>{vi.resetAllMocks();m.nativeAdmission.mockResolvedValue({id:source.versionId,contentHash:hash,content:pack})})
 afterEach(()=>vi.unstubAllEnvs())
 describe('exact whole package source authority and metadata',()=>{
  it('round trips all three exact package source protocols and rejects aliases/wildcards/leaf U',()=>{
@@ -72,7 +72,7 @@ describe('exact whole package source authority and metadata',()=>{
  it('does not materialize, publish or create an editable version during an exact native preview',async()=>{
   const tx=database();m.transaction.mockImplementation(work=>work(tx))
   const result=await previewEducationWholePackage(context,{sourceRef:source})
-  expect(m.nativeAdmission).toHaveBeenCalledExactlyOnceWith(tx,pack)
+  expect(m.nativeAdmission).toHaveBeenCalledExactlyOnceWith(tx,source.versionId,hash)
   expect(result).toMatchObject({sourceRef:source,readOnly:true,protocol:'NATIVE_BUNDLE_V3'})
   if(result.protocol!=='NATIVE_BUNDLE_V3')throw new Error('Expected native protocol')
   expect(result.members.map(member=>member.slotKey)).toEqual(pack.manifest.definition.slots.map(slot=>slot.slotKey))
@@ -92,13 +92,13 @@ describe('exact whole package source authority and metadata',()=>{
  })
  it('rejects changed content and unpublished status even when metadata was previously discoverable',async()=>{
   const tx=database();m.transaction.mockImplementation(work=>work(tx))
-  tx.bundlePackageRelease.findUnique.mockResolvedValueOnce({id:source.versionId,status:'DRAFT',contentHash:hash,content:pack})
+  m.nativeAdmission.mockRejectedValueOnce(new Error('BUNDLE_PACKAGE_NOT_PUBLISHED'))
   await expect(previewEducationWholePackage(context,{sourceRef:source})).rejects.toMatchObject({code:'EDUCATION_PACKAGE_SOURCE_UNAVAILABLE'})
   const changed=structuredClone(pack);changed.report.states.missing='Different original source report'
   expect(canonicalHash(changed)).not.toBe(canonicalHash(pack))
-  tx.bundlePackageRelease.findUnique.mockResolvedValueOnce({id:source.versionId,status:'PUBLISHED',contentHash:hash,content:changed})
-  await expect(previewEducationWholePackage(context,{sourceRef:source})).rejects.toMatchObject({code:'EDUCATION_PACKAGE_SOURCE_CHANGED'})
-  expect(m.nativeAdmission).not.toHaveBeenCalled()
+  m.nativeAdmission.mockRejectedValueOnce(new Error('BUNDLE_CONTENT_HASH_MISMATCH'))
+  await expect(previewEducationWholePackage(context,{sourceRef:source})).rejects.toMatchObject({code:'EDUCATION_PACKAGE_SOURCE_UNAVAILABLE'})
+  expect(m.nativeAdmission).toHaveBeenCalledTimes(2)
  })
  it('keeps unpublished code packages unavailable without any database or fake publication',async()=>{
   const headers=await readEducationPackageHeaders({} as never,[{provider:'CODE_BUNDLE',bundleKey:'integrated_gonogo_adexi_adult_zh_cn_v1',bundleVersion:'1.0.0',contentHash:'a'.repeat(64)}])

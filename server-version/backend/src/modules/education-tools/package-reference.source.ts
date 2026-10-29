@@ -2,9 +2,8 @@ import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {packageEntry} from '../assessment-bundle/onboarding/catalog'
-import {hashDeclarativePackage} from '../assessment-bundle/onboarding/contract'
 import {BundleDefinitionProvider,type BundleDefinitionEntry} from '../bundle-product/definition-provider'
-import {assertPackageAdmission} from '../bundle-product/package-release'
+import {readPackageReleaseAdmission} from '../bundle-product/package-release'
 import {assertGovernedOnline,assertGovernedDependencies} from '../survey/governed-tool.service'
 import {artifactBlockers,type GovernedArtifact} from '../survey/governed-tool.model'
 import {AdminPermissionError} from '../admin-permissions/service'
@@ -14,10 +13,19 @@ import {readEducationPublicUse} from './public-source.catalog'
 import {educationPackageSelectionSchema,educationPackageKey,type EducationPackageReference} from './package-reference.contracts'
 import {readEducationPackageHeaders,readPublishedCodePackage} from './package-reference.headers'
 import {packageHeaderSupportsEntry,educationPackageHeaderView} from './package-reference.catalog'
+import {readInstance} from '../bundle-product/instance'
 
 export type EducationWholePackageSource=
  |{kind:'NATIVE_BUNDLE';sourceRef:EducationPackageReference;entry:BundleDefinitionEntry}
  |{kind:'GOVERNED_PACKAGE';sourceRef:EducationPackageReference;artifact:GovernedArtifact}
+/** Match the complete published source, not merely its title or Bundle key.
+ * Original C/P/R and item bindings are subsequently retained by preparation. */
+export function matchesEducationWholePackage(instance:Parameters<typeof readInstance>[0]|null|undefined,source:EducationWholePackageSource){
+ if(!instance||source.kind!=='NATIVE_BUNDLE')return false
+ const {frozen}=readInstance(instance)
+ return canonicalHash({definition:frozen.bundleSnapshot.bundleDefinition,contextDefinition:frozen.contextDefinition,
+  ruleSet:frozen.ruleSet,reportDefinition:frozen.reportDefinition,...(frozen.declarativePackage?{declarativePackage:frozen.declarativePackage}:{})})===canonicalHash(source.entry)
+}
 /** Authorized immutable source read, not a Survey delivery/import or a new
  * public package. The caller owns its current author and exact whole-package U.
  * No leaf grants, editable private version or source Composite are fabricated.
@@ -36,11 +44,8 @@ export async function readEducationWholePackageSource(tx:Prisma.TransactionClien
   if(!entry)privateToolFail('EDUCATION_PACKAGE_SOURCE_UNAVAILABLE',409)
   return {kind:'NATIVE_BUNDLE',sourceRef:source,entry}
  }
- const row=await tx.bundlePackageRelease.findUnique({where:{id:source.versionId}})
- if(!row||row.status!=='PUBLISHED'||row.contentHash!==source.contentHash)privateToolFail('EDUCATION_PACKAGE_SOURCE_UNAVAILABLE',409)
- if(hashDeclarativePackage(row.content)!==source.contentHash)privateToolFail('EDUCATION_PACKAGE_SOURCE_CHANGED',409)
- const published=await assertPackageAdmission(tx,row.content)
- if(published.id!==source.versionId||published.contentHash!==source.contentHash)privateToolFail('EDUCATION_PACKAGE_SOURCE_CHANGED',409)
+ const row=await readPackageReleaseAdmission(tx,source.versionId,source.contentHash)
+ if(row.id!==source.versionId||row.contentHash!==source.contentHash)privateToolFail('EDUCATION_PACKAGE_SOURCE_CHANGED',409)
  const original=packageEntry(row.content),entry={...original,definition:{...original.definition,status:'PUBLISHED' as const}}
  if(new BundleDefinitionProvider([entry]).publicationBlockers(entry.definition.bundleKey,entry.definition.bundleVersion).length)
   privateToolFail('EDUCATION_PACKAGE_PROTOCOL_UNAVAILABLE',409)

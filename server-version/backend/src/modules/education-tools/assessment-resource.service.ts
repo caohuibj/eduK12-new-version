@@ -1,3 +1,8 @@
+import {authorizePrivateTool} from './private-tool.access'
+import {educationPackageReferenceSchema,educationPackageUseSchema,type EducationPackageReference} from './package-reference.contracts'
+import {readEducationPackageUse,readEducationPackageForUse} from './package-reference.access'
+import {fixedEducationPackageSelection,preservesEducationPackageSelection} from './package-reference.selection'
+import {readEducationWholePackageSource,matchesEducationWholePackage} from './package-reference.source'
 import {educationNativeBundleSchema} from '../bundle-product/education-identity'
 import {retainEducationNativeBundle,assertEducationNativeBundle,assertEducationNativeBundlePopulation} from '../bundle-product/education-adapter'
 import {CompositeServiceError} from '../composite/composite.errors'
@@ -29,13 +34,13 @@ import {educationCompositeInclude,lockEducationAssessmentSourceIdentities,readEd
 
 type Tx=Prisma.TransactionClient
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
-export const prepareEducationAssessmentSchema=z.object({resourceId:uuid,sourceCompositeId:uuid,title:z.string().trim().min(1).max(200),family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),licenses:educationDistributionSelectionSchema}).strict()
+export const prepareEducationAssessmentSchema=z.object({resourceId:uuid,sourceCompositeId:uuid,title:z.string().trim().min(1).max(200),family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),licenses:educationDistributionSelectionSchema,publicPackage:educationPackageReferenceSchema.optional()}).strict()
 export const registerEducationAssessmentSchema=z.object({expectedPreparationHash:hash,disclosure:z.unknown(),feedbackPolicy:trainingFeedbackPolicySchema.transform(parseTrainingFeedbackPolicy),references:trainingReferenceSelectionSchema,
  reports:z.array(z.object({itemId:uuid,releaseId:uuid}).strict()).max(1000),licenses:educationDistributionSelectionSchema}).strict()
 export const transitionEducationAssessmentSchema=z.object({expectedEntryHash:hash,reason:z.string().trim().min(1).max(500)}).strict()
 const preparationSchema=z.object({schemaVersion:z.literal(1),resourceId:uuid,product:z.enum(['SCHOOL','TEACHER']),organizationId:uuid,
  family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),sourceCompositeId:uuid,sourceSnapshotHash:hash,sourceDefinitionHash:hash,runtimeCompositeId:uuid,
- runtimeSnapshotHash:hash,runtimeDefinitionHash:hash,nativeBundle:educationNativeBundleSchema.optional(),snapshot:trainingContentSnapshotSchema,title:z.string(),createdAuthority:educationDeliveryAuthoritySchema,distribution:educationDistributionSchema}).strict()
+ runtimeSnapshotHash:hash,runtimeDefinitionHash:hash,nativeBundle:educationNativeBundleSchema.optional(),publicPackage:educationPackageUseSchema.optional(),snapshot:trainingContentSnapshotSchema,title:z.string(),createdAuthority:educationDeliveryAuthoritySchema,distribution:educationDistributionSchema}).strict()
 type Preparation=z.infer<typeof preparationSchema>
 type Row={id:string;entry:Record<string,unknown>;entry_hash:string;status:string;created_by_user_id:string;created_authority:unknown;reviewed_by_user_id:string|null;reviewed_authority:unknown;published_authority:unknown}
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000}
@@ -70,7 +75,8 @@ async function boundary(tx:Tx,c:EducationAssessmentContext,sourceId:string,proof
 }
 function projection(p:Preparation){return {resourceId:p.resourceId,product:p.product,organizationId:p.organizationId,family:p.family,
  sourceCompositeId:p.sourceCompositeId,runtimeCompositeId:p.runtimeCompositeId,preparationHash:canonicalHash(p),title:p.title,
- licenses:p.distribution.grants.map(({resourceId,grantId})=>({resourceId,grantId}))}}
+ licenses:p.distribution.grants.map(({resourceId,grantId})=>({resourceId,grantId})),
+ ...(p.publicPackage?{publicPackage:p.publicPackage.sourceRef,fixedSelection:fixedEducationPackageSelection(p.snapshot)}:{})}}
 async function assertPreparationPrivateOwners(tx:Tx,c:EducationAssessmentContext,snapshot:TrainingContentSnapshot){
  for(const unit of snapshot.units)if(unit.source.privateVersionId){
   const version=await tx.educationPrivateToolVersion.findUnique({where:{id:unit.source.privateVersionId}})
@@ -120,10 +126,11 @@ export async function prepareEducationAssessment(c:EducationAssessmentContext,ra
  const input=prepareEducationAssessmentSchema.parse(raw)
  return transaction(async tx=>{
   const {identities,actor}=await boundary(tx,c,input.sourceCompositeId)
+  if(input.publicPackage)await authorizePrivateTool(tx,{entry:c.product,organizationId:c.organizationId,principal:c.principal})
   const prior=await tx.assessmentManagementEvent.findUnique({where:{id:input.resourceId}})
   if(prior){
    const p=await findPreparation(tx,c,input.resourceId)
-   if(p.createdAuthority.actorId!==c.principal.userId||p.sourceCompositeId!==input.sourceCompositeId||p.title!==input.title||p.family!==input.family
+   if(p.createdAuthority.actorId!==c.principal.userId||p.sourceCompositeId!==input.sourceCompositeId||p.title!==input.title||p.family!==input.family||canonicalHash(p.publicPackage?.sourceRef??null)!==canonicalHash(input.publicPackage??null)
     ||canonicalHash(p.distribution.grants.map(({resourceId,grantId})=>({resourceId,grantId})))!==canonicalHash([...input.licenses].sort((a,b)=>a.resourceId.localeCompare(b.resourceId))))fail('EDUCATION_ASSESSMENT_REQUEST_CONFLICT')
    await retainEducationAssessmentIssuers(tx,c,[p.createdAuthority])
    await assertEducationAssessmentDistributionCurrent(tx,p)
@@ -132,6 +139,13 @@ export async function prepareEducationAssessment(c:EducationAssessmentContext,ra
   }
   const {source,content}=await readEducationAssessmentSource(tx,input.sourceCompositeId,identities,c.product)
   await assertPreparationPrivateOwners(tx,c,content.snapshot)
+  let publicPackage:z.infer<typeof educationPackageUseSchema>|undefined
+  if(input.publicPackage){
+   if(input.family!=='BUNDLE')fail('EDUCATION_WHOLE_PACKAGE_REQUIRED',400)
+   publicPackage=(await readEducationPackageUse(tx,{...c,actorId:c.principal.userId},input.publicPackage)).use
+   const whole=await readEducationPackageForUse(tx,input.publicPackage,c.product)
+   if(!matchesEducationWholePackage(source.bundleInstance,whole))fail('EDUCATION_PACKAGE_SOURCE_CHANGED')
+  }
   const assets=educationAssessmentAssets(source,content.releases.values())
   await assertEducationAssessmentAssets(tx,assets)
   const distribution=await assertEducationAssessmentDistribution(tx,{...c,actorId:c.principal.userId,selection:input.licenses,
@@ -149,10 +163,11 @@ export async function prepareEducationAssessment(c:EducationAssessmentContext,ra
     formDefinition:item.formDefinition??Prisma.DbNull,contextKey:item.contextKey,formSectionId:item.formSectionId?sections.get(item.formSectionId)!:null,
     formSectionPosition:item.formSectionPosition,standardCombinationSource:item.standardCombinationSource??Prisma.DbNull}))}},include:educationCompositeInclude})
   const nativeBundle=await retainEducationNativeBundle(tx,source.bundleInstance,runtime.id,items)
-  const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:runtime.id,units:content.snapshot.units.map(unit=>({itemId:items.get(unit.itemId)!,family:unit.family,source:{...unit.source,...(unit.source.standardCombination||unit.source.privateVersionId?{educationBinding:{schemaVersion:1,product:c.product,organizationId:c.organizationId,resourceId:input.resourceId,sourceCompositeId:source.id,sourceItemId:unit.itemId,runtimeCompositeId:runtime.id,runtimeItemId:items.get(unit.itemId)!,ownerId:c.principal.userId}}:{})},measurement:unit.measurement}))})
+  const original=publicPackage?trainingContentSnapshotSchema.parse(source.trainingContentSnapshot):content.snapshot
+  const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:runtime.id,units:original.units.map(unit=>({itemId:items.get(unit.itemId)!,family:unit.family,source:{...unit.source,...(unit.source.standardCombination||unit.source.privateVersionId?{educationBinding:{schemaVersion:1,product:c.product,organizationId:c.organizationId,resourceId:input.resourceId,sourceCompositeId:source.id,sourceItemId:unit.itemId,runtimeCompositeId:runtime.id,runtimeItemId:items.get(unit.itemId)!,ownerId:c.principal.userId}}:{})},measurement:unit.measurement,...(publicPackage&&unit.referencePolicy?{referencePolicy:unit.referencePolicy}:{}),...(publicPackage&&unit.report?{report:unit.report}:{})}))})
   const p=preparationSchema.parse({schemaVersion:1,resourceId:input.resourceId,...{product:c.product,organizationId:c.organizationId},family:input.family,sourceCompositeId:source.id,
    sourceSnapshotHash:canonicalHash(source.trainingContentSnapshot),sourceDefinitionHash:canonicalHash(buildTrainingFlowUnits(source)),runtimeCompositeId:runtime.id,
-   runtimeSnapshotHash:canonicalHash(snapshot),runtimeDefinitionHash:canonicalHash(buildTrainingFlowUnits(runtime)),...(nativeBundle?{nativeBundle}:{}),snapshot,title:input.title,createdAuthority:actor,distribution})
+   runtimeSnapshotHash:canonicalHash(snapshot),runtimeDefinitionHash:canonicalHash(buildTrainingFlowUnits(runtime)),...(nativeBundle?{nativeBundle}:{}),...(publicPackage?{publicPackage}:{}),snapshot,title:input.title,createdAuthority:actor,distribution})
   await content.recheckSourceLicenses()
   await retainEducationAssessmentIssuers(tx,c,[actor]);await captureEducationAssessmentIssuer(tx,c)
   await assertEducationAssessmentDistribution(tx,{...c,actorId:c.principal.userId,selection:input.licenses,
@@ -245,6 +260,9 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
   const runtime=await readRuntime(tx,c,p)
   if(runtime.status!=='DRAFT'||runtime.trainingContentSnapshotHash!==null||runtime.trainingContentSnapshot!==null
    ||canonicalHash(p.snapshot)!==p.runtimeSnapshotHash||p.snapshot.compositeId!==runtime.id)fail('EDUCATION_ASSESSMENT_PREPARATION_CHANGED')
+  if(p.publicPackage){
+   if(!preservesEducationPackageSelection(p.snapshot,{references:input.references,reports:input.reports}))fail('EDUCATION_PACKAGE_SELECTION_IMMUTABLE',400)
+  }
   const selected=await selectedContent(tx,c,p,p.snapshot,input)
   const assets=educationAssessmentAssets(runtime,selected.releases.values())
   await assertEducationAssessmentAssets(tx,assets)
@@ -253,7 +271,7 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
   for(const original of p.distribution.grants)if(!distribution.grants.some(grant=>grant.resourceId===original.resourceId&&grant.grantId===original.grantId&&grant.version===original.version))fail('EDUCATION_ASSESSMENT_DISTRIBUTION_CHANGED',403)
   const origin=educationAssessmentOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',resourceId:id,product:c.product,organizationId:c.organizationId,family:p.family,
    sourceCompositeId:source.id,runtimeCompositeId:runtime.id,sourceSnapshotHash:p.sourceSnapshotHash,runtimeSnapshotHash:canonicalHash(selected.snapshot),runtimeDefinitionHash:p.runtimeDefinitionHash,
-   distribution,...(p.nativeBundle?{nativeBundle:p.nativeBundle}:{}),feedbackPolicy:input.feedbackPolicy,units:selected.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,
+   distribution,...(p.nativeBundle?{nativeBundle:p.nativeBundle}:{}),...(p.publicPackage?{publicPackage:p.publicPackage}:{}),feedbackPolicy:input.feedbackPolicy,units:selected.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,
     references:[...new Map((unit.referencePolicy?.choices??[]).map(choice=>[choice.releaseId,{releaseId:choice.releaseId,contentHash:choice.contentHash}])).values()],report:unit.report??null}))})
   const entry=(()=>{try{return draftEducationAssessmentEntry({origin,title:p.title,disclosure:input.disclosure})}
    catch(error){if(error instanceof z.ZodError)throw error;fail('EDUCATION_ASSESSMENT_DISCLOSURE_INVALID',400)}})()
@@ -345,22 +363,32 @@ export async function readEducationAssessmentRegistration(c:EducationAssessmentC
 /** Management picker metadata only. Exact source payload, copyright, lifecycle
  * and the complete grant set are revalidated at prepare/register, not inferred
  * from this navigation projection. No arbitrary Training library is enumerated. */
-export async function listEducationAssessmentSourceCandidates(c:EducationAssessmentContext,cursor?:string){
+export async function listEducationAssessmentSourceCandidates(c:EducationAssessmentContext,cursor?:string,publicPackage?:EducationPackageReference){
  if(cursor)uuid.parse(cursor)
  return transaction(async tx=>{
   // Discovery precedes the existing source-advisory -> Org lock boundary. It
   // authorizes no response; every emitted source grant is checked again below.
+  // Package metadata narrows discovery; existing source/grant checks still own
+  // preparation authority. No source instance or leaf license is fabricated.
+  const packageKey=publicPackage?publicPackage.provider==='CODE_BUNDLE'?{key:publicPackage.bundleKey,version:publicPackage.bundleVersion}:
+   await tx.bundlePackageRelease.findUnique({where:{id:publicPackage.versionId},select:{bundleKey:true,bundleVersion:true}}):null
   const candidates=await tx.$queryRaw<Array<{id:string;name:string}>>(Prisma.sql`
    SELECT DISTINCT composite.id,composite.name
    FROM content_capability_grants grant_row JOIN composite_assessments composite ON composite.id=ANY(grant_row.resource_keys)
    WHERE grant_row.subject_id=${c.principal.userId} AND grant_row.product=${c.product} AND grant_row.scope_kind='ORGANIZATION'
     AND grant_row.scope_id=${c.organizationId} AND grant_row.resource_kind='material' AND 'material.distribute'=ANY(grant_row.capabilities)
     AND grant_row.revoked_at IS NULL AND grant_row.valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND grant_row.expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
-    AND composite.status='PUBLISHED' ${cursor?Prisma.sql`AND composite.id>${cursor}`:Prisma.empty} ORDER BY composite.id LIMIT 51`)
+    AND composite.status='PUBLISHED' ${publicPackage?Prisma.sql`AND EXISTS(SELECT 1 FROM bundle_instances b WHERE b.composite_id=composite.id AND b.bundle_key=${packageKey&&'key'in packageKey?packageKey.key:packageKey?.bundleKey??''} AND b.bundle_version=${packageKey&&'version'in packageKey?packageKey.version:packageKey?.bundleVersion??''})`:Prisma.empty} ${cursor?Prisma.sql`AND composite.id>${cursor}`:Prisma.empty} ORDER BY composite.id LIMIT 51`)
   const page=candidates.slice(0,50),nextCursor=candidates.length>50?page[49].id:null
   const identities=new Map<string,Awaited<ReturnType<typeof lockEducationAssessmentSourceIdentities>>>()
   for(const candidate of page)identities.set(candidate.id,await lockEducationAssessmentSourceIdentities(tx,candidate.id))
   await lockEducationAssessmentOrganization(tx,c);await captureEducationAssessmentIssuer(tx,c)
+  let whole:Awaited<ReturnType<typeof readEducationWholePackageSource>>|undefined
+  if(publicPackage){
+   await authorizePrivateTool(tx,{entry:c.product,organizationId:c.organizationId,principal:c.principal})
+   await readEducationPackageUse(tx,{...c,actorId:c.principal.userId},publicPackage)
+   whole=await readEducationPackageForUse(tx,publicPackage,c.product)
+  }
   const list=[]
   for(const candidate of page){
    const sourceLicenses=await discoverLicenses(tx,c,[candidate.id])
@@ -368,6 +396,7 @@ export async function listEducationAssessmentSourceCandidates(c:EducationAssessm
    let licenses:License[]|null=null,unavailableReason:'SOURCE_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY'|null=null
    try{
     const {source,content}=await readEducationAssessmentSource(tx,candidate.id,identities.get(candidate.id)!,c.product)
+    if(whole&&!matchesEducationWholePackage(source.bundleInstance,whole))continue
     await assertPreparationPrivateOwners(tx,c,content.snapshot)
     const assets=educationAssessmentAssets(source,content.releases.values())
     await assertEducationAssessmentAssets(tx,assets)
