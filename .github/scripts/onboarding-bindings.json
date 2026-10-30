@@ -916,9 +916,9 @@
       "schemaVersion": 1,
       "pr": 408,
       "enabled": true,
-      "base": "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
+      "base": "28c5d75f73b3569e1f799e3f8daaf3ab71f67fee",
       "product": "e0c993ef672e889c9373d68d1c90541f61b53e5e",
-      "controlCheckpoint": "131fad32c002e3b1a0915d7661daed78bc32856a",
+      "controlCheckpoint": "016f820132e64514d3d9d6969ffa8fff1fb6ee76",
       "components": {
         "backend": "94f9e5bb921ec587774857e7dc85ef4518616eb6",
         "frontend": "f9d4530ad115402477acdaed7993d7b0f51ac804"
@@ -940,7 +940,7 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "021cf3022aa87bf8206c380f7aa8929024c8a7c8"
+        ".github/workflows/ci.yml": "916cf9095181455e713017f408a9fbf1a7dce60b"
       },
       "source": {
         "docs/development/group-report-training-20261030.md": {
