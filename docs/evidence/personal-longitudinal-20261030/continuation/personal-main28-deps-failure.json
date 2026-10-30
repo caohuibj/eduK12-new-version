@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-30T11:56:51.335529+00:00",
+  "sourceHead": "52b4cbdb4463a7ffcaf5192cc577a6d4d71774dc",
+  "runId": 41050414835,
+  "attempt": 1,
+  "failedJobId": 124044901601,
+  "failedStep": "actual frontend app types and affected source lint",
+  "firstErrors": "Cannot find module zod/@prisma/client; dependent implicit-any annotations. Exact frontend includes existing cross-backend test imports. Native-only receipt skipped backend install although frontend remained selected.",
+  "fix": "Install locked backend dependencies/generate Prisma as required frontend type prerequisites, without replaying native DB or audit.",
+  "logDownload": {
+    "target": "jobs/124044901601/logs",
+    "status": "denied",
+    "reason": "HTTP403 at redirected storage endpoint; no retry or alternative log download; annotations and job metadata are separate successful diagnostic reads. Signed URL kept out of repository."
+  },
+  "originalSuccesses": {
+    "imageJob": 124044901946,
+    "sastJob": 124044900861,
+    "serverVersionTree": "fe9d705895f6f2a5bbee3dd35b7b39b2e03daaf3"
+  },
+  "continuation": "Authenticate unchanged image/application SAST jobs. Analyze only actual changed JS/TS control paths since original extraction, or authenticate unchanged complete extraction if none. Current frontend remains actual selected check. Preserve successful native producer and locked audit."
+}

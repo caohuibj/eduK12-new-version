@@ -65,7 +65,7 @@ test('retained application SAST requires exact official successful extraction an
 
 test('actual original source-SHA job metadata admits only its unchanged qualification scope',async()=>{
  const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),old=process.env.GH_TOKEN;process.env.GH_TOKEN='synthetic-offline-metadata-reader';
- const prefix='docs/evidence/personal-longitudinal-20261030/continuation/',sast=JSON.parse(readFileSync(prefix+'personal-ready-af8-codeql-success.json')),native=JSON.parse(readFileSync(prefix+'personal-ready-e658-native-success.json'));
+ const prefix='docs/evidence/personal-longitudinal-20261030/continuation/',sast=JSON.parse(readFileSync(prefix+(binding.applicationSastReuse?.sourceHead==='52b4cbdb4463a7ffcaf5192cc577a6d4d71774dc'?'personal-main28-codeql-success.json':'personal-ready-af8-codeql-success.json'))),native=JSON.parse(readFileSync(prefix+'personal-ready-e658-native-success.json'));
  const read=job=>async()=>({ok:true,json:async()=>job});
  try{
   if(binding.applicationSastReuse){assert.equal(sast.head_sha,binding.applicationSastReuse.sourceHead);assert.equal((await verifyOriginalApplicationSast(plan,read(sast))).reexecuted,false);}else await assert.rejects(verifyOriginalApplicationSast({...plan,applicationSastReuse:binding.historicalMain318ApplicationSastReuse},read(sast)));

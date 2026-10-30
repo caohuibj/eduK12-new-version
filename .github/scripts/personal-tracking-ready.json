@@ -955,5 +955,33 @@
       "server-version/frontend/src/survey",
       "server-version/frontend/src/modules/reporting"
     ]
+  },
+  "imageReuse": {
+    "runId": 41050414835,
+    "jobId": 124044901946,
+    "sourceHead": "52b4cbdb4463a7ffcaf5192cc577a6d4d71774dc",
+    "executionHead": "8f0e080ed76113a3082c5ebdb4428453bed637fc",
+    "serverVersionTree": "fe9d705895f6f2a5bbee3dd35b7b39b2e03daaf3",
+    "inputs": {
+      ".github/workflows/ci-images.yml": "d54c52bbe80dbb91ba70b1092490ae8a7fd22de1",
+      ".github/scripts/build-ci-images.sh": "2a4be34f89a3d14a4be099141107cd69008a7917"
+    },
+    "maximumAgeHours": 24,
+    "scope": "Official current main28 unchanged production image checks; frontend qualification setup repair changes controls only; no deployable archive claim."
+  },
+  "applicationSastReuse": {
+    "runId": 41050414835,
+    "jobId": 124044900861,
+    "sourceHead": "52b4cbdb4463a7ffcaf5192cc577a6d4d71774dc",
+    "executionHead": "8f0e080ed76113a3082c5ebdb4428453bed637fc",
+    "serverVersionTree": "fe9d705895f6f2a5bbee3dd35b7b39b2e03daaf3",
+    "maximumAgeHours": 24,
+    "paths": [
+      "server-version/backend/src/modules/survey",
+      "server-version/backend/src/modules/reporting/personal-tracking.ts",
+      "server-version/frontend/src/survey",
+      "server-version/frontend/src/modules/reporting",
+      ".github/scripts/personal-tracking-ready.mjs"
+    ]
   }
 }
