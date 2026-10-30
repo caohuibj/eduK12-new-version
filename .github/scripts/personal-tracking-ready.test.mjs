@@ -1,8 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
-import {readFileSync} from 'node:fs';
-import {binding,personalTrackingReadyPlan,personalTrackingReadyOutputs,admitOriginalReports,admitOriginalReportsInChild,verifyOriginalImages} from './personal-tracking-ready.mjs';
+import {readFileSync,mkdtempSync,statSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {resolve} from 'node:path';
+import {binding,personalTrackingReadyPlan,personalTrackingReadyOutputs,admitOriginalReports,admitOriginalReportsInChild,verifyOriginalImages,prepareMainSchema,verifyOriginalBackendAudit} from './personal-tracking-ready.mjs';
 import {changedEntries} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
@@ -39,4 +41,15 @@ test('image reuse refuses failed, skipped or expired original producer steps',as
  const run={id:job.run_id,head_sha:proof.sourceHead,event:'pull_request',path:'.github/workflows/ci.yml',conclusion:'failure'};
  const fake=value=>async url=>({ok:true,status:200,json:async()=>url.includes('/jobs/')?value:run});
  try{assert.equal((await verifyOriginalImages(imagePlan,fake(job),now,proof)).reexecuted,false);await assert.rejects(verifyOriginalImages(imagePlan,fake({...job,conclusion:'failure'}),now,proof));await assert.rejects(verifyOriginalImages(imagePlan,fake({...job,steps:steps.map(s=>({...s,conclusion:s.name.startsWith('scan')?'skipped':s.conclusion}))}),now,proof));await assert.rejects(verifyOriginalImages(imagePlan,fake({...job,completed_at:new Date(now-25*3600000).toISOString()}),now,proof));}finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
+});
+
+test('actual main schema archive exceeds 1 MiB without stdout buffer truncation',()=>{
+ const temporary=mkdtempSync(resolve(tmpdir(),'personal-archive-test-'));
+ try{const schema=prepareMainSchema(temporary);assert(statSync(resolve(temporary,'main-schema.tar')).size>1024*1024);assert.equal(readFileSync(schema,'utf8'),execFileSync('git',['show',binding.base+':server-version/backend/prisma/schema.prisma'],{encoding:'utf8'}));}finally{rmSync(temporary,{recursive:true,force:true});}
+});
+
+test('backend audit receipt cannot admit a failed or expired original audit step',async()=>{
+ const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),proof=binding.backendAuditReuse,now=Date.now(),old=process.env.GH_TOKEN;process.env.GH_TOKEN='synthetic-metadata-test-only';
+ const job={id:proof.jobId,run_id:proof.runId,head_sha:proof.sourceHead,status:'completed',conclusion:'failure',steps:[{name:proof.step,conclusion:'success',completed_at:new Date(now).toISOString()}]};const fake=value=>async()=>({ok:true,json:async()=>value});
+ try{assert.equal((await verifyOriginalBackendAudit(plan,fake(job),now)).reexecuted,false);await assert.rejects(verifyOriginalBackendAudit(plan,fake({...job,steps:[{...job.steps[0],conclusion:'failure'}]}),now));await assert.rejects(verifyOriginalBackendAudit(plan,fake({...job,steps:[{...job.steps[0],completed_at:new Date(now-25*3600000).toISOString()}]}),now));}finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
 });

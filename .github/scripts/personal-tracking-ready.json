@@ -898,5 +898,26 @@
     },
     "maximumAgeHours": 24,
     "scope": "Official successful image build/scan checks only. No deployment or retained image archive is claimed."
+  },
+  "imageReuse": {
+    "runId": 41031885906,
+    "jobId": 123983441024,
+    "sourceHead": "571a14b73ef81148913f5ff1666e7e461f2f4b92",
+    "executionHead": "f482328ef680238b3916930adbb2d761cfd3c747",
+    "serverVersionTree": "54e6ec82e1e817e30fc11a8d00bf40ccc75b4ea5",
+    "inputs": {
+      ".github/workflows/ci-images.yml": "d54c52bbe80dbb91ba70b1092490ae8a7fd22de1",
+      ".github/scripts/build-ci-images.sh": "2a4be34f89a3d14a4be099141107cd69008a7917"
+    },
+    "maximumAgeHours": 24,
+    "scope": "Official successful images for exact final catalog8bd inputs; only CI control code changed afterwards. Qualification receipt only; no deployable archive."
+  },
+  "backendAuditReuse": {
+    "runId": 41031885906,
+    "jobId": 123983441600,
+    "sourceHead": "571a14b73ef81148913f5ff1666e7e461f2f4b92",
+    "executionHead": "f482328ef680238b3916930adbb2d761cfd3c747",
+    "step": "install locked native migration tools and audit backend",
+    "maximumAgeHours": 24
   }
 }

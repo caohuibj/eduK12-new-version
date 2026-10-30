@@ -2021,3 +2021,11 @@ The source171f image success is historical only: backend production inputs now
 differ, so it cannot qualify the new tree. Existing compound image checks remain
 required for those changed inputs; current native/audit/types/SAST still execute.
 The optional old-image receipt must not bypass its exact-tree refusal.
+
+For the8bd IO-only recovery, official image job123983441024/run41031885906 and
+its successful backend audit step in job123983441600 may be authenticated only
+against the exact571a source/input pins and <24h metadata. The original native
+job/run failure stays failed. Changed or missing producer inputs, failed/skipped
+steps, stale receipts and unreadable official metadata refuse admission. Only
+unchanged image/audit checks are retained; fresh native/schema/frontend and
+changed-control SAST outcomes remain mandatory.

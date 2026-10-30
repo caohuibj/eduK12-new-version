@@ -26,7 +26,8 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
  assert.deepEqual(entries.filter(e=>e.file.startsWith('server-version/')).map(e=>e.file).sort(),Object.keys(binding.files).sort());
  for(const [file,blob]of Object.entries(binding.protectedInputs))assert.equal(git('rev-parse',head+':'+file),blob,'Dependency/build input changed');
  if(binding.imageReuse){assert.equal(git('rev-parse',head+':server-version'),binding.imageReuse.serverVersionTree,'Image source tree changed');assert.equal(git('rev-parse',binding.imageReuse.sourceHead+':server-version'),binding.imageReuse.serverVersionTree);for(const [file,blob]of Object.entries(binding.imageReuse.inputs))assert.equal(git('rev-parse',head+':'+file),blob,'Original image producer input changed');}
- return {schemaVersion:1,route:'personal-tracking',base,head,tree:git('rev-parse',head+'^{tree}'),draft:draft===true,reviewedCandidate:binding.reviewedCandidate,...(binding.imageReuse?{imageReuse:binding.imageReuse}:{}),required:draft?['scope']:['scope','personal-tracking',...(binding.imageReuse?[]:['docker']),'codeql']};
+ if(binding.backendAuditReuse)for(const file of ['server-version/backend/package.json','server-version/backend/package-lock.json'])assert.equal(git('rev-parse',binding.backendAuditReuse.sourceHead+':'+file),git('rev-parse',head+':'+file),'Original backend audit input changed');
+ return {schemaVersion:1,route:'personal-tracking',base,head,tree:git('rev-parse',head+'^{tree}'),draft:draft===true,reviewedCandidate:binding.reviewedCandidate,...(binding.imageReuse?{imageReuse:binding.imageReuse}:{}),...(binding.backendAuditReuse?{backendAuditReuse:binding.backendAuditReuse}:{}),required:draft?['scope']:['scope','personal-tracking',...(binding.imageReuse?[]:['docker']),'codeql']};
 }
 export function personalTrackingReadyOutputs(plan){const out=participantAccessOutputs(plan);delete out.participant_access_plan;return {...out,application_route:'personal-tracking',scenario:'personal-tracking',codeql:!plan.draft,personal_tracking_plan:JSON.stringify(plan),personal_tracking_draft:false};}
 export async function admitOriginalReports(read=readFileSync){
@@ -59,6 +60,21 @@ export async function verifyOriginalImages(plan,fetcher=fetch,now=Date.now(),exp
  for(const name of steps)assert.equal(job.steps.find(step=>step.name===name)?.conclusion,'success','Original required image step did not pass: '+name);
  return {status:'ADMITTED_IMAGE_CHECKS_ONLY',runId:run.id,originalRunConclusion:run.conclusion,jobId:job.id,sourceHead:run.head_sha,executionHead:job.head_sha,completedAt:job.completed_at,serverVersionTree:proof.serverVersionTree,requiredSteps:steps,ciExecutedInOriginalRun:true,reexecuted:false,deployableArchiveAvailable:false};
 }
+export async function verifyOriginalBackendAudit(plan,fetcher=fetch,now=Date.now()){
+ const proof=plan.backendAuditReuse;assert(proof&&JSON.stringify(proof)===JSON.stringify(binding.backendAuditReuse));assert(process.env.GH_TOKEN);
+ const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official audit metadata unavailable');const job=await response.json();
+ assert.equal(job.run_id,proof.runId);assert([proof.sourceHead,proof.executionHead].includes(job.head_sha));assert.equal(job.status,'completed');
+ const matches=job.steps.filter(step=>step.name===proof.step);assert.equal(matches.length,1);const step=matches[0];assert.equal(step.conclusion,'success','Original locked backend audit did not pass');
+ const age=now-Date.parse(step.completed_at);assert(Number.isFinite(age)&&age>=-300000&&age<=proof.maximumAgeHours*3600000,'Original locked audit expired');
+ const originalWorkflow=execFileSync('git',['show',proof.sourceHead+':.github/workflows/ci.yml'],{encoding:'utf8'});const block=originalWorkflow.slice(originalWorkflow.indexOf('- name: '+proof.step),originalWorkflow.indexOf('- name: real nonempty main upgrade'));assert(block.includes('npm audit --audit-level=high'),'Original audit threshold changed');
+ return {status:'ADMITTED_BACKEND_AUDIT_ONLY',runId:proof.runId,jobId:job.id,sourceHead:proof.sourceHead,originalJobConclusion:job.conclusion,step:proof.step,completedAt:step.completed_at,ciExecutedInOriginalRun:true,reexecuted:false};
+}
+export function prepareMainSchema(temporary){
+ const file=resolve(temporary,'main-schema.tar');
+ execFileSync('git',['archive','--format=tar','--output',file,binding.base,'server-version/backend/prisma']);
+ execFileSync('tar',['-xf',file,'-C',temporary]);
+ return resolve(temporary,'server-version/backend/prisma/schema.prisma');
+}
 async function nativeDatabase(){
  const service=process.env.PG_SERVICE;assert(service&&/^[a-zA-Z0-9_.-]+$/.test(service));
  const backend=resolve('server-version/backend'),temporary=mkdtempSync(resolve(tmpdir(),'personal-native-'));
@@ -68,8 +84,7 @@ async function nativeDatabase(){
  const deploy=(schema,url)=>execFileSync(process.execPath,[resolve(backend,'node_modules/prisma/build/index.js'),'migrate','deploy','--schema',schema],{env:{...process.env,DATABASE_URL:url},stdio:'inherit'});
  try{
   for(const name of names)sql('postgres','CREATE DATABASE '+name+';');
-  const archive=execFileSync('git',['archive',binding.base,'server-version/backend/prisma']);execFileSync('tar',['-xf','-','-C',temporary],{input:archive});
-  deploy(resolve(temporary,'server-version/backend/prisma/schema.prisma'),database(names[0]));
+  deploy(prepareMainSchema(temporary),database(names[0]));
   const owner=randomUUID(),id=randomUUID(),participant=randomUUID(),wave=randomUUID(),publication=randomUUID(),attempt=randomUUID(),final=randomUUID(),digest='a'.repeat(64);
   const {PrismaClient}=createRequire(resolve(backend,'package.json'))('@prisma/client'),db=new PrismaClient({datasources:{db:{url:database(names[0])}}}),login='native-'+owner.replaceAll('-','').slice(0,20);
   try{await db.user.create({data:{id:owner,username:login,passwordHash:'synthetic-schema-fixture-not-a-login',role:'TEACHER',accountDomain:'SURVEY'}});await db.surveyAccount.create({data:{userId:owner,loginName:login,normalizedLogin:login}});}finally{await db.$disconnect()}
@@ -92,7 +107,7 @@ async function nativeDatabase(){
   const dump=execFileSync('docker',['exec',service,'pg_dump','-U','ptool','-Fc',names[0]],{maxBuffer:64*1024*1024});
   execFileSync('docker',['exec','-i',service,'pg_restore','-U','ptool','--no-owner','--no-privileges','-d',names[1]],{input:dump});
   assert.equal(facts(names[1]),before,'Native restored facts changed');
-  const schema=db=>execFileSync('docker',['exec',service,'pg_dump','-U','ptool','--schema-only','--no-owner','--no-privileges',db],{encoding:'utf8'}).split('\n').filter(line=>!/^\\(?:un)?restrict /.test(line)&&!/^-- Dumped (?:from|by)/.test(line)).join('\n');
+  const schema=db=>execFileSync('docker',['exec',service,'pg_dump','-U','ptool','--schema-only','--no-owner','--no-privileges',db],{encoding:'utf8',maxBuffer:64*1024*1024}).split('\n').filter(line=>!/^\\(?:un)?restrict /.test(line)&&!/^-- Dumped (?:from|by)/.test(line)).join('\n');
   assert.equal(schema(names[0]),schema(names[1]),'Native restored schema changed');
   assert.throws(()=>sql(names[1],`UPDATE survey_projects SET longitudinal_plan='{}' WHERE id='${id}';`),/Published personal tracking plan is immutable/);
   return {status:'PASSED',base:binding.base,postgres:sql(names[0],'SHOW server_version;'),schemaFixture:'nonempty old-schema SQL, no application replay',oldFactsSHA256:hash(before),dumpSHA256:hash(dump),dumpBytes:dump.length,restoredFactsEqual:true,restoredSchemaEqual:true,immutableGuards:true,dumpPublished:false};
@@ -102,7 +117,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  assert.equal(process.env.GITHUB_ACTIONS,'true','Formal qualification requires the existing Actions execution context');
  const phase=process.argv[2],plan=JSON.parse(process.env.PERSONAL_TRACKING_PLAN||'null');
  assert(plan&&plan.head===git('rev-parse','HEAD')&&!plan.draft);mkdirSync('personal-tracking-evidence',{recursive:true});
- if(phase==='admit')writeFileSync('personal-tracking-evidence/reused-originals.json',JSON.stringify({plan,...admitOriginalReportsInChild(),...(plan.imageReuse?{originalImages:await verifyOriginalImages(plan)}:{})},null,2)+'\n');
+ if(phase==='admit'){const originals=admitOriginalReportsInChild();const [images,audit]=await Promise.all([plan.imageReuse?verifyOriginalImages(plan):undefined,plan.backendAuditReuse?verifyOriginalBackendAudit(plan):undefined]);writeFileSync('personal-tracking-evidence/reused-originals.json',JSON.stringify({plan,...originals,...(images?{originalImages:images}:{}),...(audit?{originalBackendAudit:audit}:{})},null,2)+'\n');}
  else if(phase==='native')writeFileSync('personal-tracking-evidence/native-upgrade-restore.json',JSON.stringify({plan,...await nativeDatabase()},null,2)+'\n');
  else throw Error('Unknown qualification phase');
 }

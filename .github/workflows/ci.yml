@@ -402,7 +402,7 @@ jobs:
           node-version: '24.21.0'
       - name: fetch the immutable reviewed personal tracking source
         if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'feat/personal-longitudinal-survey-20261030'
-        run: git fetch --no-tags --depth=1 origin a62c9a5763da69aa13b4f70d062b0bf55d6db65f
+        run: git fetch --no-tags --depth=1 origin a62c9a5763da69aa13b4f70d062b0bf55d6db65f 571a14b73ef81148913f5ff1666e7e461f2f4b92
       - name: fetch the exact diff base without full history
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -3540,14 +3540,17 @@ jobs:
           node-version: '24.21.0'
       - name: admit exact original local reporters without application replay
         run: node .github/scripts/personal-tracking-ready.mjs admit
-      - name: install locked native migration tools and audit backend
+      - name: install locked native migration tools
         working-directory: server-version/backend
         env:
           PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
         run: |
           npm ci
           npx prisma generate
-          npm audit --audit-level=high
+      - name: audit backend when no admitted exact-input success
+        if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').backendAuditReuse }}
+        working-directory: server-version/backend
+        run: npm audit --audit-level=high
       - name: real nonempty main upgrade and native dump restore
         env:
           PG_SERVICE: ${{ job.services.postgres.id }}

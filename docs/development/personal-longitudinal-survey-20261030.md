@@ -457,3 +457,25 @@ job explicitly generates that client once after install (postinstall generation
 skipped). Original app31/32/5 are not replayed. Only changed gate/image-refusal
 contracts, the actual child entry and workflow syntax were checked locally;
 actual native upgrade/restore is still first execution in the next selected CI.
+
+### Actual8bd run: successful admission/audit/images retained; schema archive IO fixed
+
+Ready run41031885906 source571a passed source, original-report admission, locked
+backend audit/client setup, production images123983441024 and SAST123983440232.
+Qualification123983441600 stopped before schema migration on git archive
+ENOBUFS: Node's default stdout buffer truncated the actual >1MiB Prisma tar.
+The first error/metadata remain retained. The archive now writes straight to a
+private temporary file. Its actual large Git archive/extraction contract passed;
+source schema bytes match. Schema-only dump output also has a bounded64MiB
+buffer; a read-only isolated schema-capacity preflight returned979455 bytes.
+No new migration/business execution is claimed by those preflights.
+
+Only CI controls changed after571a, so its exact whole-input successful image
+job is now admissible (<24h, matching tree/producer/required steps). Its completed
+backend audit step is independently authenticated with matching locked inputs
+and age; the original native job and whole run remain failures. Tool installation
+is still necessary on the new runner, but that passed audit is not rerun. Failed
+or stale audit receipts are refused by a new boundary contract. Native SQL,
+frontend actual types/lint/audit and changed-control SAST still execute. Scope
+fetches both the immutable reviewed a62 and original571a producer objects for
+its shallow Git comparison. No previous successful application case is replayed.
