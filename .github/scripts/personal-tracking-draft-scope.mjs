@@ -12,6 +12,7 @@ const allowed=new Set([
     'src/modules/survey/public.routes.ts','src/modules/survey/publication.service.ts','src/modules/survey/waves.publish.ts',
     'src/modules/survey/waves.routes.ts','src/modules/survey/waves.service.ts',
     'src/__tests__/reporting/personal-tracking.test.ts','src/__tests__/survey/personal-tracking.postgres.integration.test.ts',
+    'src/__tests__/measurement-content/survey-content-selection.test.ts',
   ].map(path=>backend+path),
   ...['modules/reporting/PersonalChangesReport.tsx','modules/reporting/longitudinalVisualization.ts',
     'modules/reporting/__tests__/PersonalChangesReport.test.tsx','survey/SurveyPersonalChanges.tsx',

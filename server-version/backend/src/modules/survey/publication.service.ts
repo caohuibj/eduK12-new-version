@@ -1,4 +1,4 @@
-import {loadSurveyTrackingSource,inheritedSurveyTrackingUnit} from './tracking-source'
+import {loadSurveyTrackingSource,inheritedSurveyTrackingUnit,surveyTrackingDefaultSelections} from './tracking-source'
 import {freezeSurveyTracking,surveyFormTrackingIdentity,type SurveyTrackingSelection,type SurveyTrackingBinding} from './personal-tracking'
 import type {SurveyNativeBundle} from '../bundle-product/survey-native'
 import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
@@ -251,14 +251,13 @@ export async function freezeResearchWaveDraft(input:{
         measurementHash: release.content.measurementHash }
     }
     for(const unit of units){await bindApprovedTripletContent(tx,unit,input.actorUserId);await bindGovernedToolContent(tx,unit,input.actorUserId)}
-    if((input.participantFeedback??[]).some(s=>units.some(u=>s.feedback.mode==='DESCRIPTIVE'&&u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId)&&u.sourceProvenance?.reportConfigured===false)))stop('已批准组合明确不反馈，不能在投放时添加报告反馈')
+    const defaults=surveyTrackingDefaultSelections(inheritedSnapshot,units)
+    const participantFeedback=input.participantFeedback??defaults.participantFeedback
+    const contentSelections=input.contentSelections??defaults.contentSelections
+    if(participantFeedback.some(s=>units.some(u=>s.feedback.mode==='DESCRIPTIVE'&&u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId)&&u.sourceProvenance?.reportConfigured===false)))stop('已批准组合明确不反馈，不能在投放时添加报告反馈')
     if((input.contentSelections??[]).some(s=>units.some(u=>u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId))))stop('已批准标准工具的参数与报告组合已冻结，不能在投放时替换版本')
-    const inheritedFeedback=inheritedSnapshot?.units.flatMap(prior=>{
-      const unit=units.find(u=>u.instrumentKey===prior.instrumentKey)
-      return unit&&prior.participantFeedback?[{instrumentId:unit.draftId,feedback:prior.participantFeedback}]:[]
-    })
-    freezeSurveyParticipantFeedback(units,input.participantFeedback??inheritedFeedback??[],feedbackMetrics)
-    await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,input.contentSelections??[])
+    freezeSurveyParticipantFeedback(units,participantFeedback,feedbackMetrics)
+    await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,contentSelections)
     // Initial bounded research safety limit, not a measured capacity claim.
     if(units.filter(unit=>unit.kind==='COGNITIVE').length>4)
       stop('一个波次最多包含 4 个受控认知任务（480 个正式试次）')

@@ -4,6 +4,7 @@ vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:m
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 import {freezeSurveyContentSelections} from '../../modules/survey/content-selection'
 import {freezeResearchWaveDraft} from '../../modules/survey/publication.service'
+import {inheritedSurveyTrackingUnit,surveyTrackingDefaultSelections} from '../../modules/survey/tracking-source'
 import {referenceEntryKey} from '../../modules/measurement-content/reference-candidate'
 const iid='11111111-1111-4111-8111-111111111111',rid='22222222-2222-4222-8222-222222222222',pid='33333333-3333-4333-8333-333333333333'
 const entry={scoreKey:'total',referenceKind:'descriptive_sample' as const,evidenceLevel:'local_pilot' as const,provenanceType:'local_observed' as const,instrumentVersion:'1',scoringVersion:'1',population:{},source:{citation:'Local'},statistics:{mean:1}}
@@ -15,6 +16,24 @@ const unit=()=>({draftId:iid,kind:'SCALE',measurementRelease:measurement} as any
 const selection=()=>({instrumentId:iid,reportReleaseId:pid,references:[{releaseId:rid,entryKey:referenceEntryKey(entry),priority:1}]})
 beforeEach(()=>{vi.clearAllMocks();mocks.get.mockImplementation(async(_tx,id)=>id===rid?reference():report())})
 describe('actual Wave content selection freezer',()=>{
+ it('clears an explicit empty continuation selection, but revalidates intentionally inherited private P/R',async()=>{
+  const old={...unit(),instrumentKey:'A',contentSelection:undefined}
+  await freezeSurveyContentSelections({} as never,'owner','project',[old],[selection()])
+  const source={units:[old],longitudinal:{metrics:[{draftId:iid}]}} as any
+  const next=inheritedSurveyTrackingUnit(source,{id:iid,instrumentKey:'A'})!
+  expect(next.contentSelection).toBeUndefined()
+  await freezeSurveyContentSelections({} as never,'owner','project',[next],[])
+  expect(next.contentSelection).toBeUndefined()
+  const defaults=surveyTrackingDefaultSelections(source,[next])
+  await freezeSurveyContentSelections({} as never,'owner','project',[next],defaults.contentSelections)
+  expect(next.contentSelection).toEqual(old.contentSelection)
+  const retired=inheritedSurveyTrackingUnit(source,{id:iid,instrumentKey:'A'})!
+  mocks.get.mockResolvedValue({...reference(),status:'REVOKED'})
+  await expect(freezeSurveyContentSelections({} as never,'owner','project',[retired],defaults.contentSelections)).rejects.toMatchObject({statusCode:409})
+  expect(retired.contentSelection).toBeUndefined()
+  const approved={...old,sourceProvenance:{surveyStandardReleaseId:'approved',reportConfigured:false}}
+  expect(surveyTrackingDefaultSelections({...source,units:[approved]},[approved]).contentSelections).toEqual([])
+ })
  it('stores only exact pointers and policy, with locked release reads',async()=>{
   const u=unit();await freezeSurveyContentSelections({} as never,'owner','project',[u],[selection()])
   expect(u.contentSelection.referencePolicy.choices[0]).toMatchObject({releaseId:rid,entryKey:referenceEntryKey(entry),metricKey:'total',priority:1})

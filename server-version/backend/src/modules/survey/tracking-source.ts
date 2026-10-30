@@ -2,6 +2,8 @@ import type {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import type {ResearchFrozenPublication,ResearchFrozenUnit} from './publication.service'
 import {SurveyWaveError} from './waves.service'
+import type {SurveyParticipantFeedbackSelection} from './participant-feedback'
+import type {SurveyContentSelection} from './content-selection'
 
 /** Resolve the existing immutable publication pointer; never copy or reopen a
  * mutable tool draft to recover T1. The caller retains current owner/grant and
@@ -32,5 +34,28 @@ export function inheritedSurveyTrackingUnit(source:ResearchFrozenPublication|und
   const unit=matches[0]
   if((unit.sourceProvenance?.sourceGrantId??null)!==(draft.catalogGrantId??null))
     throw new SurveyWaveError(409,'冻结追踪工具的当前来源授权不一致')
-  return structuredClone(unit)
+  const inherited=structuredClone(unit)
+  // These are wave choices, not C. Reapply either explicit T2 selections
+  // (including []) or defaults through the normal freeze/status checks.
+  delete inherited.participantFeedback
+  delete inherited.contentSelection
+  delete inherited.longitudinalMetricKeys
+  return inherited
+}
+
+export function surveyTrackingDefaultSelections(source:ResearchFrozenPublication|undefined,units:ResearchFrozenUnit[]){
+  const participantFeedback:SurveyParticipantFeedbackSelection[]=[],contentSelections:SurveyContentSelection[]=[]
+  for(const prior of source?.units??[]){
+    const unit=units.find(u=>u.draftId===prior.draftId&&u.instrumentKey===prior.instrumentKey)
+    if(!unit)continue
+    if(prior.participantFeedback)participantFeedback.push({instrumentId:unit.draftId,feedback:prior.participantFeedback})
+    // Approved combinations rebind their own exact report/parameter contract.
+    // Ordinary private P/R is intentionally inherited only when omitted, and
+    // re-enters the same current PUBLISHED/scope/measurement checks as a picker.
+    if(prior.contentSelection&&!unit.sourceProvenance?.surveyStandardReleaseId&&!unit.sourceProvenance?.surveyToolReleaseId)
+      contentSelections.push({instrumentId:unit.draftId,
+        ...(prior.contentSelection.reportRelease?{reportReleaseId:prior.contentSelection.reportRelease.releaseId}:{}),
+        references:prior.contentSelection.referencePolicy.choices.map(({releaseId,entryKey,priority})=>({releaseId,entryKey,priority}))})
+  }
+  return {participantFeedback,contentSelections}
 }

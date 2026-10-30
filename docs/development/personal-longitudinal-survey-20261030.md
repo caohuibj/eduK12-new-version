@@ -247,3 +247,39 @@ index, not changes to the repaired projection, publisher, scorer or credential
 logic. Existing local assertions retain their original execution identities;
 formal compilation still consumes the actual integrated source. The failed
 scope run and earlier cancelled workflow remain retained, with no rerun.
+
+### Explicit T2 disclosure narrowing (DOT follow-up)
+
+The immutable-source repair copied the prior wave's mutable participant feedback
+and private content selection together with C. Because the normal freezers set
+only selected entries, an explicit T2 subset or empty array could retain an
+omitted tool's prior disclosure. This was a real disclosure regression in the
+candidate `8733effe0`; its successful Draft compile/type CI 41010833671 and
+publication integrity 41010833605 did not establish the missing assertion.
+Ready/merge qualification is paused pending independent disposition of this fix.
+
+Inherited C now drops participantFeedback, contentSelection and the previous
+longitudinal output allowlist before ordinary publication binding. Explicit
+arrays (including []) take precedence. Only an omitted field defaults to the
+previous wave's exact per-draft choices. Intentionally inherited private P/R
+goes through the existing current PUBLISHED/scope/measurement checks. Approved
+combinations rebind their own P/R through the existing authorized binders;
+native Bundle disclosure ceilings and reportConfigured=false stay intact.
+
+Minimal verification: the two A/B→A and A/B→[] cases and the affected existing
+fixed-Bundle inheritance assertion pass (3 passed, 11 filtered). Direct content
+selection and participant-feedback consumers pass (33 cases, including the
+explicit empty private P/R and revoked inherited P/R case). Backend tsc exits 0;
+the modified Draft scope allowlist contract passes once. No database, browser,
+full cognitive journey or original 31-case suite was rerun. Raw reporter/logs
+and byte manifests are in continuation/narrowing-manifest.json.
+
+The first worktree test command used a wrong relative dependency-link target;
+npx consequently launched an unpinned cached/downloaded test tool. That process
+was stopped; its possibly interleaved initial files are retained and explicitly
+unqualified. The reported 3-pass result is the subsequent direct invocation of
+the existing locked node_modules/.bin/vitest with separate `narrowing-locked`
+reporter/logs. No lockfile or package manifest changed.
+
+Training WIP is preserved separately in /workspace/eduK12-new-version on
+feat/personal-longitudinal-training-20261030. This patch changes Survey only.

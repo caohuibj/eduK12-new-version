@@ -1,4 +1,5 @@
-import {inheritedSurveyTrackingUnit} from '../../modules/survey/tracking-source'
+import {inheritedSurveyTrackingUnit,surveyTrackingDefaultSelections} from '../../modules/survey/tracking-source'
+import {freezeSurveyParticipantFeedback,surveyRawMetricDisclosure} from '../../modules/survey/participant-feedback'
 import {describe,it,expect} from 'vitest'
 import {randomUUID} from 'node:crypto'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
@@ -70,6 +71,28 @@ const unit=(name:string):ResearchFrozenUnit=>({draftId:randomUUID(),instrumentKe
   measurementRelease:{releaseId:'release',contentHash:hash,measurementHash:hash},trackingIdentity:{measurementHash:hash,metrics:[{key:'total',label:'总分',unit:'points'}]},
   participantFeedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['total'],release:'AFTER_FINAL'}})
 describe('Frozen Survey tracking plan and leaf identity',()=>{
+  it.each(['ONLY_A','NONE'] as const)('applies an explicit %s narrowing to inherited A/B without retaining old feedback or P/R choices',choice=>{
+    const originals=['A','B'].map(unit)
+    for(const u of originals)u.contentSelection={referencePolicy:{policyVersion:'EXACT_POPULATION_PRIORITY_V1',measurementReleaseId:'release',choices:[]},reportRelease:{releaseId:randomUUID(),contentHash:hash}}
+    const t1=freezeSurveyTracking({projectId:'project',waveId:'t1',ordinal:1,collectionMode:'LINKED_WAVES',existing:null,firstPublishedAt:null,
+      units:originals,selection:{mode:'LONGITUDINAL',metrics:originals.map(u=>({instrumentId:u.draftId,scoreKey:'total'}))}})!
+    const source={units:originals,longitudinal:t1.binding} as ResearchFrozenPublication
+    const next=originals.map(u=>inheritedSurveyTrackingUnit(source,{id:u.draftId,instrumentKey:u.instrumentKey})!)
+    expect(next.every(u=>u.participantFeedback===undefined&&u.contentSelection===undefined&&u.longitudinalMetricKeys===undefined)).toBe(true)
+    const defaults=surveyTrackingDefaultSelections(source,next)
+    expect(defaults.participantFeedback).toHaveLength(2)
+    expect(defaults.contentSelections).toHaveLength(2)
+    // Same explicit array selection as publication; [] must never use defaults.
+    const selected=choice==='ONLY_A'?defaults.participantFeedback.slice(0,1):[]
+    freezeSurveyParticipantFeedback(next,selected,new Map(next.map(u=>[u.draftId,['total']])))
+    freezeSurveyTracking({projectId:'project',waveId:'t2',ordinal:2,collectionMode:'LINKED_WAVES',existing:t1.plan,firstPublishedAt:new Date(),
+      units:next,selection:{mode:'LONGITUDINAL',metrics:[]}})
+    expect(surveyRawMetricDisclosure(next[1],true)).toBeNull()
+    expect(next[1].longitudinalMetricKeys).toEqual([])
+    expect(surveyRawMetricDisclosure(next[0],true)!==null).toBe(choice==='ONLY_A')
+    expect(next[0].longitudinalMetricKeys).toEqual(choice==='ONLY_A'?['total']:[])
+    expect(originals.every(u=>u.participantFeedback?.mode==='DESCRIPTIVE'&&u.contentSelection?.reportRelease)).toBe(true)
+  })
   it('inherits ABC from ABCD into ABCE, binds same-named totals to their own tool, and does not expand disclosure',()=>{
     const units=['A','B','C','D'].map(unit)
     units[1].participantFeedback=undefined
@@ -132,7 +155,7 @@ describe('Frozen Survey tracking plan and leaf identity',()=>{
     const a=unit('A'),b=unit('B'),source={units:[a,b],longitudinal:{planId:plan.id,metrics:[{metricId:'a',draftId:a.draftId,instrumentKey:'A',scoreKey:'total',measurementHash:hash,unit:'points'}]},
       governedPackages:[{family:'BUNDLE',slots:[{draftId:a.draftId},{draftId:b.draftId}]}]} as ResearchFrozenPublication
     const inherited=inheritedSurveyTrackingUnit(source,{id:b.draftId,instrumentKey:'B'})!
-    expect(inherited).toEqual(b)
+    expect(inherited).toEqual({...b,participantFeedback:undefined})
     inherited.title='local change'
     expect(b.title).toBe('B')
     expect(inheritedSurveyTrackingUnit({...source,governedPackages:[]},{id:b.draftId,instrumentKey:'B'})).toBeUndefined()
