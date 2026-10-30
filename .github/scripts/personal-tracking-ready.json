@@ -1,106 +1,164 @@
 {
   "schemaVersion": 1,
   "repository": "caohuibj/eduK12-new-version",
-  "branch": "feat/personal-longitudinal-survey-20261030",
-  "base": "55fab18e9933e58dcb800b20156f5b7e48858536",
-  "reviewedCandidate": "a62c9a5763da69aa13b4f70d062b0bf55d6db65f",
-  "reviewBasis": "DOT closed source findings on a62; user authorizes reuse of original unchanged 31 and targeted repairs. Original unsigned local execution stays local evidence; no claim CI executed those cases. All Survey product/test/schema bytes pinned to reviewed a62; Training main delta is separate and reviewed by PR407. Main advanced to BAT/COPSOQ catalog-only 1d95; no Survey plan/migration/source/fixture or locked tool input changed. Catalog additions are separately governed main content, not the synthetic tracked source. Final catalog main PR410 changes backend image source inputs, so the prior successful image producer is historical only and is not admitted for this new tree. Existing combined image gate must execute for the changed producer inputs. Main31845 includes separately merged group-report source/schema and PR404 catalog. Survey pinned blobs and locked audit inputs remain unchanged; changed production image tree requires current image checks. Older image successes stay historical. Main2fc adds separately governed JD-R/Profile production inputs but no Prisma schema/migrations or locked tools. Image and application SAST receipts become historical. Original complete native producer may cover only unchanged base/candidate Prisma trees, backend tool locks and native commands; frontend source changed and must execute current types/lint. Prior application originals remain pinned to a62. Main28c PR417 only changes CodeQL native-Bundle resource controls and existing release-tooling policy. Actual ci.yml conflict resolved by keeping personal configuration plus native Bundle conditional resources; original native schema and commands remain exact. Main55fab PR408 changes Training group sources and frontend consumers; former main28 image/application SAST receipts remain historical and cannot admit this production tree. Original base/candidate Prisma trees and backend tool locks remain exact; native-only reuse stays valid. Required backend dependency setup for current frontend types is restored; Notion recording is nonblocking under the latest user instruction.",
+  "slice": "training",
+  "branch": "feat/personal-longitudinal-training-20261030",
+  "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+  "reviewedCandidate": "e8d515058554a5e4bbf321074c5906c53d880c7a",
+  "originalSource": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+  "originalCaseCount": 31,
+  "originalReportPrefix": "docs/evidence/personal-longitudinal-training-20261030/",
+  "reviewBasis": "Training original32 records remain local unsigned evidence:31 passed application/consumer JSON cases plus one historical Draft-scope Node control. Every Training application added/removed-line delta matches immutable dbcc (schema compared to its Survey base2f8829; other files to main1cc). Mainfa context is separately merged/qualified. Current frozen e8d source is the candidate anchor for independent DOT review, not a claim DOT approved this PR. Current formal new migration/native restore and changed production source checks still execute.",
   "files": {
-    "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql": {
+    "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql": {
       "before": null,
-      "after": "059bf0e4cb0168bf90ca9ff803291605df9e6cec"
-    },
-    "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql": {
-      "before": null,
-      "after": "aa4e2554afc93acf7eaa539bd9953878780f9a50"
+      "after": "6f864876d2a10bb9fe9f837ae21cd5c56f7eb88d",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "b767aa24ad90b42f7e2e48a3df4ead711f0122f918733f2789bfd940cc193a8e"
     },
     "server-version/backend/prisma/schema.prisma": {
-      "before": "8beef2106fff0996ba42c9b9bfc3dd94a6e337d6",
-      "after": "007cf25fce43a97a7278b4d13277128154d70b6b"
+      "before": "007cf25fce43a97a7278b4d13277128154d70b6b",
+      "after": "9eda61f452eb26ba2007233e9317805207c6dacb",
+      "originalBase": "2f8829d64b37d2780e7b8546523a7a2d6d8f1a90",
+      "originalDeltaSHA256": "0fadc5340eaba040c0593ca1b9ca980ae3b4f8a4d302f88893ee3938a366ddf2"
     },
-    "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts": {
-      "before": "ec549e6bdb74e4f73d033304452b44fe9da51a33",
-      "after": "14849c889864cc9ad00b16d6f5adf32dc32f274c"
-    },
-    "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts": {
+    "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts": {
       "before": null,
-      "after": "1cf04891398e23c476241ca217f930d20e71c7ec"
+      "after": "01339c2f2a86799aaef112576547ddfe22abb265",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "b4f3f39ac0d4aa51cf8c00ff12b32c3201e774c8065bf2dd17477ad815676d31"
     },
-    "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts": {
+    "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts": {
+      "before": "9c1587875c6b15d9b730a387b82715aa2de20520",
+      "after": "2c609d96b7fe5dd7d6f74f5737bb88b52be2d83f",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "531f309b6bf9967c030c07f4baa49185e5baf3517576931b6382e5530c445f84"
+    },
+    "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts": {
       "before": null,
-      "after": "1b3a3d1cc61a5418662fcbc72ecc6794d22e0c54"
+      "after": "cb5bd422021cd0f23f06858ffa7121f1b9056b69",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "0f90bfc9f466fe5c9e0956bbd8f46d1f4d9a0d3de076e25d0b4ad704d0dc5961"
     },
-    "server-version/backend/src/modules/reporting/personal-tracking.ts": {
+    "server-version/backend/src/modules/anonymous-study/routes.ts": {
+      "before": "323a19a2a84a67ba16109f0422b43598f85b8659",
+      "after": "0fbe6c19cafa34153a4bb2341733c7477083e9fc",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "8cddc6f7cac290e7b5b795f90ebcf7b39d08902f3f05bcc7bd8192946752084a"
+    },
+    "server-version/backend/src/modules/anonymous-study/service.ts": {
+      "before": "a6ae47192c4c171c3e27086a70227646e4424f5f",
+      "after": "63261260b198fa60bc00f7fcc090ea3fa44220a6",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "64be210a5708945a738904db1748e7d94df3353f2ec214e6b22c0ff277782bc8"
+    },
+    "server-version/backend/src/modules/bundle-product/routes.ts": {
+      "before": "f00d92d4e111948ffa92478d00dbc512426f0944",
+      "after": "4bf98360eeb897c9a5d07b075cb4808d869a5600",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "c0972ef3637bf9110e41b1beac2569d77fd766505c08f4f37650946a5292cb7b"
+    },
+    "server-version/backend/src/modules/bundle-product/service.ts": {
+      "before": "c330f7f35a5a8aea3ad9211cde1f375bc19f0800",
+      "after": "0c8635c4546a2c0a078f3255b2224dfd4310699c",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "54f39a205963b56ea7f02ca3b9c643d2389fda0320fa2af03c178f18e662266a"
+    },
+    "server-version/backend/src/modules/composite/composite.routes.ts": {
+      "before": "244e054f08448948749271b09a47c95fa2e9738e",
+      "after": "d0719f903f96e78499a9ed6303462169437981b8",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "8ce9ca30c7ce8ce55e13ed03dd929a38ef0eff162716f5149226c99546918e99"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "066853789e82bc7b39c43b63d0d2869c9b0457df",
+      "after": "3878a537a413f7349930c285b89b830033eab37e",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "7c599e126fc729433fa7edb730235100a987248819e62d4140bc43d25fe02415"
+    },
+    "server-version/backend/src/modules/composite/personal-tracking-results.ts": {
       "before": null,
-      "after": "51ea4b1c06836aab6f30e0f59b6101fa0897a928"
+      "after": "e93c69f08e23ac18c36c42d57f36b655174059c0",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "1d024ff4eda3e1522dd8a0b517d46f57c960ae27302d9df0e615e14d32931fa7"
     },
-    "server-version/backend/src/modules/survey/measurement.result.ts": {
-      "before": "b337dbbcb173ff76231ce76224d57c637b62754f",
-      "after": "4703850e34d79f861d67cc5517ad576e66b573a1"
-    },
-    "server-version/backend/src/modules/survey/participant-feedback.ts": {
-      "before": "1ddf6dbe3ba19ce420f3f1219d143b7fc12f218b",
-      "after": "367234a8490590befb7197cf2e0336e9123c380d"
-    },
-    "server-version/backend/src/modules/survey/personal-tracking.service.ts": {
+    "server-version/backend/src/modules/composite/personal-tracking.service.ts": {
       "before": null,
-      "after": "2e254172e3de65065d8e643a93f7765789781577"
+      "after": "5e81e7e389b9f7d66e8b8c5a460e63fa147ea94a",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "6096e8805749cea6aa755cd5e15b86835e7b15f00e91c00b9edc3e67125fd398"
     },
-    "server-version/backend/src/modules/survey/personal-tracking.ts": {
+    "server-version/backend/src/modules/composite/personal-tracking.ts": {
       "before": null,
-      "after": "44cba227cbe95f0db55082cf2f3aa2b822234a1e"
+      "after": "7ab8d072a566a959c6bbde232a34e92b855d5727",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "faeb4ae0926f3ddaad1d1ce40b36ca4477bfd3d3800f1ae629c4f53fbd5d8b3d"
     },
-    "server-version/backend/src/modules/survey/public.routes.ts": {
-      "before": "e7a561f111c3848656854d44d480f5d77c7bbb11",
-      "after": "066ce49c417a1fac108b164793af9c19a7fe86ef"
+    "server-version/backend/src/modules/composite/training-content-binding.ts": {
+      "before": "0d70f2e272bcca3ed36384e2c74d9d15cdfe82ac",
+      "after": "60c2ed53c328ea6d28a2bfa4bd3abf5a1f77281b",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "f2019bad5fd056bc2f69049b0c29acc6cfce9add8bc13b2cc9089eb27c0334a9"
     },
-    "server-version/backend/src/modules/survey/publication.service.ts": {
-      "before": "1e9cbf2a76b473f818382ae9fc368bcd0ef08132",
-      "after": "9f4dda5022d557f20a6517fba393455a60b33d85"
+    "server-version/backend/src/modules/composite/training-metric-disclosure.ts": {
+      "before": "26d9c79852d8f15d985f55d0dc75dbe5c5b3d399",
+      "after": "abaa68a0b5dce36d868355321d5c549a33e59d84",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "8b0882a1b701eb23ae57038a37260fb403f53cd0daab76f3fb286e64a148b9cb"
     },
-    "server-version/backend/src/modules/survey/tracking-source.ts": {
+    "server-version/backend/src/modules/questionnaire-product/routes.ts": {
+      "before": "ddf46f02c8e30038e18cbb9f104f0175e97c556a",
+      "after": "e72e540a55b40f1e4f6b1aee23603a6c688212fa",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "397c80e033998b719db1b1608f9c0133d08969de7fef73e6a2c5fc4eb36a60b6"
+    },
+    "server-version/backend/src/modules/questionnaire-product/service.ts": {
+      "before": "f2d60e8feb0635ac10160f073a4beb329b332f35",
+      "after": "96ea8096f2c7a537228461da4623f6064df42325",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "25e27cb85eec9d38c6c013bf05e23f9d6d900b5a8a5f473fa62886d297f083cd"
+    },
+    "server-version/frontend/src/api/anonymousStudy.ts": {
+      "before": "87735f316ac201712a0cf6dc28d01574541e3638",
+      "after": "9885f6879cf11fd2533c270315a15e91160e1c77",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "88c73e349d88626c642d9187ba06fbabea2f940a0bd0d81f145aeee312d2a2e0"
+    },
+    "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
+      "before": "14bf92d842753749b6dfc7f040163fa1e84c0901",
+      "after": "c2bbaad8ada2691d23bb4615b20ad6716cd93f45",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "9d37c7d848986d67331062ff9e6e6f18797d1e8ede429efedcf303bec5438356"
+    },
+    "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx": {
       "before": null,
-      "after": "a72cb675beb1e765f25d366b5851f9ac2f09f17a"
+      "after": "b3ffb65076ba4119318af6d3314b773394b36c7a",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "5d893f14a081d6e1cc031285d192968838449349c307c9d5585fc5a8066dfe48"
     },
-    "server-version/backend/src/modules/survey/waves.publish.ts": {
-      "before": "6dd41e6fc06dae1dc9f3653c6b218d50470a3096",
-      "after": "62b832aa6bddd6c50991b2595fdb21b8d3422c7c"
-    },
-    "server-version/backend/src/modules/survey/waves.routes.ts": {
-      "before": "e550fe964443779cadea2fae92bf325fd3685ed7",
-      "after": "51e650957f13232a9aae0e88408db372ac69cdd9"
-    },
-    "server-version/backend/src/modules/survey/waves.service.ts": {
-      "before": "0dfdb288b70c12e3cf80415a10d1b800c92cbb65",
-      "after": "273c81c74140aeb8c9a2dc2fe2fc6816adeb9fd6"
-    },
-    "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx": {
+    "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx": {
       "before": null,
-      "after": "bccd7ad9c0d7110269c42e48d4781c9203f4102e"
+      "after": "7665577adc466b8c6e248dee83a488b806dcdbae",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "e116352e7efb1248405c3974a50cb02b08847554d3f7e0bb685f6643abd693bb"
     },
-    "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.test.tsx": {
-      "before": null,
-      "after": "dcd08a11f6479762062a890642e043644732635c"
+    "server-version/frontend/src/pages/bundle/BundleProducts.tsx": {
+      "before": "5edd1d1d7d4476410cd69f4bbb050541c6a9093e",
+      "after": "20f57cb571df7e6f67999973b871b4de90d77ed4",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "970f1e37695ae72b2586e88dbf2a78fd6d8986648584ece8718a238cdbf5ea14"
     },
-    "server-version/frontend/src/modules/reporting/longitudinalVisualization.ts": {
-      "before": "268ab3b6d6b1723a61680c92d831c1359cfd43e8",
-      "after": "e2942062d43b412ce7c2a7ab9466edc71d70b4da"
+    "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx": {
+      "before": "440ada5e283d26e68ea8399705c174a05ff17b94",
+      "after": "f7387f506be530eb54020ddf10e550d6d82b3b76",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "61387788a160109f72fa4938db5b68e45affb8596d82e3d7c10335341dfb2e6a"
     },
-    "server-version/frontend/src/survey/SurveyPersonalChanges.tsx": {
-      "before": null,
-      "after": "416e1050a34a23f988bb1d358d11eb1e8c853af9"
-    },
-    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
-      "before": "69d07207c19ce15ae429023d0e532ab4fcfca988",
-      "after": "8fec0ba48f733adf881338a7a6aab9dd8720698d"
-    },
-    "server-version/frontend/src/survey/SurveyWaveStudio.tracking.test.tsx": {
-      "before": null,
-      "after": "baf590030aeeb8e39e74ddc084b12f2c6fc257ec"
-    },
-    "server-version/frontend/src/survey/SurveyWaveStudio.tsx": {
-      "before": "6e925c3299508e207f1f43e5beed0e6d037e4e7d",
-      "after": "70b36b7ad7816c54c057366e0d8c1358f3cd3a31"
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
+      "before": "48d61ec98199cafdc5e1a5b23b8ea6bb0adc7534",
+      "after": "8e904a8dac481fbc142abd9a44bad8076b5d7395",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "1238aa4073d511a6fde32935b509ec402934c394c3fbc91fb69f0aac59590206"
     }
   },
   "protectedInputs": {
@@ -115,239 +173,22 @@
   },
   "reports": [
     {
-      "id": "longitudinal-core-quality.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-core-quality.json",
-      "sha256": "662a0d452a9702235f402ad3e31d08cbd143a092bba517af1e102585261efb6d",
+      "id": "training-browser-response-fixed",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-response-fixed.json",
+      "sha256": "ea3ebbcc25beaa76f1ea5fb0813acd0720620fd43ad037d1e0dd630ff8c6c3e9",
       "review": {
         "cases": [
           {
-            "fullName": "Personal exact raw-score changes keeps zero and signed differences; independent missing metrics do not erase other trends",
+            "fullName": "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium",
             "status": "passed"
           },
           {
-            "fullName": "Personal exact raw-score changes retains another disclosed metric with one result after any metric makes the report available",
-            "status": "passed"
-          },
-          {
-            "fullName": "Personal exact raw-score changes does not bridge a missing T2; baseline-to-T3 stays possible",
-            "status": "passed"
-          },
-          {
-            "fullName": "Personal exact raw-score changes selects newest complete whole parent before projecting, without per-metric fallback",
-            "status": "passed"
-          },
-          {
-            "fullName": "Personal exact raw-score changes withholds hidden, protocol-mismatched and unit-mismatched values",
-            "status": "passed"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity inherits ABC from ABCD into ABCE, binds same-named totals to their own tool, and does not expand disclosure",
-            "status": "passed"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity rejects unlinked and retroactive tracking, measurement changes and single-mode downgrades",
-            "status": "passed"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity keeps invalid cognitive values out of personal comparisons and shared numeric facts",
-            "status": "passed"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity C identity excludes report wording and P/R selections, while preserving item/scoring definitions",
-            "status": "passed"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 9,
-          "numFailedTests": 0,
-          "numPendingTests": 0
-        },
-        "selectedCases": [
-          "Personal exact raw-score changes keeps zero and signed differences; independent missing metrics do not erase other trends",
-          "Personal exact raw-score changes retains another disclosed metric with one result after any metric makes the report available",
-          "Personal exact raw-score changes does not bridge a missing T2; baseline-to-T3 stays possible",
-          "Personal exact raw-score changes selects newest complete whole parent before projecting, without per-metric fallback",
-          "Personal exact raw-score changes withholds hidden, protocol-mismatched and unit-mismatched values",
-          "Frozen Survey tracking plan and leaf identity inherits ABC from ABCD into ABCE, binds same-named totals to their own tool, and does not expand disclosure",
-          "Frozen Survey tracking plan and leaf identity rejects unlinked and retroactive tracking, measurement changes and single-mode downgrades",
-          "Frozen Survey tracking plan and leaf identity keeps invalid cognitive values out of personal comparisons and shared numeric facts",
-          "Frozen Survey tracking plan and leaf identity C identity excludes report wording and P/R selections, while preserving item/scoring definitions"
-        ]
-      }
-    },
-    {
-      "id": "longitudinal-ui-vitest.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-ui-vitest.json",
-      "sha256": "5c77b9648cb46bc10daa150de942f0bb7f3ec221c7f0526cbde02d43c181c473",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Personal changes report keeps zero, actual dates, signed baseline differences and a missing-wave note",
-            "status": "passed"
-          },
-          {
-            "fullName": "Personal changes report shows eligibility in the report response without a separate request",
-            "status": "passed"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 2,
-          "numFailedTests": 0,
-          "numPendingTests": 0
-        },
-        "selectedCases": [
-          "Personal changes report keeps zero, actual dates, signed baseline differences and a missing-wave note",
-          "Personal changes report shows eligibility in the report response without a separate request"
-        ]
-      }
-    },
-    {
-      "id": "longitudinal-wave-ui.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-wave-ui.json",
-      "sha256": "6684f57991e86c3f755d2629e1fa6fcb9d7125e6de126bccd0268660cf9733df",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Survey Wave report selection freeze boundary does not offer unselected draft tools in the independent-library workspace",
-            "status": "passed"
-          },
-          {
-            "fullName": "Survey Wave report selection freeze boundary keeps published self-authored scales selectable for explicit wave freezing",
-            "status": "passed"
-          },
-          {
-            "fullName": "Survey Wave report selection freeze boundary does not offer archived scales for new wave selection",
-            "status": "passed"
-          },
-          {
-            "fullName": "Survey Wave report selection freeze boundary sends exact selections separately from participant feedback and displays frozen server identities",
-            "status": "passed"
-          },
-          {
-            "fullName": "Survey Wave report selection freeze boundary retains selection after a known 409 and does not retry or replace with newest",
-            "status": "passed"
-          },
-          {
-            "fullName": "Survey Wave report selection freeze boundary checks an uncertain freeze and only retries the original payload on explicit action",
-            "status": "passed"
-          },
-          {
-            "fullName": "Survey Wave report selection freeze boundary unlocks preserved choices after an uncertain request is definitively rejected on retry and verified unfrozen",
-            "status": "passed"
-          },
-          {
-            "fullName": "Survey Wave report selection freeze boundary recovers an accepted but lost response by reading the actual frozen binding without another POST",
-            "status": "passed"
-          },
-          {
-            "fullName": "Survey Wave report selection freeze boundary invalidates unsubmitted choices when instrument-library revisions change",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit Wave participant feedback defaults disabled and preserves the old prepare payload, excluding FORM/Cog/catalog",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit Wave participant feedback requires a metric and sends only explicit policy in prepare, then locks feedback",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit Wave participant feedback explicitly freezes a native total score policy that can release its configured interval feedback",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit Wave participant feedback does not invent a total feedback metric when the optional native total is disabled",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit Wave participant feedback clears selection when a tool is removed/reselected and when the Wave changes",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit Wave participant feedback clears selection on project switch and instrument-library revision invalidation",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit Wave participant feedback does not invent a frozen policy from current draft metrics",
-            "status": "passed"
-          },
-          {
-            "fullName": "Survey tracking publisher selection requires a selected leaf metric and sends tracking independently of ordinary numeric disclosure",
-            "status": "passed"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 17,
-          "numFailedTests": 0,
-          "numPendingTests": 0
-        },
-        "selectedCases": [
-          "Survey Wave report selection freeze boundary does not offer unselected draft tools in the independent-library workspace",
-          "Survey Wave report selection freeze boundary keeps published self-authored scales selectable for explicit wave freezing",
-          "Survey Wave report selection freeze boundary does not offer archived scales for new wave selection",
-          "Survey Wave report selection freeze boundary sends exact selections separately from participant feedback and displays frozen server identities",
-          "Survey Wave report selection freeze boundary retains selection after a known 409 and does not retry or replace with newest",
-          "Survey Wave report selection freeze boundary checks an uncertain freeze and only retries the original payload on explicit action",
-          "Survey Wave report selection freeze boundary unlocks preserved choices after an uncertain request is definitively rejected on retry and verified unfrozen",
-          "Survey Wave report selection freeze boundary recovers an accepted but lost response by reading the actual frozen binding without another POST",
-          "Survey Wave report selection freeze boundary invalidates unsubmitted choices when instrument-library revisions change",
-          "explicit Wave participant feedback defaults disabled and preserves the old prepare payload, excluding FORM/Cog/catalog",
-          "explicit Wave participant feedback requires a metric and sends only explicit policy in prepare, then locks feedback",
-          "explicit Wave participant feedback explicitly freezes a native total score policy that can release its configured interval feedback",
-          "explicit Wave participant feedback does not invent a total feedback metric when the optional native total is disabled",
-          "explicit Wave participant feedback clears selection when a tool is removed/reselected and when the Wave changes",
-          "explicit Wave participant feedback clears selection on project switch and instrument-library revision invalidation",
-          "explicit Wave participant feedback does not invent a frozen policy from current draft metrics",
-          "Survey tracking publisher selection requires a selected leaf metric and sends tracking independently of ordinary numeric disclosure"
-        ]
-      }
-    },
-    {
-      "id": "longitudinal-survey-browser-final.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-browser-final.json",
-      "sha256": "d1720d4fe8c1105f9c84485a06184dc8b8f3559a4aa1f3a90cc2d1c65ed1964e",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop freezes selected leafs, inherits into T2, saves real answers and serves both reports with current identity fences",
+            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
             "status": "skipped"
           },
           {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop renders real T1/T2 answers, single reports and a separate personal change report in Chromium",
-            "status": "passed"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 1,
-          "numFailedTests": 0,
-          "numPendingTests": 1
-        },
-        "selectedCases": [
-          "Survey personal tracking real publication/FINAL/HTTP loop renders real T1/T2 answers, single reports and a separate personal change report in Chromium"
-        ]
-      }
-    },
-    {
-      "id": "longitudinal-guards-pg.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-guards-pg.json",
-      "sha256": "7d5eaca67d31750a569e24f86a07d86b7fa27cebd46f8c3d901de4c7172f906f",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop freezes selected leafs, inherits into T2, saves real answers and serves both reports with current identity fences",
+            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
             "status": "skipped"
-          },
-          {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop renders real T1/T2 answers, single reports and a separate personal change report in Chromium",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop rejects changing a persisted frozen plan or a published next-wave source",
-            "status": "passed"
           }
         ],
         "summary": {
@@ -357,22 +198,56 @@
           "numPendingTests": 2
         },
         "selectedCases": [
-          "Survey personal tracking real publication/FINAL/HTTP loop rejects changing a persisted frozen plan or a published next-wave source"
+          "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium"
         ]
       }
     },
     {
-      "id": "longitudinal-survey-pg-browser.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-pg-browser.json",
-      "sha256": "b56418a43aa2fe9e8daf26ffa0ada19e46c91254ea4860a5fc956d751eb28a2d",
+      "id": "training-bundle-pg-course",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-course.json",
+      "sha256": "8f26a89378f4da1fcc2f24d168a945024bea613eecbee6572ec69aa4a9f60752",
       "review": {
         "cases": [
           {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop freezes selected leafs, inherits into T2, saves real answers and serves both reports with current identity fences",
+            "fullName": "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
             "status": "passed"
           },
           {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop renders real T1/T2 answers, single reports and a separate personal change report in Chromium",
+            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+            "status": "skipped"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 3
+        },
+        "selectedCases": [
+          "Training personal longitudinal native publication and SELF results keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment"
+        ]
+      }
+    },
+    {
+      "id": "training-contract",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-contract.json",
+      "sha256": "fcd59c8d98f0838124dda8f771cb7122dea85b58467ef75e8f975cdb3e0766f5",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Training entry measurement adapter uses C plus actual cognitive mode, while full config report changes do not change raw-score identity",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training entry measurement adapter preserves numeric Form meaning across copied slot keys, and refuses category encodings",
             "status": "failed"
           }
         ],
@@ -383,505 +258,296 @@
           "numPendingTests": 0
         },
         "selectedCases": [
-          "Survey personal tracking real publication/FINAL/HTTP loop freezes selected leafs, inherits into T2, saves real answers and serves both reports with current identity fences"
+          "Training entry measurement adapter uses C plus actual cognitive mode, while full config report changes do not change raw-score identity"
         ],
         "allowPartialFailure": true,
         "failureContinuations": [
           {
-            "caseName": "Survey personal tracking real publication/FINAL/HTTP loop renders real T1/T2 answers, single reports and a separate personal change report in Chromium",
-            "reportId": "longitudinal-survey-browser-final.json"
+            "caseName": "Training entry measurement adapter preserves numeric Form meaning across copied slot keys, and refuses category encodings",
+            "reportId": "training-form-contract-corrected"
           }
         ]
       }
     },
     {
-      "id": "longitudinal-review-disclosure-complete.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-disclosure-complete.json",
-      "sha256": "080053afc87ccfcfe6bf1115caeb16c526e01bceecfd94dd24025384929f67ab",
+      "id": "training-disclosure",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-disclosure.json",
+      "sha256": "5a3b3aa385475de703944c97128aaff32f846b6783f6dfcd94c45ad5e46003ec",
       "review": {
         "cases": [
           {
-            "fullName": "Personal exact raw-score changes keeps zero and signed differences; independent missing metrics do not erase other trends",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes retains another disclosed metric with one result after any metric makes the report available",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes retains wholly missing disclosed metrics and separates release timing from authorization",
+            "fullName": "Training shared frozen per-unit disclosure ceiling keeps the participant subject ceiling independent from teacher scores and cognitive research-only keys",
             "status": "passed"
           },
           {
-            "fullName": "Personal exact raw-score changes does not bridge a missing T2; baseline-to-T3 stays possible",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes selects newest complete whole parent before projecting, without per-metric fallback",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes withholds hidden, protocol-mismatched and unit-mismatched values",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity inherits ABC from ABCD into ABCE, binds same-named totals to their own tool, and does not expand disclosure",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity rejects unlinked and retroactive tracking, measurement changes and single-mode downgrades",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity keeps invalid cognitive values out of personal comparisons and shared numeric facts",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity keeps raw-score disclosure eligibility when values are invalid, absent, unreached or not yet released",
+            "fullName": "Training shared frozen per-unit disclosure ceiling excludes research-only, nonstandard, product index and nonnumeric cognitive metrics, while preserving standard and QC facts",
             "status": "passed"
           },
           {
-            "fullName": "Frozen Survey tracking plan and leaf identity inherits every required slot of a tracked fixed Bundle without cloning or mutating its source",
+            "fullName": "Training shared frozen per-unit disclosure ceiling does not promote an ADMIN-derived researcher label or a researcher template into extra cognitive data permission",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive parent source",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive item source",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive assignment source",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive config source",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive submission source",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive profile source",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive runtime source",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive provenance source",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling retains QC numeric diagnostics without allowing them to acquire individual reference interpretation",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling uses the frozen Scale V2 policy, independently gates references, and never reads answers or result bodies",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling cannot promote researcher disclosure over an educational-only frozen teacher policy",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling also retains a stricter frozen researcher audience restriction rather than replacing it with teacher permission",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling preserves only explicit V1 custom-descriptive compatibility and denies unknown standard instruments",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale epoch corruption",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale scale corruption",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale submission corruption",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale hash corruption",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale snapshot corruption",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "Training shared frozen per-unit disclosure ceiling keeps the participant subject ceiling independent from teacher scores and cognitive research-only keys",
+          "Training shared frozen per-unit disclosure ceiling excludes research-only, nonstandard, product index and nonnumeric cognitive metrics, while preserving standard and QC facts",
+          "Training shared frozen per-unit disclosure ceiling does not promote an ADMIN-derived researcher label or a researcher template into extra cognitive data permission",
+          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive parent source",
+          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive item source",
+          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive assignment source",
+          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive config source",
+          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive submission source",
+          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive profile source",
+          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive runtime source",
+          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive provenance source",
+          "Training shared frozen per-unit disclosure ceiling retains QC numeric diagnostics without allowing them to acquire individual reference interpretation",
+          "Training shared frozen per-unit disclosure ceiling uses the frozen Scale V2 policy, independently gates references, and never reads answers or result bodies",
+          "Training shared frozen per-unit disclosure ceiling cannot promote researcher disclosure over an educational-only frozen teacher policy",
+          "Training shared frozen per-unit disclosure ceiling also retains a stricter frozen researcher audience restriction rather than replacing it with teacher permission",
+          "Training shared frozen per-unit disclosure ceiling preserves only explicit V1 custom-descriptive compatibility and denies unknown standard instruments",
+          "Training shared frozen per-unit disclosure ceiling fails closed for Scale epoch corruption",
+          "Training shared frozen per-unit disclosure ceiling fails closed for Scale scale corruption",
+          "Training shared frozen per-unit disclosure ceiling fails closed for Scale submission corruption",
+          "Training shared frozen per-unit disclosure ceiling fails closed for Scale hash corruption",
+          "Training shared frozen per-unit disclosure ceiling fails closed for Scale snapshot corruption"
+        ]
+      }
+    },
+    {
+      "id": "training-form-contract-corrected",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-contract-corrected.json",
+      "sha256": "5aaf84e98f0ccaf99c59fdce9d606d1fb7a55b4f755b79ae383710779311ece7",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Training entry measurement adapter uses C plus actual cognitive mode, while full config report changes do not change raw-score identity",
             "status": "skipped"
           },
           {
-            "fullName": "Frozen Survey tracking plan and leaf identity C identity excludes report wording and P/R selections, while preserving item/scoring definitions",
+            "fullName": "Training entry measurement adapter preserves numeric Form meaning across copied slot keys, and refuses category encodings",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 1
+        },
+        "selectedCases": [
+          "Training entry measurement adapter preserves numeric Form meaning across copied slot keys, and refuses category encodings"
+        ]
+      }
+    },
+    {
+      "id": "training-form-pg",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-pg.json",
+      "sha256": "61e9aa91e045c5271e6e059d62f9fc16b88c0b357c30eae7e3632f206a314639",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium",
             "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results tracks a typed numeric Form response through copy and real FINAL without creating a psychological score",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+            "status": "skipped"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 4
+        },
+        "selectedCases": [
+          "Training personal longitudinal native publication and SELF results tracks a typed numeric Form response through copy and real FINAL without creating a psychological score"
+        ]
+      }
+    },
+    {
+      "id": "training-latest-pg-access",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg-access.json",
+      "sha256": "5ae81ab914b6d0dc3ced499ee7da8e37e1bffa09fe3c6327eb496791ed3798ab",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results tracks a typed numeric Form response through copy and real FINAL without creating a psychological score",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results selects the latest completed whole Training parent while retaining prior snapshots and rechecking course access",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 5
+        },
+        "selectedCases": [
+          "Training personal longitudinal native publication and SELF results selects the latest completed whole Training parent while retaining prior snapshots and rechecking course access"
+        ]
+      }
+    },
+    {
+      "id": "training-pg-corrected",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-corrected.json",
+      "sha256": "55da45d4031b13a163696cc1104c890019ea157011668a96e845d080158ba4fb",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+            "status": "passed"
+          },
+          {
+            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+            "status": "passed"
           }
         ],
         "summary": {
           "success": true,
           "numPassedTests": 2,
           "numFailedTests": 0,
-          "numPendingTests": 10
+          "numPendingTests": 0
         },
         "selectedCases": [
-          "Personal exact raw-score changes retains wholly missing disclosed metrics and separates release timing from authorization",
-          "Frozen Survey tracking plan and leaf identity keeps raw-score disclosure eligibility when values are invalid, absent, unreached or not yet released"
+          "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads"
         ]
       }
     },
     {
-      "id": "longitudinal-review-inheritance.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-inheritance.json",
-      "sha256": "25da85bae123de40bd2c3700a2fce851f569aa508e9f4edfd8794d770e9678f7",
+      "id": "training-ui-scope",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-ui-scope.json",
+      "sha256": "bf454d99170be78f5729cd0b367436beb6f610ad1266ec2d4df7113ae2d73723",
       "review": {
         "cases": [
           {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop freezes selected leafs, inherits into T2, saves real answers and serves both reports with current identity fences",
-            "status": "skipped"
+            "fullName": "Training own changes request scope discards an old response when the account/attempt changes",
+            "status": "passed"
           },
           {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop renders real T1/T2 answers, single reports and a separate personal change report in Chromium",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop rejects changing a persisted frozen plan or a published next-wave source",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Survey personal tracking real publication/FINAL/HTTP loop inherits frozen tracked C after the same source draft is revised, while untracked Form edits remain current",
+            "fullName": "Training own changes request scope uses the stable study credential and clears the rendered view when it changes",
             "status": "passed"
           }
         ],
         "summary": {
           "success": true,
-          "numPassedTests": 1,
-          "numFailedTests": 0,
-          "numPendingTests": 3
-        },
-        "selectedCases": [
-          "Survey personal tracking real publication/FINAL/HTTP loop inherits frozen tracked C after the same source draft is revised, while untracked Form edits remain current"
-        ]
-      }
-    },
-    {
-      "id": "longitudinal-review-bundle-source.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-bundle-source.json",
-      "sha256": "f12d41deaf5af268075a3e1c7825324b797c151423afb35bb3dd52216972cfda",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Personal exact raw-score changes keeps zero and signed differences; independent missing metrics do not erase other trends",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes retains another disclosed metric with one result after any metric makes the report available",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes retains wholly missing disclosed metrics and separates release timing from authorization",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes does not bridge a missing T2; baseline-to-T3 stays possible",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes selects newest complete whole parent before projecting, without per-metric fallback",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes withholds hidden, protocol-mismatched and unit-mismatched values",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity inherits ABC from ABCD into ABCE, binds same-named totals to their own tool, and does not expand disclosure",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity rejects unlinked and retroactive tracking, measurement changes and single-mode downgrades",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity keeps invalid cognitive values out of personal comparisons and shared numeric facts",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity keeps raw-score disclosure eligibility when values are invalid, absent, unreached or not yet released",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity inherits every required slot of a tracked fixed Bundle without cloning or mutating its source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity C identity excludes report wording and P/R selections, while preserving item/scoring definitions",
-            "status": "skipped"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 1,
-          "numFailedTests": 0,
-          "numPendingTests": 11
-        },
-        "selectedCases": [
-          "Frozen Survey tracking plan and leaf identity inherits every required slot of a tracked fixed Bundle without cloning or mutating its source"
-        ]
-      }
-    },
-    {
-      "id": "longitudinal-review-narrowing-locked.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing-locked.json",
-      "sha256": "96fa0684c07abedb8691998c7b044cf08b69aa5156a5764fcd3b763c361a9fd5",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Personal exact raw-score changes keeps zero and signed differences; independent missing metrics do not erase other trends",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes retains another disclosed metric with one result after any metric makes the report available",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes retains wholly missing disclosed metrics and separates release timing from authorization",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes does not bridge a missing T2; baseline-to-T3 stays possible",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes selects newest complete whole parent before projecting, without per-metric fallback",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Personal exact raw-score changes withholds hidden, protocol-mismatched and unit-mismatched values",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity applies an explicit ONLY_A narrowing to inherited A/B without retaining old feedback or P/R choices",
-            "status": "passed"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity applies an explicit NONE narrowing to inherited A/B without retaining old feedback or P/R choices",
-            "status": "passed"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity inherits ABC from ABCD into ABCE, binds same-named totals to their own tool, and does not expand disclosure",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity rejects unlinked and retroactive tracking, measurement changes and single-mode downgrades",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity keeps invalid cognitive values out of personal comparisons and shared numeric facts",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity keeps raw-score disclosure eligibility when values are invalid, absent, unreached or not yet released",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity inherits every required slot of a tracked fixed Bundle without cloning or mutating its source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Frozen Survey tracking plan and leaf identity C identity excludes report wording and P/R selections, while preserving item/scoring definitions",
-            "status": "skipped"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 3,
-          "numFailedTests": 0,
-          "numPendingTests": 11
-        },
-        "selectedCases": [
-          "Frozen Survey tracking plan and leaf identity applies an explicit ONLY_A narrowing to inherited A/B without retaining old feedback or P/R choices",
-          "Frozen Survey tracking plan and leaf identity applies an explicit NONE narrowing to inherited A/B without retaining old feedback or P/R choices",
-          "Frozen Survey tracking plan and leaf identity inherits every required slot of a tracked fixed Bundle without cloning or mutating its source"
-        ]
-      }
-    },
-    {
-      "id": "longitudinal-review-narrowing-consumers.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing-consumers.json",
-      "sha256": "8abf44ad69344e919daabb022b14fc849e8291addec644779938fe58b72bde3f",
-      "review": {
-        "cases": [
-          {
-            "fullName": "actual Wave content selection freezer clears an explicit empty continuation selection, but revalidates intentionally inherited private P/R",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer stores only exact pointers and policy, with locked release reads",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer reuses a release once for multiple selected entries",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects RETIRED at freeze time",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects REVOKED at freeze time",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects SUPERSEDED at freeze time",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects cross-project/owner scope and incompatible measurement",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects foreign or duplicate instruments and reference entries",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer does not create implicit report/reference selections",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects a mismatched report and FORM target",
-            "status": "passed"
-          },
-          {
-            "fullName": "Wave freeze locks current identity/grant/MFA and rechecks expiry after waiting",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit frozen participant raw metric policy defaults off and validates explicit unique allowlist and mode",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit frozen participant raw metric policy freezes only selected Scale/SJT release metrics and leaves measurement identity untouched",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit frozen participant raw metric policy projects only explicitly allowed stored SCALE values, with no private/template/reference data",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit frozen participant raw metric policy projects only explicitly allowed stored SJT values, with no private/template/reference data",
-            "status": "passed"
-          },
-          {
-            "fullName": "explicit frozen participant raw metric policy denies unknown policy keys, wrong source identity, missing quality and noninterpretable/noncalculated/nonfinite values",
-            "status": "passed"
-          },
-          {
-            "fullName": "participant general route current authorization and frozen timing keeps legacy GENERAL without opt-in and does not read private results",
-            "status": "passed"
-          },
-          {
-            "fullName": "participant general route current authorization and frozen timing uses existing locked credential/consent branch for explicit Scale feedback",
-            "status": "passed"
-          },
-          {
-            "fullName": "participant general route current authorization and frozen timing preserves AFTER_COLLECTION pending and releases only at existing collection boundary",
-            "status": "passed"
-          },
-          {
-            "fullName": "participant general route current authorization and frozen timing refuses current withdrawn before disclosure",
-            "status": "passed"
-          },
-          {
-            "fullName": "participant general route current authorization and frozen timing refuses current credential before disclosure",
-            "status": "passed"
-          },
-          {
-            "fullName": "participant general route current authorization and frozen timing refuses current consent before disclosure",
-            "status": "passed"
-          },
-          {
-            "fullName": "participant general route current authorization and frozen timing refuses current linked revoked before disclosure",
-            "status": "passed"
-          },
-          {
-            "fullName": "participant general route current authorization and frozen timing refuses current incomplete before disclosure",
-            "status": "passed"
-          },
-          {
-            "fullName": "participant general route current authorization and frozen timing refuses current hash before disclosure",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual compiler \u2192 verified FINAL computation \u2192 participant projection discloses only the permitted saved SCALE raw metric with real structures",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual compiler \u2192 verified FINAL computation \u2192 participant projection discloses only the permitted saved SJT_V1 raw metric with real structures",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual compiler \u2192 verified FINAL computation \u2192 participant projection discloses only the permitted saved SJT_V2 raw metric with real structures",
-            "status": "passed"
-          },
-          {
-            "fullName": "signals explicit raw feedback in the actual task DTO without disclosing policy keys or measurement release",
-            "status": "passed"
-          },
-          {
-            "fullName": "freezes matched text and images at FINAL rather than rerendering a later draft",
-            "status": "passed"
-          },
-          {
-            "fullName": "reads only required disclosure fields while retaining current identity and result checks",
-            "status": "passed"
-          },
-          {
-            "fullName": "uses frozen SCALE display labels only for already permitted saved metrics",
-            "status": "passed"
-          },
-          {
-            "fullName": "uses frozen SJT display labels only for already permitted saved metrics",
-            "status": "passed"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 33,
+          "numPassedTests": 2,
           "numFailedTests": 0,
           "numPendingTests": 0
         },
         "selectedCases": [
-          "actual Wave content selection freezer clears an explicit empty continuation selection, but revalidates intentionally inherited private P/R",
-          "actual Wave content selection freezer stores only exact pointers and policy, with locked release reads",
-          "actual Wave content selection freezer reuses a release once for multiple selected entries",
-          "actual Wave content selection freezer rejects RETIRED at freeze time",
-          "actual Wave content selection freezer rejects REVOKED at freeze time",
-          "actual Wave content selection freezer rejects SUPERSEDED at freeze time",
-          "actual Wave content selection freezer rejects cross-project/owner scope and incompatible measurement",
-          "actual Wave content selection freezer rejects foreign or duplicate instruments and reference entries",
-          "actual Wave content selection freezer does not create implicit report/reference selections",
-          "actual Wave content selection freezer rejects a mismatched report and FORM target",
-          "Wave freeze locks current identity/grant/MFA and rechecks expiry after waiting",
-          "explicit frozen participant raw metric policy defaults off and validates explicit unique allowlist and mode",
-          "explicit frozen participant raw metric policy freezes only selected Scale/SJT release metrics and leaves measurement identity untouched",
-          "explicit frozen participant raw metric policy projects only explicitly allowed stored SCALE values, with no private/template/reference data",
-          "explicit frozen participant raw metric policy projects only explicitly allowed stored SJT values, with no private/template/reference data",
-          "explicit frozen participant raw metric policy denies unknown policy keys, wrong source identity, missing quality and noninterpretable/noncalculated/nonfinite values",
-          "participant general route current authorization and frozen timing keeps legacy GENERAL without opt-in and does not read private results",
-          "participant general route current authorization and frozen timing uses existing locked credential/consent branch for explicit Scale feedback",
-          "participant general route current authorization and frozen timing preserves AFTER_COLLECTION pending and releases only at existing collection boundary",
-          "participant general route current authorization and frozen timing refuses current withdrawn before disclosure",
-          "participant general route current authorization and frozen timing refuses current credential before disclosure",
-          "participant general route current authorization and frozen timing refuses current consent before disclosure",
-          "participant general route current authorization and frozen timing refuses current linked revoked before disclosure",
-          "participant general route current authorization and frozen timing refuses current incomplete before disclosure",
-          "participant general route current authorization and frozen timing refuses current hash before disclosure",
-          "actual compiler \u2192 verified FINAL computation \u2192 participant projection discloses only the permitted saved SCALE raw metric with real structures",
-          "actual compiler \u2192 verified FINAL computation \u2192 participant projection discloses only the permitted saved SJT_V1 raw metric with real structures",
-          "actual compiler \u2192 verified FINAL computation \u2192 participant projection discloses only the permitted saved SJT_V2 raw metric with real structures",
-          "signals explicit raw feedback in the actual task DTO without disclosing policy keys or measurement release",
-          "freezes matched text and images at FINAL rather than rerendering a later draft",
-          "reads only required disclosure fields while retaining current identity and result checks",
-          "uses frozen SCALE display labels only for already permitted saved metrics",
-          "uses frozen SJT display labels only for already permitted saved metrics"
-        ]
-      }
-    },
-    {
-      "id": "longitudinal-review-untracked-content.json",
-      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-untracked-content.json",
-      "sha256": "910a8935e13f8144bab76240cfa58c04c9f28a4e17b1c9eed4ac4c59b17a655b",
-      "review": {
-        "cases": [
-          {
-            "fullName": "actual Wave content selection freezer leaves private P/R unselected when an untracked D changes C, while explicit new choices still validate",
-            "status": "passed"
-          },
-          {
-            "fullName": "actual Wave content selection freezer clears an explicit empty continuation selection, but revalidates intentionally inherited private P/R",
-            "status": "skipped"
-          },
-          {
-            "fullName": "actual Wave content selection freezer stores only exact pointers and policy, with locked release reads",
-            "status": "skipped"
-          },
-          {
-            "fullName": "actual Wave content selection freezer reuses a release once for multiple selected entries",
-            "status": "skipped"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects RETIRED at freeze time",
-            "status": "skipped"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects REVOKED at freeze time",
-            "status": "skipped"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects SUPERSEDED at freeze time",
-            "status": "skipped"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects cross-project/owner scope and incompatible measurement",
-            "status": "skipped"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects foreign or duplicate instruments and reference entries",
-            "status": "skipped"
-          },
-          {
-            "fullName": "actual Wave content selection freezer does not create implicit report/reference selections",
-            "status": "skipped"
-          },
-          {
-            "fullName": "actual Wave content selection freezer rejects a mismatched report and FORM target",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Wave freeze locks current identity/grant/MFA and rechecks expiry after waiting",
-            "status": "skipped"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 1,
-          "numFailedTests": 0,
-          "numPendingTests": 11
-        },
-        "selectedCases": [
-          "actual Wave content selection freezer leaves private P/R unselected when an untracked D changes C, while explicit new choices still validate"
+          "Training own changes request scope discards an old response when the account/attempt changes",
+          "Training own changes request scope uses the stable study credential and clears the rendered view when it changes"
         ]
       }
     }
@@ -907,41 +573,6 @@
     "step": "install locked native migration tools and audit backend",
     "maximumAgeHours": 24
   },
-  "historical8bdImageSuccess": {
-    "runId": 41031885906,
-    "jobId": 123983441024,
-    "sourceHead": "571a14b73ef81148913f5ff1666e7e461f2f4b92",
-    "executionHead": "f482328ef680238b3916930adbb2d761cfd3c747",
-    "serverVersionTree": "54e6ec82e1e817e30fc11a8d00bf40ccc75b4ea5",
-    "inputs": {
-      ".github/workflows/ci-images.yml": "d54c52bbe80dbb91ba70b1092490ae8a7fd22de1",
-      ".github/scripts/build-ci-images.sh": "2a4be34f89a3d14a4be099141107cd69008a7917"
-    },
-    "maximumAgeHours": 24,
-    "scope": "Official successful images for exact final catalog8bd inputs; only CI control code changed afterwards. Qualification receipt only; no deployable archive."
-  },
-  "qualificationReuse": {
-    "runId": 41038456712,
-    "jobId": 124005165894,
-    "sourceHead": "e6585ebed49e5cd92e858c19fd930230c791adbb",
-    "executionHead": "a4019d0a8b51783f8ae3dac869456c81557f5bd5",
-    "serverVersionTree": "04c7d744e4835dabd055a5595ad8578a792d8b72",
-    "maximumAgeHours": 24,
-    "nativeOnly": true
-  },
-  "historicalMain318ImageReuse": {
-    "runId": 41037266506,
-    "jobId": 124001203658,
-    "sourceHead": "af8fad552f776615afaa1e91e57a012768021bca",
-    "executionHead": "bb54da2172b7a517e7775b3f0efa72f1901e3984",
-    "serverVersionTree": "04c7d744e4835dabd055a5595ad8578a792d8b72",
-    "inputs": {
-      ".github/workflows/ci-images.yml": "d54c52bbe80dbb91ba70b1092490ae8a7fd22de1",
-      ".github/scripts/build-ci-images.sh": "2a4be34f89a3d14a4be099141107cd69008a7917"
-    },
-    "maximumAgeHours": 24,
-    "scope": "Official successful main31845 exact-input image checks; source changes since producer only affect CI control/fixture and docs. No deployable archive claim."
-  },
   "historicalMain318ApplicationSastReuse": {
     "runId": 41037266506,
     "jobId": 124001202537,
@@ -956,32 +587,24 @@
       "server-version/frontend/src/modules/reporting"
     ]
   },
-  "historicalMain28ImageReuse": {
-    "runId": 41050414835,
-    "jobId": 124044901946,
-    "sourceHead": "52b4cbdb4463a7ffcaf5192cc577a6d4d71774dc",
-    "executionHead": "8f0e080ed76113a3082c5ebdb4428453bed637fc",
-    "serverVersionTree": "fe9d705895f6f2a5bbee3dd35b7b39b2e03daaf3",
-    "inputs": {
-      ".github/workflows/ci-images.yml": "d54c52bbe80dbb91ba70b1092490ae8a7fd22de1",
-      ".github/scripts/build-ci-images.sh": "2a4be34f89a3d14a4be099141107cd69008a7917"
-    },
-    "maximumAgeHours": 24,
-    "scope": "Official current main28 unchanged production image checks; frontend qualification setup repair changes controls only; no deployable archive claim."
+  "previousSliceQualification": {
+    "sourceHead": "e34438dc35ac2f21b2ae48ec291e20c80d9903f8",
+    "runId": 41053670118,
+    "jobId": 124055865989,
+    "serverVersionTree": "6deef4737c8d8b707b4ec0cced08152375a4cd47",
+    "maximumAgeHours": 24
   },
-  "historicalMain28ApplicationSastReuse": {
-    "runId": 41050414835,
-    "jobId": 124044900861,
-    "sourceHead": "52b4cbdb4463a7ffcaf5192cc577a6d4d71774dc",
-    "executionHead": "8f0e080ed76113a3082c5ebdb4428453bed637fc",
-    "serverVersionTree": "fe9d705895f6f2a5bbee3dd35b7b39b2e03daaf3",
-    "maximumAgeHours": 24,
-    "paths": [
-      "server-version/backend/src/modules/survey",
-      "server-version/backend/src/modules/reporting/personal-tracking.ts",
-      "server-version/frontend/src/survey",
-      "server-version/frontend/src/modules/reporting",
-      ".github/scripts/personal-tracking-ready.mjs"
-    ]
+  "frontendAuditReuse": {
+    "sourceHead": "e34438dc35ac2f21b2ae48ec291e20c80d9903f8",
+    "executionHead": "7ca965681cc92ff669d36d2495660ef263b6977a",
+    "runId": 41053670118,
+    "jobId": 124055865989,
+    "step": "install frontend tools and audit locked inputs",
+    "maximumAgeHours": 24
+  },
+  "historicalDraftControl": {
+    "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-draft-scope.log",
+    "sha256": "cc80628baf71f0be597f744bf20926c7eb0d99d76518b47b5db26bfc859f82a5",
+    "currentControlChecks": "Current route/admission unit checks execute; original control result is historical only."
   }
 }

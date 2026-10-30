@@ -57,6 +57,17 @@ test('personal tracking Draft reuses existing producers without qualifying Ready
   assert.ok(failedChecks(needs,false).includes('scope'));
   assert.ok(requiredChecks({scope:{outputs:{...scope,personal_tracking_draft:'false'}}},false).includes('backend-regression'));
 });
+test('Training personal tracking selects the same bounded Draft producers and refuses unrelated writes',()=>{
+  const entry=file=>({file,status:'A',oldMode:'000000',newMode:'100644'});
+  const entries=['server-version/backend/src/modules/composite/personal-tracking.ts',
+    'server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql',
+    'server-version/backend/src/modules/bundle-product/service.ts',
+    'docs/evidence/personal-longitudinal-training-20261030/manifest.json'].map(entry);
+  assert.equal(personalTrackingDraftScope(entries,{event:'pull_request',draft:true}),true);
+  assert.equal(personalTrackingDraftScope(entries,{event:'pull_request',draft:false}),false);
+  assert.throws(()=>personalTrackingDraftScope([...entries,entry('server-version/backend/src/modules/auth/changed.ts')],{event:'pull_request',draft:true}),/no broad fallback/);
+  assert.throws(()=>personalTrackingDraftScope(entries,{event:'pull_request',draft:true,forceFull:true}),/does not authorize/);
+});
 test('aggregate checks only selected jobs, and fails closed for every selected job', () => {
   assert.ok(requiredChecks({ scope: { outputs: scopeOutputs() } }, false).includes('backend-regression'));
   for (const [content, presentation, draft] of [

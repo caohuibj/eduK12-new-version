@@ -51,6 +51,11 @@ publicAnonymousStudyRouter.post('/waves/:waveId/join',wrap(async(req,res)=>{
   return success(res,await service.joinStudy(id.parse(req.params.waveId),body.token,body.consent,body))
 }))
 publicAnonymousStudyRouter.get('/:studyId/participation-info',wrap(async(req,res)=>success(res,await service.publicParticipationInfo(id.parse(req.params.studyId)))))
+publicAnonymousStudyRouter.post('/:studyId/changes',wrap(async(req,res)=>{
+ const {attemptId}=z.object({attemptId:id}).strict().parse(req.body)
+ const {readTrainingPersonalChanges}=await import('../composite/personal-tracking.service')
+ return success(res,await readTrainingPersonalChanges(attemptId,{study:{studyId:id.parse(req.params.studyId),credential:credential(req)}}))
+}))
 publicAnonymousStudyRouter.post('/:studyId/code/recover',wrap(async(req,res)=>{
  const body=z.object({code:z.string().max(64)}).strict().parse(req.body)
  return success(res,await service.recoverParticipationCode(id.parse(req.params.studyId),body.code))

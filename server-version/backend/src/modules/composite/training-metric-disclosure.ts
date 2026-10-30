@@ -15,7 +15,7 @@ import type {DisclosureCapabilitiesV1} from '../scale/policy/types'
 import type {TrainingContentSnapshot} from './training-content-binding'
 
 type Unit=TrainingContentSnapshot['units'][number]
-export type TrainingReportAudience='teacher'|'researcher'
+export type TrainingReportAudience='teacher'|'researcher'|'participant'
 type Source={sourceType:string|null;sourceAttemptId:string|null;sourceSubmissionId?:string|null}
 export interface TrainingMetricDisclosure {
  metricKeys:ReadonlySet<string>
@@ -51,7 +51,7 @@ export async function loadTrainingMetricDisclosure(db:Prisma.TransactionClient,i
  parent:{id:string;attemptEpoch:number};unit:Unit;source:Source;audience:TrainingReportAudience;core?:CanonicalUnitResultCoreV1;metricKeys?:readonly string[]
 }):Promise<TrainingMetricDisclosure>{
  const {parent,unit,source,core,audience}=input
- if(!['teacher','researcher'].includes(audience)||!source.sourceAttemptId)invalid()
+ if(!['teacher','researcher','participant'].includes(audience)||!source.sourceAttemptId)invalid()
  if(unit.family==='COGNITIVE'){
   if(unit.source.kind!=='COGNITIVE_CONFIG'||!unit.source.assignmentId||source.sourceType!=='COGNITIVE_SESSION')invalid()
   const child=await db.cognitiveSession.findUnique({where:{id:source.sourceAttemptId},select:{
@@ -126,9 +126,9 @@ export async function loadTrainingMetricDisclosure(db:Prisma.TransactionClient,i
    // The present caller's researcher label is only an ADMIN role mapping,
    // not a separately verified scientific/data grant. Never widen teacher
    // disclosure from it; existing legacy researcher reports are untouched.
-   instrumentVersion:runtime.instrumentVersion,audience:'teacher',purpose:'report',frozenPolicy:policy.policy})
+   instrumentVersion:runtime.instrumentVersion,audience:audience==='participant'?'subject':'teacher',purpose:'report',frozenPolicy:policy.policy})
   const capabilities=intersectDisclosureCapabilities(resolveEffectiveScaleDisclosure(context),
-   resolveEffectiveScaleDisclosure({...context,audience}))
+   resolveEffectiveScaleDisclosure({...context,audience:audience==='participant'?'subject':audience}))
   const metricKeys=new Set(capabilities.numericScores?Object.keys(runtime.compiledRuntime.metricDefinitions):[])
   return {metricKeys,referenceMetricKeys:new Set(capabilities.references&&capabilities.individualInterpretations?metricKeys:[]),capabilities}
  }
