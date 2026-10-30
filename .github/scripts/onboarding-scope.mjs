@@ -19,7 +19,7 @@ const sha=value=>assert.match(value??'',/^[a-f0-9]{40}$/);
 
 /** One reviewed backend patch; route name retained for existing consumers. Unknown changes never select a broad fallback. */
 export function allowedSourcePath(path,pr){
- if(pr==='414')return SCHOOL_GROUP_SOURCES.includes(path)||path==='docs/development/group-report-school-20261030.md'||path.startsWith('docs/evidence/group-report-school-20261030/');
+ if(pr==='414')return SCHOOL_GROUP_SOURCES.includes(path)||path==='docs/evidence/group-report-training-20261030/main-alignment/formal-result.json'||path==='docs/development/group-report-school-20261030.md'||path.startsWith('docs/evidence/group-report-school-20261030/');
  if(pr==='408')return TRAINING_GROUP_SOURCES.includes(path)||path==='docs/development/group-report-training-20261030.md'||path.startsWith('docs/evidence/group-report-training-20261030/');
  if(pr==='404')return groupReportAllowedPaths.includes(path)||GROUP_REPORT_QUALIFICATION_SOURCES.includes(path);
  if(pr==='choice-page')return CHOICE_PAGE_SOURCES.includes(path);
