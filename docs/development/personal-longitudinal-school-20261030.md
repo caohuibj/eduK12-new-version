@@ -81,3 +81,35 @@ queue was introduced.
 Formal dependent qualification awaits the normal preceding PR399→406→409 base
 sequence and exact-source review. No workflow was added for stacked PRs and no
 local PASS is labelled formal CI. Keep this slice Draft for independent review.
+
+
+## Final main8bc qualification preparation
+
+This section supersedes the earlier stacked-main/Notion waiting status. Survey399,
+Training406, School-group414 and Teacher409 are merged. The School slice aligns
+once to main8bc677156a3548333450363a31e33812ad2a9f0c. The actual merge is
+conflict-free; all55 application deltas equal originalaecb against Teacherf0.
+The automatically merged campus report router preserves both group reporting
+and the own changes route. No School feature is copied back into Teacher409.
+
+Eighteen original reporters preserve37 distinct successful observations and12
+failed original reporters with their exact named continuations. They remain
+unsigned local evidence. No business test, PostgreSQL journey, browser, formula
+or cognition trial is replayed. Seven affected admission/route controls and
+current workflow actionlint passed.
+
+There is no migration delta. Current base and candidate complete Prisma trees
+both equal the physically qualified Teacher1170 candidate. Existing native-only
+reuse now permits that exact candidate state as the new baseline, while still
+pinning tools, native program, required successful producer steps, official job
+identity and24h age. A changed baseline or missing/failed/expired native producer
+is refused. No database replay is needed. Current School frontend consumers,
+images/security and selected source SAST remain actual formal producers in the
+same workflow; package/lock audit reuse remains independently authenticated.
+
+The exact plan is continuation/school-ready-qualification-plan.json. Formal
+qualification is pending, and PR416 has no merge approval. Numeric Form sources
+retain completion-only boundaries; fixed Bundle stays whole with required slots;
+no Profile/observer/group-longitudinal expansion or departed-member redesign.
+Hui review is the current record target. The old Qiang404 is historical and is
+not a CI blocker under the latest instruction. No merge/deployment is authorized.

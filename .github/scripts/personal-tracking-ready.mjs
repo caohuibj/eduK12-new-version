@@ -15,7 +15,8 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
  if(branch!==binding.branch||event!=='pull_request')return null;
  assert.equal(forceFull,false,'Personal tracking does not authorize whole-platform execution');
  assert.equal(base,binding.base,'Personal tracking main base changed; recheck affected inputs');
- if(binding.slice==='teacher'){assert.equal(binding.branch,'feat/personal-longitudinal-education-20261030');assert.equal(binding.originalSource,'2160f195f67b211cc62ab8eda1ecf3f698927900');}
+ if(binding.slice==='school'){assert.equal(binding.branch,'feat/personal-longitudinal-school-20261030');assert.equal(binding.originalSource,'aecb26636ebec3d7e8fe27201bc01ad7840ca7e2');}
+ else if(binding.slice==='teacher'){assert.equal(binding.branch,'feat/personal-longitudinal-education-20261030');assert.equal(binding.originalSource,'2160f195f67b211cc62ab8eda1ecf3f698927900');}
  else if(binding.slice==='training'){assert.equal(binding.branch,'feat/personal-longitudinal-training-20261030');assert.equal(binding.originalSource,'dbcc7e597aba792aa052cd23634332d80a4252e1');}
  else assert.equal(binding.reviewedCandidate,'a62c9a5763da69aa13b4f70d062b0bf55d6db65f');
  assert(personalTrackingDraftScope(entries,{event,draft:true}));
@@ -23,7 +24,7 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
   const pin=binding.files[entry.file];assert(pin,'Unreviewed application input: '+entry.file);
   assert.equal(git('rev-parse',head+':'+entry.file),pin.after);
   assert.equal(pin.after,git('rev-parse',binding.reviewedCandidate+':'+entry.file),'Application differs from reviewed source');
-  if(['training','teacher'].includes(binding.slice)){const delta=(from,to)=>execFileSync('git',['diff','--unified=0',from,to,'--',entry.file],{encoding:'utf8'}).split('\n').filter(line=>/^[+-]/.test(line)&&!line.startsWith('+++ ')&&!line.startsWith('--- ')).join('\n');assert.equal(hash(delta(pin.originalBase,binding.originalSource)),pin.originalDeltaSHA256,'Original longitudinal delta changed');assert.equal(hash(delta(base,head)),pin.originalDeltaSHA256,'Longitudinal implementation delta differs from original evidence');}
+  if(['training','teacher','school'].includes(binding.slice)){const delta=(from,to)=>execFileSync('git',['diff','--unified=0',from,to,'--',entry.file],{encoding:'utf8'}).split('\n').filter(line=>/^[+-]/.test(line)&&!line.startsWith('+++ ')&&!line.startsWith('--- ')).join('\n');assert.equal(hash(delta(pin.originalBase,binding.originalSource)),pin.originalDeltaSHA256,'Original longitudinal delta changed');assert.equal(hash(delta(base,head)),pin.originalDeltaSHA256,'Longitudinal implementation delta differs from original evidence');}
   if(pin.before){assert.equal(entry.status,'M');assert.equal(git('rev-parse',base+':'+entry.file),pin.before)}else assert.equal(entry.status,'A');
  }
  assert.deepEqual(entries.filter(e=>e.file.startsWith('server-version/')).map(e=>e.file).sort(),Object.keys(binding.files).sort());
@@ -32,8 +33,8 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
  if(binding.applicationSastReuse)assert.equal(git('rev-parse',head+':server-version'),binding.applicationSastReuse.serverVersionTree,'Original SAST application input changed');
  if(binding.backendAuditReuse)for(const file of ['server-version/backend/package.json','server-version/backend/package-lock.json'])assert.equal(git('rev-parse',binding.backendAuditReuse.sourceHead+':'+file),git('rev-parse',head+':'+file),'Original backend audit input changed');
  const runtime=entries.filter(e=>/\.(?:[cm]?js|[cm]?ts|jsx|tsx)$/.test(e.file)).map(e=>e.file);
- const sastPaths=['training','teacher'].includes(binding.slice)?[...new Set([...runtime,'.github/scripts/personal-tracking-ready.mjs'])]:undefined;
- const frontendLintPaths=['training','teacher'].includes(binding.slice)?runtime.filter(p=>p.startsWith('server-version/frontend/src/')).map(p=>p.slice('server-version/frontend/'.length)):undefined;
+ const sastPaths=['training','teacher','school'].includes(binding.slice)?[...new Set([...runtime,'.github/scripts/personal-tracking-ready.mjs'])]:undefined;
+ const frontendLintPaths=['training','teacher','school'].includes(binding.slice)?runtime.filter(p=>p.startsWith('server-version/frontend/src/')).map(p=>p.slice('server-version/frontend/'.length)):undefined;
  return {schemaVersion:1,route:'personal-tracking',...(sastPaths?{sastPaths,frontendLintPaths}:{}),base,head,tree:git('rev-parse',head+'^{tree}'),draft:draft===true,reviewedCandidate:binding.reviewedCandidate,...(binding.imageReuse?{imageReuse:binding.imageReuse}:{}),...(binding.backendAuditReuse?{backendAuditReuse:binding.backendAuditReuse}:{}),...(binding.frontendAuditReuse?{frontendAuditReuse:binding.frontendAuditReuse}:{}),...(binding.applicationSastReuse?{applicationSastReuse:binding.applicationSastReuse}:{}),...(binding.qualificationReuse?{qualificationReuse:binding.qualificationReuse}:{}),required:draft?['scope']:['scope','personal-tracking',...(binding.imageReuse?[]:['docker']),'codeql']};
 }
 export function personalTrackingReadyOutputs(plan){const out=participantAccessOutputs(plan);delete out.participant_access_plan;return {...out,application_route:'personal-tracking',scenario:'personal-tracking',codeql:!plan.draft,personal_tracking_plan:JSON.stringify(plan),personal_tracking_draft:false};}
@@ -42,7 +43,7 @@ export async function admitOriginalReports(read=readFileSync){
  // filtered rows are preserved; these cases are NOT claimed as CI executions.
  const {verifyOriginalReport,verifyFailureContinuations}=await import('./onboarding-checks.mjs');
  const admitted=[],unique=new Set(),original=new Set();
- for(const item of binding.reports){const bytes=read(item.file);assert.equal(hash(bytes),item.sha256,'Original reporter changed');assert.equal(hash(execFileSync('git',['show',binding.reviewedCandidate+':'+item.file])),item.sha256,'Reporter differs from reviewed immutable Git original');if(binding.originalSource)assert.equal(hash(execFileSync('git',['show',binding.originalSource+':'+item.file])),item.sha256,'Reporter differs from original Training Git evidence');const report=JSON.parse(bytes);const caseNames=verifyOriginalReport(report,item.review,{allowDuplicateFiltered:true});for(const name of caseNames){unique.add(name);if(binding.originalReportPrefix?item.file.startsWith(binding.originalReportPrefix):item.file.includes('/originals/'))original.add(name);}admitted.push({id:item.id,caseNames,ciExecuted:false,originalSigned:false,provenance:'reviewed-local-evidence'});}
+ for(const item of binding.reports){const bytes=read(item.file);assert.equal(hash(bytes),item.sha256,'Original reporter changed');assert.equal(hash(execFileSync('git',['show',binding.reviewedCandidate+':'+item.file])),item.sha256,'Reporter differs from reviewed immutable Git original');if(binding.originalSource)assert.equal(hash(execFileSync('git',['show',binding.originalSource+':'+item.file])),item.sha256,'Reporter differs from immutable original longitudinal evidence');const report=JSON.parse(bytes);const caseNames=verifyOriginalReport(report,item.review,{allowDuplicateFiltered:true});for(const name of caseNames){unique.add(name);if(binding.originalReportPrefix?item.file.startsWith(binding.originalReportPrefix):item.file.includes('/originals/'))original.add(name);}admitted.push({id:item.id,caseNames,ciExecuted:false,originalSigned:false,provenance:'reviewed-local-evidence'});}
  verifyFailureContinuations(binding.reports.map(r=>({...r.review,id:r.id})),admitted);
  assert.equal(original.size,binding.originalCaseCount??31,'All original successful cases must remain present');assert.equal(unique.size,binding.originalCaseCount??unique.size,'Unexpected application evidence count');
  if(binding.historicalDraftControl){const p=binding.historicalDraftControl;assert.equal(hash(read(p.file)),p.sha256);assert.equal(hash(execFileSync('git',['show',binding.originalSource+':'+p.file])),p.sha256);}
@@ -51,7 +52,10 @@ export async function admitOriginalReports(read=readFileSync){
   const bytes=read(item.file);assert.equal(hash(bytes),item.sha256,'Original failed reporter changed');assert.equal(hash(execFileSync('git',['show',binding.originalSource+':'+item.file])),item.sha256);
   const report=JSON.parse(bytes);assert.equal(report.success,false);assert.deepEqual(Object.fromEntries(['success','numPassedTests','numFailedTests','numPendingTests'].map(k=>[k,report[k]])),item.summary);
   const cases=report.testResults.flatMap(s=>s.assertionResults.map(c=>({fullName:c.fullName,status:c.status})));assert.deepEqual(cases,item.cases);assert(cases.some(c=>c.status==='failed'));
-  assert(admitted.some(r=>r.id===item.continuation&&r.caseNames.length),'Retained-state continuation missing');
+  if(item.continuations){
+   assert.deepEqual(item.continuations.map(c=>c.failedCaseName).sort(),cases.filter(c=>c.status==='failed').map(c=>c.fullName).sort(),'Failed cases lost their original continuation identities');
+   for(const c of item.continuations)assert(admitted.some(r=>r.id===c.successfulReportId&&r.caseNames.includes(c.failedCaseName)),'Retained-state continuation missing');
+  }else assert(admitted.some(r=>r.id===item.continuation&&r.caseNames.length),'Retained-state continuation missing');
   historicalFailures.push({...item,status:'ORIGINAL_FAILURE_RETAINED',ciExecuted:false});
  }
  return {reviewedCandidate:binding.reviewedCandidate,caseCount:unique.size,admitted,historicalFailures,ciExecuted:false,reviewBasis:binding.reviewBasis};
@@ -78,7 +82,7 @@ export async function verifyOriginalImages(plan,fetcher=fetch,now=Date.now(),exp
 }
 export async function verifyOriginalBackendAudit(plan,fetcher=fetch,now=Date.now()){
  const proof=plan.backendAuditReuse;assert(proof&&JSON.stringify(proof)===JSON.stringify(binding.backendAuditReuse));assert(process.env.GH_TOKEN);
- const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official audit metadata unavailable');const job=await response.json();
+ const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official audit metadata unavailable: '+response.status);const job=await response.json();
  assert.equal(job.run_id,proof.runId);assert([proof.sourceHead,proof.executionHead].includes(job.head_sha));assert.equal(job.status,'completed');
  const matches=job.steps.filter(step=>step.name===proof.step);assert.equal(matches.length,1);const step=matches[0];assert.equal(step.conclusion,'success','Original locked backend audit did not pass');
  const age=now-Date.parse(step.completed_at);assert(Number.isFinite(age)&&age>=-300000&&age<=proof.maximumAgeHours*3600000,'Original locked audit expired');
@@ -90,7 +94,7 @@ export async function verifyOriginalFrontendAudit(plan,fetcher=fetch,now=Date.no
  const proof=plan.frontendAuditReuse;assert(proof&&JSON.stringify(proof)===JSON.stringify(binding.frontendAuditReuse));assert(process.env.GH_TOKEN);
  for(const path of ['server-version/frontend/package.json','server-version/frontend/package-lock.json'])assert.equal(git('rev-parse','HEAD:'+path),git('rev-parse',proof.sourceHead+':'+path),'Original frontend audit input changed');
  const workflow=execFileSync('git',['show',proof.sourceHead+':.github/workflows/ci.yml'],{encoding:'utf8'}),start=workflow.indexOf('- name: '+proof.step),end=workflow.indexOf('      - name:',start+8);assert(start>=0&&workflow.slice(start,end).includes('npm audit --audit-level=high'),'Original frontend audit threshold changed');
- const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official frontend audit metadata unavailable');const job=await response.json();
+ const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official frontend audit metadata unavailable: '+response.status);const job=await response.json();
  assert.equal(job.run_id,proof.runId);assert([proof.sourceHead,proof.executionHead].includes(job.head_sha));assert.equal(job.status,'completed');const steps=job.steps.filter(s=>s.name===proof.step);assert.equal(steps.length,1);const step=steps[0];assert.equal(step.conclusion,'success','Original frontend audit did not pass');const age=now-Date.parse(step.completed_at);assert(Number.isFinite(age)&&age>=-300000&&age<=proof.maximumAgeHours*3600000,'Original frontend audit expired');
  return {status:'ADMITTED_FRONTEND_LOCK_AUDIT_ONLY',runId:proof.runId,jobId:proof.jobId,sourceHead:proof.sourceHead,originalJobConclusion:job.conclusion,step:proof.step,completedAt:step.completed_at,reexecuted:false};
 }
@@ -116,13 +120,16 @@ export async function verifyOriginalQualification(plan,fetcher=fetch,now=Date.no
  for(const path of ['server-version/backend/prisma','server-version/backend/package.json','server-version/backend/package-lock.json'])assert.equal(git('rev-parse','HEAD:'+path),git('rev-parse',proof.sourceHead+':'+path),'Original native schema/tool input changed: '+path);
  const original=execFileSync('git',['show',proof.sourceHead+':.github/scripts/personal-tracking-ready.mjs'],{encoding:'utf8'}),current=readFileSync(new URL(import.meta.url),'utf8');
  assert.equal(nativeSourceInput(current),nativeSourceInput(original),'Native qualification code changed');
- const originalBinding=JSON.parse(execFileSync('git',['show',proof.sourceHead+':.github/scripts/personal-tracking-ready.json'],{encoding:'utf8'}));assert.equal(git('rev-parse',binding.base+':server-version/backend/prisma'),git('rev-parse',originalBinding.base+':server-version/backend/prisma'),'Original native main schema changed');
+ const originalBinding=JSON.parse(execFileSync('git',['show',proof.sourceHead+':.github/scripts/personal-tracking-ready.json'],{encoding:'utf8'}));
+ const baselineSchema=git('rev-parse',binding.base+':server-version/backend/prisma');
+ if(proof.candidateAsBaseline){assert.equal(proof.nativeOnly,true,'Candidate state admits native-only evidence');assert.equal(baselineSchema,git('rev-parse',proof.sourceHead+':server-version/backend/prisma'),'Qualified candidate state differs from current base; no-migration reuse refused');}
+ else assert.equal(baselineSchema,git('rev-parse',originalBinding.base+':server-version/backend/prisma'),'Original native main schema changed');
  const workflow=readFileSync('.github/workflows/ci.yml','utf8'),originalWorkflow=execFileSync('git',['show',proof.sourceHead+':.github/workflows/ci.yml'],{encoding:'utf8'});assert.equal(qualificationJobInput(workflow),qualificationJobInput(originalWorkflow),'Original tool/qualification job input changed');
- const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official successful qualification metadata inaccessible');const job=await response.json();
+ const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official successful qualification metadata inaccessible: '+response.status);const job=await response.json();
  assert.equal(job.id,proof.jobId);assert.equal(job.run_id,proof.runId);assert([proof.sourceHead,proof.executionHead].includes(job.head_sha));assert.equal(job.name,'personal tracking / original evidence and native migration');assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
  const age=now-Date.parse(job.completed_at);assert(Number.isFinite(age)&&age>=-300000&&age<=proof.maximumAgeHours*3600000,'Original qualification expired');
  for(const name of ['admit exact original local reporters without application replay','install locked native migration tools','real nonempty main upgrade and native dump restore',...(proof.nativeOnly?[]:['install frontend tools and audit locked inputs','actual frontend app types and affected source lint'])])assert.equal(job.steps.find(s=>s.name===name)?.conclusion,'success','Original qualification step missing or failed: '+name);
- return {status:proof.nativeOnly?'ADMITTED_NATIVE_QUALIFICATION_ONLY':'ADMITTED_COMPLETE_NATIVE_FRONTEND_QUALIFICATION',runId:proof.runId,jobId:proof.jobId,sourceHead:proof.sourceHead,executionHead:proof.executionHead,reexecuted:false,base:binding.base,originalServerVersionTree:proof.serverVersionTree,nativeSchemaTree:git('rev-parse','HEAD:server-version/backend/prisma'),frontendAdmitted:!proof.nativeOnly};
+ return {status:proof.nativeOnly?'ADMITTED_NATIVE_QUALIFICATION_ONLY':'ADMITTED_COMPLETE_NATIVE_FRONTEND_QUALIFICATION',runId:proof.runId,jobId:proof.jobId,sourceHead:proof.sourceHead,executionHead:proof.executionHead,reexecuted:false,base:binding.base,originalServerVersionTree:proof.serverVersionTree,nativeSchemaTree:git('rev-parse','HEAD:server-version/backend/prisma'),candidateAsBaseline:proof.candidateAsBaseline===true,frontendAdmitted:!proof.nativeOnly};
 }
 export function prepareMainSchema(temporary){
  const file=resolve(temporary,'main-schema.tar');
