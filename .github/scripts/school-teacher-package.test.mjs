@@ -2,7 +2,7 @@ import{execFileSync}from'node:child_process';import test from 'node:test';import
 import{nativeBinding,NATIVE_BRANCH,PACKAGE_BRANCH,PACKAGE_MARKER,requireNativeQualification,validateNativeBoundary,requireNativeEvidence,nativePlan,observeNativeMain}from'./school-teacher-native.mjs';
 import{binding}from'./school-teacher-scope.mjs';import{inspectHistoricalCase,requireReviewedCase}from'./school-teacher-checks.mjs';
 import{verifyNativeEvidence,readNativeEvidenceBytes}from'./school-teacher-native-evidence.mjs';
-function fixture(){const b=structuredClone(nativeBinding(PACKAGE_BRANCH)),entries=Object.entries({...b.source,...b.controls}).map(([file,e])=>({file,oldBlob:e.before||'0'.repeat(40),newBlob:e.after||'c'.repeat(40),oldMode:e.before?'100644':'000000',newMode:'100644',status:e.before?'M':'A'}));return{b,o:{event:'pull_request',repository:b.repository,branch:PACKAGE_BRANCH,draft:true,forceFull:false,base:b.base,sourceHead:'a'.repeat(40),checkoutHead:'b'.repeat(40),sourceTree:'d'.repeat(40),checkoutTree:'d'.repeat(40),productTree:b.productTree,frontendTree:b.frontendTree,backendTree:b.backendTree,protectedInputs:structuredClone(b.protectedInputs),entries}}}
+function fixture(){const b=structuredClone(nativeBinding(PACKAGE_BRANCH));b.enabled=false;const entries=Object.entries({...b.source,...b.controls}).map(([file,e])=>({file,oldBlob:e.before||'0'.repeat(40),newBlob:e.after||'c'.repeat(40),oldMode:e.before?'100644':'000000',newMode:'100644',status:e.before?'M':'A'}));return{b,o:{event:'pull_request',repository:b.repository,branch:PACKAGE_BRANCH,draft:true,forceFull:false,base:b.base,sourceHead:'a'.repeat(40),checkoutHead:'b'.repeat(40),sourceTree:'d'.repeat(40),checkoutTree:'d'.repeat(40),productTree:b.productTree,frontendTree:b.frontendTree,backendTree:b.backendTree,protectedInputs:structuredClone(b.protectedInputs),entries}}}
 test('PR392 is independent of388, closed over the complete patch and cannot activate without new control review',()=>{
  assert.equal(binding({CI_HEAD_REF:PACKAGE_BRANCH}).branch,PACKAGE_BRANCH);assert.equal(binding({CI_HEAD_REF:NATIVE_BRANCH}).branch,NATIVE_BRANCH);assert.equal(binding({PLAN:JSON.stringify({candidate:'native-bundle',publicPackage:true})}).branch,PACKAGE_BRANCH);
  const{b,o}=fixture();assert.equal(b.enabled,false);assert.throws(()=>requireNativeQualification(b));assert.notEqual(b.evidence.reviewSha256,nativeBinding().evidence.reviewSha256);
@@ -24,4 +24,14 @@ test('single new browser consumer uses same compiled contexts and never replaces
 test('old388/391 main observation still selects only388; package main can never borrow its green',async()=>{
  let first;await assert.rejects(observeNativeMain({candidate:'native-bundle',postMerge:true,requiredJobs:nativeBinding().requiredJobs},async path=>{first=path;throw Error('stop')}));assert.equal(first,'/pulls/388');
  await assert.rejects(observeNativeMain({candidate:'native-bundle',postMerge:true,publicPackage:true,requiredJobs:nativeBinding().requiredJobs},async path=>{first=path;throw Error('stop')}));assert.equal(first,'/pulls/392');
+});
+
+test('shallow product fetch covers both native PR branches and their exact main merge bases',()=>{
+ const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const block=workflow.split('- name: fetch reviewed School Teacher product anchor without full history')[1].split('- name:')[0];
+ const condition=block.match(/\n\s+if: (.*)/)[1],selected=new Function('github','return ('+condition+')');
+ for(const branch of [NATIVE_BRANCH,PACKAGE_BRANCH])assert(selected({event_name:'pull_request',event:{pull_request:{head:{ref:branch}}}}));
+ for(const before of ['e65d87222d351e5dfde52e389f3aa403380443eb',nativeBinding(PACKAGE_BRANCH).base])assert(selected({event_name:'push',ref:'refs/heads/main',event:{before}}));
+ assert(!selected({event_name:'pull_request',event:{pull_request:{head:{ref:'unrelated'}}}}));
+ assert(block.includes("'--depth=1','origin',b.productHead"));
 });

@@ -198,7 +198,7 @@
     },
     ".github/scripts/school-teacher-package.test.mjs": {
       "before": null,
-      "after": "1ca17d849fd2f07cf5229b21cb88466de4e6b144"
+      "after": "4da44e270c29374fdccbb57275e4c56709b180ca"
     },
     ".github/scripts/school-teacher-scope.mjs": {
       "before": "0f553bba6766571834830ea8af05371e54fb4d90",
@@ -210,7 +210,7 @@
     },
     ".github/workflows/ci.yml": {
       "before": "6b80b453ac51601dab0eee3392adb9d40bb47148",
-      "after": "c8d32f26cd3b984fde0967b82e2590f87c49d6e5"
+      "after": "0c0147e5b1e71fbcae41c9eeaf705c1c06722e77"
     },
     "server-version/e2e/school-teacher-package-browser.cjs": {
       "before": null,
