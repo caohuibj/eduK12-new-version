@@ -1,0 +1,565 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "talis2018_stakeholder_participation_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "选用TALIS2018题集：学校利益相关者参与（项目描述性均分）",
+      "abbreviation": "T3STAKE-RAW",
+      "instrumentFamily": "TALIS2018 selected complete item set; project descriptive raw mean, not OECD factor score"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "职工、家长、学生的参与机会及共同承担责任、互相支持的学校文化；不等同于仅教师个人决策参与。 使用完整作答的项目等权原始均分，不是OECD CFA因子分，也未验证为独立施测量表。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "talis2018_stakeholder_participation_zh_cn",
+        "domain:teacher_workplace",
+        "construct:stakeholder_participation",
+        "population:adult_teacher",
+        "population:shanghai_lower_secondary_source",
+        "response:self",
+        "scoring:project_complete_raw_mean_not_oecd_cfa",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "license:oecd_pre_2024_terms",
+        "language_validation:existing_shanghai_chinese",
+        "language_validation:standalone_validation_pending"
+      ]
+    },
+    "population": {
+      "populationNotes": "复用上海ISCED2教师问卷现成简体中文原题，面向当前初中教师的工作条件回顾候选；18+是项目成人范围，不冒称原作者年龄界线。本独立选用形式与项目描述性均分未建立效度或本地常模。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目标班级/本校的一般教学与工作语境；未额外指定回顾期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留所选原题相对顺序、原响应类别和正式题码。",
+        "本工具只使用T3STAKE完整题集；报告为项目原始均分，不是OECD因子分或独立量表效度证明。",
+        "完整作答后等权均分为项目明示规则，不冒称OECD官方缺失算法。",
+        "2分钟为阅读估计，尚未做电子施测时长实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "官方题集依据不证明当前独立选用形式、描述性均分或个体解释有效。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "OECD TALIS2018上海ISCED2教师问卷现成简体中文原题；原文未重译。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "只选取完整T3STAKE题集，原题文和响应类别逐项核到现成上海DOCX；项目改造为独立选用、原始均分和原创教师反馈，不称OECD官方计分包或验证独立短表。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "talis2018_stakeholder_participation_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "talis2018_stakeholder_participation_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "talis2018_stakeholder_participation_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "OECD (2018), TALIS2018 Shanghai-China ISCED2 Teacher Questionnaire, https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip",
+      "本项目改编自OECD原作；本改编的观点与论证不代表OECD或其成员国的官方观点。",
+      "署名与改造说明依OECD现行条款§1.2；只选现成2018自有中文文本，不实施商业新译；排除TSES第三方题项、整份题本、封面、版式、标识和图片。 https://www.oecd.org/en/about/terms-conditions.html"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "TALIS2018 T3STAKE complete selected item set; project descriptive raw mean",
+        "citation": "OECD (2018), TALIS2018 Shanghai-China ISCED2 Teacher Questionnaire; OECD TALIS2018 Technical Report, table/page 334. Complete item-set selection and project scoring/report adaptation.",
+        "url": "https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "仅针对本包所选2018 OECD自有现成中文题文，依据OECD条款§1.2署名改编；无另见第三方声明。OECD (2018), TALIS2018 Shanghai-China ISCED2 Teacher Questionnaire, https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip。本项目改编自OECD原作；本改编的观点与论证不代表OECD或其成员国的官方观点。排除TSES题项、整份题本、标识/封面/图片；非新商业翻译。 https://www.oecd.org/en/about/terms-conditions.html"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "original_response",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "非常同意",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "TT3G48A",
+          "content": "学校为职工提供积极参与学校决策的机会。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G48B",
+          "content": "学校为家长或监护人提供积极参与学校决策的机会。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G48C",
+          "content": "学校为学生提供积极参与学校决策的机会。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G48D",
+          "content": "学校有共同承担学校事务责任的文化。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G48E",
+          "content": "学校有以互相支持为特点的合作式校园文化。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "TT3G48A",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TT3G48B",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TT3G48C",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TT3G48D",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TT3G48E",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "stakeholder_participation",
+            "type": "dimension",
+            "label": "学校利益相关者参与（描述性均分）",
+            "description": "职工、家长、学生的参与机会及共同承担责任、互相支持的学校文化；不等同于仅教师个人决策参与。 仅完整作答后等权均分；不代表OECD因子分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "TT3G48A",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G48B",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G48C",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G48D",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G48E",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "stakeholder_participation"
+        ],
+        "scoreOrder": [
+          "stakeholder_participation"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "stakeholder_participation",
+            "headline": "学校参与机会：谁有表达和共同承担的空间",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注职工、家长和学生参与决策的机会，以及共同承担责任和互相支持的文化。1–4描述性均分越大，表示你更认同这些参与和协作条件存在，不等于个人话语权、领导能力或学校民主程度的客观排名。比如，一项新安排提出前是否有征询，意见是否有人回应，能帮助把“参与感”说得更具体。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一项近期影响教学的决定，区分“知道结果”“有机会表达”和“意见得到回应”三个环节；也留意不同群体的机会可能并不相同。"
+              },
+              {
+                "category": "environment",
+                "text": "选一个你有权提出的小议题，尝试通过已有年级组、教代会或家校沟通渠道，提出明确问题与反馈时点。参与机制是共同责任，不要求单个教师独自改变制度。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这五题不仅测教师决策参与；分数来自个人看法，不能代表全体教职工、家长或学生，也不支持学校排名。",
+          "本独立选用工具只给项目等权原始均分，不是OECD因子分；未建立独立施测效度、中国教师常模、百分位或分级线。"
+        ],
+        "disclaimer": "仅用于本次工作条件回顾；不诊断、考核或排名。所有题目均有有效回答才生成项目均分，缺失不补0、不插补；四工具分别解释，不计算JD-R合计。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "talis2018_stakeholder_participation_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "TT3G48A",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G48B",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G48C",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G48D",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G48E",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "stakeholder_participation": 1
+          },
+          "totalScoreKeys": [
+            "stakeholder_participation"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "TT3G48A",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TT3G48B",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TT3G48C",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TT3G48D",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TT3G48E",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "stakeholder_participation": 4
+          },
+          "totalScoreKeys": [
+            "stakeholder_participation"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "TT3G48A",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G48B",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TT3G48C",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TT3G48D",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TT3G48E",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "stakeholder_participation": 2.8
+          },
+          "totalScoreKeys": [
+            "stakeholder_participation"
+          ]
+        }
+      },
+      {
+        "name": "missing",
+        "answers": [
+          {
+            "itemCode": "TT3G48A",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G48B",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G48C",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G48D",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "stakeholder_participation": null
+          },
+          "totalScoreKeys": [
+            "stakeholder_participation"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "stakeholder_participation": null
+          },
+          "totalScoreKeys": [
+            "stakeholder_participation"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "您是否同意以下关于本校的描述？ 请每行只勾选一项。本选用形式采用完整作答的项目描述性均分，不是OECD官方因子分。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "上海ISCED2原指导语/题组语境；独立选用、缺失策略说明及原创教师反馈为项目改造。 https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}
