@@ -4,7 +4,7 @@
 
 ## Scope and release boundary
 
-New packages contain JSON and deterministic generated JSON, with no package-owned executable code. Supported capabilities are exact Scale/Cognitive/Situational/Form identities, scalar evidence, bounded comparison/boolean rules, and evidence/conclusion/limitation blocks. There is no arbitrary arithmetic, unit conversion, new scorer, norm generation, diagnosis, safety-trigger activation or live-upload/hot-loading facility. Generation, build and deployment are still required. PR4 owns content-only CI routing; PR3 runs the full platform gate.
+New packages contain JSON and deterministic generated JSON, with no package-owned executable code. Supported capabilities are exact Scale/Cognitive/Situational/Form identities, scalar evidence, bounded comparison/boolean rules, and evidence/conclusion/limitation blocks. There is no arbitrary arithmetic, unit conversion, new scorer, norm generation, diagnosis, safety-trigger activation or live-upload/hot-loading facility. Regenerate changed static content and select checks from the actual complete diff. Runtime loading uses the normal release process; main delivery alone does not deploy. The original rule-package scope below predates the existing Profile sub-capability.
 
 `example_descriptive_v1` is an EXPERIMENTAL DRAFT example, not a release-approved instrument. Existing real Bundles remain at their existing lifecycle/scientific status. Synthetic test approval is not real content approval.
 
@@ -26,7 +26,7 @@ Edit manifest.json, evidence-map.json, rules.json, report.json, scientific.json 
 
 Only fixed file names and JSON are accepted. Executable/extra files, symlinks, traversal references, directory/identity mismatch, version aliases/ranges, duplicate identities, invalid references, unknown blocks/operators and excessive nesting are rejected. Generate sorts packages by key/version. `bundle:manifest:check` regenerates in memory and compares without writing. Runtime imports generated JSON rather than scanning arbitrary directories.
 
-Content roots for PR4: `src/modules/assessment-bundle/packages/<key>/<version>/`. Mechanical output: `src/modules/assessment-bundle/generated/packages.json`. Exact dependency indexes are manifest slots and cognitiveDependencies. These paths do not yet bypass any full CI checks.
+Content roots for PR4: `src/modules/assessment-bundle/packages/<key>/<version>/`. Mechanical output: `src/modules/assessment-bundle/generated/packages.json`. Exact dependency indexes are manifest slots and cognitiveDependencies. These content paths do not by themselves qualify a mixed application/control patch; use the actual current classifier and input-compatible evidence.
 
 ## Evidence, rules and reports
 
@@ -65,7 +65,7 @@ Existing teacher material grants, ownership, course membership, assessment avail
 | --- | --- |
 | Rule, report, evidence, context, dependency, scientific support or fixture | New package version and approved content hash |
 | Lifecycle intent only | Explicit database transition; no execution identity change |
-| New operator/scorer/renderer capability | Platform implementation and appropriate new version; full CI |
+| New operator/scorer/renderer capability | Platform implementation and appropriate version; select directly affected checks from the complete diff |
 | Legacy migration | Keep legacy identity unless exact equivalence is demonstrated; otherwise create a new version |
 
 Legacy production freezes retain schemaVersion 1 and original hashes. Declarative content uses production freeze schemaVersion 2, embedding the complete package/rules. The underlying V3 Bundle snapshot stays exact and report facts remain persisted. Reanalysis appends records without rescoring units or replacing old FINALs/reports. Roll back by closing new creation/admission, not by deploying a reader that cannot read schemaVersion 2.
@@ -80,7 +80,7 @@ npm run bundle:manifest:check
 npm run bundle:onboarding:check
 ```
 
-The full backend gate requires the new lifecycle suite to run, not skip. Two random names exercise Scale+SJT and Cognitive+Scale installation, signed publication, real FINALs, persisted reports, reanalysis and retirement. The test temporarily publishes a seeded WHO-5 row only in the isolated database and restores its status. It does not approve a real WHO-5 release. Core-diff tests compare handwritten module bytes before/after unknown-package generation. Generic renderer tests exercise unfamiliar blocks and HTML-as-text; the existing browser gate still checks the shared product workflow.
+The original PR3 capability qualification required the lifecycle suite to run, not skip. Current patches reuse unchanged qualification and run only the missing affected checks. Two random names exercise Scale+SJT and Cognitive+Scale installation, signed publication, real FINALs, persisted reports, reanalysis and retirement. The test temporarily publishes a seeded WHO-5 row only in the isolated database and restores its status. It does not approve a real WHO-5 release. Core-diff tests compare handwritten module bytes before/after unknown-package generation. Generic renderer tests exercise unfamiliar blocks and HTML-as-text; the existing browser gate still checks the shared product workflow.
 
 ## Content-only CI (C4)
 
