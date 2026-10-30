@@ -1,3 +1,4 @@
+import {deferredPage} from '../page-loading/deferredPage'
 import {RefreshCw,Info} from 'lucide-react'
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
 import {EducationFormBulkImport} from './EducationFormBulkImport'
@@ -8,15 +9,15 @@ import {EducationPrivateScaleSharing} from './EducationPrivateScaleSharing'
 import {createEducationPrivateImageAdapter} from './educationPrivateImageAdapter'
 import {EducationQuestionImageField} from './EducationQuestionImageField'
 import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react'
-import {ScaleDefinitionEditor} from '../../pages/ScaleDefinitionEditor'
+const ScaleDefinitionEditor=deferredPage(async()=>({default:(await import('../../pages/ScaleDefinitionEditor')).ScaleDefinitionEditor}))
 import {type ScaleDefinition,updateReportContract} from '../../pages/scaleDefinitionEditorModel'
-import {EducationPrivateFormEditor} from './EducationPrivateFormEditor'
+const EducationPrivateFormEditor=deferredPage(async()=>({default:(await import('./EducationPrivateFormEditor')).EducationPrivateFormEditor}))
 import type {FormDraft} from '../../survey/builder.types'
 import type {ProfessionalAnswer} from '../../modules/assessment-core/form/types'
 import {sanitizeFormAnswers} from '../../modules/assessment-core/form/form-visibility'
 import {PrivateToolPreview} from './PrivateToolPreview'
-import {EducationCompositionStudio} from './EducationCompositionStudio'
-import {EducationPackageLibrary} from './EducationPackageLibrary'
+const EducationCompositionStudio=deferredPage(async()=>({default:(await import('./EducationCompositionStudio')).EducationCompositionStudio}))
+const EducationPackageLibrary=deferredPage(async()=>({default:(await import('./EducationPackageLibrary')).EducationPackageLibrary}))
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateTool,type PrivateToolSummary,type PrivateToolKind,type PrivateToolValidation,type PrivateToolVersion,type PrivateDraftState,type PrivateToolIssue} from './privateToolClient'
 import './education-private-tools.css'
 
