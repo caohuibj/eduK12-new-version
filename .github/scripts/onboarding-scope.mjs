@@ -21,7 +21,7 @@ const sha=value=>assert.match(value??'',/^[a-f0-9]{40}$/);
 
 /** One reviewed backend patch; route name retained for existing consumers. Unknown changes never select a broad fallback. */
 export function allowedSourcePath(path,pr){
- if(pr==='418')return TEACHER_SUBGROUP_SOURCES.includes(path)||path==='docs/development/group-report-teacher-subgroups-20261030.md'||path.startsWith('docs/evidence/group-report-teacher-subgroups-20261030/')||path.startsWith('docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/');
+ if(pr==='418')return path.startsWith('docs/evidence/group-report-training-20261030/main-2fc-alignment/')||TEACHER_SUBGROUP_SOURCES.includes(path)||path==='docs/development/group-report-teacher-subgroups-20261030.md'||path.startsWith('docs/evidence/group-report-teacher-subgroups-20261030/')||path.startsWith('docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/');
  if(pr==='415')return TEACHER_READING_SOURCES.includes(path)||path==='docs/development/group-report-teacher-reading-20261030.md'||path.startsWith('docs/evidence/group-report-teacher-reading-20261030/')||path.startsWith('docs/evidence/group-report-school-20261030/mainfa/formal/')||path.startsWith('docs/evidence/group-report-school-20261030/mainfb/formal/');
  if(pr==='414')return SCHOOL_GROUP_SOURCES.includes(path)||path==='docs/evidence/group-report-training-20261030/main-alignment/formal-result.json'||path==='docs/development/group-report-school-20261030.md'||path.startsWith('docs/evidence/group-report-school-20261030/');
  if(pr==='408')return TRAINING_GROUP_SOURCES.includes(path)||path==='docs/development/group-report-training-20261030.md'||path.startsWith('docs/evidence/group-report-training-20261030/');
