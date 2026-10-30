@@ -224,5 +224,15 @@
     "formalCiActivated": false,
     "draft": true,
     "mergeQueueEntered": false
+  },
+  "main8bcPreparation": {
+    "record": "main8bc/preparation.json",
+    "sourceCheckpoint": "478670cef348ce0c686bb889708fa4ddfbe12c14",
+    "backendTypes": "main8bc/backend-types.json:once exit0",
+    "frontendTypes": "main8bc/frontend-types-continuation.json:exit0 after real mock type repair;first exit2 retained",
+    "navigation": "main8bc/navigation-continuation.json:2PASS after real repair/diagnostic wait;original1failed/1filtered retained",
+    "databaseBrowserReplayed": false,
+    "formalCiActivated": false,
+    "readerDependency": "b3e9f35 candidate objects uploaded;retarget metadata denied and stopped"
   }
 }
