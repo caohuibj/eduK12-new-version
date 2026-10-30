@@ -12,6 +12,7 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { success,notFound } from '../../utils/response'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { startAssessmentRunExecution } from '../assessment-run/startExecution'
+import {readTeacherPersonalChanges} from '../reporting/teacher-personal-changes.service'
 import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
@@ -207,6 +208,7 @@ export async function listOwnTeacherScaleTasks(userId:string){
   `
   return {list:rows.slice(0,100),truncated:rows.length>100}
 }
+router.post('/scale-tasks/:executionId/changes',authenticateHuiteacher,wrap(req=>readTeacherPersonalChanges({actorUserId:req.user!.userId,executionId:uuid.parse(req.params.executionId)})))
 router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>
   listOwnTeacherScaleTasks(req.user!.userId)))
 router.post('/run-executions/:executionId/start-scale',

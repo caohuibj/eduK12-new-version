@@ -24,6 +24,8 @@ export type RunActorRole = 'TEACHER' | 'STUDENT' | 'COUNSELOR' | 'CLIENT' | 'PAR
 type Tx = Prisma.TransactionClient
 
 export interface AssessmentRunRecord {
+  personalTrackingBaselineId?:string|null
+  personalTrackingOrdinal?:number|null
   id: string
   organizationId: string
   name: string
@@ -73,7 +75,8 @@ export class AssessmentRunRepositoryError extends Error {
 const runProjection = `
   "id", "organization_id" AS "organizationId", "name", "status", "version",
   "created_by_user_id" AS "createdByUserId", "intake_deadline" AS "intakeDeadline",
-  "published_at" AS "publishedAt", "closed_at" AS "closedAt", "cancelled_at" AS "cancelledAt"
+  "published_at" AS "publishedAt", "closed_at" AS "closedAt", "cancelled_at" AS "cancelledAt",
+  personal_tracking_baseline_id AS "personalTrackingBaselineId",personal_tracking_ordinal AS "personalTrackingOrdinal"
 `
 
 export async function createAssessmentRunDraft(input: {

@@ -1,0 +1,6 @@
+src/modules/huiteacher/run.service.ts(230,26): error TS18048: 'track' is possibly 'undefined'.
+src/modules/huiteacher/run.service.ts(230,79): error TS18048: 'track' is possibly 'undefined'.
+src/modules/huiteacher/run.service.ts(230,105): error TS18048: 'track' is possibly 'undefined'.
+src/modules/huiteacher/run.service.ts(232,127): error TS18048: 'track' is possibly 'undefined'.
+src/modules/huiteacher/run.service.ts(232,168): error TS18048: 'track' is possibly 'undefined'.
+src/modules/huiteacher/run.service.ts(232,209): error TS18048: 'track' is possibly 'undefined'.

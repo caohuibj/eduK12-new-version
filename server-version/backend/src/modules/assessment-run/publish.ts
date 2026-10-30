@@ -977,6 +977,7 @@ export const publishAssessmentRun = async (input: {
   actorUserId: string
   expectedVersion: number
   resourceRegistry?: RunResourceAuthorityRegistry
+  tracking?:unknown
 }): Promise<PublishedRunResult> => {
   const registry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
   const preparedTracks = await prepareTracks(input.runId, input.organizationId, registry, input.actorUserId)
@@ -1002,8 +1003,8 @@ export const publishAssessmentRun = async (input: {
     `
     if (!organizations[0]) throw new RunPublishError('ORG_NOT_FOUND', 'Organization not found', 404)
     if (organizations[0].status !== 'ACTIVE') throw new RunPublishError('ORGANIZATION_SUSPENDED', 'Organization is suspended', 409)
-    const runs = await tx.$queryRaw<Array<{ status: string; version: number; createdByUserId: string }>>`
-      SELECT "status", "version", "created_by_user_id" AS "createdByUserId" FROM "assessment_runs"
+    const runs = await tx.$queryRaw<Array<{ status: string; version: number; createdByUserId: string;trackingBaselineId:string|null }>>`
+      SELECT "status", "version", "created_by_user_id" AS "createdByUserId",personal_tracking_baseline_id AS "trackingBaselineId" FROM "assessment_runs"
       WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.runId} FOR UPDATE
     `
     const run = runs[0]
@@ -1277,6 +1278,10 @@ export const publishAssessmentRun = async (input: {
     for(const track of preparedTracks.filter(t=>t.resourceKey.startsWith('education-composition:')).sort((a,b)=>a.resourceKey.localeCompare(b.resourceKey)))
       await publishPrivateCompositionRuntime(tx,track.resourcePolicy)
     await assertLockedLibraryUseTime(tx,education?.libraryUses)
+    if(input.tracking!==undefined||run.trackingBaselineId){
+      const {freezeEducationTracking}=await import('../reporting/education-personal-tracking')
+      await freezeEducationTracking(tx,{...input,tracks:preparedTracks,selection:input.tracking})
+    }
     const version = run.version + 1
     await tx.$executeRaw`
       UPDATE "assessment_runs"
