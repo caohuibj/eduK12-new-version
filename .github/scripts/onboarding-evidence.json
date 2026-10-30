@@ -609,6 +609,270 @@
       ],
       "types": [],
       "missingCheck": "CURRENT_COMBINED_BACKEND_TYPES"
+    },
+    "395": {
+      "schemaVersion": 1,
+      "product": "d537212929887218f255ee6f654a9522463abff7",
+      "reviewer": "independent Codex pr395_review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "limitations": [
+          "Local observations are unsigned and retrospectively associated with the unchanged product tree, not a signed original execution.",
+          "Component tests use synthetic API replies; browser, real authorization and FINAL are not established.",
+          "Original School synchronization failure and compiler missing-dependency failure remain saved.",
+          "Static gzip estimates are build results, not network latency or throughput.",
+          "The partial initial loading reporter predates the School wait correction; only its two unchanged shared-editor cases are admitted. All other partial rows retain original status."
+        ]
+      },
+      "reports": [
+        {
+          "id": "registration",
+          "path": "docs/performance/education-post-p6-20261030/evidence/registration-fix.json",
+          "sha256": "4f9b9d7dbb64c9363f7e40f8c6db23594af6acb876b5ff3f7844a0bc7260a8e1",
+          "originalSourceAssociation": "d537212929887218f255ee6f654a9522463abff7",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedUnrelatedSourceDelta": [],
+          "deltaRationale": "Retrospective association of the explicitly selected case bodies and their relevant product consumers with the final product. Not proof that every historical frontend byte equaled the final tree.",
+          "sourceAssociationBasis": "DOT observed these local executions on uncommitted bytes and transferred their originals. The selected assertions and relevant consumers were retained in the remote product; no historical commit identity or complete original environment attestation is invented.",
+          "cases": [
+            {
+              "fullName": "shared education registration management real client contracts presents readable frozen metadata and preserves historical missing feedback policy without inventing defaults",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts does not expose operations before actual issuer read succeeds and keeps denial closed",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts freezes exact P/R, real grant ids, explicit scheduled UTC and respondent-only disclosure without publication flags",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts requires an explicit immediate choice and supports pure Form with explicit empty P/R and completion only",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts recovers a lost registration response by original id without repeating the mutation",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts discards a pending read after organization switches",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts recovers an existing preparation by id and reloads actual source and grant choices without creating another preparation",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts refuses multiple grant conflicts before POST rather than replacing a pinned source asset",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts disables unavailable sources and P/R without guessing missing authority",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts submits NONE disclosure with stable readonly policy id and only original licenses when P/R are not selected",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts clears an old source selection when the current source list refreshes",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts cancels a pending permission read without late resurrection",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts reviews an independent frozen registration with its hash and reads the result back",
+              "status": "passed"
+            },
+            {
+              "fullName": "bounded resource pagination continues an empty eligible source page and preserves the selected source grant",
+              "status": "passed"
+            },
+            {
+              "fullName": "bounded resource pagination appends P/R choices without clearing selections or replacing the original grant",
+              "status": "passed"
+            },
+            {
+              "fullName": "bounded resource pagination refuses a changed measurement on later pages and preserves the prior selection",
+              "status": "passed"
+            },
+            {
+              "fullName": "reports unsaved registration title to the parent before prepare so switching authoring modes can protect it",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 17,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          }
+        },
+        {
+          "id": "shared-editors-initial",
+          "path": "docs/performance/education-post-p6-20261030/evidence/lazy-consumers.json",
+          "sha256": "b92a78da1f6a797fc4d7191447681d66a6b0a8fd36a5dbc63557795f22870c32",
+          "originalSourceAssociation": "d537212929887218f255ee6f654a9522463abff7",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedUnrelatedSourceDelta": [],
+          "deltaRationale": "Only the two explicitly selected shared-editor cases are admitted from this partial reporter. The failed School case used the OLD initial-loading await condition and qualifies only through school-recheck. This is a retrospective case-level source association, not whole-reporter final-source equality.",
+          "sourceAssociationBasis": "DOT observed execution on uncommitted bytes. The selected two shared-editor case bodies and their product consumers were unchanged; the School await changed before the successful recheck. No historical Git or complete environment attestation exists.",
+          "cases": [
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts exposes the shared School editor through its parent authoring studio",
+              "status": "failed"
+            },
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts attaches a fixed SELF questionnaire from the actual activity consumer and displays the source revision",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts attaches a fixed PARENT_REPORT questionnaire from the actual activity consumer and displays the source revision",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts attaches a fixed TEACHER_REPORT questionnaire from the actual activity consumer and displays the source revision",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts does not render a late Teacher draft after the entry changes on the same transport",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education shared authoring integration keeps unapplied text and blocks question/type/structure changes and persistence until applied",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education shared authoring integration retains a referenced option and pending text when replacement would remove its stable key",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education shared authoring integration keeps scale item and feedback materials through normalize and report updates",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education shared authoring integration reports scale paste risk and keeps shared authoring limits",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education editor reload boundary clears discarded FORM buffers on successful same-id reload",
+              "status": "passed"
+            },
+            {
+              "fullName": "education editor reload boundary clears discarded SCALE buffers on successful same-id reload",
+              "status": "passed"
+            },
+            {
+              "fullName": "education CSV pending boundary keeps CSV pending separate from ordinary bulk buffers and prevents navigation loss",
+              "status": "skipped"
+            }
+          ],
+          "summary": {
+            "success": false,
+            "numPassedTests": 2,
+            "numFailedTests": 1,
+            "numPendingTests": 9
+          },
+          "allowPartialFailure": true,
+          "selectedCases": [
+            "education editor reload boundary clears discarded FORM buffers on successful same-id reload",
+            "education editor reload boundary clears discarded SCALE buffers on successful same-id reload"
+          ],
+          "failureContinuations": [
+            {
+              "caseName": "School composition product consumers / synthetic HTTP contracts exposes the shared School editor through its parent authoring studio",
+              "reportId": "school-recheck"
+            }
+          ],
+          "historicalTestDifference": {
+            "path": "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
+            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'普通问卷'})).toBeEnabled())",
+            "afterAwait": "await waitFor(()=>expect(screen.queryByText('正在读取或保存，请稍候…')).not.toBeInTheDocument())",
+            "affectsSelectedCases": false,
+            "failedCaseQualifiedBy": "school-recheck"
+          }
+        },
+        {
+          "id": "school-recheck",
+          "path": "docs/performance/education-post-p6-20261030/evidence/lazy-school-recheck.json",
+          "sha256": "e54ade3ceb7b1969f4e819c3582d3e812c6ceb30725afddaa40205045e0797cd",
+          "originalSourceAssociation": "d537212929887218f255ee6f654a9522463abff7",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedUnrelatedSourceDelta": [],
+          "deltaRationale": "Retrospective association of the explicitly selected case bodies and their relevant product consumers with the final product. Not proof that every historical frontend byte equaled the final tree.",
+          "sourceAssociationBasis": "DOT observed these local executions on uncommitted bytes and transferred their originals. The selected assertions and relevant consumers were retained in the remote product; no historical commit identity or complete original environment attestation is invented.",
+          "cases": [
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts exposes the shared School editor through its parent authoring studio",
+              "status": "passed"
+            },
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts attaches a fixed SELF questionnaire from the actual activity consumer and displays the source revision",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts attaches a fixed PARENT_REPORT questionnaire from the actual activity consumer and displays the source revision",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts attaches a fixed TEACHER_REPORT questionnaire from the actual activity consumer and displays the source revision",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School composition product consumers / synthetic HTTP contracts does not render a late Teacher draft after the entry changes on the same transport",
+              "status": "skipped"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 4
+          }
+        },
+        {
+          "id": "teacher-tabs",
+          "path": "docs/performance/education-post-p6-20261030/evidence/lazy-teacher.json",
+          "sha256": "9aa965f4a08e4a0355bfed97634d4e019ad38617f223a2b49e3f0f0534af3dde",
+          "originalSourceAssociation": "d537212929887218f255ee6f654a9522463abff7",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedUnrelatedSourceDelta": [],
+          "deltaRationale": "Retrospective association of the explicitly selected case bodies and their relevant product consumers with the final product. Not proof that every historical frontend byte equaled the final tree.",
+          "sourceAssociationBasis": "DOT observed these local executions on uncommitted bytes and transferred their originals. The selected assertions and relevant consumers were retained in the remote product; no historical commit identity or complete original environment attestation is invented.",
+          "cases": [
+            {
+              "fullName": "loads Teacher package data only on its tab and keeps an unsaved questionnaire when switching is declined",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          }
+        }
+      ],
+      "types": [],
+      "pr395LocalTypes": {
+        "path": "docs/performance/education-post-p6-20261030/evidence/app-types-observation.json",
+        "sha256": "8a0116537b46f505a4c84f953387e6b6b58c2371e121bf3457c59c8c1f1baf61",
+        "log": "docs/performance/education-post-p6-20261030/evidence/frontend-typecheck-deps-recheck.log",
+        "exit": "docs/performance/education-post-p6-20261030/evidence/frontend-typecheck-deps-recheck.exit"
+      }
     }
   }
 }

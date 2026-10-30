@@ -1,0 +1,39 @@
+{
+  "kind": "CURRENT_TASK_UNSIGNED_OBSERVATIONS",
+  "node": "v24.21.0",
+  "commands": [
+    {
+      "command": "node --test --test-name-pattern='PR395' .github/scripts/onboarding-controls.test.mjs",
+      "exitCode": 0,
+      "report": "controls-r1.tap",
+      "distinctControlCases": 3
+    },
+    {
+      "command": "node --test --test-name-pattern='observer follow-up|PR393' .github/scripts/onboarding-controls.test.mjs",
+      "exitCode": 0,
+      "report": "controls-consumers.tap",
+      "distinctControlCases": 4
+    },
+    {
+      "command": "node --test --test-name-pattern='PR381 keeps one real compiled' .github/scripts/onboarding-controls.test.mjs",
+      "exitCode": 0,
+      "report": "controls-pr381.tap",
+      "distinctControlCases": 0,
+      "limit": "No selected named case matched; file-level success is not qualification."
+    },
+    {
+      "command": "node --test --test-name-pattern='^PR381 keeps one compiled GET-only' .github/scripts/onboarding-controls.test.mjs",
+      "exitCode": 0,
+      "report": "controls-pr381-selected.tap",
+      "distinctControlCases": 1
+    },
+    {
+      "command": "actionlint -shellcheck= -pyflakes= .github/workflows/ci.yml",
+      "exitCode": 0,
+      "toolVersion": "1.7.12",
+      "officialArchiveSHA256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "log": "actionlint.log"
+    }
+  ],
+  "notExecuted": "No application test/type/build replay, browser, database or CI execution in these commands."
+}

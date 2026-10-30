@@ -1,0 +1,120 @@
+{
+  "library_file_id": "libfile_b50c05c4bc308191ad581535efcd52b0",
+  "version": 0,
+  "filename": "DOT-Performance-PR395-Handoff-20261030.zip",
+  "bytes": 44619945,
+  "sha256": "44a790f12f7034e36f9ea79727c5e9a3e9cd139910fe7085c858bf16ae3e7a77",
+  "originalFiles": [
+    {
+      "path": "app-types-observation.json",
+      "bytes": 539,
+      "sha256": "8a0116537b46f505a4c84f953387e6b6b58c2371e121bf3457c59c8c1f1baf61"
+    },
+    {
+      "path": "baseline/build.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "baseline/build.log",
+      "bytes": 80118,
+      "sha256": "f95ebb29566edfa46dc03d1e1119c7fcf55051232e1b96b7327680aff6e4152f"
+    },
+    {
+      "path": "editor-byte-comparison.json",
+      "bytes": 10722,
+      "sha256": "b844e27fb22649d9dfd1bbfba9d516912ed80c9ee4f7d7ad3c0e5d78f4eea813"
+    },
+    {
+      "path": "frontend-typecheck-deps-recheck.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "frontend-typecheck-deps-recheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "frontend-typecheck.exit",
+      "bytes": 2,
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "path": "frontend-typecheck.log",
+      "bytes": 14606,
+      "sha256": "af46d858893e90ae02f44486f78378fd1093821c6cc9efb67221a81106ecc852"
+    },
+    {
+      "path": "lazy-consumers.json",
+      "bytes": 26750,
+      "sha256": "b92a78da1f6a797fc4d7191447681d66a6b0a8fd36a5dbc63557795f22870c32"
+    },
+    {
+      "path": "lazy-consumers.log",
+      "bytes": 100,
+      "sha256": "ff3067e2b1e4cba78a8597947e5b6685c51597b99cc55def1ca4cb67534ea312"
+    },
+    {
+      "path": "lazy-school-recheck.json",
+      "bytes": 2919,
+      "sha256": "e54ade3ceb7b1969f4e819c3582d3e812c6ceb30725afddaa40205045e0797cd"
+    },
+    {
+      "path": "lazy-school-recheck.log",
+      "bytes": 105,
+      "sha256": "9b9737f5438b56ea232e3b4c1de19c8e1b590f95390e8499cd2bd47380f6c8a8"
+    },
+    {
+      "path": "lazy-teacher.json",
+      "bytes": 1104,
+      "sha256": "9aa965f4a08e4a0355bfed97634d4e019ad38617f223a2b49e3f0f0534af3dde"
+    },
+    {
+      "path": "lazy-teacher.log",
+      "bytes": 98,
+      "sha256": "f0853707ad129190dc0766185e91a06e719f9a91916dde4d5c1f12699f6ab093"
+    },
+    {
+      "path": "local-review-evidence.json",
+      "bytes": 2061,
+      "sha256": "48092c5fdb5366e6ac4b3e504c53080087c4a03dfdbd584a4f1633dcaac5eabf"
+    },
+    {
+      "path": "optimized/build.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "optimized/build.log",
+      "bytes": 81254,
+      "sha256": "627f740fab481fa1e2026e061fe5ed118af3a14a4a29a4882f2e7948a001db9c"
+    },
+    {
+      "path": "registration-fix.json",
+      "bytes": 8157,
+      "sha256": "4f9b9d7dbb64c9363f7e40f8c6db23594af6acb876b5ff3f7844a0bc7260a8e1"
+    },
+    {
+      "path": "registration-fix.log",
+      "bytes": 102,
+      "sha256": "43501a6b460cb23346a981c1a4cc87f92b7022a8dfe83490515d611b53880887"
+    },
+    {
+      "path": "unsaved-registration-title.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "unsaved-registration-title.json",
+      "bytes": 1596,
+      "sha256": "ce8acfdcae4d00445c229e829542855dd13054e4fa436d29ca7224550710b812"
+    },
+    {
+      "path": "unsaved-registration-title.log",
+      "bytes": 112,
+      "sha256": "b3638d7575141b484ae359208026b032a06df2c7fd270ad30ed93ebef2a1986d"
+    }
+  ],
+  "limits": "Transferred original bytes; retrospective review metadata is not signed execution. Complete original builds retained in the cloud handoff archive, not published in Git."
+}

@@ -64,7 +64,7 @@ function Panel({api,organizationId,actorId,product,publicPackage,onDraftStateCha
    if(write&&mutationSent.current){setUncertain(true);setNotice('写入结果尚未确认，请用原登记编号回读核对，不要重复提交。')}
   }}finally{if(valid()){locked.current=false;writing.current=false;setBusy(false)}}
  }
- useEffect(()=>{onDraftStateChange?.({dirty:!!preparation&&!registration,writing:busy&&writing.current})},[preparation,registration,busy,onDraftStateChange])
+ useEffect(()=>{onDraftStateChange?.({dirty:!registration&&(!!preparation||!!title||!!sourceId||family!=='BUNDLE'),writing:busy&&writing.current})},[preparation,registration,title,sourceId,family,busy,onDraftStateChange])
  const applyFixed=(result:EducationAssessmentPreparation)=>{
   setP(Object.fromEntries(result.fixedSelection?.references.units.map(unit=>[unit.itemId,unit.choices.map(choice=>JSON.stringify([choice.releaseId,choice.entryKey]))])??[]))
   setR(Object.fromEntries(result.fixedSelection?.reports.map(report=>[report.itemId,report.releaseId])??[]))

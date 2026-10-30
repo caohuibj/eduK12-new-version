@@ -1,0 +1,7 @@
+{
+  "command": "./node_modules/.bin/tsc -p tsconfig.app.json --noEmit",
+  "exitCode": 0,
+  "componentTree": "5c0402cdbc06239dd3fde86cf59c69c294a49d2a",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceAssociationBasis": "Retrospectively indexed from observed DOT command completion and saved log. Not an original signed execution receipt. Source frontend tree unchanged between execution and product. Matching backend dependency lock and schema were supplied after the retained first failure."
+}

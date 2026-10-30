@@ -1,0 +1,925 @@
+reviewed onboarding evidence admission	Set up job	﻿2026-10-30T03:24:50.4928334Z Current runner version: '2.338.0'
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4966416Z ##[group]Runner Image Provisioner
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4968073Z Hosted Compute Agent
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4969075Z Version: 20261021.618
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4970221Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4971495Z Build Date: 2026-10-21T00:45:21Z
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4972611Z Worker ID: {92a9b66e-d2a1-42ea-9ae9-6767a4b49a48}
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4973952Z Region: eastus
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4974924Z Cloud: Azure
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4976084Z ##[endgroup]
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4978545Z ##[group]Operating System
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4979540Z Ubuntu
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4980586Z 24.04.5
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4981493Z LTS
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4982398Z ##[endgroup]
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4983381Z ##[group]Runner Image
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4984469Z Image: ubuntu-24.04
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4985425Z Version: 20261025.353.1
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4987578Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4990707Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4992549Z ##[endgroup]
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4994618Z ##[group]GITHUB_TOKEN Permissions
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4997732Z Actions: read
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4998756Z Contents: read
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.4999628Z Metadata: read
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.5000609Z ##[endgroup]
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.5004191Z Secret source: Actions
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.5006368Z Cache mode: write
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.5007826Z Prepare workflow directory
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.5800898Z Prepare all required actions
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.5878185Z Getting action download info
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.7777924Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.8725089Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:50.9696516Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+reviewed onboarding evidence admission	Set up job	2026-10-30T03:24:51.1757552Z Complete job name: reviewed onboarding evidence admission
+reviewed onboarding evidence admission	Run actions/checkout@v4	﻿2026-10-30T03:24:51.2660662Z ##[group]Run actions/checkout@v4
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2661599Z with:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2662055Z   fetch-depth: 0
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2662544Z   persist-credentials: false
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2663095Z   repository: caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2667128Z   token: ***
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2667577Z   ssh-strict: true
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2668015Z   ssh-user: git
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2668434Z   clean: true
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2668890Z   sparse-checkout-cone-mode: true
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2669427Z   fetch-tags: false
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2669879Z   show-progress: true
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2670343Z   lfs: false
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2670772Z   submodules: false
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2671235Z   set-safe-directory: true
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2671751Z   allow-unsafe-pr-checkout: false
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2672552Z env:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2673129Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2673817Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2674365Z   CI: true
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2677869Z   PLAN: {"schema":1,"route":"onboarding-structure","base":"dc796e04203696b4a579aa6fd2428df592031ee3","head":"e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6","sourceHead":"23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5","tree":"cd8d923e7696dd01c28a0de8a17bad3230572a60","product":"d537212929887218f255ee6f654a9522463abff7","components":{"backend":"7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc","frontend":"5c0402cdbc06239dd3fde86cf59c69c294a49d2a"},"controlCheckpoint":"5f6e82df42e9657c84f942be4d523b7df531b1b0","pr":395,"postMerge":false,"draft":false}
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2681238Z   CI_EVENT: pull_request
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2681802Z   CI_HEAD_REF: fix/education-draft-review-20261030
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2682500Z   CI_SOURCE_HEAD: 23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2683116Z   CI_IS_DRAFT: false
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2683971Z   CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2684562Z   CI_PR_NUMBER: 395
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.2685001Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.5738294Z Syncing repository: caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.5742242Z ##[group]Getting Git version info
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.5743950Z Working directory is '/home/runner/work/eduK12-new-version/eduK12-new-version'
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.5746514Z [command]/usr/bin/git version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.5888007Z git version 2.56.0
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.5930217Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.5948490Z Temporarily overriding HOME='/home/runner/work/_temp/5d919390-e61f-496f-b943-1cccfb918f72' before making global git config changes
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6076235Z Adding repository directory to the temporary git global config as a safe directory
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6078758Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6081678Z Deleting the contents of '/home/runner/work/eduK12-new-version/eduK12-new-version'
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6083342Z ##[group]Initializing the repository
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6084445Z [command]/usr/bin/git init /home/runner/work/eduK12-new-version/eduK12-new-version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6181936Z hint: Using 'master' as the name for the initial branch. This default branch name
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6184704Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6187416Z hint: to use in all of your new repositories, which will suppress this warning,
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6189062Z hint: call:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6189857Z hint:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6190775Z hint: 	git config --global init.defaultBranch <name>
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6191931Z hint:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6193043Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6194814Z hint: 'development'. The just-created branch can be renamed via this command:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6196366Z hint:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6197218Z hint: 	git branch -m <name>
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6198208Z hint:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6199329Z hint: Disable this message with "git config set advice.defaultBranchName false"
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6201894Z Initialized empty Git repository in /home/runner/work/eduK12-new-version/eduK12-new-version/.git/
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6206653Z [command]/usr/bin/git remote add origin https://github.com/caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6261442Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6263057Z ##[group]Disabling automatic garbage collection
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6264919Z [command]/usr/bin/git config --local gc.auto 0
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6305358Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6307063Z ##[group]Setting up auth
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6315847Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6366299Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6765162Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.6816162Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.7067950Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.7117643Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.7372541Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.7426302Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.7427407Z ##[group]Fetching the repository
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:51.7441563Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6:refs/remotes/pull/395/merge
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7378738Z From https://github.com/caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7381455Z  * [new branch]          ACTcontents                              -> origin/ACTcontents
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7382883Z  * [new branch]          CBTDBTcontents                           -> origin/CBTDBTcontents
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7384412Z  * [new branch]          Mindfulnesscontents                      -> origin/Mindfulnesscontents
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7386302Z  * [new branch]          SELcontents                              -> origin/SELcontents
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7387726Z  * [new branch]          admin-permissions/a01-a07-20261020       -> origin/admin-permissions/a01-a07-20261020
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7389596Z  * [new branch]          admin-permissions/ci-repair-review-20261020 -> origin/admin-permissions/ci-repair-review-20261020
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7391086Z  * [new branch]          archive/dev-final-20260826               -> origin/archive/dev-final-20260826
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7392409Z  * [new branch]          archive/main-before-dev                  -> origin/archive/main-before-dev
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7393792Z  * [new branch]          backup/mac-training-workspace-20261022   -> origin/backup/mac-training-workspace-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7395450Z  * [new branch]          backup/measurement-version-v1-cloud-20261020 -> origin/backup/measurement-version-v1-cloud-20261020
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7399143Z  * [new branch]          backup/pr318-ci-activation-20261020      -> origin/backup/pr318-ci-activation-20261020
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7400849Z  * [new branch]          backup/shared-sjt-native-20261024        -> origin/backup/shared-sjt-native-20261024
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7402733Z  * [new branch]          backup/training-c19-supplement-cloud-20261019 -> origin/backup/training-c19-supplement-cloud-20261019
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7404095Z  * [new branch]          backup/training-c22-cloud-20261019       -> origin/backup/training-c22-cloud-20261019
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7405175Z  * [new branch]          backup/training-entry-20261024           -> origin/backup/training-entry-20261024
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7407953Z  * [new branch]          backup/training-integration-cloud-20261019 -> origin/backup/training-integration-cloud-20261019
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7410004Z  * [new branch]          backup/training-mac-followup-20261022-e1ef69a7 -> origin/backup/training-mac-followup-20261022-e1ef69a7
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7411914Z  * [new branch]          backup/training-phase2-cloud-20261019    -> origin/backup/training-phase2-cloud-20261019
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7413793Z  * [new branch]          backup/training-survey-main350-20261024  -> origin/backup/training-survey-main350-20261024
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7415827Z  * [new branch]          chore/ci-gating-optimization             -> origin/chore/ci-gating-optimization
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7417468Z  * [new branch]          chore/mainline-development               -> origin/chore/mainline-development
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7418966Z  * [new branch]          chore/org-reporting-v2.1-g0              -> origin/chore/org-reporting-v2.1-g0
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7420427Z  * [new branch]          chore/pilot-release-baseline             -> origin/chore/pilot-release-baseline
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7421975Z  * [new branch]          chore/situational-browser-debug          -> origin/chore/situational-browser-debug
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7423940Z  * [new branch]          chore/verification-gate-simplification   -> origin/chore/verification-gate-simplification
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7425920Z  * [new branch]          ci/bundle-content-validation             -> origin/ci/bundle-content-validation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7427444Z  * [new branch]          ci/cognitive-intake-control-20261029     -> origin/ci/cognitive-intake-control-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7429009Z  * [new branch]          ci/documentation-gate-20261009           -> origin/ci/documentation-gate-20261009
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7430493Z  * [new branch]          ci/draft-throttle-main                   -> origin/ci/draft-throttle-main
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7432419Z  * [new branch]          ci/frontend-vitest-worker-cap            -> origin/ci/frontend-vitest-worker-cap
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7434082Z  * [new branch]          ci/frontend-vitest-worker-cap-test-ignore -> origin/ci/frontend-vitest-worker-cap-test-ignore
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7436152Z  * [new branch]          ci/frontend-vitest-worker-cap-test-ignore2 -> origin/ci/frontend-vitest-worker-cap-test-ignore2
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7437814Z  * [new branch]          ci/github-hosted-only-20261009           -> origin/ci/github-hosted-only-20261009
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7440290Z  * [new branch]          ci/hosted-scope-parallel-browser-20261009 -> origin/ci/hosted-scope-parallel-browser-20261009
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7441303Z  * [new branch]          ci/local-validation-once-20261009        -> origin/ci/local-validation-once-20261009
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7442185Z  * [new branch]          ci/measurement-browser-20261020          -> origin/ci/measurement-browser-20261020
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7443131Z  * [new branch]          ci/pr238-mainland-image-probe-20261006   -> origin/ci/pr238-mainland-image-probe-20261006
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7444059Z  * [new branch]          ci/pr363-limited-wiring-20261027         -> origin/ci/pr363-limited-wiring-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7444977Z  * [new branch]          ci/pr382-chrome-environment-20261029     -> origin/ci/pr382-chrome-environment-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7446267Z  * [new branch]          ci/pr382-chrome-readonly-20261029        -> origin/ci/pr382-chrome-readonly-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7447169Z  * [new branch]          ci/required-gate-throughput              -> origin/ci/required-gate-throughput
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7448035Z  * [new branch]          ci/risk-scoped-release-20261009          -> origin/ci/risk-scoped-release-20261009
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7449038Z  * [new branch]          ci/scale-authoring-browser-diagnostic-20261021 -> origin/ci/scale-authoring-browser-diagnostic-20261021
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7450068Z  * [new branch]          ci/scale-authoring-evidence-20261021     -> origin/ci/scale-authoring-evidence-20261021
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7451222Z  * [new branch]          ci/scale-authoring-feedback-20261021     -> origin/ci/scale-authoring-feedback-20261021
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7452765Z  * [new branch]          ci/scale-content-fast-path               -> origin/ci/scale-content-fast-path
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7454277Z  * [new branch]          ci/scale-intake-mainline-20261029        -> origin/ci/scale-intake-mainline-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7455163Z  * [new branch]          ci/scenario-runner-split                 -> origin/ci/scenario-runner-split
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7456402Z  * [new branch]          ci/school-teacher-browser-20261022       -> origin/ci/school-teacher-browser-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7457329Z  * [new branch]          ci/school-teacher-console-20261023       -> origin/ci/school-teacher-console-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7458217Z  * [new branch]          ci/self-hosted-runner-migration          -> origin/ci/self-hosted-runner-migration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7459162Z  * [new branch]          ci/training-hosted-integration           -> origin/ci/training-hosted-integration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7460256Z  * [new branch]          codex/access-efficiency-followup-20261013 -> origin/codex/access-efficiency-followup-20261013
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7461231Z  * [new branch]          codex/anonymous-delivery-closure         -> origin/codex/anonymous-delivery-closure
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7462152Z  * [new branch]          codex/assessment-capacity-20261015       -> origin/codex/assessment-capacity-20261015
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7463088Z  * [new branch]          codex/backup-stream-memory-20261015      -> origin/codex/backup-stream-memory-20261015
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7464058Z  * [new branch]          codex/cos-large-point-rotation-20261017  -> origin/codex/cos-large-point-rotation-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7465280Z  * [new branch]          codex/cos-recovery-bounded-scan-20261017 -> origin/codex/cos-recovery-bounded-scan-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7466907Z  * [new branch]          codex/cos-recovery-renewal-20261017      -> origin/codex/cos-recovery-renewal-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7468097Z  * [new branch]          codex/huischool-project-pages-20261011   -> origin/codex/huischool-project-pages-20261011
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7469031Z  * [new branch]          codex/miniprogram-v2-runtime             -> origin/codex/miniprogram-v2-runtime
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7470005Z  * [new branch]          codex/prelaunch-legacy-cleanup           -> origin/codex/prelaunch-legacy-cleanup
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7470913Z  * [new branch]          codex/preload-performance-20261014       -> origin/codex/preload-performance-20261014
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7471915Z  * [new branch]          codex/preload-runtime-qualification-20261014 -> origin/codex/preload-runtime-qualification-20261014
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7473109Z  * [new branch]          codex/private-cdn-media-20261017         -> origin/codex/private-cdn-media-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7474144Z  * [new branch]          codex/reporting-cohort-longitudinal      -> origin/codex/reporting-cohort-longitudinal
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7475143Z  * [new branch]          codex/reporting-individual-longitudinal  -> origin/codex/reporting-individual-longitudinal
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7477161Z  * [new branch]          codex/reporting-plan-closure             -> origin/codex/reporting-plan-closure
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7478405Z  * [new branch]          codex/reporting-review-fixes             -> origin/codex/reporting-review-fixes
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7479403Z  * [new branch]          codex/school-https-ingress-20261014      -> origin/codex/school-https-ingress-20261014
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7480339Z  * [new branch]          codex/security-efficiency-20261013       -> origin/codex/security-efficiency-20261013
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7481791Z  * [new branch]          codex/server-efficiency-20261016         -> origin/codex/server-efficiency-20261016
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7483561Z  * [new branch]          codex/shared-media-storage-20261017      -> origin/codex/shared-media-storage-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7485394Z  * [new branch]          codex/teacher-survey-local-fixes-20261013 -> origin/codex/teacher-survey-local-fixes-20261013
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7487896Z  * [new branch]          codex/upload-deduplication-20261017      -> origin/codex/upload-deduplication-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7489586Z  * [new branch]          cognitive-next-three-core-20261026       -> origin/cognitive-next-three-core-20261026
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7491454Z  * [new branch]          cognitive/domain-child-learning-20261027 -> origin/cognitive/domain-child-learning-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7492936Z  * [new branch]          cognitive/domain-clinical-research-20261027 -> origin/cognitive/domain-clinical-research-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7493938Z  * [new branch]          cognitive/domain-emotion-ei-20261027     -> origin/cognitive/domain-emotion-ei-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7494956Z  * [new branch]          cognitive/domain-occupational-20261027   -> origin/cognitive/domain-occupational-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7496376Z  * [new branch]          cognitive/review-hearts-flowers-20261027 -> origin/cognitive/review-hearts-flowers-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7497385Z  * [new branch]          cognitive/twelve-new-tasks-20261028      -> origin/cognitive/twelve-new-tasks-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7498276Z  * [new branch]          content/cognitive-expansion              -> origin/content/cognitive-expansion
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7499211Z  * [new branch]          content/dot-cognitive-intake-pilot-20261029 -> origin/content/dot-cognitive-intake-pilot-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7500188Z  * [new branch]          content/dot-cognitive-library-20261026   -> origin/content/dot-cognitive-library-20261026
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7501086Z  * [new branch]          content/dot-local-scales-20261025        -> origin/content/dot-local-scales-20261025
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7502023Z  * [new branch]          content/dot-scale-intake-followup-20261028 -> origin/content/dot-scale-intake-followup-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7503348Z  * [new branch]          content/jdr-independent-teacher-20261030 -> origin/content/jdr-independent-teacher-20261030
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7504468Z  * [new branch]          content/scale-bps9-intake-20261028       -> origin/content/scale-bps9-intake-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7505382Z  * [new branch]          content/scale-content-batch3-20261028    -> origin/content/scale-content-batch3-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7506692Z  * [new branch]          content/scale-dual-reports-final-20261029 -> origin/content/scale-dual-reports-final-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7507675Z  * [new branch]          content/scale-dual-reports-next-20261029 -> origin/content/scale-dual-reports-next-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7508550Z  * [new branch]          content/scale-expansion                  -> origin/content/scale-expansion
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7509379Z  * [new branch]          content/scale-ipip-batch1-20261028       -> origin/content/scale-ipip-batch1-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7510268Z  * [new branch]          content/scale-ipip-batch2-20261028       -> origin/content/scale-ipip-batch2-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7511179Z  * [new branch]          content/scale-materials-three-20261029   -> origin/content/scale-materials-three-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7512122Z  * [new branch]          content/scale-structural-batch1-20261028 -> origin/content/scale-structural-batch1-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7513071Z  * [new branch]          content/sec-sjt-research-draft-20261023  -> origin/content/sec-sjt-research-draft-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7514006Z  * [new branch]          content/student-traits-pilot-batch-2     -> origin/content/student-traits-pilot-batch-2
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7514891Z  * [new branch]          content/teacher-scale-batch-1            -> origin/content/teacher-scale-batch-1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7516017Z  * [new branch]          content/teacher-scales-pilot-batch-1-v2  -> origin/content/teacher-scales-pilot-batch-1-v2
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7516958Z  * [new branch]          content/tipi-standard-pilot              -> origin/content/tipi-standard-pilot
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7518138Z  * [new branch]          design/classroom-authoring-control-presentation -> origin/design/classroom-authoring-control-presentation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7519097Z  * [new branch]          design/code-native-ui-lab                -> origin/design/code-native-ui-lab
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7519888Z  * [new branch]          design/cognitive-design-kit              -> origin/design/cognitive-design-kit
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7520738Z  * [new branch]          design/cognitive-next-three-20261026     -> origin/design/cognitive-next-three-20261026
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7521646Z  * [new branch]          design/cognitive-runner-presentation     -> origin/design/cognitive-runner-presentation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7522544Z  * [new branch]          design/design-system-convergence         -> origin/design/design-system-convergence
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7523497Z  * [new branch]          design/final-visual-accessibility-cleanup -> origin/design/final-visual-accessibility-cleanup
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7524423Z  * [new branch]          design/legacy-surface-migration          -> origin/design/legacy-surface-migration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7525409Z  * [new branch]          design/modern-education-classroom-participant -> origin/design/modern-education-classroom-participant
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7526685Z  * [new branch]          design/modern-education-entry-auth       -> origin/design/modern-education-entry-auth
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7527562Z  * [new branch]          design/modern-education-parent           -> origin/design/modern-education-parent
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7528637Z  * [new branch]          design/modern-education-public           -> origin/design/modern-education-public
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7529544Z  * [new branch]          design/modern-education-shared-surfaces  -> origin/design/modern-education-shared-surfaces
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7530439Z  * [new branch]          design/modern-education-staff            -> origin/design/modern-education-staff
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7531585Z  * [new branch]          design/organization-report-reading-convergence -> origin/design/organization-report-reading-convergence
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7532642Z  * [new branch]          design/public-participation-convergence  -> origin/design/public-participation-convergence
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7533873Z  * [new branch]          design/report-reading-system             -> origin/design/report-reading-system
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7534795Z  * [new branch]          design/report-visualization-system       -> origin/design/report-visualization-system
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7536188Z  * [new branch]          design/staff-complex-controller-presentation -> origin/design/staff-complex-controller-presentation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7537240Z  * [new branch]          design/student-submission-experience     -> origin/design/student-submission-experience
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7538012Z  * [new branch]          dev                                      -> origin/dev
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7538760Z  * [new branch]          docs/beijing-maintenance-mirrors         -> origin/docs/beijing-maintenance-mirrors
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7539985Z  * [new branch]          docs/g0-closeout-evidence                -> origin/docs/g0-closeout-evidence
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7541191Z  * [new branch]          docs/huischool-pilot-readiness-20261010  -> origin/docs/huischool-pilot-readiness-20261010
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7543061Z  * [new branch]          docs/release-guidance-20261009           -> origin/docs/release-guidance-20261009
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7544636Z  * [new branch]          docs/scale-intake-workflow-20261028      -> origin/docs/scale-intake-workflow-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7546497Z  * [new branch]          evidence/training-mac-followup-20261022-e1ef69a7 -> origin/evidence/training-mac-followup-20261022-e1ef69a7
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7547696Z  * [new branch]          exam-anxiety-20261030                    -> origin/exam-anxiety-20261030
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7548489Z  * [new branch]          feat-fe-05-report-shell                  -> origin/feat-fe-05-report-shell
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7549317Z  * [new branch]          feat-fe-06-situational-migration         -> origin/feat-fe-06-situational-migration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7550450Z  * [new branch]          feat-fe-07a-cognitive-shell-readiness    -> origin/feat-fe-07a-cognitive-shell-readiness
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7551340Z  * [new branch]          feat-fe-07b-cognitive-timing             -> origin/feat-fe-07b-cognitive-timing
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7552241Z  * [new branch]          feat-fe-08-form-questionnaire-migration  -> origin/feat-fe-08-form-questionnaire-migration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7553192Z  * [new branch]          feat-fe-09-bundle-product-integration    -> origin/feat-fe-09-bundle-product-integration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7554117Z  * [new branch]          feat-fe-10-discovery-history-export      -> origin/feat-fe-10-discovery-history-export
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7554970Z  * [new branch]          feat-fe-10b-remaining-pages              -> origin/feat-fe-10b-remaining-pages
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7556096Z  * [new branch]          feat-fe-11-unified-journey-gate          -> origin/feat-fe-11-unified-journey-gate
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7556982Z  * [new branch]          feat/anonymous-study-waves-pr4           -> origin/feat/anonymous-study-waves-pr4
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7557881Z  * [new branch]          feat/assessment-journey-authority-pr1    -> origin/feat/assessment-journey-authority-pr1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7558863Z  * [new branch]          feat/bundle-declarative-onboarding       -> origin/feat/bundle-declarative-onboarding
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7559912Z  * [new branch]          feat/bundle-evc-profile-20261029         -> origin/feat/bundle-evc-profile-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7560798Z  * [new branch]          feat/bundle-profile-feedback-20261029    -> origin/feat/bundle-profile-feedback-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7561645Z  * [new branch]          feat/bundle-v3-production                -> origin/feat/bundle-v3-production
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7562682Z  * [new branch]          feat/campus-governed-reporting-pr3       -> origin/feat/campus-governed-reporting-pr3
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7563593Z  * [new branch]          feat/campus-pr1-identity-security        -> origin/feat/campus-pr1-identity-security
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7564528Z  * [new branch]          feat/cognitive-assessment-v2-foundation  -> origin/feat/cognitive-assessment-v2-foundation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7565771Z  * [new branch]          feat/cognitive-device-input-provenance-v1 -> origin/feat/cognitive-device-input-provenance-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7566917Z  * [new branch]          feat/cognitive-library-pilot-catalog     -> origin/feat/cognitive-library-pilot-catalog
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7567824Z  * [new branch]          feat/cognitive-onboarding-gates          -> origin/feat/cognitive-onboarding-gates
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7568785Z  * [new branch]          feat/cognitive-onboarding-structure-20261028 -> origin/feat/cognitive-onboarding-structure-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7569756Z  * [new branch]          feat/cognitive-pilot-reference-v1        -> origin/feat/cognitive-pilot-reference-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7570654Z  * [new branch]          feat/cognitive-report-upgrade-local      -> origin/feat/cognitive-report-upgrade-local
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7571548Z  * [new branch]          feat/cognitive-review-fixes-local        -> origin/feat/cognitive-review-fixes-local
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7572733Z  * [new branch]          feat/cognitive-round2-pr16               -> origin/feat/cognitive-round2-pr16
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7574183Z  * [new branch]          feat/cognitive-scoring-plane-budget-v1   -> origin/feat/cognitive-scoring-plane-budget-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7575255Z  * [new branch]          feat/dot-cognitive-content-integration-20261028 -> origin/feat/dot-cognitive-content-integration-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7576616Z  * [new branch]          feat/education-authoring-p1-20261028     -> origin/feat/education-authoring-p1-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7577623Z  * [new branch]          feat/education-native-self-sources-20261029 -> origin/feat/education-native-self-sources-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7578838Z  * [new branch]          feat/education-observer-adapters-20261028 -> origin/feat/education-observer-adapters-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7579836Z  * [new branch]          feat/education-observer-composition-20261029 -> origin/feat/education-observer-composition-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7580865Z  * [new branch]          feat/education-observer-ui-mainline-20261029 -> origin/feat/education-observer-ui-mainline-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7581859Z  * [new branch]          feat/education-package-reference-20261029 -> origin/feat/education-package-reference-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7582818Z  * [new branch]          feat/education-package-runtime-20261029  -> origin/feat/education-package-runtime-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7583714Z  * [new branch]          feat/fe-01-product-ui-foundation         -> origin/feat/fe-01-product-ui-foundation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7584534Z  * [new branch]          feat/fe-02-app-shell                     -> origin/feat/fe-02-app-shell
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7585354Z  * [new branch]          feat/fe-03a-sealed-unit-submission       -> origin/feat/fe-03a-sealed-unit-submission
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7586698Z  * [new branch]          feat/fe-03b-required-video-completion    -> origin/feat/fe-03b-required-video-completion
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7587650Z  * [new branch]          feat/fe-03c-scale-reference-journey      -> origin/feat/fe-03c-scale-reference-journey
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7588547Z  * [new branch]          feat/fe-04-assessment-shell-v1           -> origin/feat/fe-04-assessment-shell-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7589423Z  * [new branch]          feat/huischool-a1-original-brand         -> origin/feat/huischool-a1-original-brand
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7590390Z  * [new branch]          feat/huischool-cognitive-composite-runner -> origin/feat/huischool-cognitive-composite-runner
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7591426Z  * [new branch]          feat/huischool-pr2-activities-assessment -> origin/feat/huischool-pr2-activities-assessment
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7592808Z  * [new branch]          feat/huischool-pr4-role-workflows        -> origin/feat/huischool-pr4-role-workflows
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7593780Z  * [new branch]          feat/huischool-pr5-scientific-reporting  -> origin/feat/huischool-pr5-scientific-reporting
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7594894Z  * [new branch]          feat/huiteacher-pr1-education-identity   -> origin/feat/huiteacher-pr1-education-identity
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7596169Z  * [new branch]          feat/instrument-final-submit-indexeddb   -> origin/feat/instrument-final-submit-indexeddb
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7597164Z  * [new branch]          feat/jdr-bat-report-language-20261030    -> origin/feat/jdr-bat-report-language-20261030
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7598086Z  * [new branch]          feat/jdr-talis-materials-20261030        -> origin/feat/jdr-talis-materials-20261030
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7598907Z  * [new branch]          feat/legacy-import                       -> origin/feat/legacy-import
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7599835Z  * [new branch]          feat/media-1-universal-assessment-image-core -> origin/feat/media-1-universal-assessment-image-core
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7600859Z  * [new branch]          feat/media-2-scale-form-image-adapter    -> origin/feat/media-2-scale-form-image-adapter
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7601807Z  * [new branch]          feat/media-3-cognitive-image-adapter     -> origin/feat/media-3-cognitive-image-adapter
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7602721Z  * [new branch]          feat/media-4-universal-video-core        -> origin/feat/media-4-universal-video-core
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7603657Z  * [new branch]          feat/media-5-situational-video-adapter   -> origin/feat/media-5-situational-video-adapter
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7604619Z  * [new branch]          feat/media-6-scale-form-video-adapter    -> origin/feat/media-6-scale-form-video-adapter
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7605876Z  * [new branch]          feat/media-7-cognitive-video-cross-runtime -> origin/feat/media-7-cognitive-video-cross-runtime
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7606872Z  * [new branch]          feat/mental-health-bundle-v1             -> origin/feat/mental-health-bundle-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7607962Z  * [new branch]          feat/modal-task-accessibility-closure    -> origin/feat/modal-task-accessibility-closure
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7608912Z  * [new branch]          feat/multi-role-delivery-inbox-pr2       -> origin/feat/multi-role-delivery-inbox-pr2
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7609782Z  * [new branch]          feat/org-01-identity-access              -> origin/feat/org-01-identity-access
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7610727Z  * [new branch]          feat/org-02-structure-run-orchestration  -> origin/feat/org-02-structure-run-orchestration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7611619Z  * [new branch]          feat/org-03-reporting-core               -> origin/feat/org-03-reporting-core
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7612520Z  * [new branch]          feat/org-04-longitudinal-feedback-safety -> origin/feat/org-04-longitudinal-feedback-safety
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7613458Z  * [new branch]          feat/org-05-product-integration          -> origin/feat/org-05-product-integration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7614429Z  * [new branch]          feat/org-05-product-integration-checkpoint -> origin/feat/org-05-product-integration-checkpoint
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7615461Z  * [new branch]          feat/org-05-product-integration-temp-check -> origin/feat/org-05-product-integration-temp-check
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7616784Z  * [new branch]          feat/pr363-education-feedback            -> origin/feat/pr363-education-feedback
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7617658Z  * [new branch]          feat/pr363-education-management          -> origin/feat/pr363-education-management
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7618574Z  * [new branch]          feat/pr363-education-marker-adapters     -> origin/feat/pr363-education-marker-adapters
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7619556Z  * [new branch]          feat/pr363-education-source-publication  -> origin/feat/pr363-education-source-publication
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7620634Z  * [new branch]          feat/pr363-teacher-runtime               -> origin/feat/pr363-teacher-runtime
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7621546Z  * [new branch]          feat/questionnaire-four-type-collection  -> origin/feat/questionnaire-four-type-collection
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7622522Z  * [new branch]          feat/ra-01-relational-assessment-core    -> origin/feat/ra-01-relational-assessment-core
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7623507Z  * [new branch]          feat/ra-02-relational-product-integration -> origin/feat/ra-02-relational-product-integration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7624490Z  * [new branch]          feat/report-privacy-preferences-pr1      -> origin/feat/report-privacy-preferences-pr1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7625796Z  * [new branch]          feat/report-privacy-preferences-pr2-huiteacher -> origin/feat/report-privacy-preferences-pr2-huiteacher
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7626956Z  * [new branch]          feat/report-privacy-preferences-pr3-huischool -> origin/feat/report-privacy-preferences-pr3-huischool
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7628052Z  * [new branch]          feat/reporting-analytics-backend-foundation -> origin/feat/reporting-analytics-backend-foundation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7629046Z  * [new branch]          feat/reporting-cohort-selector-v2        -> origin/feat/reporting-cohort-selector-v2
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7630007Z  * [new branch]          feat/result-disclosure-longitudinal-pr3  -> origin/feat/result-disclosure-longitudinal-pr3
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7630967Z  * [new branch]          feat/scale-assessment-v2-foundation      -> origin/feat/scale-assessment-v2-foundation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7631862Z  * [new branch]          feat/scale-library-catalog-v1            -> origin/feat/scale-library-catalog-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7632789Z  * [new branch]          feat/scale-library-pilot-governance-v1   -> origin/feat/scale-library-pilot-governance-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7633829Z  * [new branch]          feat/scale-library-wave0-mvp             -> origin/feat/scale-library-wave0-mvp
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7634701Z  * [new branch]          feat/scale-onboarding-closeout           -> origin/feat/scale-onboarding-closeout
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7635774Z  * [new branch]          feat/scale-onboarding-pr2                -> origin/feat/scale-onboarding-pr2
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7636816Z  * [new branch]          feat/scale-onboarding-pr3                -> origin/feat/scale-onboarding-pr3
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7637680Z  * [new branch]          feat/scale-onboarding-pr3-check          -> origin/feat/scale-onboarding-pr3-check
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7638550Z  * [new branch]          feat/scale-onboarding-pr4                -> origin/feat/scale-onboarding-pr4
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7639466Z  * [new branch]          feat/scale-response-device-provenance-v1 -> origin/feat/scale-response-device-provenance-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7640367Z  * [new branch]          feat/scale-wave1-content                 -> origin/feat/scale-wave1-content
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7641170Z  * [new branch]          feat/scale-wave1-governance              -> origin/feat/scale-wave1-governance
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7641978Z  * [new branch]          feat/scale-wave1-reports                 -> origin/feat/scale-wave1-reports
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7642874Z  * [new branch]          feat/scientific-maturity-research-ready  -> origin/feat/scientific-maturity-research-ready
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7643874Z  * [new branch]          feat/situational-bundle-integration-v1   -> origin/feat/situational-bundle-integration-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7644868Z  * [new branch]          feat/situational-runtime-text-pilot-v1   -> origin/feat/situational-runtime-text-pilot-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7646118Z  * [new branch]          feat/situational-standardized-vnext      -> origin/feat/situational-standardized-vnext
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7647074Z  * [new branch]          feat/situational-static-visual-v1        -> origin/feat/situational-static-visual-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7648001Z  * [new branch]          feat/situational-text-pilot-product-v1   -> origin/feat/situational-text-pilot-product-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7648907Z  * [new branch]          feat/situational-v1-domain               -> origin/feat/situational-v1-domain
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7650073Z  * [new branch]          feat/situational-v2-a-branch-graph-contract -> origin/feat/situational-v2-a-branch-graph-contract
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7651140Z  * [new branch]          feat/situational-v2-b-branch-traversal-draft -> origin/feat/situational-v2-b-branch-traversal-draft
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7652316Z  * [new branch]          feat/situational-v2-c-authoritative-trajectory-final -> origin/feat/situational-v2-c-authoritative-trajectory-final
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7653466Z  * [new branch]          feat/situational-v2-d-diagnostic-multiround -> origin/feat/situational-v2-d-diagnostic-multiround
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7654424Z  * [new branch]          feat/sjt-scientific-governance           -> origin/feat/sjt-scientific-governance
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7655278Z  * [new branch]          feat/sjt-zero-core-onboarding            -> origin/feat/sjt-zero-core-onboarding
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7656508Z  * [new branch]          feat/staff-experience-upgrade            -> origin/feat/staff-experience-upgrade
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7657435Z  * [new branch]          feat/survey-flow-experiment-20261011     -> origin/feat/survey-flow-experiment-20261011
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7658404Z  * [new branch]          feat/survey-form-correctness-20261011    -> origin/feat/survey-form-correctness-20261011
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7659390Z  * [new branch]          feat/survey-form-professional-20261011   -> origin/feat/survey-form-professional-20261011
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7660381Z  * [new branch]          feat/survey-research-operations-20261011 -> origin/feat/survey-research-operations-20261011
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7661333Z  * [new branch]          feat/survey-research-platform-v1         -> origin/feat/survey-research-platform-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7662216Z  * [new branch]          feat/survey-timed-scale-20261012         -> origin/feat/survey-timed-scale-20261012
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7663098Z  * [new branch]          feat/survey-v12-research-closeout        -> origin/feat/survey-v12-research-closeout
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7664093Z  * [new branch]          feat/teacher-expert-public-sources-20261029 -> origin/feat/teacher-expert-public-sources-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7665350Z  * [new branch]          feat/teacher-expert-questionnaires-20261029 -> origin/feat/teacher-expert-questionnaires-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7666804Z  * [new branch]          feat/teacher-student-questionnaires-20261029 -> origin/feat/teacher-student-questionnaires-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7667777Z  * [new branch]          feat/training-admin-governance           -> origin/feat/training-admin-governance
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7668697Z  * [new branch]          feat/training-copy-publish-20261018      -> origin/feat/training-copy-publish-20261018
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7669566Z  * [new branch]          feat/training-course-flow                -> origin/feat/training-course-flow
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7670433Z  * [new branch]          feat/training-form-optional-20261018     -> origin/feat/training-form-optional-20261018
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7671354Z  * [new branch]          feat/training-home-copy-20261011         -> origin/feat/training-home-copy-20261011
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7672367Z  * [new branch]          feat/training-home-huisurvey-landscape-20261009 -> origin/feat/training-home-huisurvey-landscape-20261009
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7673428Z  * [new branch]          feat/training-paper-ink-entry            -> origin/feat/training-paper-ink-entry
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7674339Z  * [new branch]          feat/training-unified-entry-20261011     -> origin/feat/training-unified-entry-20261011
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7675266Z  * [new branch]          feat/unified-runtime-v32-4-boundary      -> origin/feat/unified-runtime-v32-4-boundary
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7676517Z  * [new branch]          feat/unified-runtime-v32-governance      -> origin/feat/unified-runtime-v32-governance
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7677407Z  * [new branch]          feat/ux-reading-refinement               -> origin/feat/ux-reading-refinement
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7678413Z  * [new branch]          feature/cognitive-core                   -> origin/feature/cognitive-core
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7679213Z  * [new branch]          feature/cognitive-export                 -> origin/feature/cognitive-export
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7680027Z  * [new branch]          feature/cognitive-reaction               -> origin/feature/cognitive-reaction
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7680826Z  * [new branch]          feature/cognitive-runner                 -> origin/feature/cognitive-runner
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7681647Z  * [new branch]          feature/composite-assessment             -> origin/feature/composite-assessment
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7682459Z  * [new branch]          feature/docker-baseline                  -> origin/feature/docker-baseline
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7683324Z  * [new branch]          feature/unified-assessment-bundle-v1     -> origin/feature/unified-assessment-bundle-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7684239Z  * [new branch]          fix/admin-entry-origins-20261017         -> origin/fix/admin-entry-origins-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7685154Z  * [new branch]          fix/aggregate-report-postgres-flake      -> origin/fix/aggregate-report-postgres-flake
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7686571Z  * [new branch]          fix/assessment-runtime-consistency-pr25  -> origin/fix/assessment-runtime-consistency-pr25
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7687492Z  * [new branch]          fix/backup-tcp-readiness                 -> origin/fix/backup-tcp-readiness
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7688302Z  * [new branch]          fix/ci-runner-stability-v2               -> origin/fix/ci-runner-stability-v2
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7689085Z  * [new branch]          fix/ci-two-host-lanes                    -> origin/fix/ci-two-host-lanes
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7689942Z  * [new branch]          fix/code-review-remediation-20260826     -> origin/fix/code-review-remediation-20260826
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7690914Z  * [new branch]          fix/cognitive-report-content-completion  -> origin/fix/cognitive-report-content-completion
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7691852Z  * [new branch]          fix/cos-metadata-scan-20261009           -> origin/fix/cos-metadata-scan-20261009
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7692706Z  * [new branch]          fix/dependency-audit-20261006            -> origin/fix/dependency-audit-20261006
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7693818Z  * [new branch]          fix/dot-teacher-durable-resume-20261029  -> origin/fix/dot-teacher-durable-resume-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7694769Z  * [new branch]          fix/education-draft-review-20261030      -> origin/fix/education-draft-review-20261030
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7696133Z  * [new branch]          fix/education-observer-journeys-20261028 -> origin/fix/education-observer-journeys-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7697217Z  * [new branch]          fix/education-resource-pagination-20261028 -> origin/fix/education-resource-pagination-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7698214Z  * [new branch]          fix/education-workflow-simplification    -> origin/fix/education-workflow-simplification
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7699297Z  * [new branch]          fix/four-entrances-account-survey-session-20261014 -> origin/fix/four-entrances-account-survey-session-20261014
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7700371Z  * [new branch]          fix/four-entry-scale-probe-20261028      -> origin/fix/four-entry-scale-probe-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7701272Z  * [new branch]          fix/frontend-eslint-baseline             -> origin/fix/frontend-eslint-baseline
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7702190Z  * [new branch]          fix/frontend-notification-test-teardown  -> origin/fix/frontend-notification-test-teardown
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7703132Z  * [new branch]          fix/frontend-typecheck-cleanup           -> origin/fix/frontend-typecheck-cleanup
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7704029Z  * [new branch]          fix/grant-loading-and-legacy-modals      -> origin/fix/grant-loading-and-legacy-modals
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7705018Z  * [new branch]          fix/huischool-cognitive-auth-privacy-final -> origin/fix/huischool-cognitive-auth-privacy-final
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7706234Z  * [new branch]          fix/huischool-cross-analysis-differencing -> origin/fix/huischool-cross-analysis-differencing
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7707501Z  * [new branch]          fix/huischool-local-account-boundaries-20261011 -> origin/fix/huischool-local-account-boundaries-20261011
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7708696Z  * [new branch]          fix/huischool-student-longitudinal-science-embargo -> origin/fix/huischool-student-longitudinal-science-embargo
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7709723Z  * [new branch]          fix/huisurvey-pr1-pr2-review             -> origin/fix/huisurvey-pr1-pr2-review
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7710619Z  * [new branch]          fix/material-questionnaire-recovery      -> origin/fix/material-questionnaire-recovery
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7711530Z  * [new branch]          fix/native-main-parents-20261029         -> origin/fix/native-main-parents-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7712350Z  * [new branch]          fix/ops-backfill-exit                    -> origin/fix/ops-backfill-exit
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7713250Z  * [new branch]          fix/ops-supported-runtime-bounded-workers -> origin/fix/ops-supported-runtime-bounded-workers
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7714209Z  * [new branch]          fix/organization-parent-portal           -> origin/fix/organization-parent-portal
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7715145Z  * [new branch]          fix/pdf-worker-mime-20261003             -> origin/fix/pdf-worker-mime-20261003
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7716387Z  * [new branch]          fix/post-merge-consistency-pr26          -> origin/fix/post-merge-consistency-pr26
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7717290Z  * [new branch]          fix/post-merge-review-20260827           -> origin/fix/post-merge-review-20260827
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7718230Z  * [new branch]          fix/post356-reference-kind-picker-20261027 -> origin/fix/post356-reference-kind-picker-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7719179Z  * [new branch]          fix/post358-shallow-ci-20261027          -> origin/fix/post358-shallow-ci-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7719994Z  * [new branch]          fix/postlaunch-security                  -> origin/fix/postlaunch-security
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7720857Z  * [new branch]          fix/pr202-ux-cleanup-current-main        -> origin/fix/pr202-ux-cleanup-current-main
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7721925Z  * [new branch]          fix/pr5-browser-ci-stability             -> origin/fix/pr5-browser-ci-stability
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7722762Z  * [new branch]          fix/pr5-response-body-race               -> origin/fix/pr5-response-body-race
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7723613Z  * [new branch]          fix/prelaunch-security-closure           -> origin/fix/prelaunch-security-closure
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7724545Z  * [new branch]          fix/prelaunch-ux-deployment-closure      -> origin/fix/prelaunch-ux-deployment-closure
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7725859Z  * [new branch]          fix/product-entry-legacy-auth-boundary-20261014 -> origin/fix/product-entry-legacy-auth-boundary-20261014
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7726931Z  * [new branch]          fix/production-security-hardening        -> origin/fix/production-security-hardening
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7727852Z  * [new branch]          fix/qa-round2-course-organization        -> origin/fix/qa-round2-course-organization
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7728769Z  * [new branch]          fix/qa-round3-assessment-data-loop       -> origin/fix/qa-round3-assessment-data-loop
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7729623Z  * [new branch]          fix/r5-assessment-repair                 -> origin/fix/r5-assessment-repair
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7730475Z  * [new branch]          fix/ra-01-consent-binding-authority      -> origin/fix/ra-01-consent-binding-authority
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7731334Z  * [new branch]          fix/release-gate-20260829                -> origin/fix/release-gate-20260829
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7732137Z  * [new branch]          fix/release-hardening-pr27               -> origin/fix/release-hardening-pr27
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7733023Z  * [new branch]          fix/release-hardening-review-20260828    -> origin/fix/release-hardening-review-20260828
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7734008Z  * [new branch]          fix/release-security-functional-20260830 -> origin/fix/release-security-functional-20260830
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7735147Z  * [new branch]          fix/release-verify-integration-env       -> origin/fix/release-verify-integration-env
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7736520Z  * [new branch]          fix/report-privacy-lenient-cross-release-20261013 -> origin/fix/report-privacy-lenient-cross-release-20261013
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7737627Z  * [new branch]          fix/reporting-runtime-privacy-hardening  -> origin/fix/reporting-runtime-privacy-hardening
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7738635Z  * [new branch]          fix/reporting-security-query-efficiency  -> origin/fix/reporting-security-query-efficiency
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7739639Z  * [new branch]          fix/runtime-time-and-validation-20261025 -> origin/fix/runtime-time-and-validation-20261025
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7740527Z  * [new branch]          fix/scale-auto-advance                   -> origin/fix/scale-auto-advance
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7741442Z  * [new branch]          fix/scale-onboarding-extensible-regression -> origin/fix/scale-onboarding-extensible-regression
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7742445Z  * [new branch]          fix/scale-onboarding-wave0-test-scope    -> origin/fix/scale-onboarding-wave0-test-scope
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7743428Z  * [new branch]          fix/security-authorization-boundary-pr24 -> origin/fix/security-authorization-boundary-pr24
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7744428Z  * [new branch]          fix/shared-assessment-foundation-20261017 -> origin/fix/shared-assessment-foundation-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7745488Z  * [new branch]          fix/shared-assessment-foundation-merge-20261017 -> origin/fix/shared-assessment-foundation-merge-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7746880Z  * [new branch]          fix/student-registration-course-verification -> origin/fix/student-registration-course-verification
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7747977Z  * [new branch]          fix/survey-checkpoint-export-paging-20261012 -> origin/fix/survey-checkpoint-export-paging-20261012
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7749013Z  * [new branch]          fix/survey-form-summary-parity-20261017  -> origin/fix/survey-form-summary-parity-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7749994Z  * [new branch]          fix/survey-governance-followup-20261025  -> origin/fix/survey-governance-followup-20261025
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7751115Z  * [new branch]          fix/survey-pr281-review-stage-20261012   -> origin/fix/survey-pr281-review-stage-20261012
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7752125Z  * [new branch]          fix/survey-pr282-debian-ca-bootstrap-20261012 -> origin/fix/survey-pr282-debian-ca-bootstrap-20261012
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7753142Z  * [new branch]          fix/survey-pr282-debian-https-20261012   -> origin/fix/survey-pr282-debian-https-20261012
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7754077Z  * [new branch]          fix/survey-pr282-review-stage-20261012   -> origin/fix/survey-pr282-review-stage-20261012
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7755049Z  * [new branch]          fix/survey-prototype-key-timing-20261012 -> origin/fix/survey-prototype-key-timing-20261012
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7756251Z  * [new branch]          fix/survey-storage-export-roundtrip-20261017 -> origin/fix/survey-storage-export-roundtrip-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7757227Z  * [new branch]          fix/survey-v1-contract-closeout          -> origin/fix/survey-v1-contract-closeout
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7758090Z  * [new branch]          fix/survey-v11-minimal-closeout          -> origin/fix/survey-v11-minimal-closeout
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7759028Z  * [new branch]          fix/survey-wave-content-selection-20261021 -> origin/fix/survey-wave-content-selection-20261021
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7760016Z  * [new branch]          fix/teacher-course-detail-loading        -> origin/fix/teacher-course-detail-loading
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7760952Z  * [new branch]          fix/teacher-student-start-proof-20261029 -> origin/fix/teacher-student-start-proof-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7761924Z  * [new branch]          fix/training-course-pagination-20261021  -> origin/fix/training-course-pagination-20261021
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7762880Z  * [new branch]          fix/training-release-contrast-20261009   -> origin/fix/training-release-contrast-20261009
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7763954Z  * [new branch]          fix/training-workflow-round1-20261017    -> origin/fix/training-workflow-round1-20261017
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7764877Z  * [new branch]          fix/visual-interaction-consistency       -> origin/fix/visual-interaction-consistency
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7765987Z  * [new branch]          fix/web-acceptance-20261003              -> origin/fix/web-acceptance-20261003
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7766918Z  * [new branch]          frontend/product-convergence-scale-slice -> origin/frontend/product-convergence-scale-slice
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7767790Z  * [new branch]          harden/production-csp                    -> origin/harden/production-csp
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7768475Z  * [new branch]          ignore-me                                -> origin/ignore-me
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7769161Z  * [new branch]          import/server-version                    -> origin/import/server-version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7770004Z  * [new branch]          integration/cognitive-onboarding-main    -> origin/integration/cognitive-onboarding-main
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7770905Z  * [new branch]          integration/mot-pr356-20261026           -> origin/integration/mot-pr356-20261026
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7771769Z  * [new branch]          integration/scale-26-b0-main-20261028    -> origin/integration/scale-26-b0-main-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7772688Z  * [new branch]          integration/scale-26-candidate-20261028  -> origin/integration/scale-26-candidate-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7773601Z  * [new branch]          integration/scale-onboarding-main        -> origin/integration/scale-onboarding-main
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7774474Z  * [new branch]          local/huischool-a1-home-20261010         -> origin/local/huischool-a1-home-20261010
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7775311Z  * [new branch]          local/huisurvey-home-20261013            -> origin/local/huisurvey-home-20261013
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7776426Z  * [new branch]          local/huiteacher-journal-20261013        -> origin/local/huiteacher-journal-20261013
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7777164Z  * [new branch]          main                                     -> origin/main
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7778081Z  * [new branch]          ops/attachment-backup-tasks              -> origin/ops/attachment-backup-tasks
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7778932Z  * [new branch]          ops/backup-automation-20261006           -> origin/ops/backup-automation-20261006
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7779791Z  * [new branch]          ops/backup-space-upgrade-20261013        -> origin/ops/backup-space-upgrade-20261013
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7780689Z  * [new branch]          ops/cos-protected-cleanup-20261006       -> origin/ops/cos-protected-cleanup-20261006
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7781575Z  * [new branch]          ops/joint-recovery-proof-20261006        -> origin/ops/joint-recovery-proof-20261006
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7782421Z  * [new branch]          ops/recovery-import-summary              -> origin/ops/recovery-import-summary
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7783226Z  * [new branch]          ops/safe-host-monitoring                 -> origin/ops/safe-host-monitoring
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7784151Z  * [new branch]          perf/assessment-tail-latency-observability -> origin/perf/assessment-tail-latency-observability
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7785103Z  * [new branch]          perf/ci-browser-build-handoff            -> origin/perf/ci-browser-build-handoff
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7786250Z  * [new branch]          perf/ci-runner-local-caches              -> origin/perf/ci-runner-local-caches
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7787109Z  * [new branch]          perf/four-entry-feedback-20261027        -> origin/perf/four-entry-feedback-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7788059Z  * [new branch]          perf/four-entry-feedback-baseline-20261028 -> origin/perf/four-entry-feedback-baseline-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7789045Z  * [new branch]          perf/four-entry-first-feedback-20261028  -> origin/perf/four-entry-first-feedback-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7789998Z  * [new branch]          perf/four-entry-page-loading-20261028    -> origin/perf/four-entry-page-loading-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7791297Z  * [new branch]          perf/four-entry-page-loading-implementation-20261028 -> origin/perf/four-entry-page-loading-implementation-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7792363Z  * [new branch]          perf/four-entry-postlogin-20261028       -> origin/perf/four-entry-postlogin-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7793267Z  * [new branch]          perf/four-entry-runtime-next-20261028    -> origin/perf/four-entry-runtime-next-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7794186Z  * [new branch]          perf/four-entry-shared-path-20261027     -> origin/perf/four-entry-shared-path-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7795122Z  * [new branch]          perf/four-entry-storage-ledger-20261028  -> origin/perf/four-entry-storage-ledger-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7796291Z  * [new branch]          perf/four-entry-storage-observation-20261028 -> origin/perf/four-entry-storage-observation-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7797305Z  * [new branch]          perf/frontend-startup-catalog-20261021   -> origin/perf/frontend-startup-catalog-20261021
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7798275Z  * [new branch]          perf/gate-e-public-limiter-and-capacity  -> origin/perf/gate-e-public-limiter-and-capacity
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7799299Z  * [new branch]          perf/isolate-background-workers-from-submit -> origin/perf/isolate-background-workers-from-submit
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7800327Z  * [new branch]          perf/login-worker-pool                   -> origin/perf/login-worker-pool
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7801135Z  * [new branch]          perf/measurement-baseline-v1             -> origin/perf/measurement-baseline-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7801949Z  * [new branch]          perf/o1-form-strict-hot-path             -> origin/perf/o1-form-strict-hot-path
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7802790Z  * [new branch]          perf/o2-cognitive-frozen-identity        -> origin/perf/o2-cognitive-frozen-identity
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7803698Z  * [new branch]          perf/o3-aggregate-read-normalization     -> origin/perf/o3-aggregate-read-normalization
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7804615Z  * [new branch]          perf/o4-complete-load-once-dispatch      -> origin/perf/o4-complete-load-once-dispatch
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7805977Z  * [new branch]          perf/post-work-c-calibration             -> origin/perf/post-work-c-calibration
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7806911Z  * [new branch]          perf/postlaunch-query-and-proxy          -> origin/perf/postlaunch-query-and-proxy
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7807806Z  * [new branch]          perf/pr39-finalization-convergence       -> origin/perf/pr39-finalization-convergence
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7808691Z  * [new branch]          perf/prelaunch-heavy-work-closure        -> origin/perf/prelaunch-heavy-work-closure
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7809579Z  * [new branch]          perf/profile-assessment-hot-path         -> origin/perf/profile-assessment-hot-path
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7810539Z  * [new branch]          perf/questionnaire-completion-finalization -> origin/perf/questionnaire-completion-finalization
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7811601Z  * [new branch]          perf/questionnaire-form-answer-bulk-mutation -> origin/perf/questionnaire-form-answer-bulk-mutation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7812632Z  * [new branch]          perf/questionnaire-form-answer-true-batch -> origin/perf/questionnaire-form-answer-true-batch
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7813569Z  * [new branch]          perf/questionnaire-start-burst           -> origin/perf/questionnaire-start-burst
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7814378Z  * [new branch]          perf/runtime-hotpath-v1                  -> origin/perf/runtime-hotpath-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7815318Z  * [new branch]          perf/runtime-prelaunch-serialization-reporting -> origin/perf/runtime-prelaunch-serialization-reporting
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7816685Z  * [new branch]          perf/stage1r-fixture-repair              -> origin/perf/stage1r-fixture-repair
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7817612Z  * [new branch]          perf/submission-persistence-optimization -> origin/perf/submission-persistence-optimization
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7818504Z  * [new branch]          perf/survey-entry-20261024               -> origin/perf/survey-entry-20261024
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7819509Z  * [new branch]          perf/training-entry-20261023             -> origin/perf/training-entry-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7820389Z  * [new branch]          perf/training-load-followup-20261020     -> origin/perf/training-load-followup-20261020
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7821286Z  * [new branch]          perf/training-survey-core-20261024       -> origin/perf/training-survey-core-20261024
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7822249Z  * [new branch]          perf/v32-capacity-reconciliation-hardening -> origin/perf/v32-capacity-reconciliation-hardening
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7823188Z  * [new branch]          public-library/cognitive-20261022        -> origin/public-library/cognitive-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7824034Z  * [new branch]          public-library/scales-20261022           -> origin/public-library/scales-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7824834Z  * [new branch]          public-library/sjt-20261022              -> origin/public-library/sjt-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7825899Z  * [new branch]          rebase-fe-06-on-3a654229                 -> origin/rebase-fe-06-on-3a654229
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7826767Z  * [new branch]          recovery/training-rebuild-20261018       -> origin/recovery/training-rebuild-20261018
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7827738Z  * [new branch]          refactor/assessment-qualification-governance -> origin/refactor/assessment-qualification-governance
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7828760Z  * [new branch]          refactor/cognitive-onboarding-hardening  -> origin/refactor/cognitive-onboarding-hardening
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7829757Z  * [new branch]          refactor/cognitive-release-single-truth  -> origin/refactor/cognitive-release-single-truth
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7830856Z  * [new branch]          refactor/cognitive-scientific-maturity-orthogonality -> origin/refactor/cognitive-scientific-maturity-orthogonality
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7831994Z  * [new branch]          refactor/cognitive-task-owned-onboarding-pr1 -> origin/refactor/cognitive-task-owned-onboarding-pr1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7832966Z  * [new branch]          refactor/cognitive-task-packages         -> origin/refactor/cognitive-task-packages
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7834067Z  * [new branch]          refactor/scale-onboarding-pr1            -> origin/refactor/scale-onboarding-pr1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7834964Z  * [new branch]          refactor/unified-runtime-v32-aggregate   -> origin/refactor/unified-runtime-v32-aggregate
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7836044Z  * [new branch]          refactor/unified-runtime-v32-unit        -> origin/refactor/unified-runtime-v32-unit
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7836992Z  * [new branch]          release/cognitive-round2-pilot-promotion -> origin/release/cognitive-round2-pilot-promotion
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7837907Z  * [new branch]          release/dbt-wccl59-v1-0-2-20261027       -> origin/release/dbt-wccl59-v1-0-2-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7838834Z  * [new branch]          release/education-observer-native-20261029 -> origin/release/education-observer-native-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7839856Z  * [new branch]          release/education-self-scale-form-20261028 -> origin/release/education-self-scale-form-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7840770Z  * [new branch]          release/flanker-publish-prep             -> origin/release/flanker-publish-prep
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7841648Z  * [new branch]          release/patterncompare-publish-prep      -> origin/release/patterncompare-publish-prep
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7842562Z  * [new branch]          release/training-functional-20261020     -> origin/release/training-functional-20261020
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7843367Z  * [new branch]          release/v1.0.0                           -> origin/release/v1.0.0
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7844216Z  * [new branch]          rescue/pr363-education-markers-wip-20261027 -> origin/rescue/pr363-education-markers-wip-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7845204Z  * [new branch]          review/education-authoring-gaps-20261028 -> origin/review/education-authoring-gaps-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7846752Z  * [new branch]          scale-library-structure-20261027         -> origin/scale-library-structure-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7847643Z  * [new branch]          scale/zh-cn-sdq-texi-draft               -> origin/scale/zh-cn-sdq-texi-draft
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7848412Z  * [new branch]          screen-use-20261030                      -> origin/screen-use-20261030
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7849284Z  * [new branch]          security/classroom-production-hardening  -> origin/security/classroom-production-hardening
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7850215Z  * [new branch]          staging/media-2-finalize-20260910        -> origin/staging/media-2-finalize-20260910
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7851089Z  * [new branch]          survey-cloud-flow-visual-20261022        -> origin/survey-cloud-flow-visual-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7851951Z  * [new branch]          survey/mac-visual-s01-20261019           -> origin/survey/mac-visual-s01-20261019
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7852910Z  * [new branch]          task1-precise-authorization-contract-20261029 -> origin/task1-precise-authorization-contract-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7853973Z  * [new branch]          task1-scale-exact-authorization-20261029 -> origin/task1-scale-exact-authorization-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7854890Z  * [new branch]          test/pr363-four-entry-coverage           -> origin/test/pr363-four-entry-coverage
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7856216Z  * [new branch]          test/scientific-maturity-qualification-invariant -> origin/test/scientific-maturity-qualification-invariant
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7857327Z  * [new branch]          test/situational-v2-e-branching-acceptance -> origin/test/situational-v2-e-branching-acceptance
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7858268Z  * [new branch]          test/visual-qa-canonical-screens         -> origin/test/visual-qa-canonical-screens
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7859007Z  * [new branch]          tmp-noop                                 -> origin/tmp-noop
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7859735Z  * [new branch]          tmp-noop-pr3                             -> origin/tmp-noop-pr3
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7860405Z  * [new branch]          tmp/ra-c3-base                           -> origin/tmp/ra-c3-base
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7861056Z  * [new branch]          tmp/ra-c4-base                           -> origin/tmp/ra-c4-base
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7861972Z  * [new branch]          tmp/ra-c5-base                           -> origin/tmp/ra-c5-base
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7862617Z  * [new branch]          tmp/ra-c6-base                           -> origin/tmp/ra-c6-base
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7863256Z  * [new branch]          tmp/ra-c7-base                           -> origin/tmp/ra-c7-base
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7863931Z  * [new branch]          tmp/ra-fix-build-1                       -> origin/tmp/ra-fix-build-1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7864716Z  * [new branch]          tool-onboarding-next-20261025            -> origin/tool-onboarding-next-20261025
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7865481Z  * [new branch]          trae/agent-o8kbT2                        -> origin/trae/agent-o8kbT2
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7866645Z  * [new branch]          validation/cognitive-onboarding-pr1      -> origin/validation/cognitive-onboarding-pr1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7867542Z  * [new branch]          validation/flanker-publish-prep          -> origin/validation/flanker-publish-prep
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7868398Z  * [new branch]          validation/scale-26-a-20261028           -> origin/validation/scale-26-a-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7869243Z  * [new branch]          validation/scale-26-a-r2-20261028        -> origin/validation/scale-26-a-r2-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7870080Z  * [new branch]          validation/scale-26-a-r3-20261028        -> origin/validation/scale-26-a-r3-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7870928Z  * [new branch]          validation/scale-onboarding-pr2          -> origin/validation/scale-onboarding-pr2
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7871780Z  * [new branch]          validation/scale-onboarding-pr3          -> origin/validation/scale-onboarding-pr3
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7872617Z  * [new branch]          validation/scale-onboarding-pr4          -> origin/validation/scale-onboarding-pr4
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7873748Z  * [new branch]          validation/scale26-actionlint-20261029   -> origin/validation/scale26-actionlint-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7874677Z  * [new branch]          validation/scale26-b0-router-20261028    -> origin/validation/scale26-b0-router-20261028
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7875829Z  * [new branch]          validation/scale26-intake-light-20261029 -> origin/validation/scale26-intake-light-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7876807Z  * [new branch]          validation/scale26-official-lane-20261029 -> origin/validation/scale26-official-lane-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7877777Z  * [new branch]          validation/scale26-reusable-smoke-20261029 -> origin/validation/scale26-reusable-smoke-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7878675Z  * [new branch]          work-c-hotpath-convergence               -> origin/work-c-hotpath-convergence
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7879557Z  * [new branch]          work/admin-authenticator-main-20261022   -> origin/work/admin-authenticator-main-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7880486Z  * [new branch]          work/composite-csv-memory-20261021       -> origin/work/composite-csv-memory-20261021
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7881326Z  * [new branch]          work/ipip50-ready-20261023               -> origin/work/ipip50-ready-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7882184Z  * [new branch]          work/library-management-next-20261025    -> origin/work/library-management-next-20261025
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7883120Z  * [new branch]          work/measurement-version-final-20261020  -> origin/work/measurement-version-final-20261020
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7884037Z  * [new branch]          work/participant-access-20261023         -> origin/work/participant-access-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7884937Z  * [new branch]          work/scale-authoring-feedback-20261021   -> origin/work/scale-authoring-feedback-20261021
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7886189Z  * [new branch]          work/scale-library-governance-20261021   -> origin/work/scale-library-governance-20261021
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7887170Z  * [new branch]          work/scale-test-anxiety-intake-20261029  -> origin/work/scale-test-anxiety-intake-20261029
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7888141Z  * [new branch]          work/school-teacher-consolidated-20261027 -> origin/work/school-teacher-consolidated-20261027
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7889377Z  * [new branch]          work/school-teacher-main-integration-20261022 -> origin/work/school-teacher-main-integration-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7890356Z  * [new branch]          work/school-teacher-review-20261022      -> origin/work/school-teacher-review-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7891251Z  * [new branch]          work/school-teacher-visual-20261023      -> origin/work/school-teacher-visual-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7892179Z  * [new branch]          work/shared-assessment-authoring-20261023 -> origin/work/shared-assessment-authoring-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7893189Z  * [new branch]          work/survey-assessment-performance-20261024 -> origin/work/survey-assessment-performance-20261024
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7894251Z  * [new branch]          work/survey-cognitive-protocol-simon-20261023 -> origin/work/survey-cognitive-protocol-simon-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7895217Z  * [new branch]          work/survey-experience-20261022          -> origin/work/survey-experience-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7896412Z  * [new branch]          work/survey-governance-20261025          -> origin/work/survey-governance-20261025
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7897319Z  * [new branch]          work/survey-manual-acceptance-20261023   -> origin/work/survey-manual-acceptance-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7898188Z  * [new branch]          work/survey-review-20261024              -> origin/work/survey-review-20261024
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7899061Z  * [new branch]          work/survey-training-branding-20261023   -> origin/work/survey-training-branding-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7899938Z  * [new branch]          work/survey-visual-20261022              -> origin/work/survey-visual-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7900770Z  * [new branch]          work/training-appearance-20261022        -> origin/work/training-appearance-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7901939Z  * [new branch]          work/training-assessment-performance-20261023 -> origin/work/training-assessment-performance-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7903005Z  * [new branch]          work/training-followup-integrated-20261022 -> origin/work/training-followup-integrated-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7903962Z  * [new branch]          work/training-mac-ui-final-20261020      -> origin/work/training-mac-ui-final-20261020
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7904893Z  * [new branch]          work/training-manual-acceptance-20261023 -> origin/work/training-manual-acceptance-20261023
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7906118Z  * [new branch]          work/training-miniprogram-native-20261022 -> origin/work/training-miniprogram-native-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7907058Z  * [new branch]          work/training-student-20261022           -> origin/work/training-student-20261022
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7907946Z  * [new branch]          work/training-survey-capacity-20261024   -> origin/work/training-survey-capacity-20261024
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7908841Z  * [new tag]             archive/chore/mainline-development       -> archive/chore/mainline-development
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7909547Z  * [new tag]             archive/dev                              -> archive/dev
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7910356Z  * [new tag]             archive/feat/cognitive-assessment-v2-foundation -> archive/feat/cognitive-assessment-v2-foundation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7911280Z  * [new tag]             archive/feat/cognitive-round2-pr16       -> archive/feat/cognitive-round2-pr16
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7912161Z  * [new tag]             archive/feat/scale-assessment-v2-foundation -> archive/feat/scale-assessment-v2-foundation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7913006Z  * [new tag]             archive/feature/cognitive-core           -> archive/feature/cognitive-core
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7913802Z  * [new tag]             archive/feature/cognitive-runner         -> archive/feature/cognitive-runner
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7914612Z  * [new tag]             archive/feature/composite-assessment     -> archive/feature/composite-assessment
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7915418Z  * [new tag]             archive/feature/docker-baseline          -> archive/feature/docker-baseline
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7916673Z  * [new tag]             archive/fix/assessment-runtime-consistency-pr25 -> archive/fix/assessment-runtime-consistency-pr25
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7917667Z  * [new tag]             archive/fix/code-review-remediation-20260826 -> archive/fix/code-review-remediation-20260826
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7918560Z  * [new tag]             archive/fix/frontend-eslint-baseline     -> archive/fix/frontend-eslint-baseline
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7919424Z  * [new tag]             archive/fix/frontend-typecheck-cleanup   -> archive/fix/frontend-typecheck-cleanup
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7920392Z  * [new tag]             archive/fix/post-merge-consistency-pr26  -> archive/fix/post-merge-consistency-pr26
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7921256Z  * [new tag]             archive/fix/post-merge-review-20260827   -> archive/fix/post-merge-review-20260827
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7922145Z  * [new tag]             archive/fix/production-security-hardening -> archive/fix/production-security-hardening
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7922995Z  * [new tag]             archive/fix/release-gate-20260829        -> archive/fix/release-gate-20260829
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7923792Z  * [new tag]             archive/fix/release-hardening-pr27       -> archive/fix/release-hardening-pr27
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7924684Z  * [new tag]             archive/fix/release-hardening-review-20260828 -> archive/fix/release-hardening-review-20260828
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7925843Z  * [new tag]             archive/fix/release-security-functional-20260830 -> archive/fix/release-security-functional-20260830
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7926743Z  * [new tag]             archive/fix/scale-auto-advance           -> archive/fix/scale-auto-advance
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7927648Z  * [new tag]             archive/fix/security-authorization-boundary-pr24 -> archive/fix/security-authorization-boundary-pr24
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7928713Z  * [new tag]             archive/import/server-version            -> archive/import/server-version
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7929686Z  * [new tag]             archive/perf/assessment-tail-latency-observability-pr35 -> archive/perf/assessment-tail-latency-observability-pr35
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7930772Z  * [new tag]             archive/perf/instrument-final-submit-indexeddb -> archive/perf/instrument-final-submit-indexeddb
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7931884Z  * [new tag]             archive/perf/questionnaire-completion-finalization-pr36 -> archive/perf/questionnaire-completion-finalization-pr36
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7933031Z  * [new tag]             archive/perf/questionnaire-form-answer-bulk-mutation -> archive/perf/questionnaire-form-answer-bulk-mutation
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7934061Z  * [new tag]             archive/perf/questionnaire-start-burst-pr37 -> archive/perf/questionnaire-start-burst-pr37
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7935059Z  * [new tag]             archive/perf/submission-persistence-optimization -> archive/perf/submission-persistence-optimization
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7936562Z  * [new tag]             archive/refactor-cognitive-phase1-phase2-optimization-20260829 -> archive/refactor-cognitive-phase1-phase2-optimization-20260829
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7937764Z  * [new tag]             archive/security/classroom-production-hardening -> archive/security/classroom-production-hardening
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7938643Z  * [new tag]             cognitive-backend-core-v1                -> cognitive-backend-core-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7939344Z  * [new tag]             docker-baseline-v1                       -> docker-baseline-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7939982Z  * [new tag]             host-baseline-v1                         -> host-baseline-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7940617Z  * [new tag]             local-baseline-v1                        -> local-baseline-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7941296Z  * [new tag]             main-before-dev-20260826                 -> main-before-dev-20260826
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7941994Z  * [new tag]             release-20261004-pr233                   -> release-20261004-pr233
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7942859Z  * [new tag]             release-20261005-pr234                   -> release-20261005-pr234
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7943573Z  * [new tag]             upstream-eduk12-server-v1                -> upstream-eduk12-server-v1
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7944209Z  * [new tag]             v1.0.0                                   -> v1.0.0
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7944808Z  * [new ref]             e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6 -> pull/395/merge
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7947033Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7947603Z ##[group]Determining the checkout info
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7948201Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7948579Z [command]/usr/bin/git sparse-checkout disable
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7949715Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7950922Z ##[group]Checking out the ref
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:56.7951474Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/395/merge
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7152747Z Note: switching to 'refs/remotes/pull/395/merge'.
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7153314Z 
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7153605Z You are in 'detached HEAD' state. You can look around, make experimental
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7154247Z changes and commit them, and you can discard any commits you make in this
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7154876Z state without impacting any branches by switching back to a branch.
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7155250Z 
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7155488Z If you want to create a new branch to retain commits you create, you may
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7156493Z do so (now or later) by using -c with the switch command. Example:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7156858Z 
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7157127Z   git switch -c <new-branch-name>
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7177219Z 
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7177484Z Or undo this operation with:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7177800Z 
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7226074Z   git switch -
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7226340Z 
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7227376Z Turn off this advice by setting config variable advice.detachedHead to false
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7227938Z 
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7228618Z HEAD is now at e6f4a27a5 Merge 23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5 into dc796e04203696b4a579aa6fd2428df592031ee3
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7230976Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7290218Z [command]/usr/bin/git log -1 --format=%H
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7329093Z e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7344549Z ##[group]Removing auth
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7346918Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7390049Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7659290Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7696764Z http.https://github.com/.extraheader
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7706251Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.7750618Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.8017498Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.8063713Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+reviewed onboarding evidence admission	Run actions/checkout@v4	2026-10-30T03:24:57.8332642Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/setup-node@v4	﻿2026-10-30T03:24:57.8618087Z ##[group]Run actions/setup-node@v4
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8618404Z with:
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8618611Z   node-version: 24.21.0
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8618831Z   always-auth: false
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8619035Z   check-latest: false
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8621597Z   token: ***
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8621795Z env:
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8622039Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8622365Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8622632Z   CI: true
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8624481Z   PLAN: {"schema":1,"route":"onboarding-structure","base":"dc796e04203696b4a579aa6fd2428df592031ee3","head":"e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6","sourceHead":"23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5","tree":"cd8d923e7696dd01c28a0de8a17bad3230572a60","product":"d537212929887218f255ee6f654a9522463abff7","components":{"backend":"7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc","frontend":"5c0402cdbc06239dd3fde86cf59c69c294a49d2a"},"controlCheckpoint":"5f6e82df42e9657c84f942be4d523b7df531b1b0","pr":395,"postMerge":false,"draft":false}
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8626818Z   CI_EVENT: pull_request
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8627100Z   CI_HEAD_REF: fix/education-draft-review-20261030
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8627477Z   CI_SOURCE_HEAD: 23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8627792Z   CI_IS_DRAFT: false
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8628045Z   CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8628332Z   CI_PR_NUMBER: 395
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:57.8628533Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:58.0168162Z Attempting to download 24.21.0...
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:58.0339993Z (node:2404) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:58.0341048Z (Use `node --trace-deprecation ...` to show where the warning was created)
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:58.6859555Z Acquiring 24.21.0 - x64 from https://github.com/actions/node-versions/releases/download/24.21.0-34304089047/node-24.21.0-linux-x64.tar.gz
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:59.0724612Z Extracting ...
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:24:59.0892122Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/34f57351-0b3f-4540-b1d8-5a5beda3af13 -f /home/runner/work/_temp/21f980ef-4d30-40bf-8d7c-e3e84ad7c7a5
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:25:00.3398612Z Adding to the cache ...
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:25:02.0765078Z ##[group]Environment details
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:25:02.3241023Z node: v24.21.0
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:25:02.3241404Z npm: 11.19.0
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:25:02.3241752Z yarn: 1.22.22
+reviewed onboarding evidence admission	Run actions/setup-node@v4	2026-10-30T03:25:02.3242268Z ##[endgroup]
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	﻿2026-10-30T03:25:02.3504766Z ##[group]Run node .github/scripts/onboarding-checks.mjs admit
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3505285Z [36;1mnode .github/scripts/onboarding-checks.mjs admit[0m
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3531986Z shell: /usr/bin/bash -e {0}
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3532262Z env:
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3532528Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3532871Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3533134Z   CI: true
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3534998Z   PLAN: {"schema":1,"route":"onboarding-structure","base":"dc796e04203696b4a579aa6fd2428df592031ee3","head":"e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6","sourceHead":"23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5","tree":"cd8d923e7696dd01c28a0de8a17bad3230572a60","product":"d537212929887218f255ee6f654a9522463abff7","components":{"backend":"7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc","frontend":"5c0402cdbc06239dd3fde86cf59c69c294a49d2a"},"controlCheckpoint":"5f6e82df42e9657c84f942be4d523b7df531b1b0","pr":395,"postMerge":false,"draft":false}
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3537368Z   CI_EVENT: pull_request
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3537654Z   CI_HEAD_REF: fix/education-draft-review-20261030
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3538019Z   CI_SOURCE_HEAD: 23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3538334Z   CI_IS_DRAFT: false
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3538596Z   CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3538889Z   CI_PR_NUMBER: 395
+reviewed onboarding evidence admission	admit reviewed results and qualify only missing compiler inputs	2026-10-30T03:25:02.3539091Z ##[endgroup]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	﻿2026-10-30T03:25:02.8475174Z ##[group]Run npm ci --ignore-scripts --registry=https://registry.npmjs.org --replace-registry-host=always --prefix server-version/frontend
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8476592Z [36;1mnpm ci --ignore-scripts --registry=https://registry.npmjs.org --replace-registry-host=always --prefix server-version/frontend[0m
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8477547Z [36;1mnpm ci --ignore-scripts --registry=https://registry.npmjs.org --replace-registry-host=always --prefix .github/release-tools[0m
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8478200Z [36;1mcommand -v google-chrome[0m
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8478472Z [36;1mgoogle-chrome --version[0m
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8478725Z [36;1msudo apt-get update[0m
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8478996Z [36;1msudo apt-get install -y fonts-noto-cjk[0m
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8500414Z shell: /usr/bin/bash -e {0}
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8500668Z env:
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8500917Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8501262Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8501531Z   CI: true
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8503431Z   PLAN: {"schema":1,"route":"onboarding-structure","base":"dc796e04203696b4a579aa6fd2428df592031ee3","head":"e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6","sourceHead":"23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5","tree":"cd8d923e7696dd01c28a0de8a17bad3230572a60","product":"d537212929887218f255ee6f654a9522463abff7","components":{"backend":"7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc","frontend":"5c0402cdbc06239dd3fde86cf59c69c294a49d2a"},"controlCheckpoint":"5f6e82df42e9657c84f942be4d523b7df531b1b0","pr":395,"postMerge":false,"draft":false}
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8505362Z   CI_EVENT: pull_request
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8505926Z   CI_HEAD_REF: fix/education-draft-review-20261030
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8506293Z   CI_SOURCE_HEAD: 23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8506609Z   CI_IS_DRAFT: false
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8506860Z   CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8507165Z   CI_PR_NUMBER: 395
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:02.8507380Z ##[endgroup]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:04.5635397Z npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1010400Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1011448Z added 395 packages, and audited 396 packages in 11s
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1011997Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1012294Z 81 packages are looking for funding
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1012958Z   run `npm fund` for details
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1100659Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1101688Z 5 moderate severity vulnerabilities
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1102059Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1102448Z To address issues that do not require attention, run:
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1103005Z   npm audit fix
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1103229Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1103610Z To address all issues (including breaking changes), run:
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1104173Z   npm audit fix --force
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1104409Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.1104614Z Run `npm audit` for details.
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.8154431Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.8155818Z added 3 packages, and audited 4 packages in 579ms
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.8163788Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.8164266Z found 0 vulnerabilities
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:14.8270756Z /usr/bin/google-chrome
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.4434966Z Google Chrome 156.0.8078.47 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.5283780Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.5654508Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.5656736Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.5665500Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.5706570Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.5747336Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.7083364Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [682 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.7253180Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [617 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.7561629Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1406 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.7633427Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [310 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.7653835Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1708 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.7840615Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [343 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.7863061Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1809 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.7990330Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [411 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.8020346Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse Translation-en [14.3 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.8764119Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1146 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.8819616Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [231 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.8839252Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1223 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:16.9331168Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [246 kB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:20.2615675Z Fetched 10.5 MB in 1s (9746 kB/s)
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.4302961Z Reading package lists...
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.4703102Z Reading package lists...
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.7206929Z Building dependency tree...
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.7213801Z Reading state information...
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.8974659Z Suggested packages:
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.8975161Z   fonts-noto-cjk-extra
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.9187074Z The following NEW packages will be installed:
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.9197033Z   fonts-noto-cjk
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.9425787Z 0 upgraded, 1 newly installed, 0 to remove and 6 not upgraded.
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.9426756Z Need to get 61.2 MB of archives.
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.9427661Z After this operation, 93.2 MB of additional disk space will be used.
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:21.9428858Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.0632527Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-noto-cjk all 1:20230817+repack1-3 [61.2 MB]
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7136967Z Fetched 61.2 MB in 0s (123 MB/s)
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7419792Z Selecting previously unselected package fonts-noto-cjk.
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7700093Z (Reading database ... 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7700611Z (Reading database ... 5%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7701048Z (Reading database ... 10%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7701457Z (Reading database ... 15%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7701856Z (Reading database ... 20%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7702249Z (Reading database ... 25%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7702640Z (Reading database ... 30%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7703294Z (Reading database ... 35%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7704406Z (Reading database ... 40%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7704986Z (Reading database ... 45%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7705878Z (Reading database ... 50%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.7757680Z (Reading database ... 55%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:22.9010719Z (Reading database ... 60%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:23.1037995Z (Reading database ... 65%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:23.3002836Z (Reading database ... 70%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:23.5074309Z (Reading database ... 75%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:23.6434909Z (Reading database ... 80%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:23.7211054Z (Reading database ... 85%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:23.8179408Z (Reading database ... 90%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:24.0048515Z (Reading database ... 95%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:24.0049225Z (Reading database ... 100%
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:24.0050106Z (Reading database ... 215504 files and directories currently installed.)
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:24.0098392Z Preparing to unpack .../fonts-noto-cjk_1%3a20230817+repack1-3_all.deb ...
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:24.0212608Z Unpacking fonts-noto-cjk (1:20230817+repack1-3) ...
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:24.5578954Z Setting up fonts-noto-cjk (1:20230817+repack1-3) ...
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:24.5711028Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4087309Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4088290Z Running kernel seems to be up-to-date.
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4089158Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4089688Z No services need to be restarted.
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4090298Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4090768Z No containers need to be restarted.
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4091307Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4091843Z No user sessions are running outdated binaries.
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4092496Z 
+reviewed onboarding evidence admission	install only missing reviewed browser consumer dependencies	2026-10-30T03:25:26.4093213Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	﻿2026-10-30T03:25:27.7334444Z ##[group]Run node .github/scripts/pr395-browser.mjs
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7334875Z [36;1mnode .github/scripts/pr395-browser.mjs[0m
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7356266Z shell: /usr/bin/bash -e {0}
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7356520Z env:
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7356805Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7357148Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7357411Z   CI: true
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7359308Z   PLAN: {"schema":1,"route":"onboarding-structure","base":"dc796e04203696b4a579aa6fd2428df592031ee3","head":"e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6","sourceHead":"23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5","tree":"cd8d923e7696dd01c28a0de8a17bad3230572a60","product":"d537212929887218f255ee6f654a9522463abff7","components":{"backend":"7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc","frontend":"5c0402cdbc06239dd3fde86cf59c69c294a49d2a"},"controlCheckpoint":"5f6e82df42e9657c84f942be4d523b7df531b1b0","pr":395,"postMerge":false,"draft":false}
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7361359Z   CI_EVENT: pull_request
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7361681Z   CI_HEAD_REF: fix/education-draft-review-20261030
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7362045Z   CI_SOURCE_HEAD: 23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7362363Z   CI_IS_DRAFT: false
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7362611Z   CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7362902Z   CI_PR_NUMBER: 395
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:25:27.7363108Z ##[endgroup]
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7653666Z node:internal/modules/run_main:107
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7654319Z     triggerUncaughtException(
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7654761Z     ^
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7654893Z 
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7655086Z locator.waitFor: Timeout 30000ms exceeded.
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7655375Z Call log:
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7656661Z   - waiting for getByText('暂无私有工具，可先创建一份量表或表单。', { exact: true }) to be visible
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7657282Z 
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7658362Z     at /home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr395-browser.mjs:37:61 {
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7659157Z   log: [
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7660076Z     "  - waiting for getByText('暂无私有工具，可先创建一份量表或表单。', { exact: true }) to be visible"
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7660830Z   ],
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7661232Z   name: 'TimeoutError'
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7661634Z }
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7661787Z 
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.7661926Z Node.js v24.21.0
+reviewed onboarding evidence admission	qualify missing shared education editor browser interactions	2026-10-30T03:26:05.8532888Z ##[error]Process completed with exit code 1.
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	﻿2026-10-30T03:26:05.8663954Z ##[group]Run actions/upload-artifact@v4
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8664276Z with:
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8664590Z   name: onboarding-admission-e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8664993Z   path: onboarding-evidence/
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8665249Z   if-no-files-found: error
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8665480Z   retention-days: 14
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8665972Z   compression-level: 6
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8666194Z   overwrite: false
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8666433Z   include-hidden-files: false
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8666675Z env:
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8666915Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8667260Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8667529Z   CI: true
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8669381Z   PLAN: {"schema":1,"route":"onboarding-structure","base":"dc796e04203696b4a579aa6fd2428df592031ee3","head":"e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6","sourceHead":"23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5","tree":"cd8d923e7696dd01c28a0de8a17bad3230572a60","product":"d537212929887218f255ee6f654a9522463abff7","components":{"backend":"7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc","frontend":"5c0402cdbc06239dd3fde86cf59c69c294a49d2a"},"controlCheckpoint":"5f6e82df42e9657c84f942be4d523b7df531b1b0","pr":395,"postMerge":false,"draft":false}
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8671321Z   CI_EVENT: pull_request
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8671589Z   CI_HEAD_REF: fix/education-draft-review-20261030
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8671945Z   CI_SOURCE_HEAD: 23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8672258Z   CI_IS_DRAFT: false
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8672497Z   CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8672779Z   CI_PR_NUMBER: 395
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:05.8672976Z ##[endgroup]
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.0496399Z (node:3261) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.0498442Z (Use `node --trace-deprecation ...` to show where the warning was created)
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.0596365Z With the provided path, there will be 2 files uploaded
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.0604158Z Artifact name is valid!
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.0605333Z Root directory input is valid!
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.2831764Z Beginning upload of artifact content to blob storage
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.3055853Z (node:3261) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.3419887Z Uploaded bytes 3722
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.3578404Z Finished uploading artifact content to blob storage!
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.3580316Z SHA256 digest of uploaded artifact zip is a951ab4f8a4d7b806651bff6f7fadfe927162546266db8a0996794798b3f32f8
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.3581745Z Finalizing artifact upload
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.7331135Z Artifact onboarding-admission-e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6.zip successfully finalized. Artifact ID 12951653377
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.7333074Z Artifact onboarding-admission-e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6 has been successfully uploaded! Final size is 3722 bytes. Artifact ID is 12951653377
+reviewed onboarding evidence admission	Run actions/upload-artifact@v4	2026-10-30T03:26:06.7338794Z Artifact download URL: https://github.com/caohuibj/eduK12-new-version/actions/runs/40997195433/artifacts/12951653377
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	﻿2026-10-30T03:26:06.7558816Z Post job cleanup.
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.8458475Z [command]/usr/bin/git version
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.8509766Z git version 2.56.0
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.8558877Z Temporarily overriding HOME='/home/runner/work/_temp/2e2cafa4-f816-470a-80d0-0a0f91fe3df1' before making global git config changes
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.8561106Z Adding repository directory to the temporary git global config as a safe directory
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.8565115Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.8613545Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.8657788Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.8957323Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.9006635Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.9306025Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+reviewed onboarding evidence admission	Post Run actions/checkout@v4	2026-10-30T03:26:06.9382144Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+reviewed onboarding evidence admission	Complete job	﻿2026-10-30T03:26:06.9949507Z Cleaning up orphan processes
+reviewed onboarding evidence admission	Complete job	2026-10-30T03:26:07.0350737Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -318,6 +318,243 @@
         "recordSHA256": "136cb9cc54a834996e8d64bcdba7f2445558affc145fb5ab7e4819129313cea5",
         "scope": "Independent actual control and original-evidence review; not a GitHub APPROVE or signed original execution"
       }
+    },
+    "395": {
+      "schemaVersion": 1,
+      "pr": 395,
+      "enabled": true,
+      "base": "dc796e04203696b4a579aa6fd2428df592031ee3",
+      "product": "d537212929887218f255ee6f654a9522463abff7",
+      "controlCheckpoint": "66a7c60042fbc37e811e6fee6d1a621066e9b85a",
+      "components": {
+        "backend": "7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc",
+        "frontend": "5c0402cdbc06239dd3fde86cf59c69c294a49d2a"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9",
+        ".github/scripts/merge-gate.mjs": "53c7f80151c32c99f56570f18de7246769858fe9",
+        ".github/scripts/onboarding-bindings.json": "8cc10d0ec740926c9974b6388275cd339f3e13c2",
+        ".github/scripts/onboarding-checks.mjs": "53c320d50295fd51f935677a0a5fd5fec1331d82",
+        ".github/scripts/onboarding-controls.test.mjs": "7c7a0fb616c68c6c4390f774c92398b53a8c4a8b",
+        ".github/scripts/onboarding-evidence.json": "841b0b717581574d7feb919fef003a4e5ac70982",
+        ".github/scripts/onboarding-scope.mjs": "5be4221ef70df4eb7a5942600c1a5965ff3300d2",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": null,
+        ".github/workflows/ci.yml": "db4b49a93aaa205c38ead2cc001851cff2fa0b1e"
+      },
+      "source": {
+        "docs/performance/education-post-p6-20261030/CI-CANDIDATE.md": {
+          "before": null,
+          "after": "28a8d1c7b272f5527976e8c8e083ca3cdf0311f9"
+        },
+        "docs/performance/education-post-p6-20261030/CI-FAILURE-R1.md": {
+          "before": null,
+          "after": "8debb38898fff295b58e67539560094101d15387"
+        },
+        "docs/performance/education-post-p6-20261030/INDEPENDENT-REVIEW.md": {
+          "before": null,
+          "after": "33b312d9b25e63f01c49e8cb5f5685e6add7ee3d"
+        },
+        "docs/performance/education-post-p6-20261030/README.md": {
+          "before": null,
+          "after": "d47277126c7e3cfa6553d97a53fdebe5884de0f6"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/app-types-observation.json": {
+          "before": null,
+          "after": "79980a03faf3b76cef1e919fdeef42dfd5cd07c8"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/baseline/build.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/baseline/build.log": {
+          "before": null,
+          "after": "d7e2e90be88c6141d031bbde8f2aebde09dd6129"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-controls/actionlint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-controls/commands.json": {
+          "before": null,
+          "after": "cd5aa4fadcfc91d87c82cb07d8b417ae5feb18c8"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-controls/controls-consumers.tap": {
+          "before": null,
+          "after": "380221237baee597a7c1e73a9a02b3082d7ebbf9"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-controls/controls-pr381-selected.tap": {
+          "before": null,
+          "after": "dab02738477226d6333573a9c7d62a2430f60f09"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-controls/controls-pr381.tap": {
+          "before": null,
+          "after": "b0780bdbc25cc6b5c4b88b149149b1ca83fd3e40"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-controls/controls-r1.tap": {
+          "before": null,
+          "after": "0dedd5d791efde24e41d0764069b5e82931829be"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/admission-failure.log": {
+          "before": null,
+          "after": "633230a4ea57347d5a3deff2e45811dfe6681323"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/admission.json": {
+          "before": null,
+          "after": "815afee86003ec693fe3d3ba3969cff7da63a9e2"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/artifacts.json": {
+          "before": null,
+          "after": "8dd9d3182b6ad02b17efc9d69b28e0d57f54e649"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/browser.json": {
+          "before": null,
+          "after": "91c0cfbdd31ab93e601f15a371c7c1e1f87d950a"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/recovery-actionlint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/recovery-controls.tap": {
+          "before": null,
+          "after": "e818c28deeb0efb05e8bbf4b9a3fddb110a38dfd"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/run.json": {
+          "before": null,
+          "after": "88a63c9654c5f29b2a058d0916b44ee88c401ab6"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/sast-artifact.json": {
+          "before": null,
+          "after": "a1449336ec1c205dbf3b6b69de8d0f0d652effe4"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/sast-job.json": {
+          "before": null,
+          "after": "46045b535828c4c3e68ea47e7a38f4d3a9f9bfba"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/editor-byte-comparison.json": {
+          "before": null,
+          "after": "868f9c0ac78b45fcd6902c2eb61ad50c1c40c9cf"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/frontend-typecheck-deps-recheck.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/frontend-typecheck-deps-recheck.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/frontend-typecheck.exit": {
+          "before": null,
+          "after": "0cfbf08886fca9a91cb753ec8734c84fcbe52c9f"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/frontend-typecheck.log": {
+          "before": null,
+          "after": "e0b1437b7ddc7265b138c9fbad8c287481e7c609"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/handoff-identity.json": {
+          "before": null,
+          "after": "d93de444e02900ab43d10dd59361f1189e466e42"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/lazy-consumers.json": {
+          "before": null,
+          "after": "b39f384d7790122a7edb2fe64fa35baeaf04a8fa"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/lazy-consumers.log": {
+          "before": null,
+          "after": "e1e6dcb3d9faa09f4041434add2cdab27415db55"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/lazy-school-recheck.json": {
+          "before": null,
+          "after": "730e48e004da5196aca239ad24416ba71b016f61"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/lazy-school-recheck.log": {
+          "before": null,
+          "after": "9dbd950a6f121c902c4ac5db56b5b9bc3ac4f518"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/lazy-teacher.json": {
+          "before": null,
+          "after": "254ece5d2d646278dad99ad61ac7252bdb70694e"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/lazy-teacher.log": {
+          "before": null,
+          "after": "e50c387b203e9637171d9c14cc2d22cc0620eae0"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/local-review-evidence.json": {
+          "before": null,
+          "after": "dda9f002c29bb3e50b98e384166db85af1e6ed5a"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/optimized/build.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/optimized/build.log": {
+          "before": null,
+          "after": "03aba025e1ae3384e7bad919851203b5c40884f8"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/registration-fix.json": {
+          "before": null,
+          "after": "5f990338107154dafb7428e9a318558bb935ef4b"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/registration-fix.log": {
+          "before": null,
+          "after": "059b970f9b9405ceb1863dc2eadd73d844b6f934"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/unsaved-registration-title.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/unsaved-registration-title.json": {
+          "before": null,
+          "after": "8aa2dde1a37fbda472ec40b7e266434aaeedba56"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/unsaved-registration-title.log": {
+          "before": null,
+          "after": "5120e833cb42a3e756ff8c0831f55cd0c3b0574c"
+        },
+        "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": {
+          "before": "6d17550126e65d1035060aa9adfd7da5b09f3662",
+          "after": "f4cc6644607931519b1946bc4814699a00daf5c0"
+        },
+        "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.unsaved-input.review.test.tsx": {
+          "before": null,
+          "after": "8bc3cbd6597b61d310ccad7eabcf2e8d42dcb195"
+        },
+        "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx": {
+          "before": "69d661dafd7caac17114c6d134e3f28b8030e346",
+          "after": "b9a044a0b9ee986d706843c50e378ccfdb96c874"
+        },
+        "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.loading.test.tsx": {
+          "before": null,
+          "after": "35deb5915b81331d7694d8d4605a42134e3d37b7"
+        },
+        "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx": {
+          "before": "d941e9d323326cc00be7e3adbcdfc59aefc3437b",
+          "after": "556bcaff07a1f2ea0ed78ee59e12e57ca01a46e3"
+        }
+      },
+      "activationReview": {
+        "reviewer": "independent Codex pr395_review",
+        "reviewedSource": "adec07f9c647afec22ca22d79c49b0efd94c77cb",
+        "reviewedTree": "1af698eaac14a0d8c1e9dbc29983dd9a86b24f3e",
+        "record": "docs/performance/education-post-p6-20261030/INDEPENDENT-REVIEW.md",
+        "recordSHA256": "9f3595114177403402b2f8b8911e6e391b38076bb246bc93dcd2c0cf8918260c",
+        "scope": "Independent diagnosed continuation review; metadata-only final binding authorized. Original first failure and full SAST retained; no DOT/GitHub APPROVE/signed execution claim.",
+        "priorReview": {
+          "reviewer": "independent Codex pr395_review",
+          "reviewedSource": "58659b99b8474828f22102b06a99016f5bafd091",
+          "reviewedTree": "1da4b2f09c5650359b69d0dc2617fba4f47dbea0",
+          "record": "docs/performance/education-post-p6-20261030/INDEPENDENT-REVIEW.md",
+          "recordSHA256": "e90cf0748350f8c0505430f44c59977d1da2700953e6c233cb7d30126802f249",
+          "scope": "Independent actual product/control/original evidence review; authorized final metadata-only delta. Not DOT, GitHub APPROVE or signed original execution."
+        }
+      }
     }
   }
 }
