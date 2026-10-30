@@ -23,7 +23,10 @@ import { createScaleProjectionContext } from '../scale/projection/context-factor
 import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { resolveTrainingComparability } from './core'
-import { trainingGroupFormDefinitions, trainingGroupFormQuestion, selectLatestTrainingGroupParents, trainingGroupLeafItems, type TrainingGroupSource } from './group-source'
+import { trainingGroupFormDefinitions, trainingGroupFormQuestion, selectLatestTrainingGroupParents, trainingGroupLeafItems, trainingCognitiveGroupTaskKey, trainingCognitiveGroupAssignmentId, trainingStandaloneCognitiveFacts, selectLatestTrainingCognitiveSessions, type TrainingGroupSource } from './group-source'
+import { decryptCognitivePayload } from '../cognitive/cognitive.security'
+import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
+import { readTaskGroupArtifact } from '../reporting/task-artifact'
 import type { GroupMetricDefinition, GroupMetricObservation } from '../reporting/group-summary'
 import type { TrainingAnalysisRequestV1, TrainingAnalysisSourceV1, TrainingAnalysisWaveV1, TrainingMetricIdentityV1, TrainingNumericObservationV1, TrainingObservationReason } from './types'
 
@@ -760,5 +763,56 @@ export function trainingGroupSnapshotHash(row: any) {
 
 export async function listTrainingGroupTasks(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string) {
   await assertTrainingGroupAccess(tx, actor, courseId)
-  return tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId, true), publishedAt: {not: null}}, select: {id: true, name: true}, orderBy: {publishedAt: 'desc'}, take: 100})
+  const [composite,cognitive]=await Promise.all([
+    tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId, true), publishedAt: {not: null}}, select: {id: true, name: true}, orderBy: {publishedAt: 'desc'}, take: 100}),
+    tx.cognitiveAssignment.findMany({where:{courseId,listedStandalone:true,status:{in:['PUBLISHED','ARCHIVED']},publishedAt:{not:null},resolvedConfigHash:{not:null},resolvedReportSnapshotEncrypted:{not:null},courseSnapshot:{path:['id'],equals:courseId},...(actor.role===UserRole.ADMIN?{}:{createdBy:actor.userId})},select:{id:true,title:true,status:true},orderBy:[{publishedAt:'desc'},{id:'desc'}],take:100}),
+  ])
+  return [...composite,...cognitive.map(row=>({id:trainingCognitiveGroupTaskKey(row.id),name:row.title+' · 独立认知'+(row.status==='ARCHIVED'?'（已归档，只读）':'')}))]
+}
+
+async function standaloneCognitiveGroupHeader(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string,historical=false){
+  await authority(tx,actor,courseId,'SHARE')
+  const id=trainingCognitiveGroupAssignmentId(taskId)
+  if(!id)unavailable()
+  const assignment=await tx.cognitiveAssignment.findFirst({where:{id,courseId,listedStandalone:true,status:historical?{in:['PUBLISHED','ARCHIVED']}:'PUBLISHED',publishedAt:{not:null},...(actor.role===UserRole.ADMIN?{}:{createdBy:actor.userId})}})
+  const report=readFrozenReport(assignment?.resolvedReportSnapshotEncrypted)
+  if(!assignment?.resolvedConfigHash||!report||(assignment.courseSnapshot as {id?:string}|null)?.id!==courseId)unavailable()
+  const contractHash=hash({id,courseId,publishedAt:iso(assignment.publishedAt),resolvedConfigHash:assignment.resolvedConfigHash,report})
+  const tool={key:trainingCognitiveGroupTaskKey(assignment.id),kind:'COGNITIVE' as const,title:assignment.title,
+    source:{taskId,taskName:assignment.title,publication:iso(assignment.publishedAt)!,configDigest:assignment.resolvedConfigHash,variantKey:null}}
+  return {assignment,report,contractHash,tool}
+}
+const standaloneSessionHash=(row:{id:string;userId:string|null;participantKey:string;attemptNo:number;status:string;finishedAt:Date|string|null;resultDigest:string|null})=>hash({...row,finishedAt:iso(row.finishedAt)})
+export interface TrainingStandaloneCognitiveBindings {kind:'COGNITIVE_ASSIGNMENT';contractHash:string;sessions:Array<{id:string;hash:string}>}
+
+/** Tool selection reads the frozen assignment only, not participants/results. */
+export async function trainingStandaloneCognitiveGroupTool(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string){
+  const {assignment,tool}=await standaloneCognitiveGroupHeader(tx,actor,courseId,taskId,true)
+  return assignment.status==='PUBLISHED'?tool:null
+}
+
+/** Same creator/professional-report boundary as standalone Cognitive. No raw
+ * trials, current roster join, live scoring or fake composite parent. */
+export async function loadTrainingStandaloneCognitiveGroup(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string){
+  const {assignment,report,contractHash,tool}=await standaloneCognitiveGroupHeader(tx,actor,courseId,taskId)
+  const rows=await tx.cognitiveSession.findMany({where:{assignmentId:assignment.id,compositeAttemptId:null,status:'COMPLETED',finishedAt:{not:null}},select:{id:true,userId:true,participantKey:true,attemptNo:true,status:true,finishedAt:true,resultSnapshotEncrypted:true},orderBy:[{finishedAt:'desc'},{id:'desc'}],take:TRAINING_ANALYSIS_SOURCE_LIMIT+1})
+  if(rows.length>TRAINING_ANALYSIS_SOURCE_LIMIT)throw Object.assign(new Error('正式认知结果超过现有6000份来源上限'),{statusCode:413})
+  const facts=trainingStandaloneCognitiveFacts({assignmentId:assignment.id,resolvedConfigHash:assignment.resolvedConfigHash!,report,sessions:selectLatestTrainingCognitiveSessions(assignment.id,rows).map(row=>({...row,finishedAt:row.finishedAt!,result:row.resultSnapshotEncrypted?parseCognitiveResultSnapshot(decryptCognitivePayload(row.resultSnapshotEncrypted)):null}))})
+  if(!facts)return null
+  const byId=new Map(rows.map(row=>[row.id,row]))
+  const bindings:TrainingStandaloneCognitiveBindings={kind:'COGNITIVE_ASSIGNMENT',contractHash,sessions:facts.selected.map(row=>{const {resultSnapshotEncrypted,...metadata}=byId.get(row.id)!;return {id:row.id,hash:standaloneSessionHash({...metadata,resultDigest:resultSnapshotEncrypted?createHash('md5').update(resultSnapshotEncrypted).digest('hex'):null})}})}
+  return {...facts,bindings,tool}
+}
+
+/** Frozen pointer verification only. New sessions never change an old snapshot. */
+export async function readTrainingStandaloneCognitiveGroupArtifact(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string,artifactId:string){
+  const {assignment,contractHash}=await standaloneCognitiveGroupHeader(tx,actor,courseId,taskId,true)
+  const artifact=await readTaskGroupArtifact(tx,{product:'TRAINING',containerId:courseId,taskId},artifactId)
+  if(!artifact)return null
+  const bindings=artifact.sourceBindings as TrainingStandaloneCognitiveBindings
+  if(bindings.kind!=='COGNITIVE_ASSIGNMENT'||bindings.contractHash!==contractHash)invalid('原独立认知来源或纳入资格已变化，请生成更新版报告')
+  const rows=bindings.sessions.length?await tx.$queryRaw<Array<{id:string;userId:string|null;participantKey:string;attemptNo:number;status:string;finishedAt:Date|null;resultDigest:string|null}>>`SELECT id,user_id AS "userId",participant_key AS "participantKey",attempt_no AS "attemptNo",status,finished_at AS "finishedAt",md5(result_snapshot_encrypted) AS "resultDigest" FROM cognitive_sessions WHERE id IN (${Prisma.join(bindings.sessions.map(row=>row.id))}) AND assignment_id=${assignment.id} AND composite_attempt_id IS NULL AND status='COMPLETED'`:[]
+  const hashes=new Map(rows.map(row=>[row.id,standaloneSessionHash(row)]))
+  if(hashes.size!==bindings.sessions.length||bindings.sessions.some(row=>hashes.get(row.id)!==row.hash))invalid('原独立认知快照的正式结果已变化，请生成更新版报告')
+  return artifact
 }
