@@ -39,3 +39,11 @@ test('exact ingress bundle uses tools gate; unknown vhosts, app files, deletions
  assert.equal(toolingOnly(known),true);
  for(const extra of [regular('server-version/ops/nginx/unknown.conf'),regular('server-version/frontend/src/main.tsx'),{...known[0],newMode:'120000'},{...known[0],status:'D',newMode:'000000'}])assert.equal(toolingOnly([...known,extra]),false);
 });
+
+ test('native CodeQL configuration uses existing tooling route, not application acceptance',()=>{
+ const files=['.github/workflows/ci.yml','.github/scripts/school-teacher-native.mjs','.github/scripts/school-teacher-native.test.mjs','docs/performance/codeql-analysis-20261030.md','server-version/scripts/release/policy.mjs','server-version/scripts/release/policy.test.mjs'].map(regular);
+ assert.equal(toolingOnly(files),true);
+ assert.equal(toolingOnly([...files,regular(auth)]),false);
+ const needs={scope:{result:'success',outputs:{scenario:'release-tooling'}},'release-tools':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','release-tools','codeql']);
+ });
