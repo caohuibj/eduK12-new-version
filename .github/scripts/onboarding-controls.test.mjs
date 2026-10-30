@@ -213,3 +213,68 @@ test('PR381 keeps one compiled GET-only editor and live sandbox verification bef
  assert(script.includes("assert.deepEqual(admitted.source,plan)"));assert(script.includes("assert.equal(plan.pr,381)"));
  assert(!script.includes('restoreBrowserBuild'));
 });
+
+test('PR393 selects only its appended exact backend candidate and preserves old route boundaries',()=>{
+ const f=fixture(),path='server-version/backend/src/modules/assessment-bundle/profile/report.ts';
+ const candidate={...f.b,pr:393,source:{[path]:{before:null,after:blob}}};
+ const combined={...f.b,candidates:{393:candidate}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e);
+ const env={...f.env,CI_PR_NUMBER:'393',CI_HEAD_REF:BRANCHES[393]};
+ const p=onboardingPlan(entries,base,head,f.read,env,combined);
+ assert.equal(p.pr,393);assert.equal(onboardingOutputs(p).frontend,false);assert.equal(onboardingOutputs(p).bundle,false);
+ // The old branch still consumes its root record, never PR393's nested data.
+ assert.equal(onboardingPlan(f.entries,base,head,f.read,f.env,combined).pr,366);
+ for(const outside of ['server-version/backend/src/middleware/auth.ts','server-version/backend/package-lock.json','server-version/frontend/src/App.tsx','server-version/backend/src/modules/assessment-bundle/profile/match.ts']){
+  assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...combined,candidates:{393:{...candidate,source:{[outside]:{before:null,after:blob}}}}}));
+ }
+ for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_HEAD_REF:BRANCHES[381]},{CI_PR_NUMBER:'381'},{CI_FORCE_FULL:'true'},{CI_PR_REPOSITORY:'other/repo'}])
+  assert.throws(()=>onboardingPlan(entries,base,head,f.read,{...env,...patch},combined));
+ assert.throws(()=>onboardingPlan(entries,base,head,f.read,env,{...combined,candidates:{393:{...candidate,enabled:false}}}));
+ assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...r)=>a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r),env,combined));
+ const postRead=(cmd,a,...r)=>cmd==='fetch'?'':cmd==='cat-file'?`tree ${tree}\nparent ${base}\nparent ${source}`:f.read(cmd,a,...r);
+ const pushed=onboardingPlan(entries,base,head,postRead,{...env,CI_EVENT:'push',CI_HEAD_REF:'',CI_PR_NUMBER:'',GITHUB_REF_NAME:'main'},combined);
+ assert.equal(pushed.pr,393);assert.equal(pushed.postMerge,true);assert.equal(onboardingOutputs(pushed).codeql,false);
+ assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...r)=>cmd==='cat-file'?`parent ${h('9')}\nparent ${source}`:postRead(cmd,a,...r),{...env,CI_EVENT:'push',GITHUB_REF_NAME:'main'},combined));
+});
+
+test('PR393 admits the original 7 plus 7, retains skipped rows and cannot select superseded or withheld cases',async()=>{
+ const {createHash}=await import('node:crypto');
+ const review=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['393'];
+ assert.deepEqual(review.types,[]);assert.equal(review.missingCheck,'CURRENT_COMBINED_BACKEND_TYPES');
+ assert.equal(review.originalExecutionSigned,false);assert.equal(review.reports.length,2);
+ const selected=[];
+ for(const record of review.reports){
+  const bytes=readFileSync(record.path);assert.equal(createHash('sha256').update(bytes).digest('hex'),record.sha256);
+  const original=JSON.parse(bytes),names=verifyOriginalReport(original,record);
+  assert.equal(names.length,7);selected.push(...names);
+  assert.throws(()=>verifyOriginalReport({...original,numPassedTests:100},record));
+ }
+ assert.equal(new Set(selected).size,14);
+ const first=review.reports[0],original=JSON.parse(readFileSync(first.path));
+ assert(first.selectedCases.every(n=>!n.includes('matched summaries')&&!n.includes('reopens')&&!n.includes('package hash')));
+ const second=review.reports[1],filtered=second.cases.find(c=>c.status==='skipped').fullName;
+ assert.equal(second.summary.numPendingTests,7);
+ assert.throws(()=>verifyOriginalReport(JSON.parse(readFileSync(second.path)),{...second,selectedCases:[filtered]}));
+ // Historical root review and binding are preserved as values.
+ const {execFileSync}=await import('node:child_process');
+ for(const name of ['onboarding-evidence.json','onboarding-bindings.json']){
+  const file='.github/scripts/'+name,current=JSON.parse(readFileSync(file));delete current.candidates;
+  const old=JSON.parse(execFileSync('git',['show','4a3aaa2ebbae712002a2d349c5e83368085c437e:'+file],{encoding:'utf8'}));
+  assert.deepEqual(current,old);
+ }
+});
+
+test('PR393 keeps only missing backend types, changed SAST and the existing mandatory gate',()=>{
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');
+ const job=yaml.slice(yaml.indexOf('  onboarding-structure:\n'),yaml.indexOf('  report-planning:\n'));
+ assert(job.includes("if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 393\n      working-directory: server-version/backend"));
+ assert(job.includes('npm ci --ignore-scripts --no-audit --no-fund'));assert(job.includes('node node_modules/prisma/build/index.js generate'));
+ assert(job.includes('https://registry.npmjs.org'));assert(!job.includes('npm run build'));
+ assert(yaml.includes(".pr == 393 && 'paths: [server-version/backend/src/modules/assessment-bundle,"));
+ assert(job.includes("contains(fromJSON('[374,376,378,380,381]')")); // PR393 never selects a browser.
+ assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+ const script=readFileSync('.github/scripts/onboarding-checks.mjs','utf8');
+ assert(script.includes("spawnSync(process.execPath,argv,{cwd:'server-version/backend',encoding:'utf8'})"));
+ assert(script.includes("assert.equal(execution.status,0,'Current combined backend types failed"));
+ assert(script.indexOf("writeFileSync('onboarding-evidence/backend-types.json'")<script.indexOf("assert.equal(execution.status,0"));
+});

@@ -334,5 +334,281 @@
       "commands.json was summarized after the actual executions; it is not contemporaneously signed evidence.",
       "Admission remains pending DOT final review; missing/null/string/nonzero exits are rejected, not inferred from the logs."
     ]
+  },
+  "candidates": {
+    "393": {
+      "schemaVersion": 1,
+      "product": "b00712d2887cccf3117a9095184f6afd301f0e6f",
+      "reviewer": "root dot",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "limitations": [
+          "Original local executions are unsigned; F02 precommit tree is retrospectively associated, not an exact original tree attestation.",
+          "Historical environment and shell commands are not reconstructed; only the already independently reviewed synthetic case results are admitted.",
+          "Old backend type exit0 is not admitted as this final combined backend tree; compiler runs in the official job.",
+          "Original F02 ten passed rows remain intact but only seven are selected; F01 seven passed and seven skipped rows remain intact.",
+          "No DB, browser, model scoring or production behavior is established by these projection/schema/review unit reports."
+        ]
+      },
+      "reports": [
+        {
+          "id": "pr393-profile-feedback-unit",
+          "path": "docs/development/pr393-profile-evidence/profile-feedback-unit.json",
+          "sha256": "74d788b5881dec3e2500a97a46441f64bf8f9954affbeb14414a5ba7e5d3c652",
+          "originalSourceAssociation": "1369d661db44f7c5d7ff29affe26db857c533546",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedUnrelatedSourceDelta": [
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-actions.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-feedback.test.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-completion.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-connection.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-connection.test.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-continuation.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-original-scope.test.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-sources.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/modules/admin-permissions/routes.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/learning_motivation_math_support/0.1.2.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/report.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/bundle-product/package-release.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.distribution.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.routes.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.access.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.catalog.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.contracts.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.headers.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.selection.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.routes.ts",
+            "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+            "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+            "server-version/backend/src/modules/scale/instruments/cbi_client_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/cbi_client_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/cbi_personal_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/cbi_personal_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/cbi_work_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/cbi_work_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_change_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_change_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_control_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_control_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_demands_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_demands_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_managerial_support_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_managerial_support_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_peer_support_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_peer_support_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_relationships_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_relationships_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_role_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_role_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original working-tree execution, retrospectively associated with first commit 1369; no original precommit whole-tree or installed-environment attestation. Only six status cases and withheld-capability case selected; later changed matched/history/schema cases excluded.",
+          "deltaRationale": "F02 selected state cases never select a matched profile, so BUNDLE_OWNED only affects the unexecuted profile-present branch. Their helper/test bodies, EVC source policies and all scientific parameters remain unchanged. F01 current passed cases supersede the earlier three matched/history/schema cases. Main package-release changes only a type import and uncalled admission functions; these tests call unchanged validateReview/publishPackage, with mock publisher attempts rejecting at ADMIN/signature checks. education-adapter is not imported. PR394 registration additions do not alter either exact EVC identity lookup; no CBI/HSE scorer or report is invoked. Unrelated backend entry changes are outside these selected call paths. Current whole-backend compiler input is separately executed in CI.",
+          "cases": [
+            {
+              "fullName": "frozen profile status feedback explains INSUFFICIENT using only frozen reader-facing text",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback explains INVALID using only frozen reader-facing text",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback explains NOT_APPLICABLE using only frozen reader-facing text",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback explains UNCLASSIFIED using only frozen reader-facing text",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback explains MIXED using only frozen reader-facing text",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback explains BOUNDARY using only frozen reader-facing text",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback withholds explanation for denied audiences and either missing interpretation capability",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback keeps matched summaries and source-limited actions unchanged",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback reopens the old frozen definition without importing the new template",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback freezes feedback in the package hash and requires a complete bounded state template",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 10,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "selectedCases": [
+            "frozen profile status feedback explains INSUFFICIENT using only frozen reader-facing text",
+            "frozen profile status feedback explains INVALID using only frozen reader-facing text",
+            "frozen profile status feedback explains NOT_APPLICABLE using only frozen reader-facing text",
+            "frozen profile status feedback explains UNCLASSIFIED using only frozen reader-facing text",
+            "frozen profile status feedback explains MIXED using only frozen reader-facing text",
+            "frozen profile status feedback explains BOUNDARY using only frozen reader-facing text",
+            "frozen profile status feedback withholds explanation for denied audiences and either missing interpretation capability"
+          ]
+        },
+        {
+          "id": "pr393-profile-actions-unit",
+          "path": "docs/development/pr393-profile-evidence/profile-actions-unit.json",
+          "sha256": "8970e69cc59e5b6e735119fc9986b2f8601e01b2618ae2fac84525ac22d83289",
+          "originalSourceAssociation": "990d3a5271284e40b137183e1524bb0842614960",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedUnrelatedSourceDelta": [
+            "server-version/backend/src/__tests__/bundle-product/education-package-completion.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-connection.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-connection.test.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-continuation.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-original-scope.test.ts",
+            "server-version/backend/src/__tests__/bundle-product/education-package-sources.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/modules/admin-permissions/routes.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/bundle-product/package-release.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.distribution.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.routes.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.access.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.catalog.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.contracts.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.headers.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.selection.ts",
+            "server-version/backend/src/modules/education-tools/package-reference.source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.routes.ts",
+            "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+            "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+            "server-version/backend/src/modules/scale/instruments/cbi_client_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/cbi_client_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/cbi_personal_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/cbi_personal_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/cbi_work_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/cbi_work_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_change_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_change_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_control_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_control_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_demands_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_demands_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_managerial_support_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_managerial_support_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_peer_support_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_peer_support_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_relationships_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_relationships_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/hse_role_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/hse_role_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original task execution at F01 source; original 7 skipped rows remain skipped. All seven actual passed cases selected.",
+          "deltaRationale": "F02 selected state cases never select a matched profile, so BUNDLE_OWNED only affects the unexecuted profile-present branch. Their helper/test bodies, EVC source policies and all scientific parameters remain unchanged. F01 current passed cases supersede the earlier three matched/history/schema cases. Main package-release changes only a type import and uncalled admission functions; these tests call unchanged validateReview/publishPackage, with mock publisher attempts rejecting at ADMIN/signature checks. education-adapter is not imported. PR394 registration additions do not alter either exact EVC identity lookup; no CBI/HSE scorer or report is invoked. Unrelated backend entry changes are outside these selected call paths. Current whole-backend compiler input is separately executed in CI.",
+          "cases": [
+            {
+              "fullName": "Bundle-owned profile actions selects only frozen Bundle action text without raising source educational permissions",
+              "status": "passed"
+            },
+            {
+              "fullName": "Bundle-owned profile actions still withholds actions for restricted audiences, missing core permissions and an unclassified result",
+              "status": "passed"
+            },
+            {
+              "fullName": "Bundle-owned profile actions keeps old report content and its hash unchanged and rejects source-material declarations",
+              "status": "passed"
+            },
+            {
+              "fullName": "Bundle-owned profile actions uses existing content-bound rights/report review; ordinary allocation is not content approval",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback explains INSUFFICIENT using only frozen reader-facing text",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen profile status feedback explains INVALID using only frozen reader-facing text",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen profile status feedback explains NOT_APPLICABLE using only frozen reader-facing text",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen profile status feedback explains UNCLASSIFIED using only frozen reader-facing text",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen profile status feedback explains MIXED using only frozen reader-facing text",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen profile status feedback explains BOUNDARY using only frozen reader-facing text",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen profile status feedback withholds explanation for denied audiences and either missing interpretation capability",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen profile status feedback keeps legacy matched summaries and source-limited actions unchanged",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback reopens the old frozen definition without importing the new template",
+              "status": "passed"
+            },
+            {
+              "fullName": "frozen profile status feedback freezes feedback in the package hash and requires a complete bounded state template",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 7
+          },
+          "selectedCases": [
+            "Bundle-owned profile actions selects only frozen Bundle action text without raising source educational permissions",
+            "Bundle-owned profile actions still withholds actions for restricted audiences, missing core permissions and an unclassified result",
+            "Bundle-owned profile actions keeps old report content and its hash unchanged and rejects source-material declarations",
+            "Bundle-owned profile actions uses existing content-bound rights/report review; ordinary allocation is not content approval",
+            "frozen profile status feedback keeps legacy matched summaries and source-limited actions unchanged",
+            "frozen profile status feedback reopens the old frozen definition without importing the new template",
+            "frozen profile status feedback freezes feedback in the package hash and requires a complete bounded state template"
+          ]
+        }
+      ],
+      "types": [],
+      "missingCheck": "CURRENT_COMBINED_BACKEND_TYPES"
+    }
   }
 }

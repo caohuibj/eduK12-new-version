@@ -569,3 +569,15 @@ Draft首轮run40972703596/source1369d661d在backend job123793241307的Bundle con
 实际投影样例采用已计算P4的合成呈现输入，不重新运行匹配：学生看到“看重学习，但把握与负担形成拉扯”和既有3条建议（十至十五分钟小任务；定位耗时点求助；连续一周记录进展与承受程度）。实际教师源策略仍WITHHELD且actions=[]；旧0.1.1学生视图仍actions=[]。原前端已显示actions并附教育支持限制说明，未修改前端。
 
 本轮最小验证：4项F01建议/限制/旧版本/内容签审边界，加3项受模板版本影响的既有报告断言，实际7 PASS/exit0；其余7项F02状态断言filtered，保留前轮成功，不冒充本轮执行。合成签审仅用于内存验证，分配者TEACHER和没有有效签审的普通ADMIN均被原发布函数拒绝；无真实DB发布。后端类型检查exit0、0诊断。原模型、入口计分、PG、浏览器及PR388/391观察未重跑。本次只提交推送普通Draft，等待PR392收口，不markReady/激活重型CI；旧Notion披露拒绝继续停止。
+
+## 25. PR393 最小正式路线草稿（2026-10-30）
+
+PR392/394 已进入 main `4a3aaa2ebbae712002a2d349c5e83368085c437e`；本分支通过一次正常 merge 对齐，产品提交 `b00712d2887cccf3117a9095184f6afd301f0e6f`。F01/F02 业务组件保持原报告改动；没有加入 JD-R 工具、语言机制或新的模型。原始19文件清单及两份报告的选例见 `pr393-profile-evidence/route-plan.json`。
+
+复用已有 `onboarding-structure`：只修改 scope/bindings/checks/evidence/controls.test 和原 ci.yml；不新增 workflow、稳定门禁或签名机制。历史根绑定/证据保持原值，393追加独立记录，实际 source/base、两组件tree、完整 path/mode/blob、控制 checkpoint 和合并预览均须吻合。候选先保持 `enabled:false`、Draft；此时分类明确拒绝，不降级全平台。独立复核后才更新 activation binding 和 Ready。
+
+选例为原F02未变7例（六状态及受限能力）与F01实际7 PASS的并集，共14个不同用例；两份原JSON逐字保存，F01七个过滤项仍为 skipped。原F02提交前执行树未完整记录，source关联为回顾性索引，不伪造签名或旧环境。后续新建议声明只改变存在匹配profile的分支，不改变原六个无匹配状态的断言；F01报告接替早期匹配、历史冻结、hash/schema三例。main的 package-release 变化位于测试未调用的 admission 路径，实际 validateReview/publishPackage早退分支不变；PR394新增CBI/HSE注册不改变两个EVC工具的精确来源/披露权限，选例不执行新增量表计分。
+
+唯一缺失应用检查放在正式 admission 作业：官方源锁定安装后端依赖、Prisma generate（不连接DB）、当前组合后端 `tsc --noEmit`，保留真实 source/merge/run/attempt/tree/退出/日志hash。历史类型通过不冒充新主干结果，不用 npm run build 重放量表/Bundle验收。真实CodeQL只扫描受影响 assessment-bundle 和直接控制/测试源码；原 stable gate 仍要求 scope、admission、CodeQL 全部成功。前端、镜像、模型、PG和浏览器不重跑。main push只观察精确merge身份，不执行这些应用作业。本路线仅用于合并，不用于部署。
+
+控制验证首条命令 `node --test .github/scripts/onboarding-controls.test.mjs` 意外包括旧任务用例，实际20 PASS/1 FAIL：新增393三例均通过；旧PR381命令记录用例读取当前 Prisma schema，与其历史固定hash不同而失败。该历史验证函数及该用例未改，保留首错，不改旧证据或重复已经通过项，也不以本次结果声称历史PR381全组当前通过。actionlint基线/候选各exit0，新增诊断0；三个直接控制脚本语法exit0。正式当前后端类型、CodeQL、Ready和合并尚未执行；必要检查预计约5分钟，CodeQL保留原30分钟预算，超过5分钟报告具体阶段。

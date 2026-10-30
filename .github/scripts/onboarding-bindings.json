@@ -192,5 +192,127 @@
       "before": null,
       "after": "a40a38fe914f7d251b7e47c9802914cafa99ab5b"
     }
+  },
+  "candidates": {
+    "393": {
+      "schemaVersion": 1,
+      "pr": 393,
+      "enabled": false,
+      "base": "4a3aaa2ebbae712002a2d349c5e83368085c437e",
+      "product": "b00712d2887cccf3117a9095184f6afd301f0e6f",
+      "controlCheckpoint": "b00712d2887cccf3117a9095184f6afd301f0e6f",
+      "components": {
+        "backend": "7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc",
+        "frontend": "391d7fd729cff3f55d46b4c3bbba1b81e4a05d69"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9",
+        ".github/scripts/merge-gate.mjs": "53c7f80151c32c99f56570f18de7246769858fe9",
+        ".github/scripts/onboarding-bindings.json": "084c0d71b1f4d2c56d1eaa3966c963e092249572",
+        ".github/scripts/onboarding-checks.mjs": "18da97092c70b28024480800abbd0c2fb82f616f",
+        ".github/scripts/onboarding-controls.test.mjs": "5d85e0a543edaf293744e21cc64cd618459bb0ef",
+        ".github/scripts/onboarding-evidence.json": "d824d2cff7196989252056d675f7da94255619d6",
+        ".github/scripts/onboarding-scope.mjs": "aafdabaf950bfaac4275ce64efaa7998347ebb93",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/workflows/ci.yml": "cb2ac7e390440efe3527e97117520ca7d199fb6a"
+      },
+      "source": {
+        "docs/development/bundle-evc-profile-implementation-20261029.md": {
+          "before": "095b77dabc16a624d1d2a4a09922b50b7bc4ebe7",
+          "after": "5975edc4347c7153b50026ab8ed688335cfd42a1"
+        },
+        "docs/development/pr393-profile-evidence/profile-actions-unit.json": {
+          "before": null,
+          "after": "a81303351f3266da0ff93305d2b99e76eb76e733"
+        },
+        "docs/development/pr393-profile-evidence/profile-feedback-unit.json": {
+          "before": null,
+          "after": "5e9b0f8e4dbc269d2346b62204d306433219dd39"
+        },
+        "docs/development/pr393-profile-evidence/route-plan.json": {
+          "before": null,
+          "after": "ea674e223629702607dedc42e2d7f77e287cf7cd"
+        },
+        "server-version/backend/src/__tests__/bundle-onboarding/profile-actions.test.ts": {
+          "before": null,
+          "after": "3a073a7748015947574295681cb4cd51e61e7490"
+        },
+        "server-version/backend/src/__tests__/bundle-onboarding/profile-feedback.test.ts": {
+          "before": null,
+          "after": "ff65b69657aa31523d05b56fc328c0adfcba12b6"
+        },
+        "server-version/backend/src/modules/assessment-bundle/ci-fixtures/learning_motivation_math_support/0.1.2.json": {
+          "before": null,
+          "after": "a8c6efa27ecdace17070a736e35c591b12038aa5"
+        },
+        "server-version/backend/src/modules/assessment-bundle/generated/packages.json": {
+          "before": "26a9433ffe025af051ec760025774a854a4cbfd8",
+          "after": "6ccb0569149b7ab60dd19562a7da77b055020623"
+        },
+        "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts": {
+          "before": "6aaf8419e89699e427d72efbdd1c469f9659bf92",
+          "after": "88d54cd45a800b84c95df4e339ce8e4a47f19d50"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/context.json": {
+          "before": null,
+          "after": "dddde39899e9f394b8fe3f9f062b8cfc7551cdb9"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/evidence-map.json": {
+          "before": null,
+          "after": "46a6d34cde58cfc0b119c89d2aaa0bc51c9a3d9d"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/fixtures/invalid.json": {
+          "before": null,
+          "after": "c9986f07107b14ac67bfde686283315e2f40cb5a"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/fixtures/missing.json": {
+          "before": null,
+          "after": "fc316e2819084bb09956cd47abec7ae2e82198eb"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/fixtures/not-applicable.json": {
+          "before": null,
+          "after": "638560f6c77d005e99fb79354912a116ed74e68a"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/fixtures/valid.json": {
+          "before": null,
+          "after": "7606daeda4b96e3a6ec726bc6b81608816dfa974"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/manifest.json": {
+          "before": null,
+          "after": "a991ef72c6d12a45ebb40c4710110856bf35a9cc"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/profile.json": {
+          "before": null,
+          "after": "9c51d41ece714aa0194b419491a1aa79ee7349dd"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/publication.json": {
+          "before": null,
+          "after": "80d6b9ebbd1fdec46fd252888cfb5f1ef2aecf9c"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/report.json": {
+          "before": null,
+          "after": "0295c1fbfc4ff8c13b4bdd14d650ed8204b1cbff"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/rules.json": {
+          "before": null,
+          "after": "27b7b88ac60133772499bb25a8c795992ff10d01"
+        },
+        "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/scientific.json": {
+          "before": null,
+          "after": "46804debdf96af35ff5090c542d91ec3fc7b72ae"
+        },
+        "server-version/backend/src/modules/assessment-bundle/profile/report.ts": {
+          "before": "1f304835921957b9fc4f42b3a102c6b62076dece",
+          "after": "dac3746688abe3ef09d20c631d19aab8a712bd0b"
+        }
+      }
+    }
   }
 }
