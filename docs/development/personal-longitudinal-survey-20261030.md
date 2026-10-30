@@ -402,3 +402,33 @@ is replayed. The failed original run/preview and diagnostic are retained. Before
 any next activation the live PR base event is refreshed again. Another moving
 base stops classification rather than broadening the allowed scope or repeatedly
 launching full CI; no original failed run is rerun.
+
+### Authorized Ready run: preserve successful images; fix admission CLI cycle
+
+The user explicitly authorized Draft→Ready. The original tool succeeded at
+source171f. Ready run41028537466 passed scope123972428313, SAST123972543793 and
+production images123972544793. The personal qualification job123972544549 failed
+before migration at original-reporter admission: Node exit13, unsettled top-level
+await. The CLI dynamically imported onboarding-checks→content-scope→its own
+still-evaluating CLI module. Imported unit tests did not exercise that entrypoint.
+The exact first failure section and run/job metadata are retained; the failed run
+is not relabelled successful.
+
+The CLI now invokes the same original verifier in a short separate Node process,
+where the Ready module has completed import. A new real child-entry contract
+passes, along with the changed gate contract. No original business test reruns.
+To honor one-build execution, the next qualification authenticates the successful
+original image job via the existing Actions read token: fixed run/job/source,
+completed successful required build/scan steps, <24h age, identical full
+server-version tree and original reusable-image workflow/build script. Original
+whole-run failure remains failure. Missing/failed/skipped/expired or changed
+producer inputs refuse admission. The existing image workflow is unchanged.
+
+With that explicit receipt, the required image checks are admitted within the
+personal-tracking qualification job instead of rebuilding identical sources.
+Scope/qualification/current SAST remain required. Two new entry/provenance
+contracts and the affected gate contract passed; failed/expired/scan-skipped
+producer fixtures are refused. Actual new Actions metadata verification and
+native migration still must run. There is no retained deployable image archive
+and no deployment qualification. Current SAST is selected again because the
+qualification control code changed; application31/32/5 are not replayed.

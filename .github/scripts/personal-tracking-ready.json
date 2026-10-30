@@ -885,5 +885,18 @@
         ]
       }
     }
-  ]
+  ],
+  "imageReuse": {
+    "runId": 41028537466,
+    "jobId": 123972544793,
+    "sourceHead": "171f3c483d70b0d309b1ad2fe9fe4f0563512a4f",
+    "executionHead": "de5fa671d56fe824c480a5f2f715d338034fa045",
+    "serverVersionTree": "e1c1076b76b9aa92aef43e748bdeb9094630caa4",
+    "inputs": {
+      ".github/workflows/ci-images.yml": "d54c52bbe80dbb91ba70b1092490ae8a7fd22de1",
+      ".github/scripts/build-ci-images.sh": "2a4be34f89a3d14a4be099141107cd69008a7917"
+    },
+    "maximumAgeHours": 24,
+    "scope": "Official successful image build/scan checks only. No deployment or retained image archive is claimed."
+  }
 }

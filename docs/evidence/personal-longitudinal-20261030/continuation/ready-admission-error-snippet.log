@@ -1,0 +1,17 @@
+2026-10-30T08:45:51.0338944Z ##[group]Run node .github/scripts/personal-tracking-ready.mjs admit
+2026-10-30T08:45:51.0339967Z [36;1mnode .github/scripts/personal-tracking-ready.mjs admit[0m
+2026-10-30T08:45:51.0358081Z shell: /usr/bin/bash -e {0}
+2026-10-30T08:45:51.0358407Z env:
+2026-10-30T08:45:51.0358768Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T08:45:51.0359143Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T08:45:51.0360552Z   PERSONAL_TRACKING_PLAN: {"schemaVersion":1,"route":"personal-tracking","base":"1d95bf5d9c104dcc9d0ffa344858cb39a70212bd","head":"de5fa671d56fe824c480a5f2f715d338034fa045","tree":"c54520ab287aefff1c1a11a37864cffc0ee54992","draft":false,"reviewedCandidate":"a62c9a5763da69aa13b4f70d062b0bf55d6db65f","required":["scope","personal-tracking","docker","codeql"]}
+2026-10-30T08:45:51.0362102Z   DATABASE_URL: ***127.0.0.1:5432/personal_tracking_upgrade_test?schema=public
+2026-10-30T08:45:51.0362494Z ##[endgroup]
+2026-10-30T08:45:51.1120948Z Warning: Detected unsettled top-level await at file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/personal-tracking-ready.mjs:81
+2026-10-30T08:45:51.1122280Z  if(phase==='admit')writeFileSync('personal-tracking-evidence/reused-originals.json',JSON.stringify({plan,...await admitOriginalReports()},null,2)+'\n');
+2026-10-30T08:45:51.1123211Z                                                                                                              ^
+2026-10-30T08:45:51.1123663Z 
+2026-10-30T08:45:51.1123672Z 
+2026-10-30T08:45:51.1123678Z 
+2026-10-30T08:45:51.1153522Z ##[error]Process completed with exit code 13.
+

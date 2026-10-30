@@ -2005,3 +2005,13 @@ a newly merged BAT/COPSOQ catalog commit against an older event base. Only that
 base pin changed; all24 reviewed Survey application/test/schema blobs and locked
 inputs remain fixed. The original failed preview/refusal is retained. Main drift
 continues to stop qualification rather than broadening or starting full CI.
+
+For the PR399 CLI-only recovery, the successful image build/scans from official
+run41028537466/job123972544793 may be admitted only with exact source/head and
+required successful step metadata, age<24h, identical entire server-version tree,
+unchanged reusable image workflow and build script. The personal qualification
+job verifies that receipt before native checks; skipped/failed/stale/missing or
+changed inputs refuse. The original failed overall run stays failed. This is
+qualification evidence, not a deployable image archive or production permission.
+The existing image workflow is not changed; current SAST still runs for changed
+qualification controls.

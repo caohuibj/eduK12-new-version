@@ -24,7 +24,8 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
  }
  assert.deepEqual(entries.filter(e=>e.file.startsWith('server-version/')).map(e=>e.file).sort(),Object.keys(binding.files).sort());
  for(const [file,blob]of Object.entries(binding.protectedInputs))assert.equal(git('rev-parse',head+':'+file),blob,'Dependency/build input changed');
- return {schemaVersion:1,route:'personal-tracking',base,head,tree:git('rev-parse',head+'^{tree}'),draft:draft===true,reviewedCandidate:binding.reviewedCandidate,required:draft?['scope']:['scope','personal-tracking','docker','codeql']};
+ if(binding.imageReuse){assert.equal(git('rev-parse',head+':server-version'),binding.imageReuse.serverVersionTree,'Image source tree changed');assert.equal(git('rev-parse',binding.imageReuse.sourceHead+':server-version'),binding.imageReuse.serverVersionTree);for(const [file,blob]of Object.entries(binding.imageReuse.inputs))assert.equal(git('rev-parse',head+':'+file),blob,'Original image producer input changed');}
+ return {schemaVersion:1,route:'personal-tracking',base,head,tree:git('rev-parse',head+'^{tree}'),draft:draft===true,reviewedCandidate:binding.reviewedCandidate,...(binding.imageReuse?{imageReuse:binding.imageReuse}:{}),required:draft?['scope']:['scope','personal-tracking',...(binding.imageReuse?[]:['docker']),'codeql']};
 }
 export function personalTrackingReadyOutputs(plan){const out=participantAccessOutputs(plan);delete out.participant_access_plan;return {...out,application_route:'personal-tracking',scenario:'personal-tracking',codeql:!plan.draft,personal_tracking_plan:JSON.stringify(plan),personal_tracking_draft:false};}
 export async function admitOriginalReports(read=readFileSync){
@@ -36,6 +37,26 @@ export async function admitOriginalReports(read=readFileSync){
  verifyFailureContinuations(binding.reports.map(r=>({...r.review,id:r.id})),admitted);
  assert.equal(original.size,31,'All 31 original successful cases must remain present');assert(unique.size>=31,'Missing original successful application coverage');
  return {reviewedCandidate:binding.reviewedCandidate,caseCount:unique.size,admitted,ciExecuted:false,reviewBasis:binding.reviewBasis};
+}
+/** Separate process avoids the CLI -> onboarding -> scope -> CLI top-level
+ * await cycle; it uses the same original verifier, without application replay. */
+export function admitOriginalReportsInChild(){
+ const code="const {admitOriginalReports}=await import('./.github/scripts/personal-tracking-ready.mjs');process.stdout.write(JSON.stringify(await admitOriginalReports()));";
+ return JSON.parse(execFileSync(process.execPath,['--input-type=module','-e',code],{encoding:'utf8'}));
+}
+export async function verifyOriginalImages(plan,fetcher=fetch,now=Date.now()){
+ const proof=plan.imageReuse;assert(proof&&JSON.stringify(proof)===JSON.stringify(binding.imageReuse));
+ const token=process.env.GH_TOKEN;assert(token,'Existing Actions read token required');
+ const get=async path=>{const response=await fetcher('https://api.github.com/repos/'+binding.repository+path,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'}});assert(response.ok,'Official image metadata inaccessible: '+response.status);return response.json()};
+ const run=await get('/actions/runs/'+proof.runId),job=await get('/actions/jobs/'+proof.jobId);
+ assert.equal(run.head_sha,proof.sourceHead);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
+ assert.equal(job.run_id,proof.runId);assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
+ assert([proof.sourceHead,proof.executionHead].includes(job.head_sha),'Image execution source changed');
+ assert.equal(job.name,'docker (compose config + production builds) / production image build and scan');
+ const age=now-Date.parse(job.completed_at);assert(Number.isFinite(age)&&age>=-300000&&age<=proof.maximumAgeHours*3600000,'Original image check expired');
+ const steps=['validate compose','assert prelaunch resource and HTTPS contract','assert API/worker isolation topology','validate monitoring compose','build production images','verify production Nginx static asset MIME and security headers','scan backend image (high and critical)','scan frontend image (high and critical)'];
+ for(const name of steps)assert.equal(job.steps.find(step=>step.name===name)?.conclusion,'success','Original required image step did not pass: '+name);
+ return {status:'ADMITTED_IMAGE_CHECKS_ONLY',runId:run.id,originalRunConclusion:run.conclusion,jobId:job.id,sourceHead:run.head_sha,executionHead:job.head_sha,completedAt:job.completed_at,serverVersionTree:proof.serverVersionTree,requiredSteps:steps,ciExecutedInOriginalRun:true,reexecuted:false,deployableArchiveAvailable:false};
 }
 async function nativeDatabase(){
  const service=process.env.PG_SERVICE;assert(service&&/^[a-zA-Z0-9_.-]+$/.test(service));
@@ -78,7 +99,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  assert.equal(process.env.GITHUB_ACTIONS,'true','Formal qualification requires the existing Actions execution context');
  const phase=process.argv[2],plan=JSON.parse(process.env.PERSONAL_TRACKING_PLAN||'null');
  assert(plan&&plan.head===git('rev-parse','HEAD')&&!plan.draft);mkdirSync('personal-tracking-evidence',{recursive:true});
- if(phase==='admit')writeFileSync('personal-tracking-evidence/reused-originals.json',JSON.stringify({plan,...await admitOriginalReports()},null,2)+'\n');
+ if(phase==='admit')writeFileSync('personal-tracking-evidence/reused-originals.json',JSON.stringify({plan,...admitOriginalReportsInChild(),...(plan.imageReuse?{originalImages:await verifyOriginalImages(plan)}:{})},null,2)+'\n');
  else if(phase==='native')writeFileSync('personal-tracking-evidence/native-upgrade-restore.json',JSON.stringify({plan,...await nativeDatabase()},null,2)+'\n');
  else throw Error('Unknown qualification phase');
 }

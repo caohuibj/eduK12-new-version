@@ -1159,7 +1159,7 @@ jobs:
     # artifacts. Start it with scope; the merge gate independently requires
     # backend, production image scans and all other selected checks.
     needs: scope
-    if: ${{ (needs.scope.outputs.application_route == 'personal-tracking' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
+    if: ${{ (needs.scope.outputs.application_route == 'personal-tracking' && !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').imageReuse && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' }}
@@ -3517,6 +3517,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
+      GH_TOKEN: ${{ github.token }}
       PERSONAL_TRACKING_PLAN: ${{ needs.scope.outputs.personal_tracking_plan }}
       DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/personal_tracking_upgrade_test?schema=public
     services:
