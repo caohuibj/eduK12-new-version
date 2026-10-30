@@ -4219,7 +4219,7 @@
       "enabled": true,
       "base": "0a9c565ce9a46793363fd1b40a3e7a0b1d124019",
       "product": "676063e8989b8119fbae176d99dcbd0c8c331a97",
-      "controlCheckpoint": "78cb9322f89abc6167424cdae192c109cf27ade7",
+      "controlCheckpoint": "3cc544510241948e161f85cf4bc1e30978c45df5",
       "components": {
         "backend": "3981ae7a7afa5716834f69315b708075b93c6c76",
         "frontend": "8d7f9214106aa965d1379b75464136d7cc5b90e5"
