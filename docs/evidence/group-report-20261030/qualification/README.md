@@ -76,3 +76,35 @@ Actual local native-base control output (tool exit0; local, not CI execution):
 ℹ todo 0
 ℹ duration_ms 109.022596
 ```
+
+## Preserved main-race failure: run41032121655
+
+Source f854b49c27127accf2dc0c57837926742da4fc0c, attempt1; scope123984083883 and Ready gate123984227036 failed. Admission/native/application/SAST NOTRUN. Official checkout79bb9df925d2f1ed901e3565edf6f9f5328d4c07 has parents b85e3466819266ffb8cd844b39d87aa566fb90e6 and f854; event base8bd was refreshed correctly, but PR411 merged at09:15:20 UTC before this09:15:36 run. Exact source tree5b077dc1 versus merge tree5e9bac58 mismatch correctly stopped classification. This is diagnosed moving-main, not an application failure.
+
+Official raw logs: https://github.com/caohuibj/eduK12-new-version/actions/runs/41032121655/job/123984083883 . Downloaded full job log SHA256444e199abfe78bd0a9f06dcf92b80a28c80f96bc6f399946997cba04ce42423f (retained locally, not an artifact ZIP). First error excerpt:
+
+```text
+AssertionError [ERR_ASSERTION]: Source/merge tree drift
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2896901Z + actual - expected
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2897035Z 
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2897187Z + '5b077dc1e57c79f0d6e22f52b7d9f426663a9e53'
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2897549Z - '5e9bac58332dedc2d7591fc3474afb3c64e80dc7'
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2897755Z 
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2898182Z     at onboardingPlan (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/onboarding-scope.mjs:68:25)
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2898859Z     at file:///home/runner/work/eduK12-new-version/eduK12-new-version/[eval1]:12:18
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2899413Z     at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2899821Z   generatedMessage: false,
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2900056Z   code: 'ERR_ASSERTION',
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2900342Z   actual: '5b077dc1e57c79f0d6e22f52b7d9f426663a9e53',
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2900718Z   expected: '5e9bac58332dedc2d7591fc3474afb3c64e80dc7',
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2901022Z   operator: 'strictEqual',
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2901235Z   diff: 'simple'
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2901425Z }
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2901526Z 
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2901613Z Node.js v24.21.0
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T09:15:56.2914460Z ##[error]Process completed with exit code 1.
+```
+
+One bounded repair now aligns actual mainb85, only approved catalog/registry/docs changes. No old application, frontend type, browser or native replay. If main moves again, stop this qualification restart and ask DOT to sequence the merge window rather than churn candidates.
+
+The b85-aligned backend registry input received one current compiler execution, exit0, component tree `3aec4bd4f19888eb9f02ea8cbd2f470a03de6365`. Frontend and baseline/candidate Prisma trees remain unchanged; no frontend/compiler, application, browser or database replay. This replaces the earlier catalog checkpoint receipt for current qualification; the old success remains in immutable e576 history.
