@@ -1,0 +1,30 @@
+{
+  "status": "PREPARATION_ONLY_NOT_ACTIVATED",
+  "pr": 415,
+  "base": "43d119c9bfbc7949baab2edea29d96044b04607c",
+  "productCheckpoint": "91487d27e12e60cd30895d5e5327016552f9a45a",
+  "frontendTree": "b672a3fcf90f535079675048a7a013fbbbf660fb",
+  "backendTree": "dc9a331f08901238236ec3664e3173aba3f15030",
+  "scope": "Existing Teacher native adult Form reading, shared primitives/fullscreen/print; no source/statistics/permissions/store changes",
+  "proofsReused": [
+    "One original actual HuiteacherApp navigation case",
+    "One original actual navigation/responsive/fullscreen/print browser observation with synthetic API/auth",
+    "Exact current frontend type receipt and identical School backend tree receipt"
+  ],
+  "freshApplicationChecks": [],
+  "freshControlCheck": "One new415 fixed-route/browser-observation case only",
+  "laterJobs": [
+    "existing scope",
+    "reviewed original evidence admission",
+    "affected CodeQL",
+    "existing stable gate"
+  ],
+  "noNewWorkflow": true,
+  "queueConstraint": "Keep Draft and candidate disabled; PR409 currently aligns main, do not enter merge queue concurrently. Rebind actual final main when its queue slot opens.",
+  "notClaims": [
+    "No real backend/browser authority proof from synthetic UI fixture",
+    "No Teacher non-Form or personal-only GROUP permission",
+    "No subgroup/version functionality in415",
+    "No deployment"
+  ]
+}
