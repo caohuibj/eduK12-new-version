@@ -126,6 +126,8 @@ backend/frontend 镜像归档及摘要必须作为官方 artifact 保留，不�
 
 ## 规则位置与每次开工方式
 
+教师 JD-R PR405 继续复用 native-bundle / `ci-school-teacher.yml`：独立固定分支、完整 source/control/运行依赖闭包、原 passed-case reader 和当前两组件产物，计划见 [teacher-jdr-ci-plan.md](../bundle-declarative-onboarding/teacher-jdr-ci-plan.md)。原 PR388/392 身份与原件保留，未知/混合差异拒绝。Draft只admission；独立复核后方可激活当前类型、两producer、audit/runtime扫描、应用及控制CodeQL和stable gate，原模型/PG/浏览器不重放。main只观察精确已成功PR，不重建或部署。
+
 仓库本文件是完整规则的唯一维护来源，根 `AGENTS.md` 是开发/代理入口，`.github/PULL_REQUEST_TEMPLATE.md` 只记录本次适用项。本机 `~/.codex/AGENTS.md` 的 Huisurvey 专用段落和服务器 `/opt/eduk12-new/deploy/AGENTS.md` 仅作指引，指向同一仓库规则，不独立维护另一套发布标准。源码和文档均按实际 Git 版本读取；服务器安装版本不可静默改写为另一版本。
 
 每次开发/发布先给短执行清单：**修改范围 → 检查发现的具体故障 → 主要执行位置 → 输入一致的复用证据 → 时间预算**。不引入额外审批轮次或新验收机制。

@@ -1,5 +1,5 @@
 import { projectProfileScaleSource } from '../assessment-bundle/profile/sources'
-import { projectProfileView } from '../assessment-bundle/profile/report'
+import { projectProfileView,isAdultSelfBundleReport } from '../assessment-bundle/profile/report'
 import type { ProfileResult } from '../assessment-bundle/profile/match'
 import type { DisclosureCapabilitiesV1 } from '../scale/policy/types'
 import { loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
@@ -142,6 +142,7 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
     for (const binding of bindings.slots.filter(slot => slot.unitType === 'SCALE')) {
       let policy = binding.scaleDisclosure
       let frozenReportAudience:string|undefined
+      let adultSelfReport=false
       const admission = scaleAdmissions.find(item => item.compositeItemId === binding.itemId)
       // The policy frozen at actual admission takes precedence over creation-time compatibility.
       try {
@@ -150,12 +151,13 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
           const runtime = (await loadFrozenScaleRuntimeSnapshot(admission.runtimeSnapshotEncrypted,db))
           if (runtime.schemaVersion === 2) policy = scaleProjectionPolicyFromCompiled(runtime.compiledPolicy)
           frozenReportAudience=runtime.definition.report.audienceContract?.audience
+          adultSelfReport=isAdultSelfBundleReport(target.declarativePackage,runtime.definition.report.audienceContract,audience)
         }
       } catch { policy = denyAllScaleProjectionPolicy() }
       const capabilities = policy && policy.disposition !== 'UNKNOWN'
         ? resolveAudienceDisclosure(policy.disclosure, audience === 'student' ? 'subject' : audience === 'parent' ? 'respondent' : audience === 'admin' ? 'researcher' : 'teacher') : null
       if(target.declarativePackage?.schemaVersion===2 && capabilities && frozenReportAudience &&
-        frozenReportAudience!==(audience==='student'||audience==='parent'?'student':audience==='teacher'?'teacher':null))capabilities.individualInterpretations=false
+        !adultSelfReport && frozenReportAudience!==(audience==='student'||audience==='parent'?'student':audience==='teacher'?'teacher':null))capabilities.individualInterpretations=false
       profilePolicies.set(binding.slotKey,capabilities)
       for (let i=0;i<facts.evidence.length;i++) {
         const evidence = facts.evidence[i]
@@ -173,7 +175,7 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
     }
     if(target.declarativePackage?.schemaVersion===2 && facts.enginePayload.kind==='COMPUTED'){
       const payload=facts.enginePayload.payload as {profile:ProfileResult}
-      view.profileView=projectProfileView(payload.profile,target.declarativePackage,profilePolicies,audience==='admin')
+      view.profileView=projectProfileView(payload.profile,target.declarativePackage,profilePolicies,audience==='admin',audience)
       // Core-only classification is independent of auxiliary quality. ProfileView
       // supplies its own state; do not leak the full engine payload or modifier text.
     }

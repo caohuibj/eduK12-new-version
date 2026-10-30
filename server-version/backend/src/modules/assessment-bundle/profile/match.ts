@@ -26,13 +26,37 @@ export function runBundleProfile(model:ProfileModel,input:BundleEngineInputV1):P
     trace:{evidenceKeys:[],sourceResultHashes:[],supportRefs:[]},uncertainty:{inputCoverage:0,empiricalClassValidation:'NOT_ESTABLISHED',probabilityAvailable:false},
   }
   const evidence=new Map(input.evidence.map(e=>[e.evidenceKey,e]))
-  const grade=evidence.get(model.applicability.gradeEvidenceKey)
-  if(!grade || grade.value.state!=='present' || grade.quality!=='interpretable'){
-    out.reasons.push('MISSING_GRADE_CONTEXT');return out
-  }
-  const gradeValue=Number(grade.value.value)
-  if(!Number.isInteger(gradeValue) || gradeValue<model.applicability.minGrade || gradeValue>model.applicability.maxGrade){
-    out.state='NOT_APPLICABLE';out.reasons.push('GRADE_OUT_OF_SCOPE');return out
+  const applicability=model.applicability
+  if('gradeEvidenceKey' in applicability){
+    const grade=evidence.get(applicability.gradeEvidenceKey)
+    if(!grade || grade.value.state!=='present' || grade.quality!=='interpretable'){
+      out.reasons.push('MISSING_GRADE_CONTEXT');return out
+    }
+    const gradeValue=Number(grade.value.value)
+    if(!Number.isInteger(gradeValue) || gradeValue<applicability.minGrade || gradeValue>applicability.maxGrade){
+      out.state='NOT_APPLICABLE';out.reasons.push('GRADE_OUT_OF_SCOPE');return out
+    }
+  }else{
+    // Explicit self-declarations select this model's population; they grant no data access.
+    for(const key of [applicability.adultEvidenceKey,applicability.teacherEvidenceKey]){
+      const fact=evidence.get(key)
+      if(!fact || fact.value.state==='missing' || fact.quality==='unavailable'){
+        out.reasons.push(key+':MISSING_CONTEXT');return out
+      }
+      if(fact.value.state==='invalid' || fact.quality==='invalid' ||
+        (fact.value.state==='present' && typeof fact.value.value!=='boolean')){
+        out.state='INVALID';out.reasons.push(key+':INVALID_CONTEXT');return out
+      }
+      if(fact.value.state==='not_applicable'){
+        out.state='NOT_APPLICABLE';out.reasons.push(key+':CONTEXT_OUT_OF_SCOPE');return out
+      }
+      if(fact.value.state!=='present' || fact.quality!=='interpretable'){
+        out.reasons.push(key+':LIMITED_CONTEXT');return out
+      }
+      if(fact.value.value!==true){
+        out.state='NOT_APPLICABLE';out.reasons.push(key+':CONTEXT_OUT_OF_SCOPE');return out
+      }
+    }
   }
   let invalid=false
   for(const b of [...model.bindings].sort((a,b)=>a.constructKey.localeCompare(b.constructKey,'en'))){

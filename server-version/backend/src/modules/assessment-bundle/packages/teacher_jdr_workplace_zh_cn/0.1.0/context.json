@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "contextDefinitionKey": "teacher_jdr_workplace_zh_cn_context",
+  "contextDefinitionVersion": "0.1.0",
+  "fields": [
+    {
+      "contextKey": "adult_confirmed",
+      "required": true,
+      "valueType": "boolean"
+    },
+    {
+      "contextKey": "teaching_confirmed",
+      "required": true,
+      "valueType": "boolean"
+    }
+  ]
+}
