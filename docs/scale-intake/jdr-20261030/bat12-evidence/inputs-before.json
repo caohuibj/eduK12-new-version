@@ -1,0 +1,59 @@
+{
+  "base": "dc796e04203696b4a579aa6fd2428df592031ee3",
+  "executionTree": "UNCOMMITTED_CANDIDATE_BOUND_BY_RECORDED_FILE_BYTES",
+  "inputFiles": {
+    "server-version/backend/src/modules/scale/library/audience-report-gate.ts": {
+      "bytes": 1387,
+      "sha256": "3503b1ce38c976d0bb99943fb0657bef3e542ffda73a04d290ce3c314e7ab579"
+    },
+    "server-version/backend/src/__tests__/scale/structural-admission.test.ts": {
+      "bytes": 5970,
+      "sha256": "b156a8df87a810a2c8f73610621dd19e11f4ea6a603e35ac4da5b50aeb288167"
+    },
+    "server-version/backend/src/__tests__/scale/audience-report-locale.test.ts": {
+      "bytes": 2523,
+      "sha256": "6ab523358cdda67b9a60669e3307e613f91a950d94e95abb69e0e433940549d9"
+    },
+    "server-version/backend/src/modules/scale/instruments/bat12_2020_en/1.0.0/source.json": {
+      "bytes": 28395,
+      "sha256": "baa4f770b82032e2397a26d8a2adef1fc857bf643f1ea0ba70c5527cbf99b19e"
+    },
+    "server-version/backend/src/modules/scale/instruments/bat12_2020_en/1.0.0/instrument.ts": {
+      "bytes": 193,
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": {
+      "bytes": 16166,
+      "sha256": "47cbb90923dbb114f8e945513081add335bad5a007a8c0323540c7f326ce3aef"
+    },
+    "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts": {
+      "bytes": 3635,
+      "sha256": "96ba95d850446ce1b627807f866b46008787f0a245ec1a11b7da6a6c6f42ab69"
+    },
+    "server-version/backend/src/modules/scale/onboarding/source-snapshot.ts": {
+      "bytes": 1235,
+      "sha256": "5140b2be3e744d577bf6ec45ba6a3ab1555499417b3cce2c040557d51acf13c6"
+    },
+    "server-version/backend/src/modules/scale/policy/localization.ts": {
+      "bytes": 2855,
+      "sha256": "0b1d9fa4ba9d3de3be039cf2f86b53cac045a5a6bb8558e3f4357131b3b9e7d7"
+    },
+    "server-version/backend/scripts/scale-intake-selected-check.ts": {
+      "bytes": 22540,
+      "sha256": "a6e02bd0b7fe4071ecd1050e35f8ad988873ef841b5c2b1e5821b51838ec1831"
+    },
+    "server-version/backend/package.json": {
+      "bytes": 7246,
+      "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a"
+    },
+    "server-version/backend/package-lock.json": {
+      "bytes": 245999,
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "bytes": 233457,
+      "sha256": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f"
+    }
+  },
+  "policy": "No complete installed-dependency byte attestation; use actual Node version and locked package inputs. No DB/browser/install/publish/start claim."
+}

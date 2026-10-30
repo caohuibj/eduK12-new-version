@@ -152,12 +152,35 @@ function plan(){
   assert.equal(value.draft,false);assert.equal(value.postMerge,false);
   return value;
 }
-function readOriginal(proof){const bytes=readFileSync(safePath(proof.path));assert.equal(hash(bytes),proof.sha256,'Original evidence bytes drift');return JSON.parse(bytes);}
+function readOriginalBytes(proof){const bytes=readFileSync(safePath(proof.path));assert.equal(hash(bytes),proof.sha256,'Original evidence bytes drift');return bytes;}
+function readOriginal(proof){return JSON.parse(readOriginalBytes(proof));}
 
-// PR393 reuses reviewed tests, but its combined main backend has no exact-tree
+
+export function verifyBat12OriginalCommand(record,readBytes=path=>readFileSync(path)){
+  const bytes=proof=>{safePath(proof.path);const value=readBytes(proof.path);assert.equal(hash(value),proof.sha256,'Original BAT12 evidence byte drift');return value;};
+  const result=JSON.parse(bytes(record.result)),commands=JSON.parse(bytes(record.commands)),inputs=JSON.parse(bytes(record.inputs));
+  assert.equal(bytes(record.exit).toString('utf8'),'0\n');
+  assert.deepEqual(JSON.parse(bytes(record.stdout).toString('utf8')),result);
+  bytes(record.runner); // Inspect exact original runner bytes; never execute it in CI.
+  assert.equal(commands.workingDirectory,'/workspace/eduK12-jdr-work/server-version/backend');
+  assert.equal(result.cwd,commands.workingDirectory);assert.equal(commands.node,'v24.21.0');
+  assert.deepEqual(commands.selected.argv,['node','node_modules/tsx/dist/cli.mjs','/workspace/bundle-inputs/jdr-bat12-slice-20261030/selected-check.mts']);
+  assert.deepEqual(result.argv,['/workspace/eduk12-cloud/tools/node_modules/node/bin/node','/workspace/bundle-inputs/jdr-bat12-slice-20261030/selected-check.mts']);
+  assert.equal(commands.selected.exitCode,0);assert.equal(result.node,'v24.21.0');
+  assert.equal(result.status,'SELECTED_SOURCE_CONTRACT_PASS');
+  assert.equal(result.sourceSHA256,record.sourceSHA256);
+  assert.deepEqual(result.result,{instrumentKey:'bat12_2020_en',instrumentVersion:'1.0.0',status:'DRAFT',administrationEligibility:'not-evaluated',goldenCases:5,scoringExecutions:6,referencePolicy:'none',issues:[]});
+  assert.equal(inputs.base,'dc796e04203696b4a579aa6fd2428df592031ee3');
+  assert.equal(Object.keys(inputs.inputFiles).length,13);
+  for(const [path,proof]of Object.entries(inputs.inputFiles))assert.equal(hash(readBytes(safePath(path))),proof.sha256,'Original BAT12 input drift: '+path);
+  assert.equal(hash(readBytes('server-version/backend/src/modules/scale/instruments/bat12_2020_en/1.0.0/source.json')),record.sourceSHA256);
+  return {kind:'BAT12_SELECTED_SOURCE_CONTRACT',originalExitCode:0,originalSourceSHA256:record.sourceSHA256,goldenCases:5,distinctScoringInputs:6,ciExecuted:false,originalSigned:false,administrationEligibility:'not-evaluated'};
+}
+
+// Reviewed onboarding tests may precede a combined backend with no exact-tree
 // compiler result. Execute only that missing check here, never npm run build
 // (which invokes unrelated onboarding/scoring suites). Failure logs survive.
-function qualifyPr393BackendTypes(p,review){
+function qualifyCurrentBackendTypes(p,review){
   assert.deepEqual(review.types,[],'Do not relabel historical types as this combined tree');
   assert.equal(review.missingCheck,'CURRENT_COMBINED_BACKEND_TYPES');
   mkdirSync('onboarding-evidence',{recursive:true});
@@ -176,7 +199,7 @@ function qualifyPr393BackendTypes(p,review){
 
 function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=p.pr===393?allReviews.candidates?.['393']:allReviews;
+  const review=p.candidateKey?allReviews.candidates?.[p.candidateKey]:p.pr===393?allReviews.candidates?.['393']:allReviews;
   assert(review,'Missing exact reviewed evidence');
   assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
@@ -204,10 +227,12 @@ function admit(){
     assert.deepEqual(review.types,[],'PR381 does not fabricate an argv-style original receipt');
     originalTaskChecks=verifyPr381CommandRecords(readOriginal(record.commands),readOriginal(record.inputs),readOriginal(record.firstInputs),p.components.frontend,path=>readFileSync(path));
   }else assert(!review.pr381LocalChecks);
-  const types=p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
+  const types=(p.pr===393||p.candidateKey==='bat12-report-language')?qualifyCurrentBackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
   if([372,374].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   const observations=[];
+  if(p.candidateKey==='bat12-report-language')observations.push(verifyBat12OriginalCommand(review.bat12Selected));
+  else assert(!review.bat12Selected);
   if(p.pr===369){
     assert.equal(review.reportPlanningObservations?.length,1);
     const record=review.reportPlanningObservations[0];

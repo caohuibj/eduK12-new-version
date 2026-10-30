@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords} from './onboarding-checks.mjs';
+import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyBat12OriginalCommand} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 function fixture(){
@@ -267,7 +267,8 @@ test('PR393 admits the original 7 plus 7, retains skipped rows and cannot select
 test('PR393 keeps only missing backend types, changed SAST and the existing mandatory gate',()=>{
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');
  const job=yaml.slice(yaml.indexOf('  onboarding-structure:\n'),yaml.indexOf('  report-planning:\n'));
- assert(job.includes("if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 393\n      working-directory: server-version/backend"));
+ assert(job.includes("if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 393 ||"));
+ assert(job.includes('working-directory: server-version/backend'));
  assert(job.includes('npm ci --ignore-scripts --no-audit --no-fund'));assert(job.includes('node node_modules/prisma/build/index.js generate'));
  assert(job.includes('https://registry.npmjs.org'));assert(!job.includes('npm run build'));
  assert(yaml.includes(".pr == 393 && 'paths: [server-version/backend/src/modules/assessment-bundle,"));
@@ -277,4 +278,54 @@ test('PR393 keeps only missing backend types, changed SAST and the existing mand
  assert(script.includes("spawnSync(process.execPath,argv,{cwd:'server-version/backend',encoding:'utf8'})"));
  assert(script.includes("assert.equal(execution.status,0,'Current combined backend types failed"));
  assert(script.indexOf("writeFileSync('onboarding-evidence/backend-types.json'")<script.indexOf("assert.equal(execution.status,0"));
+});
+
+test('BAT12 pending branch binds an assigned PR only, rejects mixed inputs and preserves the legacy family',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/scale/library/audience-report-gate.ts';
+ const c={...f.b,pr:997,candidateKey:'bat12-report-language',branch:'feat/jdr-bat-report-language-20261030',source:{[file]:{before:null,after:blob}}};
+ const b={...f.b,candidates:{'bat12-report-language':c}},entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file}:e);
+ const env={...f.env,CI_PR_NUMBER:'997',CI_HEAD_REF:c.branch};
+ const p=onboardingPlan(entries,base,head,f.read,env,b);
+ assert.equal(p.candidateKey,c.candidateKey);assert.equal(onboardingOutputs(p).frontend,false);
+ assert.equal(onboardingPlan(f.entries,base,head,f.read,f.env,b).pr,366);
+ assert.throws(()=>onboardingPlan(entries,base,head,f.read,env,{...b,candidates:{'bat12-report-language':{...c,enabled:false,pr:null}}}),/pending independent activation review/);
+ assert.throws(()=>onboardingPlan(entries,base,head,f.read,env,{...b,candidates:{'bat12-report-language':{...c,pr:null}}}));
+ for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_PR_NUMBER:'393'},{CI_HEAD_REF:'other'},{CI_FORCE_FULL:'true'},{CI_PR_REPOSITORY:'other/repo'}])assert.throws(()=>onboardingPlan(entries,base,head,f.read,{...env,...patch},b));
+ for(const outside of ['server-version/frontend/src/App.tsx','server-version/backend/src/modules/scale/scale-scoring.ts','server-version/backend/prisma/schema.prisma'])
+  assert.throws(()=>onboardingPlan(entries.map(e=>e.file===file?{...e,file:outside}:e),base,head,f.read,env,{...c,source:{[outside]:{before:null,after:blob}}}));
+ assert.throws(()=>onboardingPlan(entries,base,head,f.read,{...env,CI_HEAD_REF:'unsupported'},{...c,branch:'unsupported'}),/Unsupported/);
+ const duplicate={...b,candidates:{one:c,two:{...c}}};assert.throws(()=>onboardingPlan(entries,base,head,f.read,env,duplicate),/Ambiguous/);
+ const postRead=(cmd,a,...r)=>cmd==='fetch'?'':cmd==='cat-file'?`tree ${tree}\nparent ${base}\nparent ${source}`:f.read(cmd,a,...r);
+ const pushed=onboardingPlan(entries,base,head,postRead,{...env,CI_EVENT:'push',CI_HEAD_REF:'',CI_PR_NUMBER:'',GITHUB_REF_NAME:'main'},b);
+ assert.equal(pushed.postMerge,true);assert.equal(onboardingOutputs(pushed).codeql,false);
+});
+
+test('BAT12 original command admission verifies actual exits, captured stdout and current source without scoring replay',async()=>{
+ const {createHash}=await import('node:crypto'),hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+ const review=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['bat12-report-language'];
+ assert.equal(review.decision,'PENDING_INDEPENDENT_REVIEW');assert.deepEqual(review.types,[]);
+ const record=review.bat12Selected,result=verifyBat12OriginalCommand(record);
+ assert.equal(result.goldenCases,5);assert.equal(result.distinctScoringInputs,6);assert.equal(result.ciExecuted,false);assert.equal(result.administrationEligibility,'not-evaluated');
+ for(const [field,value]of [['exit','1\n'],['stdout','{}']]){
+  const bad=structuredClone(record),bytes=Buffer.from(value);bad[field].sha256=hash(bytes);
+  assert.throws(()=>verifyBat12OriginalCommand(bad,path=>path===bad[field].path?bytes:readFileSync(path)));
+ }
+ const input=JSON.parse(readFileSync(record.inputs.path));delete input.inputFiles['server-version/backend/package-lock.json'];
+ const bad=structuredClone(record),bytes=Buffer.from(JSON.stringify(input));bad.inputs.sha256=hash(bytes);
+ assert.throws(()=>verifyBat12OriginalCommand(bad,path=>path===bad.inputs.path?bytes:readFileSync(path)));
+ assert.throws(()=>verifyBat12OriginalCommand(record,path=>path==='server-version/backend/src/modules/scale/library/audience-report-gate.ts'?Buffer.from('changed'):readFileSync(path)));
+ const original=review.reports[0],report=JSON.parse(readFileSync(original.path));assert.equal(verifyOriginalReport(report,original).length,3);
+ assert.equal(report.numPendingTests,4);
+ assert.throws(()=>verifyOriginalReport(report,{...original,selectedCases:[original.cases.find(c=>c.status==='skipped').fullName]}));
+});
+
+test('BAT12 uses the existing compiler/admission/SAST/gate without an unreviewed PR or frontend execution',()=>{
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8'),job=yaml.slice(yaml.indexOf('  onboarding-structure:\n'),yaml.indexOf('  report-planning:\n'));
+ assert(job.includes(".candidateKey == 'bat12-report-language'"));assert(job.includes('node .github/scripts/onboarding-checks.mjs admit'));
+ assert(job.includes('npm ci --ignore-scripts --no-audit --no-fund'));assert(!job.includes('npm run build'));
+ assert(yaml.includes(".candidateKey == 'bat12-report-language' && 'paths: [server-version/backend/src/modules/scale/library/audience-report-gate.ts"));
+ assert(job.includes("contains(fromJSON('[374,376,378,380,381]')"));
+ assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+ const binding=JSON.parse(readFileSync('.github/scripts/onboarding-bindings.json')).candidates['bat12-report-language'];
+ assert.equal(binding.enabled,false);assert.equal(binding.pr,null);
 });

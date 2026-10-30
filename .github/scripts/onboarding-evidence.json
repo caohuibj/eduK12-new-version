@@ -609,6 +609,108 @@
       ],
       "types": [],
       "missingCheck": "CURRENT_COMBINED_BACKEND_TYPES"
+    },
+    "bat12-report-language": {
+      "schemaVersion": 1,
+      "product": "af56bca1560fe2043f7b5788a19d8f7f1998c6f4",
+      "reviewer": "PENDING",
+      "decision": "PENDING_INDEPENDENT_REVIEW",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Original executions are unsigned; tests ran in the recorded uncommitted candidate, retrospectively associated with matching af56 source bytes.",
+          "Inputs-before records thirteen source/lock/schema hashes; not a full installed-dependency or historical whole-environment attestation.",
+          "3 passed and 4 skipped original cases remain exact; selected command receipt is not a Vitest reporter or a newly executed CI test.",
+          "Source DRAFT status and administrationEligibility not-evaluated remain unchanged; no installation/publication/FINAL/browser or scientific approval claim.",
+          "Only current combined backend tsc is missing and must run in the official job."
+        ]
+      },
+      "reports": [
+        {
+          "id": "bat12-locale-original",
+          "path": "docs/scale-intake/jdr-20261030/bat12-evidence/locale-unit.json",
+          "sha256": "1e1b17222f67101df6131e9544603d3522f521712e8d80be50e2e05e27ecc181",
+          "originalSourceAssociation": "af56bca1560fe2043f7b5788a19d8f7f1998c6f4",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedUnrelatedSourceDelta": [],
+          "deltaRationale": "Product source is the same af56 backend bytes; subsequent CI controls and evidence documents are outside the application component.",
+          "sourceAssociationBasis": "Recorded uncommitted input-file hashes match af56; association retrospective and unsigned, no historical exact Git execution-tree claim.",
+          "cases": [
+            {
+              "fullName": "cross-language report axis accepts the actual English BAT12 questionnaire with Chinese teacher feedback without widening questionnaire locale or source rights",
+              "status": "passed"
+            },
+            {
+              "fullName": "cross-language report axis binds report locale to the existing report revision and frozen source without changing measurement identity or old bytes",
+              "status": "passed"
+            },
+            {
+              "fullName": "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+              "status": "skipped"
+            },
+            {
+              "fullName": "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+              "status": "passed"
+            },
+            {
+              "fullName": "three-part structural admission keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy",
+              "status": "skipped"
+            },
+            {
+              "fullName": "three-part structural admission quarantines schema-invalid candidates with original diagnostics and still rejects identity collisions",
+              "status": "skipped"
+            },
+            {
+              "fullName": "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching",
+              "status": "skipped"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 4
+          },
+          "selectedCases": [
+            "cross-language report axis accepts the actual English BAT12 questionnaire with Chinese teacher feedback without widening questionnaire locale or source rights",
+            "cross-language report axis binds report locale to the existing report revision and frozen source without changing measurement identity or old bytes",
+            "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures"
+          ]
+        }
+      ],
+      "types": [],
+      "missingCheck": "CURRENT_COMBINED_BACKEND_TYPES",
+      "bat12Selected": {
+        "result": {
+          "path": "docs/scale-intake/jdr-20261030/bat12-evidence/selected-result.json",
+          "sha256": "6c5a00466d81800e022a9f70a8a2c480395e5473b7776f0486b2f8694163a4ce"
+        },
+        "stdout": {
+          "path": "docs/scale-intake/jdr-20261030/bat12-evidence/selected.log",
+          "sha256": "04154abd78c69b94c4f00da8f697b2ea6520e3289a1518a84a5f24e8a6fafb4a"
+        },
+        "exit": {
+          "path": "docs/scale-intake/jdr-20261030/bat12-evidence/selected.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "runner": {
+          "path": "docs/scale-intake/jdr-20261030/bat12-evidence/selected-check.mts",
+          "sha256": "641635237a62f308dc87e6245f7a0852c0677270fd0d82ec29c52d5d6ac99462"
+        },
+        "inputs": {
+          "path": "docs/scale-intake/jdr-20261030/bat12-evidence/inputs-before.json",
+          "sha256": "1d49682f83c5376c8f5576e5e676251259e4096f168e19e813428b43db214c3a"
+        },
+        "commands": {
+          "path": "docs/scale-intake/jdr-20261030/bat12-evidence/commands.json",
+          "sha256": "6b5a8415e6d6f1158ef357dfb5fd74606a5ccfe1f3bfa42bfa2b5b8f5af25cf4"
+        },
+        "sourceSHA256": "baa4f770b82032e2397a26d8a2adef1fc857bf643f1ea0ba70c5527cbf99b19e"
+      }
     }
   }
 }

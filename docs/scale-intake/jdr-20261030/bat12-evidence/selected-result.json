@@ -1,0 +1,24 @@
+{
+  "node": "v24.21.0",
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "/workspace/bundle-inputs/jdr-bat12-slice-20261030/selected-check.mts"
+  ],
+  "cwd": "/workspace/eduK12-jdr-work/server-version/backend",
+  "result": {
+    "instrumentKey": "bat12_2020_en",
+    "instrumentVersion": "1.0.0",
+    "status": "DRAFT",
+    "administrationEligibility": "not-evaluated",
+    "goldenCases": 5,
+    "scoringExecutions": 6,
+    "referencePolicy": "none",
+    "issues": []
+  },
+  "sourceSHA256": "baa4f770b82032e2397a26d8a2adef1fc857bf643f1ea0ba70c5527cbf99b19e",
+  "status": "SELECTED_SOURCE_CONTRACT_PASS",
+  "limits": [
+    "No DB installation/publication, deployment, browser or scientific/rights approval",
+    "Only BAT12 selected scorer and report consumer; previously passed CBI/HSE tools not replayed"
+  ]
+}

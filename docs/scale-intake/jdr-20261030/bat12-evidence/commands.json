@@ -1,0 +1,42 @@
+{
+  "base": "dc796e04203696b4a579aa6fd2428df592031ee3",
+  "workingDirectory": "/workspace/eduK12-jdr-work/server-version/backend",
+  "shellSetup": "source /workspace/eduk12-cloud/activate.sh",
+  "node": "v24.21.0",
+  "executionSigned": false,
+  "unit": {
+    "argv": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/__tests__/scale/structural-admission.test.ts",
+      "src/__tests__/scale/audience-report-locale.test.ts",
+      "-t",
+      "retains report language|cross-language report axis",
+      "--reporter=json",
+      "--outputFile=/workspace/bundle-inputs/jdr-bat12-slice-20261030/locale-unit.json"
+    ],
+    "exitCode": 0,
+    "report": "locale-unit.json"
+  },
+  "selected": {
+    "argv": [
+      "node",
+      "node_modules/tsx/dist/cli.mjs",
+      "/workspace/bundle-inputs/jdr-bat12-slice-20261030/selected-check.mts"
+    ],
+    "exitCode": 0,
+    "result": "selected-result.json",
+    "runner": "selected-check.mts"
+  },
+  "staticLocales": {
+    "exitCode": 0,
+    "result": "existing-report-locales.json",
+    "scope": "Existing report locale field compatibility only; no scoring/validation/DB/browser"
+  },
+  "limits": [
+    "No fresh whole-backend types or new formal CI",
+    "No DB installation/publication/FINAL/browser",
+    "Original failed checker is the handed-off failure; its argv/environment not reconstructed"
+  ]
+}
