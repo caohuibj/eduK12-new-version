@@ -1,0 +1,60 @@
+{
+  "recordedAt": "2026-10-30T13:03:33.503704+00:00",
+  "pr": 409,
+  "base": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+  "applicationAnchor": "483dde73c409eb8842e133ba281a69b51ddaf178",
+  "originalSource": "2160f195f67b211cc62ab8eda1ecf3f698927900",
+  "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+  "applicationDeltasUnchanged": 14,
+  "originalEvidence": {
+    "successfulJSONCases": 4,
+    "historicalDraftControl": 1,
+    "originalFailuresRetained": 2,
+    "applicationReplay": false
+  },
+  "localValidation": {
+    "changedAdmissionRouteControls": {
+      "passed": 5,
+      "log": "teacher-ready-controls.log"
+    },
+    "workflowActionlint": {
+      "exit": 0
+    },
+    "oldRowFixture": {
+      "status": "ROLLBACK_ONLY_PASS",
+      "fullMigrationOrRestoreExecuted": false,
+      "logSHA256": "b14c50e1aa3231ebfe5ea91dcf33b55c94fd46adaa679d66487dcafebdab87b0"
+    }
+  },
+  "formalPlan": {
+    "workflow": ".github/workflows/ci.yml",
+    "jobs": [
+      "scope",
+      "personal-tracking",
+      "docker",
+      "codeql",
+      "merge-gate"
+    ],
+    "native": {
+      "execute": true,
+      "why": "new education migration relative to main; Training native proof cannot admit it"
+    },
+    "currentFrontendTypesAndLint": true,
+    "imageAndSast": "new production tree; execute existing producers",
+    "backendFrontendAudits": "only authenticated exact locked-input prior steps <=24h; no unsigned local audit admission",
+    "budgetMinutes": "10-15; diagnose actual waiting at5",
+    "noMergeOrDeploy": true
+  },
+  "documentation": {
+    "spec": "https://app.notion.com/p/409190e0cc30819fbcbff2ba5902bb09",
+    "review": "https://app.notion.com/p/409190e0cc30814ebe2fc3cbe10c1704",
+    "oldCIPageNotMapped": true,
+    "recordingNonblocking": true
+  },
+  "authentication": {
+    "localGitGh": "401; no credential modified",
+    "connectedGitHub": "authorized connector Git object read/create/CAS publishing",
+    "mainImport": "exact upstream signed commit object SHA verified; full tree equals qualified Training candidate",
+    "oldLog403Retried": false
+  }
+}

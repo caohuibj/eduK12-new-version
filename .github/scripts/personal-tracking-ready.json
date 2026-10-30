@@ -1,164 +1,98 @@
 {
   "schemaVersion": 1,
   "repository": "caohuibj/eduK12-new-version",
-  "slice": "training",
-  "branch": "feat/personal-longitudinal-training-20261030",
-  "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
-  "reviewedCandidate": "e8d515058554a5e4bbf321074c5906c53d880c7a",
-  "originalSource": "dbcc7e597aba792aa052cd23634332d80a4252e1",
-  "originalCaseCount": 31,
-  "originalReportPrefix": "docs/evidence/personal-longitudinal-training-20261030/",
-  "reviewBasis": "Training original32 records remain local unsigned evidence:31 passed application/consumer JSON cases plus one historical Draft-scope Node control. Every Training application added/removed-line delta matches immutable dbcc (schema compared to its Survey base2f8829; other files to main1cc). Mainfa context is separately merged/qualified. Current frozen e8d source is the candidate anchor for independent DOT review, not a claim DOT approved this PR. Current formal new migration/native restore and changed production source checks still execute.",
+  "slice": "teacher",
+  "branch": "feat/personal-longitudinal-education-20261030",
+  "base": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+  "reviewedCandidate": "483dde73c409eb8842e133ba281a69b51ddaf178",
+  "originalSource": "2160f195f67b211cc62ab8eda1ecf3f698927900",
+  "originalCaseCount": 4,
+  "originalReportPrefix": "docs/evidence/personal-longitudinal-teacher-20261030/",
+  "reviewBasis": "Teacher four distinct successful raw application/retained-state/browser JSON records plus one historical Draft control remain unsigned local evidence. Two original failed raw reporters remain failed, with explicit retained-state continuations; no application journey replay. All14 application deltas match original2160 relative to prerequisite dbcc; current frozen anchor only incorporates separately merged Training mainfb3. New education migration/restore, current image/security, selected SAST and frontend types remain actual formal checks.",
   "files": {
-    "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql": {
+    "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql": {
       "before": null,
-      "after": "6f864876d2a10bb9fe9f837ae21cd5c56f7eb88d",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "b767aa24ad90b42f7e2e48a3df4ead711f0122f918733f2789bfd940cc193a8e"
+      "after": "1e60060b0349b5537cca76fea8b7cdbb705e911d",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "9b07b7183e539661da44cd12c0f49a25cdf8aa33cfa07d803e82876dd6f3774c"
     },
-    "server-version/backend/prisma/schema.prisma": {
-      "before": "007cf25fce43a97a7278b4d13277128154d70b6b",
-      "after": "9eda61f452eb26ba2007233e9317805207c6dacb",
-      "originalBase": "2f8829d64b37d2780e7b8546523a7a2d6d8f1a90",
-      "originalDeltaSHA256": "0fadc5340eaba040c0593ca1b9ca980ae3b4f8a4d302f88893ee3938a366ddf2"
-    },
-    "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts": {
+    "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts": {
       "before": null,
-      "after": "01339c2f2a86799aaef112576547ddfe22abb265",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "b4f3f39ac0d4aa51cf8c00ff12b32c3201e774c8065bf2dd17477ad815676d31"
+      "after": "86e656866eee5fb00bc6b3ba3f274e27837b69e2",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "778dd823872e37549438dd6c41f7ae35f7ebda8f36d64dee8ce2fc9abc855de9"
     },
-    "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts": {
-      "before": "9c1587875c6b15d9b730a387b82715aa2de20520",
-      "after": "2c609d96b7fe5dd7d6f74f5737bb88b52be2d83f",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "531f309b6bf9967c030c07f4baa49185e5baf3517576931b6382e5530c445f84"
-    },
-    "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts": {
+    "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts": {
       "before": null,
-      "after": "cb5bd422021cd0f23f06858ffa7121f1b9056b69",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "0f90bfc9f466fe5c9e0956bbd8f46d1f4d9a0d3de076e25d0b4ad704d0dc5961"
+      "after": "b2594ab6b1ee1c2ff8a02173bfe2263e5974e887",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "da3f5d5b6beb3d397531ed9e8e17f4b98df84cf43386c5ac710357f39af21161"
     },
-    "server-version/backend/src/modules/anonymous-study/routes.ts": {
-      "before": "323a19a2a84a67ba16109f0422b43598f85b8659",
-      "after": "0fbe6c19cafa34153a4bb2341733c7477083e9fc",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "8cddc6f7cac290e7b5b795f90ebcf7b39d08902f3f05bcc7bd8192946752084a"
+    "server-version/backend/src/modules/assessment-run/publish.ts": {
+      "before": "e98bb714e632b030fe6dacd5c8da24af604eeb20",
+      "after": "c8005da46d53213329dd250f0127506987902278",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "3d316df12c3f1221ee2e06b589ee8bcc6cbf8433a079b1a213996fd765a5c826"
     },
-    "server-version/backend/src/modules/anonymous-study/service.ts": {
-      "before": "a6ae47192c4c171c3e27086a70227646e4424f5f",
-      "after": "63261260b198fa60bc00f7fcc090ea3fa44220a6",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "64be210a5708945a738904db1748e7d94df3353f2ec214e6b22c0ff277782bc8"
+    "server-version/backend/src/modules/assessment-run/repository.ts": {
+      "before": "d9359c3a3b50ea54921986227cb5d00e3b6a2e80",
+      "after": "26208ea23966b8cfadfe1cdda85fb93ab6eeb4e3",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "a8ea4c1a22a6aeb506220ffb410560f4309137780afdb5072176dc712a98104d"
     },
-    "server-version/backend/src/modules/bundle-product/routes.ts": {
-      "before": "f00d92d4e111948ffa92478d00dbc512426f0944",
-      "after": "4bf98360eeb897c9a5d07b075cb4808d869a5600",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "c0972ef3637bf9110e41b1beac2569d77fd766505c08f4f37650946a5292cb7b"
+    "server-version/backend/src/modules/huiteacher/evaluation.service.ts": {
+      "before": "5de03db1d97e18647246e98d4cc8706f497cc97b",
+      "after": "2970e80f4d06018e94db9eb9f0364177e8a2792f",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "0c2488fba242d6b55b220364d8ae3715aec824dd82a2414ba0f83070cafe4c6d"
     },
-    "server-version/backend/src/modules/bundle-product/service.ts": {
-      "before": "c330f7f35a5a8aea3ad9211cde1f375bc19f0800",
-      "after": "0c8635c4546a2c0a078f3255b2224dfd4310699c",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "54f39a205963b56ea7f02ca3b9c643d2389fda0320fa2af03c178f18e662266a"
+    "server-version/backend/src/modules/huiteacher/run.routes.ts": {
+      "before": "367d1ced654b44762fd003a3ba1f6c075e2c81b0",
+      "after": "e5f50445c5ef7876e3a4c86da806438cdc850746",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "f83d5a79bb1d1293af339e753366c555cf59155f3ad2975c4b75e52acc434ea5"
     },
-    "server-version/backend/src/modules/composite/composite.routes.ts": {
-      "before": "244e054f08448948749271b09a47c95fa2e9738e",
-      "after": "d0719f903f96e78499a9ed6303462169437981b8",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "8ce9ca30c7ce8ce55e13ed03dd929a38ef0eff162716f5149226c99546918e99"
+    "server-version/backend/src/modules/huiteacher/run.service.ts": {
+      "before": "98468e55eae9c201a32fe5cc46a703b013cee2fc",
+      "after": "70eac6c38c43683490f53069792290dd697fa039",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "65496c1c21b129ddce94aaa7e7fc39bb4b9836ada90198536be4163a2ac22b6b"
     },
-    "server-version/backend/src/modules/composite/composite.service.ts": {
-      "before": "066853789e82bc7b39c43b63d0d2869c9b0457df",
-      "after": "3878a537a413f7349930c285b89b830033eab37e",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "7c599e126fc729433fa7edb730235100a987248819e62d4140bc43d25fe02415"
+    "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts": {
+      "before": "f7c1a4ed2d468ba349d21d6fa05d7132e4294517",
+      "after": "c3536f21ff37a268c3463be0b8b2fcbdf77bbb8e",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "c49de5e5aeed526b5dea038f4ebd85e46b5a5d8bb051c5912d38a3e7cb1f233a"
     },
-    "server-version/backend/src/modules/composite/personal-tracking-results.ts": {
+    "server-version/backend/src/modules/reporting/education-personal-tracking.ts": {
       "before": null,
-      "after": "e93c69f08e23ac18c36c42d57f36b655174059c0",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "1d024ff4eda3e1522dd8a0b517d46f57c960ae27302d9df0e615e14d32931fa7"
+      "after": "6353b866b5ef2b8ecac22698abbf2b957e83d61d",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "24ba5077b7f33a1300ed9da5ebd0cf6a3b5bc6f9dcdcb5230f0a9799f7f28cf5"
     },
-    "server-version/backend/src/modules/composite/personal-tracking.service.ts": {
+    "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": {
       "before": null,
-      "after": "5e81e7e389b9f7d66e8b8c5a460e63fa147ea94a",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "6096e8805749cea6aa755cd5e15b86835e7b15f00e91c00b9edc3e67125fd398"
+      "after": "737821d28e4556096806911118e820668c36b68b",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "6a3a07ea8e3ad01cad87dff1d9f92b55dd699dec9bfc3d4e1e56ad43527d80da"
     },
-    "server-version/backend/src/modules/composite/personal-tracking.ts": {
+    "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
+      "before": "72708bedf1c0ce6308d3c6fcf4f0267655229c73",
+      "after": "b6bab50a6a827937877e8534469ca5fabd363ec5",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "95695c1f2afbce65078dd79456996b283797a20b3520450a629984f21578e00c"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx": {
+      "before": "67e996f49ce24a43bd32afa0464900454bff8599",
+      "after": "1773440e9ab6c51df5736de620a338562be0b33e",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "17b7a3c58e1ee175b2da5a46d8f41e4ee3822c215ff3397807528b5755fa84a2"
+    },
+    "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx": {
       "before": null,
-      "after": "7ab8d072a566a959c6bbde232a34e92b855d5727",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "faeb4ae0926f3ddaad1d1ce40b36ca4477bfd3d3800f1ae629c4f53fbd5d8b3d"
-    },
-    "server-version/backend/src/modules/composite/training-content-binding.ts": {
-      "before": "0d70f2e272bcca3ed36384e2c74d9d15cdfe82ac",
-      "after": "60c2ed53c328ea6d28a2bfa4bd3abf5a1f77281b",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "f2019bad5fd056bc2f69049b0c29acc6cfce9add8bc13b2cc9089eb27c0334a9"
-    },
-    "server-version/backend/src/modules/composite/training-metric-disclosure.ts": {
-      "before": "26d9c79852d8f15d985f55d0dc75dbe5c5b3d399",
-      "after": "abaa68a0b5dce36d868355321d5c549a33e59d84",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "8b0882a1b701eb23ae57038a37260fb403f53cd0daab76f3fb286e64a148b9cb"
-    },
-    "server-version/backend/src/modules/questionnaire-product/routes.ts": {
-      "before": "ddf46f02c8e30038e18cbb9f104f0175e97c556a",
-      "after": "e72e540a55b40f1e4f6b1aee23603a6c688212fa",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "397c80e033998b719db1b1608f9c0133d08969de7fef73e6a2c5fc4eb36a60b6"
-    },
-    "server-version/backend/src/modules/questionnaire-product/service.ts": {
-      "before": "f2d60e8feb0635ac10160f073a4beb329b332f35",
-      "after": "96ea8096f2c7a537228461da4623f6064df42325",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "25e27cb85eec9d38c6c013bf05e23f9d6d900b5a8a5f473fa62886d297f083cd"
-    },
-    "server-version/frontend/src/api/anonymousStudy.ts": {
-      "before": "87735f316ac201712a0cf6dc28d01574541e3638",
-      "after": "9885f6879cf11fd2533c270315a15e91160e1c77",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "88c73e349d88626c642d9187ba06fbabea2f940a0bd0d81f145aeee312d2a2e0"
-    },
-    "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
-      "before": "14bf92d842753749b6dfc7f040163fa1e84c0901",
-      "after": "c2bbaad8ada2691d23bb4615b20ad6716cd93f45",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "9d37c7d848986d67331062ff9e6e6f18797d1e8ede429efedcf303bec5438356"
-    },
-    "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx": {
-      "before": null,
-      "after": "b3ffb65076ba4119318af6d3314b773394b36c7a",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "5d893f14a081d6e1cc031285d192968838449349c307c9d5585fc5a8066dfe48"
-    },
-    "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx": {
-      "before": null,
-      "after": "7665577adc466b8c6e248dee83a488b806dcdbae",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "e116352e7efb1248405c3974a50cb02b08847554d3f7e0bb685f6643abd693bb"
-    },
-    "server-version/frontend/src/pages/bundle/BundleProducts.tsx": {
-      "before": "5edd1d1d7d4476410cd69f4bbb050541c6a9093e",
-      "after": "20f57cb571df7e6f67999973b871b4de90d77ed4",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "970f1e37695ae72b2586e88dbf2a78fd6d8986648584ece8718a238cdbf5ea14"
-    },
-    "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx": {
-      "before": "440ada5e283d26e68ea8399705c174a05ff17b94",
-      "after": "f7387f506be530eb54020ddf10e550d6d82b3b76",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "61387788a160109f72fa4938db5b68e45affb8596d82e3d7c10335341dfb2e6a"
-    },
-    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
-      "before": "48d61ec98199cafdc5e1a5b23b8ea6bb0adc7534",
-      "after": "8e904a8dac481fbc142abd9a44bad8076b5d7395",
-      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
-      "originalDeltaSHA256": "1238aa4073d511a6fde32935b509ec402934c394c3fbc91fb69f0aac59590206"
+      "after": "9d7e6c65e255a419ec4bd49d083511c38447305d",
+      "originalBase": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+      "originalDeltaSHA256": "e9202e332df6cb8617962413e27aec30693de8b1fe337507a4a4fb49935b8485"
     }
   },
   "protectedInputs": {
@@ -173,236 +107,17 @@
   },
   "reports": [
     {
-      "id": "training-browser-response-fixed",
-      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-response-fixed.json",
-      "sha256": "ea3ebbcc25beaa76f1ea5fb0813acd0720620fd43ad037d1e0dd630ff8c6c3e9",
+      "id": "teacher-longitudinal-pg-continuation",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-pg-continuation.json",
+      "sha256": "287c3a96c370af64eb9c91c7a2e6e3f11e28de5574d49a41b36b58d5649fd1f3",
       "review": {
         "cases": [
           {
-            "fullName": "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+            "fullName": "Teacher personal longitudinal native Run publishes frozen T1, creates native T2, saves actual answers, reads both reports and rejects wrong/currently revoked identity",
             "status": "skipped"
           },
           {
-            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
-            "status": "skipped"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 1,
-          "numFailedTests": 0,
-          "numPendingTests": 2
-        },
-        "selectedCases": [
-          "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium"
-        ]
-      }
-    },
-    {
-      "id": "training-bundle-pg-course",
-      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-course.json",
-      "sha256": "8f26a89378f4da1fcc2f24d168a945024bea613eecbee6572ec69aa4a9f60752",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
-            "status": "skipped"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 1,
-          "numFailedTests": 0,
-          "numPendingTests": 3
-        },
-        "selectedCases": [
-          "Training personal longitudinal native publication and SELF results keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment"
-        ]
-      }
-    },
-    {
-      "id": "training-contract",
-      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-contract.json",
-      "sha256": "fcd59c8d98f0838124dda8f771cb7122dea85b58467ef75e8f975cdb3e0766f5",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Training entry measurement adapter uses C plus actual cognitive mode, while full config report changes do not change raw-score identity",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training entry measurement adapter preserves numeric Form meaning across copied slot keys, and refuses category encodings",
-            "status": "failed"
-          }
-        ],
-        "summary": {
-          "success": false,
-          "numPassedTests": 1,
-          "numFailedTests": 1,
-          "numPendingTests": 0
-        },
-        "selectedCases": [
-          "Training entry measurement adapter uses C plus actual cognitive mode, while full config report changes do not change raw-score identity"
-        ],
-        "allowPartialFailure": true,
-        "failureContinuations": [
-          {
-            "caseName": "Training entry measurement adapter preserves numeric Form meaning across copied slot keys, and refuses category encodings",
-            "reportId": "training-form-contract-corrected"
-          }
-        ]
-      }
-    },
-    {
-      "id": "training-disclosure",
-      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-disclosure.json",
-      "sha256": "5a3b3aa385475de703944c97128aaff32f846b6783f6dfcd94c45ad5e46003ec",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling keeps the participant subject ceiling independent from teacher scores and cognitive research-only keys",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling excludes research-only, nonstandard, product index and nonnumeric cognitive metrics, while preserving standard and QC facts",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling does not promote an ADMIN-derived researcher label or a researcher template into extra cognitive data permission",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive parent source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive item source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive assignment source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive config source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive submission source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive profile source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive runtime source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive provenance source",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling retains QC numeric diagnostics without allowing them to acquire individual reference interpretation",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling uses the frozen Scale V2 policy, independently gates references, and never reads answers or result bodies",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling cannot promote researcher disclosure over an educational-only frozen teacher policy",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling also retains a stricter frozen researcher audience restriction rather than replacing it with teacher permission",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling preserves only explicit V1 custom-descriptive compatibility and denies unknown standard instruments",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale epoch corruption",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale scale corruption",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale submission corruption",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale hash corruption",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training shared frozen per-unit disclosure ceiling fails closed for Scale snapshot corruption",
-            "status": "passed"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 21,
-          "numFailedTests": 0,
-          "numPendingTests": 0
-        },
-        "selectedCases": [
-          "Training shared frozen per-unit disclosure ceiling keeps the participant subject ceiling independent from teacher scores and cognitive research-only keys",
-          "Training shared frozen per-unit disclosure ceiling excludes research-only, nonstandard, product index and nonnumeric cognitive metrics, while preserving standard and QC facts",
-          "Training shared frozen per-unit disclosure ceiling does not promote an ADMIN-derived researcher label or a researcher template into extra cognitive data permission",
-          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive parent source",
-          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive item source",
-          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive assignment source",
-          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive config source",
-          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive submission source",
-          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive profile source",
-          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive runtime source",
-          "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive provenance source",
-          "Training shared frozen per-unit disclosure ceiling retains QC numeric diagnostics without allowing them to acquire individual reference interpretation",
-          "Training shared frozen per-unit disclosure ceiling uses the frozen Scale V2 policy, independently gates references, and never reads answers or result bodies",
-          "Training shared frozen per-unit disclosure ceiling cannot promote researcher disclosure over an educational-only frozen teacher policy",
-          "Training shared frozen per-unit disclosure ceiling also retains a stricter frozen researcher audience restriction rather than replacing it with teacher permission",
-          "Training shared frozen per-unit disclosure ceiling preserves only explicit V1 custom-descriptive compatibility and denies unknown standard instruments",
-          "Training shared frozen per-unit disclosure ceiling fails closed for Scale epoch corruption",
-          "Training shared frozen per-unit disclosure ceiling fails closed for Scale scale corruption",
-          "Training shared frozen per-unit disclosure ceiling fails closed for Scale submission corruption",
-          "Training shared frozen per-unit disclosure ceiling fails closed for Scale hash corruption",
-          "Training shared frozen per-unit disclosure ceiling fails closed for Scale snapshot corruption"
-        ]
-      }
-    },
-    {
-      "id": "training-form-contract-corrected",
-      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-contract-corrected.json",
-      "sha256": "5aaf84e98f0ccaf99c59fdce9d606d1fb7a55b4f755b79ae383710779311ece7",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Training entry measurement adapter uses C plus actual cognitive mode, while full config report changes do not change raw-score identity",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Training entry measurement adapter preserves numeric Form meaning across copied slot keys, and refuses category encodings",
+            "fullName": "Teacher personal longitudinal native Run retains completed T1/T2 and verifies current report denial after the original native journey",
             "status": "passed"
           }
         ],
@@ -413,76 +128,26 @@
           "numPendingTests": 1
         },
         "selectedCases": [
-          "Training entry measurement adapter preserves numeric Form meaning across copied slot keys, and refuses category encodings"
+          "Teacher personal longitudinal native Run retains completed T1/T2 and verifies current report denial after the original native journey"
         ]
       }
     },
     {
-      "id": "training-form-pg",
-      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-pg.json",
-      "sha256": "61e9aa91e045c5271e6e059d62f9fc16b88c0b357c30eae7e3632f206a314639",
+      "id": "teacher-longitudinal-invariants",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-invariants.json",
+      "sha256": "a3e1434f8a469e031635df88bb7a22a2cbc9fdc6e6fb2db913b79d575c616956",
       "review": {
         "cases": [
           {
-            "fullName": "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium",
+            "fullName": "Teacher personal longitudinal native Run publishes frozen T1, creates native T2, saves actual answers, reads both reports and rejects wrong/currently revoked identity",
             "status": "skipped"
           },
           {
-            "fullName": "Training personal longitudinal native publication and SELF results keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+            "fullName": "Teacher personal longitudinal native Run retains completed T1/T2 and verifies current report denial after the original native journey",
             "status": "skipped"
           },
           {
-            "fullName": "Training personal longitudinal native publication and SELF results tracks a typed numeric Form response through copy and real FINAL without creating a psychological score",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
-            "status": "skipped"
-          }
-        ],
-        "summary": {
-          "success": true,
-          "numPassedTests": 1,
-          "numFailedTests": 0,
-          "numPendingTests": 4
-        },
-        "selectedCases": [
-          "Training personal longitudinal native publication and SELF results tracks a typed numeric Form response through copy and real FINAL without creating a psychological score"
-        ]
-      }
-    },
-    {
-      "id": "training-latest-pg-access",
-      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg-access.json",
-      "sha256": "5ae81ab914b6d0dc3ced499ee7da8e37e1bffa09fe3c6327eb496791ed3798ab",
-      "review": {
-        "cases": [
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results tracks a typed numeric Form response through copy and real FINAL without creating a psychological score",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
-            "status": "skipped"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results selects the latest completed whole Training parent while retaining prior snapshots and rechecking course access",
+            "fullName": "Teacher personal longitudinal native Run keeps published Teacher tracking and encrypted snapshots immutable",
             "status": "passed"
           }
         ],
@@ -490,64 +155,66 @@
           "success": true,
           "numPassedTests": 1,
           "numFailedTests": 0,
-          "numPendingTests": 5
+          "numPendingTests": 2
         },
         "selectedCases": [
-          "Training personal longitudinal native publication and SELF results selects the latest completed whole Training parent while retaining prior snapshots and rechecking course access"
+          "Teacher personal longitudinal native Run keeps published Teacher tracking and encrypted snapshots immutable"
         ]
       }
     },
     {
-      "id": "training-pg-corrected",
-      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-corrected.json",
-      "sha256": "55da45d4031b13a163696cc1104c890019ea157011668a96e845d080158ba4fb",
+      "id": "teacher-longitudinal-browser-resume",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-resume.json",
+      "sha256": "16a2c973713720a4e90a0761377ba2cf81fb42aba8e6531ece9fcdb1a1e43053",
       "review": {
         "cases": [
           {
-            "fullName": "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
-            "status": "passed"
-          },
-          {
-            "fullName": "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+            "fullName": "Teacher native longitudinal publisher, SELF answer and reports in Chromium creates the next native event, publishes, saves three SELF responses and reads single plus independent changes",
             "status": "passed"
           }
         ],
         "summary": {
           "success": true,
-          "numPassedTests": 2,
+          "numPassedTests": 1,
           "numFailedTests": 0,
           "numPendingTests": 0
         },
         "selectedCases": [
-          "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
-          "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads"
+          "Teacher native longitudinal publisher, SELF answer and reports in Chromium creates the next native event, publishes, saves three SELF responses and reads single plus independent changes"
         ]
       }
     },
     {
-      "id": "training-ui-scope",
-      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-ui-scope.json",
-      "sha256": "bf454d99170be78f5729cd0b367436beb6f610ad1266ec2d4df7113ae2d73723",
+      "id": "teacher-longitudinal-bounded-read",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-bounded-read.json",
+      "sha256": "a57a785abe88459e43b10a9917bb8b7bdc06f8771ce08b1c203324558d54a86a",
       "review": {
         "cases": [
           {
-            "fullName": "Training own changes request scope discards an old response when the account/attempt changes",
-            "status": "passed"
+            "fullName": "Teacher personal longitudinal native Run publishes frozen T1, creates native T2, saves actual answers, reads both reports and rejects wrong/currently revoked identity",
+            "status": "skipped"
           },
           {
-            "fullName": "Training own changes request scope uses the stable study credential and clears the rendered view when it changes",
+            "fullName": "Teacher personal longitudinal native Run retains completed T1/T2 and verifies current report denial after the original native journey",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Teacher personal longitudinal native Run keeps published Teacher tracking and encrypted snapshots immutable",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Teacher personal longitudinal native Run reads retained native T3 with tracked-task bounds and stable cached ordering",
             "status": "passed"
           }
         ],
         "summary": {
           "success": true,
-          "numPassedTests": 2,
+          "numPassedTests": 1,
           "numFailedTests": 0,
-          "numPendingTests": 0
+          "numPendingTests": 3
         },
         "selectedCases": [
-          "Training own changes request scope discards an old response when the account/attempt changes",
-          "Training own changes request scope uses the stable study credential and clears the rendered view when it changes"
+          "Teacher personal longitudinal native Run reads retained native T3 with tracked-task bounds and stable cached ordering"
         ]
       }
     }
@@ -588,10 +255,10 @@
     ]
   },
   "previousSliceQualification": {
-    "sourceHead": "e34438dc35ac2f21b2ae48ec291e20c80d9903f8",
-    "runId": 41053670118,
-    "jobId": 124055865989,
-    "serverVersionTree": "6deef4737c8d8b707b4ec0cced08152375a4cd47",
+    "sourceHead": "a787a777d444b649a3d13870b737fc5113652cad",
+    "runId": 41057646991,
+    "jobId": 124069249478,
+    "serverVersionTree": "bfd2e2e2e24051095ae306624c980460044a526c",
     "maximumAgeHours": 24
   },
   "frontendAuditReuse": {
@@ -603,8 +270,46 @@
     "maximumAgeHours": 24
   },
   "historicalDraftControl": {
-    "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-draft-scope.log",
-    "sha256": "cc80628baf71f0be597f744bf20926c7eb0d99d76518b47b5db26bfc859f82a5",
-    "currentControlChecks": "Current route/admission unit checks execute; original control result is historical only."
-  }
+    "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-control-test.log",
+    "sha256": "fabdd420ae8e9d4dddaa53ff4bcba4c1dbfc259ebee71b9b16eeb32696f83e4b",
+    "currentControlChecks": "Historical1 only; current admission/route controls run separately."
+  },
+  "historicalFailures": [
+    {
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-pg-first.json",
+      "sha256": "7a176fa1845e2975871df8c98e6a6f892cd08ed7a5a48dcd1dcf257b678bf1f8",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "Teacher personal longitudinal native Run publishes frozen T1, creates native T2, saves actual answers, reads both reports and rejects wrong/currently revoked identity",
+          "status": "failed"
+        }
+      ],
+      "continuation": "teacher-longitudinal-pg-continuation",
+      "disposition": "Native original reached both finals/reports; last assertion incorrectly expected施测license revocation to deny preserved history. Retained-state continuation tests actual REPORT_READ denial, without replay."
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-first.json",
+      "sha256": "118c94903b2994528e918dbf977dc5f6fa525ac6395274a192bf2f335e884de8",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "Teacher native longitudinal publisher, SELF answer and reports in Chromium creates the next native event, publishes, saves three SELF responses and reads single plus independent changes",
+          "status": "failed"
+        }
+      ],
+      "continuation": "teacher-longitudinal-browser-resume",
+      "disposition": "Original created/published/started T3; required-marker suffix broke selector. Continuation uses same accepted T3 and attempt; original failure not erased."
+    }
+  ]
 }

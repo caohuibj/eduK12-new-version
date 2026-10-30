@@ -117,3 +117,22 @@ Run publish controller is byte-identical to prerequisite dbcc; the Teacher produ
 service owns this optional publication field. Types/lint remain qualified at
 65fa inputs; this follow-up is qualified by the selected actual-PG read. It does
 not relabel earlier browser/type output as a new execution.
+
+
+## mainfb3 Ready candidate
+
+PR406 is merged by DOT with user approval. This Teacher candidate aligns to
+main fb3a0cab6f3f28e737a38550167ff6b2affcae56. All14 application deltas
+remain identical to original2160 against prerequisite dbcc. Four successful
+raw JSON case records and the historical Draft control are reused with their
+original provenance; both failed originals and retained-state continuations
+remain intact. No original application/PG/browser journey was repeated.
+
+Existing personal-tracking CI now selects the Teacher slice. New education
+migration/restore, current frontend consumers, changed source SAST and current
+image build/security remain required actual producers. Exact locked audit
+steps are authenticated independently within24h. Five changed admission/route
+controls and workflow actionlint passed locally. The new old-Run SQL fixture
+passed one rollback-only check; formal migration/dump/restore remains CI-only.
+The exact plan is continuation/teacher-ready-plan.json in this slice's evidence
+folder. This is preparation, not a formal success or merge/deployment claim.

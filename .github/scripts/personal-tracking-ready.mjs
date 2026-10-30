@@ -15,14 +15,15 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
  if(branch!==binding.branch||event!=='pull_request')return null;
  assert.equal(forceFull,false,'Personal tracking does not authorize whole-platform execution');
  assert.equal(base,binding.base,'Personal tracking main base changed; recheck affected inputs');
- if(binding.slice==='training'){assert.equal(binding.branch,'feat/personal-longitudinal-training-20261030');assert.equal(binding.originalSource,'dbcc7e597aba792aa052cd23634332d80a4252e1');}
+ if(binding.slice==='teacher'){assert.equal(binding.branch,'feat/personal-longitudinal-education-20261030');assert.equal(binding.originalSource,'2160f195f67b211cc62ab8eda1ecf3f698927900');}
+ else if(binding.slice==='training'){assert.equal(binding.branch,'feat/personal-longitudinal-training-20261030');assert.equal(binding.originalSource,'dbcc7e597aba792aa052cd23634332d80a4252e1');}
  else assert.equal(binding.reviewedCandidate,'a62c9a5763da69aa13b4f70d062b0bf55d6db65f');
  assert(personalTrackingDraftScope(entries,{event,draft:true}));
  for(const entry of entries.filter(e=>e.file.startsWith('server-version/'))){
   const pin=binding.files[entry.file];assert(pin,'Unreviewed application input: '+entry.file);
   assert.equal(git('rev-parse',head+':'+entry.file),pin.after);
   assert.equal(pin.after,git('rev-parse',binding.reviewedCandidate+':'+entry.file),'Application differs from reviewed source');
-  if(binding.slice==='training'){const delta=(from,to)=>execFileSync('git',['diff','--unified=0',from,to,'--',entry.file],{encoding:'utf8'}).split('\n').filter(line=>/^[+-]/.test(line)&&!line.startsWith('+++ ')&&!line.startsWith('--- ')).join('\n');assert.equal(hash(delta(pin.originalBase,binding.originalSource)),pin.originalDeltaSHA256,'Original Training delta changed');assert.equal(hash(delta(base,head)),pin.originalDeltaSHA256,'Training implementation delta differs from original evidence');}
+  if(['training','teacher'].includes(binding.slice)){const delta=(from,to)=>execFileSync('git',['diff','--unified=0',from,to,'--',entry.file],{encoding:'utf8'}).split('\n').filter(line=>/^[+-]/.test(line)&&!line.startsWith('+++ ')&&!line.startsWith('--- ')).join('\n');assert.equal(hash(delta(pin.originalBase,binding.originalSource)),pin.originalDeltaSHA256,'Original longitudinal delta changed');assert.equal(hash(delta(base,head)),pin.originalDeltaSHA256,'Longitudinal implementation delta differs from original evidence');}
   if(pin.before){assert.equal(entry.status,'M');assert.equal(git('rev-parse',base+':'+entry.file),pin.before)}else assert.equal(entry.status,'A');
  }
  assert.deepEqual(entries.filter(e=>e.file.startsWith('server-version/')).map(e=>e.file).sort(),Object.keys(binding.files).sort());
@@ -31,8 +32,8 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
  if(binding.applicationSastReuse)assert.equal(git('rev-parse',head+':server-version'),binding.applicationSastReuse.serverVersionTree,'Original SAST application input changed');
  if(binding.backendAuditReuse)for(const file of ['server-version/backend/package.json','server-version/backend/package-lock.json'])assert.equal(git('rev-parse',binding.backendAuditReuse.sourceHead+':'+file),git('rev-parse',head+':'+file),'Original backend audit input changed');
  const runtime=entries.filter(e=>/\.(?:[cm]?js|[cm]?ts|jsx|tsx)$/.test(e.file)).map(e=>e.file);
- const sastPaths=binding.slice==='training'?[...new Set([...runtime,'.github/scripts/personal-tracking-ready.mjs'])]:undefined;
- const frontendLintPaths=binding.slice==='training'?runtime.filter(p=>p.startsWith('server-version/frontend/src/')).map(p=>p.slice('server-version/frontend/'.length)):undefined;
+ const sastPaths=['training','teacher'].includes(binding.slice)?[...new Set([...runtime,'.github/scripts/personal-tracking-ready.mjs'])]:undefined;
+ const frontendLintPaths=['training','teacher'].includes(binding.slice)?runtime.filter(p=>p.startsWith('server-version/frontend/src/')).map(p=>p.slice('server-version/frontend/'.length)):undefined;
  return {schemaVersion:1,route:'personal-tracking',...(sastPaths?{sastPaths,frontendLintPaths}:{}),base,head,tree:git('rev-parse',head+'^{tree}'),draft:draft===true,reviewedCandidate:binding.reviewedCandidate,...(binding.imageReuse?{imageReuse:binding.imageReuse}:{}),...(binding.backendAuditReuse?{backendAuditReuse:binding.backendAuditReuse}:{}),...(binding.frontendAuditReuse?{frontendAuditReuse:binding.frontendAuditReuse}:{}),...(binding.applicationSastReuse?{applicationSastReuse:binding.applicationSastReuse}:{}),...(binding.qualificationReuse?{qualificationReuse:binding.qualificationReuse}:{}),required:draft?['scope']:['scope','personal-tracking',...(binding.imageReuse?[]:['docker']),'codeql']};
 }
 export function personalTrackingReadyOutputs(plan){const out=participantAccessOutputs(plan);delete out.participant_access_plan;return {...out,application_route:'personal-tracking',scenario:'personal-tracking',codeql:!plan.draft,personal_tracking_plan:JSON.stringify(plan),personal_tracking_draft:false};}
@@ -45,7 +46,15 @@ export async function admitOriginalReports(read=readFileSync){
  verifyFailureContinuations(binding.reports.map(r=>({...r.review,id:r.id})),admitted);
  assert.equal(original.size,binding.originalCaseCount??31,'All original successful cases must remain present');assert.equal(unique.size,binding.originalCaseCount??unique.size,'Unexpected application evidence count');
  if(binding.historicalDraftControl){const p=binding.historicalDraftControl;assert.equal(hash(read(p.file)),p.sha256);assert.equal(hash(execFileSync('git',['show',binding.originalSource+':'+p.file])),p.sha256);}
- return {reviewedCandidate:binding.reviewedCandidate,caseCount:unique.size,admitted,ciExecuted:false,reviewBasis:binding.reviewBasis};
+ const historicalFailures=[];
+ for(const item of binding.historicalFailures??[]){
+  const bytes=read(item.file);assert.equal(hash(bytes),item.sha256,'Original failed reporter changed');assert.equal(hash(execFileSync('git',['show',binding.originalSource+':'+item.file])),item.sha256);
+  const report=JSON.parse(bytes);assert.equal(report.success,false);assert.deepEqual(Object.fromEntries(['success','numPassedTests','numFailedTests','numPendingTests'].map(k=>[k,report[k]])),item.summary);
+  const cases=report.testResults.flatMap(s=>s.assertionResults.map(c=>({fullName:c.fullName,status:c.status})));assert.deepEqual(cases,item.cases);assert(cases.some(c=>c.status==='failed'));
+  assert(admitted.some(r=>r.id===item.continuation&&r.caseNames.length),'Retained-state continuation missing');
+  historicalFailures.push({...item,status:'ORIGINAL_FAILURE_RETAINED',ciExecuted:false});
+ }
+ return {reviewedCandidate:binding.reviewedCandidate,caseCount:unique.size,admitted,historicalFailures,ciExecuted:false,reviewBasis:binding.reviewBasis};
 }
 /** Separate process avoids the CLI -> onboarding -> scope -> CLI top-level
  * await cycle; it uses the same original verifier, without application replay. */
@@ -141,12 +150,36 @@ export function nativeTrainingFixtureSql({owner,id,trackingId,attempt}){
 export function nativeTrainingFactsSql(id,attempt){return `SELECT jsonb_build_object(
  'publication',(SELECT to_jsonb(p)-ARRAY['personal_tracking_baseline_id','personal_tracking_ordinal','personal_tracking'] FROM composite_assessments p WHERE id='${id}'),
  'attempt',(SELECT to_jsonb(a)-'personal_changes_snapshots' FROM composite_assessment_attempts a WHERE id='${attempt}'))::text;`;}
-function trainingSchemaSql(){return `SELECT jsonb_build_object(
- 'columns',(SELECT jsonb_agg(jsonb_build_array(c.relname,a.attname,format_type(a.atttypid,a.atttypmod),a.attnotnull,pg_get_expr(d.adbin,d.adrelid)) ORDER BY c.relname,a.attnum) FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum WHERE a.attrelid IN ('composite_assessments'::regclass,'composite_assessment_attempts'::regclass) AND a.attname IN ('personal_tracking_baseline_id','personal_tracking_ordinal','personal_tracking','personal_changes_snapshots')),
- 'checks',(SELECT jsonb_agg(jsonb_build_array(conname,pg_get_constraintdef(oid)) ORDER BY conname) FROM pg_constraint WHERE conrelid IN ('composite_assessments'::regclass,'composite_assessment_attempts'::regclass) AND (conname='personal_tracking_complete' OR pg_get_constraintdef(oid) LIKE '%personal_changes_snapshots%')),
- 'indexes',(SELECT jsonb_agg(pg_get_indexdef(indexrelid) ORDER BY indexrelid::regclass::text) FROM pg_index WHERE indexrelid='composite_personal_tracking_wave'::regclass),
- 'triggers',(SELECT jsonb_agg(pg_get_triggerdef(oid,true) ORDER BY tgname) FROM pg_trigger WHERE tgname IN ('composite_personal_tracking_immutable','personal_changes_snapshots_append')),
- 'functions',(SELECT jsonb_agg(pg_get_functiondef(oid) ORDER BY proname) FROM pg_proc WHERE proname IN ('preserve_composite_personal_tracking','preserve_personal_changes_snapshots')))::text;`;}
+/** Minimal valid old Run graph. Opaque SQL sentinel, not an application FINAL. */
+export function nativeTeacherFixtureSql({owner,id,trackingId,attempt,organization,membership,track,actor,relationship,digest}){
+ return `INSERT INTO organizations(id,name,created_by_user_id,product_domain) VALUES('${organization}','Synthetic native Teacher schema fixture','${owner}','SCHOOL');
+ INSERT INTO organization_memberships(id,organization_id,user_id,org_role) VALUES('${membership}','${organization}','${owner}','ORG_ADMIN');
+ INSERT INTO assessment_runs(id,organization_id,name,status,created_by_user_id,published_at) VALUES
+ ('${id}','${organization}','Opaque old completed run','PUBLISHED','${owner}',clock_timestamp()),
+ ('${trackingId}','${organization}','Synthetic new tracked draft','DRAFT','${owner}',NULL);
+ INSERT INTO assessment_run_tracks(id,organization_id,run_id,resource_family,resource_key,resource_version,requested_policy,frozen_resource_policy,resource_policy_hash)
+ VALUES('${track}','${organization}','${id}','SCALE','synthetic-schema-source','1.0.0','{}','{"synthetic":true}','${digest}');
+ INSERT INTO assessment_run_actor_snapshots(id,organization_id,run_id,provenance_kind,user_id,membership_id,actor_role,snapshot_payload,snapshot_hash)
+ VALUES('${actor}','${organization}','${id}','ORG_MEMBER','${owner}','${membership}','TEACHER','{"synthetic":true}','${digest}');
+ INSERT INTO assessment_run_relationship_snapshots(id,organization_id,run_id,relationship_kind,subject_actor_snapshot_id,respondent_actor_snapshot_id,snapshot_payload,snapshot_hash)
+ VALUES('${relationship}','${organization}','${id}','SELF','${actor}','${actor}','{"opaqueOldReport":"synthetic-schema-sentinel"}','${digest}');
+ INSERT INTO assessment_run_executions(id,organization_id,run_id,track_id,subject_actor_snapshot_id,respondent_actor_snapshot_id,relationship_snapshot_id,status,runtime_binding_kind,runtime_binding_ref,started_at,completed_at)
+ VALUES('${attempt}','${organization}','${id}','${track}','${actor}','${actor}','${relationship}','COMPLETED','COMPOSITE_ATTEMPT','synthetic-opaque-runtime-${attempt}',clock_timestamp(),clock_timestamp());`;
+}
+export function nativeTeacherFactsSql(id,attempt){return `SELECT jsonb_build_object(
+ 'run',(SELECT to_jsonb(r)-ARRAY['personal_tracking_baseline_id','personal_tracking_ordinal','personal_tracking'] FROM assessment_runs r WHERE id='${id}'),
+ 'execution',(SELECT to_jsonb(e)-'personal_changes_snapshots' FROM assessment_run_executions e WHERE id='${attempt}'),
+ 'tracks',(SELECT jsonb_agg(to_jsonb(t) ORDER BY id) FROM assessment_run_tracks t WHERE run_id='${id}'),
+ 'actors',(SELECT jsonb_agg(to_jsonb(a) ORDER BY id) FROM assessment_run_actor_snapshots a WHERE run_id='${id}'),
+ 'relationships',(SELECT jsonb_agg(to_jsonb(r) ORDER BY id) FROM assessment_run_relationship_snapshots r WHERE run_id='${id}'))::text;`;}
+function trackingSchemaSql({parent,attempt,check,index,trigger,snapshotTrigger,preserve}){return `SELECT jsonb_build_object(
+ 'columns',(SELECT jsonb_agg(jsonb_build_array(c.relname,a.attname,format_type(a.atttypid,a.atttypmod),a.attnotnull,pg_get_expr(d.adbin,d.adrelid)) ORDER BY c.relname,a.attnum) FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum WHERE a.attrelid IN ('${parent}'::regclass,'${attempt}'::regclass) AND a.attname IN ('personal_tracking_baseline_id','personal_tracking_ordinal','personal_tracking','personal_changes_snapshots')),
+ 'checks',(SELECT jsonb_agg(jsonb_build_array(conname,pg_get_constraintdef(oid)) ORDER BY conname) FROM pg_constraint WHERE conrelid IN ('${parent}'::regclass,'${attempt}'::regclass) AND (conname='${check}' OR pg_get_constraintdef(oid) LIKE '%personal_changes_snapshots%')),
+ 'indexes',(SELECT jsonb_agg(pg_get_indexdef(indexrelid) ORDER BY indexrelid::regclass::text) FROM pg_index WHERE indexrelid='${index}'::regclass),
+ 'triggers',(SELECT jsonb_agg(pg_get_triggerdef(oid,true) ORDER BY tgname) FROM pg_trigger WHERE tgname IN ('${trigger}','${snapshotTrigger}')),
+ 'functions',(SELECT jsonb_agg(pg_get_functiondef(oid) ORDER BY proname) FROM pg_proc WHERE proname IN ('${preserve}','preserve_personal_changes_snapshots')))::text;`;}
+function trainingSchemaSql(){return trackingSchemaSql({parent:'composite_assessments',attempt:'composite_assessment_attempts',check:'personal_tracking_complete',index:'composite_personal_tracking_wave',trigger:'composite_personal_tracking_immutable',snapshotTrigger:'personal_changes_snapshots_append',preserve:'preserve_composite_personal_tracking'});}
+function educationSchemaSql(){return trackingSchemaSql({parent:'assessment_runs',attempt:'assessment_run_executions',check:'education_tracking_complete',index:'education_personal_tracking_wave',trigger:'education_personal_tracking_immutable',snapshotTrigger:'education_personal_snapshots_append',preserve:'preserve_education_personal_tracking'});}
 async function nativeDatabase(){
  const service=process.env.PG_SERVICE;assert(service&&/^[a-zA-Z0-9_.-]+$/.test(service));
  const backend=resolve('server-version/backend'),temporary=mkdtempSync(resolve(tmpdir(),'personal-native-'));
@@ -159,14 +192,22 @@ async function nativeDatabase(){
   deploy(prepareMainSchema(temporary),database(names[0]));
   const owner=randomUUID(),id=randomUUID(),participant=randomUUID(),wave=randomUUID(),publication=randomUUID(),attempt=randomUUID(),final=randomUUID(),trackingId=randomUUID(),digest='a'.repeat(64);
   const {PrismaClient}=createRequire(resolve(backend,'package.json'))('@prisma/client'),db=new PrismaClient({datasources:{db:{url:database(names[0])}}}),login='native-'+owner.replaceAll('-','').slice(0,20);
-  try{await db.user.create({data:{id:owner,username:login,passwordHash:'synthetic-schema-fixture-not-a-login',role:'TEACHER',accountDomain:binding.slice==='training'?'TRAINING':'SURVEY'}});if(binding.slice!=='training')await db.surveyAccount.create({data:{userId:owner,loginName:login,normalizedLogin:login}});}finally{await db.$disconnect()}
+  try{await db.user.create({data:{id:owner,username:login,passwordHash:'synthetic-schema-fixture-not-a-login',role:'TEACHER',accountDomain:binding.slice==='training'?'TRAINING':binding.slice==='teacher'?'SCHOOL':'SURVEY'}});if(!['training','teacher'].includes(binding.slice))await db.surveyAccount.create({data:{userId:owner,loginName:login,normalizedLogin:login}});}finally{await db.$disconnect()}
   // Nonempty old-schema SQL fixture, not a repeated application journey or a
   // claim of a newly accepted scientific FINAL. Opaque original bytes survive.
-  sql(names[0],binding.slice==='training'?nativeTrainingFixtureSql({owner,id,trackingId,attempt}):nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}));
-  const facts=db=>sql(db,binding.slice==='training'?nativeTrainingFactsSql(id,attempt):`SELECT jsonb_build_object('publication',(SELECT to_jsonb(p) FROM survey_publications p WHERE id='${publication}'),'final',(SELECT to_jsonb(f) FROM survey_wave_finals f WHERE id='${final}'),'attempt',(SELECT to_jsonb(a) FROM survey_wave_attempts a WHERE id='${attempt}'))::text;`);
+  sql(names[0],binding.slice==='teacher'?nativeTeacherFixtureSql({owner,id,trackingId,attempt,organization:randomUUID(),membership:randomUUID(),track:randomUUID(),actor:randomUUID(),relationship:randomUUID(),digest}):binding.slice==='training'?nativeTrainingFixtureSql({owner,id,trackingId,attempt}):nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}));
+  const facts=db=>sql(db,binding.slice==='teacher'?nativeTeacherFactsSql(id,attempt):binding.slice==='training'?nativeTrainingFactsSql(id,attempt):`SELECT jsonb_build_object('publication',(SELECT to_jsonb(p) FROM survey_publications p WHERE id='${publication}'),'final',(SELECT to_jsonb(f) FROM survey_wave_finals f WHERE id='${final}'),'attempt',(SELECT to_jsonb(a) FROM survey_wave_attempts a WHERE id='${attempt}'))::text;`);
   const before=facts(names[0]);
   deploy(resolve(backend,'prisma/schema.prisma'),database(names[0]));assert.equal(facts(names[0]),before,'Old publication/FINAL/attempt changed');
-  if(binding.slice==='training'){
+  if(binding.slice==='teacher'){
+   assert.equal(sql(names[0],`SELECT (personal_tracking IS NULL)::text FROM assessment_runs WHERE id='${id}';`),'true');
+   assert.equal(sql(names[0],`SELECT personal_changes_snapshots::text FROM assessment_run_executions WHERE id='${attempt}';`),'{}');
+   assert.throws(()=>sql(names[0],`UPDATE assessment_runs SET personal_tracking_baseline_id=id,personal_tracking_ordinal=1,personal_tracking='{}' WHERE id='${id}';`),/Published education tracking is immutable/);
+   sql(names[0],`UPDATE assessment_runs SET personal_tracking_baseline_id=id,personal_tracking_ordinal=1,personal_tracking='{"synthetic":true}',status='PUBLISHED' WHERE id='${trackingId}';`);
+   assert.throws(()=>sql(names[0],`UPDATE assessment_runs SET personal_tracking='{}' WHERE id='${trackingId}';`),/Published education tracking is immutable/);
+   sql(names[0],`UPDATE assessment_run_executions SET personal_changes_snapshots='{"t1":"synthetic-opaque-snapshot"}' WHERE id='${attempt}';`);
+   assert.throws(()=>sql(names[0],`UPDATE assessment_run_executions SET personal_changes_snapshots='{}' WHERE id='${attempt}';`),/append-only/);
+  }else if(binding.slice==='training'){
    assert.equal(sql(names[0],`SELECT (personal_tracking IS NULL)::text FROM composite_assessments WHERE id='${id}';`),'true');
    assert.equal(sql(names[0],`SELECT personal_changes_snapshots::text FROM composite_assessment_attempts WHERE id='${attempt}';`),'{}');
    assert.throws(()=>sql(names[0],`UPDATE composite_assessments SET personal_tracking_baseline_id=id,personal_tracking_ordinal=1,personal_tracking='{}' WHERE id='${id}';`),/Published personal tracking is immutable/);
@@ -184,14 +225,18 @@ async function nativeDatabase(){
   const dump=execFileSync('docker',['exec',service,'pg_dump','-U','ptool','-Fc',names[0]],{maxBuffer:64*1024*1024});
   execFileSync('docker',['exec','-i',service,'pg_restore','-U','ptool','--no-owner','--no-privileges','-d',names[1]],{input:dump});
   assert.equal(facts(names[1]),before,'Native restored facts changed');
-  const schema=db=>binding.slice==='training'?sql(db,trainingSchemaSql()):execFileSync('docker',['exec',service,'pg_dump','-U','ptool','--schema-only','--table=public.survey_projects','--table=public.survey_waves','--table=public.survey_participants','--no-owner','--no-privileges',db],{encoding:'utf8',maxBuffer:64*1024*1024}).split('\n').filter(line=>!/^\\(?:un)?restrict /.test(line)&&!/^-- Dumped (?:from|by)/.test(line)).join('\n');
+  const schema=db=>binding.slice==='teacher'?sql(db,educationSchemaSql()):binding.slice==='training'?sql(db,trainingSchemaSql()):execFileSync('docker',['exec',service,'pg_dump','-U','ptool','--schema-only','--table=public.survey_projects','--table=public.survey_waves','--table=public.survey_participants','--no-owner','--no-privileges',db],{encoding:'utf8',maxBuffer:64*1024*1024}).split('\n').filter(line=>!/^\\(?:un)?restrict /.test(line)&&!/^-- Dumped (?:from|by)/.test(line)).join('\n');
   assert.equal(schema(names[0]),schema(names[1]),'Native restored schema changed');
-  if(binding.slice==='training'){
+  if(binding.slice==='teacher'){
+   assert.throws(()=>sql(names[1],`UPDATE assessment_runs SET personal_tracking='{}' WHERE id='${trackingId}';`),/Published education tracking is immutable/);
+   assert.equal(sql(names[1],`SELECT personal_changes_snapshots->>'t1' FROM assessment_run_executions WHERE id='${attempt}';`),'synthetic-opaque-snapshot');
+   assert.throws(()=>sql(names[1],`UPDATE assessment_run_executions SET personal_changes_snapshots='{}' WHERE id='${attempt}';`),/append-only/);
+  }else if(binding.slice==='training'){
    assert.throws(()=>sql(names[1],`UPDATE composite_assessments SET personal_tracking='{}' WHERE id='${trackingId}';`),/Published personal tracking is immutable/);
    assert.equal(sql(names[1],`SELECT personal_changes_snapshots->>'t1' FROM composite_assessment_attempts WHERE id='${attempt}';`),'synthetic-opaque-snapshot');
    assert.throws(()=>sql(names[1],`UPDATE composite_assessment_attempts SET personal_changes_snapshots='{}' WHERE id='${attempt}';`),/append-only/);
   }else assert.throws(()=>sql(names[1],`UPDATE survey_projects SET longitudinal_plan='{}' WHERE id='${id}';`),/Published personal tracking plan is immutable/);
-  return {status:'PASSED',base:binding.base,postgres:sql(names[0],'SHOW server_version;'),schemaFixture:'nonempty old-schema SQL, no application replay',oldFactsSHA256:hash(before),dumpSHA256:hash(dump),dumpBytes:dump.length,restoredFactsEqual:true,restoredSchemaEqual:true,schemaScope:binding.slice==='training'?'new columns, CHECKs, unique index, triggers and functions on composite_assessments/composite_assessment_attempts; full database native restore; unrelated legacy DDL text is not requalified':'changed survey_projects, survey_waves, survey_participants tables, constraints, indexes and triggers; full database native restore',immutableGuards:true,dumpPublished:false};
+  return {status:'PASSED',base:binding.base,postgres:sql(names[0],'SHOW server_version;'),schemaFixture:'nonempty old-schema SQL, no application replay',oldFactsSHA256:hash(before),dumpSHA256:hash(dump),dumpBytes:dump.length,restoredFactsEqual:true,restoredSchemaEqual:true,schemaScope:binding.slice==='teacher'?'new education columns, CHECKs, unique index, immutable/append-only triggers and functions on assessment_runs/assessment_run_executions; full database native restore; old Run graph facts retained':binding.slice==='training'?'new columns, CHECKs, unique index, triggers and functions on composite_assessments/composite_assessment_attempts; full database native restore; unrelated legacy DDL text is not requalified':'changed survey_projects, survey_waves, survey_participants tables, constraints, indexes and triggers; full database native restore',immutableGuards:true,dumpPublished:false};
  }finally{rmSync(temporary,{recursive:true,force:true});}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
