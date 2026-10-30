@@ -1,0 +1,4 @@
+BEGIN
+INSERT 0 1
+ERROR:  new row for relation "composite_assessments" violates check constraint "composite_report_package_pair_check"
+DETAIL:  Failing row contains (c1d3c3ba-20a7-47ae-9ad6-21fb0ea019ff, native-old-c1d3c3ba-20a7-47ae-9ad6-21fb0ea019ff, Synthetic old publication, null, null, PUBLISHED, null, 11fb08ac-a771-4e0c-83a5-5efa97e24b2f, null, null, 1, f, 2026-10-30 12:37:38.339, 2026-10-30 12:37:38.342, null, f, null, null, null, null, null, null, null, synthetic-opaque-old-report-definition, LEGACY_COMPOSITE, null, 0, null, null, null, f, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {}, null, null, null).

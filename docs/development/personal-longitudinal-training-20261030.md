@@ -144,3 +144,43 @@ authorization and authoring callers are retained. Current backend and frontend
 TypeScript checks exit 0; original application cases were not replayed for this
 already-reviewed base alignment. The source/evidence identities remain those
 of their original executions, not relabeled as tests of a new build.
+
+
+## Mainfa qualification candidate
+
+Survey PR399 has merged to mainfa038041c47b275d30ccb8b8b01ab019615906e0
+with formal run41053670118 success. Training merged that main without conflict
+at e8d515058554a5e4bbf321074c5906c53d880c7a. All25 Training application deltas
+match the original verified dbcc source as exact added/removed lines; schema is
+compared with its Survey2f8829 base and other files with main1cc. Current full
+application blobs are frozen to e8d for independent DOT review; the legacy
+reviewedCandidate config name is an immutable source anchor, not a claim DOT
+approved this new PR. No original32 business/PG/browser/consumer cases replay.
+
+The same personal-tracking workflow now supports the Training slice. It verifies
+the31 original passed application/consumer JSON cases with exact full failed/
+filtered rows, immutable dbcc reporter bytes, and the separate historical1-case
+Draft control record. Current route/refusal/native-fixture/audit-admission checks
+run locally:12 initial passes, followed only by changed fixture/original reporter
+continuations. No historical signature/environment proof is invented.
+
+Formal missing scope: actual nonempty main→Training schema upgrade, full native
+DB dump/restore, old publication/report-definition/completed-parent preservation,
+new column/CHECK/index/trigger/function metadata and restored immutable/append
+guards; current frontend types/affected lint, current images/HIGH-CRITICAL scans
+and selected source/control CodeQL. Locked backend/frontend audits authenticate
+original successful steps with exact dependencies and24h. An old Survey native
+receipt cannot admit this new migration. No new workflow or whole-platform run.
+
+Rollback-only fixture preflight retained first errors: wrong assumed local DB
+role, correctly rejected unbound interpretation, and incomplete legacy report
+package pair. It now uses configured isolated-test role and a complete opaque
+legacy report definition with old completed parent, without creating a scientific
+FINAL or bypassing guards. No full local migration/restore is repeated before CI.
+The selected schema comparison covers new Training DDL, not unrelated old CHECK
+expression text; the native restore remains full DB and verifies old facts/guards.
+
+Exact source/input/case matrix and raw originals are in
+continuation/training-qualification-plan.json. Ordinary Notion records remain
+Git/local during DOT's Hui migration; there is no recording gate or Qiang append.
+Candidate is not yet formally qualified until actual selected jobs succeed.
