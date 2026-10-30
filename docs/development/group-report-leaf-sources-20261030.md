@@ -9,3 +9,7 @@
 真实 PG 首错是测试 bundleKey 含连字符。保留已发布素材，改合法 key 后续行通过，没有重复建发布数据。补验中认知断言完成，随后因测试把公开 SJT 写成内部 SITUATIONAL 而未找到工具；修测试命名后只续行 SJT。原失败保留，未将部分完成的认知阶段伪称为独立绿色 case。量表零值、单人隐藏、Context 拒绝和读取不物化 canonical 结果均已实际验证。
 
 当前仅 Draft 工程证据。正式资格、具体 PR 合并与部署没有由这些本地结果自动获得授权。无生产访问。
+
+自然提交点已无冲突对齐 main `55fab18e9933e58dcb800b20156f5b7e48858536`。当前产品提交 `08ccad064`，main 合入检查点 `f51d2275e065333ede10636605171404cca5e17d`；backend tree `60e3a0336b424f0ca3f665ff427251a4ca0c75d6` 的一次 tsc --noEmit 实际 exit0。frontend tree `6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103` 与 PR418 相同。合入仅改变已有 CI 绑定文件，未变更这批业务输入，没有重跑已完成用例。
+
+后续 Draft 以 PR418 的 `feat/group-report-teacher-subgroups-20261030` 为审阅 base，故完整差异也列有同步 main 的既有控制变动；不是新建或修改 CI 路线。本批尚未激活正式 CI，也未将本地无签名结果声称为正式接纳。
