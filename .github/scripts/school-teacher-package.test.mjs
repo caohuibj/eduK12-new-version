@@ -40,3 +40,9 @@ test('package Chrome diagnostics run in existing admission before producers and 
  assert(admission.includes('node server-version/e2e/school-teacher-chrome.cjs preflight'));assert(admission.includes('if: fromJSON(inputs.plan).publicPackage == true'));assert(admission.includes('if: always()'));
  assert(browser.indexOf("report.error='CHROME_PREFLIGHT_REJECTED'")<browser.indexOf('assert(preflight.ok'));assert(browser.indexOf("report.preflight=preflight")<browser.indexOf('assert(preflight.ok'));
 });
+
+test('PR392 continuation skips producers and audits and keeps the failed parent identity',async()=>{
+ const{origin,verifyOriginJob}=await import('./school-teacher-package-resume.mjs'),run={id:origin.run,head_sha:origin.head,head_branch:PACKAGE_BRANCH,path:'.github/workflows/ci.yml',event:'pull_request',run_attempt:1,status:'completed',conclusion:'cancelled'},job={id:origin.jobs.frontend,run_id:origin.run,head_sha:origin.head,status:'completed',conclusion:'success',name:'school-teacher / frontend'};
+ verifyOriginJob(run,job,'frontend');assert.throws(()=>verifyOriginJob({...run,conclusion:'success'},job,'frontend'));assert.throws(()=>verifyOriginJob(run,{...job,conclusion:'failure'},'frontend'));
+ const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8');assert(workflow.includes("continuation != 'package-browser-only'"));assert(workflow.includes('confirmed-public-package-scope'));
+});

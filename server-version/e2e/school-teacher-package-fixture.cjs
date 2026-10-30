@@ -1,9 +1,10 @@
 // Isolated browser preparation only. No assertions/replay of FINAL or scoring.
 'use strict';
 const {randomUUID,createHmac}=require('node:crypto');
-const mod=p=>require('/app/dist/'+p+'.js');
+const path=require('node:path'),backendRoot=process.env.P6_BROWSER_BACKEND_ROOT||'/app';
+const mod=p=>require(path.join(backendRoot,'dist',p+'.js'));
 module.exports=async function prepare(){
- const url=new URL(process.env.DATABASE_URL);if(process.env.P6_BROWSER_ISOLATED_SETUP!=='true'||process.env.NODE_ENV!=='test'||url.pathname!=='/p6_browser_ci_test'||!/^p6-browser-\d+-\d+-pg$/.test(url.hostname))throw Error('Only the isolated browser fixture database is allowed');
+ const url=new URL(process.env.DATABASE_URL);if(process.env.P6_BROWSER_ISOLATED_SETUP!=='true'||process.env.NODE_ENV!=='test'||url.pathname!=='/p6_browser_ci_test'||!(/^p6-browser-\d+-\d+-pg$/.test(url.hostname)||process.env.P6_BROWSER_HOST_CONTEXT==='true'&&process.env.GITHUB_ACTIONS==='true'&&url.hostname==='127.0.0.1'))throw Error('Only the isolated browser fixture database is allowed');
  const {prisma:db}=mod('config/database'),M=p=>mod('modules/'+p);
  const user=async(name,extra={})=>db.user.create({data:{username:name+'-'+randomUUID(),passwordHash:'synthetic-only-no-login',...extra}});
  const system=await user('p6-system',{role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'TRAINING'}),reviewer=await user('p6-reviewer',{role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'TRAINING'});
@@ -35,7 +36,7 @@ module.exports=async function prepare(){
  return {db,M,manager,reviewer:()=>({...principal(reviewer),...proof()}),scope:{product:'SCHOOL',organizationId:org.id,actorKey:manager.userId,workflowId:activity.id,runId:run.id,expectedVersion:1},sourceRef,sourceId:source.id};
 };
 if(require.main===module)(async()=>{
- const f=await module.exports(),express=require('/app/node_modules/express'),app=express();let resourceId;
+ const f=await module.exports(),express=require(path.join(backendRoot,'node_modules/express')),app=express();let resourceId;
  app.use(express.json());app.use((req,_res,next)=>{req.user=f.manager;if(req.method==='POST'&&req.path.endsWith('/preparations'))resourceId=req.body.resourceId;next()});
  app.get('/api/fixture-config',(_req,res)=>res.json({data:{organizationId:f.scope.organizationId,actorId:f.manager.userId,scope:f.scope,sourceRef:f.sourceRef,sourceId:f.sourceId}}));
  app.use('/api/organizations/:organizationId/private-tools',f.M('education-tools/private-tool.routes').educationPrivateToolRouter('SCHOOL'));
@@ -47,5 +48,5 @@ if(require.main===module)(async()=>{
   res.json({data:{resourceId,originalParameters:row.entry.educationOrigin.units.map(u=>({references:u.references,report:u.report})),sourceRef:f.sourceRef}});
  }catch(e){next(e)}});
  app.get('/api/task-resources',async(_q,res,next)=>{try{res.json({data:await f.M('education-tools/assessment-resource.catalog').listEducationAssessmentResources({...f.scope,actor:f.manager})})}catch(e){next(e)}});
- app.use(express.static('/frontend'));app.use((e,_q,res,_next)=>res.status(e.statusCode||500).json({code:e.code||'FIXTURE_ERROR',message:e.message}));app.listen(3000,'0.0.0.0',()=>console.log('P6_PACKAGE_BROWSER_READY'));
-})().catch(e=>{console.error(e);process.exit(1)});
+ app.use(express.static(process.env.P6_BROWSER_FRONTEND_ROOT||'/frontend'));app.use((e,_q,res,_next)=>res.status(e.statusCode||500).json({code:e.code||'FIXTURE_ERROR',message:e.message}));app.listen(3000,process.env.P6_BROWSER_HOST_CONTEXT==='true'?'127.0.0.1':'0.0.0.0',()=>console.log('P6_PACKAGE_BROWSER_READY'));
+})().catch(e=>{console.error('P6_FIXTURE_FAILURE '+JSON.stringify({name:e.name,code:/^[A-Z][A-Z_0-9]{0,80}$/.test(e.code||'')?e.code:null,message:/^[A-Z][A-Z_0-9]{0,80}$/.test(e.message||'')?e.message:null}));process.exit(1)});

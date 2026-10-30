@@ -174,7 +174,7 @@
   "controls": {
     ".github/scripts/school-teacher-checks.mjs": {
       "before": "6826eeb0b7ee49bac050b5f02f8a327111eff088",
-      "after": "f806f9a9938aae1336856569d90d64bc4117a0a1"
+      "after": "8d565a850bd576d057635b7276b488949ee07199"
     },
     ".github/scripts/school-teacher-native-evidence.mjs": {
       "before": "f47d74ca2bffa17bd6c8e06a8d19055f2a3a90bf",
@@ -182,11 +182,11 @@
     },
     ".github/scripts/school-teacher-native-runtime.py": {
       "before": "bf8229b2bf8be0032c7e935491ef6c741a33556f",
-      "after": "2e099071d94ffa29ea074ecf83f7a611daa99059"
+      "after": "220f27f8c429590a45ed72e487c196987cde5f29"
     },
     ".github/scripts/school-teacher-native.mjs": {
       "before": "dbc90deb25a9b787d27ef7c5608a2c59eb0b03df",
-      "after": "6bd6cecddee931b437aa10629deed41092d83e5a"
+      "after": "b1e01c577d269d1e1691b7d1de3887c59eea8e26"
     },
     ".github/scripts/school-teacher-package-bindings.json": {
       "before": null,
@@ -198,7 +198,7 @@
     },
     ".github/scripts/school-teacher-package.test.mjs": {
       "before": null,
-      "after": "9428d35dd145cf1e22026c4d93054d8abd48be1f"
+      "after": "ade8e4517237d5da690d4009210dc59eb807ec9c"
     },
     ".github/scripts/school-teacher-scope.mjs": {
       "before": "0f553bba6766571834830ea8af05371e54fb4d90",
@@ -206,7 +206,7 @@
     },
     ".github/workflows/ci-school-teacher.yml": {
       "before": "d778bf7cbbe8e922d3ea03bc7a5a87e40f7b09c4",
-      "after": "4d19f01a83979c9de4e593154448704ecddb9bd0"
+      "after": "7fe3cebd84c1849c7ffbb48f26c808b79ff742e2"
     },
     ".github/workflows/ci.yml": {
       "before": "6b80b453ac51601dab0eee3392adb9d40bb47148",
@@ -214,11 +214,23 @@
     },
     "server-version/e2e/school-teacher-package-browser.cjs": {
       "before": null,
-      "after": "6df0ea6714de2f5574b0d3cccee501e30b8577e0"
+      "after": "4c71a418e5481cbcaf6554e2accc57b26a28eb78"
     },
     "server-version/e2e/school-teacher-package-fixture.cjs": {
       "before": null,
-      "after": "62cc5f287158da8c12329b31ea79199e9f671494"
+      "after": "849b5ea8cb49a300ea6920ee3cce506ee7159e3a"
+    },
+    ".github/scripts/school-teacher-package-resume.mjs": {
+      "before": null,
+      "after": "3e4c9f34809a628abcd558ceeeebd12e9cfe0a9b"
+    },
+    "server-version/e2e/school-teacher-chrome-permissions.cjs": {
+      "before": "dfb51e4ebe91247000e045cbaf09dc1bc495c2e5",
+      "after": "9880db6f0ba9b99ba4ad48014dd83b368a97f632"
+    },
+    "server-version/e2e/school-teacher-chrome-permissions.test.cjs": {
+      "before": "e69cab5e5f1ba8eaa182bef67529278232380f1d",
+      "after": "e23a3baebb6de0a7953ba94d58069cab493c5894"
     }
   },
   "protectedInputs": {
@@ -249,14 +261,8 @@
     "server-version/scripts/ci-install-canvas-deps.sh": "75e8b7f5ce24a53e1c040d105b8b757e3686f102"
   },
   "execution": {
-    "buildComponents": [
-      "frontend",
-      "backend"
-    ],
-    "auditComponents": [
-      "frontend",
-      "backend"
-    ],
+    "buildComponents": [],
+    "auditComponents": [],
     "historicalOfficialReuse": false,
     "runtime": {
       "node": "node:24.21.0-bookworm-slim",
@@ -267,7 +273,8 @@
         "HIGH"
       ],
       "ignoreUnfixed": true
-    }
+    },
+    "officialContinuation": 40977943858
   },
   "evidence": {
     "status": "REVIEWED_LOCAL_EVIDENCE",

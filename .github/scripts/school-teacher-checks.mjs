@@ -502,6 +502,9 @@ function nativeContext(kind){
  receipt(kind+'-runtime-context',{schemaVersion:1,kind,head:git('rev-parse','HEAD'),tree:git('rev-parse','HEAD:server-version/'+kind),runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,archiveSha256:sha256(readFileSync(archive)),manifest});
 }
 async function nativePhase(phase,b,plan){
+ if(plan.continuation==='package-browser-only'&&['frontend','backend','audit','native-evidence','native-runtime'].includes(phase)){
+  const {resumePackagePhase}=await import('./school-teacher-package-resume.mjs');await resumePackagePhase(phase,b,plan,{git,officialApi,officialZip,jsonZip,receipt,command});return;
+ }
  if(phase==='admission')receipt('admission',{status:'PASSED',plan,applicationEvidenceStatus:b.evidence.status,historicalAcceptedCases:0});
  else if(phase==='frontend'||phase==='backend'){
   requireNativeProducerAttempt(process.env.GITHUB_RUN_ATTEMPT);

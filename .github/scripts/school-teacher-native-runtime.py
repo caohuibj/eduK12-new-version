@@ -55,6 +55,38 @@ def main():
         runtime.require(result.returncode == 0, 'Native runtime command failed: ' + name)
         return result.stdout.decode()
 
+    if plan.get('continuation') == 'package-browser-only':
+        original = json.loads((out / 'original-native-runtime.json').read_text())
+        runtime.require(original['head'] == '807e12c7edf061efc2ec1bd893690c7a0ca01ac3' and original['runId'] == '40977943858', 'Wrong original runtime')
+        with tempfile.TemporaryDirectory(prefix='package-browser-', dir=env['RUNNER_TEMP']) as temporary:
+            contexts = Path(temporary)
+            for item in original['results']:
+                kind = item['component']
+                directory = ROOT / 'native-runtime-inputs' / kind
+                archive = directory / (kind + '-runtime.tar.gz')
+                runtime.require(hashlib.sha256(archive.read_bytes()).hexdigest() == item['context']['archiveSha256'], 'Changed original compiled context')
+                runtime.require(item['context']['tree'] == plan['components'][kind], 'Changed current component')
+                target = contexts / kind
+                target.mkdir()
+                allowed = {'dist', 'Dockerfile', 'nginx.conf'} if kind == 'frontend' else {'dist', 'node_modules', 'assets', 'prisma', 'scripts', 'package.json', 'package-lock.json', 'Dockerfile'}
+                runtime.safe_extract(archive, target, allowed)
+                run(kind + '-retained-dist-bytes', ['node', '--input-type=module', '-e',
+                    "import assert from 'node:assert/strict';import{readFileSync}from'node:fs';import{treeDigest}from'./.github/scripts/ci-artifact.mjs';const[d,m]=process.argv.slice(1);const expected=JSON.parse(m);assert.deepEqual(JSON.parse(readFileSync(d+'/ci-build-manifest.json')),expected);assert.equal(treeDigest(d),expected.contentDigest)",
+                    str(target / 'dist'), json.dumps(item['context']['manifest'])])
+                env['P6_BROWSER_CONTEXT'] = str(contexts)
+            report = {'status': 'SCANNED_BROWSER_PENDING', 'head': plan['head'], 'runId': env['GITHUB_RUN_ID'],
+                      'originalRuntime': original, 'results': original['results'], 'baseImages': original['baseImages'],
+                      'buildExecuted': False, 'runtimeImageRebuilt': False, 'runtimeScanRepeated': False}
+            (out / 'native-runtime.json').write_text(json.dumps(report, indent=2))
+            env['P6_BROWSER_HOST_CONTEXT'] = 'true'
+            run('package-browser', ['node', 'server-version/e2e/school-teacher-package-browser.cjs'])
+            browser = json.loads((out / 'package-browser.json').read_text())
+            runtime.require(browser['status'] == 'PASSED' and browser['head'] == plan['head'] and browser['runId'] == env['GITHUB_RUN_ID'], 'Current missing browser failed')
+            report['status'] = 'PASSED'
+            report['browserSha256'] = hashlib.sha256((out / 'package-browser.json').read_bytes()).hexdigest()
+            (out / 'native-runtime.json').write_text(json.dumps(report, indent=2))
+        return
+
     version = run('trivy-version', ['trivy', '--version'])
     runtime.require(re.search(r'^Version:\s*0\.70\.0$', version, re.M), 'Pinned Trivy required')
     bases = {}

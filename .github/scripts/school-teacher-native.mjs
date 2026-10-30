@@ -27,8 +27,9 @@ export function requireNativeQualification(b){
  assert.equal(b.review.status,'INDEPENDENTLY_REVIEWED','Native controls not independently reviewed');
  assert.match(b.review.recordSha256||'',/^[a-f0-9]{64}$/);
  assert.deepEqual(b.requiredJobs,NATIVE_JOBS);
+ if(b.branch===PACKAGE_BRANCH&&b.execution.officialContinuation===40977943858){assert.deepEqual(b.execution.buildComponents,[]);assert.deepEqual(b.execution.auditComponents,[])}else{
  assert.deepEqual(b.execution.buildComponents,['frontend','backend']);
- assert.deepEqual(b.execution.auditComponents,['frontend','backend']);
+ assert.deepEqual(b.execution.auditComponents,['frontend','backend']);}
  assert.equal(b.execution.historicalOfficialReuse,false,'Historical School producer identities forbidden');
  assert.deepEqual(b.execution.runtime,{node:'node:24.21.0-bookworm-slim',nginx:'nginx:1.31.6-alpine3.24-slim',trivy:'0.70.0',severity:['CRITICAL','HIGH'],ignoreUnfixed:true});
  return true;
@@ -59,7 +60,7 @@ export function validateNativeBoundary(b,o,{draftPreflight=false}={}){
  assert(Object.keys(b.protectedInputs).length>10,'Runtime/config closure missing');
  assert.deepEqual(o.protectedInputs,b.protectedInputs,'Locked dependency/schema/runtime/control dependency drift');
  return {schema:1,route:'school-teacher',candidate:'native-bundle',base:b.base,head:o.checkoutHead,sourceHead:o.sourceHead,sourceTree:o.sourceTree,
-  product:b.productHead,productTree:b.productTree,...(b.branch===PACKAGE_BRANCH?{publicPackage:true}:{}),components:{frontend:b.frontendTree,backend:b.backendTree},...(o.event==='push'?{postMerge:true}:{}),...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
+  product:b.productHead,productTree:b.productTree,...(b.branch===PACKAGE_BRANCH?{publicPackage:true,...(b.execution.officialContinuation===40977943858?{continuation:'package-browser-only'}:{})}:{}),components:{frontend:b.frontendTree,backend:b.backendTree},...(o.event==='push'?{postMerge:true}:{}),...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
   inputsSha256:hash(JSON.stringify({source:b.source,controls:b.controls,protectedInputs:b.protectedInputs,execution:b.execution}))};
 }
 export function nativePlan(entries,base,head,read,env,b){
