@@ -1,0 +1,17 @@
+{
+  "bundledOnceAfterPublicAssetResolverRepair": true,
+  "files": [
+    {
+      "name": "teacher-group-fixture.js",
+      "bytes": 21684742,
+      "sha256": "6587db70e480dd6576953b72713a54ad81f5cc2994ea4f6ca8d595baf1a99929",
+      "retained": "temporary local build output; not committed as a second application copy"
+    },
+    {
+      "name": "teacher-group-fixture.css",
+      "bytes": 759059,
+      "sha256": "6788deadf9c58aac8c5bb94cf118bdaa53bf7a686f4e5eefcae0156a710283c4",
+      "retained": "temporary local build output; not committed as a second application copy"
+    }
+  ]
+}

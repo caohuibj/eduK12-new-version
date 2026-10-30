@@ -1,0 +1,8 @@
+{
+  "artifact": 12977801611,
+  "bytes": 72015,
+  "sha256": "fb498ffe538b3a392b06c3c7a04ce32ee754a4c2895a2f18d69ff701b16db083",
+  "expected": "fb498ffe538b3a392b06c3c7a04ce32ee754a4c2895a2f18d69ff701b16db083",
+  "matches": true,
+  "status": "DOWNLOADED"
+}

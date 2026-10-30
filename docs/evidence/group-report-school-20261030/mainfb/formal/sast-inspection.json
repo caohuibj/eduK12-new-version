@@ -1,0 +1,9 @@
+{
+  "artifact": 12981535068,
+  "kind": "sast",
+  "sha256": "180f9402e593aa991b123c3cf87c3e4809fdd3ef81a687a4ee0b98630fe512d0",
+  "bytes": 72012,
+  "findings": 1,
+  "sameFindingMessagesAndLocationsAsPrevious": true,
+  "invocationsSuccessful": true
+}

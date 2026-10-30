@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.app.json",
+    "--noEmit"
+  ],
+  "component": "frontend",
+  "componentTree": "3227cd02582e5322a765d4483c4ad2b1ea8a7b77",
+  "head": "0367785f19fadc20b9e9368d8e435377f298bcca",
+  "node": "v24.21.0",
+  "startedAt": "2026-10-30T14:24:21.551132+00:00",
+  "finishedAt": "2026-10-30T14:25:09.863926+00:00",
+  "exitCode": 0,
+  "signal": null,
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "originalExecutionSigned": false
+}

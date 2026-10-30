@@ -1,0 +1,14 @@
+{
+  "id": 41057701948,
+  "event": "pull_request",
+  "path": ".github/workflows/ci.yml",
+  "head_sha": "77e2767248d171f8914fe94b9f3debada424a4d4",
+  "head_branch": "feat/group-report-school-teacher-20261030",
+  "run_attempt": 1,
+  "status": "completed",
+  "conclusion": "cancelled",
+  "created_at": "2026-10-30T12:45:04Z",
+  "run_started_at": "2026-10-30T12:45:04Z",
+  "updated_at": "2026-10-30T12:45:53Z",
+  "html_url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/41057701948"
+}
