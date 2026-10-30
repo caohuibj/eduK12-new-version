@@ -325,7 +325,7 @@
       "enabled": true,
       "base": "dc796e04203696b4a579aa6fd2428df592031ee3",
       "product": "d537212929887218f255ee6f654a9522463abff7",
-      "controlCheckpoint": "4fbc71f590767149e68ef3aa4c1852f11371f291",
+      "controlCheckpoint": "5f6e82df42e9657c84f942be4d523b7df531b1b0",
       "components": {
         "backend": "7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc",
         "frontend": "5c0402cdbc06239dd3fde86cf59c69c294a49d2a"
@@ -353,6 +353,10 @@
         "docs/performance/education-post-p6-20261030/CI-CANDIDATE.md": {
           "before": null,
           "after": "28a8d1c7b272f5527976e8c8e083ca3cdf0311f9"
+        },
+        "docs/performance/education-post-p6-20261030/INDEPENDENT-REVIEW.md": {
+          "before": null,
+          "after": "93e8f86bdbc322a405d37813b5ce65934f4baa47"
         },
         "docs/performance/education-post-p6-20261030/README.md": {
           "before": null,
@@ -496,8 +500,12 @@
         }
       },
       "activationReview": {
-        "status": "PENDING_INDEPENDENT_REVIEW",
-        "scope": "Ready is still Draft; no CI activation. Current user authorization permits routine activation after necessary independent review."
+        "reviewer": "independent Codex pr395_review",
+        "reviewedSource": "58659b99b8474828f22102b06a99016f5bafd091",
+        "reviewedTree": "1da4b2f09c5650359b69d0dc2617fba4f47dbea0",
+        "record": "docs/performance/education-post-p6-20261030/INDEPENDENT-REVIEW.md",
+        "recordSHA256": "e90cf0748350f8c0505430f44c59977d1da2700953e6c233cb7d30126802f249",
+        "scope": "Independent actual product/control/original evidence review; authorized final metadata-only delta. Not DOT, GitHub APPROVE or signed original execution."
       }
     }
   }
