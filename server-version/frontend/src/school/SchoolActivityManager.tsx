@@ -1,3 +1,4 @@
+import {EducationTrackingPublish,EducationTrackingNext} from '../modules/reporting/EducationPersonalTracking'
 import {SchoolActivityCollection} from './SchoolActivityCollection'
 import './school-activity-collection.css'
 import './school-activity-configuration.css'
@@ -299,10 +300,10 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     setPreview(r)
     setNotice('仅展示人数预览，不展示任何个体心理报告或原始作答。')
   })
-  const publishRun=()=>void execute(async()=>{
+  const publishRun=(tracking?:unknown)=>void execute(async()=>{
     if(!selected||!activeRun)return
     if(!window.confirm('确认测评资源、参与名单、许可与科学成熟度已经审核，正式向获批人员发布？'))return
-    await api(path+'/runs/'+activeRun.id+'/publish','POST',{expectedVersion:activeRun.version})
+    await api(path+'/runs/'+activeRun.id+'/publish','POST',{expectedVersion:activeRun.version,tracking})
     await fetchDetail(selected.courseId)
     setActiveRun(null);setNotice('正式测评已发布。学生仍需以本人身份完成原有作答流程。')
   })
@@ -423,6 +424,10 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
             if(request!==runRequest.current||activityPath.current!==path)return
             setActiveRun({...d.run,tracks:d.tracks})
           })}>{r.name} · {schoolRunStatusText(r.status)}</button>
+          {['PUBLISHED','CLOSED'].includes(r.status)&&<EducationTrackingNext entry="SCHOOL" api={api} path={path+'/runs/'+r.runId} disabled={busy} create={()=>void execute(async()=>{
+            const next=await api<{courseId:string;runId:string}>(path+'/runs/'+r.runId+'/next-wave','POST',{requestId:crypto.randomUUID()})
+            await fetchList();await fetchDetail(next.courseId);setActiveRun(null);setPreview(null);setNotice('下一轮活动草稿已创建；请按原流程确认名单、审批并发布。')
+          })}/>}
           {(r.capabilities?.canClose||r.capabilities?.canCancel)?<div key={'lifecycle-'+r.runId} className="hs-actions">
         {r.capabilities.canClose&&<button aria-label={compact?`收尾 ${r.name}`:undefined} disabled={busy} onClick={()=>void execute(async()=>{
           if(!window.confirm('停止该批次的新作答；已开始的作答按原有规则继续。确认收尾？'))return
@@ -528,8 +533,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
           {preview.tracks.map((t,i)=><span key={i}> 项目 {i+1}（作答 {t.executionCount}，
             受评对象 {t.subjectCount}）</span>)}</p>}
         {selected.runs.find(r=>r.runId===activeRun.id)?.capabilities?.canPublish===true&&
-          <button className="hs-primary" disabled={busy||!preview} onClick={publishRun}>
-            {selected.capabilities?.ownPsychologyPublisher?'正式发布本人测评':'学校管理员正式发布测评'}</button>}
+          <EducationTrackingPublish entry="SCHOOL" api={api} path={path+'/runs/'+activeRun.id} disabled={busy||!preview} publish={publishRun} publishLabel={selected.capabilities?.ownPsychologyPublisher?'正式发布本人测评':'学校管理员正式发布测评'}/>}
       </div>}
       </section>
       <section className="hs-activity-config-panel" id="hs-activity-panel-results" aria-label="活动进度与结果" hidden={compact&&panel!=='results'}>

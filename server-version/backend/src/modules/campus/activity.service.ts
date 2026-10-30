@@ -85,11 +85,12 @@ async function requireGovernor(ctx:OrganizationAccessContext){
   if(!isSchoolAdmin(ctx))deny('ACTIVITY_GOVERNANCE_REQUIRED',403)
 }
 export async function createCampusActivity(input:{
+  tx?:Prisma.TransactionClient;
   actor:AuthenticatedPrincipal;organizationId:string;title:string
   description?:string|null;purpose:ActivityPurpose
 }){
   if(!input.title.trim()||input.title.length>200)deny('ACTIVITY_TITLE_INVALID',400)
-  return prisma.$transaction(async tx=>{
+  const execute=async(tx:Prisma.TransactionClient)=>{
     const ctx=await currentSchoolContext(tx,input.actor,input.organizationId)
     if(!await canPrepareActivity(tx,ctx))deny('ACTIVITY_EDITOR_REQUIRED',403)
     const course=await tx.course.create({data:{
@@ -109,7 +110,8 @@ export async function createCampusActivity(input:{
       domainEventId:randomUUID(),payload:{purpose:input.purpose},
     })
     return {id:course.id,title:course.title,status:'DRAFT' as const,version:1}
-  })
+  }
+  return input.tx?execute(input.tx):prisma.$transaction(execute)
 }
 export async function listCampusActivities(input:{
   actor:AuthenticatedPrincipal;organizationId:string;page:number;pageSize:number

@@ -1,3 +1,4 @@
+import {readSchoolPersonalChanges} from '../reporting/teacher-personal-changes.service'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z, ZodError } from 'zod'
 import { config } from '../../config'
@@ -190,6 +191,11 @@ router.get('/reports/student/executions/:executionId', guarded(async req => {
     throw new ParentPortalError('CAMPUS_REPORT_NOT_FOUND', 404)
   }
   return readCampusStudentFeedback(req.user!.userId, id.parse(req.params.executionId))
+}))
+
+router.post('/reports/student/executions/:executionId/changes',mutationBudget,guarded(async req=>{
+  if(req.user!.role!=='STUDENT'||(await readCampusStudentStatus(req.user!)).status!=='APPROVED')throw new ParentPortalError('CAMPUS_REPORT_NOT_FOUND',404)
+  return readSchoolPersonalChanges({actorUserId:req.user!.userId,executionId:id.parse(req.params.executionId)})
 }))
 
 // Counselor's professional reports are separately authorized from parent

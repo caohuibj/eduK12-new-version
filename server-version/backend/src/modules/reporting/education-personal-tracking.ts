@@ -1,3 +1,5 @@
+import {readPrivateScaleRuntimeResource} from '../education-tools/private-tool.runtime-resources'
+import {relationalEntryToRunPolicy} from '../assessment-run/resourceAuthority'
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -13,21 +15,34 @@ const key=z.string().min(1).max(240)
 export const educationTrackingSelectionSchema=z.object({mode:z.enum(['SINGLE','LONGITUDINAL']),
  metrics:z.array(z.object({trackId:key,itemId:key,scoreKey:key}).strict()).max(128).default([])}).strict()
 const binding=z.object({metricId:key,trackId:key,itemId:key,scoreKey:key}).strict()
-export const educationTrackingSchema=z.object({schemaVersion:z.literal(1),entry:z.literal('TEACHER'),
+export const educationTrackingSchema=z.object({schemaVersion:z.literal(1),entry:z.enum(['SCHOOL','TEACHER']),
  plan:personalTrackingPlanSchema.optional(),bindings:z.array(binding).min(1).max(128),requestId:z.string().uuid().optional()}).strict()
 export type EducationTracking=z.infer<typeof educationTrackingSchema>
 export type EducationTrackingTrack={id:string;resourcePolicy:RunResourcePolicy}
 function fail(message:string):never{return reportingFail('PERSONAL_TRACKING_INVALID',message,409)}
 
+/** Options use the same private source lane as original publication. */
+export async function educationTrackingPolicy(db:Prisma.TransactionClient,track:{resourceKey:string;resourceVersion:string;frozenResourcePolicy:unknown},context:{entry:'SCHOOL'|'TEACHER';organizationId:string;actorUserId:string}){
+ if(track.frozenResourcePolicy)return track.frozenResourcePolicy as RunResourcePolicy
+ if(track.resourceKey.startsWith('private-scale:')){
+  if(track.resourceVersion!=='1.0.0')fail('私有追踪来源版本不受支持')
+  const source=await readPrivateScaleRuntimeResource(db,{key:track.resourceKey,version:'1.0.0',purpose:'NEW_USE',context:{entry:context.entry,organizationId:context.organizationId,principal:{userId:context.actorUserId,accountDomain:'SCHOOL'}}})
+  return relationalEntryToRunPolicy(source.resourceEntry)
+ }
+ const {productionRunResourceAuthorityRegistry}=await import('../assessment-run/resourceAuthority')
+ return productionRunResourceAuthorityRegistry.resolveExact({family:'SCALE',key:track.resourceKey,version:track.resourceVersion})
+}
+
 /** Only existing content-owned longitudinal rights become picker choices.
  * Empty longitudinalMetricKeys is not upgraded from ordinary numeric access. */
-export async function educationTrackingChoices(db:Prisma.TransactionClient,tracks:EducationTrackingTrack[]){
+export async function educationTrackingChoices(db:Prisma.TransactionClient,tracks:EducationTrackingTrack[],entry:'SCHOOL'|'TEACHER'='TEACHER'){
+ const role=entry==='SCHOOL'?'STUDENT':'TEACHER'
  const choices:Array<{trackId:string;itemId:string;scoreKey:string;label:string;unit:string;measurementHash:string}>=[]
  const releases=new Map<string,Awaited<ReturnType<typeof getContentRelease>>>()
  for(const track of tracks){
   const policy=track.resourcePolicy
-  if(policy.relationshipKinds.length!==1||policy.relationshipKinds[0]!=='SELF'||policy.subjectRoles.length!==1||policy.subjectRoles[0]!=='TEACHER'
-   ||policy.respondentRoles.length!==1||policy.respondentRoles[0]!=='TEACHER'||!policy.resultDisclosure||policy.runtimeLaunchTarget?.kind!=='COMPOSITE')continue
+  if(policy.relationshipKinds.length!==1||policy.relationshipKinds[0]!=='SELF'||policy.subjectRoles.length!==1||policy.subjectRoles[0]!==role
+   ||policy.respondentRoles.length!==1||policy.respondentRoles[0]!==role||!policy.resultDisclosure||policy.runtimeLaunchTarget?.kind!=='COMPOSITE')continue
   const allowed=validateResultDisclosureContract(policy.resultDisclosure).audiences.RESPONDENT
   if(allowed.mode!=='INDIVIDUAL_SUMMARY'||!allowed.longitudinalMetricKeys.length)continue
   const source=await db.compositeAssessment.findUnique({where:{id:policy.runtimeLaunchTarget.ref},include:{items:{include:{scale:true}}}})
@@ -61,15 +76,19 @@ export async function freezeEducationTracking(db:Prisma.TransactionClient,input:
  if(!row)fail('任务不存在')
  const selected=input.selection===undefined?undefined:educationTrackingSelectionSchema.parse(input.selection)
  if(!row.tracking&&selected?.mode!=='LONGITUDINAL')return
- const [link]=await db.$queryRaw<Array<{id:string}>>`SELECT event.id FROM huiteacher_evaluation_run_links link
+ const links=await db.$queryRaw<Array<{entry:'SCHOOL'|'TEACHER'}>>`SELECT 'TEACHER'::text AS entry FROM huiteacher_evaluation_run_links link
   JOIN huiteacher_evaluation_events event ON event.organization_id=link.organization_id AND event.id=link.event_id
   WHERE link.organization_id=${input.organizationId} AND link.run_id=${input.runId} AND event.status='OPEN'
-   AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.run_id=link.run_id)`
- if(!link)fail('当前仅可从具备本人纵向披露许可的教师 SELF 任务发布')
- const choices=await educationTrackingChoices(db,input.tracks)
+  UNION ALL SELECT 'SCHOOL'::text AS entry FROM campus_activity_runs link
+  JOIN campus_activities activity ON activity.organization_id=link.organization_id AND activity.course_id=link.course_id
+  WHERE link.organization_id=${input.organizationId} AND link.run_id=${input.runId} AND activity.status='OPEN'`
+ if(links.length!==1)fail('请从已获授权且开放的本人 SELF 活动发布')
+ const entry=links[0].entry
+ const choices=await educationTrackingChoices(db,input.tracks,entry)
  if(row.tracking){
   if(selected?.mode==='SINGLE')fail('后续轮次不能降为单次')
   const tracking=educationTrackingSchema.parse(row.tracking)
+  if(tracking.entry!==entry)fail('追踪计划所属入口不一致')
   const [baseline]=await db.$queryRaw<Array<{tracking:unknown}>>`SELECT personal_tracking AS tracking FROM assessment_runs
    WHERE organization_id=${input.organizationId} AND id=${row.baselineId}`
   const plan=educationTrackingSchema.parse(baseline?.tracking).plan
@@ -92,7 +111,7 @@ export async function freezeEducationTracking(db:Prisma.TransactionClient,input:
   metrics.push({id:metricId,sourceKey:item.trackId+':'+item.itemId,scoreKey:item.scoreKey,label:choice.label,unit:choice.unit,kind:'SCALE',measurementHash:choice.measurementHash})
   bindings.push({...item,metricId})
  }
- const tracking:EducationTracking={schemaVersion:1,entry:'TEACHER',plan:{schemaVersion:1,id:randomUUID(),baselineWaveId:input.runId,metrics},bindings}
+ const tracking:EducationTracking={schemaVersion:1,entry,plan:{schemaVersion:1,id:randomUUID(),baselineWaveId:input.runId,metrics},bindings}
  await db.$executeRaw`UPDATE assessment_runs SET personal_tracking_baseline_id=id,personal_tracking_ordinal=1,
   personal_tracking=${JSON.stringify(tracking)}::jsonb WHERE organization_id=${input.organizationId} AND id=${input.runId}`
 }

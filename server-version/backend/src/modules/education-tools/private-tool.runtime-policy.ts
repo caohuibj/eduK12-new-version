@@ -16,7 +16,7 @@ export function privateScaleResourceEntry(origin:PrivateScaleRuntimeOrigin,title
    analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:v.responseMode==='SELF'?policyKey:'observer_private_respondent_v1',minimumRespondents:null},
   ...(v.population==='STUDENT'&&v.responseMode==='TEACHER_REPORT'?{allowedTargetModes:['HOMEROOM_TEACHER','ALL_CLASS_TEACHERS','SELECTED_CLASS_TEACHERS'] as const}:{}),
   cohortAnalysisPolicy:null,launchTarget:{runtime:'COMPOSITE',compositeAssessmentId:compositeId},
-  resultDisclosure:{schemaVersion:1,policyKey,minimumRespondents:null,audiences:{RESPONDENT:personal?{mode:'INDIVIDUAL_SUMMARY',metricKeys,longitudinalMetricKeys:[]}:none,
+  resultDisclosure:{schemaVersion:1,policyKey,minimumRespondents:null,audiences:{RESPONDENT:personal?{mode:'INDIVIDUAL_SUMMARY',metricKeys,longitudinalMetricKeys:definition.report.audienceContract?.longitudinalMetricKeys??[]}:none,
    SUBJECT:none,TEACHER:none,PARENT:none,PROFESSIONAL:none,ORGANIZATION:none,RESEARCH:none}},
  }
  createRelationalProductRegistry([entry]);return entry

@@ -191,9 +191,9 @@ export async function teacherTrackingOptions(input:Key){
  const link=await activeLink(input)
  return prisma.$transaction(async tx=>{
   const {listRunTracks}=await import('../assessment-run/repository')
-  const {educationTrackingChoices}=await import('../reporting/education-personal-tracking')
+  const {educationTrackingChoices,educationTrackingPolicy}=await import('../reporting/education-personal-tracking')
   const tracks=await listRunTracks(tx,input.organizationId,link.runId)
-  const resolved=await Promise.all(tracks.map(async t=>({id:t.id,resourcePolicy:(t.frozenResourcePolicy??await productionRunResourceAuthorityRegistry.resolveExact({family:t.resourceFamily as RunResourceRef['family'],key:t.resourceKey,version:t.resourceVersion})) as import('../assessment-run/resourceAuthority').RunResourcePolicy})))
+  const resolved=await Promise.all(tracks.filter(t=>t.resourceFamily==='SCALE').map(async t=>({id:t.id,resourcePolicy:await educationTrackingPolicy(tx,t,{entry:'TEACHER',organizationId:input.organizationId,actorUserId:input.actorUserId})})))
   const [run]=await tx.$queryRaw<Array<{baselineId:string|null;ordinal:number|null}>>`SELECT personal_tracking_baseline_id AS "baselineId",personal_tracking_ordinal AS ordinal FROM assessment_runs WHERE id=${link.runId} AND organization_id=${input.organizationId}`
   return {...run,choices:link.runStatus==='DRAFT'&&!run.baselineId?await educationTrackingChoices(tx,resolved):[]}
  })
@@ -226,10 +226,10 @@ export async function createNextTeacherTrackingEvent(input:Key&{requestId:string
   const {listRunTracks}=await import('../assessment-run/repository')
   const tracks=await listRunTracks(tx,input.organizationId,link.runId)
   const track=tracks.find(t=>t.id===tracking.bindings[0].trackId)
-  if(!track||tracking.bindings.some(b=>b.trackId!==track.id)||!track.resourceKey.startsWith('teacher-scale:'))throw new HuiteacherRunError('HUITEACHER_TRACKING_SOURCE_UNSUPPORTED')
+  if(!track||tracking.bindings.some(b=>b.trackId!==track.id)||!['teacher-scale:','private-scale:','library-scale:'].some(prefix=>track.resourceKey.startsWith(prefix)))throw new HuiteacherRunError('HUITEACHER_TRACKING_SOURCE_UNSUPPORTED')
   const resource={family:track.resourceFamily as RunResourceRef['family'],key:track.resourceKey,version:track.resourceVersion}
-  await assertRegisteredResourceUse(resource,input.actorUserId,tx,false,{organizationId:input.organizationId,runId:draft.runId})
-  const next=await addAssessmentRunTrackDraft({organizationId:input.organizationId,runId:draft.runId,resource,subjectSelector:track.subjectSelector,respondentSelector:track.respondentSelector,requestedPolicy:track.requestedPolicy,actorUserId:input.actorUserId,tx})
+  if(!resource.key.startsWith('private-scale:'))await assertRegisteredResourceUse(resource,input.actorUserId,tx,false,{organizationId:input.organizationId,runId:draft.runId})
+  const next=await addAssessmentRunTrackDraft({organizationId:input.organizationId,runId:draft.runId,resource,subjectSelector:track.subjectSelector,respondentSelector:track.respondentSelector,requestedPolicy:track.requestedPolicy,actorUserId:input.actorUserId,expectedVersion:1,tx})
   const stored={schemaVersion:1,entry:'TEACHER',bindings:tracking.bindings.map(b=>({...b,trackId:next.id})),requestId:input.requestId}
   await tx.$executeRaw`UPDATE assessment_runs SET personal_tracking_baseline_id=${source.baselineId},personal_tracking_ordinal=${ordinal},personal_tracking=${JSON.stringify(stored)}::jsonb WHERE id=${draft.runId} AND organization_id=${input.organizationId}`
   return {eventId:event.id,runId:draft.runId,ordinal}

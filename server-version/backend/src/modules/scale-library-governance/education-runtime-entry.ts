@@ -45,7 +45,7 @@ export function educationLibraryResourceEntry(input:{origin:EducationLibraryOrig
   const personal=v.responseMode==='SELF'&&((v.population==='STUDENT'&&audience==='student')
     ||(v.population==='TEACHER'&&audience==='teacher'))
   const none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
-  const self={mode:'INDIVIDUAL_SUMMARY' as const,metricKeys,longitudinalMetricKeys:[]}
+  const self={mode:'INDIVIDUAL_SUMMARY' as const,metricKeys,longitudinalMetricKeys:input.definition.report.audienceContract?.longitudinalMetricKeys??[]}
   const policyKey='EDUCATION_LIBRARY_APPROVED_CONTENT_V1'
   // Observer consent is an existing collection prerequisite, not report access.
   // The independent result-disclosure ceiling below remains NONE for observers.

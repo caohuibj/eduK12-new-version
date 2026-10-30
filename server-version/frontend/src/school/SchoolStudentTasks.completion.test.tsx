@@ -44,7 +44,8 @@ describe('School authoritative completion feedback consumer (synthetic transport
     expect(await screen.findByRole('region',{name:'获准的个人测评反馈'})).toHaveTextContent('正式提交已确认')
     await waitFor(()=>expect(api.mock.calls.filter(([path])=>path.startsWith('/reports/'))).toHaveLength(1))
     await act(async()=>{rejectList(Error('列表暂不可用'));await refresh.catch(()=>{})})
-    expect(screen.getByRole('region',{name:'获准的个人测评反馈'})).toBeInTheDocument()
+    expect(screen.getAllByRole('region',{name:'获准的个人测评反馈'})).toHaveLength(1)
+    expect(screen.getAllByRole('button',{name:'查看我的变化'})).toHaveLength(1)
     expect(api.mock.calls.some(call=>call.length>1)).toBe(false)
   })
   it('preserves FORM completion without requesting personal psychological feedback',async()=>{
