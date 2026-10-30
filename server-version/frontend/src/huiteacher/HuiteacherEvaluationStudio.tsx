@@ -1,3 +1,4 @@
+import {TeacherFormGroupReport,type TeacherFormGroupProjection} from './TeacherFormGroupReport'
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
@@ -21,9 +22,6 @@ type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DR
 type TeacherScale={id:string;key:string;version:string;title:string;hash:string;
   visibilityPolicyKey?:string;personalReportAvailable?:boolean}
 type Progress={runId:string;total:number;counts:Record<string,number>}
-type GroupReport={independentRespondents:number|null;minimumRespondents:number;
-  distributions:Array<{itemKey:string;prompt:string;status:'READY'|'WITHHELD';
-    reason?:string;cells?:Array<{key:string;label:string;count?:number;percentage?:number}>}>}
 const targetLabels:Record<string,string>={
   PERSON:'教师或学校人员',TEAM:'教研组／管理团队',ORGANIZATION:'学校',
   ACTIVITY:'其他活动',ARTIFACT:'教学成果或方案',PROJECT:'改进项目',
@@ -75,7 +73,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
   const [scaleChoice,setScaleChoice]=useState<Record<string,string>>({})
   const [formChoice,setFormChoice]=useState<Record<string,string>>({})
   const [progress,setProgress]=useState<Record<string,Progress>>({})
-  const [reports,setReports]=useState<Record<string,GroupReport>>({})
+  const [reports,setReports]=useState<Record<string,{report:TeacherFormGroupProjection;activityTitle:string;formTitle:string}>>({})
   const [targetName,setTargetName]=useState('')
   const [targetKind,setTargetKind]=useState('PERSON')
   const [subjectUserId,setSubjectUserId]=useState('')
@@ -296,10 +294,11 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     const formId=formChoice[event.id]
     if(!formId)throw new Error('请先选择报告对应的正式 Form')
     if(!window.confirm('确认正式发布冻结后的教师群体调查报告？后续读取将使用同一快照。'))return
-    const report=await api<GroupReport>(
+    const report=await api<TeacherFormGroupProjection>(
       base+'/evaluation-events/'+event.id+'/forms/'+formId+'/group-report/release',
       'POST',{})
-    setReports(previous=>({...previous,[event.id]:report}))
+    if(previewContext.current.base!==base||previewContext.current.api!==api||previewContext.current.actorKey!==actorKey)return
+    setReports({[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formId)?.title??formId}})
     setNotice('群体报告已正式发布，后续授权访问只读取同一份快照。')
   })
   const readGroup=(event:Event,historical=false)=>perform(async()=>{
@@ -309,10 +308,11 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     // may write the first disclosure ledger, so it retains its own step-up.
     const releasedOnly=import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
       &&!historical
-    const report=await api<GroupReport>(
+    const report=await api<TeacherFormGroupProjection>(
       base+'/evaluation-events/'+event.id+'/forms/'+formId
         +'/group-report'+(releasedOnly?'/released':''))
-    setReports(previous=>({...previous,[event.id]:report}))
+    if(previewContext.current.base!==base||previewContext.current.api!==api||previewContext.current.actorKey!==actorKey)return
+    setReports({[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formId)?.title??formId}})
   })
   const transition=(event:Event,action:'OPEN'|'CLOSE'|'CANCEL')=>perform(async()=>{
     const result=await api<{status:string;version:number}>(
@@ -527,22 +527,8 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
         <HuiteacherFieldManager key={'field:'+event.id}
           organizationId={organizationId} eventId={event.id}
           eventStatus={event.status} api={api}/>}
-      {reports[event.id]&&<div className="ht-report" aria-label="学校调查群体报告">
-        <p><strong>不同有效参与者：{reports[event.id].independentRespondents??'受限展示'}</strong>
-          （隐私下限 {reports[event.id].minimumRespondents}）</p>
-        <p>仅提供满足隐私保护的选项分布；个人答案、原始文本和作答身份不可见。</p>
-        {reports[event.id].distributions.map(item=><article key={item.itemKey}>
-          <h4>{item.prompt}</h4>
-          {item.status==='WITHHELD'?<p>{
-            item.reason==='PRIVATE_FREE_TEXT'?'开放性文字属于原始评价证据，默认不向管理者披露。':
-            item.reason==='AGGREGATION_NOT_RELEASED'?'该题型尚无正式合规的群体统计规则，暂不发布数值摘要。':
-            item.reason==='SMALL_CELL'?'选择分布存在可识别的小单元，因此隐藏整道题的统计。':
-            '该题因数据来源或权限保护暂不显示。'
-          }</p>:
-            <div className="ht-units">{item.cells?.map(cell=>
-              <span className="ht-tag" key={cell.key}>{cell.label}：{cell.count??(cell.percentage===undefined?'受限':cell.percentage+'%')}</span>)}</div>}
-        </article>)}
-      </div>}
+      {reports[event.id]&&<TeacherFormGroupReport {...reports[event.id]}/>}
+
     </article>)}</div>
     {eventCursor&&<button disabled={eventLoading||working} onClick={()=>void loadEvents(eventCursor)}>加载更多评价活动</button>}
 {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'
