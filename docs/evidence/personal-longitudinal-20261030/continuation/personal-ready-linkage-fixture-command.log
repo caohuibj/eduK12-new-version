@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {createRequire} from 'node:module';
+import {nativeSurveyFixtureSql} from '/workspace/eduK12-longitudinal-survey-review/.github/scripts/personal-tracking-ready.mjs';
+const require=createRequire('/workspace/eduK12-new-version/server-version/backend/package.json');
+const {PrismaClient}=require('@prisma/client');
+const url=process.env.TEST_DATABASE_URL;assert(url&&new URL(url).pathname==='/eduk12_test','Only the existing isolated synthetic DB');
+const db=new PrismaClient({datasources:{db:{url}}});
+const owner=randomUUID(),id=randomUUID(),participant=randomUUID(),wave=randomUUID(),publication=randomUUID(),attempt=randomUUID(),final=randomUUID(),digest='a'.repeat(64),login='native-'+owner.replaceAll('-','').slice(0,20);
+const rollback=new Error('EXPECTED_SYNTHETIC_ROLLBACK');let rowsPrepared=false;
+try{
+ await db.$transaction(async tx=>{
+  await tx.user.create({data:{id:owner,username:login,passwordHash:'synthetic-schema-fixture-not-a-login',role:'TEACHER',accountDomain:'SURVEY'}});
+  await tx.surveyAccount.create({data:{userId:owner,loginName:login,normalizedLogin:login}});
+  for(const sql of nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}).split(';').map(s=>s.trim()).filter(Boolean))await tx.$executeRawUnsafe(sql);
+  const [row]=await tx.$queryRawUnsafe('SELECT linkage_notice_confirmed AS confirmed FROM survey_waves WHERE id=$1',wave);assert.equal(row.confirmed,true);
+  const [saved]=await tx.$queryRawUnsafe('SELECT results_cipher AS cipher FROM survey_wave_finals WHERE id=$1',final);assert.equal(saved.cipher,'synthetic-opaque-old-report');
+  rowsPrepared=true;throw rollback;
+ });
+}catch(error){if(error!==rollback)throw error;}finally{await db.$disconnect();}
+assert(rowsPrepared);console.log(JSON.stringify({status:'PASSED',scope:'corrected synthetic old-row SQL against existing isolated migrated test database',linkageConfirmed:true,opaqueFinalInserted:true,rolledBack:true,migrationsReplayed:false,nativeRestoreExecuted:false,applicationJourneyReplayed:false}));

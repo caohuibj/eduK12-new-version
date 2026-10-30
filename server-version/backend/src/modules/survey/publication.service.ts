@@ -1,3 +1,5 @@
+import {loadSurveyTrackingSource,inheritedSurveyTrackingUnit,surveyTrackingDefaultSelections} from './tracking-source'
+import {freezeSurveyTracking,surveyFormTrackingIdentity,type SurveyTrackingSelection,type SurveyTrackingBinding} from './personal-tracking'
 import {surveyProfileMeasurementInput} from './cognitive-profile.definition'
 import type {SurveyNativeBundle} from '../bundle-product/survey-native'
 import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
@@ -40,6 +42,8 @@ import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy }
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
+  trackingIdentity?:{measurementHash:string;metrics:Array<{key:string;label:string;unit:string}>}
+  longitudinalMetricKeys?:string[]
   nativeBundleReport?:{definitionHash:string;audience:'student'|'researcher'|null;policy:import('../scale/projection/types').EffectiveScaleDisclosureSnapshot}
   executionProtocol?:'SITUATIONAL_NATIVE_V1'
   /** Catalog previews carry an unbound header; persisted publication adds time/epoch.
@@ -67,6 +71,7 @@ export interface ResearchFrozenUnit {
 }
 export interface FrozenGovernedPackage {nativeBundle?:SurveyNativeBundle;schemaVersion:1;importId:string;toolId:string;hash:string;title:string;family:'COMBINATION'|'BUNDLE';parentGrantId:string;report:PackageReport|null;slots:Array<{slotKey:string;draftId:string;instrumentKey:string;kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE'}>}
 export interface ResearchFrozenPublication {
+  longitudinal?:SurveyTrackingBinding
   governedPackages?:FrozenGovernedPackage[]
   schemaVersion:1
   purpose:'RESEARCH_ONLY'
@@ -169,7 +174,7 @@ export function compileFrozenResearchUnit(draft:{
  * authenticated action and remains fail-closed behind SURVEY_PUBLICATION_ENABLED.
  */
 export async function freezeResearchWaveDraft(input:{
-  actorUserId:string;projectId:string;waveId:string;revision:number;contentSelections?:SurveyContentSelection[];participantFeedback?:SurveyParticipantFeedbackSelection[]
+  actorUserId:string;projectId:string;waveId:string;revision:number;tracking?:SurveyTrackingSelection;contentSelections?:SurveyContentSelection[];participantFeedback?:SurveyParticipantFeedbackSelection[]
 }):Promise<{publicationId:string;version:number;digest:string;waveId:string;runtimeReady:true}> {
   return prisma.$transaction(async tx=>{
     // Lock project first so concurrent freezes share one exact publication sequence.
@@ -218,32 +223,43 @@ export async function freezeResearchWaveDraft(input:{
     const rows=await tx.surveyInstrumentDraft.findMany({
       where:{projectId:input.projectId,id:{in:orderedIds},status:{in:['DRAFT','PUBLISHED']}},
     })
+    const inheritedSnapshot=await loadSurveyTrackingSource(tx,input.projectId,wave.longitudinalSourceWaveId)
     const sources=await catalogSnapshotsForDrafts(tx,input.actorUserId,rows.flatMap(r=>r.catalogGrantId?[r.catalogGrantId]:[]))
     const byId=new Map(rows.map(row=>[row.id,row]))
     const frozenAt=new Date()
     const units=orderedIds.map(id=>{
       const draft=byId.get(id)
       if(!draft)stop('研究工具来源已发生变化')
-      const unit=draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
+      const catalogUnit=draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):undefined
+      const inherited=inheritedSurveyTrackingUnit(inheritedSnapshot,draft!)
+      if(inherited&&catalogUnit&&inherited.sourceDigest!==catalogUnit.sourceDigest)stop('冻结追踪工具的授权来源版本已变化')
+      const unit=inherited??catalogUnit??compileFrozenResearchUnit(draft!)
       return unit.nativeSituational?{...unit,nativeSituational:{...unit.nativeSituational,attemptEpoch:1 as const,frozenAt:frozenAt.toISOString()}}:unit
     })
     const feedbackMetrics=new Map<string,string[]>()
     for (const unit of units) {
-      if (unit.kind === 'FORM') continue
+      if (unit.kind === 'FORM') {unit.trackingIdentity=surveyFormTrackingIdentity(unit);continue}
       // Scale catalog imports now use the same explicit publication action as
       // native drafts. Other catalog families retain their separate migration.
       const release=surveyMeasurementPublicationMode(unit)==='AT_FREEZE'
         ?await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
         :await resolveSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
+      const scoring=unit.compiledDefinition as {scoring?:{scores?:Array<{key:string;label:string}>;publishedMetrics?:Array<{key:string;label:string}>}}
+      const labels=unit.kind==='SCALE'?scoring.scoring?.scores:scoring.scoring?.publishedMetrics
+      unit.trackingIdentity={measurementHash:release.content.measurementHash,metrics:release.content.metrics.map(metric=>({
+        key:metric.metricKey,unit:metric.unit,label:labels?.find(m=>m.key===metric.metricKey)?.label??metric.metricKey}))}
       feedbackMetrics.set(unit.draftId,release.content.metrics.map(metric=>metric.metricKey))
       unit.measurementRelease = { releaseId: release.releaseId, contentHash: release.contentHash,
         measurementHash: release.content.measurementHash }
     }
     for(const unit of units){await bindApprovedTripletContent(tx,unit,input.actorUserId);await bindGovernedToolContent(tx,unit,input.actorUserId)}
-    if((input.participantFeedback??[]).some(s=>units.some(u=>s.feedback.mode==='DESCRIPTIVE'&&u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId)&&u.sourceProvenance?.reportConfigured===false)))stop('已批准组合明确不反馈，不能在投放时添加报告反馈')
+    const defaults=surveyTrackingDefaultSelections(inheritedSnapshot,units)
+    const participantFeedback=input.participantFeedback??defaults.participantFeedback
+    const contentSelections=input.contentSelections??defaults.contentSelections
+    if(participantFeedback.some(s=>units.some(u=>s.feedback.mode==='DESCRIPTIVE'&&u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId)&&u.sourceProvenance?.reportConfigured===false)))stop('已批准组合明确不反馈，不能在投放时添加报告反馈')
     if((input.contentSelections??[]).some(s=>units.some(u=>u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId))))stop('已批准标准工具的参数与报告组合已冻结，不能在投放时替换版本')
-    freezeSurveyParticipantFeedback(units,input.participantFeedback??[],feedbackMetrics)
-    await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,input.contentSelections??[])
+    freezeSurveyParticipantFeedback(units,participantFeedback,feedbackMetrics)
+    await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,contentSelections)
     // Initial bounded research safety limit, not a measured capacity claim.
     if(units.filter(unit=>unit.kind==='COGNITIVE').length>4)
       stop('一个波次最多包含 4 个受控认知任务（480 个正式试次）')
@@ -334,7 +350,14 @@ export async function freezeResearchWaveDraft(input:{
       linearSituational:units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL
         &&!surveyNativeSituationalRequiresStageNotice(unit.compiledDefinition as SituationRuntimeDefinition))})
     const governedPackages=await freezeGovernedPackages(tx,input.actorUserId,input.projectId,units,frozenFlow)
+    const trackingProject=await tx.surveyProject.findUniqueOrThrow({where:{id:input.projectId},select:{longitudinalPlan:true,firstPublishedAt:true}})
+    if(trackingProject.longitudinalPlan&&!wave.longitudinalSourceWaveId)stop('请通过已发布纵向波次创建下一轮，以继承测量来源与计划')
+    const tracking=freezeSurveyTracking({projectId:input.projectId,waveId:input.waveId,ordinal:wave.ordinal,
+      collectionMode:project.collectionMode,existing:trackingProject.longitudinalPlan,firstPublishedAt:trackingProject.firstPublishedAt,
+      selection:input.tracking,units})
+    if(tracking&&!trackingProject.longitudinalPlan)await tx.surveyProject.update({where:{id:input.projectId},data:{longitudinalPlan:tracking.plan as Prisma.InputJsonValue}})
     const snapshot:ResearchFrozenPublication={
+      ...(tracking?{longitudinal:tracking.binding}:{}),
       schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:input.projectId,
       waveId:input.waveId,collectionMode:project.collectionMode as ResearchFrozenPublication['collectionMode'],
       consentVersion:wave.consentVersion,

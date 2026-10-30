@@ -44,14 +44,21 @@ const recordedScores=z.object({
 }).passthrough()
 /** Project saved authoritative scores only. No scorer, reference resolver,
  * template rendering, population inference, or private result spreading. */
-export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnitResult,collectionClosed:boolean){
+export function surveyRawMetricDisclosure(unit:ResearchFrozenUnit,collectionClosed:boolean){
   if(unit.sourceProvenance?.reportConfigured===false)return null
   const nativePolicy=unit.nativeBundleReport?resolveAudienceDisclosure(unit.nativeBundleReport.policy.disclosure,'subject'):null
   if(unit.nativeBundleReport&&(unit.nativeBundleReport.audience!=='student'||unit.nativeBundleReport.policy.disposition==='UNKNOWN'||!nativePolicy?.numericScores))return null
-  if(!['SCALE','SJT'].includes(unit.kind)||!unit.participantFeedback||result.notExecuted)return null
+  if(!['SCALE','SJT'].includes(unit.kind)||!unit.participantFeedback)return null
   const policy=surveyRawFeedbackSchema.parse(unit.participantFeedback)
   if(policy.mode!=='DESCRIPTIVE')return null
-  if(policy.release==='AFTER_COLLECTION'&&!collectionClosed)return {pending:true as const}
+  return {policy,nativePolicy,pending:policy.release==='AFTER_COLLECTION'&&!collectionClosed}
+}
+export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnitResult,collectionClosed:boolean){
+  if(result.notExecuted)return null
+  const access=surveyRawMetricDisclosure(unit,collectionClosed)
+  if(!access)return null
+  if(access.pending)return {pending:true as const}
+  const {policy,nativePolicy}=access
   if(result.instrumentKey!==unit.instrumentKey||result.kind!==unit.kind||result.sourceDigest!==unit.sourceDigest||
     result.scoringDigest!==unit.scoringDigest||!unit.measurementRelease)
     throw new Error('Stored participant score identity mismatch')

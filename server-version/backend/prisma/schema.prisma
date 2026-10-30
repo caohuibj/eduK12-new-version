@@ -3008,6 +3008,7 @@ model SurveyMfaRecoveryCode {
   @@map("survey_mfa_recovery_codes")
 }
 model SurveyProject {
+  longitudinalPlan Json? @map("longitudinal_plan")
   systemExportGrants SurveySystemExportGrant[]
   administratorDataAudits SurveyAdminDataAudit[]
   participantCodes SurveyParticipantCode[]
@@ -3104,6 +3105,7 @@ model SurveyPublication {
   @@map("survey_publications")
 }
 model SurveyWave {
+  longitudinalSourceWaveId String? @map("longitudinal_source_wave_id")
   referenceRequests SurveyReferenceRequest[]
   id              String        @id
   projectId       String        @map("project_id")
@@ -3143,6 +3145,7 @@ model SurveyWave {
   @@map("survey_waves")
 }
 model SurveyParticipant {
+  longitudinalSnapshots Json @default("{}") @map("longitudinal_snapshots")
   memorableCode SurveyParticipantCode?
   id                String        @id
   projectId         String        @map("project_id")
