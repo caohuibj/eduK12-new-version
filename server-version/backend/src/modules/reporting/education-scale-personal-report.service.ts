@@ -1,3 +1,4 @@
+import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
 import {readNativeEducationScaleFeedback} from './education-native-scale-feedback'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -78,7 +79,7 @@ export async function readEducationRespondentScaleReport(input: EducationPersona
     const rule = contract.audiences.RESPONDENT
     // This stage deliberately does not infer subject/observer read rights.
     if (rule.mode !== 'INDIVIDUAL_SUMMARY') return withheld()
-    if (own.policy.analysisMode !== 'INDIVIDUAL_ONLY') return hidden()
+    if (own.policy.analysisMode !== 'INDIVIDUAL_ONLY' && !isSelfGroupV2Entry(source.resourceEntry)) return hidden()
     const parent = await tx.compositeAssessmentAttempt.findUnique({ where: { id: own.attemptId } })
     if (!parent || parent.status !== 'COMPLETED' || parent.compositeAssessmentId !== source.compositeId
       || parent.userId !== input.actorUserId || parent.respondentUserId !== input.actorUserId

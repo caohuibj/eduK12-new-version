@@ -39,3 +39,22 @@ School 的 TEACHER / PROFESSIONAL / ORGANIZATION 每个聚合规则必须在新�
 `disclosureIdentityHash` 不包含父容器、slot、值、个人身份或 compiledRuntimeHash，包含实际工具／版本、sourceDefinitionHash、scorer、Cognitive protocol/profile/config 及指标单位，因此同一个叶工具放进另一个父容器不能建立独立披露身份。它仅服务来源披露分域；跨波可比性仍使用现有 C 身份／version axes，不把它另作纵向引擎。P/R 选择、父合同、entryHash 和执行 runtime hash 仍分别核验，不能靠这个 hash 替代。
 
 School 持有的来源 resolver 负责在父来源和 canonical 叶来源之间提供上述真实映射，并按实际 PROFESSIONAL／TEACHER／ORGANIZATION 选择原规则；不要将父的 GROUP 合同隐式当作叶的 GROUP 批准。新 helper 尚未接到发布／读取生产路径，Teacher 全量实现继续下一切片。
+
+## Shared native publishing / reader slice
+
+The fixed pure helper remains byte-identical to 00f2b788. School may synchronize the following shared production files together from this slice, then apply its own private source adapters:
+
+- `assessment-relational/product-registry.ts`
+- `reporting/respondentSummary.ts`
+- `reporting/education-scale-personal-report.service.ts`
+- `reporting/education-assessment-personal-report.service.ts`
+- `reporting/education-assessment-report.projector.ts`
+- `education-tools/assessment-resource.contract.ts`
+
+Native publication and runtime plumbing also changes `assessment-resource.service.ts`, `.repository.ts`, `.catalog.ts`, `.marker.ts`, `.marker-contract.ts`, plus Teacher `assessmentRunPolicy.ts` / `assessmentRuntime.access.ts` and the existing registration panel/client. These files remain owned by this thread. School must not recreate them independently.
+
+Native GROUP registration passes `analysisMode: COHORT_AGGREGATE`, an explicit parent `disclosure`, and `groupUnits: [{itemId,disclosure}]` for every real C unit. Each origin unit freezes `groupDisclosure`; no contract is copied from the parent by the backend. Parent and leaf metrics must agree; every leaf explicitly approves its own PROFESSIONAL / TEACHER / ORGANIZATION aggregate recipients. The content minimum N can differ by leaf; group consumers still take the maximum with parent/task/Spec.
+
+The version-2 personal renderer uses the intersection of parent RESPONDENT keys, current own disclosure and each unit's RESPONDENT keys; a leaf's NONE does not inherit the parent's own summary. The existing independently checked feedback timing and FINAL identity are unchanged.
+
+Still pending: group consumer resolution against these frozen native leaf contracts, library v2 registration/review and original Teacher GROUP consumers. Do not describe this checkpoint as a finished Teacher report journey. Task-artifact and group-longitudinal shared files have not been changed.

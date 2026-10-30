@@ -31,7 +31,7 @@ export async function readEducationMarkerSource(tx:Prisma.TransactionClient,raw:
  const {EducationAssessmentSourceError,readEducationAssessmentDeliveryIdentity}=await import('./assessment-resource.repository')
  function fail():never{throw new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_MARKER_IDENTITY')}
  if(b.runtimeCompositeId!==context.compositeId||b.runtimeItemId!==context.itemId||b.ownerId!==context.ownerId)fail()
- const identity=await readEducationAssessmentDeliveryIdentity(tx,{resourceKey:`education-assessment:${b.product}:${b.organizationId}:${b.resourceId}`,version:'1.0.0',purpose})
+ const identity=await readEducationAssessmentDeliveryIdentity(tx,{resourceKey:`education-assessment:${b.product}:${b.organizationId}:${b.resourceId}`,version:b.resourceVersion??'1.0.0',purpose})
  if(identity.origin.sourceCompositeId!==b.sourceCompositeId||identity.runtime.id!==b.runtimeCompositeId||identity.runtime.createdBy!==b.ownerId)fail()
  const target=identity.runtime.items.find(item=>item.id===b.runtimeItemId)
  const targetUnit=(identity.runtime.trainingContentSnapshot as {units:Array<{itemId:string;source:Record<string,unknown>;measurement:unknown}>}).units.find(unit=>unit.itemId===b.runtimeItemId)
