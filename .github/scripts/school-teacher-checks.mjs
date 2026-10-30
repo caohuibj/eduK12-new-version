@@ -512,6 +512,7 @@ async function nativePhase(phase,b,plan){
   // Build each component once. Original application cases and Draft lint/types
   // keep their own identities; they are not silently reexecuted here.
   if(kind==='frontend'&&plan.publicPackage)process.env.P6_PACKAGE_PROBE_BUILD='true';
+  if(kind==='frontend'&&plan.jdrDemo)command('frontend-types',process.execPath,['node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],resolve('server-version/frontend'));
   freshBuild(kind);nativeContext(kind);
  }
  else if(phase==='verify-frontend-artifact')freshArtifact('frontend');

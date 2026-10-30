@@ -6,15 +6,17 @@ import {readFileSync} from 'node:fs';
 import {readNativeEvidenceBytes,verifyNativeEvidence} from './school-teacher-native-evidence.mjs';
 export const NATIVE_BRANCH='feat/bundle-evc-profile-20261029';
 export const PACKAGE_BRANCH='feat/education-package-runtime-20261029';
+export const JDR_BRANCH='feat/teacher-jdr-bundle-20261030';
+export const JDR_MARKER='.github/scripts/school-teacher-jdr-bindings.json';
 export const PACKAGE_MARKER='.github/scripts/school-teacher-package-bindings.json';
-export const isNativeBranch=branch=>[NATIVE_BRANCH,PACKAGE_BRANCH].includes(branch);
-const markerFor=b=>b.branch===PACKAGE_BRANCH?PACKAGE_MARKER:NATIVE_MARKER;
+export const isNativeBranch=branch=>[NATIVE_BRANCH,PACKAGE_BRANCH,JDR_BRANCH].includes(branch);
+const markerFor=b=>b.branch===JDR_BRANCH?JDR_MARKER:b.branch===PACKAGE_BRANCH?PACKAGE_MARKER:NATIVE_MARKER;
 export const NATIVE_MARKER='.github/scripts/school-teacher-native-bindings.json';
 export const NATIVE_JOBS=['admission','frontend','backend-self','native-evidence','native-runtime','security'];
 const hash=x=>createHash('sha256').update(x).digest('hex');
 const sha=x=>typeof x==='string'&&/^[a-f0-9]{40}$/.test(x);
-export const nativeBinding=(branch=NATIVE_BRANCH)=>{assert(isNativeBranch(branch),'Unknown native branch');return JSON.parse(readFileSync(new URL(branch===PACKAGE_BRANCH?'./school-teacher-package-bindings.json':'./school-teacher-native-bindings.json',import.meta.url)))};
-export function nativeSastConfig(paths,b=paths.some(p=>p.includes('school-teacher-package'))?nativeBinding(PACKAGE_BRANCH):null){
+export const nativeBinding=(branch=NATIVE_BRANCH)=>{assert(isNativeBranch(branch),'Unknown native branch');return JSON.parse(readFileSync(new URL(branch===JDR_BRANCH?'./school-teacher-jdr-bindings.json':branch===PACKAGE_BRANCH?'./school-teacher-package-bindings.json':'./school-teacher-native-bindings.json',import.meta.url)))};
+export function nativeSastConfig(paths,b=null){
  const python=new Set(['.github/scripts/school-teacher-native-runtime.py','.github/scripts/school-teacher-native-runtime.test.py','.github/scripts/exact-candidate-runtime.py']);
  assert([...python].every(p=>paths.includes(p)),'Native Python extractor inputs missing');
  const reusedApplicationScan=b?.execution.sastContinuation===40980640181;
@@ -61,15 +63,15 @@ export function validateNativeBoundary(b,o,{draftPreflight=false}={}){
  assert(Object.keys(b.protectedInputs).length>10,'Runtime/config closure missing');
  assert.deepEqual(o.protectedInputs,b.protectedInputs,'Locked dependency/schema/runtime/control dependency drift');
  return {schema:1,route:'school-teacher',candidate:'native-bundle',base:b.base,head:o.checkoutHead,sourceHead:o.sourceHead,sourceTree:o.sourceTree,
-  product:b.productHead,productTree:b.productTree,...(b.branch===PACKAGE_BRANCH?{publicPackage:true,...(b.execution.officialContinuation===40977943858?{continuation:'package-browser-only'}:{})}:{}),components:{frontend:b.frontendTree,backend:b.backendTree},...(o.event==='push'?{postMerge:true}:{}),...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
+  product:b.productHead,productTree:b.productTree,...(b.branch===JDR_BRANCH?{jdrDemo:true}:{}),...(b.branch===PACKAGE_BRANCH?{publicPackage:true,...(b.execution.officialContinuation===40977943858?{continuation:'package-browser-only'}:{})}:{}),components:{frontend:b.frontendTree,backend:b.backendTree},...(o.event==='push'?{postMerge:true}:{}),...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
   inputsSha256:hash(JSON.stringify({source:b.source,controls:b.controls,protectedInputs:b.protectedInputs,execution:b.execution}))};
 }
 export function nativePlan(entries,base,head,read,env,b){
  const branch=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
- const markers=[NATIVE_MARKER,PACKAGE_MARKER].filter(p=>entries.some(e=>e.file===p)),known=isNativeBranch(branch);
+ const markers=[NATIVE_MARKER,PACKAGE_MARKER,JDR_MARKER].filter(p=>entries.some(e=>e.file===p)),known=isNativeBranch(branch);
  assert(markers.length<=1,'Mixed native candidate markers');
  const marker=markers.length===1;
- b??=nativeBinding(known?branch:markers[0]===PACKAGE_MARKER?PACKAGE_BRANCH:NATIVE_BRANCH);
+ b??=nativeBinding(known?branch:markers[0]===JDR_MARKER?JDR_BRANCH:markers[0]===PACKAGE_MARKER?PACKAGE_BRANCH:NATIVE_BRANCH);
  if(!known&&!marker)return null;
  assert.notEqual(env.CI_EVENT,'workflow_dispatch','Native manual/full/probe fallback forbidden');
  assert(branch===b.branch||branch==='main'&&env.CI_EVENT==='push','Native marker on wrong branch');
@@ -99,7 +101,7 @@ export async function nativeOfficialApi(path,env=process.env){
 }
 export async function observeNativeMain(plan,api=nativeOfficialApi){
  assert.equal(plan.candidate,'native-bundle');assert.equal(plan.postMerge,true);assert.notEqual(plan.preflightOnly,true);assert.deepEqual(plan.requiredJobs,NATIVE_JOBS);
- const prNumber=plan.publicPackage?392:388,branch=plan.publicPackage?PACKAGE_BRANCH:NATIVE_BRANCH;
+ const prNumber=plan.jdrDemo?405:plan.publicPackage?392:388,branch=plan.jdrDemo?JDR_BRANCH:plan.publicPackage?PACKAGE_BRANCH:NATIVE_BRANCH;
  const pr=await api('/pulls/'+prNumber);
  assert.equal(pr.number,prNumber);assert.equal(pr.merged,true);assert.equal(pr.state,'closed');assert.equal(pr.draft,false);
  assert.equal(pr.head.ref,branch);assert.equal(pr.head.repo.full_name,'caohuibj/eduK12-new-version');assert.equal(pr.head.sha,plan.sourceHead);
