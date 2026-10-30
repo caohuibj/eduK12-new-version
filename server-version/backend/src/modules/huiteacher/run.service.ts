@@ -1,3 +1,5 @@
+import {lockCompositionLibraryUses} from '../education-tools/library-source.use'
+import {educationCompositionPolicyBindingSchema} from '../education-tools/private-tool.composition-contracts'
 import {assertTeacherPersonalAssessmentPolicy} from './assessmentRunPolicy'
 import {addPrivateScaleRunTrack,addPrivateFormRunTrack,addPrivateCompositionRunTrack} from '../education-tools/private-tool.run-adapter'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
@@ -191,19 +193,17 @@ export async function teacherTrackingOptions(input:Key){
  const link=await activeLink(input)
  return prisma.$transaction(async tx=>{
   const {listRunTracks}=await import('../assessment-run/repository')
-  const {educationTrackingChoices,educationTrackingPolicy}=await import('../reporting/education-personal-tracking')
+  const {educationTrackingOptions,educationTrackingPolicy}=await import('../reporting/education-personal-tracking')
   const tracks=await listRunTracks(tx,input.organizationId,link.runId)
-  const resolved=await Promise.all(tracks.filter(t=>t.resourceFamily==='SCALE').map(async t=>({id:t.id,resourcePolicy:await educationTrackingPolicy(tx,t,{entry:'TEACHER',organizationId:input.organizationId,actorUserId:input.actorUserId})})))
-  const [run]=await tx.$queryRaw<Array<{baselineId:string|null;ordinal:number|null}>>`SELECT personal_tracking_baseline_id AS "baselineId",personal_tracking_ordinal AS ordinal FROM assessment_runs WHERE id=${link.runId} AND organization_id=${input.organizationId}`
-  return {...run,choices:link.runStatus==='DRAFT'&&!run.baselineId?await educationTrackingChoices(tx,resolved):[]}
+  const resolved=await Promise.all(tracks.filter(t=>['SCALE','COGNITIVE','SITUATIONAL','BUNDLE'].includes(t.resourceFamily)).map(async t=>({id:t.id,resourcePolicy:await educationTrackingPolicy(tx,t,{entry:'TEACHER',organizationId:input.organizationId,actorUserId:input.actorUserId})})))
+  const [run]=await tx.$queryRaw<Array<{baselineId:string|null;ordinal:number|null;tracking:unknown}>>`SELECT personal_tracking AS tracking,personal_tracking_baseline_id AS "baselineId",personal_tracking_ordinal AS ordinal FROM assessment_runs WHERE id=${link.runId} AND organization_id=${input.organizationId}`
+  return link.runStatus==='DRAFT'?educationTrackingOptions(tx,run,resolved,'TEACHER',input.organizationId):{baselineId:run.baselineId,ordinal:run.ordinal,choices:[]}
  })
 }
 export async function createNextTeacherTrackingEvent(input:Key&{requestId:string}){
  const link=await activeLink(input)
  if(!['PUBLISHED','CLOSED'].includes(link.runStatus))fail('HUITEACHER_TRACKING_SOURCE_UNPUBLISHED')
  return prisma.$transaction(async tx=>{
-  // Match publication's organization -> Run lock order.
-  await tx.$queryRaw`SELECT id FROM organizations WHERE id=${input.organizationId} FOR UPDATE`
   const [source]=await tx.$queryRaw<Array<{baselineId:string;tracking:unknown;targetId:string;kind:any;title:string}>>`
    SELECT run.personal_tracking_baseline_id AS "baselineId",run.personal_tracking AS tracking,event.target_id AS "targetId",event.kind,event.title
    FROM assessment_runs run JOIN huiteacher_evaluation_run_links link ON link.organization_id=run.organization_id AND link.run_id=run.id
@@ -212,6 +212,17 @@ export async function createNextTeacherTrackingEvent(input:Key&{requestId:string
   if(!source?.baselineId)fail('HUITEACHER_TRACKING_NOT_CONFIGURED')
   const {educationTrackingSchema}=await import('../reporting/education-personal-tracking')
   const tracking=educationTrackingSchema.parse(source.tracking)
+  if(tracking.entry!=='TEACHER')fail('HUITEACHER_TRACKING_ENTRY_MISMATCH')
+  const {listRunTracks}=await import('../assessment-run/repository')
+  const tracks=await listRunTracks(tx,input.organizationId,link.runId),track=tracks.find(t=>t.id===tracking.bindings[0].trackId)
+  if(!track||tracking.bindings.some(b=>b.trackId!==track.id)||!['teacher-scale:','private-scale:','library-scale:','education-assessment:','education-composition:'].some(prefix=>track.resourceKey.startsWith(prefix)))throw new HuiteacherRunError('HUITEACHER_TRACKING_SOURCE_UNSUPPORTED')
+  const composition=track.resourceKey.startsWith('education-composition:')?educationCompositionPolicyBindingSchema.parse((track.frozenResourcePolicy as import('../assessment-run/resourceAuthority').RunResourcePolicy).educationComposition):null
+  const libraryUses=composition?await lockCompositionLibraryUses(tx,{entry:'TEACHER',organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}},[track.resourceKey]):undefined
+  // Original issuer/library order, then organization -> Run.
+  await tx.$queryRaw`SELECT id FROM organizations WHERE id=${input.organizationId} FOR UPDATE`
+  const active=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_runs WHERE organization_id=${input.organizationId} AND id=${link.runId} AND status IN ('PUBLISHED','CLOSED') FOR UPDATE`
+  if(!active.length)fail('HUITEACHER_TRACKING_SOURCE_UNPUBLISHED')
+
   await tx.$queryRaw`SELECT id FROM assessment_runs WHERE organization_id=${input.organizationId} AND id=${source.baselineId} FOR UPDATE`
   const previous=await tx.$queryRaw<Array<{eventId:string;runId:string;ordinal:number}>>`SELECT link.event_id AS "eventId",run.id AS "runId",run.personal_tracking_ordinal AS ordinal
    FROM assessment_runs run JOIN huiteacher_evaluation_run_links link ON link.run_id=run.id AND link.organization_id=run.organization_id
@@ -223,15 +234,22 @@ export async function createNextTeacherTrackingEvent(input:Key&{requestId:string
   const {createHuiteacherEvent,createHuiteacherEventRunDraft}=await import('./evaluation.service')
   const event=await createHuiteacherEvent({...input,targetId:source.targetId,kind:source.kind,title:source.title.replace(/ · T\d+$/,'')+' · T'+ordinal,tx})
   const draft=await createHuiteacherEventRunDraft({...input,eventId:event.id,name:event.title,tx})
-  const {listRunTracks}=await import('../assessment-run/repository')
-  const tracks=await listRunTracks(tx,input.organizationId,link.runId)
-  const track=tracks.find(t=>t.id===tracking.bindings[0].trackId)
-  if(!track||tracking.bindings.some(b=>b.trackId!==track.id)||!['teacher-scale:','private-scale:','library-scale:'].some(prefix=>track.resourceKey.startsWith(prefix)))throw new HuiteacherRunError('HUITEACHER_TRACKING_SOURCE_UNSUPPORTED')
   const resource={family:track.resourceFamily as RunResourceRef['family'],key:track.resourceKey,version:track.resourceVersion}
-  if(!resource.key.startsWith('private-scale:'))await assertRegisteredResourceUse(resource,input.actorUserId,tx,false,{organizationId:input.organizationId,runId:draft.runId})
-  const next=await addAssessmentRunTrackDraft({organizationId:input.organizationId,runId:draft.runId,resource,subjectSelector:track.subjectSelector,respondentSelector:track.respondentSelector,requestedPolicy:track.requestedPolicy,actorUserId:input.actorUserId,expectedVersion:1,tx})
+  if(!['private-scale:','education-composition:','education-assessment:'].some(prefix=>resource.key.startsWith(prefix)))await assertRegisteredResourceUse(resource,input.actorUserId,tx,false,{organizationId:input.organizationId,runId:draft.runId})
+  const next=await addAssessmentRunTrackDraft({organizationId:input.organizationId,runId:draft.runId,resource,subjectSelector:track.subjectSelector,respondentSelector:track.respondentSelector,requestedPolicy:track.requestedPolicy,actorUserId:input.actorUserId,expectedVersion:1,...(['education-assessment:','education-composition:'].some(prefix=>resource.key.startsWith(prefix))?{expectedRunId:draft.runId,educationWorkflow:{product:'TEACHER' as const,id:event.id}}:{}),...(composition?{privateComposition:{versionId:composition.origin.versionId,contentHash:composition.origin.contentHash},privateCompositionLibraryLocks:{proof:libraryUses}}:{}),tx})
   const stored={schemaVersion:1,entry:'TEACHER',bindings:tracking.bindings.map(b=>({...b,trackId:next.id})),requestId:input.requestId}
   await tx.$executeRaw`UPDATE assessment_runs SET personal_tracking_baseline_id=${source.baselineId},personal_tracking_ordinal=${ordinal},personal_tracking=${JSON.stringify(stored)}::jsonb WHERE id=${draft.runId} AND organization_id=${input.organizationId}`
   return {eventId:event.id,runId:draft.runId,ordinal}
+ })
+}
+
+export async function removeTeacherTrackingDraftSource(input:Key&{trackId:string;expectedVersion:number}){
+ const link=await activeLink(input)
+ return prisma.$transaction(async tx=>{
+  await tx.$queryRaw`SELECT id FROM organizations WHERE id=${input.organizationId} FOR UPDATE`
+  const [event]=await tx.$queryRaw<Array<{status:string}>>`SELECT status FROM huiteacher_evaluation_events WHERE organization_id=${input.organizationId} AND id=${input.eventId} FOR UPDATE`
+  if(event?.status!=='DRAFT')fail('HUITEACHER_RUN_NOT_DRAFT')
+  const {removeAssessmentRunTrackDraft}=await import('../assessment-run/repository')
+  return removeAssessmentRunTrackDraft({...input,runId:link.runId,tx})
  })
 }

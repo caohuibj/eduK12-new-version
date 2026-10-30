@@ -217,7 +217,7 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
       <EducationTaskFeedback key={visibleFeedback.task.id} entry="SCHOOL"
       executionId={visibleFeedback.task.id} title={visibleFeedback.task.title} api={api}
       loadFeedback={readFeedback} onClose={()=>setFeedback(null)}/>)}
-    {visibleFeedback&&visibleFeedback.task.resourceFamily==='SCALE'&&<EducationPersonalChanges key={'changes:'+visibleFeedback.task.id} entry="SCHOOL" api={api} executionId={visibleFeedback.task.id}/>}
+    {visibleFeedback&&['SCALE','COGNITIVE','SITUATIONAL','BUNDLE'].includes(visibleFeedback.task.resourceFamily??'')&&<EducationPersonalChanges key={'changes:'+visibleFeedback.task.id} entry="SCHOOL" api={api} executionId={visibleFeedback.task.id}/>}
     {visibleExecution&&<SchoolCompositeRunner key={visibleExecution.executionId} api={api} execution={visibleExecution} title={executionTask.current?.scope===scope?executionTask.current.task.title:undefined}
       onExit={()=>setExecution(null)}
       onFinished={finishExecution} onParentCompleted={finishExecution}/>}

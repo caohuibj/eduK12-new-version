@@ -1,0 +1,24 @@
+{
+  "capturedBeforeExecutionAt": "2026-10-30T11:02:33.291446+00:00",
+  "base": "10c12ff680059850c31f11165c1f7611e8385946",
+  "indexTree": "426fb960966d0393702e58f23e015f21fc7af5b5",
+  "sourceBlobs": {
+    "server-version/backend/src/modules/campus/personal-tracking.ts": "cca8a36b9db69d6f84307d941169eec1f653b8ec",
+    "server-version/backend/src/modules/composite/personal-tracking-results.ts": "d375ca02e81d8d8808049a348e6f34a36183c644",
+    "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts": "dc194dfd9b29cf2260f27e57deb805f0ede356ef",
+    "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts": "b404055e4545412cfbf13975aafd6cd0ae205557",
+    "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts": "8d0eb96a98dea86ec6c6b027795d3c7dc5f8cb02",
+    "server-version/backend/src/modules/huiteacher/run.service.ts": "dfb45439521bb8c2821142f08cca09243ac84ffd",
+    "server-version/backend/src/modules/reporting/education-personal-tracking.ts": "3b840b2d3a576924ceb62fda7eea4d64ff07a969",
+    "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": "08bc79b86ce6d0de7e8d0ecd9f04e83ea02dda1c",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": "d7a0ffb27930725e0ff251949b5763ee3a2ff788",
+    "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx": "f4be5589bb68f753bcb33f1da99a30d47a9969fc",
+    "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": "517ba17a464e69c0ad072b251b9ec92eac151639",
+    "server-version/frontend/src/components/education-tools/educationCompositionClient.ts": "3b916b7113b9ded279a923ebe850c0cf1da0072f",
+    "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx": "302c143ae37be6302e35a77aca696c1838d0f750",
+    "server-version/frontend/src/modules/reporting/EducationPersonalTracking.tsx": "94ffd7acad20307a9e07158ff813bfe673a5a2fa",
+    "server-version/frontend/src/school/SchoolStudentTasks.tsx": "df19639816e9ce76756648c878da49575c554a71"
+  },
+  "environment": "same existing isolated loopback test DB, Node24.21; no secrets or real data recorded",
+  "scope": "education native/composition leaf generalization, same-source next Run, explicit new-version disclosure; first type diagnostics"
+}

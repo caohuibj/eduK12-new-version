@@ -1,0 +1,18 @@
+
+/workspace/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx
+  57:73  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+
+/workspace/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx
+   45:77  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+  130:3   warning  React Hook useMemo has a missing dependency: 'block'. Either include it or remove the dependency array                                                                                                                                                     react-hooks/exhaustive-deps
+
+/workspace/eduK12-new-version/server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx
+  141:33  warning  The ref value 'scopeGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'scopeGeneration.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+
+/workspace/eduK12-new-version/server-version/frontend/src/school/SchoolActivityManager.tsx
+  174:28  warning  The ref value 'listRequest.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'listRequest.current' to a variable inside the effect, and use that variable in the cleanup function          react-hooks/exhaustive-deps
+  174:77  warning  The ref value 'resourceRequest.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'resourceRequest.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+  174:98  warning  The ref value 'runRequest.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'runRequest.current' to a variable inside the effect, and use that variable in the cleanup function            react-hooks/exhaustive-deps
+
+✖ 7 problems (0 errors, 7 warnings)
+

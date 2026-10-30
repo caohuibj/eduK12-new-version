@@ -1,3 +1,5 @@
+import {trainingFeedbackAvailability,trainingFeedbackPolicySchema} from '../assessment-policy/training-feedback-policy'
+import {readFrozenCompositionIdentity} from '../assessment-run/educationCompositionExecution'
 import {readPrivateScaleRuntimeResource} from '../education-tools/private-tool.runtime-resources'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
@@ -52,14 +54,23 @@ export async function readEducationPersonalChanges(input:{actorUserId:string;exe
   const own=(await read(end.baselineId)).filter(w=>w.ordinal<=end.ordinal&&w.organizationId===end.organizationId)
   const eligible=own.filter(w=>educationTrackingSchema.parse(w.tracking).bindings.some(b=>b.trackId===w.trackId))
   if(eligible.length>100)denied()
-  const checkedSources=new Set<string>()
+  const checkedSources=new Set<string>(),pendingSources=new Set<string>()
   for(const wave of eligible){
    if(!wave.policy?.resultDisclosure||canonicalHash(wave.policy)!==wave.policyHash)denied()
    const sourceKey=wave.family+':'+wave.key+':'+wave.version+':'+wave.policyHash
    if(checkedSources.has(sourceKey))continue
+   if(wave.key.startsWith('education-composition:')){
+    const identity=await readFrozenCompositionIdentity(tx,{policy:wave.policy,policyHash:wave.policyHash,organizationId:wave.organizationId,key:wave.key,version:wave.version})
+    if(identity.origin.entry!==input.entry||!identity.origin.variantKey.endsWith(':SELF'))denied()
+    checkedSources.add(sourceKey);continue
+   }
    if(wave.key.startsWith('private-scale:')&&wave.version!=='1.0.0')denied()
    const entry=wave.key.startsWith('private-scale:')?(await readPrivateScaleRuntimeResource(tx,{key:wave.key,version:'1.0.0',purpose:'HISTORY'})).resourceEntry:await resolveHistoricalRelationalEntry({resourceKind:wave.family,resourceKey:wave.key,resourceVersion:wave.version},tx)
    if(!entry||entry.releaseStatus!=='PUBLISHED'||!entry.resultDisclosure||canonicalHash(entry.resultDisclosure)!==canonicalHash(wave.policy.resultDisclosure))denied()
+   if(wave.key.startsWith('education-assessment:')){
+    const policy=trainingFeedbackPolicySchema.parse((entry as any).educationOrigin?.feedbackPolicy??{schemaVersion:1,mode:'IMMEDIATE'})
+    if(trainingFeedbackAvailability({policy,completed:true,reportReady:true,now:new Date()}).state!=='AVAILABLE')pendingSources.add(sourceKey)
+   }
    checkedSources.add(sourceKey)
   }
   // Latest whole completed parent per assignment, independently of an
@@ -74,10 +85,14 @@ export async function readEducationPersonalChanges(input:{actorUserId:string;exe
    const wave=eligible.find(w=>w.assignmentId===parent.assignmentRef)!
    if(parent.compositeAssessmentId!==wave.policy.runtimeLaunchTarget?.ref||parent.episodeId!==wave.episodeId)denied()
    const tracking=educationTrackingSchema.parse(wave.tracking),rule=validateResultDisclosureContract(wave.policy.resultDisclosure).audiences.RESPONDENT
-   return {...parent,compositeAssessment:{...parent.compositeAssessment,personalTrackingOrdinal:wave.ordinal,personalTracking:{schemaVersion:1,bindings:tracking.bindings.map(({metricId,itemId,scoreKey})=>({metricId,itemId,scoreKey,visible:rule.mode==='INDIVIDUAL_SUMMARY'&&rule.metricKeys.includes(scoreKey)&&rule.longitudinalMetricKeys.includes(scoreKey)}))}}}
+   return {...parent,compositeAssessment:{...parent.compositeAssessment,personalTrackingOrdinal:wave.ordinal,personalTracking:{schemaVersion:1,bindings:tracking.bindings.map(({metricId,itemId,scoreKey,visible})=>{
+     const block=(parent.compositeAssessment.trainingContentSnapshot as any)?.educationBinding?.manifest?.find((b:any)=>b.itemIds.includes(itemId))
+     const ceiling=wave.policy.educationComposition?wave.policy.educationComposition.unitReports.find((r:any)=>r.blockId===block?.blockId)?.respondent:rule
+     return {metricId,itemId,scoreKey,visible:visible!==false&&ceiling?.mode==='INDIVIDUAL_SUMMARY'&&ceiling.metricKeys.includes(scoreKey)&&ceiling.longitudinalMetricKeys.includes(scoreKey)}
+    })}}}
   })
   const leaves=await readTrainingPersonalLeafs(tx,{scopedSubjectId:end.organizationId+':'+input.actorUserId,plan:plan!,parents:adapted})
-  for(const leaf of leaves){const parent=parents.find(p=>p.id===leaf.attemptId)!;leaf.waveId=eligible.find(w=>w.assignmentId===parent.assignmentRef)!.runId}
+  for(const leaf of leaves){const parent=parents.find(p=>p.id===leaf.attemptId)!,wave=eligible.find(w=>w.assignmentId===parent.assignmentRef)!;leaf.waveId=wave.runId;if(pendingSources.has(wave.family+':'+wave.key+':'+wave.version+':'+wave.policyHash))for(const metric of Object.values(leaf.metrics))metric.pending=true}
   leaves.sort((a,b)=>a.ordinal-b.ordinal)
   await tx.$queryRaw`SELECT id FROM assessment_run_executions WHERE id=${input.executionId} FOR UPDATE`
   const sourceHash=canonicalHash({kind:input.entry+'_PERSONAL_CHANGES_V1',plan,subject:input.actorUserId,organizationId:end.organizationId,waves,leaves})

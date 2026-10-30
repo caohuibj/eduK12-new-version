@@ -21,7 +21,7 @@ type Tx=Prisma.TransactionClient
 type Ref={family:string;key:string;version:string}
 const leafSummarySchema=z.array(z.object({blockId:z.string().guid(),versionId:z.string().guid(),contentHash:z.string(),
  kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']),audience:z.string().nullable(),metricKeys:z.array(z.string()).max(100),sourceProvider:z.string().optional(),
- reportRespondent:z.string().nullable().optional(),subjectNumeric:z.boolean().nullable().optional(),reportScoreKeys:z.array(z.string()).nullable().optional()}).strict()).min(1).max(50)
+ longitudinal:z.boolean().optional(),sourceLongitudinalMetricKeys:z.array(z.string()).nullable().optional(),reportRespondent:z.string().nullable().optional(),subjectNumeric:z.boolean().nullable().optional(),reportScoreKeys:z.array(z.string()).nullable().optional()}).strict()).min(1).max(50)
 type Row={id:string;key:string;creationHash:string;createdBy:string;status:string;publishedAt:Date|null;productKind:string;
  publicEnabled:boolean;copyable:boolean;manifestHash:string;versionId:string;toolId:string;entry:string;organizationId:string;
  ownerUserId:string;contentHash:string;variantKey:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[];publicBindings?:unknown;librarySources:Array<{versionId:string;contentHash:string}>}
@@ -54,6 +54,8 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider'='LIBRARY_SCALE') AS "librarySources",
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','versionId',b->>'versionId','contentHash',b->>'contentHash','kind',b->>'kind',
     'sourceProvider',b->>'sourceProvider',
+    'longitudinal',COALESCE((SELECT block->'longitudinal' FROM jsonb_array_elements(v.definition->'blocks') block WHERE block->>'blockId'=b->>'blockId'),'false'::jsonb),
+    'sourceLongitudinalMetricKeys',COALESCE(s.definition#>'{report,audienceContract,longitudinalMetricKeys}',std.snapshot#>'{definition,report,audienceContract,longitudinalMetricKeys}',library.snapshot#>'{compiledDefinition,report,audienceContract,longitudinalMetricKeys}'),
     'audience',CASE WHEN b->>'sourceProvider' IN ('COGNITIVE_CONFIG','SJT_RELEASE') THEN CASE v.entry WHEN 'SCHOOL' THEN 'student' ELSE 'teacher' END ELSE COALESCE(s.definition#>>'{report,audienceContract,audience}',std.snapshot#>>'{definition,report,audienceContract,audience}',library.snapshot#>>'{compiledDefinition,report,audienceContract,audience}') END,
     'reportRespondent',COALESCE(s.definition#>>'{report,audienceContract,respondent}',std.snapshot#>>'{definition,report,audienceContract,respondent}',library.snapshot#>>'{compiledDefinition,report,audienceContract,respondent}'),
     'reportScoreKeys',COALESCE(s.definition#>'{report,scoreOrder}',std.snapshot#>'{definition,report,scoreOrder}',library.snapshot#>'{compiledDefinition,report,scoreOrder}'),
@@ -116,7 +118,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
  const binding=educationCompositionPolicyBindingSchema.parse({origin,manifestHash:row.manifestHash,
    unitReports:leafSummarySchema.parse(row.leaves).filter(leaf=>leaf.kind!=='FORM').map(leaf=>({blockId:leaf.blockId,versionId:leaf.versionId,
     contentHash:leaf.contentHash,respondent:variant.responseMode==='SELF'&&leaf.audience===(origin.entry==='SCHOOL'?'student':'teacher')
-     ?{mode:'INDIVIDUAL_SUMMARY',metricKeys:leaf.metricKeys,longitudinalMetricKeys:[]}:none,
+     ?{mode:'INDIVIDUAL_SUMMARY',metricKeys:leaf.metricKeys,longitudinalMetricKeys:leaf.longitudinal&&leaf.subjectNumeric!==false?leaf.metricKeys.filter(key=>leaf.sourceLongitudinalMetricKeys==null||leaf.sourceLongitudinalMetricKeys.includes(key)):[]}:none,
     ...(student?{subject:studentCompositionSubjectCeiling(leaf)}:{})}))})
   if(student){
    if(process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)

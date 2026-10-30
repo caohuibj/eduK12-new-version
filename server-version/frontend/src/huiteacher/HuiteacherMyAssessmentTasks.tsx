@@ -1,3 +1,4 @@
+import {EducationPersonalChanges} from '../modules/reporting/EducationPersonalTracking'
 import {deferredPage} from '../components/page-loading/deferredPage'
 import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react'
 import {MemoryRouter} from 'react-router-dom'
@@ -166,6 +167,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
     {busy&&<p role="status">正在核对测评状态…</p>}
     {session.completion?<div role="status"><h3>{student?'本次评价已完成':'本次测评已完成'}</h3><p>正式作答已提交并确认，反馈按独立授权规则开放。</p>
       {renderFeedback?.(session.completion)}
+      {!student&&<EducationPersonalChanges key={'changes:'+session.completion.executionId} api={api} executionId={session.completion.executionId} path={'/run-executions/'+encodeURIComponent(session.completion.executionId)+'/changes'}/>}
      </div>:
      child?.type==='COGNITIVE'&&child.cognitiveSession?.sessionId&&cognitive?
       <MemoryRouter key={actorKey+':'+child.cognitiveSession.sessionId}><CognitiveRunner embedded={{sessionId:child.cognitiveSession.sessionId,api:cognitive,
