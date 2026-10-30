@@ -27,6 +27,19 @@ beforeEach(()=>{
  m.load.mockImplementation(async(ciphers:string[])=>ciphers.map(cipher=>cipher==='old'?view('a',100):view(cipher,cipher==='a'?0:999)))
 })
 describe('selected Organization Run leaf observations',()=>{
+ it('GROUP discovery rejects a personal-only parent and does not advertise an unresolved private leaf as a registered measurement',async()=>{
+  const input={organizationId:'org',runId:'run',trackId:'track',groupAudience:'ORGANIZATION' as const}
+  m.rows.mockResolvedValue([{...row,frozenResourcePolicy:{resultDisclosure:contract(null)}}])
+  await expect(listAuthoritativeRunLeafSources(input)).rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
+  expect(m.load).not.toHaveBeenCalled()
+  m.rows.mockResolvedValue([{...row,frozenResourcePolicy:{resultDisclosure:contract(10)}}])
+  const privateKey='education-private-scale:00000000-0000-4000-8000-000000000001'
+  m.load.mockImplementation(async(ciphers:string[])=>ciphers.map(cipher=>{const result=view(cipher,0);if(cipher==='a')result.core.instrumentKey=privateKey;return result}))
+  m.entry.mockImplementation(async(ref:any)=>ref.resourceKey===privateKey?null:{releaseStatus:'PUBLISHED',resultDisclosure:contract(10)})
+  const tools=await listAuthoritativeRunLeafSources(input)
+  expect(tools.map(tool=>({slot:tool.leaf.slotKey,key:tool.leaf.instrumentKey}))).toEqual([{slot:'scale:b',key:'b'}])
+  expect(tools[0].metrics).toEqual([{key:'score',unit:'score'}])
+ })
  it('isolates equal metric names in different tools and uses only the current completed epoch',async()=>{
   const result=await resolveAuthoritativeRunResults(cohort,leaf)
   expect(result.resolved[0].metrics).toEqual([{key:'score',value:0,unit:'score',resultQuality:'interpretable',metricQuality:null}])

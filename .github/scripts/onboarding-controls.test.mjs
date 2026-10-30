@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
+import {verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
@@ -386,4 +386,16 @@ test('Training group qualification binds the existing shared family and requires
  for(const patch of [{CI_PR_NUMBER:'404'},{CI_HEAD_REF:'other'},{CI_FORCE_FULL:'true'},{CI_EVENT:'workflow_dispatch'}])assert.throws(()=>call(f.b,f.entries,{...f.env,...patch}));
  const unknown='server-version/backend/src/unrelated.ts';assert.throws(()=>call({...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}},[...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}]));
  assert.throws(()=>call(f.b,f.entries.map(e=>e.file===backend?{...e,newMode:'120000'}:e)));
+});
+
+test('School group qualification keeps the fixed exact route and validates original School observations',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/reporting/discovery.ts';
+ const b={...f.b,pr:414,source:{[file]:{before:null,after:blob}}},entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file}:e),env={...f.env,CI_PR_NUMBER:'414',CI_HEAD_REF:BRANCHES[414]};
+ const p=onboardingPlan(entries,base,head,f.read,env,b);assert.equal(p.pr,414);assert(task1SastConfig(p,b).paths.includes(file));
+ assert.throws(()=>onboardingPlan(entries,base,head,f.read,{...env,CI_HEAD_REF:BRANCHES[408]},b));
+ assert.throws(()=>onboardingPlan(entries.map(e=>e.file===file?{...e,file:'server-version/backend/src/unrelated.ts'}:e),base,head,f.read,env,b));
+ for(const [kind,path] of [['browser','browser.json'],['school-service','service-postgres-proof.json']]){
+  const original=JSON.parse(readFileSync('docs/evidence/group-report-school-20261030/'+path));assert.equal(verifySchoolGroupObservation(original,kind).testsExecutedInCI,false);
+  assert.throws(()=>verifySchoolGroupObservation({...original,passed:false},kind));
+ }
 });

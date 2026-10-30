@@ -1,10 +1,10 @@
 {
   "status": "PREPARED_NOT_MERGE_READY",
-  "base": "55fab18e9933e58dcb800b20156f5b7e48858536",
-  "productHead": "199d2807fd634e6fa54fd09163233d4722fd9778",
+  "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+  "productHead": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
   "componentTrees": {
-    "backend": "b0ab5f0b0fad5b14d203499deea50640264c2901",
-    "frontend": "7db01e8ff09cd4f5865e99fbb0438f2f4ff6caea"
+    "backend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+    "frontend": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8"
   },
   "localTypes": [
     {
@@ -41,6 +41,30 @@
       "componentTree": "7db01e8ff09cd4f5865e99fbb0438f2f4ff6caea",
       "exitCode": 0,
       "sourceCheckpoint": "199d2807fd634e6fa54fd09163233d4722fd9778",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "backend",
+      "report": "group-discovery-backend-types.json",
+      "componentTree": "95198c4740897cb76e4fddb8db8dbd78a232f1e7",
+      "exitCode": 0,
+      "sourceCheckpoint": "a2b20a6e66ac68fd38ca8c37b9128613c2a725f4",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "backend",
+      "report": "mainfa/backend-types.json",
+      "componentTree": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+      "exitCode": 0,
+      "sourceCheckpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "frontend",
+      "report": "mainfa/frontend-types.json",
+      "componentTree": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8",
+      "exitCode": 0,
+      "sourceCheckpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
       "originalExecutionSigned": false
     }
   ],
@@ -92,133 +116,157 @@
       "sha256": "2684a545392afb6a18c07d0dd204711b29ccdacff0d1cf9ca4712f020abecfed",
       "numPassedTests": 4,
       "numFailedTests": 0,
-      "numPendingTests": 17
+      "numPendingTests": 17,
+      "bytes": 8699
     },
     "backend-final-delta.json": {
       "sha256": "25acc300726464e0c0f40781288da36a3708a340ad4898260f56306dd82dd11c",
       "numPassedTests": 9,
       "numFailedTests": 0,
-      "numPendingTests": 13
+      "numPendingTests": 13,
+      "bytes": 9233
     },
     "backend-unit.json": {
       "sha256": "dc9929e6495d8c761eef42dd37c61560fa74852ed06672b6b2f8a0965d329e9d",
       "numPassedTests": 21,
       "numFailedTests": 0,
-      "numPendingTests": 0
+      "numPendingTests": 0,
+      "bytes": 9187
     },
     "browser.json": {
-      "sha256": "7791ffd1feecb7227a8ef682bfe013eef5d0b28e15ee3b73054837cc8e1b6daa"
+      "sha256": "7791ffd1feecb7227a8ef682bfe013eef5d0b28e15ee3b73054837cc8e1b6daa",
+      "bytes": 1350
     },
     "frontend-renderer-delta.json": {
       "sha256": "437a3d269d34e12fb83b1c04312c3e85a091baf94c9a1e0de070bb529b406603",
       "numPassedTests": 2,
       "numFailedTests": 0,
-      "numPendingTests": 2
+      "numPendingTests": 2,
+      "bytes": 1860
     },
     "frontend-unit.json": {
       "sha256": "3e6dcaefa9273816f5885a871b65696d2b6ab04f0a700571563e57f62daebcee",
       "numPassedTests": 4,
       "numFailedTests": 0,
-      "numPendingTests": 0
+      "numPendingTests": 0,
+      "bytes": 1926
     },
     "leaf-current-epoch.json": {
       "sha256": "eeae411c7413e1a7d8a5d0c0efbd91008402c7bcf20096911a669b66a5cd85e5",
       "numPassedTests": 6,
       "numFailedTests": 0,
-      "numPendingTests": 0
+      "numPendingTests": 0,
+      "bytes": 3034
     },
     "postgres-continuation.json": {
       "sha256": "b9f0441d384e03089ff70df3f3f7f91376714c66f51bd70ff7653475471a1653",
       "numPassedTests": 1,
       "numFailedTests": 0,
-      "numPendingTests": 1
+      "numPendingTests": 1,
+      "bytes": 1613
     },
     "postgres.json": {
       "sha256": "a40a837700683f7bb55dfea98d2bcf3d874948d62935da9a5ebafcbd549df77f",
       "numPassedTests": 0,
       "numFailedTests": 1,
-      "numPendingTests": 0
+      "numPendingTests": 0,
+      "bytes": 2652
     },
     "presentation-delta.json": {
       "sha256": "4dd4fb5464ff20de9258ba45805194e6a657948f3a565eca17c539b7c0a1b57e",
       "numPassedTests": 3,
       "numFailedTests": 0,
-      "numPendingTests": 19
+      "numPendingTests": 19,
+      "bytes": 9061
     },
     "routes.json": {
       "sha256": "e2cada086cd988e05da342cd15dece86c150b6e7b398d020058bbb924748a04e",
       "numPassedTests": 6,
       "numFailedTests": 0,
-      "numPendingTests": 28
+      "numPendingTests": 28,
+      "bytes": 12133
     },
     "frozen-privacy.json": {
       "sha256": "c1e77020cf51e3f5913a55f3c6e7d96692606cc54cf230f954708609a15dece9",
       "numPassedTests": 4,
       "numFailedTests": 0,
-      "numPendingTests": 0
+      "numPendingTests": 0,
+      "bytes": 2447
     },
     "frozen-privacy-types.json": {
       "sha256": "c80bccc8d5789f488b6e982dc6cd96a7faeb607d4518cd838305b530daee6752",
-      "exitCode": 2
+      "exitCode": 2,
+      "bytes": 481
     },
     "frozen-privacy-types-repair.json": {
       "sha256": "1fa8b543cbbe0172901d7d8e4d6fad98ac101835a6f5cca40f0f30b7f39bac89",
-      "exitCode": 0
+      "exitCode": 0,
+      "bytes": 481
     },
     "backend-leaf-floor-types.json": {
       "sha256": "f11e7e993985150cd5a58d7f9e2eae066420b14af27af38f69430c5d619ef46e",
-      "exitCode": 0
+      "exitCode": 0,
+      "bytes": 434
     },
     "leaf-floor-before.json": {
       "sha256": "68a47f61885fc7d5199a5cbdba7f7235fe7d71a8b9b939aaea8f4477763c3a1d",
       "numPassedTests": 0,
       "numFailedTests": 1,
-      "numPendingTests": 6
+      "numPendingTests": 6,
+      "bytes": 4217
     },
     "leaf-floor-fix.json": {
       "sha256": "2705ad058580ade96d0309b29bad6e96becbf5315b5b2c79dc102aeee59a0957",
       "numPassedTests": 1,
       "numFailedTests": 0,
-      "numPendingTests": 6
+      "numPendingTests": 6,
+      "bytes": 3218
     },
     "leaf-floor-reproduction.json": {
       "sha256": "4e12922c904a6dcad49c8f19ee0d9cfcadabe54cd0755d27eb24c4323e75ba69",
       "numPassedTests": 0,
       "numFailedTests": 1,
-      "numPendingTests": 6
+      "numPendingTests": 6,
+      "bytes": 3647
     },
     "leaf-floor-review-fix.json": {
       "sha256": "c53655e4267b1e05f503806e5b781eea5035584aeea9d3507cb7182c5e21907b",
       "numPassedTests": 1,
       "numFailedTests": 0,
-      "numPendingTests": 6
+      "numPendingTests": 6,
+      "bytes": 3219
     },
     "service-postgres-domain-continuation.json": {
       "sha256": "87eef3b6401608869e1317dc2e5285d8524b784432ac550694855ef6fe43d1c9",
       "numPassedTests": 0,
       "numFailedTests": 1,
-      "numPendingTests": 0
+      "numPendingTests": 0,
+      "bytes": 2114
     },
     "service-postgres-first.json": {
       "sha256": "23d5ec6cfba880b57f710732986c19a7df74a0c4ce55c826300024dbb3030ec6",
       "numPassedTests": 0,
       "numFailedTests": 1,
-      "numPendingTests": 0
+      "numPendingTests": 0,
+      "bytes": 3306
     },
     "service-postgres-proof.json": {
-      "sha256": "b1c07e34d3eecd7de7b33b208b523f128c0b260506e4781536fcce84837d0db5"
+      "sha256": "b1c07e34d3eecd7de7b33b208b523f128c0b260506e4781536fcce84837d0db5",
+      "bytes": 610
     },
     "service-postgres-read-continuation.json": {
       "sha256": "2869d7a74016c34ea3364b8ebb360ed33bab5ef906b5a8fa995eb6c2527732db",
       "numPassedTests": 1,
       "numFailedTests": 0,
-      "numPendingTests": 0
+      "numPendingTests": 0,
+      "bytes": 1233
     },
     "service-postgres-users-continuation.json": {
       "sha256": "c6de98132500c2159f4c732e786893481d7d5f644d2d2c874f8b8f48fc8b9d39",
       "numPassedTests": 0,
       "numFailedTests": 1,
-      "numPendingTests": 0
+      "numPendingTests": 0,
+      "bytes": 2303
     },
     "current-backend-types.json": {
       "sha256": "62a9bfa1fa2a3da32534572464b3ced2730d97e3bb9e95ff24a5476478782cff",
@@ -237,16 +285,66 @@
       "bytes": 0
     },
     "qualification-case-inventory.json": {
-      "sha256": "9244ebf57781fad7469ba4f1257b919f127a7fcc49eb84b96119ff9365923a7b",
-      "bytes": 14235
+      "sha256": "7e36e348c7026099f53e87961ad302bfb88181e2574acf03cefd56a0e80de000",
+      "bytes": 15167
     },
     "main55-qualification-plan.json": {
-      "sha256": "31a3b2b4562570af88a057dcac89f609174fdee071b8ee9aa1e03ec457bb721e",
-      "bytes": 2763
+      "sha256": "850000dbcbceabec183bba2accbb7a12b84dc7ded19ba4e61ca0a50f10992946",
+      "bytes": 2862
     },
     "main55-source-diff.raw": {
-      "sha256": "aa293be63e2d11f893d5dfbadfabc70ef8e978d681a8cabbfd2759dcec9f5ac7",
-      "bytes": 14595
+      "sha256": "b3e929c7915f0c07aabc14d3b0850b4b458edcd897232b7ce2e3870a716c7f58",
+      "bytes": 16466
+    },
+    "group-discovery-contract.json": {
+      "sha256": "9e64c85b2921b6454c87fbd724bcb09c4afc6566d31cfb407eb18a9d9bd61799",
+      "bytes": 5178
+    },
+    "group-discovery-contract.log": {
+      "sha256": "debbbdb8efbc40769f4832cd377cfa0e43711014906e445de34473641a0818db",
+      "bytes": 126
+    },
+    "group-discovery-backend-types.json": {
+      "sha256": "a236956f792966856b42697532692ca5b3467d5f01324e4869959aaa07e91ea8",
+      "bytes": 492
+    },
+    "group-discovery-backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfa/backend-types.json": {
+      "sha256": "dd458fa11d29e5c4e63bd36987d6abff9d76b996d1ee3508083c6330b9b962bc",
+      "bytes": 492
+    },
+    "mainfa/backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfa/frontend-types.json": {
+      "sha256": "676d4b28428ce44964d660035e9046b5b58ef07e629302ccfac1ab105c9288e4",
+      "bytes": 528
+    },
+    "mainfa/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfa/qualification-plan.json": {
+      "sha256": "aa3dae1e77a31a8dd541f35bb83ce62d46548105e00f86e19ec5ed0262e8df31",
+      "bytes": 2681
+    },
+    "mainfa/source-diff.raw": {
+      "sha256": "f91bfc34aa4ca246555f804bc2c9a41ddd5ccedda5d071809274cca151469d44",
+      "bytes": 17809
+    },
+    "mainfa/prisma-generate.log.gz": {
+      "sha256": "1ba4d378849898d61ba6b45e4d139c833d4fe51730199a33446e56a66f57f688",
+      "bytes": 242,
+      "transport": "lossless gzip; original trailing blank lines preserved",
+      "originalSHA256": "83e77ef372e807271b890e2150324d024ecf2bbac53f7f231b47a8510e79ad25"
+    },
+    "mainfa/receipt-review.json": {
+      "sha256": "0bc318b2af1cc16f7d95f32235f4e88767638c3d0e457ad8d207739ce2fc0632",
+      "bytes": 806
     }
   },
   "ciExecuted": false,
@@ -296,13 +394,32 @@
     ]
   },
   "qualificationPreparation": {
-    "plan": "main55-qualification-plan.json",
+    "plan": "mainfa/qualification-plan.json",
     "deduplicatedCases": "qualification-case-inventory.json",
-    "distinctNamedPassed": 39,
-    "unitAndMockHttp": 37,
+    "distinctNamedPassed": 41,
+    "unitAndMockHttp": 39,
     "retainedPg": 2,
     "businessChecksReexecuted": false,
     "formalActivation": false,
-    "remainingControlWork": "Extend the existing exact onboarding candidate configuration for PR414; no new workflow or broad fallback."
+    "remainingControlWork": "Final actual candidate binding verification and checklist/live PR identity before activation; existing fixed route only."
+  },
+  "groupDiscoveryContractFix": {
+    "scope": "School GROUP source catalog uses actual audience and frozen parent GROUP contract; leaf tools require the same parent ceiling and a resolvable leaf GROUP contract/metric keys",
+    "privateComposition": "Current private parent contract is INDIVIDUAL_ONLY with manager/professional NONE; private canonical instrument lacks generic registry adapter. Do not infer GROUP permission from personal or longitudinal fields; do not advertise until a valid GROUP source adapter and ceiling exist.",
+    "newCases": 2,
+    "report": "group-discovery-contract.json",
+    "old37AndPgReexecuted": false,
+    "backendTypes": "group-discovery-backend-types.json: one actual current backend compile exit0; no frontend replay.",
+    "frontendChanged": false
+  },
+  "mainfaIntegration": {
+    "main": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "checkpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+    "conflicts": false,
+    "sharedPersonalFilesModifiedByThisNode": false,
+    "prismaClientGenerated": true,
+    "databaseMigrationApplied": false,
+    "oldBusinessTestsReexecuted": false,
+    "groupLongitudinalStarted": false
   }
 }

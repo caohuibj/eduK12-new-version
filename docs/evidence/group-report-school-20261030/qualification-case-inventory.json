@@ -1,7 +1,7 @@
 {
   "status": "INVENTORY_FOR_REVIEW_NOT_FORMAL_ADMISSION",
-  "distinctNamedCases": 39,
-  "unitAndMockHttp": 37,
+  "distinctNamedCases": 41,
+  "unitAndMockHttp": 39,
   "retainedPostgresCases": 2,
   "allOriginalReportsRetained": true,
   "signature": "none; no reconstructed execution signature",
@@ -201,6 +201,16 @@
       "fullName": "School actual reporting service with isolated PostgreSQL generates and persists a selected class V2, reads it without canonical reprocessing, and retains the old version after rename",
       "report": "service-postgres-read-continuation.json",
       "file": "server-version/backend/src/__tests__/integration/groupReportSchoolService.postgres.integration.test.ts"
+    },
+    {
+      "fullName": "SCHOOL protected source discovery is not an all-student directory GROUP discovery excludes personal-only compositions and uses the actual professional audience without changing generic discovery",
+      "report": "group-discovery-contract.json",
+      "file": "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts"
+    },
+    {
+      "fullName": "selected Organization Run leaf observations GROUP discovery rejects a personal-only parent and does not advertise an unresolved private leaf as a registered measurement",
+      "report": "group-discovery-contract.json",
+      "file": "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts"
     }
   ],
   "reports": {
@@ -294,6 +304,13 @@
       "passed": 1,
       "failed": 0,
       "filtered": 0
+    },
+    "group-discovery-contract.json": {
+      "sha256": "9e64c85b2921b6454c87fbd724bcb09c4afc6566d31cfb407eb18a9d9bd61799",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "filtered": 9
     }
   }
 }

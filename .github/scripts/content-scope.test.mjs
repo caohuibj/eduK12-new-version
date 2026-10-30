@@ -32,6 +32,31 @@ test('empty, core, executable additions and mixed changes require full checks', 
 });
 
 import { requiredChecks, failedChecks } from './merge-gate.mjs';
+import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
+test('personal tracking Draft reuses existing producers without qualifying Ready or unrelated maintenance',()=>{
+  const marker={file:'server-version/backend/src/modules/reporting/personal-tracking.ts',status:'A',oldMode:'000000',newMode:'100644'};
+  const draft={event:'pull_request',draft:true};
+  assert.equal(personalTrackingDraftScope([marker],draft),true);
+  assert.equal(personalTrackingDraftScope([marker,{...marker,file:'docs/evidence/personal-longitudinal-20261030/continuation/source.json'}],draft),true);
+  assert.throws(()=>personalTrackingDraftScope([marker,{...marker,file:'docs/evidence/personal-longitudinal-20261030/continuation/code.mjs'}],draft),/no broad fallback/);
+  assert.equal(personalTrackingDraftScope([marker],{...draft,draft:false}),false);
+  assert.equal(personalTrackingDraftScope([marker],{...draft,event:'push'}),false);
+  assert.throws(()=>personalTrackingDraftScope([marker],{...draft,forceFull:true}),/does not authorize/);
+  for(const other of [
+    {...marker,file:'server-version/backend/package-lock.json'},
+    {...marker,file:'server-version/scripts/host-ops/backup.py'},
+    {...marker,file:'server-version/backend/src/modules/auth/other.ts'},
+    {...marker,status:'D',oldMode:'100644',newMode:'000000'},
+    {...marker,newMode:'120000'},
+  ])assert.throws(()=>personalTrackingDraftScope([marker,other],draft),/no broad fallback/);
+  const scope=scopeOutputs('false','false','false',{application_route:'legacy',personal_tracking_draft:'true'});
+  const needs={scope:{outputs:scope,result:'success'},'pr-light-backend':{result:'success'},'pr-light-frontend':{result:'success'}};
+  assert.deepEqual(requiredChecks(needs,true),['scope','pr-light-backend','pr-light-frontend']);
+  assert.deepEqual(failedChecks(needs,true),[]);
+  assert.ok(failedChecks({...needs,'pr-light-backend':{result:'skipped'}},true).includes('pr-light-backend'));
+  assert.ok(failedChecks(needs,false).includes('scope'));
+  assert.ok(requiredChecks({scope:{outputs:{...scope,personal_tracking_draft:'false'}}},false).includes('backend-regression'));
+});
 test('aggregate checks only selected jobs, and fails closed for every selected job', () => {
   assert.ok(requiredChecks({ scope: { outputs: scopeOutputs() } }, false).includes('backend-regression'));
   for (const [content, presentation, draft] of [

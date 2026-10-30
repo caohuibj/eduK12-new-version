@@ -1,0 +1,15 @@
+✔ original local cases and failed continuations retain their provenance without replay (48.274138ms)
+✔ exact app pins reject unknown inputs, changed main and full fallback (207.08971ms)
+✔ Ready requires actual native/image/SAST success; Draft never qualifies (204.056405ms)
+✔ actual entrypoint child resolves original admission without a top-level-await cycle (127.582514ms)
+✔ image reuse refuses failed, skipped or expired original producer steps (255.838125ms)
+✔ actual main schema archive exceeds 1 MiB without stdout buffer truncation (42.797787ms)
+✔ backend audit receipt cannot admit a failed or expired original audit step (221.127194ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1241.007015
