@@ -3,15 +3,15 @@
   "candidate": "native-bundle",
   "repository": "caohuibj/eduK12-new-version",
   "branch": "feat/education-package-runtime-20261029",
-  "enabled": false,
+  "enabled": true,
   "base": "dc0f46ba506d51d42c5bb379059df82f18860b72",
   "productHead": "420867300f5087ed948299a768663329c6cdc971",
   "productTree": "b1ecc1c2949af065015df02b38fad95298c4f918",
   "frontendTree": "391d7fd729cff3f55d46b4c3bbba1b81e4a05d69",
   "backendTree": "55a74ef49954d8bd21e328a34b4f611fa1a6f1b1",
   "review": {
-    "status": "PENDING_INDEPENDENT_CONTROL_REVIEW",
-    "recordSha256": null
+    "status": "INDEPENDENTLY_REVIEWED",
+    "recordSha256": "49b74aec553affb52c8f6446501d9b0e02a249f8367bf0cc1e7839204cae6316"
   },
   "requiredJobs": [
     "admission",
