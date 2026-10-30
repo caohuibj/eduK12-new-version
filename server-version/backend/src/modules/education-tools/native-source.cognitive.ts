@@ -12,7 +12,7 @@ import {prepareRelease} from '../measurement-content/release'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {educationCognitiveSourceSchema,educationNativeDescriptorSchema} from './native-source.contracts'
 import type {z} from 'zod'
-import {readVerifiedCompositionAttempt,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
+import {readVerifiedCompositionAttempt,readVerifiedLongitudinalEducationAttempt,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 
 type Input=z.infer<typeof educationCognitiveSourceSchema>
 export type EducationCognitiveLeaf={config:CognitiveTestConfig;measurement:Extract<StoredRelease,{layer:'MEASUREMENT'}>;
@@ -94,14 +94,16 @@ export async function admitEducationNativeCognitive(tx:Prisma.TransactionClient,
  parent:{id:string;compositeAssessmentId:string;attemptEpoch:number;userId:string|null;subjectUserId:string|null;respondentUserId:string|null;assignmentRef:string|null;trainingContentBinding:unknown};
  actorUserId:string;itemId:string;assignmentId:string;configId:string}){
  const {parent}=input,policy=readVerifiedCompositionAttempt(input.proof,tx,parent.id,input.actorUserId,{compositeId:parent.compositeAssessmentId,assignmentRef:parent.assignmentRef??''})
+ const registered=readVerifiedLongitudinalEducationAttempt(input.proof,tx,parent,input.actorUserId)
  const binding=parent.trainingContentBinding as {educationComposition?:unknown;units?:Array<{itemId:string;family:string;source:{kind:string;id:string;assignmentId?:string;educationNative?:unknown}}>}
  const unit=binding?.units?.find(unit=>unit.itemId===input.itemId),descriptor=educationNativeDescriptorSchema.safeParse(unit?.source.educationNative)
- if(!policy||!['STUDENT:SELF','TEACHER:SELF'].includes(policy.origin.variantKey)||!parent.assignmentRef
+ if((!policy&&!registered)||policy&&!['STUDENT:SELF','TEACHER:SELF'].includes(policy.origin.variantKey)||!parent.assignmentRef
   ||parent.userId!==input.actorUserId||parent.subjectUserId!==input.actorUserId||parent.respondentUserId!==input.actorUserId
   ||!Number.isSafeInteger(parent.attemptEpoch)||parent.attemptEpoch<1
-  ||canonicalHash(binding?.educationComposition??null)!==canonicalHash({origin:policy.origin,manifestHash:policy.manifestHash})
-  ||!descriptor.success||descriptor.data.provider!=='COGNITIVE_CONFIG'||unit?.family!=='COGNITIVE'||unit.source.kind!=='COGNITIVE_CONFIG'
-  ||unit.source.assignmentId!==input.assignmentId||unit.source.id!==input.configId||descriptor.data.sourceId!==input.configId)
+  ||(policy?canonicalHash(binding?.educationComposition??null)!==canonicalHash({origin:policy.origin,manifestHash:policy.manifestHash}):binding?.educationComposition!=null)
+  ||unit?.family!=='COGNITIVE'||unit.source.kind!=='COGNITIVE_CONFIG'
+  ||unit.source.assignmentId!==input.assignmentId||unit.source.id!==input.configId
+  ||(policy&&(!descriptor.success||descriptor.data.provider!=='COGNITIVE_CONFIG'||descriptor.data.sourceId!==input.configId)))
   privateToolFail('EDUCATION_COGNITIVE_START_CONTEXT_REQUIRED',403)
  const key=JSON.stringify(['education-cognitive-slot-v1',parent.id,input.itemId,parent.attemptEpoch])
  await tx.$queryRaw(Prisma.sql`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${key},0))`)

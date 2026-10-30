@@ -42,3 +42,17 @@ describe('native education Cognitive quota belongs to the real Run parent slot',
   expect(f.db.cognitiveSession.count).not.toHaveBeenCalled();expect(f.db.$queryRaw).not.toHaveBeenCalled()
  })
 })
+
+it('requires a nonce from an actually tracked registered Run, preserves single-use scope and refuses replay or copied authority',async()=>{
+ const f=fixture(),make=(tracked:boolean,parentId=id(40),assignmentRef=id(41))=>{
+  const input=f.input(parentId,assignmentRef);delete (input.parent.trainingContentBinding as any).educationComposition;delete (input.parent.trainingContentBinding.units[0].source as any).educationNative
+  const start=issueVerifiedEducationStart({tx:f.tx,product:'TEACHER',compositeId:input.parent.compositeAssessmentId,respondentUserId:input.actorUserId,assignmentRef,longitudinal:tracked})
+  input.proof=bindVerifiedEducationAttempt(start,f.tx,input.parent);return input
+ }
+ const first=make(true);await admitEducationNativeCognitive(f.tx,first);f.records.push({parentId:first.parent.id,itemId:first.itemId,epoch:1})
+ await admitEducationNativeCognitive(f.tx,make(true,id(42),id(43)))
+ await expect(admitEducationNativeCognitive(f.tx,first)).rejects.toMatchObject({code:'EDUCATION_COGNITIVE_SLOT_ALREADY_ENTERED'})
+ await expect(admitEducationNativeCognitive(f.tx,make(false,id(44),id(45)))).rejects.toThrow()
+ const copied=make(true,id(46),id(47));copied.proof={...copied.proof};await expect(admitEducationNativeCognitive(f.tx,copied)).rejects.toThrow()
+ const rebound=make(true,id(48),id(49));rebound.parent.assignmentRef=id(99);await expect(admitEducationNativeCognitive(f.tx,rebound)).rejects.toThrow()
+})
