@@ -1,3 +1,4 @@
+import type {StandardConfigurationPointer} from '../../api/standardConfigurationGrants'
 import apiClient, { sessionFetch } from '../../api/client'
 import type { AssessmentVideoCapabilitySources } from '../assessment-media/types'
 import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession, CognitiveV2Report } from './types'
@@ -68,6 +69,8 @@ export const cognitiveApi = {
       engineVersion?: string
       scoringVersion?: string
       accessPolicy?: 'OPEN' | 'GRANT'
+      authorizationMode?:'PRECISE';available?:boolean;unavailableReason?:string|null;fixedProfile?:'experience'|'standard'|'research'|null
+      configurationName?:string|null;selectedBinding?:StandardConfigurationPointer|null
     }> }>('/cognitive/configs'),
   updateConfigAccessPolicy: (id: string, accessPolicy: 'OPEN' | 'GRANT') =>
     apiClient.patch<{ id: string; accessPolicy: 'OPEN' | 'GRANT' }>(`/cognitive/configs/${id}/access-policy`, { accessPolicy }),
@@ -85,6 +88,7 @@ export const cognitiveApi = {
     instruction?: string
     maxAttempts?: number
     profile?: 'experience' | 'standard' | 'research'
+    selectedBinding?:StandardConfigurationPointer
   }) => apiClient.post<any>('/cognitive/assignments', body),
   updateAssignment: (id: string, body: { title?: string; instruction?: string }) =>
     apiClient.patch<any>(`/cognitive/assignments/${id}`, body),

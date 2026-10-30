@@ -5,7 +5,7 @@ import GovernedToolsWorkspace from './GovernedToolsWorkspace'
 import SurveyPackageGrantAdmin from './SurveyPackageGrantAdmin'
 import GovernedToolLibrary from './GovernedToolLibrary'
 import {ResearchPackageCatalog} from '../../survey/ResearchPackageCatalog'
-import SurveyResearchersAdmin from './SurveyResearchersAdmin'
+import {SurveyResearchersWorkspace as SurveyResearchersAdmin} from './SurveyResearchersAdmin'
 const {admin,research,principal}=vi.hoisted(()=>({admin:vi.fn(),research:vi.fn(),principal:{user:{platformRole:'SYSTEM_ADMIN'}}}))
 vi.mock('../../api/surveyGovernance',async()=>({...await vi.importActual('../../api/surveyGovernance'),governedRequest:admin,governedResearcherRequest:research}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>principal}))

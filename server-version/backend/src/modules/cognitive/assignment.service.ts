@@ -18,6 +18,10 @@ import { canInstantiateConfig, grantedResourceIds } from '../../services/materia
 import { config as appConfig } from '../../config'
 import { assertTaskContractValid } from './v2/publication-gate'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
+import {resolveTrainingCognitiveProfileForNewTask,readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile,listTrainingCognitiveProfileHeaders,type TrainingCognitiveTaskBinding} from '../assessment-authorization/training-cognitive-profile-use'
+import {cognitiveProfileAssignmentFreeze,assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
+import type {CognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-artifact'
+import {publishAssignmentMeasurementRelease} from './assignment-measurement-release'
 
 export { CognitiveServiceError }
 
@@ -117,10 +121,26 @@ export const createAssignment = async (
   if (!isTeacherOrAdmin(role)) throw FORBIDDEN('Teacher role required')
 
   const { course, config, entry } = await validateConfigForAssignment(input.courseId, input.configId, role, userId)
+  const precise=await prisma.$transaction(async tx=>{
+    const selected=await resolveTrainingCognitiveProfileForNewTask(tx,userId,input.configId,input.selectedBinding)
+    if(!selected)return null
+    await tx.$queryRaw`SELECT id FROM courses WHERE id=${input.courseId} FOR SHARE`
+    const currentCourse=await tx.course.findUnique({where:{id:input.courseId}})
+    if(!currentCourse||currentCourse.creatorId!==userId)throw FORBIDDEN('Not the creator of this course')
+    if(input.profile!==undefined&&input.profile!==selected.artifact.identity.profile)throw FORBIDDEN('管理员已经固定了该任务的 Profile')
+    const assignment=await tx.cognitiveAssignment.create({data:{courseId:input.courseId,configId:input.configId,createdBy:userId,
+      title:input.title,instruction:input.instruction,status:'DRAFT',opensAt:input.opensAt?new Date(input.opensAt):null,dueAt:input.dueAt?new Date(input.dueAt):null,
+      maxAttempts:input.maxAttempts,required:input.required,courseSnapshot:{id:currentCourse.id,title:currentCourse.title,courseCode:currentCourse.courseCode,
+       selectedCognitiveProfile:selected.pin,selectedCognitiveConfigurationName:selected.configurationName},
+      ...cognitiveProfileAssignmentFreeze(selected.artifact)}})
+    const {resolvedConfigSnapshotEncrypted:_,resolvedReportSnapshotEncrypted:__,...safe}=assignment
+    return {...safe,configurationName:selected.configurationName,selectedBinding:selected.pin.selectedBinding,profileLocked:true}
+  })
+  if(precise)return {...precise,config:undefined,course:{id:course.id,title:course.title,courseCode:course.courseCode}}
   if (!(await canInstantiateConfig(userId, role, config))) {
     throw FORBIDDEN('无权限使用此认知任务类型')
   }
-  if (!hasCognitiveProfile(entry, input.profile)) {
+  if (!input.profile||!hasCognitiveProfile(entry, input.profile)) {
     throw BAD_REQUEST('只能从该任务已声明的 Profile 中选择')
   }
 
@@ -149,12 +169,13 @@ export const listPublishedConfigs = async (userId: string, role: UserRole) => {
   if (!isTeacherOrAdmin(role)) throw FORBIDDEN('Teacher role required')
 
   if (!isCognitiveNewAdmissionEnabled()) return []
+  const profileHeaders=await listTrainingCognitiveProfileHeaders(prisma,userId)
   const where: Record<string, unknown> = { status: 'PUBLISHED' }
   if (role !== UserRole.ADMIN && appConfig.materialGrantsEnabled) {
     const grantedIds = await grantedResourceIds(userId, MaterialResourceType.COGNITIVE_CONFIG)
     where.OR = [
       { accessPolicy: { not: 'GRANT' } },
-      { id: { in: grantedIds } },
+      { id: { in: [...new Set([...grantedIds,...profileHeaders.keys()])] } },
     ]
   }
 
@@ -178,7 +199,7 @@ export const listPublishedConfigs = async (userId: string, role: UserRole) => {
   return configs.filter(row => isCognitiveProductEligible(row.testType)).map(row => {
     assertCognitiveCatalogConfiguration(row)
     const { config: _privateConfig, ...catalog } = row
-    return catalog
+    return {...catalog,...(profileHeaders.get(row.id)??{})}
   })
 }
 
@@ -333,6 +354,9 @@ export const getAssignmentForTeacher = async (userId: string, role: UserRole, id
     required: assignment.required,
     listedStandalone: assignment.listedStandalone,
     reportPackageLocked: Boolean(packageReference),
+    ...(readTrainingCognitiveTaskBinding(assignment.courseSnapshot)?{profileLocked:true,profile:assignment.profile,
+     selectedBinding:readTrainingCognitiveTaskBinding(assignment.courseSnapshot)!.selectedBinding,
+     configurationName:(assignment.courseSnapshot as Record<string,unknown>).selectedCognitiveConfigurationName??null}:{}),
     publishedAt: assignment.publishedAt,
     createdAt: assignment.createdAt,
     updatedAt: assignment.updatedAt,
@@ -438,11 +462,18 @@ export const updateDraftAssignment = async (
   if (input.maxAttempts !== undefined) data.maxAttempts = input.maxAttempts
   if (input.required !== undefined) data.required = input.required
   if (input.profile !== undefined) {
-    const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: existing.configId } })
-    if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
-    const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
-    if (!entry || !hasCognitiveProfile(entry, input.profile)) {
-      throw BAD_REQUEST('只能从该任务已声明的 Profile 中选择')
+    const fixed=readTrainingCognitiveTaskBinding(existing.courseSnapshot)
+    if(fixed){
+      const selected=await prisma.$transaction(tx=>loadPinnedTrainingCognitiveProfile(tx,fixed,{userId:existing.createdBy!,configId:existing.configId},false))
+      assertCognitiveAssignmentFreeze(existing,selected.artifact)
+      if(input.profile!==selected.artifact.identity.profile)throw FORBIDDEN('该任务的 Profile 已由管理员固定')
+    }else{
+      const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: existing.configId } })
+      if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
+      const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
+      if (!entry || !hasCognitiveProfile(entry, input.profile)) {
+        throw BAD_REQUEST('只能从该任务已声明的 Profile 中选择')
+      }
     }
     data.profile = input.profile
   }
@@ -458,6 +489,26 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
   if (!existing) throw NOT_FOUND('CognitiveAssignment not found')
   assertCanManage(existing, role, userId)
   if (existing.status !== 'DRAFT') throw CONFLICT('Only DRAFT assignments can be published')
+
+  const selectedPin=readTrainingCognitiveTaskBinding(existing.courseSnapshot)
+  if(selectedPin){
+    if(existing.createdBy!==userId)throw FORBIDDEN('只有原接收者可以发布该固定配置')
+    return prisma.$transaction(async tx=>{
+      const fixed=await loadPinnedTrainingCognitiveProfile(tx,selectedPin,{userId,configId:existing.configId},true)
+      assertCognitiveAssignmentFreeze(existing,fixed.artifact)
+      await tx.$queryRaw`SELECT id FROM courses WHERE id=${existing.courseId} FOR SHARE`
+      const course=await tx.course.findUnique({where:{id:existing.courseId!}})
+      if(!course||course.creatorId!==userId)throw FORBIDDEN('Not the creator of this course')
+      const updated=await tx.cognitiveAssignment.updateMany({where:{id,status:'DRAFT',updatedAt:existing.updatedAt},data:{status:'PUBLISHED',publishedAt:new Date(),
+        courseSnapshot:{id:course.id,title:course.title,courseCode:course.courseCode,selectedCognitiveProfile:selectedPin,
+         selectedCognitiveConfigurationName:fixed.configurationName}}})
+      if(updated.count!==1)throw CONFLICT('Assignment changed while publishing; reload and retry')
+      await publishAssignmentMeasurementRelease(tx,userId,id,fixed.artifact)
+      const actual=await tx.cognitiveAssignment.findUniqueOrThrow({where:{id}})
+      const {resolvedConfigSnapshotEncrypted:_,resolvedReportSnapshotEncrypted:__,...safe}=actual
+      return {...safe,configurationName:fixed.configurationName,selectedBinding:selectedPin.selectedBinding,profileLocked:true}
+    })
+  }
 
   // publish 重检 Course/Config/Registry/schema（复用校验链），并在此时冻结 Profile。
   const { course, config, entry } = await validateConfigForAssignment(
@@ -541,6 +592,7 @@ export type FrozenAssignmentCopy = {
   resolvedConfigSnapshotEncrypted: string | null
   resolvedConfigHash: string | null
   resolvedReportSnapshotEncrypted: string | null
+  selectedCognitiveProfile?:TrainingCognitiveTaskBinding|null
 }
 
 /** Read-only wrapper resolution. No candidate assignment is created until selected. */
@@ -557,7 +609,7 @@ export const prepareTeacherPublishedAssignment = async (
     quotaSourceAssignmentId?: string | null
     maxAttempts?: number
   },
-) => {
+) : Promise<{existing?:Prisma.CognitiveAssignmentGetPayload<{}>;data?:Prisma.CognitiveAssignmentUncheckedCreateInput;frozenProfile?:CognitiveProfileArtifact}> => {
   const config = await tx.cognitiveTestConfig.findUnique({ where: { id: input.configId } })
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
   assertCognitiveProductEligible(config.testType)
@@ -584,6 +636,23 @@ export const prepareTeacherPublishedAssignment = async (
     throw BAD_REQUEST('来源认知任务冻结信息不完整，无法复制')
   }
   const hasCopiedFreeze = presentCount === freezeFields.length
+  let precisePin=source?.selectedCognitiveProfile??null
+  if(input.quotaSourceAssignmentId){
+    const root=await tx.cognitiveAssignment.findUnique({where:{id:input.quotaSourceAssignmentId},select:{courseSnapshot:true,createdBy:true,configId:true}})
+    const rootPin=readTrainingCognitiveTaskBinding(root?.courseSnapshot)
+    if(rootPin){
+      if(!root||root.createdBy!==input.userId||root.configId!==input.configId)throw FORBIDDEN('不能复制其他接收者的固定认知配置')
+      if(precisePin&&hashResolvedConfig(precisePin)!==hashResolvedConfig(rootPin))throw BAD_REQUEST('来源固定认知配置指针不一致')
+      precisePin=rootPin
+    }
+  }
+  const precise=precisePin?await loadPinnedTrainingCognitiveProfile(tx,precisePin,{userId:input.userId,configId:input.configId},true):null
+  if(precise){
+    if(!hasCopiedFreeze||input.profile)throw BAD_REQUEST('固定认知配置必须完整复制，不能重新选择 Profile')
+    assertCognitiveAssignmentFreeze({profile:source!.profile,profileDefinitionVersion:source!.profileDefinitionVersion,
+      resolvedConfigSnapshotEncrypted:source!.resolvedConfigSnapshotEncrypted,resolvedConfigHash:source!.resolvedConfigHash,
+      resolvedReportSnapshotEncrypted:source!.resolvedReportSnapshotEncrypted},precise.artifact)
+  }
   const generatedFreeze = input.profile
     ? freezeDataForWrite(freezeAssignmentProfile({ entry, baseConfig: parsed.data, profile: input.profile }))
     : null
@@ -618,10 +687,11 @@ export const prepareTeacherPublishedAssignment = async (
     const existing = candidates.find((candidate) =>
       candidate.profileDefinitionVersion === expectedDefinitionVersion
       && hashResolvedConfig(readFrozenReport(candidate.resolvedReportSnapshotEncrypted)) === sourceReportHash
+      &&hashResolvedConfig(readTrainingCognitiveTaskBinding(candidate.courseSnapshot))===hashResolvedConfig(precisePin)
     )
-    if (existing) return { existing }
-  } else if (candidates[0]) {
-    return { existing: candidates[0] }
+    if (existing) return { existing,...(precise?{frozenProfile:precise.artifact}:{}) }
+  } else if (candidates.find(candidate=>!readTrainingCognitiveTaskBinding(candidate.courseSnapshot))) {
+    return { existing:candidates.find(candidate=>!readTrainingCognitiveTaskBinding(candidate.courseSnapshot))! }
   }
 
   const course = await tx.course.findUnique({ where: { id: input.courseId } })
@@ -657,10 +727,11 @@ export const prepareTeacherPublishedAssignment = async (
       required: false,
       maxAttempts: input.maxAttempts ?? 1,
       quotaSourceAssignmentId: input.quotaSourceAssignmentId ?? null,
-      courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode },
+      courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode,
+       ...(precise?{selectedCognitiveProfile:precisePin,selectedCognitiveConfigurationName:precise.configurationName}:{})},
       ...freezeData,
   }
-  return { data }
+  return { data,...(precise?{frozenProfile:precise.artifact}:{}) }
 }
 
 export const persistPreparedTeacherPublishedAssignment = async (

@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "baseMain": "2de32609e1888cf28b73cb26e2c0cf38b11ff875",
+  "contractCommit": "8ebeed92424c0fc9eefe41620e34d75074fdbe69",
+  "recordedAt": "2026-10-29T15:31:52.483Z",
+  "environment": {
+    "kind": "isolated cloud",
+    "node": "24.21.0",
+    "production": false,
+    "postgresPort": 55439,
+    "redisPort": 56389
+  },
+  "inputs": [
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-management.ts",
+      "sha256": "f948a4c0812b721da71adb51a8bd9d5c2dfe37cfa957a17441774940fc015605"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-combination.ts",
+      "sha256": "6e12c9287211ccc0f549fb45e95f8baacfe0d39ff0eb4ca8afc9c4dbd278aa0e"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/routes.ts",
+      "sha256": "ae6d64ca2f60762589e26e371b0c7cb88d341501672ca57073ac0ac461a26636"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts",
+      "sha256": "285770958dc388bff8bc98ce532d77eb804f76e8de6c300bb7922ee7dd159018"
+    },
+    {
+      "path": "server-version/frontend/src/api/standardConfigurationGrants.ts",
+      "sha256": "94c2ca03e9e69a2caa15ce3cd47d2ea3c3de4adb3ff331974cdaae698df86116"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx",
+      "sha256": "39f7dc007b28c74f055981c730597d4fcffd3d35f02f4ff50879bdd278621b5c"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx",
+      "sha256": "38673cc4240eb0edee7ba95d029582c52192b297881a93f3675c977bc3de77d3"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingAdminResources.tsx",
+      "sha256": "16f7c578168fb2d1a7e8469a3d6d1231387e106e004a652cfb0c84a4ffd0a92d"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+      "sha256": "f51ce9636af6e156677324ff7132b294547ba1f0a18cee0a3ccb72ed79ff534d"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+      "sha256": "a5250ade8ee6f30507215ba153fe89340fdc66ace569fd70e23a0b5162dc85e2"
+    }
+  ],
+  "runtimeReuse": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-configuration-management.postgres.integration.test.ts",
+      "testedSourceSHA256": "ed5f2c8cbdddb89d6b8aeb9ec4201c63bfa7001dc292d626b8068487b5efbd46",
+      "currentSourceSHA256": "fc3ab667a1340802abdc6aa91655f67f24665164f547d730ca0e190611447b19",
+      "emittedRuntimeSHA256": "7010a78899adcc3e2d36cadb0b6e62fa518b8a819f15a5fc576f6aecb401a3d4",
+      "onlyDifference": "Post-run TypeScript non-null assertion on the successfully installed Scale ID; erased runtime bytes identical. No HTTP replay."
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-general-exact-journey.postgres.integration.test.ts",
+      "testedSourceSHA256": "08f4a5460215e7b239cee5c0171e1dc7937a2f0fad9e400f02d4c8f187c53f5e",
+      "currentSourceSHA256": "aa2d51d1f2477bb14c07b69fb25c64ad2894d8a6d641b9647d29bd09b6dc5ed0",
+      "emittedRuntimeSHA256": "d6bdc5111f17c95a6dae8e19408dd9962b47f7ae7c899e4f3241b5a22d872452",
+      "onlyDifference": "Post-run TypeScript non-null assertion on the successfully installed Scale ID; erased runtime bytes identical. No HTTP replay."
+    }
+  ],
+  "reports": [
+    {
+      "file": "training-standard-ui-initial.json",
+      "sha256": "90fd4bbfc5e33db411606e89d8f93068a8bfdf498137e38cb209f12efc1144c2",
+      "passed": 6,
+      "failed": 0,
+      "total": 6,
+      "pending": 0,
+      "success": true,
+      "scope": "Selected scope only"
+    },
+    {
+      "file": "training-standard-source-general.json",
+      "sha256": "6d38000b6d2c3f5aa84b5bdddac04042aacaa199cbb0095e09dcb470b3016617",
+      "passed": 81,
+      "failed": 0,
+      "total": 81,
+      "pending": 0,
+      "success": true,
+      "scope": "Selected scope only"
+    },
+    {
+      "file": "training-admin-parent-current.json",
+      "sha256": "08bd405ed0cf0fb129fcc439906e5bae8b75de156d2b7b82dd73667ed2d27a11",
+      "passed": 13,
+      "failed": 0,
+      "total": 13,
+      "pending": 0,
+      "success": true,
+      "scope": "Selected scope only"
+    },
+    {
+      "file": "training-standard-management-initial.json",
+      "sha256": "095a4b68ca17b409ded7a051023746e17b64ebfbde2cdcc31133a845fdb6838f",
+      "passed": 7,
+      "failed": 0,
+      "total": 7,
+      "pending": 0,
+      "success": true,
+      "scope": "Selected scope only"
+    },
+    {
+      "file": "training-general-journey-initial.json",
+      "sha256": "e24a3263b32508260ed6229834ae75b0079ac7323fd8d09cdfb8a3a54f877b65",
+      "passed": 1,
+      "failed": 0,
+      "total": 1,
+      "pending": 0,
+      "success": true,
+      "scope": "Selected scope only"
+    },
+    {
+      "file": "training-questionnaire-consumer-current.json",
+      "sha256": "a91afb70c9fbf2434210a6bf56f4a9ad93ea511bcf151bc2f021c31aef837628",
+      "passed": 83,
+      "failed": 1,
+      "total": 84,
+      "pending": 0,
+      "success": false,
+      "scope": "83 unchanged cases passed; obsolete GENERAL expectation failed, corrected case rerun separately"
+    },
+    {
+      "file": "training-questionnaire-general-current.json",
+      "sha256": "91f28ea8e620899647fda415f78e0179033c5365a555b245af4ecf748c32842a",
+      "passed": 1,
+      "failed": 0,
+      "total": 84,
+      "pending": 83,
+      "success": true,
+      "scope": "Only corrected GENERAL case; other cases excluded by test-name filter"
+    }
+  ],
+  "checks": [
+    {
+      "name": "frontend application tsc --noEmit",
+      "exitCode": 0,
+      "log": "training-exact-frontend-types-final.log",
+      "logSHA256": "0c5e2568b4c79c13debcc497cf347b98e7a01e636ae2bed42cf3faa742048c94"
+    },
+    {
+      "name": "changed frontend eslint",
+      "exitCode": 0,
+      "log": "training-exact-lint.log",
+      "logSHA256": "a4fbce2251d86476f435faac05b79a4cae8d942ec3ad0616f93ac775c374953a"
+    },
+    {
+      "name": "backend affected production modules and integration fixture dependency closure tsc --noEmit",
+      "exitCode": 0,
+      "log": "training-exact-backend-types-final.log",
+      "logSHA256": "0c5e2568b4c79c13debcc497cf347b98e7a01e636ae2bed42cf3faa742048c94"
+    }
+  ],
+  "httpEvidence": [
+    {
+      "file": "training-standard-management-http-initial.json",
+      "sha256": "62c1bf6aebe1ab7c4bf571e3bcf55d917db9a7e9c1d7fdfb38edd821dd522c5e"
+    },
+    {
+      "file": "training-general-http-initial.json",
+      "sha256": "0d239b7043276855f39ef5dbfb43079e35b64c70fd0746169043df2079f1b6c4"
+    }
+  ],
+  "notExecuted": [
+    "browser end-to-end",
+    "four-entry acceptance",
+    "same-environment performance baseline/comparison",
+    "formal GitHub CI",
+    "production deployment"
+  ],
+  "materialBlocker": "DOT scale-report-variants source not on remote; denied seed/registration work not reproduced"
+}

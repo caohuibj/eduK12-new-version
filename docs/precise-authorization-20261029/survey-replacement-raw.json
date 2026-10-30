@@ -1,0 +1,819 @@
+{
+  "schemaVersion": 1,
+  "runs": [
+    {
+      "name": "survey-standard-replacement",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-replacement.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/survey-standard-replacement.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/survey-standard-replacement.json"
+        ],
+        "startedAt": "2026-10-29T20:26:02.690427+00:00",
+        "finishedAt": "2026-10-29T20:26:15.239988+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793305563438,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey explicit immutable standard-use replacement"
+                ],
+                "fullName": "Survey explicit immutable standard-use replacement prepares a current exact use, immutable published wave and separate waiting source without changing older grants",
+                "status": "passed",
+                "title": "prepares a current exact use, immutable published wave and separate waiting source without changing older grants",
+                "duration": 565.1888360000012,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey explicit immutable standard-use replacement"
+                ],
+                "fullName": "Survey explicit immutable standard-use replacement rejects legacy, wrong recipient, self replacement, invalid revision and injected lineage before mutation",
+                "status": "passed",
+                "title": "rejects legacy, wrong recipient, self replacement, invalid revision and injected lineage before mutation",
+                "duration": 84.26770599999873,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey explicit immutable standard-use replacement"
+                ],
+                "fullName": "Survey explicit immutable standard-use replacement replaces atomically with the same business name, preserves old T1/waves and freezes the new exact lineage without changing scoring",
+                "status": "passed",
+                "title": "replaces atomically with the same business name, preserves old T1/waves and freezes the new exact lineage without changing scoring",
+                "duration": 501.9333379999989,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey explicit immutable standard-use replacement"
+                ],
+                "fullName": "Survey explicit immutable standard-use replacement admits one concurrent next revision and rejects the competing stale replacement without extra grants",
+                "status": "passed",
+                "title": "admits one concurrent next revision and rejects the competing stale replacement without extra grants",
+                "duration": 182.0074850000001,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793305573663,
+            "endTime": 1793305574998.0076,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Existing full/none R and actual precise grant/import/measurement/frozen-wave services. No scoring/seed/participant/browser replay.",
+        "observations": [
+          {
+            "baselineId": "9b95de14-9638-4387-ae2a-e403421d6fe3",
+            "projectId": "f5990d2f-f6de-4e34-9333-483deaeebe24",
+            "waitingId": "0e2a836b-9c4c-46b2-ac2b-532d38ca54ae",
+            "oldPublicationId": "65b364b2-a395-4c1e-b934-b66458686877",
+            "originalGrantsUnchanged": true
+          },
+          {
+            "invalidReplacementNoMutation": true
+          },
+          {
+            "replacementId": "0c038e10-f9e8-4004-9e66-17aa627b3d6a",
+            "supersedes": {
+              "selectedBinding": {
+                "bindingHash": "58d76ee44f260a0df7aac5ee5647aaefc2a7caff2464cae2580dec03cf747eee",
+                "configurationHash": "24476a25f83b463c9c481f6959a44e7fac86c42c2039ab64f5a7d2b9971e9746",
+                "authorizationId": "9b95de14-9638-4387-ae2a-e403421d6fe3",
+                "authorizationRevision": 1
+              },
+              "reason": "Explicit switch to the approved absent report"
+            },
+            "oldUseRevoked": true,
+            "oldT1AndPublicationUnchanged": true,
+            "oldImportWaitingAndNewAdmissionBlocked": true,
+            "newPublicationId": "3ad45994-fa28-46de-a21c-b8c9730bc10d",
+            "sourceScoringSame": true
+          },
+          {
+            "concurrentAccepted": 1,
+            "concurrentStaleConflict": 1,
+            "totalGrants": 8,
+            "originalSourcesUnchanged": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "survey-standard-replacement-types",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/survey-replacement-types.json"
+        ],
+        "startedAt": "2026-10-29T20:26:02.673545+00:00",
+        "finishedAt": "2026-10-29T20:26:24.566635+00:00",
+        "exitCode": 2
+      },
+      "log": "src/modules/survey/catalog.service.ts(97,78): error TS18048: 'configuration' is possibly 'undefined'.\nsrc/modules/survey/catalog.service.ts(97,92): error TS2339: Property 'combinationId' does not exist on type '{ kind: \"STANDARD_COMBINATION\"; toolKey: string; instrumentVersion: string; combinationId: string; combinationHash: string; measurement: { releaseId: string; contentHash: string; }; axes: { ...; }; } | { ...; }'.\n  Property 'combinationId' does not exist on type '{ kind: \"COGNITIVE_PROFILE\"; testType: string; configId: string; configVersion: string; engineVersion: string; scoringVersion: string; measurement: { releaseId: string; contentHash: string; }; ... 8 more ...; presentationVersion: string | null; }'.\nsrc/modules/survey/catalog.service.ts(97,122): error TS18048: 'configuration' is possibly 'undefined'.\nsrc/modules/survey/catalog.service.ts(97,136): error TS2339: Property 'combinationHash' does not exist on type '{ kind: \"STANDARD_COMBINATION\"; toolKey: string; instrumentVersion: string; combinationId: string; combinationHash: string; measurement: { releaseId: string; contentHash: string; }; axes: { ...; }; } | { ...; }'.\n  Property 'combinationHash' does not exist on type '{ kind: \"COGNITIVE_PROFILE\"; testType: string; configId: string; configVersion: string; engineVersion: string; scoringVersion: string; measurement: { releaseId: string; contentHash: string; }; ... 8 more ...; presentationVersion: string | null; }'.\nsrc/modules/survey/catalog.service.ts(99,66): error TS2345: Argument of type '{ binding: { schemaVersion: 1; product: \"TEACHER\" | \"TRAINING\" | \"SURVEY\" | \"SCHOOL\"; configuration: { kind: \"STANDARD_COMBINATION\"; toolKey: string; instrumentVersion: string; combinationId: string; combinationHash: string; measurement: { ...; }; axes: { ...; }; } | { ...; }; configurationHash: string; authorizatio...' is not assignable to parameter of type '{ binding: { schemaVersion: 1; product: \"TEACHER\" | \"TRAINING\" | \"SURVEY\" | \"SCHOOL\"; configuration: { kind: \"STANDARD_COMBINATION\"; toolKey: string; instrumentVersion: string; combinationId: string; combinationHash: string; measurement: { ...; }; axes: { ...; }; } | { ...; }; configurationHash: string; authorizatio...'.\n  Type 'null' is not assignable to type '{ binding: { schemaVersion: 1; product: \"TEACHER\" | \"TRAINING\" | \"SURVEY\" | \"SCHOOL\"; configuration: { kind: \"STANDARD_COMBINATION\"; toolKey: string; instrumentVersion: string; combinationId: string; combinationHash: string; measurement: { ...; }; axes: { ...; }; } | { ...; }; configurationHash: string; authorizatio...'.\nnpm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n"
+    },
+    {
+      "name": "survey-standard-replacement-types-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/survey-replacement-types.json"
+        ],
+        "startedAt": "2026-10-29T20:28:35.132074+00:00",
+        "finishedAt": "2026-10-29T20:29:09.204904+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "survey-replacement-ui",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/api/__tests__/surveyStandardConfigurations.test.ts",
+          "src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+          "--maxWorkers=2",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/survey-replacement-ui.json"
+        ],
+        "startedAt": "2026-10-29T20:28:05.719010+00:00",
+        "finishedAt": "2026-10-29T20:28:11.202717+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 6,
+        "numPassedTestSuites": 6,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 20,
+        "numPassedTests": 20,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793305686201,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey original standard request intent"
+                ],
+                "fullName": "Survey original standard request intent accepts only the minimal original intent and excludes password, arbitrary binding and organization injection",
+                "status": "passed",
+                "title": "accepts only the minimal original intent and excludes password, arbitrary binding and organization injection",
+                "duration": 3.573662000000013,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original standard request intent"
+                ],
+                "fullName": "Survey original standard request intent compares the receiver, full source, business name, original authorization and both hashes",
+                "status": "passed",
+                "title": "compares the receiver, full source, business name, original authorization and both hashes",
+                "duration": 0.6104189999998653,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original standard request intent"
+                ],
+                "fullName": "Survey original standard request intent confirms an already-revoked original operation without treating it as a new live grant",
+                "status": "passed",
+                "title": "confirms an already-revoked original operation without treating it as a new live grant",
+                "duration": 1.2110070000001087,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original standard request intent"
+                ],
+                "fullName": "Survey original standard request intent does not confirm missing or malformed operation fields",
+                "status": "passed",
+                "title": "does not confirm missing or malformed operation fields",
+                "duration": 0.5549909999999727,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original replacement intent"
+                ],
+                "fullName": "Survey original replacement intent retains only a bounded predecessor identity and reason, never an arbitrary historical binding",
+                "status": "passed",
+                "title": "retains only a bounded predecessor identity and reason, never an arbitrary historical binding",
+                "duration": 0.8850019999999859,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original replacement intent"
+                ],
+                "fullName": "Survey original replacement intent compares both original predecessor request and immutable returned lineage, including the reason",
+                "status": "passed",
+                "title": "compares both original predecessor request and immutable returned lineage, including the reason",
+                "duration": 0.6181409999999232,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793305687940,
+            "endTime": 1793305687947.6182,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/api/__tests__/surveyStandardConfigurations.test.ts"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery requires a business name, issues one exact server-bound request and never lets the researcher choose R",
+                "status": "passed",
+                "title": "requires a business name, issues one exact server-bound request and never lets the researcher choose R",
+                "duration": 434.9088569999999,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery retains no secret and confirms a lost response through original complete intent without a second write",
+                "status": "passed",
+                "title": "retains no secret and confirms a lost response through original complete intent without a second write",
+                "duration": 216.03587199999993,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery allows only an original-number retry after explicit absent readback",
+                "status": "passed",
+                "title": "allows only an original-number retry after explicit absent readback",
+                "duration": 258.5815520000001,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery keeps a conflicting request blocked and cannot turn a different recipient into the original grant",
+                "status": "passed",
+                "title": "keeps a conflicting request blocked and cannot turn a different recipient into the original grant",
+                "duration": 194.64695900000015,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery recovers the original recipient even after the manager changes the visible researcher",
+                "status": "passed",
+                "title": "recovers the original recipient even after the manager changes the visible researcher",
+                "duration": 250.32186600000023,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery does not fall back to untyped standard issuance when the authenticated catalog lacks actor identity",
+                "status": "passed",
+                "title": "does not fall back to untyped standard issuance when the authenticated catalog lacks actor identity",
+                "duration": 101.03253899999982,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery requires the live authenticated account to match the issuer returned by the source catalog",
+                "status": "passed",
+                "title": "requires the live authenticated account to match the issuer returned by the source catalog",
+                "duration": 115.45001300000013,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery rejects malformed absence readback and keeps the original operation blocked without a retry button",
+                "status": "passed",
+                "title": "rejects malformed absence readback and keeps the original operation blocked without a retry button",
+                "duration": 171.36057200000005,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery shows a researcher the fixed business configuration and imports its exact grant without an R selector",
+                "status": "passed",
+                "title": "shows a researcher the fixed business configuration and imports its exact grant without an R selector",
+                "duration": 21.192747000000054,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "keeps Survey axis discovery in the authenticated approved page and submits the exact chosen source after normal name/password checks",
+                "status": "passed",
+                "title": "keeps Survey axis discovery in the authenticated approved page and submits the exact chosen source after normal name/password checks",
+                "duration": 187.55111899999974,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey administrator explicit configuration replacement"
+                ],
+                "fullName": "Survey administrator explicit configuration replacement requires an explicit reason and sends the old exact revision with the unchanged recipient before switching reports",
+                "status": "passed",
+                "title": "requires an explicit reason and sends the old exact revision with the unchanged recipient before switching reports",
+                "duration": 260.94591100000025,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey administrator explicit configuration replacement"
+                ],
+                "fullName": "Survey administrator explicit configuration replacement keeps the complete replacement unresolved after a lost response or changed original reason and recovers only matching lineage",
+                "status": "passed",
+                "title": "keeps the complete replacement unresolved after a lost response or changed original reason and recovers only matching lineage",
+                "duration": 324.0921099999996,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey administrator explicit configuration replacement"
+                ],
+                "fullName": "Survey administrator explicit configuration replacement keeps another issuer use visible while offering replacement only to the actual original issuer",
+                "status": "passed",
+                "title": "keeps another issuer use visible while offering replacement only to the actual original issuer",
+                "duration": 116.12701300000026,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "retains an unresolved operation after leaving the manager workspace and ignores its late success response",
+                "status": "passed",
+                "title": "retains an unresolved operation after leaving the manager workspace and ignores its late success response",
+                "duration": 136.856812,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793305688366,
+            "endTime": 1793305691155.857,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "name": "survey-replacement-frontend-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "startedAt": "2026-10-29T20:28:05.703096+00:00",
+        "finishedAt": "2026-10-29T20:29:12.206355+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "survey-replacement-frontend-lint",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/eslint/bin/eslint.js",
+          "src/api/surveyStandardConfigurations.ts",
+          "src/api/__tests__/surveyStandardConfigurations.test.ts",
+          "src/survey/ResearchCatalog.tsx",
+          "src/survey/useSurveyStandardConfigurationGrant.ts",
+          "src/pages/admin/SurveyCatalogGrants.tsx",
+          "src/pages/admin/SurveyCatalogGrants.standard.test.tsx"
+        ],
+        "startedAt": "2026-10-29T20:28:05.693039+00:00",
+        "finishedAt": "2026-10-29T20:28:07.830574+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "survey-standard-replacement-http",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-replacement.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/survey-standard-replacement.http.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/survey-standard-replacement-http.json"
+        ],
+        "startedAt": "2026-10-29T20:29:50.744366+00:00",
+        "finishedAt": "2026-10-29T20:30:00.072523+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793305791451,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey explicit configuration replacement through existing protected router"
+                ],
+                "fullName": "Survey explicit configuration replacement through existing protected router requires the existing password guard then atomically replaces and reads the full original intent including older non-replacement requests",
+                "status": "passed",
+                "title": "requires the existing password guard then atomically replaces and reads the full original intent including older non-replacement requests",
+                "duration": 398.8344369999995,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey explicit configuration replacement through existing protected router"
+                ],
+                "fullName": "Survey explicit configuration replacement through existing protected router does not change full intent during replay and rejects stale, invalid-revision or injected replacement before adding grants",
+                "status": "passed",
+                "title": "does not change full intent during replay and rejects stale, invalid-revision or injected replacement before adding grants",
+                "duration": 484.0675890000002,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793305798985,
+            "endTime": 1793305799869.0676,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Existing Cookie/CSRF/origin/current-password/proof router; synthetic JWT proof, no real MFA or participant/browser replay",
+        "requests": [
+          {
+            "path": "/api/platform/survey/researchers/dfc3344a-8dae-40cd-ba5c-80e4859a0075/tool-grants",
+            "status": 403
+          },
+          {
+            "path": "/api/platform/survey/researchers/dfc3344a-8dae-40cd-ba5c-80e4859a0075/tool-grants",
+            "status": 200
+          },
+          {
+            "path": "/api/platform/survey/researchers/dfc3344a-8dae-40cd-ba5c-80e4859a0075/tool-grant-requests/4aa0d47c-68c3-4028-b19d-ddd714d35b73",
+            "status": 200
+          },
+          {
+            "path": "/api/platform/survey/researchers/dfc3344a-8dae-40cd-ba5c-80e4859a0075/tool-grant-requests/47b7edc0-c747-4e1e-b10d-5f4686dfd2b8",
+            "status": 200
+          },
+          {
+            "path": "/api/platform/survey/researchers/dfc3344a-8dae-40cd-ba5c-80e4859a0075/tool-grants",
+            "status": 200
+          },
+          {
+            "path": "/api/platform/survey/researchers/dfc3344a-8dae-40cd-ba5c-80e4859a0075/tool-grants",
+            "status": 409
+          },
+          {
+            "path": "/api/platform/survey/researchers/dfc3344a-8dae-40cd-ba5c-80e4859a0075/tool-grants",
+            "status": 409
+          },
+          {
+            "path": "/api/platform/survey/researchers/dfc3344a-8dae-40cd-ba5c-80e4859a0075/tool-grants",
+            "status": 400
+          },
+          {
+            "path": "/api/platform/survey/researchers/dfc3344a-8dae-40cd-ba5c-80e4859a0075/tool-grants",
+            "status": 400
+          }
+        ],
+        "issuedId": "4aa0d47c-68c3-4028-b19d-ddd714d35b73"
+      }
+    },
+    {
+      "name": "survey-replacement-http-types-final",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/survey-replacement-http-types.json"
+        ],
+        "startedAt": "2026-10-29T20:30:52.590844+00:00",
+        "finishedAt": "2026-10-29T20:31:18.397591+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "survey-replacement-page-lint-final",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/eslint/bin/eslint.js",
+          "src/pages/admin/SurveyCatalogGrants.tsx"
+        ],
+        "startedAt": "2026-10-29T20:30:52.606666+00:00",
+        "finishedAt": "2026-10-29T20:30:53.686307+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "survey-replacement-api-malformed",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/api/__tests__/surveyStandardConfigurations.test.ts",
+          "-t",
+          "original replacement intent",
+          "--maxWorkers=1",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/survey-replacement-api-malformed.json"
+        ],
+        "startedAt": "2026-10-29T20:31:25.693317+00:00",
+        "finishedAt": "2026-10-29T20:31:26.804935+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 3,
+        "numPassedTestSuites": 3,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 6,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 4,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793305885987,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey original standard request intent"
+                ],
+                "fullName": "Survey original standard request intent accepts only the minimal original intent and excludes password, arbitrary binding and organization injection",
+                "status": "skipped",
+                "title": "accepts only the minimal original intent and excludes password, arbitrary binding and organization injection",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original standard request intent"
+                ],
+                "fullName": "Survey original standard request intent compares the receiver, full source, business name, original authorization and both hashes",
+                "status": "skipped",
+                "title": "compares the receiver, full source, business name, original authorization and both hashes",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original standard request intent"
+                ],
+                "fullName": "Survey original standard request intent confirms an already-revoked original operation without treating it as a new live grant",
+                "status": "skipped",
+                "title": "confirms an already-revoked original operation without treating it as a new live grant",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original standard request intent"
+                ],
+                "fullName": "Survey original standard request intent does not confirm missing or malformed operation fields",
+                "status": "skipped",
+                "title": "does not confirm missing or malformed operation fields",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original replacement intent"
+                ],
+                "fullName": "Survey original replacement intent retains only a bounded predecessor identity and reason, never an arbitrary historical binding",
+                "status": "passed",
+                "title": "retains only a bounded predecessor identity and reason, never an arbitrary historical binding",
+                "duration": 2.3965049999999337,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey original replacement intent"
+                ],
+                "fullName": "Survey original replacement intent compares both original predecessor request and immutable returned lineage, including the reason",
+                "status": "passed",
+                "title": "compares both original predecessor request and immutable returned lineage, including the reason",
+                "duration": 0.8680640000000039,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793305886756,
+            "endTime": 1793305886758.8682,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/api/__tests__/surveyStandardConfigurations.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "survey-replacement-api-types-final",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/survey-replacement-api-types.json",
+          "--noEmit"
+        ],
+        "startedAt": "2026-10-29T20:33:26.375974+00:00",
+        "finishedAt": "2026-10-29T20:33:27.554018+00:00",
+        "exitCode": 0
+      }
+    }
+  ]
+}

@@ -1,8 +1,10 @@
 import {frozenScaleInstructionSchema,type FrozenScaleInstruction} from '../assessment-runtime/frozen-scale-instruction'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {standardAxisHashes,standardCombinationHash,compileStandardCombinationReport} from '../measurement-content/standard-combination'
+import {standardReportParameterBlockers} from '../measurement-content/standard-report-parameters'
 import {getScaleInstrumentSource,listScaleInstrumentSources} from '../scale/onboarding/instrument-registry'
-import {snapshotScaleInstrumentSource} from '../scale/onboarding/source-snapshot'
+import {snapshotScaleInstrumentSource,scaleSourceAxisPayloads} from '../scale/onboarding/source-snapshot'
+import {listScaleReportVariants} from '../scale/onboarding/report-variants'
 import {validateScaleDefinition,hashScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
 import {getScaleCustomScorerKeys} from '../scale/scale-scoring'
 import {validateReferenceSetDefinition,type AssessmentReferenceSetDefinition} from '../assessment-reference/reference'
@@ -17,13 +19,15 @@ const json=<T>(v:T):T=>JSON.parse(JSON.stringify(v))
 export function sourceParts(toolKey:string,version:string):Part[]{
  const source=getScaleInstrumentSource(toolKey,version)
  if(!source?.executable)return []
- const {report,referencePolicy,source:provenance,license,...content}=source.executable.definition
+ const {report,parameters:{referencePolicy},provenance,license,content}=scaleSourceAxisPayloads(source)
  const reference=toolReference('SCALE',toolKey,{...snapshotScaleInstrumentSource({...source,executable:{...source.executable,scorerPlugins:source.executable.scorerPlugins??[]}}),originalProvenance:provenance,originalLicense:license})
  const make=(axis:Axis,label:string,payload:unknown):Part=>({axis,version:label,hash:canonicalHash(payload),payload:json(payload),sourceVersion:version,reference})
  return [make('CONTENT',version+':'+content.scoring.scoringVersion,content),make('PARAMETERS',source.executable.references.map(r=>r.referenceVersion).sort().join('+')||'none-v1',{referencePolicy,references:source.executable.references}),make('REPORT',report.reportVersion,report)]
 }
 export function registeredParts(key:string){
  const registered=listScaleInstrumentSources().filter(s=>s.identity.instrumentKey===key).flatMap(s=>sourceParts(key,s.identity.instrumentVersion))
+ for(const source of listScaleInstrumentSources().filter(s=>s.identity.instrumentKey===key&&s.executable))for(const variant of listScaleReportVariants(source))registered.push({axis:'REPORT',version:variant.report.reportVersion,hash:canonicalHash(variant.report),payload:json(variant.report),sourceVersion:source.identity.instrumentVersion,
+  reference:toolReference('SCALE',key,{identity:source.identity,reportVariant:{key:variant.key,title:variant.title,baseContentHash:variant.baseContentHash,baseParametersHash:variant.baseParametersHash,materialHash:variant.materialHash,origin:variant.origin},report:variant.report,originalProvenance:source.executable!.definition.source,originalLicense:source.executable!.definition.license})})
  const source=registered.find(p=>p.axis==='CONTENT')
  if(source)for(const axis of ['PARAMETERS','REPORT'] as const)registered.push({axis,version:'none-v1',hash:canonicalHash(null),payload:null,sourceVersion:source.sourceVersion,reference:toolReference('SCALE',key,{explicitlyUnconfigured:true,axis})})
  return registered
@@ -55,13 +59,14 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
  if(parameters.referencePolicy.type==='declared')for(const choice of parameters.referencePolicy.selections){
   const entry=parameters.references.find(r=>r.referenceVersion===choice.referenceVersion)?.entries.find(e=>e.scoreKey===choice.scoreKey&&e.referenceKind===choice.referenceKind)
   if(!entry)blockers.push('参数选择缺少对应的精确参考版本：'+choice.referenceVersion)
-  const report=definition.report.interpretations.find(r=>r.scoreKey===choice.scoreKey)
-  if(entry?.statistics.thresholds?.some(t=>!report?.bands.some(b=>b.key===t.key)))blockers.push('报告区间与参数阈值编码不匹配：'+choice.scoreKey)
  }
- const {template,blockers:reportBlockers}=compileStandardCombinationReport(source.catalog.identity.canonicalName,definition,parts.REPORT.payload!==null)
+ blockers.push(...standardReportParameterBlockers(definition,parameters.references,parts.REPORT.payload!==null))
+ const variant=parts.REPORT.reference.metadata.reportVariant as {title?:unknown}|undefined
+ const title=typeof variant?.title==='string'?source.catalog.identity.canonicalName+' · '+variant.title:source.catalog.identity.canonicalName
+ const {template,blockers:reportBlockers}=compileStandardCombinationReport(title,definition,parts.REPORT.payload!==null)
  blockers.push(...reportBlockers)
  const reference=toolReference('SCALE',key,{content:parts.CONTENT.reference,parameters:parts.PARAMETERS.reference,report:parts.REPORT.reference})
- return {schemaVersion:1,toolKey:key,title:source.catalog.identity.canonicalName,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,combinationHash:standardCombinationHash(key,standardAxisHashes(parts)),blockers:[...new Set(blockers)],reference}
+ return {schemaVersion:1,toolKey:key,title,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,combinationHash:standardCombinationHash(key,standardAxisHashes(parts)),blockers:[...new Set(blockers)],reference}
 }
 /** The approved CONTENT source already contains its versioned instruction.
  * Resolve from that immutable record; registry/default changes are not inputs. */

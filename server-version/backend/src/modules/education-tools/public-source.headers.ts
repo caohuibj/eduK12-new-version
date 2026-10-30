@@ -5,7 +5,7 @@ import {educationPublicSourceKey} from './public-source.identity'
 
 export type EducationPublicSourceHeader={
  key:string;kind:EducationPublicSource['kind'];id:string;hash:string;title:string;language:string|null
- versions:{content:string;parameters:string|null;report:string|null;profiles?:Array<'experience'|'standard'|'research'>};applicability:unknown;educationApplicability?:unknown;expertApplicability?:unknown;nativeRespondentType?:string|null;referenceContextKeys:string[];nativeAvailable:boolean
+ versions:{content:string;parameters:string|null;report:string|null;profiles?:Array<'experience'|'standard'|'research'>;profile?:'experience'|'standard'|'research';measurementHash?:string};applicability:unknown;educationApplicability?:unknown;expertApplicability?:unknown;nativeRespondentType?:string|null;referenceContextKeys:string[];nativeAvailable:boolean
 }
 export const educationStandardHeaderColumns=Prisma.sql`'education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash AS key,'STANDARD_SCALE' AS kind,s.id,s.combination_hash AS hash,s.snapshot->>'title' AS title,
  s.snapshot#>>'{parts,CONTENT,reference,metadata,executable,contentLocale}' AS language,s.snapshot#>'{parts,CONTENT,reference,metadata,applicability}' AS applicability,
@@ -31,6 +31,20 @@ export const educationCognitiveHeaderColumns=Prisma.sql`'education-source:COGNIT
  'und'::text AS language,NULL::jsonb AS applicability,NULL::jsonb AS "expertApplicability",NULL::jsonb AS "educationApplicability",'participant_self_report'::text AS "nativeRespondentType",
  ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",jsonb_build_object('content',c.config_version,'parameters',NULL,'report',NULL,
   'profiles',ARRAY(SELECT jsonb_object_keys(m.content#>'{executable,profiles}'))) AS versions`
+// Approved profile headers only. No artifact decryption or live profile merge.
+export const educationCognitiveProfileHeaderColumns=Prisma.sql`'education-source:COGNITIVE_PROFILE:'||c.id||':'||p.fingerprint AS key,'COGNITIVE_PROFILE' AS kind,c.id,p.fingerprint AS hash,
+ c.name||' · '||CASE e.metadata#>>'{configuration,profile}' WHEN 'experience' THEN '体验配置' WHEN 'research' THEN '科研配置' ELSE '正式配置' END AS title,
+ 'und'::text AS language,NULL::jsonb AS applicability,NULL::jsonb AS "expertApplicability",NULL::jsonb AS "educationApplicability",'participant_self_report'::text AS "nativeRespondentType",
+ ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",jsonb_build_object('content',c.config_version,'parameters',NULL,'report',e.metadata#>>'{configuration,reportDefinitionVersion}',
+ 'profile',e.metadata#>>'{configuration,profile}','measurementHash',m.content_hash) AS versions`
+export const educationCognitiveProfileHeaderJoins=(product:string)=>Prisma.sql`JOIN survey_tool_policies p ON p.product=${product} AND p.resource_key LIKE 'cognitive-profile:%' AND p.decision='APPROVED' AND NOT p.paused
+ JOIN LATERAL (SELECT metadata,resource_id FROM assessment_management_events approval WHERE approval.action='COGNITIVE_PROFILE_APPROVED'
+  AND approval.metadata->>'artifactFormatVersion'='2' AND approval.metadata->>'artifactHash'=p.fingerprint
+  AND p.resource_key='cognitive-profile:'||approval.resource_id||':'||(approval.metadata#>>'{configuration,profile}') ORDER BY approval.id LIMIT 1) e ON true
+ JOIN cognitive_test_configs c ON c.id=e.resource_id AND c.status='PUBLISHED'
+ JOIN measurement_content_releases m ON m.id=c.measurement_release_id AND m.id=e.metadata#>>'{configuration,measurement,releaseId}' AND m.content_hash=e.metadata#>>'{configuration,measurement,contentHash}'
+  AND m.family='COGNITIVE' AND m.layer='MEASUREMENT' AND m.status='PUBLISHED' AND m.scope->>'kind'='PLATFORM'
+ JOIN assessment_public_templates t ON t.template_hash=p.fingerprint AND t.template_kind='COGNITIVE_PROFILE_CONFIGURATION'`
 // sjt_source is a bounded metadata UNION over the two native source tables;
 // neither a Survey delivery nor an existing Training assignment is required.
 export const educationSjtHeaderSources=(ids:Prisma.Sql|readonly string[])=>Prisma.sql`(
@@ -44,7 +58,7 @@ export const educationSjtHeaderColumns=Prisma.sql`'education-source:SJT_RELEASE:
 /** Bounded discovery/action metadata. The source guards make approved contents
  * immutable; no source body/hash/compiler or runtime object is needed here.
  * Use SHARE for a new-use write so withdrawal serializes through its real row. */
-export async function readEducationPublicSourceHeaders(tx:Prisma.TransactionClient,sources:readonly EducationPublicSource[],lock=false){
+export async function readEducationPublicSourceHeaders(tx:Prisma.TransactionClient,sources:readonly EducationPublicSource[],lock=false,product?:'SCHOOL'|'TEACHER'){
  const byKey=new Map(sources.map(source=>[educationPublicSourceKey(source),source]))
  const standard=[...byKey.values()].filter(s=>s.kind==='STANDARD_SCALE'),forms=[...byKey.values()].filter(s=>s.kind==='FORM')
  const rows:EducationPublicSourceHeader[]=[]
@@ -59,6 +73,8 @@ export async function readEducationPublicSourceHeaders(tx:Prisma.TransactionClie
   SELECT ${educationFormHeaderColumns}
   FROM survey_governed_tools t WHERE (t.id,t.snapshot_hash) IN (${Prisma.join(forms.map(s=>Prisma.sql`(${s.id},${s.hash})`))})
    AND t.family='FORM' AND t.state='ONLINE' ORDER BY t.id ${lock?Prisma.sql`FOR SHARE OF t`:Prisma.empty}`))
+ const exactProfiles=[...byKey.values()].filter(source=>source.kind==='COGNITIVE_PROFILE')
+ if(exactProfiles.length&&product)rows.push(...await tx.$queryRaw<EducationPublicSourceHeader[]>(Prisma.sql`SELECT ${educationCognitiveProfileHeaderColumns} FROM (SELECT 1) anchor ${educationCognitiveProfileHeaderJoins(product)} WHERE (c.id,p.fingerprint) IN (${Prisma.join(exactProfiles.map(source=>Prisma.sql`(${source.id},${source.hash})`))}) ORDER BY c.id,p.fingerprint ${lock?Prisma.sql`FOR SHARE OF c,m,p,t`:Prisma.empty}`))
  const cognitive=[...byKey.values()].filter(source=>source.kind==='COGNITIVE_CONFIG'),sjt=[...byKey.values()].filter(source=>source.kind==='SJT_RELEASE')
  if(cognitive.length)rows.push(...await tx.$queryRaw<EducationPublicSourceHeader[]>(Prisma.sql`SELECT ${educationCognitiveHeaderColumns}
   FROM cognitive_test_configs c JOIN measurement_content_releases m ON m.id=c.measurement_release_id

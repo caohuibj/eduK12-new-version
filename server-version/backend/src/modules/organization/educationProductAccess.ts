@@ -20,11 +20,14 @@ export interface EducationProductMemberScope {
 }
 
 const memberScopes = async (input:{
-  actorUserId:string
+  actorUserId?:string
   product:EducationProduct
   organizationId?:string
+  candidateSearch?:string
+  candidatePage?:number
+  requiredProductAdmin?:boolean
   requiredCapability?:'PSYCHOLOGY_STAFF'
-},db:Database):Promise<EducationProductMemberScope[]>=>{
+},db:Database):Promise<Array<EducationProductMemberScope&{userId?:string;username?:string}>>=>{
   const accessDeny = input.product+'_ACCESS'
   const adminDeny = input.product+'_ADMIN'
   const orgFilter=input.organizationId
@@ -50,8 +53,11 @@ const memberScopes = async (input:{
       )`
     : Prisma.empty
   const limit=input.organizationId?1:100
-  const rows=await db.$queryRaw<Array<Omit<EducationProductMemberScope,'product'>>>(Prisma.sql`
-    SELECT o."id" AS "organizationId",o."name" AS "organizationName",
+  const candidates=input.candidatePage!==undefined
+  if(candidates&&!input.organizationId)throw Error('Author candidate projection requires an exact organization')
+  if(!candidates&&!input.actorUserId)return []
+  const statement=Prisma.sql`
+    SELECT ${!candidates?Prisma.empty:Prisma.sql`DISTINCT ON (u.id)`} o."id" AS "organizationId",o."name" AS "organizationName",
            m."id" AS "membershipId",m."org_role" AS "orgRole",
            (
              EXISTS (
@@ -70,13 +76,13 @@ const memberScopes = async (input:{
                  AND denied_admin."lifted_at" IS NULL
                  AND denied_admin."permission" IN ('*',${adminDeny})
              )
-           ) AS "productAdmin"
+           ) AS "productAdmin" ${!candidates?Prisma.empty:Prisma.sql`,u.id AS "userId",u.username`}
     FROM "organizations" o
     JOIN "education_product_entitlements" e
       ON e."organization_id"=o."id"
       AND e."product"=${input.product} AND e."status"='ACTIVE'
     JOIN "organization_memberships" m ON m."organization_id"=o."id"
-      AND m."user_id"=${input.actorUserId}
+      ${!candidates?Prisma.sql`AND m."user_id"=${input.actorUserId}`:Prisma.empty}
       AND m."valid_from"<=statement_timestamp()
       AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
     JOIN "users" u ON u."id"=m."user_id"
@@ -93,9 +99,13 @@ const memberScopes = async (input:{
           AND deny."lifted_at" IS NULL
           AND deny."permission" IN ('*','EDUCATION_ACCESS',${accessDeny})
       )
-    ORDER BY o."id",m."valid_from" DESC
-    LIMIT ${limit}
-  `)
+    ${!candidates?Prisma.empty:Prisma.sql`AND (${input.candidateSearch??''}='' OR strpos(lower(u.username),lower(${input.candidateSearch??''}))>0)`}
+  `
+  const rows=await db.$queryRaw<Array<Omit<EducationProductMemberScope,'product'>&{userId?:string;username?:string}>>(!candidates
+    ?Prisma.sql`${statement} ORDER BY o."id",m."valid_from" DESC LIMIT ${limit}`
+    :Prisma.sql`SELECT * FROM (${statement} ORDER BY u.id,m.valid_from DESC) eligible
+      WHERE (${input.requiredProductAdmin??false}=false OR eligible."productAdmin")
+      ORDER BY eligible.username,eligible."userId" LIMIT 26 OFFSET ${((input.candidatePage??1)-1)*25}`)
   return rows.map(row=>({...row,product:input.product}))
 }
 
@@ -113,4 +123,13 @@ export async function listEducationProductMemberships(
   actorUserId:string,product:EducationProduct,db:Database=prisma,
 ):Promise<EducationProductMemberScope[]>{
   return memberScopes({actorUserId,product},db)
+}
+
+/** Read-only manager chooser. Reuses the same member/account/deny/qualification
+ * SQL as single-actor authorization; it never returns a reusable write permit. */
+export async function listEducationAuthoringMemberCandidates(input:{product:EducationProduct;organizationId:string;page:number;q:string},db:Database=prisma){
+  if(!Number.isInteger(input.page)||input.page<1||input.page>10000||input.q.length>120)throw Error('Invalid author candidate page')
+  const rows=await memberScopes({product:input.product,organizationId:input.organizationId,candidatePage:input.page,candidateSearch:input.q,
+    ...(input.product==='HUISCHOOL'?{requiredCapability:'PSYCHOLOGY_STAFF' as const}:{requiredProductAdmin:true})},db)
+  return {page:input.page,hasMore:rows.length>25,list:rows.slice(0,25).map(row=>({userId:row.userId!,username:row.username!,membershipId:row.membershipId}))}
 }

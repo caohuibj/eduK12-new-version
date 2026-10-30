@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "base": "015757093f6e720f94159ad0db7aba10d01e219c",
+  "qualifiedMain": "c52e1675fe7990ce49b42589d993fb12e8541ae1",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost55439 owner test role",
+    "redis": "localhost56389 database2 for HTTP",
+    "productionAccessed": false,
+    "realUsersGranted": false,
+    "httpDatabase": "precise_education_manager_http_test_20261029",
+    "peerDatabase": "precise_education_catalog_cross_r_test_20261029"
+  },
+  "results": {
+    "httpTeacher": 4,
+    "httpSchool": 2,
+    "crossReportPostgres": 4,
+    "managerUiFinal": 7,
+    "api": 4,
+    "existingSystemAdminUi": 45,
+    "earlierParentUi": 3,
+    "backendTypesExit": 0,
+    "frontendTypesExit": 0,
+    "frontendLintExit": 0
+  },
+  "raw": {
+    "file": "education-manager-ui-raw.json",
+    "sha256": "8045fcd961dfa375d4f875f31e965f17764cd9eb658c1ae62e69495fa934b568"
+  },
+  "inputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-cross-report.postgres.integration.test.ts",
+      "sha256": "93beb4ab51b940a0a4311449eadec88d905334ca52ad18f9820a59c18635ffb2"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-management-school.http.postgres.integration.test.ts",
+      "sha256": "b6b8a838a740a115e7fca29afbeec4a9b46c35076bfcf71c7c061e8a93804986"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.http.postgres.integration.test.ts",
+      "sha256": "906cd090027f4fdb2d3032139570382bcc8f774e81bb47c71e76ed5f2c5de8c8"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-management.ts",
+      "sha256": "43d277ce1618b01b696acc2c0fae075ff8b469160b13033aba9bb3154d319753"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-revoke.ts",
+      "sha256": "d10bad590654fde14886bd6a6682364d1acc7818df83ef413ef8a8f387d6c0b0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+      "sha256": "d0cdf77e9068a8259639d6385c221b93d2f02fecba09f4eb6d0b012aed97133b"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+      "sha256": "5791f249bebc0f0b15522858fad8b696190f0cdac4fbf79c0921b436b0618c83"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/selected-source-catalog.ts",
+      "sha256": "6edb884267c571266f320af9798711f73f81c02c4c8d4872a1dfe71472346ed2"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/platform.routes.ts",
+      "sha256": "fdc2d196e55d9fe19c600901ad32a466960c6a36087dfc34f003f7e026f2a87a"
+    },
+    {
+      "path": "server-version/frontend/src/admin/AdminContentPermissions.test.tsx",
+      "sha256": "228e73e9e7ab67d8204b97b6ad86d382ff8f9584c17ca0c9aeeaea3204f2bd7e"
+    },
+    {
+      "path": "server-version/frontend/src/admin/AdminContentPermissions.tsx",
+      "sha256": "232bc0d7f45225cf70ef14dc19444c9dd4ccfbaf2ff73f820eed15584b4ca0fb"
+    },
+    {
+      "path": "server-version/frontend/src/api/__tests__/educationStandardConfigurations.test.ts",
+      "sha256": "48284049274c728c23fe528f166b5879584b2b914f5d8505dd375d7cba2207c3"
+    },
+    {
+      "path": "server-version/frontend/src/api/educationStandardConfigurations.ts",
+      "sha256": "2d7e378a4e6217524c987f4a1e4933c698c117be10019fd0f2334d884477ab19"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationProductGovernance.tsx",
+      "sha256": "e1e058a136af1f86199288298f9da68214332ce36f449f8f52ee60f24bbff107"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx",
+      "sha256": "ecde1616f61ff539d9a1bbf1b6ef469c73b5b58fb4e07138dc23328fe8deb88d"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationStandardConfigurations.tsx",
+      "sha256": "badc6e91ad39111ab10eeed02f1edc7295efafd7056a234bc2f3788c24ededea"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/education-products.css",
+      "sha256": "c3a75dd540bb9ef5f902a60b34cf9dc7b7a05e1f7ade853bdc0dfd3009ca0660"
+    }
+  ],
+  "inputCapture": {
+    "at": "2026-10-29T18:18:53.987310+00:00",
+    "kind": "Post-execution direct source hashes; original per-invocation evidence retained; not a contemporaneous full dependency manifest or signed qualification"
+  },
+  "reuseBoundary": "No replay of unchanged scoring/content or participant lifecycle. Earlier admin HTTP and frontend raw successes retain original identities. New peer reader executed on independent clone; two SQL queries measured for helper only. Do not add overlapping UI iterations. No broad CI or build.",
+  "notExecuted": [
+    "Actual browser with compiled application",
+    "Actual MFA ceremony",
+    "Production runtime role",
+    "Axis composition and atomic replacement lineage",
+    "All four-entry scales and cognition",
+    "Legacy dry-run and representative performance comparison",
+    "Formal CI or merge gate",
+    "Deployment/production"
+  ],
+  "specificBlocker": "Denied DOT mixed seed/fun-R registration engineering remains excluded. Pure material JSON is not six registered reports."
+}

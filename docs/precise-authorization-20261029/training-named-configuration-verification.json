@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "base": "c8986efe7b01b32c9ecccd389e6ffe43a36899fc",
+  "main": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "scope": "Training business names, bounded directory metadata, exact UI selection token, original immutable request readback and durable current-account UI recovery. Frozen standard P/R selection display only.",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 owner role localhost55439",
+    "database": "precise_training_named_configuration_test_20261029",
+    "productionAccessed": false
+  },
+  "results": {
+    "postgresDistinctPassed": 4,
+    "postgresInvocations": [
+      {
+        "name": "training-named-configuration",
+        "passed": 1,
+        "failed": 3
+      },
+      {
+        "name": "training-named-configuration-v2",
+        "passed": 3,
+        "filtered": 1
+      }
+    ],
+    "administratorUiDistinctPassed": 16,
+    "administratorUiInvocations": [
+      {
+        "name": "training-named-ui-initial",
+        "passed": 8,
+        "failed": 8
+      },
+      {
+        "name": "training-named-ui-recovery-v2",
+        "passed": 8,
+        "filtered": 8
+      }
+    ],
+    "apiAndConsumerPassed": 10,
+    "apiAndConsumerFiltered": 115,
+    "httpDistinctPassed": 4,
+    "httpInvocations": [
+      {
+        "name": "training-named-http",
+        "passed": 1,
+        "failed": 3
+      },
+      {
+        "name": "training-named-http-v2",
+        "passed": 3,
+        "filtered": 1
+      }
+    ],
+    "backendClosureTypesExit": 0,
+    "frontendTypesExit": 0,
+    "changedFrontendLintExit": 0
+  },
+  "raw": {
+    "file": "training-named-configuration-raw.json",
+    "sha256": "18d7228fb67e64a8ab8e459fc413c3a987dfc8ae46312c837b147f696c739b61"
+  },
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts",
+      "sha256": "4b988aa2bcfebc1c5759f030124dad44479b4e267b377197d0f45ed67a822236"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts",
+      "sha256": "927d3392b3c383bc63a505704c6c92c8fa63f5b0ac2a038af1a739cf4a8da49e"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/standard-configuration-binding.ts",
+      "sha256": "fc8a92b86c1aa34e523db9c1b59ea12b6aab12359eab3c5a7d4aeb385f320180"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.schema.ts",
+      "sha256": "6cf06740d91944ddfb8b793e066483c5b0ef1188b0ea2c3940421ec635f4c5f6"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-reference-selection.ts",
+      "sha256": "1aa7864ae3c63fba692c9f8231f89b576f34b7513862750a380661df150502ac"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-combination.ts",
+      "sha256": "71cc98a8edbdd2febd20752af6fdcefca13877c834222d154cda56fc45474fb5"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-management.ts",
+      "sha256": "2663a8f4e1407ac11d9319ab4ab0256b21f489b1758ce14c0cbd4e59d56bfab0"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+      "sha256": "8d72bbc47356ca6fa1c6393692e033ab8b2ec6f035c2f1b5321a1b8febc27639"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/routes.ts",
+      "sha256": "11fe9adecbc1c8b9de9c6e9cf8bb59fff71796e3eb8bff935db716280526369c"
+    },
+    {
+      "path": "server-version/frontend/src/api/standardConfigurationGrants.test.ts",
+      "sha256": "f0308b93f35bac19dac5ee5aabc9382cc5421218f6f370dd3a244fbdc74825fd"
+    },
+    {
+      "path": "server-version/frontend/src/api/standardConfigurationGrants.ts",
+      "sha256": "88f4b9896d52b003750dd7df45875309eeef8360b5b751a0b20182e81360048f"
+    },
+    {
+      "path": "server-version/frontend/src/components/AssessmentToolPicker.tsx",
+      "sha256": "7d96b4f0eda406c8e819d97312e6a5a37b00e4898b0b371005aac4c9b6d80f84"
+    },
+    {
+      "path": "server-version/frontend/src/components/__tests__/AssessmentToolPicker.test.tsx",
+      "sha256": "c54a451065d334305c3f1ee565c3302767b5a34d328b3a92eef033a1e33dbe79"
+    },
+    {
+      "path": "server-version/frontend/src/components/assessment-tool-picker.css",
+      "sha256": "d43dd3f458f0bd6787d7a5a114749ac2446745bf9710825f485937efaa875e36"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+      "sha256": "4bc1a2771e30142904993236384ccf4861849a9266338aa44240cc40fa0b6205"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/TrainingContentSelection.tsx",
+      "sha256": "9fc3805880587cf33a2bd552030d970e6687ae9e5f311ae61331f901da83a1f0"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+      "sha256": "08f5ba8fabb3a3ab72b75543ffd2476a1b27bbeb8575eac9d2f0233f8df53f44"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/__tests__/TrainingContentSelection.test.tsx",
+      "sha256": "1a0a837fe571841f84e8c357e49997cffdb186843e1ce9a7757bc4a60fddeb72"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx",
+      "sha256": "1d76262c3fb522f85ba23ae4a2897a32a996bb73bbd655b65a3285b5e4b2538c"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx",
+      "sha256": "3fee6c51b897a7aab2ef55464bfa7cd31501579d1d725b372e844c67437c87d0"
+    },
+    {
+      "path": "server-version/frontend/src/training/useTrainingStandardConfigurationIssue.ts",
+      "sha256": "bc131faf261e107b63a9469d05857896268fe02c0d7e7b3ffaa2985121f5c5b9"
+    }
+  ],
+  "inputCapture": {
+    "at": "2026-10-29T20:02:27.280170+00:00",
+    "kind": "Post-execution direct source inventory, not contemporaneous dependency closure/signed CI. Final backend types ran before HTTP-only proof fixture and preflight-count assertion correction; no application source changed afterward."
+  },
+  "failuresPreserved": [
+    "Initial PG first1 passed then3 failed/dependency-stopped: fixture incorrectly assumed original other NONE grant. Readback proved three grants; resume guarded exact retained counts, corrected first NONE creation and ran only failed three.",
+    "Initial admin UI8 passed/8 failed: shared unknown helper queried two same-name close buttons; fixture selects first accessible close button then reruns only affected8. No production UI change for that failure.",
+    "Initial HTTP1 passed/3 failed/dependency-stopped: management fixture omitted existing admin login proof, actual401 denied writes; independent readback and second beforeAll proved zero new named events. Explicit synthetic proof added, failed3 only rerun. Real MFA was not performed.",
+    "First attempted creation of extra frontend tests used doubled relative paths; shell reported no such path and created none. Tests were written at correct root afterward. Initial UI reporter refers only to its16 present tests."
+  ],
+  "reuseBoundary": "No old scoring/seed/synthetic basic-fun pairs, source approval, anonymous participant27 or old lifecycle replay. Three existing exact/GENERAL consumer tests were directly affected by precise branch and run with new consumer cases. Core types run once per changed closure. Initial passed tests filtered on continuation. No full CI/build.",
+  "notExecuted": [
+    "Representative performance including pre-existing Training directory per-choice authority queries and conservative >100 overflow behavior",
+    "Current runtime-role DB operation",
+    "Compiled browser and new participant/scoring/report journey; earlier exact source evidence retained",
+    "Deleted-current-grant receipt LEFT JOIN branch on actual PG; pure browser historical-null receipt checked",
+    "Legacy trusted-evidence migration/dry-run",
+    "Arbitrary C/P/R axis composition and Training/Survey replacement lineage",
+    "Cognitive four-entry profile authorization",
+    "Formal CI / Draft PR / merge / production"
+  ]
+}

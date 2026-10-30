@@ -1,0 +1,644 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "name": "survey-exact-journey",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_SURVEY_EXACT_JOURNEY=1",
+          "PRECISE_SURVEY_JOURNEY_EVIDENCE=/workspace/materials-load-20261029/evidence/survey-exact-journey-requests.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-journey.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/survey-exact-journey.json"
+        ],
+        "startedAt": "2026-10-29T22:09:42.584352+00:00",
+        "finishedAt": "2026-10-29T22:10:04.598632+00:00",
+        "exitCode": 1
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/survey-exact-journey.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793311783117,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey existing exact use through protected author and anonymous participant HTTP"
+                ],
+                "fullName": "Survey existing exact use through protected author and anonymous participant HTTP imports the administered exact use, blocks consumer edits and freezes the original identity before actual anonymous START",
+                "status": "failed",
+                "title": "imports the administered exact use, blocks consumer edits and freezes the original identity before actual anonymous START",
+                "duration": 233.70535599999857,
+                "failureMessages": [
+                  "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:4394:19)\n    at successSteps (node:internal/deps/undici/undici:7048:27)\n    at readAllBytes (node:internal/deps/undici/undici:5965:13)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey existing exact use through protected author and anonymous participant HTTP"
+                ],
+                "fullName": "Survey existing exact use through protected author and anonymous participant HTTP denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result",
+                "status": "failed",
+                "title": "denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result",
+                "duration": 3.292741000001115,
+                "failureMessages": [
+                  "Error: Admission stage incomplete; dependent revocation/FINAL forbidden\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts:78:19\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793311803920,
+            "endTime": 1793311804156.2927,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "survey-exact-journey-v2",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_SURVEY_EXACT_JOURNEY=1",
+          "PRECISE_SURVEY_JOURNEY_RESUME_IMPORT=1",
+          "PRECISE_SURVEY_JOURNEY_EVIDENCE=/workspace/materials-load-20261029/evidence/survey-exact-journey-requests-v2.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-journey.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/survey-exact-journey-v2.json"
+        ],
+        "startedAt": "2026-10-29T22:11:13.554935+00:00",
+        "finishedAt": "2026-10-29T22:11:24.143756+00:00",
+        "exitCode": 1
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/survey-exact-journey-v2.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 1,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793311873882,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey existing exact use through protected author and anonymous participant HTTP"
+                ],
+                "fullName": "Survey existing exact use through protected author and anonymous participant HTTP imports the administered exact use, blocks consumer edits and freezes the original identity before actual anonymous START",
+                "status": "passed",
+                "title": "imports the administered exact use, blocks consumer edits and freezes the original identity before actual anonymous START",
+                "duration": 607.8747670000012,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey existing exact use through protected author and anonymous participant HTTP"
+                ],
+                "fullName": "Survey existing exact use through protected author and anonymous participant HTTP denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result",
+                "status": "failed",
+                "title": "denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result",
+                "duration": 198.6674980000007,
+                "failureMessages": [
+                  "AssertionError: 原研究固定配置授权已撤销或不属于当前项目: expected 409 to be 403 // Object.is equality\n    at call (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts:20:83)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts:91:3\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793311883154,
+            "endTime": 1793311883960.6675,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "survey-exact-journey-final",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_SURVEY_EXACT_JOURNEY=1",
+          "PRECISE_SURVEY_JOURNEY_CONTINUE_FINAL=1",
+          "PRECISE_SURVEY_JOURNEY_EVIDENCE=/workspace/materials-load-20261029/evidence/survey-exact-journey-requests-final.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-journey.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts",
+          "-t",
+          "denies new starts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/survey-exact-journey-final.json"
+        ],
+        "startedAt": "2026-10-29T22:12:43.394821+00:00",
+        "finishedAt": "2026-10-29T22:12:56.993274+00:00",
+        "exitCode": 1
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/survey-exact-journey-final.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 1,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793311963754,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey existing exact use through protected author and anonymous participant HTTP"
+                ],
+                "fullName": "Survey existing exact use through protected author and anonymous participant HTTP imports the administered exact use, blocks consumer edits and freezes the original identity before actual anonymous START",
+                "status": "skipped",
+                "title": "imports the administered exact use, blocks consumer edits and freezes the original identity before actual anonymous START",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey existing exact use through protected author and anonymous participant HTTP"
+                ],
+                "fullName": "Survey existing exact use through protected author and anonymous participant HTTP denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result",
+                "status": "failed",
+                "title": "denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result",
+                "duration": 124.48065799999858,
+                "failureMessages": [
+                  "AssertionError: itemTimings：逐题施测必须提供每题计时状态: expected 400 to be 200 // Object.is equality\n    at call (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts:21:83)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts:112:19\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793311976621,
+            "endTime": 1793311976745.4807,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "survey-exact-journey-final-v2",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_SURVEY_EXACT_JOURNEY=1",
+          "PRECISE_SURVEY_JOURNEY_CONTINUE_FINAL=1",
+          "PRECISE_SURVEY_JOURNEY_EVIDENCE=/workspace/materials-load-20261029/evidence/survey-exact-journey-requests-final-v2.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-journey.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts",
+          "-t",
+          "denies new starts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/survey-exact-journey-final-v2.json"
+        ],
+        "startedAt": "2026-10-29T22:13:57.746537+00:00",
+        "finishedAt": "2026-10-29T22:14:13.175548+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/survey-exact-journey-final-v2.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 1,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793312038336,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey existing exact use through protected author and anonymous participant HTTP"
+                ],
+                "fullName": "Survey existing exact use through protected author and anonymous participant HTTP imports the administered exact use, blocks consumer edits and freezes the original identity before actual anonymous START",
+                "status": "skipped",
+                "title": "imports the administered exact use, blocks consumer edits and freezes the original identity before actual anonymous START",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey existing exact use through protected author and anonymous participant HTTP"
+                ],
+                "fullName": "Survey existing exact use through protected author and anonymous participant HTTP denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result",
+                "status": "passed",
+                "title": "denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result",
+                "duration": 342.63697500000126,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793312052524,
+            "endTime": 1793312052866.637,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "survey-exact-journey-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/survey-journey-types.json"
+        ],
+        "startedAt": "2026-10-29T22:09:42.586338+00:00",
+        "finishedAt": "2026-10-29T22:10:33.440571+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "name": "survey-exact-journey-types-final",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/survey-journey-types.json"
+        ],
+        "startedAt": "2026-10-29T22:13:57.698373+00:00",
+        "finishedAt": "2026-10-29T22:14:44.785992+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    }
+  ],
+  "observations": {
+    "survey-exact-journey-requests": {
+      "productionAccessed": false,
+      "scope": "Real protected Cookie/CSRF/current database researcher and manager qualification; synthetic JWT recent-MFA proof, no real MFA ceremony or browser. Real anonymous SCALE FINAL/general feedback.",
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/survey/projects",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/survey/projects/9c6e8538-d14e-4ac5-aa14-4b2017699e22",
+          "status": 404
+        },
+        {
+          "method": "POST",
+          "path": "/survey/projects/9c6e8538-d14e-4ac5-aa14-4b2017699e22/catalog/4aa0d47c-68c3-4028-b19d-ddd714d35b73/import",
+          "status": 200
+        }
+      ],
+      "observations": []
+    },
+    "survey-exact-journey-requests-v2": {
+      "productionAccessed": false,
+      "scope": "Real protected Cookie/CSRF/current database researcher and manager qualification; synthetic JWT recent-MFA proof, no real MFA ceremony or browser. Real anonymous SCALE FINAL/general feedback.",
+      "requests": [
+        {
+          "method": "PATCH",
+          "path": "/survey/projects/9c6e8538-d14e-4ac5-aa14-4b2017699e22/instruments/5f85b46b-00a5-4f2b-86a4-1598fab85970",
+          "status": 409
+        },
+        {
+          "method": "POST",
+          "path": "/survey/projects/9c6e8538-d14e-4ac5-aa14-4b2017699e22/instruments/5f85b46b-00a5-4f2b-86a4-1598fab85970/measurement-release",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/survey/projects/9c6e8538-d14e-4ac5-aa14-4b2017699e22/waves",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/survey/projects/9c6e8538-d14e-4ac5-aa14-4b2017699e22/waves/8f14febb-8532-40c0-bbf8-3b6be1287f4e/prepare",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/survey/projects/9c6e8538-d14e-4ac5-aa14-4b2017699e22/waves/8f14febb-8532-40c0-bbf8-3b6be1287f4e",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/survey/projects/9c6e8538-d14e-4ac5-aa14-4b2017699e22/waves/8f14febb-8532-40c0-bbf8-3b6be1287f4e/open",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/waves/8f14febb-8532-40c0-bbf8-3b6be1287f4e/start-unlinked",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/attempts/a94e02d6-5559-4fc1-9f5d-066f030f2005/task",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/platform/survey/tool-grants/4aa0d47c-68c3-4028-b19d-ddd714d35b73/revoke",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/waves/8f14febb-8532-40c0-bbf8-3b6be1287f4e/start-unlinked",
+          "status": 409
+        }
+      ],
+      "observations": [
+        {
+          "readExistingSuccessfulImport": true,
+          "originalProjectAndImportNotRecreated": true
+        },
+        {
+          "projectId": "9c6e8538-d14e-4ac5-aa14-4b2017699e22",
+          "waveId": "8f14febb-8532-40c0-bbf8-3b6be1287f4e",
+          "attemptId": "a94e02d6-5559-4fc1-9f5d-066f030f2005",
+          "originalGrantId": "4aa0d47c-68c3-4028-b19d-ddd714d35b73",
+          "selectedBinding": {
+            "binding": {
+              "product": "SURVEY",
+              "authorization": {
+                "id": "4aa0d47c-68c3-4028-b19d-ddd714d35b73",
+                "kind": "SURVEY_TOOL_USE",
+                "issuerId": "57f14834-683c-4ca9-aa78-22223e66f2c3",
+                "revision": 1,
+                "authority": [
+                  {
+                    "id": "ae5b4b90-9ce4-423c-aee4-0b7a99f926b8",
+                    "kind": "ENTRY_ADMIN",
+                    "revision": 3
+                  }
+                ],
+                "recipientId": "dfc3344a-8dae-40cd-ba5c-80e4859a0075",
+                "organizationId": null
+              },
+              "configuration": {
+                "axes": {
+                  "REPORT": {
+                    "hash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+                    "version": "none-v1"
+                  },
+                  "CONTENT": {
+                    "hash": "98d83b219dbc609d7317c9bfb08b57a9878c3b971b0b3e3bf8b56f4471ffbe96",
+                    "version": "1.0.0:1.0.0"
+                  },
+                  "PARAMETERS": {
+                    "hash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+                    "version": "none-v1"
+                  }
+                },
+                "kind": "STANDARD_COMBINATION",
+                "toolKey": "academic_self_concept_biology_zh_cn",
+                "measurement": {
+                  "releaseId": "7094d624-be6e-4434-bd8a-ae8767ddeb9e",
+                  "contentHash": "238d0c60314a80a90a945bed1362cdab6f331d8d3941ed401c50ac30e9c8c046"
+                },
+                "combinationId": "e35aa04d-fad5-4188-8fbe-4f793dd25583",
+                "combinationHash": "27e505bc39728a1e1a8fcc6db1a67e17a490b279b45088140e75714ed643d051",
+                "instrumentVersion": "1.0.0"
+              },
+              "schemaVersion": 1,
+              "configurationHash": "7dfb3934f35999ae1654352169fe2b6725662c940c4b1ad9ea5df6a0796fbe6a"
+            },
+            "bindingHash": "bfeb2f2f1a3fcd0b579b5805addc3533412f5137052813de4e97086f7c709ad0"
+          },
+          "readOnlyConsumer": true,
+          "crossResearcherDenied": true,
+          "publicProjectionNoPrivateTechnicalDefinitions": true
+        }
+      ]
+    },
+    "survey-exact-journey-requests-final": {
+      "productionAccessed": false,
+      "scope": "Real protected Cookie/CSRF/current database researcher and manager qualification; synthetic JWT recent-MFA proof, no real MFA ceremony or browser. Real anonymous SCALE FINAL/general feedback.",
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/attempts/a94e02d6-5559-4fc1-9f5d-066f030f2005/task",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/attempts/a94e02d6-5559-4fc1-9f5d-066f030f2005/final",
+          "status": 400
+        }
+      ],
+      "observations": [
+        {
+          "resumeOriginalAdmittedAttempt": true,
+          "grantAlreadyRevoked": true,
+          "originalPostRevokeNewStartObserved409InPriorReporter": true,
+          "noNewAdmissionOrRepeatedRevocation": true
+        }
+      ]
+    },
+    "survey-exact-journey-requests-final-v2": {
+      "productionAccessed": false,
+      "scope": "Real protected Cookie/CSRF/current database researcher and manager qualification; synthetic JWT recent-MFA proof, no real MFA ceremony or browser. Real anonymous SCALE FINAL/general feedback.",
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/attempts/a94e02d6-5559-4fc1-9f5d-066f030f2005/task",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/attempts/a94e02d6-5559-4fc1-9f5d-066f030f2005/final",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/attempts/a94e02d6-5559-4fc1-9f5d-066f030f2005/final",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/attempts/a94e02d6-5559-4fc1-9f5d-066f030f2005/general",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/attempts/a94e02d6-5559-4fc1-9f5d-066f030f2005/general",
+          "status": 403
+        }
+      ],
+      "observations": [
+        {
+          "resumeOriginalAdmittedAttempt": true,
+          "grantAlreadyRevoked": true,
+          "originalPostRevokeNewStartObserved409InPriorReporter": true,
+          "noNewAdmissionOrRepeatedRevocation": true
+        },
+        {
+          "newStartAfterRevokeDenied": true,
+          "admittedTaskUnchanged": true,
+          "completedAfterRevoke": true,
+          "idempotentOneFinal": true,
+          "generalOnlyNoFeedbackAsFrozen": true,
+          "oldFivePublicationsAndOriginalT1Unchanged": true,
+          "unauthorizedResultDenied": true,
+          "answeredItems": 4
+        }
+      ]
+    }
+  },
+  "readbacks": [
+    {
+      "after": "initial non-JSON edit request failure",
+      "projects": 1,
+      "drafts": 1,
+      "waves": 0,
+      "totalPublications": 5,
+      "targetActiveUses": 1
+    },
+    {
+      "after": "original 409 new-START denial; before FINAL continuation",
+      "projectStatus": "ACTIVE",
+      "drafts": 1,
+      "waves": 1,
+      "startedAttempts": 1,
+      "finals": 0,
+      "totalPublications": 6,
+      "targetUseStatus": "REVOKED"
+    },
+    {
+      "after": "timing-validation 400; before affected FINAL retry",
+      "attemptStatus": "STARTED",
+      "finals": 0
+    },
+    {
+      "after": "final success",
+      "waveStatus": "OPEN",
+      "startsCount": 1,
+      "attemptStatus": "COMPLETED",
+      "finalsForAttempt": 1,
+      "frozenReportConfigured": false,
+      "targetUseStatus": "REVOKED",
+      "frozenReportAxisHash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "sourceReportPayload": null
+    }
+  ]
+}

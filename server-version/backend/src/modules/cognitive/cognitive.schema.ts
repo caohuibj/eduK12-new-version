@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const cognitiveProfessionalReportsQuerySchema = z.object({ offset: z.coerce.number().int().min(0).max(100000).default(0), collectionId: z.string().guid().optional() }).strict()
 import { MAX_TOKEN_USES } from '../../constants'
 import { administrationProvenanceV1Schema } from './administration-provenance'
+import {selectedConfigurationPointerSchema} from '../assessment-authorization/standard-configuration-binding'
 
 /**
  * Cognitive 跨阶段共享 schema/helper（D2 Step 6）。
@@ -39,7 +40,8 @@ export const createAssignmentSchema = z
     dueAt: z.string().datetime().optional(),
     maxAttempts: z.number().int().positive().optional().default(1),
     required: z.boolean().optional().default(true),
-    profile: cognitiveProfileSchema,
+    profile: cognitiveProfileSchema.optional(),
+    selectedBinding:selectedConfigurationPointerSchema.optional(),
   })
   .strict()
   .refine(

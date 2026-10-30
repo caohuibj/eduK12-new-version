@@ -1,0 +1,2724 @@
+{
+  "schemaVersion": 1,
+  "kind": "Unsigned actual local observations, not official CI qualification",
+  "invocations": [
+    {
+      "name": "read-performance-main-pilot",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "PRECISE_READ_PERFORMANCE=1",
+          "PERF_ISOLATED_TEST_MODE=1",
+          "PERF_SQL_EVENT_COUNT=1",
+          "PRECISE_PERF_SOURCE_ROOT=/workspace/materials-load-20261029/performance-main-dc0",
+          "PRECISE_PERF_ROUNDS=1",
+          "PRECISE_PERF_OUTPUT=/workspace/materials-load-20261029/evidence/read-performance-main-pilot.json",
+          "node",
+          "node_modules/tsx/dist/cli.mjs",
+          "scripts/precise-authorization-read-performance.ts"
+        ],
+        "startedAt": "2026-10-29T23:42:03.586624+00:00",
+        "finishedAt": "2026-10-29T23:42:11.016235+00:00",
+        "exitCode": 1
+      },
+      "result": {
+        "schemaVersion": 1,
+        "sourceCommit": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+        "sourceBackendTree": "0e2ef32d7467de7b7da6f1700918c510a7ca7554",
+        "runnerSha256": "f5436d0b5d9136bc293d96d779ce860723f4a0bba82417cf8275b9c672d9d592",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:42:03.944Z",
+        "rounds": 1,
+        "scope": "Single small retained fixture; readonly directory function and historical report HTTP. Same 255-migration database; main release boot/253-migration qualification not claimed.",
+        "productionAccessed": false,
+        "concurrency": 1,
+        "cache": "Independent Node process, shared warm PostgreSQL/Redis. First observation is not host cold startup.",
+        "samples": [
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 0,
+            "elapsedMs": 18.820269999999255,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "firstObservations": [
+          {
+            "kind": "directory",
+            "phase": "first",
+            "index": 0,
+            "elapsedMs": 87.58892500000002,
+            "queries": 20,
+            "sqlDurationMs": 16,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "warmups": [
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 0,
+            "elapsedMs": 22.5042940000003,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 1,
+            "elapsedMs": 19.966330999999627,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 2,
+            "elapsedMs": 18.096207999999933,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "errors": [
+          {
+            "name": "AssertionError",
+            "message": "CONTENT_TRAINING_FINAL_IDENTITY_MISMATCH\n\n409 !== 200\n"
+          }
+        ],
+        "tables": {
+          "before": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          }
+        },
+        "files": {
+          "prisma/schema.prisma": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f",
+          "package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+          "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+          "src/modules/measurement-content/standard-combination-use.ts": "caea72540a7f39975483a9d1153882a2f0a0a571d249f0e62715ff8d9457380d",
+          "src/modules/composite/composite.service.ts": "443d7c8332cc050687d4a6fad521b1234f42134000aab9fac3d2ea503217f22a"
+        },
+        "identity": {
+          "current_user": "precise_task1_runtime",
+          "session_user": "precise_task1_runtime"
+        },
+        "migrationRows": [
+          {
+            "count": 255
+          }
+        ],
+        "fixture": {
+          "users": 6,
+          "tasks": 13,
+          "grants": 4,
+          "historicalSelectedRevision": 7,
+          "currentUseRevision": 9,
+          "attemptSnapshotBytes": 3343,
+          "attemptSnapshotHash": "1425989d9f946e93d7bb1b7520f08a43ea2bdcd44fec418f833c9982d13af422"
+        },
+        "moduleAndFixtureInitMs": 6682.433642
+      },
+      "resultFileSha256": "e792adefbbc89936b1416ef07b17049b9094f6064176701a708726662554d627",
+      "log": "[2026-10-29T23:42:10.952Z] [INFO] 队列已关闭\n"
+    },
+    {
+      "name": "read-performance-main-directory-a1",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "PRECISE_READ_PERFORMANCE=1",
+          "PERF_ISOLATED_TEST_MODE=1",
+          "PERF_SQL_EVENT_COUNT=1",
+          "PRECISE_PERF_KIND=directory",
+          "PRECISE_PERF_SOURCE_ROOT=/workspace/materials-load-20261029/performance-main-dc0",
+          "PRECISE_PERF_ROUNDS=30",
+          "PRECISE_PERF_OUTPUT=/workspace/materials-load-20261029/evidence/read-performance-main-directory-a1.json",
+          "node",
+          "node_modules/tsx/dist/cli.mjs",
+          "scripts/precise-authorization-read-performance.ts"
+        ],
+        "startedAt": "2026-10-29T23:42:32.313127+00:00",
+        "finishedAt": "2026-10-29T23:42:36.760894+00:00",
+        "exitCode": 0
+      },
+      "result": {
+        "schemaVersion": 1,
+        "sourceCommit": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+        "sourceBackendTree": "0e2ef32d7467de7b7da6f1700918c510a7ca7554",
+        "runnerSha256": "868a9cce67328787e5e2cfacee3732887ef60b6376685f9b6fd6912cfc37d22e",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:42:32.601Z",
+        "rounds": 30,
+        "scope": "Single small retained fixture; readonly directory function and historical report HTTP. Same 255-migration database; main release boot/253-migration qualification not claimed.",
+        "productionAccessed": false,
+        "concurrency": 1,
+        "cache": "Independent Node process, shared warm PostgreSQL/Redis. First observation is not host cold startup.",
+        "samples": [
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 0,
+            "elapsedMs": 18.69943400000011,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 1,
+            "elapsedMs": 20.824341000000004,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 2,
+            "elapsedMs": 19.64479900000015,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 3,
+            "elapsedMs": 18.437284999999974,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 4,
+            "elapsedMs": 21.191827000000103,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 5,
+            "elapsedMs": 15.706248999999843,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 6,
+            "elapsedMs": 15.531639000000268,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 7,
+            "elapsedMs": 16.208326999999827,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 8,
+            "elapsedMs": 17.64548999999988,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 9,
+            "elapsedMs": 17.95891299999994,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 10,
+            "elapsedMs": 17.961092000000008,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 11,
+            "elapsedMs": 14.383958999999777,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 12,
+            "elapsedMs": 13.433390000000145,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 13,
+            "elapsedMs": 14.908734000000095,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 14,
+            "elapsedMs": 11.465180000000146,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 15,
+            "elapsedMs": 17.178425999999945,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 16,
+            "elapsedMs": 16.785825999999815,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 17,
+            "elapsedMs": 20.364114999999856,
+            "queries": 20,
+            "sqlDurationMs": 8,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 18,
+            "elapsedMs": 15.104029000000082,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 19,
+            "elapsedMs": 17.210723000000144,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 20,
+            "elapsedMs": 15.919037000000571,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 21,
+            "elapsedMs": 20.257141000000047,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 22,
+            "elapsedMs": 24.350333999999748,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 23,
+            "elapsedMs": 16.793109000000186,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 24,
+            "elapsedMs": 16.852499000000535,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 25,
+            "elapsedMs": 17.117655000000013,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 26,
+            "elapsedMs": 13.984554000000571,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 27,
+            "elapsedMs": 15.46324199999981,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 28,
+            "elapsedMs": 14.587145999999848,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 29,
+            "elapsedMs": 13.451358000000255,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "firstObservations": [
+          {
+            "kind": "directory",
+            "phase": "first",
+            "index": 0,
+            "elapsedMs": 34.38828000000012,
+            "queries": 20,
+            "sqlDurationMs": 8,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "warmups": [
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 0,
+            "elapsedMs": 22.951694999999745,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 1,
+            "elapsedMs": 22.096652000000176,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 2,
+            "elapsedMs": 18.005760999999893,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "errors": [],
+        "tables": {
+          "before": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          },
+          "after": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          }
+        },
+        "files": {
+          "prisma/schema.prisma": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f",
+          "package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+          "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+          "src/modules/measurement-content/standard-combination-use.ts": "caea72540a7f39975483a9d1153882a2f0a0a571d249f0e62715ff8d9457380d",
+          "src/modules/composite/composite.service.ts": "443d7c8332cc050687d4a6fad521b1234f42134000aab9fac3d2ea503217f22a"
+        },
+        "identity": {
+          "current_user": "precise_task1_runtime",
+          "session_user": "precise_task1_runtime"
+        },
+        "migrationRows": [
+          {
+            "count": 255
+          }
+        ],
+        "fixture": {
+          "users": 6,
+          "tasks": 13,
+          "grants": 4,
+          "historicalSelectedRevision": 7,
+          "currentUseRevision": 9,
+          "attemptSnapshotBytes": 3343,
+          "attemptSnapshotHash": "1425989d9f946e93d7bb1b7520f08a43ea2bdcd44fec418f833c9982d13af422"
+        },
+        "moduleAndFixtureInitMs": 3478.486717,
+        "writesObserved": 0,
+        "finishedAt": "2026-10-29T23:42:36.706Z"
+      },
+      "resultFileSha256": "2465e1084125c97b40d3a36236e49eb93606ae056c3497d2d9d01b311e04fd7e",
+      "log": "[2026-10-29T23:42:36.712Z] [INFO] 队列已关闭\n"
+    },
+    {
+      "name": "read-performance-candidate-directory-b1",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "PRECISE_READ_PERFORMANCE=1",
+          "PERF_ISOLATED_TEST_MODE=1",
+          "PERF_SQL_EVENT_COUNT=1",
+          "PRECISE_PERF_KIND=directory",
+          "PRECISE_PERF_SOURCE_ROOT=/workspace/eduK12-new-version",
+          "PRECISE_PERF_ROUNDS=30",
+          "PRECISE_PERF_OUTPUT=/workspace/materials-load-20261029/evidence/read-performance-candidate-directory-b1.json",
+          "node",
+          "node_modules/tsx/dist/cli.mjs",
+          "scripts/precise-authorization-read-performance.ts"
+        ],
+        "startedAt": "2026-10-29T23:42:51.450204+00:00",
+        "finishedAt": "2026-10-29T23:42:57.451108+00:00",
+        "exitCode": 0
+      },
+      "result": {
+        "schemaVersion": 1,
+        "sourceCommit": "baad15031f6cca352ec2e8fd7f407bd246a78ae3",
+        "sourceBackendTree": "abb62bee95cfab0bc676c6e3d475b8de94ffb1a6",
+        "runnerSha256": "868a9cce67328787e5e2cfacee3732887ef60b6376685f9b6fd6912cfc37d22e",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:42:51.663Z",
+        "rounds": 30,
+        "scope": "Single small retained fixture; readonly directory function and historical report HTTP. Same 255-migration database; main release boot/253-migration qualification not claimed.",
+        "productionAccessed": false,
+        "concurrency": 1,
+        "cache": "Independent Node process, shared warm PostgreSQL/Redis. First observation is not host cold startup.",
+        "samples": [
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 0,
+            "elapsedMs": 20.015988000000107,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 1,
+            "elapsedMs": 18.782602000000225,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 2,
+            "elapsedMs": 18.67668500000036,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 3,
+            "elapsedMs": 19.432926999999836,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 4,
+            "elapsedMs": 20.47118799999953,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 5,
+            "elapsedMs": 19.139604999999392,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 6,
+            "elapsedMs": 19.763714999999138,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 7,
+            "elapsedMs": 18.883026999999856,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 8,
+            "elapsedMs": 21.18372999999974,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 9,
+            "elapsedMs": 17.989019999999982,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 10,
+            "elapsedMs": 17.760475000000042,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 11,
+            "elapsedMs": 21.47544199999993,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 12,
+            "elapsedMs": 20.841245000000526,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 13,
+            "elapsedMs": 23.394381999999496,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 14,
+            "elapsedMs": 20.163204000000405,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 15,
+            "elapsedMs": 20.73169400000006,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 16,
+            "elapsedMs": 21.520442999999432,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 17,
+            "elapsedMs": 23.023089999999684,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 18,
+            "elapsedMs": 21.144948000000113,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 19,
+            "elapsedMs": 20.062168999999813,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 20,
+            "elapsedMs": 20.258490999999594,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 21,
+            "elapsedMs": 22.653097000000344,
+            "queries": 20,
+            "sqlDurationMs": 8,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 22,
+            "elapsedMs": 17.79069900000013,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 23,
+            "elapsedMs": 23.068183000000317,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 24,
+            "elapsedMs": 19.352923999999803,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 25,
+            "elapsedMs": 23.570009000000027,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 26,
+            "elapsedMs": 17.89209000000028,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 27,
+            "elapsedMs": 18.293840999999702,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 28,
+            "elapsedMs": 19.620898999999554,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 29,
+            "elapsedMs": 17.53003600000011,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "firstObservations": [
+          {
+            "kind": "directory",
+            "phase": "first",
+            "index": 0,
+            "elapsedMs": 75.47183699999914,
+            "queries": 20,
+            "sqlDurationMs": 21,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "warmups": [
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 0,
+            "elapsedMs": 23.823707000000468,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 1,
+            "elapsedMs": 29.860005999999885,
+            "queries": 20,
+            "sqlDurationMs": 9,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 2,
+            "elapsedMs": 24.08872699999938,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "errors": [],
+        "tables": {
+          "before": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          },
+          "after": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          }
+        },
+        "files": {
+          "prisma/schema.prisma": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f",
+          "package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+          "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+          "src/modules/measurement-content/standard-combination-use.ts": "44cf0ecbc4af554547acbd4f5caa1e1ad78271090bc71e294a0d70e5218f0344",
+          "src/modules/composite/composite.service.ts": "443d7c8332cc050687d4a6fad521b1234f42134000aab9fac3d2ea503217f22a"
+        },
+        "identity": {
+          "current_user": "precise_task1_runtime",
+          "session_user": "precise_task1_runtime"
+        },
+        "migrationRows": [
+          {
+            "count": 255
+          }
+        ],
+        "fixture": {
+          "users": 6,
+          "tasks": 13,
+          "grants": 4,
+          "historicalSelectedRevision": 7,
+          "currentUseRevision": 9,
+          "attemptSnapshotBytes": 3343,
+          "attemptSnapshotHash": "1425989d9f946e93d7bb1b7520f08a43ea2bdcd44fec418f833c9982d13af422"
+        },
+        "moduleAndFixtureInitMs": 4954.387097000001,
+        "writesObserved": 0,
+        "finishedAt": "2026-10-29T23:42:57.394Z"
+      },
+      "resultFileSha256": "27ef74daaef1bd6d42c6e2de241f16ca3ec467e5b6cca84d346823d1070b6189",
+      "log": "[2026-10-29T23:42:57.398Z] [INFO] 队列已关闭\n"
+    },
+    {
+      "name": "read-performance-candidate-directory-b2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "PRECISE_READ_PERFORMANCE=1",
+          "PERF_ISOLATED_TEST_MODE=1",
+          "PERF_SQL_EVENT_COUNT=1",
+          "PRECISE_PERF_KIND=directory",
+          "PRECISE_PERF_SOURCE_ROOT=/workspace/eduK12-new-version",
+          "PRECISE_PERF_ROUNDS=30",
+          "PRECISE_PERF_OUTPUT=/workspace/materials-load-20261029/evidence/read-performance-candidate-directory-b2.json",
+          "node",
+          "node_modules/tsx/dist/cli.mjs",
+          "scripts/precise-authorization-read-performance.ts"
+        ],
+        "startedAt": "2026-10-29T23:43:04.875815+00:00",
+        "finishedAt": "2026-10-29T23:43:08.743449+00:00",
+        "exitCode": 0
+      },
+      "result": {
+        "schemaVersion": 1,
+        "sourceCommit": "baad15031f6cca352ec2e8fd7f407bd246a78ae3",
+        "sourceBackendTree": "abb62bee95cfab0bc676c6e3d475b8de94ffb1a6",
+        "runnerSha256": "868a9cce67328787e5e2cfacee3732887ef60b6376685f9b6fd6912cfc37d22e",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:43:05.092Z",
+        "rounds": 30,
+        "scope": "Single small retained fixture; readonly directory function and historical report HTTP. Same 255-migration database; main release boot/253-migration qualification not claimed.",
+        "productionAccessed": false,
+        "concurrency": 1,
+        "cache": "Independent Node process, shared warm PostgreSQL/Redis. First observation is not host cold startup.",
+        "samples": [
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 0,
+            "elapsedMs": 21.51553200000035,
+            "queries": 20,
+            "sqlDurationMs": 8,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 1,
+            "elapsedMs": 18.048063000000184,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 2,
+            "elapsedMs": 20.91451199999983,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 3,
+            "elapsedMs": 19.21329700000024,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 4,
+            "elapsedMs": 18.806997000000138,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 5,
+            "elapsedMs": 21.778813999999784,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 6,
+            "elapsedMs": 22.832834000000275,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 7,
+            "elapsedMs": 22.546720999999707,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 8,
+            "elapsedMs": 20.013253000000077,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 9,
+            "elapsedMs": 36.10429900000008,
+            "queries": 20,
+            "sqlDurationMs": 8,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 10,
+            "elapsedMs": 28.714786000000004,
+            "queries": 20,
+            "sqlDurationMs": 10,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 11,
+            "elapsedMs": 22.83096800000021,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 12,
+            "elapsedMs": 21.19823600000018,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 13,
+            "elapsedMs": 20.204580000000078,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 14,
+            "elapsedMs": 17.816193000000112,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 15,
+            "elapsedMs": 17.267252999999982,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 16,
+            "elapsedMs": 19.1394650000002,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 17,
+            "elapsedMs": 18.57456400000001,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 18,
+            "elapsedMs": 17.69395600000007,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 19,
+            "elapsedMs": 23.40581400000019,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 20,
+            "elapsedMs": 19.416416000000027,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 21,
+            "elapsedMs": 19.898232000000007,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 22,
+            "elapsedMs": 19.04293400000006,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 23,
+            "elapsedMs": 22.944027000000006,
+            "queries": 20,
+            "sqlDurationMs": 8,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 24,
+            "elapsedMs": 16.618980000000192,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 25,
+            "elapsedMs": 22.63626099999965,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 26,
+            "elapsedMs": 21.07144100000005,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 27,
+            "elapsedMs": 19.921066999999766,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 28,
+            "elapsedMs": 18.968920000000253,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 29,
+            "elapsedMs": 16.902310999999827,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "firstObservations": [
+          {
+            "kind": "directory",
+            "phase": "first",
+            "index": 0,
+            "elapsedMs": 48.61876900000016,
+            "queries": 20,
+            "sqlDurationMs": 14,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "warmups": [
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 0,
+            "elapsedMs": 23.339492999999948,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 1,
+            "elapsedMs": 26.498703000000205,
+            "queries": 20,
+            "sqlDurationMs": 7,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 2,
+            "elapsedMs": 22.325214999999844,
+            "queries": 20,
+            "sqlDurationMs": 8,
+            "responseBytes": 1755,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "errors": [],
+        "tables": {
+          "before": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          },
+          "after": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          }
+        },
+        "files": {
+          "prisma/schema.prisma": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f",
+          "package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+          "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+          "src/modules/measurement-content/standard-combination-use.ts": "44cf0ecbc4af554547acbd4f5caa1e1ad78271090bc71e294a0d70e5218f0344",
+          "src/modules/composite/composite.service.ts": "443d7c8332cc050687d4a6fad521b1234f42134000aab9fac3d2ea503217f22a"
+        },
+        "identity": {
+          "current_user": "precise_task1_runtime",
+          "session_user": "precise_task1_runtime"
+        },
+        "migrationRows": [
+          {
+            "count": 255
+          }
+        ],
+        "fixture": {
+          "users": 6,
+          "tasks": 13,
+          "grants": 4,
+          "historicalSelectedRevision": 7,
+          "currentUseRevision": 9,
+          "attemptSnapshotBytes": 3343,
+          "attemptSnapshotHash": "1425989d9f946e93d7bb1b7520f08a43ea2bdcd44fec418f833c9982d13af422"
+        },
+        "moduleAndFixtureInitMs": 2831.046088,
+        "writesObserved": 0,
+        "finishedAt": "2026-10-29T23:43:08.689Z"
+      },
+      "resultFileSha256": "95358768abc859ff282f605ad9ada5605d1bc6b81d5d0d5afa5b360beea1a806",
+      "log": "[2026-10-29T23:43:08.694Z] [INFO] 队列已关闭\n"
+    },
+    {
+      "name": "read-performance-main-directory-a2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "PRECISE_READ_PERFORMANCE=1",
+          "PERF_ISOLATED_TEST_MODE=1",
+          "PERF_SQL_EVENT_COUNT=1",
+          "PRECISE_PERF_KIND=directory",
+          "PRECISE_PERF_SOURCE_ROOT=/workspace/materials-load-20261029/performance-main-dc0",
+          "PRECISE_PERF_ROUNDS=30",
+          "PRECISE_PERF_OUTPUT=/workspace/materials-load-20261029/evidence/read-performance-main-directory-a2.json",
+          "node",
+          "node_modules/tsx/dist/cli.mjs",
+          "scripts/precise-authorization-read-performance.ts"
+        ],
+        "startedAt": "2026-10-29T23:43:11.322808+00:00",
+        "finishedAt": "2026-10-29T23:43:15.240682+00:00",
+        "exitCode": 0
+      },
+      "result": {
+        "schemaVersion": 1,
+        "sourceCommit": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+        "sourceBackendTree": "0e2ef32d7467de7b7da6f1700918c510a7ca7554",
+        "runnerSha256": "868a9cce67328787e5e2cfacee3732887ef60b6376685f9b6fd6912cfc37d22e",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:43:11.573Z",
+        "rounds": 30,
+        "scope": "Single small retained fixture; readonly directory function and historical report HTTP. Same 255-migration database; main release boot/253-migration qualification not claimed.",
+        "productionAccessed": false,
+        "concurrency": 1,
+        "cache": "Independent Node process, shared warm PostgreSQL/Redis. First observation is not host cold startup.",
+        "samples": [
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 0,
+            "elapsedMs": 14.14802200000031,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 1,
+            "elapsedMs": 15.241109000000051,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 2,
+            "elapsedMs": 17.45890899999995,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 3,
+            "elapsedMs": 14.461616000000049,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 4,
+            "elapsedMs": 15.765062999999827,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 5,
+            "elapsedMs": 13.71107499999971,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 6,
+            "elapsedMs": 13.659267,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 7,
+            "elapsedMs": 13.909321999999975,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 8,
+            "elapsedMs": 16.08730199999991,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 9,
+            "elapsedMs": 13.874951000000237,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 10,
+            "elapsedMs": 13.224584999999934,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 11,
+            "elapsedMs": 16.18091400000003,
+            "queries": 20,
+            "sqlDurationMs": 6,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 12,
+            "elapsedMs": 15.416075000000092,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 13,
+            "elapsedMs": 13.743453000000045,
+            "queries": 20,
+            "sqlDurationMs": 5,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 14,
+            "elapsedMs": 12.139965999999731,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 15,
+            "elapsedMs": 11.328964999999698,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 16,
+            "elapsedMs": 12.582564000000275,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 17,
+            "elapsedMs": 16.249734999999873,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 18,
+            "elapsedMs": 14.530827000000045,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 19,
+            "elapsedMs": 12.128244999999879,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 20,
+            "elapsedMs": 13.528859999999895,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 21,
+            "elapsedMs": 23.590509999999995,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 22,
+            "elapsedMs": 11.729808999999932,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 23,
+            "elapsedMs": 12.628975999999966,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 24,
+            "elapsedMs": 12.986437000000024,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 25,
+            "elapsedMs": 17.51720000000023,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 26,
+            "elapsedMs": 13.290803000000324,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 27,
+            "elapsedMs": 13.45952699999998,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 28,
+            "elapsedMs": 11.987331000000268,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warm",
+            "index": 29,
+            "elapsedMs": 11.504551999999876,
+            "queries": 20,
+            "sqlDurationMs": 3,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "firstObservations": [
+          {
+            "kind": "directory",
+            "phase": "first",
+            "index": 0,
+            "elapsedMs": 28.911101000000144,
+            "queries": 20,
+            "sqlDurationMs": 9,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "warmups": [
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 0,
+            "elapsedMs": 18.34712300000001,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 1,
+            "elapsedMs": 16.13788599999998,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          },
+          {
+            "kind": "directory",
+            "phase": "warmup",
+            "index": 2,
+            "elapsedMs": 13.251164000000244,
+            "queries": 20,
+            "sqlDurationMs": 4,
+            "responseBytes": 963,
+            "projectedHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352"
+          }
+        ],
+        "errors": [],
+        "tables": {
+          "before": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          },
+          "after": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          }
+        },
+        "files": {
+          "prisma/schema.prisma": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f",
+          "package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+          "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+          "src/modules/measurement-content/standard-combination-use.ts": "caea72540a7f39975483a9d1153882a2f0a0a571d249f0e62715ff8d9457380d",
+          "src/modules/composite/composite.service.ts": "443d7c8332cc050687d4a6fad521b1234f42134000aab9fac3d2ea503217f22a"
+        },
+        "identity": {
+          "current_user": "precise_task1_runtime",
+          "session_user": "precise_task1_runtime"
+        },
+        "migrationRows": [
+          {
+            "count": 255
+          }
+        ],
+        "fixture": {
+          "users": 6,
+          "tasks": 13,
+          "grants": 4,
+          "historicalSelectedRevision": 7,
+          "currentUseRevision": 9,
+          "attemptSnapshotBytes": 3343,
+          "attemptSnapshotHash": "1425989d9f946e93d7bb1b7520f08a43ea2bdcd44fec418f833c9982d13af422"
+        },
+        "moduleAndFixtureInitMs": 3092.406597,
+        "writesObserved": 0,
+        "finishedAt": "2026-10-29T23:43:15.190Z"
+      },
+      "resultFileSha256": "0de3f3b24692546adb64640c95e0028b9f43645cea1e359b54fd03de7815a1ca",
+      "log": "[2026-10-29T23:43:15.194Z] [INFO] 队列已关闭\n"
+    },
+    {
+      "name": "read-performance-candidate-report",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "PRECISE_READ_PERFORMANCE=1",
+          "PERF_ISOLATED_TEST_MODE=1",
+          "PERF_SQL_EVENT_COUNT=1",
+          "PRECISE_PERF_KIND=report",
+          "PRECISE_PERF_SOURCE_ROOT=/workspace/eduK12-new-version",
+          "PRECISE_PERF_ROUNDS=30",
+          "PRECISE_PERF_OUTPUT=/workspace/materials-load-20261029/evidence/read-performance-candidate-report.json",
+          "node",
+          "node_modules/tsx/dist/cli.mjs",
+          "scripts/precise-authorization-read-performance.ts"
+        ],
+        "startedAt": "2026-10-29T23:43:34.027689+00:00",
+        "finishedAt": "2026-10-29T23:43:40.965394+00:00",
+        "exitCode": 0
+      },
+      "result": {
+        "schemaVersion": 1,
+        "sourceCommit": "baad15031f6cca352ec2e8fd7f407bd246a78ae3",
+        "sourceBackendTree": "abb62bee95cfab0bc676c6e3d475b8de94ffb1a6",
+        "runnerSha256": "868a9cce67328787e5e2cfacee3732887ef60b6376685f9b6fd6912cfc37d22e",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:43:34.240Z",
+        "rounds": 30,
+        "scope": "Single small retained fixture; readonly directory function and historical report HTTP. Same 255-migration database; main release boot/253-migration qualification not claimed.",
+        "productionAccessed": false,
+        "concurrency": 1,
+        "cache": "Independent Node process, shared warm PostgreSQL/Redis. First observation is not host cold startup.",
+        "samples": [
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 0,
+            "elapsedMs": 63.20097799999985,
+            "queries": 30,
+            "sqlDurationMs": 9,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 1,
+            "elapsedMs": 69.37257799999952,
+            "queries": 30,
+            "sqlDurationMs": 6,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 2,
+            "elapsedMs": 57.8686230000003,
+            "queries": 30,
+            "sqlDurationMs": 6,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 3,
+            "elapsedMs": 56.67334699999992,
+            "queries": 30,
+            "sqlDurationMs": 5,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 4,
+            "elapsedMs": 61.250772000000325,
+            "queries": 30,
+            "sqlDurationMs": 8,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 5,
+            "elapsedMs": 59.74496699999963,
+            "queries": 30,
+            "sqlDurationMs": 6,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 6,
+            "elapsedMs": 56.09154800000033,
+            "queries": 30,
+            "sqlDurationMs": 7,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 7,
+            "elapsedMs": 51.02035000000069,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 8,
+            "elapsedMs": 49.14695499999925,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 9,
+            "elapsedMs": 47.98740499999985,
+            "queries": 30,
+            "sqlDurationMs": 6,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 10,
+            "elapsedMs": 50.780510000000504,
+            "queries": 30,
+            "sqlDurationMs": 5,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 11,
+            "elapsedMs": 50.757872000000134,
+            "queries": 30,
+            "sqlDurationMs": 5,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 12,
+            "elapsedMs": 50.89640200000031,
+            "queries": 30,
+            "sqlDurationMs": 6,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 13,
+            "elapsedMs": 48.89361600000029,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 14,
+            "elapsedMs": 51.76512399999956,
+            "queries": 30,
+            "sqlDurationMs": 5,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 15,
+            "elapsedMs": 54.8472840000004,
+            "queries": 30,
+            "sqlDurationMs": 7,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 16,
+            "elapsedMs": 90.52307900000051,
+            "queries": 30,
+            "sqlDurationMs": 14,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 17,
+            "elapsedMs": 94.59765200000038,
+            "queries": 30,
+            "sqlDurationMs": 6,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 18,
+            "elapsedMs": 78.93191000000024,
+            "queries": 30,
+            "sqlDurationMs": 5,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 19,
+            "elapsedMs": 76.58275799999956,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 20,
+            "elapsedMs": 63.26628800000071,
+            "queries": 30,
+            "sqlDurationMs": 5,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 21,
+            "elapsedMs": 68.75009200000022,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 22,
+            "elapsedMs": 67.7864440000003,
+            "queries": 30,
+            "sqlDurationMs": 6,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 23,
+            "elapsedMs": 57.54502700000012,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 24,
+            "elapsedMs": 49.672937999999704,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 25,
+            "elapsedMs": 49.04041199999938,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 26,
+            "elapsedMs": 53.424401999999645,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 27,
+            "elapsedMs": 56.04154500000004,
+            "queries": 30,
+            "sqlDurationMs": 9,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 28,
+            "elapsedMs": 70.89867299999969,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warm",
+            "index": 29,
+            "elapsedMs": 81.74200599999949,
+            "queries": 30,
+            "sqlDurationMs": 4,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          }
+        ],
+        "firstObservations": [
+          {
+            "kind": "report",
+            "phase": "first",
+            "index": 0,
+            "elapsedMs": 242.56742799999938,
+            "queries": 30,
+            "sqlDurationMs": 24,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          }
+        ],
+        "warmups": [
+          {
+            "kind": "report",
+            "phase": "warmup",
+            "index": 0,
+            "elapsedMs": 72.38442500000019,
+            "queries": 30,
+            "sqlDurationMs": 6,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warmup",
+            "index": 1,
+            "elapsedMs": 62.536761999999726,
+            "queries": 30,
+            "sqlDurationMs": 7,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          },
+          {
+            "kind": "report",
+            "phase": "warmup",
+            "index": 2,
+            "elapsedMs": 58.23033300000043,
+            "queries": 30,
+            "sqlDurationMs": 5,
+            "responseBytes": 3714,
+            "projectedHash": "5c9c574fdbcd54ee619aff62fdeb9f92b797c04f7f26c727a777457cf596b8a7",
+            "status": 200
+          }
+        ],
+        "errors": [],
+        "tables": {
+          "before": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          },
+          "after": {
+            "users": {
+              "count": 6,
+              "hash": "c26bcaab061dc29a5d1031129ed0f14b"
+            },
+            "material_grants": {
+              "count": 4,
+              "hash": "0d65c86f3eb71d31f01ae14ffdacb18d"
+            },
+            "composite_assessments": {
+              "count": 13,
+              "hash": "3a1a0ec7813edb03f7bd9d265d5c2479"
+            },
+            "composite_assessment_items": {
+              "count": 22,
+              "hash": "6d20f2f975f6a72c9447b9074fc96ddd"
+            },
+            "composite_assessment_attempts": {
+              "count": 5,
+              "hash": "8f8c5daa5bd06933021cc3a4a89a1f5a"
+            },
+            "assessment_management_events": {
+              "count": 23,
+              "hash": "db57e9203d5eb10ee93eead8b65c49e9"
+            },
+            "survey_standard_releases": {
+              "count": 2,
+              "hash": "bbbe410eece2b2757c69fae08202ad77"
+            },
+            "measurement_content_releases": {
+              "count": 10,
+              "hash": "7f9974096c5633a0fcf2627b51cafff8"
+            },
+            "assessment_public_templates": {
+              "count": 0,
+              "hash": "d41d8cd98f00b204e9800998ecf8427e"
+            }
+          }
+        },
+        "files": {
+          "prisma/schema.prisma": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f",
+          "package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+          "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+          "src/modules/measurement-content/standard-combination-use.ts": "44cf0ecbc4af554547acbd4f5caa1e1ad78271090bc71e294a0d70e5218f0344",
+          "src/modules/composite/composite.service.ts": "443d7c8332cc050687d4a6fad521b1234f42134000aab9fac3d2ea503217f22a"
+        },
+        "identity": {
+          "current_user": "precise_task1_runtime",
+          "session_user": "precise_task1_runtime"
+        },
+        "migrationRows": [
+          {
+            "count": 255
+          }
+        ],
+        "fixture": {
+          "users": 6,
+          "tasks": 13,
+          "grants": 4,
+          "historicalSelectedRevision": 7,
+          "currentUseRevision": 9,
+          "attemptSnapshotBytes": 3343,
+          "attemptSnapshotHash": "1425989d9f946e93d7bb1b7520f08a43ea2bdcd44fec418f833c9982d13af422"
+        },
+        "moduleAndFixtureInitMs": 4317.344991999999,
+        "writesObserved": 0,
+        "finishedAt": "2026-10-29T23:43:40.860Z"
+      },
+      "resultFileSha256": "1007edbeee09fb1e66a2f2e6100b27ae0d9e33de980f0f0dc972386a0bb8b53c",
+      "log": "[2026-10-29T23:43:40.876Z] [INFO] 队列已关闭\n"
+    }
+  ],
+  "types": [
+    {
+      "name": "read-performance-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/read-performance-types.json"
+        ],
+        "startedAt": "2026-10-29T23:44:18.918843+00:00",
+        "finishedAt": "2026-10-29T23:44:19.180298+00:00",
+        "exitCode": 2
+      },
+      "log": "error TS6059: File '/workspace/eduK12-new-version/server-version/backend/scripts/precise-authorization-read-performance.ts' is not under 'rootDir' '/workspace/eduK12-new-version/server-version/backend/src'. 'rootDir' is expected to contain all source files.\n  The file is in the program because:\n    Matched by include pattern '/workspace/eduK12-new-version/server-version/backend/scripts/precise-authorization-read-performance.ts' in '/workspace/materials-load-20261029/read-performance-types.json'\n"
+    },
+    {
+      "name": "read-performance-types-v2",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/read-performance-types.json"
+        ],
+        "startedAt": "2026-10-29T23:44:29.804516+00:00",
+        "finishedAt": "2026-10-29T23:44:30.233373+00:00",
+        "exitCode": 2
+      },
+      "log": "scripts/precise-authorization-read-performance.ts(4,32): error TS2307: Cannot find module 'node:assert' or its corresponding type declarations.\nscripts/precise-authorization-read-performance.ts(5,37): error TS2307: Cannot find module 'node:crypto' or its corresponding type declarations.\nscripts/precise-authorization-read-performance.ts(6,28): error TS2307: Cannot find module 'node:child_process' or its corresponding type declarations.\nscripts/precise-authorization-read-performance.ts(7,40): error TS2307: Cannot find module 'node:http' or its corresponding type declarations.\nscripts/precise-authorization-read-performance.ts(8,29): error TS2307: Cannot find module 'node:module' or its corresponding type declarations.\nscripts/precise-authorization-read-performance.ts(9,55): error TS2307: Cannot find module 'node:fs' or its corresponding type declarations.\nscripts/precise-authorization-read-performance.ts(10,18): error TS2307: Cannot find module 'node:path' or its corresponding type declarations.\nscripts/precise-authorization-read-performance.ts(14,25): error TS2580: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(17,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(20,15): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(21,15): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(22,15): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(22,69): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(23,16): error TS2552: Cannot find name 'URL'. Did you mean 'url'?\nscripts/precise-authorization-read-performance.ts(23,20): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(26,15): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(28,22): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(30,14): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(30,81): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(35,33): error TS2304: Cannot find name '__filename'.\nscripts/precise-authorization-read-performance.ts(35,51): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(43,14): error TS2304: Cannot find name 'performance'.\nscripts/precise-authorization-read-performance.ts(73,25): error TS2580: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(83,33): error TS2304: Cannot find name 'performance'.\nscripts/precise-authorization-read-performance.ts(86,42): error TS2304: Cannot find name 'performance'.\nscripts/precise-authorization-read-performance.ts(93,26): error TS2304: Cannot find name 'fetch'.\nscripts/precise-authorization-read-performance.ts(99,45): error TS2304: Cannot find name 'performance'.\nscripts/precise-authorization-read-performance.ts(100,19): error TS2580: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(110,98): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(114,99): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(116,103): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\nscripts/precise-authorization-read-performance.ts(123,22): error TS2584: Cannot find name 'console'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.\nscripts/precise-authorization-read-performance.ts(123,43): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\n"
+    },
+    {
+      "name": "read-performance-types-v3",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/read-performance-types.json"
+        ],
+        "startedAt": "2026-10-29T23:44:38.834010+00:00",
+        "finishedAt": "2026-10-29T23:44:39.512925+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    }
+  ],
+  "finalTypeConfig": {
+    "extends": "/workspace/eduK12-new-version/server-version/backend/tsconfig.json",
+    "compilerOptions": {
+      "noEmit": true,
+      "rootDir": "/workspace/eduK12-new-version/server-version/backend",
+      "types": [
+        "node"
+      ],
+      "typeRoots": [
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/@types"
+      ]
+    },
+    "include": [
+      "/workspace/eduK12-new-version/server-version/backend/scripts/precise-authorization-read-performance.ts"
+    ],
+    "exclude": []
+  }
+}

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import SurveyResearchersAdmin from './SurveyResearchersAdmin'
+import {SurveyResearchersWorkspace as SurveyResearchersAdmin} from './SurveyResearchersAdmin'
 vi.mock('./SurveyCatalogGrants',()=>({SurveyCatalogGrants:()=>null}))
 const response=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
 afterEach(()=>vi.unstubAllGlobals())

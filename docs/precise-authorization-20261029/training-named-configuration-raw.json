@@ -1,0 +1,2620 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-29T20:02:27.237569+00:00",
+  "runs": [
+    {
+      "name": "training-named-configuration",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-named.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-named-configuration.json"
+        ],
+        "startedAt": "2026-10-29T19:25:15.341570+00:00",
+        "finishedAt": "2026-10-29T19:25:29.025914+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 4,
+        "numPassedTests": 1,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793301916049,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training business configuration names and expected draft selection"
+                ],
+                "fullName": "Training business configuration names and expected draft selection normally names two different R for two receivers and records the complete original request without changing C/P",
+                "status": "passed",
+                "title": "normally names two different R for two receivers and records the complete original request without changing C/P",
+                "duration": 382.719932,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training business configuration names and expected draft selection"
+                ],
+                "fullName": "Training business configuration names and expected draft selection blocks both same-name R options, then uses an explicit revoke/reissue to make both business choices unambiguous",
+                "status": "failed",
+                "title": "blocks both same-name R options, then uses an explicit revoke/reissue to make both business choices unambiguous",
+                "duration": 36.47405299999991,
+                "failureMessages": [
+                  "Error: 使用权版本已变化\n    at deny (/workspace/eduK12-new-version/server-version/backend/src/modules/measurement-content/standard-combination-use.ts:36:62)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/measurement-content/standard-combination-use.ts:126:51\n    at Proxy._transactionWithCallback (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:8000)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts:54:19\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training business configuration names and expected draft selection"
+                ],
+                "fullName": "Training business configuration names and expected draft selection adds and publishes actual GENERAL and COURSE sources with fixed business labels and rejects arbitrary selection hashes",
+                "status": "failed",
+                "title": "adds and publishes actual GENERAL and COURSE sources with fixed business labels and rejects arbitrary selection hashes",
+                "duration": 0.8151379999999335,
+                "failureMessages": [
+                  "Error: Prior choices failed; dependent drafts forbidden\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts:66:38\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training business configuration names and expected draft selection"
+                ],
+                "fullName": "Training business configuration names and expected draft selection requires the original selected revision after a named reissue and leaves old drafts, frozen labels and old request results intact",
+                "status": "failed",
+                "title": "requires the original selected revision after a named reissue and leaves old drafts, frozen labels and old request results intact",
+                "duration": 0.620452999999543,
+                "failureMessages": [
+                  "Error: Prior publications failed; dependent reissue forbidden\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts:87:51\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793301928359,
+            "endTime": 1793301928780.6204,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Real named issue/revision, bounded source catalog, GENERAL and COURSE add/publish and original expected-selection rejection; no participant replay",
+        "observations": [
+          {
+            "fullUseId": "3556d111-ec36-4dde-8f2e-de5ef4ae9f6b",
+            "fullUseRevision": 3,
+            "emptyOtherUseId": "78d5ad04-100c-4752-816b-b8eb6a3ee1cc",
+            "twoRecipients": true,
+            "fullName": "基础教学报告"
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-named-configuration-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-named.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts",
+          "-t",
+          "blocks both|adds and publishes|requires the original",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-named-configuration-v2.json"
+        ],
+        "startedAt": "2026-10-29T19:29:44.524721+00:00",
+        "finishedAt": "2026-10-29T19:29:54.653768+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 4,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 1,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793302185231,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training business configuration names and expected draft selection"
+                ],
+                "fullName": "Training business configuration names and expected draft selection normally names two different R for two receivers and records the complete original request without changing C/P",
+                "status": "skipped",
+                "title": "normally names two different R for two receivers and records the complete original request without changing C/P",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training business configuration names and expected draft selection"
+                ],
+                "fullName": "Training business configuration names and expected draft selection blocks both same-name R options, then uses an explicit revoke/reissue to make both business choices unambiguous",
+                "status": "passed",
+                "title": "blocks both same-name R options, then uses an explicit revoke/reissue to make both business choices unambiguous",
+                "duration": 182.44605200000024,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training business configuration names and expected draft selection"
+                ],
+                "fullName": "Training business configuration names and expected draft selection adds and publishes actual GENERAL and COURSE sources with fixed business labels and rejects arbitrary selection hashes",
+                "status": "passed",
+                "title": "adds and publishes actual GENERAL and COURSE sources with fixed business labels and rejects arbitrary selection hashes",
+                "duration": 995.708161999999,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training business configuration names and expected draft selection"
+                ],
+                "fullName": "Training business configuration names and expected draft selection requires the original selected revision after a named reissue and leaves old drafts, frozen labels and old request results intact",
+                "status": "passed",
+                "title": "requires the original selected revision after a named reissue and leaves old drafts, frozen labels and old request results intact",
+                "duration": 148.31620499999917,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793302193137,
+            "endTime": 1793302194464.3162,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Real named issue/revision, bounded source catalog, GENERAL and COURSE add/publish and original expected-selection rejection; no participant replay",
+        "observations": [
+          {
+            "sameNameBothUnavailable": true,
+            "explicitNameRevision": 3,
+            "distinctNames": [
+              "不反馈的独立用途",
+              "基础教学报告"
+            ]
+          },
+          {
+            "generalId": "8962b31f-db99-4fe9-9923-777ab25dc2ea",
+            "courseId": "efa79554-e9cf-4d7e-ad89-23dda049d7ad",
+            "waitingId": "f46ed7c1-43d0-4bfa-98de-0da476e8e336",
+            "generalAndCoursePublished": true,
+            "forgedSelectionNoItem": true
+          },
+          {
+            "oldSelectionRejected": true,
+            "oldDraftAndPublishedLabelsUnchanged": true,
+            "historicalRequestRevision": 3,
+            "currentUseRevision": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-named-ui-initial",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/training/TrainingStandardConfigurationGrants.test.tsx",
+          "src/api/standardConfigurationGrants.test.ts",
+          "--maxWorkers=2",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-named-ui-initial.json"
+        ],
+        "startedAt": "2026-10-29T19:56:48.933099+00:00",
+        "finishedAt": "2026-10-29T19:56:59.504585+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 3,
+        "numPassedTestSuites": 1,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 16,
+        "numPassedTests": 8,
+        "numFailedTests": 8,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793303809272,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution sends the selected combination identity through the dedicated issuer API and never the legacy SCALE writer",
+                "status": "passed",
+                "title": "sends the selected combination identity through the dedicated issuer API and never the legacy SCALE writer",
+                "duration": 214.6657889999999,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution does not let a late read for another recipient populate or authorize the current selection",
+                "status": "passed",
+                "title": "does not let a late read for another recipient populate or authorize the current selection",
+                "duration": 94.94589399999995,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution blocks a second mutation after an uncertain outcome until the full original intent is read back",
+                "status": "passed",
+                "title": "blocks a second mutation after an uncertain outcome until the full original intent is read back",
+                "duration": 89.56422100000009,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution keeps another issuer grant visible without exposing overwrite or revoke actions",
+                "status": "passed",
+                "title": "keeps another issuer grant visible without exposing overwrite or revoke actions",
+                "duration": 55.66092300000014,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution allows readback and versioned revocation after withdrawal while refusing new assignment",
+                "status": "passed",
+                "title": "allows readback and versioned revocation after withdrawal while refusing new assignment",
+                "duration": 54.40191000000004,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution refuses incomplete or cross-configuration readback instead of writing against an empty grant list",
+                "status": "passed",
+                "title": "refuses incomplete or cross-configuration readback instead of writing against an empty grant list",
+                "duration": 46.79451199999994,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery recovers the original recipient, label and revision after closing the dialog and never substitutes current grants",
+                "status": "failed",
+                "title": "recovers the original recipient, label and revision after closing the dialog and never substitutes current grants",
+                "duration": 1080.8420629999998,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"button\" and name \"关闭\"\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<svg\u001b[39m\n    \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n    \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n    \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n    \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n    \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n  \u001b[36m</svg>\u001b[39m\n\u001b[36m</button>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m关闭\u001b[0m\n\u001b[36m</button>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33maria-describedby\u001b[39m=\u001b[32m\":rd:\"\u001b[39m\n  \u001b[33maria-labelledby\u001b[39m=\u001b[32m\":rc:\"\u001b[39m\n  \u001b[33maria-modal\u001b[39m=\u001b[32m\"true\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog staff-dialog--compact training-accounts-dialog training-supervision-dialog\"\u001b[39m\n  \u001b[33mrole\u001b[39m=\u001b[32m\"dialog\"\u001b[39m\n  \u001b[33mtabindex\u001b[39m=\u001b[32m\"-1\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<header\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__header\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<div>\u001b[39m\n      \u001b[36m<h2\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rc:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m分配固定量表配置\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__description\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rd:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m已有合法量表\u001b[0m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<svg\u001b[39m\n        \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n        \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n        \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n        \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n        \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</svg>\u001b[39m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</header>\u001b[39m\n  \u001b[36m<div\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__body\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m管理员选择的内容、参数和报告随此授权固定；培训师不能在建任务时更换报告。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<dl>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m内容\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m1\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m参数\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m未配置阈值或常模\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m报告\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0mshort-reviewed\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n    \u001b[36m</dl>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m接收培训师\u001b[0m\n      \u001b[36m<select\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m选择当前合格培训师\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000002\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师甲（trainer-one）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师乙（trainer-two）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n      \u001b[36m</select>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m授权配置名称\u001b[0m\n      \u001b[36m<input\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[33mmaxlength\u001b[39m=\u001b[32m\"120\"\u001b[39m\n        \u001b[33mvalue\u001b[39m=\u001b[32m\"基础教学反馈\"\u001b[39m\n      \u001b[36m/>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m用用途或报告样式命名，培训师直接使用此配置。已生效修订不原位改名；如需更新，先明确撤销再按新修订分配。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<p\u001b[39m\n      \u001b[33mrole\u001b[39m=\u001b[32m\"alert\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0mresponse lost 请先回读当前授权状态，勿重复提交。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m回读当前授权状态\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n  \u001b[36m<footer\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__actions\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m关闭\u001b[0m\n    \u001b[36m</button>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m授权此配置\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</footer>\u001b[39m\n\u001b[36m</div>\u001b[39m\n    at Proxy.waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at unknown (/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:81:347)\n    at /workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:83:16\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery retries only after verified absence and with the complete same original body",
+                "status": "failed",
+                "title": "retries only after verified absence and with the complete same original body",
+                "duration": 1059.3971349999997,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"button\" and name \"关闭\"\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<svg\u001b[39m\n    \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n    \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n    \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n    \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n    \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n  \u001b[36m</svg>\u001b[39m\n\u001b[36m</button>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m关闭\u001b[0m\n\u001b[36m</button>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33maria-describedby\u001b[39m=\u001b[32m\":rf:\"\u001b[39m\n  \u001b[33maria-labelledby\u001b[39m=\u001b[32m\":re:\"\u001b[39m\n  \u001b[33maria-modal\u001b[39m=\u001b[32m\"true\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog staff-dialog--compact training-accounts-dialog training-supervision-dialog\"\u001b[39m\n  \u001b[33mrole\u001b[39m=\u001b[32m\"dialog\"\u001b[39m\n  \u001b[33mtabindex\u001b[39m=\u001b[32m\"-1\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<header\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__header\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<div>\u001b[39m\n      \u001b[36m<h2\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":re:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m分配固定量表配置\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__description\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rf:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m已有合法量表\u001b[0m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<svg\u001b[39m\n        \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n        \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n        \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n        \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n        \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</svg>\u001b[39m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</header>\u001b[39m\n  \u001b[36m<div\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__body\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m管理员选择的内容、参数和报告随此授权固定；培训师不能在建任务时更换报告。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<dl>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m内容\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m1\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m参数\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m未配置阈值或常模\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m报告\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0mshort-reviewed\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n    \u001b[36m</dl>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m接收培训师\u001b[0m\n      \u001b[36m<select\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m选择当前合格培训师\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000002\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师甲（trainer-one）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师乙（trainer-two）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n      \u001b[36m</select>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m授权配置名称\u001b[0m\n      \u001b[36m<input\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[33mmaxlength\u001b[39m=\u001b[32m\"120\"\u001b[39m\n        \u001b[33mvalue\u001b[39m=\u001b[32m\"基础教学反馈\"\u001b[39m\n      \u001b[36m/>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m用用途或报告样式命名，培训师直接使用此配置。已生效修订不原位改名；如需更新，先明确撤销再按新修订分配。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<p\u001b[39m\n      \u001b[33mrole\u001b[39m=\u001b[32m\"alert\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0mresponse lost 请先回读当前授权状态，勿重复提交。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m回读当前授权状态\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n  \u001b[36m<footer\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__actions\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m关闭\u001b[0m\n    \u001b[36m</button>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m授权此配置\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</footer>\u001b[39m\n\u001b[36m</div>\u001b[39m\n    at Proxy.waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at unknown (/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:81:347)\n    at /workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:89:3\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery keeps the original unknown outcome when its retry is now refused",
+                "status": "failed",
+                "title": "keeps the original unknown outcome when its retry is now refused",
+                "duration": 1061.5095520000004,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"button\" and name \"关闭\"\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<svg\u001b[39m\n    \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n    \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n    \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n    \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n    \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n  \u001b[36m</svg>\u001b[39m\n\u001b[36m</button>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m关闭\u001b[0m\n\u001b[36m</button>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33maria-describedby\u001b[39m=\u001b[32m\":rh:\"\u001b[39m\n  \u001b[33maria-labelledby\u001b[39m=\u001b[32m\":rg:\"\u001b[39m\n  \u001b[33maria-modal\u001b[39m=\u001b[32m\"true\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog staff-dialog--compact training-accounts-dialog training-supervision-dialog\"\u001b[39m\n  \u001b[33mrole\u001b[39m=\u001b[32m\"dialog\"\u001b[39m\n  \u001b[33mtabindex\u001b[39m=\u001b[32m\"-1\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<header\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__header\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<div>\u001b[39m\n      \u001b[36m<h2\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rg:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m分配固定量表配置\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__description\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rh:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m已有合法量表\u001b[0m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<svg\u001b[39m\n        \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n        \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n        \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n        \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n        \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</svg>\u001b[39m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</header>\u001b[39m\n  \u001b[36m<div\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__body\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m管理员选择的内容、参数和报告随此授权固定；培训师不能在建任务时更换报告。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<dl>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m内容\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m1\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m参数\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m未配置阈值或常模\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m报告\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0mshort-reviewed\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n    \u001b[36m</dl>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m接收培训师\u001b[0m\n      \u001b[36m<select\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m选择当前合格培训师\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000002\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师甲（trainer-one）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师乙（trainer-two）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n      \u001b[36m</select>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m授权配置名称\u001b[0m\n      \u001b[36m<input\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[33mmaxlength\u001b[39m=\u001b[32m\"120\"\u001b[39m\n        \u001b[33mvalue\u001b[39m=\u001b[32m\"基础教学反馈\"\u001b[39m\n      \u001b[36m/>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m用用途或报告样式命名，培训师直接使用此配置。已生效修订不原位改名；如需更新，先明确撤销再按新修订分配。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<p\u001b[39m\n      \u001b[33mrole\u001b[39m=\u001b[32m\"alert\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0mresponse lost 请先回读当前授权状态，勿重复提交。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m回读当前授权状态\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n  \u001b[36m<footer\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__actions\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m关闭\u001b[0m\n    \u001b[36m</button>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m授权此配置\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</footer>\u001b[39m\n\u001b[36m</div>\u001b[39m\n    at Proxy.waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at unknown (/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:81:347)\n    at /workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:96:3\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original userId",
+                "status": "failed",
+                "title": "does not clear a mismatching original userId",
+                "duration": 1050.025474,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"button\" and name \"关闭\"\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<svg\u001b[39m\n    \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n    \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n    \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n    \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n    \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n  \u001b[36m</svg>\u001b[39m\n\u001b[36m</button>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m关闭\u001b[0m\n\u001b[36m</button>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33maria-describedby\u001b[39m=\u001b[32m\":rj:\"\u001b[39m\n  \u001b[33maria-labelledby\u001b[39m=\u001b[32m\":ri:\"\u001b[39m\n  \u001b[33maria-modal\u001b[39m=\u001b[32m\"true\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog staff-dialog--compact training-accounts-dialog training-supervision-dialog\"\u001b[39m\n  \u001b[33mrole\u001b[39m=\u001b[32m\"dialog\"\u001b[39m\n  \u001b[33mtabindex\u001b[39m=\u001b[32m\"-1\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<header\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__header\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<div>\u001b[39m\n      \u001b[36m<h2\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":ri:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m分配固定量表配置\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__description\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rj:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m已有合法量表\u001b[0m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<svg\u001b[39m\n        \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n        \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n        \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n        \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n        \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</svg>\u001b[39m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</header>\u001b[39m\n  \u001b[36m<div\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__body\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m管理员选择的内容、参数和报告随此授权固定；培训师不能在建任务时更换报告。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<dl>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m内容\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m1\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m参数\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m未配置阈值或常模\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m报告\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0mshort-reviewed\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n    \u001b[36m</dl>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m接收培训师\u001b[0m\n      \u001b[36m<select\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m选择当前合格培训师\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000002\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师甲（trainer-one）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师乙（trainer-two）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n      \u001b[36m</select>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m授权配置名称\u001b[0m\n      \u001b[36m<input\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[33mmaxlength\u001b[39m=\u001b[32m\"120\"\u001b[39m\n        \u001b[33mvalue\u001b[39m=\u001b[32m\"基础教学反馈\"\u001b[39m\n      \u001b[36m/>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m用用途或报告样式命名，培训师直接使用此配置。已生效修订不原位改名；如需更新，先明确撤销再按新修订分配。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<p\u001b[39m\n      \u001b[33mrole\u001b[39m=\u001b[32m\"alert\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0mresponse lost 请先回读当前授权状态，勿重复提交。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m回读当前授权状态\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n  \u001b[36m<footer\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__actions\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m关闭\u001b[0m\n    \u001b[36m</button>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m授权此配置\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</footer>\u001b[39m\n\u001b[36m</div>\u001b[39m\n    at Proxy.waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at unknown (/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:81:347)\n    at /workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:101:3\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original configurationName",
+                "status": "failed",
+                "title": "does not clear a mismatching original configurationName",
+                "duration": 1061.4132820000004,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"button\" and name \"关闭\"\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<svg\u001b[39m\n    \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n    \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n    \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n    \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n    \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n  \u001b[36m</svg>\u001b[39m\n\u001b[36m</button>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m关闭\u001b[0m\n\u001b[36m</button>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33maria-describedby\u001b[39m=\u001b[32m\":rl:\"\u001b[39m\n  \u001b[33maria-labelledby\u001b[39m=\u001b[32m\":rk:\"\u001b[39m\n  \u001b[33maria-modal\u001b[39m=\u001b[32m\"true\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog staff-dialog--compact training-accounts-dialog training-supervision-dialog\"\u001b[39m\n  \u001b[33mrole\u001b[39m=\u001b[32m\"dialog\"\u001b[39m\n  \u001b[33mtabindex\u001b[39m=\u001b[32m\"-1\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<header\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__header\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<div>\u001b[39m\n      \u001b[36m<h2\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rk:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m分配固定量表配置\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__description\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rl:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m已有合法量表\u001b[0m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<svg\u001b[39m\n        \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n        \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n        \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n        \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n        \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</svg>\u001b[39m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</header>\u001b[39m\n  \u001b[36m<div\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__body\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m管理员选择的内容、参数和报告随此授权固定；培训师不能在建任务时更换报告。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<dl>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m内容\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m1\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m参数\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m未配置阈值或常模\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m报告\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0mshort-reviewed\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n    \u001b[36m</dl>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m接收培训师\u001b[0m\n      \u001b[36m<select\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m选择当前合格培训师\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000002\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师甲（trainer-one）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师乙（trainer-two）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n      \u001b[36m</select>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m授权配置名称\u001b[0m\n      \u001b[36m<input\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[33mmaxlength\u001b[39m=\u001b[32m\"120\"\u001b[39m\n        \u001b[33mvalue\u001b[39m=\u001b[32m\"基础教学反馈\"\u001b[39m\n      \u001b[36m/>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m用用途或报告样式命名，培训师直接使用此配置。已生效修订不原位改名；如需更新，先明确撤销再按新修订分配。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<p\u001b[39m\n      \u001b[33mrole\u001b[39m=\u001b[32m\"alert\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0mresponse lost 请先回读当前授权状态，勿重复提交。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m回读当前授权状态\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n  \u001b[36m<footer\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__actions\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m关闭\u001b[0m\n    \u001b[36m</button>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m授权此配置\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</footer>\u001b[39m\n\u001b[36m</div>\u001b[39m\n    at Proxy.waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at unknown (/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:81:347)\n    at /workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:101:3\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original actorId",
+                "status": "failed",
+                "title": "does not clear a mismatching original actorId",
+                "duration": 1048.3051879999994,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"button\" and name \"关闭\"\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<svg\u001b[39m\n    \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n    \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n    \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n    \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n    \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n  \u001b[36m</svg>\u001b[39m\n\u001b[36m</button>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m关闭\u001b[0m\n\u001b[36m</button>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33maria-describedby\u001b[39m=\u001b[32m\":rn:\"\u001b[39m\n  \u001b[33maria-labelledby\u001b[39m=\u001b[32m\":rm:\"\u001b[39m\n  \u001b[33maria-modal\u001b[39m=\u001b[32m\"true\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog staff-dialog--compact training-accounts-dialog training-supervision-dialog\"\u001b[39m\n  \u001b[33mrole\u001b[39m=\u001b[32m\"dialog\"\u001b[39m\n  \u001b[33mtabindex\u001b[39m=\u001b[32m\"-1\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<header\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__header\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<div>\u001b[39m\n      \u001b[36m<h2\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rm:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m分配固定量表配置\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__description\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rn:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m已有合法量表\u001b[0m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<svg\u001b[39m\n        \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n        \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n        \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n        \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n        \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</svg>\u001b[39m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</header>\u001b[39m\n  \u001b[36m<div\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__body\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m管理员选择的内容、参数和报告随此授权固定；培训师不能在建任务时更换报告。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<dl>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m内容\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m1\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m参数\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m未配置阈值或常模\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m报告\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0mshort-reviewed\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n    \u001b[36m</dl>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m接收培训师\u001b[0m\n      \u001b[36m<select\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m选择当前合格培训师\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000002\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师甲（trainer-one）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师乙（trainer-two）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n      \u001b[36m</select>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m授权配置名称\u001b[0m\n      \u001b[36m<input\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[33mmaxlength\u001b[39m=\u001b[32m\"120\"\u001b[39m\n        \u001b[33mvalue\u001b[39m=\u001b[32m\"基础教学反馈\"\u001b[39m\n      \u001b[36m/>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m用用途或报告样式命名，培训师直接使用此配置。已生效修订不原位改名；如需更新，先明确撤销再按新修订分配。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<p\u001b[39m\n      \u001b[33mrole\u001b[39m=\u001b[32m\"alert\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0mresponse lost 请先回读当前授权状态，勿重复提交。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m回读当前授权状态\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n  \u001b[36m<footer\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__actions\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m关闭\u001b[0m\n    \u001b[36m</button>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m授权此配置\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</footer>\u001b[39m\n\u001b[36m</div>\u001b[39m\n    at Proxy.waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at unknown (/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:81:347)\n    at /workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:101:3\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original expectedUseVersion",
+                "status": "failed",
+                "title": "does not clear a mismatching original expectedUseVersion",
+                "duration": 1054.245906,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"button\" and name \"关闭\"\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<svg\u001b[39m\n    \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n    \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n    \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n    \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n    \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n  \u001b[36m</svg>\u001b[39m\n\u001b[36m</button>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m关闭\u001b[0m\n\u001b[36m</button>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33maria-describedby\u001b[39m=\u001b[32m\":rp:\"\u001b[39m\n  \u001b[33maria-labelledby\u001b[39m=\u001b[32m\":ro:\"\u001b[39m\n  \u001b[33maria-modal\u001b[39m=\u001b[32m\"true\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog staff-dialog--compact training-accounts-dialog training-supervision-dialog\"\u001b[39m\n  \u001b[33mrole\u001b[39m=\u001b[32m\"dialog\"\u001b[39m\n  \u001b[33mtabindex\u001b[39m=\u001b[32m\"-1\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<header\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__header\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<div>\u001b[39m\n      \u001b[36m<h2\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":ro:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m分配固定量表配置\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__description\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rp:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m已有合法量表\u001b[0m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<svg\u001b[39m\n        \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n        \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n        \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n        \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n        \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</svg>\u001b[39m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</header>\u001b[39m\n  \u001b[36m<div\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__body\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m管理员选择的内容、参数和报告随此授权固定；培训师不能在建任务时更换报告。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<dl>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m内容\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m1\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m参数\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m未配置阈值或常模\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m报告\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0mshort-reviewed\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n    \u001b[36m</dl>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m接收培训师\u001b[0m\n      \u001b[36m<select\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m选择当前合格培训师\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000002\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师甲（trainer-one）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师乙（trainer-two）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n      \u001b[36m</select>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m授权配置名称\u001b[0m\n      \u001b[36m<input\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[33mmaxlength\u001b[39m=\u001b[32m\"120\"\u001b[39m\n        \u001b[33mvalue\u001b[39m=\u001b[32m\"基础教学反馈\"\u001b[39m\n      \u001b[36m/>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m用用途或报告样式命名，培训师直接使用此配置。已生效修订不原位改名；如需更新，先明确撤销再按新修订分配。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<p\u001b[39m\n      \u001b[33mrole\u001b[39m=\u001b[32m\"alert\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0mresponse lost 请先回读当前授权状态，勿重复提交。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m回读当前授权状态\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n  \u001b[36m<footer\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__actions\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m关闭\u001b[0m\n    \u001b[36m</button>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m授权此配置\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</footer>\u001b[39m\n\u001b[36m</div>\u001b[39m\n    at Proxy.waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at unknown (/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:81:347)\n    at /workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:101:3\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery restores a prior revoked grant identity and reports its subsequently superseded operation as historical",
+                "status": "passed",
+                "title": "restores a prior revoked grant identity and reports its subsequently superseded operation as historical",
+                "duration": 13.947149999999965,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery keeps malformed absence and legacy results unresolved",
+                "status": "failed",
+                "title": "keeps malformed absence and legacy results unresolved",
+                "duration": 1046.484323999999,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"button\" and name \"关闭\"\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<svg\u001b[39m\n    \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n    \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n    \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n    \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n    \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n    \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n    \u001b[36m<path\u001b[39m\n      \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n    \u001b[36m/>\u001b[39m\n  \u001b[36m</svg>\u001b[39m\n\u001b[36m</button>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<button\u001b[39m\n  \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m关闭\u001b[0m\n\u001b[36m</button>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33maria-describedby\u001b[39m=\u001b[32m\":rr:\"\u001b[39m\n  \u001b[33maria-labelledby\u001b[39m=\u001b[32m\":rq:\"\u001b[39m\n  \u001b[33maria-modal\u001b[39m=\u001b[32m\"true\"\u001b[39m\n  \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog staff-dialog--compact training-accounts-dialog training-supervision-dialog\"\u001b[39m\n  \u001b[33mrole\u001b[39m=\u001b[32m\"dialog\"\u001b[39m\n  \u001b[33mtabindex\u001b[39m=\u001b[32m\"-1\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[36m<header\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__header\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<div>\u001b[39m\n      \u001b[36m<h2\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rq:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m分配固定量表配置\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__description\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\":rr:\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0m已有合法量表\u001b[0m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"关闭\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"staff-icon-button\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<svg\u001b[39m\n        \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"lucide lucide-x\"\u001b[39m\n        \u001b[33mfill\u001b[39m=\u001b[32m\"none\"\u001b[39m\n        \u001b[33mheight\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mstroke\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n        \u001b[33mstroke-linecap\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-linejoin\u001b[39m=\u001b[32m\"round\"\u001b[39m\n        \u001b[33mstroke-width\u001b[39m=\u001b[32m\"2\"\u001b[39m\n        \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[33mwidth\u001b[39m=\u001b[32m\"18\"\u001b[39m\n        \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"M18 6 6 18\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<path\u001b[39m\n          \u001b[33md\u001b[39m=\u001b[32m\"m6 6 12 12\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</svg>\u001b[39m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</header>\u001b[39m\n  \u001b[36m<div\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__body\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m管理员选择的内容、参数和报告随此授权固定；培训师不能在建任务时更换报告。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<dl>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m内容\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m1\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m参数\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0m未配置阈值或常模\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n      \u001b[36m<dt>\u001b[39m\n        \u001b[0m报告\u001b[0m\n      \u001b[36m</dt>\u001b[39m\n      \u001b[36m<dd>\u001b[39m\n        \u001b[0mshort-reviewed\u001b[0m\n      \u001b[36m</dd>\u001b[39m\n    \u001b[36m</dl>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m接收培训师\u001b[0m\n      \u001b[36m<select\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m选择当前合格培训师\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000002\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师甲（trainer-one）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n        \u001b[36m<option\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0m培训师乙（trainer-two）\u001b[0m\n        \u001b[36m</option>\u001b[39m\n      \u001b[36m</select>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<label>\u001b[39m\n      \u001b[0m授权配置名称\u001b[0m\n      \u001b[36m<input\u001b[39m\n        \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[33mmaxlength\u001b[39m=\u001b[32m\"120\"\u001b[39m\n        \u001b[33mvalue\u001b[39m=\u001b[32m\"基础教学反馈\"\u001b[39m\n      \u001b[36m/>\u001b[39m\n    \u001b[36m</label>\u001b[39m\n    \u001b[36m<p>\u001b[39m\n      \u001b[0m用用途或报告样式命名，培训师直接使用此配置。已生效修订不原位改名；如需更新，先明确撤销再按新修订分配。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<p\u001b[39m\n      \u001b[33mrole\u001b[39m=\u001b[32m\"alert\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0mresponse lost 请先回读当前授权状态，勿重复提交。\u001b[0m\n    \u001b[36m</p>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m回读当前授权状态\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n  \u001b[36m<footer\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"staff-dialog__actions\"\u001b[39m\n  \u001b[36m>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m关闭\u001b[0m\n    \u001b[36m</button>\u001b[39m\n    \u001b[36m<button\u001b[39m\n      \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n      \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[0m授权此配置\u001b[0m\n    \u001b[36m</button>\u001b[39m\n  \u001b[36m</footer>\u001b[39m\n\u001b[36m</div>\u001b[39m\n    at Proxy.waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at unknown (/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:81:347)\n    at /workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx:112:3\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery scopes restored state and late responses to the current live account and hides the workspace on logout",
+                "status": "passed",
+                "title": "scopes restored state and late responses to the current live account and hides the workspace on logout",
+                "duration": 64.40860999999859,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793303810351,
+            "endTime": 1793303819448.4087,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-named-ui-recovery-v2",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/training/TrainingStandardConfigurationGrants.test.tsx",
+          "-t",
+          "recovers the original|retries only|keeps the original unknown|does not clear|keeps malformed",
+          "--maxWorkers=1",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-named-ui-recovery-v2.json"
+        ],
+        "startedAt": "2026-10-29T19:57:21.232741+00:00",
+        "finishedAt": "2026-10-29T19:57:24.049663+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 3,
+        "numPassedTestSuites": 3,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 16,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 8,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793303841685,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution sends the selected combination identity through the dedicated issuer API and never the legacy SCALE writer",
+                "status": "skipped",
+                "title": "sends the selected combination identity through the dedicated issuer API and never the legacy SCALE writer",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution does not let a late read for another recipient populate or authorize the current selection",
+                "status": "skipped",
+                "title": "does not let a late read for another recipient populate or authorize the current selection",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution blocks a second mutation after an uncertain outcome until the full original intent is read back",
+                "status": "skipped",
+                "title": "blocks a second mutation after an uncertain outcome until the full original intent is read back",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution keeps another issuer grant visible without exposing overwrite or revoke actions",
+                "status": "skipped",
+                "title": "keeps another issuer grant visible without exposing overwrite or revoke actions",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution allows readback and versioned revocation after withdrawal while refusing new assignment",
+                "status": "skipped",
+                "title": "allows readback and versioned revocation after withdrawal while refusing new assignment",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution refuses incomplete or cross-configuration readback instead of writing against an empty grant list",
+                "status": "skipped",
+                "title": "refuses incomplete or cross-configuration readback instead of writing against an empty grant list",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery recovers the original recipient, label and revision after closing the dialog and never substitutes current grants",
+                "status": "passed",
+                "title": "recovers the original recipient, label and revision after closing the dialog and never substitutes current grants",
+                "duration": 221.19795599999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery retries only after verified absence and with the complete same original body",
+                "status": "passed",
+                "title": "retries only after verified absence and with the complete same original body",
+                "duration": 144.12501700000007,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery keeps the original unknown outcome when its retry is now refused",
+                "status": "passed",
+                "title": "keeps the original unknown outcome when its retry is now refused",
+                "duration": 121.66427999999996,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original userId",
+                "status": "passed",
+                "title": "does not clear a mismatching original userId",
+                "duration": 121.76697899999999,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original configurationName",
+                "status": "passed",
+                "title": "does not clear a mismatching original configurationName",
+                "duration": 115.24614600000018,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original actorId",
+                "status": "passed",
+                "title": "does not clear a mismatching original actorId",
+                "duration": 138.39119099999994,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original expectedUseVersion",
+                "status": "passed",
+                "title": "does not clear a mismatching original expectedUseVersion",
+                "duration": 163.12592600000016,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery restores a prior revoked grant identity and reports its subsequently superseded operation as historical",
+                "status": "skipped",
+                "title": "restores a prior revoked grant identity and reports its subsequently superseded operation as historical",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery keeps malformed absence and legacy results unresolved",
+                "status": "passed",
+                "title": "keeps malformed absence and legacy results unresolved",
+                "duration": 148.9511419999999,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery scopes restored state and late responses to the current live account and hides the workspace on logout",
+                "status": "skipped",
+                "title": "scopes restored state and late responses to the current live account and hides the workspace on logout",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793303842813,
+            "endTime": 1793303843986.9512,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-named-api-consumer",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/api/standardConfigurationGrants.test.ts",
+          "src/components/__tests__/AssessmentToolPicker.test.tsx",
+          "src/pages/questionnaire/__tests__/TrainingContentSelection.test.tsx",
+          "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+          "-t",
+          "original issue intent|keeps an unavailable fixed|shows a fixed administrator|uses named precise|exact approved Training|distinguishes approved parameter|offers granted exact",
+          "--maxWorkers=2",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-named-api-consumer.json"
+        ],
+        "startedAt": "2026-10-29T19:57:22.829053+00:00",
+        "finishedAt": "2026-10-29T19:57:26.935644+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 21,
+        "numPassedTestSuites": 21,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 125,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 115,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793303843177,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training original issue intent projection"
+                ],
+                "fullName": "Training original issue intent projection admits only bounded non-secret intent with a paired original use identity and revision",
+                "status": "passed",
+                "title": "admits only bounded non-secret intent with a paired original use identity and revision",
+                "duration": 2.277987000000053,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training original issue intent projection"
+                ],
+                "fullName": "Training original issue intent projection matches the complete original actor, entry basis, source, recipient, label and predecessor",
+                "status": "passed",
+                "title": "matches the complete original actor, entry basis, source, recipient, label and predecessor",
+                "duration": 0.6163090000000011,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training original issue intent projection"
+                ],
+                "fullName": "Training original issue intent projection requires the recorded predecessor id and next revision rather than accepting any active grant",
+                "status": "passed",
+                "title": "requires the recorded predecessor id and next revision rather than accepting any active grant",
+                "duration": 0.25864000000001397,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training original issue intent projection"
+                ],
+                "fullName": "Training original issue intent projection accepts an explicitly historical result without misreporting it as current or reconstructing deleted rows",
+                "status": "passed",
+                "title": "accepts an explicitly historical result without misreporting it as current or reconstructing deleted rows",
+                "duration": 0.3841139999999541,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793303846872,
+            "endTime": 1793303846875.384,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/api/standardConfigurationGrants.test.ts"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "searchable assessment tool picker"
+                ],
+                "fullName": "searchable assessment tool picker pages cards and searches all available pages by code before selecting the exact identity",
+                "status": "skipped",
+                "title": "pages cards and searches all available pages by code before selecting the exact identity",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "searchable assessment tool picker"
+                ],
+                "fullName": "searchable assessment tool picker distinguishes same-name versions and retains selected state when reopening",
+                "status": "skipped",
+                "title": "distinguishes same-name versions and retains selected state when reopening",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "searchable assessment tool picker"
+                ],
+                "fullName": "searchable assessment tool picker returns focus on cancellation and never changes the existing selection",
+                "status": "skipped",
+                "title": "returns focus on cancellation and never changes the existing selection",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "searchable assessment tool picker"
+                ],
+                "fullName": "searchable assessment tool picker does not open a disabled picker or invent tools for an empty catalog",
+                "status": "skipped",
+                "title": "does not open a disabled picker or invent tools for an empty catalog",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "keeps an unavailable fixed configuration visible with its business reason and prevents selection",
+                "status": "passed",
+                "title": "keeps an unavailable fixed configuration visible with its business reason and prevents selection",
+                "duration": 159.715638,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793303845857,
+            "endTime": 1793303846016.7156,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/AssessmentToolPicker.test.tsx"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback hides the cognitive authoring type while disabled and preserves stored cognitive content",
+                "status": "skipped",
+                "title": "hides the cognitive authoring type while disabled and preserves stored cognitive content",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback explicitly publishes the current cognitive configuration using the saved revision without publishing delivery",
+                "status": "skipped",
+                "title": "explicitly publishes the current cognitive configuration using the saved revision without publishing delivery",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback holds an unknown cognitive publication without resending after read-only refresh",
+                "status": "skipped",
+                "title": "holds an unknown cognitive publication without resending after read-only refresh",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback restores the original actor/composite revision after remount and only archives after explicit verified-pointer review",
+                "status": "skipped",
+                "title": "restores the original actor/composite revision after remount and only archives after explicit verified-pointer review",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback blocks edits while the original publication is pending and safely ends an obsolete revision without claiming success",
+                "status": "skipped",
+                "title": "blocks edits while the original publication is pending and safely ends an obsolete revision without claiming success",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback keeps a late publication response in its original composite scope after navigation",
+                "status": "skipped",
+                "title": "keeps a late publication response in its original composite scope after navigation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback unlocks a first definitive 400 publication rejection for correction",
+                "status": "skipped",
+                "title": "unlocks a first definitive 400 publication rejection for correction",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback unlocks a first definitive 403 publication rejection for correction",
+                "status": "skipped",
+                "title": "unlocks a first definitive 403 publication rejection for correction",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback unlocks a first definitive 409 publication rejection for correction",
+                "status": "skipped",
+                "title": "unlocks a first definitive 409 publication rejection for correction",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback preserves an earlier unknown outcome when its original-revision retry gets 403",
+                "status": "skipped",
+                "title": "preserves an earlier unknown outcome when its original-revision retry gets 403",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback exposes the active composition section to keyboard and screen-reader users",
+                "status": "skipped",
+                "title": "exposes the active composition section to keyboard and screen-reader users",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback prefills only an authorized course passed by the Training course route",
+                "status": "skipped",
+                "title": "prefills only an authorized course passed by the Training course route",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback does not preselect an unlisted course from a tampered URL",
+                "status": "skipped",
+                "title": "does not preselect an unlisted course from a tampered URL",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback discards a previous questionnaire response after switching pages",
+                "status": "skipped",
+                "title": "discards a previous questionnaire response after switching pages",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback offers publication for a saved draft while preserving the revision guard",
+                "status": "skipped",
+                "title": "offers publication for a saved draft while preserving the revision guard",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback identifies and focuses an empty name without sending a request",
+                "status": "skipped",
+                "title": "identifies and focuses an empty name without sending a request",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback preserves API message objects and permits course-less drafts under the actual rule",
+                "status": "skipped",
+                "title": "preserves API message objects and permits course-less drafts under the actual rule",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback shows a field-level deadline requirement for public drafts",
+                "status": "skipped",
+                "title": "shows a field-level deadline requirement for public drafts",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback rejects a deadline earlier than the opening time before saving",
+                "status": "skipped",
+                "title": "rejects a deadline earlier than the opening time before saving",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback blocks publication and hides stale checks after editing delivery settings",
+                "status": "skipped",
+                "title": "blocks publication and hides stale checks after editing delivery settings",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback rejects incomplete and invalid calendar dates before creating a public draft",
+                "status": "skipped",
+                "title": "rejects incomplete and invalid calendar dates before creating a public draft",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback authors an ordinary optional Form with the original revision and no context binding",
+                "status": "skipped",
+                "title": "authors an ordinary optional Form with the original revision and no context binding",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings explains the three base steps and keeps optional features off without writing any settings",
+                "status": "skipped",
+                "title": "explains the three base steps and keeps optional features off without writing any settings",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings keeps server retention separate from local cleanup and sends the unchanged policy shape on save",
+                "status": "skipped",
+                "title": "keeps server retention separate from local cleanup and sends the unchanged policy shape on save",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings shows editable group probabilities and explains the incompatible flow without changing saved groups",
+                "status": "skipped",
+                "title": "shows editable group probabilities and explains the incompatible flow without changing saved groups",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings opens nested flow rules and focuses invalid JSON when saving",
+                "status": "skipped",
+                "title": "opens nested flow rules and focuses invalid JSON when saving",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings keeps published retention and collection read-only while disclosure permissions remain independently controlled",
+                "status": "skipped",
+                "title": "keeps published retention and collection read-only while disclosure permissions remain independently controlled",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C04 typed authoring"
+                ],
+                "fullName": "C04 typed authoring creates number using the public Form definition without a client itemKey",
+                "status": "skipped",
+                "title": "creates number using the public Form definition without a client itemKey",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C04 typed authoring"
+                ],
+                "fullName": "C04 typed authoring creates long_text using the public Form definition without a client itemKey",
+                "status": "skipped",
+                "title": "creates long_text using the public Form definition without a client itemKey",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C04 typed authoring"
+                ],
+                "fullName": "C04 typed authoring creates date using the public Form definition without a client itemKey",
+                "status": "skipped",
+                "title": "creates date using the public Form definition without a client itemKey",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C04 typed authoring"
+                ],
+                "fullName": "C04 typed authoring creates time using the public Form definition without a client itemKey",
+                "status": "skipped",
+                "title": "creates time using the public Form definition without a client itemKey",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates likert as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates likert as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates matrix as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates matrix as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates matrix_multiple as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates matrix_multiple as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates rank_order as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates rank_order as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates slider as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates slider as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates constant_sum as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates constant_sum as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 incomplete single question stays editable"
+                ],
+                "fullName": "C05 incomplete single question stays editable retains title, options and matrix rows when the server rejects adding an incomplete question",
+                "status": "skipped",
+                "title": "retains title, options and matrix rows when the server rejects adding an incomplete question",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C06 stable policy authoring"
+                ],
+                "fullName": "C06 stable policy authoring adds a conditional question to the chosen existing section using its stable source key",
+                "status": "skipped",
+                "title": "adds a conditional question to the chosen existing section using its stable source key",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "shows typed export actions from the actual nested teacher form DTO",
+                "status": "skipped",
+                "title": "shows typed export actions from the actual nested teacher form DTO",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 Training conditional flow authoring"
+                ],
+                "fullName": "C19 Training conditional flow authoring saves with the latest revision after metadata and blocks publication until successful",
+                "status": "skipped",
+                "title": "saves with the latest revision after metadata and blocks publication until successful",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 Training conditional flow authoring"
+                ],
+                "fullName": "C19 Training conditional flow authoring focuses invalid flow JSON and keeps unsaved edits after server conflict",
+                "status": "skipped",
+                "title": "focuses invalid flow JSON and keeps unsaved edits after server conflict",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C20 material flow editor and attempt budget"
+                ],
+                "fullName": "C20 material flow editor and attempt budget C20 guided authoring exposes delivery and advanced JSON before saving and publishing",
+                "status": "skipped",
+                "title": "C20 guided authoring exposes delivery and advanced JSON before saving and publishing",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C20 material flow editor and attempt budget"
+                ],
+                "fullName": "C20 material flow editor and attempt budget loads the saved budget and sends budget-only changes with V2 config",
+                "status": "skipped",
+                "title": "loads the saved budget and sends budget-only changes with V2 config",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C20 material flow editor and attempt budget"
+                ],
+                "fullName": "C20 material flow editor and attempt budget upgrades the existing V1 blocks only explicitly and adds an editable quota sample",
+                "status": "skipped",
+                "title": "upgrades the existing V1 blocks only explicitly and adds an editable quota sample",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C20 material flow editor and attempt budget"
+                ],
+                "fullName": "C20 material flow editor and attempt budget hydrates copied V2 config and budget from the returned draft detail",
+                "status": "skipped",
+                "title": "hydrates copied V2 config and budget from the returned draft detail",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training persistence authoring"
+                ],
+                "fullName": "Training persistence authoring starts both independent retention controls off",
+                "status": "skipped",
+                "title": "starts both independent retention controls off",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training persistence authoring"
+                ],
+                "fullName": "Training persistence authoring freezes both settings after publication",
+                "status": "skipped",
+                "title": "freezes both settings after publication",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring defaults a newly bound Training questionnaire to immediate feedback after completion and generation",
+                "status": "skipped",
+                "title": "defaults a newly bound Training questionnaire to immediate feedback after completion and generation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring requires a valid release time before saving scheduled feedback",
+                "status": "skipped",
+                "title": "requires a valid release time before saving scheduled feedback",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring defaults to immediate feedback when a course-less draft first binds Training",
+                "status": "skipped",
+                "title": "defaults to immediate feedback when a course-less draft first binds Training",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring saves the scheduled device-local time as an ISO timestamp with the current revision",
+                "status": "skipped",
+                "title": "saves the scheduled device-local time as an ISO timestamp with the current revision",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring allows returning an existing scheduled draft to immediate feedback without a stale timestamp",
+                "status": "skipped",
+                "title": "allows returning an existing scheduled draft to immediate feedback without a stale timestamp",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring keeps published policy and timestamp read-only",
+                "status": "skipped",
+                "title": "keeps published policy and timestamp read-only",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring preserves an unconfigured legacy policy while saving unrelated metadata",
+                "status": "skipped",
+                "title": "preserves an unconfigured legacy policy while saving unrelated metadata",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring clears a configured draft policy when its author changes delivery out of Training scope",
+                "status": "skipped",
+                "title": "clears a configured draft policy when its author changes delivery out of Training scope",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring does not add Training feedback to a non-Training creation",
+                "status": "skipped",
+                "title": "does not add Training feedback to a non-Training creation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor selects SCALE through searchable cards while keeping the existing item API",
+                "status": "skipped",
+                "title": "selects SCALE through searchable cards while keeping the existing item API",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor selects COGNITIVE through searchable cards while keeping the existing item API",
+                "status": "skipped",
+                "title": "selects COGNITIVE through searchable cards while keeping the existing item API",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor selects SITUATIONAL through searchable cards while keeping the existing item API",
+                "status": "skipped",
+                "title": "selects SITUATIONAL through searchable cards while keeping the existing item API",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor keeps the cognitive type discoverable but disabled when capability is unavailable",
+                "status": "skipped",
+                "title": "keeps the cognitive type discoverable but disabled when capability is unavailable",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor explains an empty cognitive catalog without inventing an available task",
+                "status": "skipped",
+                "title": "explains an empty cognitive catalog without inventing an available task",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor keeps unsaved metadata across steps and saves through the existing revision contract",
+                "status": "skipped",
+                "title": "keeps unsaved metadata across steps and saves through the existing revision contract",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor reveals and focuses an invalid feedback time when saving from another step",
+                "status": "skipped",
+                "title": "reveals and focuses an invalid feedback time when saving from another step",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor opens the publish deep link and routes a server preflight issue back to its unit",
+                "status": "skipped",
+                "title": "opens the publish deep link and routes a server preflight issue back to its unit",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor creates with the existing request payload and opens real content authoring",
+                "status": "skipped",
+                "title": "creates with the existing request payload and opens real content authoring",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages adds library materials without opening advanced rules and persists them with the typed Form policy",
+                "status": "skipped",
+                "title": "adds library materials without opening advanced rules and persists them with the typed Form policy",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages hides manual grouping and automatically appends ordinary questions without enabling V3",
+                "status": "skipped",
+                "title": "hides manual grouping and automatically appends ordinary questions without enabling V3",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages starts a new stage only on request, then appends subsequent questions to that new stage",
+                "status": "skipped",
+                "title": "starts a new stage only on request, then appends subsequent questions to that new stage",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages provides same-stage condition sources and clears a condition when starting another stage",
+                "status": "skipped",
+                "title": "provides same-stage condition sources and clears a condition when starting another stage",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages sends a selected same-stage condition with the existing stable item key",
+                "status": "skipped",
+                "title": "sends a selected same-stage condition with the existing stable item key",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages starts automatically after another instrument instead of appending to an earlier section",
+                "status": "skipped",
+                "title": "starts automatically after another instrument instead of appending to an earlier section",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages keeps the special background section separate from ordinary questions",
+                "status": "skipped",
+                "title": "keeps the special background section separate from ordinary questions",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages saves row-based legacy options with punctuation intact and preserves them on a rejected request",
+                "status": "skipped",
+                "title": "saves row-based legacy options with punctuation intact and preserves them on a rejected request",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages saves bulk matrix rows and options using the existing typed definition shape",
+                "status": "skipped",
+                "title": "saves bulk matrix rows and options using the existing typed definition shape",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages preserves supplied background codes and requires unlinking other/exclusive roles before deleting an option",
+                "status": "skipped",
+                "title": "preserves supplied background codes and requires unlinking other/exclusive roles before deleting an option",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "guided anonymous publication"
+                ],
+                "fullName": "guided anonymous publication explains the three steps before publishing without generating a public credential",
+                "status": "skipped",
+                "title": "explains the three steps before publishing without generating a public credential",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "guided anonymous publication"
+                ],
+                "fullName": "guided anonymous publication shows links directly after publication, outside the collapsed management actions",
+                "status": "skipped",
+                "title": "shows links directly after publication, outside the collapsed management actions",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "guided anonymous publication"
+                ],
+                "fullName": "guided anonymous publication opens one anonymous settings area from delivery and preserves changes through saving",
+                "status": "skipped",
+                "title": "opens one anonymous settings area from delivery and preserves changes through saving",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training toolkit separation"
+                ],
+                "fullName": "Training toolkit separation keeps the three advanced controls in toolkit with the saved course context",
+                "status": "skipped",
+                "title": "keeps the three advanced controls in toolkit with the saved course context",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training toolkit separation"
+                ],
+                "fullName": "Training toolkit separation hides advanced controls in course editing while retaining an unconfirmed selection guard",
+                "status": "skipped",
+                "title": "hides advanced controls in course editing while retaining an unconfirmed selection guard",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "selects and submits an exact approved Training combination without collapsing versions to the physical Scale",
+                "status": "passed",
+                "title": "selects and submits an exact approved Training combination without collapsing versions to the physical Scale",
+                "duration": 523.5926869999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "distinguishes approved parameter/report versions sharing one content version and submits the selected exact combination",
+                "status": "passed",
+                "title": "distinguishes approved parameter/report versions sharing one content version and submits the selected exact combination",
+                "duration": 267.94955500000015,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "offers granted exact configurations in GENERAL while retaining authorized native Scale choices",
+                "status": "passed",
+                "title": "offers granted exact configurations in GENERAL while retaining authorized native Scale choices",
+                "duration": 219.55630100000008,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "uses named precise Training choices and sends the original selected binding while disabling ambiguous choices",
+                "status": "passed",
+                "title": "uses named precise Training choices and sends the original selected binding while disabling ambiguous choices",
+                "duration": 223.59063400000014,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793303845304,
+            "endTime": 1793303846538.5906,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component shows only server choices and limitations, leaves comparisons unselected, and publishes nothing",
+                "status": "skipped",
+                "title": "shows only server choices and limitations, leaves comparisons unselected, and publishes nothing",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component keeps edits to the other selection and uses the receipt revision; sends no hashes or inferred context",
+                "status": "skipped",
+                "title": "keeps edits to the other selection and uses the receipt revision; sends no hashes or inferred context",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component clears 参考 only through explicit null and rejects a double click synchronously",
+                "status": "skipped",
+                "title": "clears 参考 only through explicit null and rejects a double click synchronously",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component clears 报告 only through explicit null and rejects a double click synchronously",
+                "status": "skipped",
+                "title": "clears 报告 only through explicit null and rejects a double click synchronously",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component recognizes a saved selection after JSONB reorders its object keys",
+                "status": "skipped",
+                "title": "recognizes a saved selection after JSONB reorders its object keys",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component preserves unavailable references and visibly preserves the unavailable selected report",
+                "status": "skipped",
+                "title": "preserves unavailable references and visibly preserves the unavailable selected report",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component requires a read before exact original-revision retry, including after remount",
+                "status": "skipped",
+                "title": "requires a read before exact original-revision retry, including after remount",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component recognizes a matching current save without sending another mutation",
+                "status": "skipped",
+                "title": "recognizes a matching current save without sending another mutation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component ends a superseded revision only explicitly, never claiming success or resending at a new revision",
+                "status": "skipped",
+                "title": "ends a superseded revision only explicitly, never claiming success or resending at a new revision",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component unlocks a first definitive HTTP 400 refusal without dropping local edits",
+                "status": "skipped",
+                "title": "unlocks a first definitive HTTP 400 refusal without dropping local edits",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component unlocks a first definitive HTTP 401 refusal without dropping local edits",
+                "status": "skipped",
+                "title": "unlocks a first definitive HTTP 401 refusal without dropping local edits",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component unlocks a first definitive HTTP 403 refusal without dropping local edits",
+                "status": "skipped",
+                "title": "unlocks a first definitive HTTP 403 refusal without dropping local edits",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component unlocks a first definitive HTTP 404 refusal without dropping local edits",
+                "status": "skipped",
+                "title": "unlocks a first definitive HTTP 404 refusal without dropping local edits",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component unlocks a first definitive HTTP 409 refusal without dropping local edits",
+                "status": "skipped",
+                "title": "unlocks a first definitive HTTP 409 refusal without dropping local edits",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component unlocks a first definitive HTTP 422 refusal without dropping local edits",
+                "status": "skipped",
+                "title": "unlocks a first definitive HTTP 422 refusal without dropping local edits",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component retains earlier uncertainty after a retry receives a definitive refusal and requires another read",
+                "status": "skipped",
+                "title": "retains earlier uncertainty after a retry receives a definitive refusal and requires another read",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component holds malformed save receipts as unknown",
+                "status": "skipped",
+                "title": "holds malformed save receipts as unknown",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component holds missing-owner-fields save receipts as unknown",
+                "status": "skipped",
+                "title": "holds missing-owner-fields save receipts as unknown",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component holds wrong-selection save receipts as unknown",
+                "status": "skipped",
+                "title": "holds wrong-selection save receipts as unknown",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component holds wrong-id save receipts as unknown",
+                "status": "skipped",
+                "title": "holds wrong-id save receipts as unknown",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component holds old-revision save receipts as unknown",
+                "status": "skipped",
+                "title": "holds old-revision save receipts as unknown",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component does not mistake omitted owner-only fields for a verified null during recovery",
+                "status": "skipped",
+                "title": "does not mistake omitted owner-only fields for a verified null during recovery",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component isolates a late request and its stored recovery from another actor",
+                "status": "skipped",
+                "title": "isolates a late request and its stored recovery from another actor",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component isolates a late request and its stored recovery from another product",
+                "status": "skipped",
+                "title": "isolates a late request and its stored recovery from another product",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component ignores late choice results after a product change",
+                "status": "skipped",
+                "title": "ignores late choice results after a product change",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component retains local dirty edits when an independent saved selection baseline advances",
+                "status": "skipped",
+                "title": "retains local dirty edits when an independent saved selection baseline advances",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component protects dirty SPA navigation, leaves after explicit discard, and warns before unloading",
+                "status": "skipped",
+                "title": "protects dirty SPA navigation, leaves after explicit discard, and warns before unloading",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component blocks leaving an unknown outcome and keeps recovery available while new edits are externally disabled",
+                "status": "skipped",
+                "title": "blocks leaving an unknown outcome and keeps recovery available while new edits are externally disabled",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component rejects incomplete choice data without rendering or inventing a population",
+                "status": "skipped",
+                "title": "rejects incomplete choice data without rendering or inventing a population",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training content selection real component"
+                ],
+                "fullName": "Training content selection real component does not transmit a mutation when durable pending storage fails",
+                "status": "skipped",
+                "title": "does not transmit a mutation when durable pending storage fails",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "shows a fixed administrator configuration without offering that unit any P or R control and preserves other units",
+                "status": "passed",
+                "title": "shows a fixed administrator configuration without offering that unit any P or R control and preserves other units",
+                "duration": 148.59707200000003,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793303844852,
+            "endTime": 1793303845000.5972,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/questionnaire/__tests__/TrainingContentSelection.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-named-http",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-named.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-named-http.json"
+        ],
+        "startedAt": "2026-10-29T19:58:37.947000+00:00",
+        "finishedAt": "2026-10-29T19:58:58.704999+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 4,
+        "numPassedTests": 1,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793303919160,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact named original intent through authenticated HTTP"
+                ],
+                "fullName": "Training exact named original intent through authenticated HTTP rejects a substituted predecessor and unchanged route guard violations before issuing anything",
+                "status": "failed",
+                "title": "rejects a substituted predecessor and unchanged route guard violations before issuing anything",
+                "duration": 64.13746100000208,
+                "failureMessages": [
+                  "AssertionError: 请完成管理员双因素登录: expected 401 to be 409 // Object.is equality\n    at call (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts:15:133)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts:42:3\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact named original intent through authenticated HTTP"
+                ],
+                "fullName": "Training exact named original intent through authenticated HTTP issues and replays the exact original recipient, business name and previous use identity through the actual router",
+                "status": "failed",
+                "title": "issues and replays the exact original recipient, business name and previous use identity through the actual router",
+                "duration": 13.262988999998925,
+                "failureMessages": [
+                  "AssertionError: 请完成管理员双因素登录: expected 401 to be 200 // Object.is equality\n    at call (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts:15:133)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts:50:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact named original intent through authenticated HTTP"
+                ],
+                "fullName": "Training exact named original intent through authenticated HTTP reads only the original issuer request and reports older superseded revisions without changing tasks or sources",
+                "status": "failed",
+                "title": "reads only the original issuer request and reports older superseded revisions without changing tasks or sources",
+                "duration": 0.9540369999995164,
+                "failureMessages": [
+                  "Error: Prior HTTP write failed; inspect before retry\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts:61:20\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact named original intent through authenticated HTTP"
+                ],
+                "fullName": "Training exact named original intent through authenticated HTTP exposes the frozen COURSE configuration as fixed and offers no report or reference substitutions for that unit",
+                "status": "passed",
+                "title": "exposes the frozen COURSE configuration as fixed and offers no report or reference substitutions for that unit",
+                "duration": 278.76513200000045,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793303938056,
+            "endTime": 1793303938413.7651,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Training existing Cookie/CSRF/origin routes, precise original predecessor and own request receipt. No source rewrite, setup replay, new MFA policy or participant replay.",
+        "requests": [
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 401
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 401
+          },
+          {
+            "path": "/api/questionnaire-products/efa79554-e9cf-4d7e-ad89-23dda049d7ad/content-reference-choices",
+            "status": 200
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-named-http-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-named.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts",
+          "-t",
+          "rejects a substituted|issues and replays|reads only",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-named-http-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:00:30.168868+00:00",
+        "finishedAt": "2026-10-29T20:00:41.709541+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 4,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 1,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304030846,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact named original intent through authenticated HTTP"
+                ],
+                "fullName": "Training exact named original intent through authenticated HTTP rejects a substituted predecessor and unchanged route guard violations before issuing anything",
+                "status": "passed",
+                "title": "rejects a substituted predecessor and unchanged route guard violations before issuing anything",
+                "duration": 130.5185309999997,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact named original intent through authenticated HTTP"
+                ],
+                "fullName": "Training exact named original intent through authenticated HTTP issues and replays the exact original recipient, business name and previous use identity through the actual router",
+                "status": "passed",
+                "title": "issues and replays the exact original recipient, business name and previous use identity through the actual router",
+                "duration": 150.37642199999937,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact named original intent through authenticated HTTP"
+                ],
+                "fullName": "Training exact named original intent through authenticated HTTP reads only the original issuer request and reports older superseded revisions without changing tasks or sources",
+                "status": "passed",
+                "title": "reads only the original issuer request and reports older superseded revisions without changing tasks or sources",
+                "duration": 66.21907800000008,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact named original intent through authenticated HTTP"
+                ],
+                "fullName": "Training exact named original intent through authenticated HTTP exposes the frozen COURSE configuration as fixed and offers no report or reference substitutions for that unit",
+                "status": "skipped",
+                "title": "exposes the frozen COURSE configuration as fixed and offers no report or reference substitutions for that unit",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304041171,
+            "endTime": 1793304041518.219,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Training existing Cookie/CSRF/origin routes, precise original predecessor and own request receipt. No source rewrite, setup replay, new MFA policy or participant replay.",
+        "requests": [
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 409
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 400
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 403
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 403
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-requests/1bf835f4-b9ef-42c5-a31d-4cf49e75b05e",
+            "status": 403
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 200
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 200
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-requests/1bf835f4-b9ef-42c5-a31d-4cf49e75b05e",
+            "status": 200
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants?userId=603b717c-a734-483c-b693-b8a430767f71",
+            "status": 200
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 403
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-requests/1bf835f4-b9ef-42c5-a31d-4cf49e75b05e",
+            "status": 403
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-requests/1bf835f4-b9ef-42c5-a31d-4cf49e75b05e",
+            "status": 200
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-requests/e7438c45-083c-439c-814e-e064e8e7e958",
+            "status": 200
+          },
+          {
+            "path": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-requests/6e4eaafc-fabb-4b55-abe1-adbfa45e5a48",
+            "status": 200
+          }
+        ],
+        "issuedId": "570799ad-b0f3-4bbc-8cb1-910e0df43e3a"
+      }
+    },
+    {
+      "name": "training-named-backend-types-final",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/training-named-configuration-final-types.json"
+        ],
+        "startedAt": "2026-10-29T19:58:37.957645+00:00",
+        "finishedAt": "2026-10-29T20:00:10.671705+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "training-named-frontend-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "startedAt": "2026-10-29T19:58:37.972840+00:00",
+        "finishedAt": "2026-10-29T20:00:40.117078+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "training-named-frontend-lint",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/eslint/bin/eslint.js",
+          "src/api/standardConfigurationGrants.ts",
+          "src/api/standardConfigurationGrants.test.ts",
+          "src/components/AssessmentToolPicker.tsx",
+          "src/components/__tests__/AssessmentToolPicker.test.tsx",
+          "src/pages/questionnaire/QuestionnaireProducts.tsx",
+          "src/pages/questionnaire/TrainingContentSelection.tsx",
+          "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+          "src/pages/questionnaire/__tests__/TrainingContentSelection.test.tsx",
+          "src/training/TrainingStandardConfigurationGrants.tsx",
+          "src/training/TrainingStandardConfigurationGrants.test.tsx",
+          "src/training/useTrainingStandardConfigurationIssue.ts"
+        ],
+        "startedAt": "2026-10-29T19:58:37.974749+00:00",
+        "finishedAt": "2026-10-29T19:58:42.426750+00:00",
+        "exitCode": 0
+      }
+    }
+  ],
+  "readbackBeforeHttpRetry": {
+    "scope": "Read-only post-failure retained local database; no changes",
+    "users": 4,
+    "materialGrantVersions": [
+      {
+        "version": 3,
+        "count": 1
+      },
+      {
+        "version": 5,
+        "count": 1
+      },
+      {
+        "version": 2,
+        "count": 1
+      },
+      {
+        "version": 1,
+        "count": 1
+      }
+    ],
+    "tasks": 8,
+    "newHttpBusinessNameEvents": 0,
+    "proof": "Independent npx tsx query returned these counts after first HTTP1PASS/3FAIL, before proof-fixture correction. No credentials output. Exact original log not captured as portable status; counts also guarded by resumed HTTP beforeAll."
+  }
+}

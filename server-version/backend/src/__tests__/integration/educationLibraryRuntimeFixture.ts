@@ -161,7 +161,7 @@ export async function setupEducationLibraryRuntimeFixture(input: {
   const a = registered.resourceEntry.applicability
   const requestedPolicy: Parameters<typeof addAssessmentRunTrackDraft>[0]['requestedPolicy'] = { subjectRoles: a.subjectRoles, respondentRoles: a.respondentRoles, relationshipKinds: responseMode === 'TEACHER_REPORT' ? a.relationshipKinds.filter(kind => kind === 'CLASS_TEACHER_STUDENT') : a.relationshipKinds,
     perspectives: a.perspectives, analysisMode: a.analysisMode, visibilityPolicyKey: a.visibilityPolicyKey, minimumRespondents: a.minimumRespondents,
-    ...(responseMode === 'TEACHER_REPORT' ? { targetPolicy: { mode: input.publisher === 'PSYCHOLOGY' ? 'HOMEROOM_TEACHER' : 'ALL_CLASS_TEACHERS' } } : {}) }
+    ...(responseMode === 'TEACHER_REPORT' ? { targetPolicy: { mode: input.publisher === 'PSYCHOLOGY' ? 'HOMEROOM_TEACHER' as const : 'ALL_CLASS_TEACHERS' as const } } : {}) }
   for (let index = 0; index < (input.trackCount ?? 1); index++) await addAssessmentRunTrackDraft({ organizationId, runId,
     actorUserId: managerUserId, resource, subjectSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: [subjectMembershipId] },
     respondentSelector: responseMode === 'PARENT_REPORT' ? { kind: 'RELATED_PARENT' } : { kind: 'MEMBERSHIP_IDS', membershipIds: [participantMembershipId!] }, requestedPolicy })
@@ -178,3 +178,6 @@ export async function setupEducationLibraryRuntimeFixture(input: {
     imageReference, workflow, catalog, requestedPolicy, open, preview, publish, executions,
     executionId: (await executions())[0]?.id ?? null, answers: [{ itemCode: 'Q1', responseValue: 'option_3' }] }
 }
+
+// Identity metadata only, for native-profile fixtures that reuse an already installed source.
+export {seedSchool as seedEducationSchoolRuntimeIdentity,seedTeacher as seedEducationTeacherRuntimeIdentity}

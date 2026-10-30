@@ -555,6 +555,1467 @@
           "scope": "Independent actual product/control/original evidence review; authorized final metadata-only delta. Not DOT, GitHub APPROVE or signed original execution."
         }
       }
+    },
+    "task1": {
+      "schemaVersion": 1,
+      "pr": "task1",
+      "enabled": true,
+      "base": "dfd506347cfa2c684a75812936f32d48bdce34d4",
+      "product": "7403128fed365351cacbaa59c75cbe57a7cf810e",
+      "controlCheckpoint": "926fd1866983bcf031be1da4cccdcbb7e6ab4d2d",
+      "source": {
+        "docs/precise-authorization-20261029/approved-scale-axes-progress.md": {
+          "before": null,
+          "after": "fa9b56d70235a54117b58f8d0611784a2d807458"
+        },
+        "docs/precise-authorization-20261029/approved-scale-axes-raw.json": {
+          "before": null,
+          "after": "f3a79fd81bb82ac3387db0fe37633b6f61d7883f"
+        },
+        "docs/precise-authorization-20261029/approved-scale-axes-verification.json": {
+          "before": null,
+          "after": "5a3aff427415dd03e0aa2f1586103fc1f9282e2e"
+        },
+        "docs/precise-authorization-20261029/built-ui-artifacts.json": {
+          "before": null,
+          "after": "065dd3b6eebc7beca7b16b206353f6ce9df626f3"
+        },
+        "docs/precise-authorization-20261029/built-ui-progress.md": {
+          "before": null,
+          "after": "15042ef0c880a7a0094e6ff3fa8d7b4216153456"
+        },
+        "docs/precise-authorization-20261029/built-ui-raw.json": {
+          "before": null,
+          "after": "0156b5d04d2aa5c838550db869eee182687b22eb"
+        },
+        "docs/precise-authorization-20261029/built-ui-screenshots/teacher-mobile-dark.png": {
+          "before": null,
+          "after": "34a133efa169a7d01693d17f5a3fa7e1d2d4140b"
+        },
+        "docs/precise-authorization-20261029/built-ui-screenshots/training-desktop-light.png": {
+          "before": null,
+          "after": "6210558a707e780820c5994500b69dfabe426883"
+        },
+        "docs/precise-authorization-20261029/built-ui-screenshots/training-mobile-dark.png": {
+          "before": null,
+          "after": "a7af730ff73fd6c44d0c7936b6d7adc34856b544"
+        },
+        "docs/precise-authorization-20261029/built-ui-verification.json": {
+          "before": null,
+          "after": "680bc20a310da85bc6e1577de8025113eba0444b"
+        },
+        "docs/precise-authorization-20261029/ci-candidate-f7e6e430.json": {
+          "before": null,
+          "after": "5dd61915ee910dddd01a5b309ed172c51d810bd3"
+        },
+        "docs/precise-authorization-20261029/cognitive-management-review-progress.md": {
+          "before": null,
+          "after": "5c2ce834ea40bbc388febe8ed1585bd403cfd045"
+        },
+        "docs/precise-authorization-20261029/cognitive-management-review-raw.json": {
+          "before": null,
+          "after": "c1fcca988645e892781c1767d9438ac593787182"
+        },
+        "docs/precise-authorization-20261029/cognitive-profile-approval-progress.md": {
+          "before": null,
+          "after": "9585aa8609188cb86f7058b515c00529a2f37098"
+        },
+        "docs/precise-authorization-20261029/cognitive-profile-approval-raw.json": {
+          "before": null,
+          "after": "2df277b2573b3b01091a1f68893365ab59e8abf4"
+        },
+        "docs/precise-authorization-20261029/cognitive-profile-approval-verification.json": {
+          "before": null,
+          "after": "9c4078b4f072e13dc72342602db470d273453cfe"
+        },
+        "docs/precise-authorization-20261029/cognitive-profile-artifact-progress.md": {
+          "before": null,
+          "after": "ef4049504ef14bf4ea7ae36e5e8b49c32c106575"
+        },
+        "docs/precise-authorization-20261029/cognitive-profile-artifact-raw.json": {
+          "before": null,
+          "after": "91b48e8569fb7a7cee6bb2f1d8c49013d5621e8d"
+        },
+        "docs/precise-authorization-20261029/cognitive-profile-artifact-verification.json": {
+          "before": null,
+          "after": "a405c5fa7fb35274c075fb0a785158e8e6ddf36d"
+        },
+        "docs/precise-authorization-20261029/cognitive-profile-contract.md": {
+          "before": null,
+          "after": "ff75cb7c4bcd8b8fd62835d6c3216d832025edf4"
+        },
+        "docs/precise-authorization-20261029/current-status.md": {
+          "before": null,
+          "after": "422bf197eccd858e241e24631177a72fecbcb6da"
+        },
+        "docs/precise-authorization-20261029/draft-source-audit-progress.md": {
+          "before": null,
+          "after": "d88d7b82de1f93657898b1964629cb786ed838bc"
+        },
+        "docs/precise-authorization-20261029/draft-source-audit-raw.json": {
+          "before": null,
+          "after": "53c90734342c4bf8e15bb4e0aab595f2ea5957f8"
+        },
+        "docs/precise-authorization-20261029/draft-source-audit-verification.json": {
+          "before": null,
+          "after": "41d57fc61d08abbc2b3c7dd88eae91e4484cb388"
+        },
+        "docs/precise-authorization-20261029/education-admission-progress.md": {
+          "before": null,
+          "after": "41b004a72042b06728971213e8cde729e5ec3418"
+        },
+        "docs/precise-authorization-20261029/education-admission-verification.json": {
+          "before": null,
+          "after": "33dcd68c3c577e01e4d2126824c900be30de957f"
+        },
+        "docs/precise-authorization-20261029/education-cognitive-profile-contract.md": {
+          "before": null,
+          "after": "b280d93ef946412a0ddc7b6392f2a21f2867817a"
+        },
+        "docs/precise-authorization-20261029/education-cognitive-profile-progress.md": {
+          "before": null,
+          "after": "e5e65d0f1dbbe248f26401d71cf8efaf4a0dffad"
+        },
+        "docs/precise-authorization-20261029/education-cognitive-profile-raw.json": {
+          "before": null,
+          "after": "96834fc5238fa124a073addfd239a208f55e6bb3"
+        },
+        "docs/precise-authorization-20261029/education-cognitive-runtime-progress.md": {
+          "before": null,
+          "after": "811a7c7d4c4d11dd0fa0ca90fc0cd27a25bb0606"
+        },
+        "docs/precise-authorization-20261029/education-cognitive-runtime-raw.json": {
+          "before": null,
+          "after": "de78c2e2058f6d8c4cf3fd492a6d876c689c4fab"
+        },
+        "docs/precise-authorization-20261029/education-draft-change-progress.md": {
+          "before": null,
+          "after": "3ec763aa8e666eeab2c5ffeb4152d5742333afb7"
+        },
+        "docs/precise-authorization-20261029/education-draft-change-raw.json": {
+          "before": null,
+          "after": "9de511b1c74af20cd95805691b4434b66754ba6a"
+        },
+        "docs/precise-authorization-20261029/education-draft-change-verification.json": {
+          "before": null,
+          "after": "c4af79de566842b2e9cd8189d6d64106b1732717"
+        },
+        "docs/precise-authorization-20261029/education-manager-services-progress.md": {
+          "before": null,
+          "after": "8aeff944038ebe5d8b710d5b56e7cdeb18b1b3cf"
+        },
+        "docs/precise-authorization-20261029/education-manager-services-verification.json": {
+          "before": null,
+          "after": "d12fc3f54b8a617cec0ba48a1c826a9618f8c238"
+        },
+        "docs/precise-authorization-20261029/education-manager-ui-progress.md": {
+          "before": null,
+          "after": "72cb6e636a642d1e5d540a4be08cdf68ebf50d86"
+        },
+        "docs/precise-authorization-20261029/education-manager-ui-raw.json": {
+          "before": null,
+          "after": "b251d9528851a42e03bda0fd57dbd9c2d01db1a3"
+        },
+        "docs/precise-authorization-20261029/education-manager-ui-verification.json": {
+          "before": null,
+          "after": "20957a10039a8464249b15c9f77cb5ae22f8dde8"
+        },
+        "docs/precise-authorization-20261029/education-replacement-progress.md": {
+          "before": null,
+          "after": "7b3bbd3398d1da9d7eefdfdf64b0ec1791da501a"
+        },
+        "docs/precise-authorization-20261029/education-replacement-raw.json": {
+          "before": null,
+          "after": "a77cd49c73caaae6cd26cecb7f80c2cc2ea32377"
+        },
+        "docs/precise-authorization-20261029/education-replacement-verification.json": {
+          "before": null,
+          "after": "a3738c8994bec27405abf0f39478ec260dc38d13"
+        },
+        "docs/precise-authorization-20261029/education-selected-catalog-progress.md": {
+          "before": null,
+          "after": "69b4a17e0b6fec1d4f9a5e3928042be80d3376fb"
+        },
+        "docs/precise-authorization-20261029/education-selected-catalog-verification.json": {
+          "before": null,
+          "after": "dd5d057dd9729590af6f55bd9616ebece0fae9c8"
+        },
+        "docs/precise-authorization-20261029/education-selected-lifecycle-verification.json": {
+          "before": null,
+          "after": "9e30817edd1c5f6e58194f88fa4018935aa66697"
+        },
+        "docs/precise-authorization-20261029/education-selected-source-progress.md": {
+          "before": null,
+          "after": "68b683d07adf3cd7bfdd9f2ea4890f7b2d4efd68"
+        },
+        "docs/precise-authorization-20261029/education-selected-source-verification.json": {
+          "before": null,
+          "after": "98f3e67f1662d96f110356be8bee2b9a9610495b"
+        },
+        "docs/precise-authorization-20261029/education-use-progress.md": {
+          "before": null,
+          "after": "283eea56df854eeb937d53c964221a096779a046"
+        },
+        "docs/precise-authorization-20261029/education-use-verification.json": {
+          "before": null,
+          "after": "88d66600317f04796af1fbded15a87c725f54a9f"
+        },
+        "docs/precise-authorization-20261029/exact-authorization-inventory-progress.md": {
+          "before": null,
+          "after": "0475ff454e90930100c1939cc02d049177cea74a"
+        },
+        "docs/precise-authorization-20261029/exact-authorization-inventory-raw.json": {
+          "before": null,
+          "after": "f72478bf900d9221d04bc8bbe1b8150dcaaadb19"
+        },
+        "docs/precise-authorization-20261029/exact-authorization-inventory-verification.json": {
+          "before": null,
+          "after": "4f122676a526a0f98d7fe04105a321c5ec5c4ff1"
+        },
+        "docs/precise-authorization-20261029/implementation.md": {
+          "before": null,
+          "after": "9deb965aac12aac30058dc710fdde3b8bb1bd8df"
+        },
+        "docs/precise-authorization-20261029/legacy-presence-inventory.json": {
+          "before": null,
+          "after": "01cab70fbd50de412ded13fd91a418b654ac44cc"
+        },
+        "docs/precise-authorization-20261029/main-dc0f-built-ui-artifact.json": {
+          "before": null,
+          "after": "d17d71b562a9edb5fcfdafeb511229bc36836251"
+        },
+        "docs/precise-authorization-20261029/main-dc0f-built-ui-progress.md": {
+          "before": null,
+          "after": "4e74379e10ebaf873ecbfb1f33b2b85d84ffe234"
+        },
+        "docs/precise-authorization-20261029/main-dc0f-built-ui-raw.json": {
+          "before": null,
+          "after": "11e483096898666b891963a8a00bb5849d3dabdb"
+        },
+        "docs/precise-authorization-20261029/main-dc0f-built-ui-verification.json": {
+          "before": null,
+          "after": "7743020ca412d26312b1688c13666ea92ea6f53b"
+        },
+        "docs/precise-authorization-20261029/main-dc0f-integration-progress.md": {
+          "before": null,
+          "after": "7bfb6633aa7473c244450a1459c8c3d8930daa6a"
+        },
+        "docs/precise-authorization-20261029/main-dc0f-integration-raw.json": {
+          "before": null,
+          "after": "c031126af4f1458c8aa9e371064d7caa0caeddc6"
+        },
+        "docs/precise-authorization-20261029/main-dc0f-integration-verification.json": {
+          "before": null,
+          "after": "b8b769e3780c953ede9226887a3c1ecedf150cfb"
+        },
+        "docs/precise-authorization-20261029/nonempty-r-blocker.md": {
+          "before": null,
+          "after": "c059864cc0519d6fb65135f2d1206722d3402eda"
+        },
+        "docs/precise-authorization-20261029/nonempty-r-readback.json": {
+          "before": null,
+          "after": "b15292da9d22cc85a23b1c6935ff046dcaef045e"
+        },
+        "docs/precise-authorization-20261029/read-performance-progress.md": {
+          "before": null,
+          "after": "a8f4e789a2829089af69efbc1f52486c91c1b14d"
+        },
+        "docs/precise-authorization-20261029/read-performance-raw.json": {
+          "before": null,
+          "after": "b2194bd7bee496d7a4a8038db931c7c31bf3173f"
+        },
+        "docs/precise-authorization-20261029/read-performance-verification.json": {
+          "before": null,
+          "after": "fee349b0d77e8ea6a39a0c085ae7b9312d3b6fbc"
+        },
+        "docs/precise-authorization-20261029/registered-dual-report-progress.md": {
+          "before": null,
+          "after": "09bb7757a0eb387f098ef3cb085471d1ccfa441c"
+        },
+        "docs/precise-authorization-20261029/registered-dual-report-raw.json": {
+          "before": null,
+          "after": "4dbf06daa3e97eda65806b67925a2ce3382b0dd4"
+        },
+        "docs/precise-authorization-20261029/report-parameter-compatibility-progress.md": {
+          "before": null,
+          "after": "23c9f70fcefedce7d6563e3a6abc143c87ffbfa2"
+        },
+        "docs/precise-authorization-20261029/report-parameter-compatibility-raw.json": {
+          "before": null,
+          "after": "5de24cbe408b72d48c9b96c67e68fd70851b9542"
+        },
+        "docs/precise-authorization-20261029/report-parameter-compatibility-verification.json": {
+          "before": null,
+          "after": "a574a07a0cda4a3df910b2a7e6ae7fa9c4060978"
+        },
+        "docs/precise-authorization-20261029/runtime-role-progress.md": {
+          "before": null,
+          "after": "951332df07346459b28bb180945a91cbcde4f710"
+        },
+        "docs/precise-authorization-20261029/runtime-role-raw.json": {
+          "before": null,
+          "after": "af55f786c96a3d7d5f8657ed3960c2333ec4a1dd"
+        },
+        "docs/precise-authorization-20261029/runtime-role-verification.json": {
+          "before": null,
+          "after": "84a12747eb102bddd48f4ca143c21937053843ae"
+        },
+        "docs/precise-authorization-20261029/scale-ci-review-preparation.md": {
+          "before": null,
+          "after": "40d7441288d79ef5be0b361c65488ed27304fefa"
+        },
+        "docs/precise-authorization-20261029/scale-ci-route-observation.json": {
+          "before": null,
+          "after": "06fef5230a6620524dbfae8969881455b7083d27"
+        },
+        "docs/precise-authorization-20261029/scale-commonjs-artifact.jsonl": {
+          "before": null,
+          "after": "2471b91453b5bef62f584f51f63176b9fb3258e0"
+        },
+        "docs/precise-authorization-20261029/scale-commonjs-progress.md": {
+          "before": null,
+          "after": "cd9a94d75bb850e7605fd009f90b95945ef53d84"
+        },
+        "docs/precise-authorization-20261029/scale-commonjs-raw.json": {
+          "before": null,
+          "after": "7830fa6ed35394013d966aa90cbb6ca0cd539c41"
+        },
+        "docs/precise-authorization-20261029/scale-commonjs-verification.json": {
+          "before": null,
+          "after": "7335036111532888607f3ab47ebf47f58a2f189c"
+        },
+        "docs/precise-authorization-20261029/scale-materials-readback.md": {
+          "before": null,
+          "after": "156b3347d1ac5436697d6ae66826c6757c5e9013"
+        },
+        "docs/precise-authorization-20261029/scale-review-source-ca7.json": {
+          "before": null,
+          "after": "e06d7a40273cc66515ff0d1657521735feb7b881"
+        },
+        "docs/precise-authorization-20261029/source-manifest.json": {
+          "before": null,
+          "after": "7150e797a48791bc072632f90967883b4b45c468"
+        },
+        "docs/precise-authorization-20261029/specification.md": {
+          "before": null,
+          "after": "45784394509e6fb9f5eab7de4b40e1a8eaae3a10"
+        },
+        "docs/precise-authorization-20261029/survey-cognitive-profile-progress.md": {
+          "before": null,
+          "after": "1c76a9ecf324e4b009bba030f752beea81bea888"
+        },
+        "docs/precise-authorization-20261029/survey-cognitive-profile-raw.json": {
+          "before": null,
+          "after": "16c6979231e5afc820615292a61dd04b110b4bca"
+        },
+        "docs/precise-authorization-20261029/survey-exact-journey-progress.md": {
+          "before": null,
+          "after": "01d3906299dcb3540766ca1163f245d26988b9ec"
+        },
+        "docs/precise-authorization-20261029/survey-exact-journey-raw.json": {
+          "before": null,
+          "after": "e6b95a89e2918456822715fa787b0c04e03cf798"
+        },
+        "docs/precise-authorization-20261029/survey-exact-journey-verification.json": {
+          "before": null,
+          "after": "8352d416d0ac2e1ea282759c117ead329854e088"
+        },
+        "docs/precise-authorization-20261029/survey-replacement-progress.md": {
+          "before": null,
+          "after": "ab939fa627cf7ee8daaafff53d8a70056ff80904"
+        },
+        "docs/precise-authorization-20261029/survey-replacement-raw.json": {
+          "before": null,
+          "after": "d2d63e68d05ccdfa278ca08a59453c8155eed7b4"
+        },
+        "docs/precise-authorization-20261029/survey-replacement-verification.json": {
+          "before": null,
+          "after": "db4acd419752dccca770c7b625c28a917708c61d"
+        },
+        "docs/precise-authorization-20261029/survey-standard-ui-progress.md": {
+          "before": null,
+          "after": "e23fd37704a7329e9375f082b15d5858b445730e"
+        },
+        "docs/precise-authorization-20261029/survey-standard-ui-raw.json": {
+          "before": null,
+          "after": "0c3e42c92957ddebfc0c98473e3d6a94c9b998f7"
+        },
+        "docs/precise-authorization-20261029/survey-standard-ui-verification.json": {
+          "before": null,
+          "after": "4e5b7b12bc4b477fe0e7235fb0cf476b0d4bfbc7"
+        },
+        "docs/precise-authorization-20261029/survey-standard-use-progress.md": {
+          "before": null,
+          "after": "ffdeeb349b8fbb913e2eb22e04961f62f2749c94"
+        },
+        "docs/precise-authorization-20261029/survey-standard-use-raw.json": {
+          "before": null,
+          "after": "dbbe2c06eb531a7c387fc1dd6bb5f464f027e323"
+        },
+        "docs/precise-authorization-20261029/survey-standard-use-verification.json": {
+          "before": null,
+          "after": "1ad75f1b6c5fc227e2f0bdc4541ddcea878899d8"
+        },
+        "docs/precise-authorization-20261029/training-binding-progress.md": {
+          "before": null,
+          "after": "8a39702d7cd94b42b261af00be7080e8c040587a"
+        },
+        "docs/precise-authorization-20261029/training-binding-verification.json": {
+          "before": null,
+          "after": "bf51c2a2cf3e1200699a923f5e740d6db3d1a017"
+        },
+        "docs/precise-authorization-20261029/training-cognitive-profile-general-progress.md": {
+          "before": null,
+          "after": "4c3cb8d8d2b699b25b33c14a9a02553de4d760fd"
+        },
+        "docs/precise-authorization-20261029/training-cognitive-profile-general-raw.json": {
+          "before": null,
+          "after": "15929f0ce691efc21d3d02baf1a88c3f2b1bd92d"
+        },
+        "docs/precise-authorization-20261029/training-cognitive-profile-progress.md": {
+          "before": null,
+          "after": "e8c44b506dffe1168ceccceb005222319bb75c35"
+        },
+        "docs/precise-authorization-20261029/training-cognitive-profile-raw.json": {
+          "before": null,
+          "after": "0a1e48d5a564a4cde32e9045eac98648c77c0580"
+        },
+        "docs/precise-authorization-20261029/training-cognitive-profile-ui-progress.md": {
+          "before": null,
+          "after": "0fd49a627e37450831e89c38d916b9c6b9a27c7b"
+        },
+        "docs/precise-authorization-20261029/training-cognitive-profile-ui-raw.json": {
+          "before": null,
+          "after": "e691d3f28cf55d66aaccf700a29b788bc8c8c821"
+        },
+        "docs/precise-authorization-20261029/training-course-journey-progress.md": {
+          "before": null,
+          "after": "dc8a5269e0ebd6766b3aa6043facf523b9661e48"
+        },
+        "docs/precise-authorization-20261029/training-course-journey-raw.json": {
+          "before": null,
+          "after": "ffa2cd490907c0f034fe9adade5fd7f4c4c09856"
+        },
+        "docs/precise-authorization-20261029/training-course-journey-verification.json": {
+          "before": null,
+          "after": "e72351e638dacbd0bdbfb5391c2702a1a21c1cce"
+        },
+        "docs/precise-authorization-20261029/training-named-configuration-progress.md": {
+          "before": null,
+          "after": "911410b5bfd3d663fe87435d7ac19a8b25ddd559"
+        },
+        "docs/precise-authorization-20261029/training-named-configuration-raw.json": {
+          "before": null,
+          "after": "9bdd5b7aa4284aa4e6beabeb92b54dcb718d9bed"
+        },
+        "docs/precise-authorization-20261029/training-named-configuration-verification.json": {
+          "before": null,
+          "after": "d0af7064ec50a7a3c61cc00ad840e24e9a888576"
+        },
+        "docs/precise-authorization-20261029/training-progress.md": {
+          "before": null,
+          "after": "5352d6a699f217ae0bf2241786df8b57df893ed3"
+        },
+        "docs/precise-authorization-20261029/training-replacement-contract.md": {
+          "before": null,
+          "after": "f013e1ec95d831bd2af20a9ac0b8d95a332ac4d3"
+        },
+        "docs/precise-authorization-20261029/training-replacement-progress.md": {
+          "before": null,
+          "after": "bbb79a32f92fabf0d9611b38c185d8e5d441f9f0"
+        },
+        "docs/precise-authorization-20261029/training-replacement-raw.json": {
+          "before": null,
+          "after": "8c8ea6fbf7d6cfedab7dab1d25f77f2a58cd5751"
+        },
+        "docs/precise-authorization-20261029/training-replacement-verification.json": {
+          "before": null,
+          "after": "412cb8ef8163cfe9326470513561ff6e42a3d13c"
+        },
+        "docs/precise-authorization-20261029/training-verification.json": {
+          "before": null,
+          "after": "f653a8e615a5b54ff84c66f5431b5722c128ae64"
+        },
+        "docs/precise-authorization-20261029/verification.json": {
+          "before": null,
+          "after": "74faf1a3b3fe412b45949f9205f65f3df0fa59f8"
+        },
+        "server-version/backend/prisma/migrations/20261029150000_standard_combination_education_admission/migration.sql": {
+          "before": null,
+          "after": "bc2bc593c7fb47f6bd4d45f2e5e0929d0f946eaf"
+        },
+        "server-version/backend/prisma/migrations/20261029151000_standard_use_revision_evidence_index/migration.sql": {
+          "before": null,
+          "after": "5db2d835afd120c598b8caf6fdcada32f54fbacc"
+        },
+        "server-version/backend/prisma/migrations/20261030001000_cognitive_profile_public_template/migration.sql": {
+          "before": null,
+          "after": "963de89ecf75d2a8ec963607cf7949d1b464d267"
+        },
+        "server-version/backend/prisma/migrations/20261030002000_cognitive_profile_entry_admission/migration.sql": {
+          "before": null,
+          "after": "c512f5a38a345743ca6970a516a9aa5f20a406d3"
+        },
+        "server-version/backend/prisma/migrations/20261030003000_training_cognitive_profile_use_index/migration.sql": {
+          "before": null,
+          "after": "e822c5e6b1c37f5498c0c24acb48efc3d0024a2f"
+        },
+        "server-version/backend/prisma/migrations/20261030004000_survey_cognitive_frozen_trial_budget/migration.sql": {
+          "before": null,
+          "after": "96a919f23fc5fa39277ade02685d14109c048120"
+        },
+        "server-version/backend/prisma/migrations/20261030005000_education_cognitive_profile_binding_guard/migration.sql": {
+          "before": null,
+          "after": "0c6d31ab36deacc974ed9fe6351ae4af3e3e6503"
+        },
+        "server-version/backend/scripts/precise-authorization-read-performance.ts": {
+          "before": null,
+          "after": "31dd3b2ae015ec2338be41c5e1c1197f80bb60a6"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "4fde818d94652f5b211e0b3304e1fb9f15fa208e"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.postgres.integration.test.ts": {
+          "before": null,
+          "after": "d8e427210fc99acedd0df12ed0a0ea7718eed9f9"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts": {
+          "before": null,
+          "after": "f4beb774ba3555f4e655303f344b6aa2ce6b130a"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts": {
+          "before": null,
+          "after": "c110f839c304bf5a23f876de118c1b507636c5aa"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/dual-report-journey.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "473f58c4d10a608e4612795f75e9e4efde60ca5b"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/dual-report-setup.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "1150df6d4bd0e0b9d088eed7b4f7261c9673ab0a"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-collection-boundary.test.ts": {
+          "before": null,
+          "after": "1fb59dbbc5e63e746a9f23e2175daa6445d52a06"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "76200be051c579bbf08b0d84c75842ddae1d6b49"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-binding.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "bd1efd65bd70d9675dfdc6c304b5ecfd79a6ea43"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-contract.test.ts": {
+          "before": null,
+          "after": "128a4b9e489b66034605130a38a65705526e48aa"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-guards.postgres.integration.test.ts": {
+          "before": null,
+          "after": "c8cc3f16e53fe7d6a38dfbf62e2bcb1ad52aed9f"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-main-merge.test.ts": {
+          "before": null,
+          "after": "a78534208ec1fec822e585ad61e2b1e0f2bc102c"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-operation.postgres.integration.test.ts": {
+          "before": null,
+          "after": "f9dec458efe9bf7abca70fae48434550a581e626"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-setup.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "8fad07a33d2e539a890d5e8caa93075f8a36d762"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile.browser.postgres.integration.test.ts": {
+          "before": null,
+          "after": "593394ac5ec300dea9686664c426d6acd4473e6a"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime-fixture.postgres.integration.test.ts": {
+          "before": null,
+          "after": "318ab03112a2e9672884e3c488d81bb92132144a"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "72582a274e704e3e843545dcb5c9a4e86ec2ad2e"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-draft-replacement-audit.postgres.integration.test.ts": {
+          "before": null,
+          "after": "33fb66966f72868d4172876dd1ea5cad3075720e"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-clock.postgres.integration.test.ts": {
+          "before": null,
+          "after": "6f666e4801a555962e32e22b1de7a5ba5726359a"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-cross-report.postgres.integration.test.ts": {
+          "before": null,
+          "after": "895620436f830152ccb96a5afcc8ebba817f8147"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog.postgres.integration.test.ts": {
+          "before": null,
+          "after": "f9ec0d770fcfdc51b233a020ed25565cdf9b5081"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts": {
+          "before": null,
+          "after": "bf8513e3e3ee5847a59f4dd5dd83e1ef39343074"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle.postgres.integration.test.ts": {
+          "before": null,
+          "after": "fc01869b4b676a8a4ef13d976e961f4fbd999416"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-selected-source-current.postgres.integration.test.ts": {
+          "before": null,
+          "after": "5615250a694cb9043e2249a9a1fcce3f1874d5df"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-selected-source.postgres.integration.test.ts": {
+          "before": null,
+          "after": "ddbf5e84a8adf76f5d6c2b69cbacd8064fb26b60"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-management-school.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "9afc4511e3338f90219f0711dc340a02f0b8c638"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "dc966fdf2b4e98ae3c8dc93137f5db51063dd123"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.postgres.integration.test.ts": {
+          "before": null,
+          "after": "a90d936085fbbdaa442f8a34e8e1a1e6d11ea7d4"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "74e1d372efba89e76f4777a77abc4e0ece546e51"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.postgres.integration.test.ts": {
+          "before": null,
+          "after": "343c7935d56c664c2662e7dabeb021a8abb6b0bd"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-revoke.postgres.integration.test.ts": {
+          "before": null,
+          "after": "646a836b8eda850a2d3eca17317a0b5c366302a6"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-binding.test.ts": {
+          "before": null,
+          "after": "7f86fdafbb4df603bc576ee60cb1d1ace3094c24"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.postgres.integration.test.ts": {
+          "before": null,
+          "after": "fd47024bca6d1c85a18ed1ffcaf08ce48ec0b031"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.test.ts": {
+          "before": null,
+          "after": "87124969d7a9fdab0a25f26fcd557a48c3529763"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/education-standard-use.postgres.integration.test.ts": {
+          "before": null,
+          "after": "41618f1d7822f76a6fa0c2fa393b9c6b4338927b"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts": {
+          "before": null,
+          "after": "be05268ced0c111b88b15b767d40d2aa8c5425f9"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/exact-use-runtime-role.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "5284783928d5004fe5fbab212753a7bacd76a8d1"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "5b98c6ba1949be1f113246d7fa5c40aea2d7e999"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/registered-report-variants.test.ts": {
+          "before": null,
+          "after": "58caa1e34e12adda8cc7232f5ffcb28e4a0813b9"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/selected-configuration.test.ts": {
+          "before": null,
+          "after": "aeda614475634b4d4d9ec09c5bc13c9ca612612c"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/selected-reference-audit.test.ts": {
+          "before": null,
+          "after": "a40dd6109ef8704d0973ab03e228e83b803ec49b"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/standard-configuration-binding.test.ts": {
+          "before": null,
+          "after": "2b89861c22318618b838c0c3f8515172f6e9bd5a"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.postgres.integration.test.ts": {
+          "before": null,
+          "after": "ab56dc40d8d86930dbb89bfe9633605066cffdaa"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.test.ts": {
+          "before": null,
+          "after": "242ab1a6783f40646c23d832a9847fcf51c3b4fb"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts": {
+          "before": null,
+          "after": "af0d7e21fa6f61ca2fc5dc85d2e4f93cda759455"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-budget.postgres.integration.test.ts": {
+          "before": null,
+          "after": "c88065baa83be205977cfbde364c82b6c6d75fe5"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-definition.test.ts": {
+          "before": null,
+          "after": "b7edfa88ac3800e9f645a931684a1d9536802a4f"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-research.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "408179d0b64a0d2a6c902fc958694de1c72dddf2"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.browser.postgres.integration.test.ts": {
+          "before": null,
+          "after": "8d28f2adbd9fd6133abf2ab1b0b179d5e887ee81"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "818fc405afc296e70d0c987af9c16289f5eae051"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "bd1654b5474dc5aaf1a72ecc81dc4db2c89da89d"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "e5ae15ff83e3d4da251a0bba79fe6d6ee5e0b62c"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.postgres.integration.test.ts": {
+          "before": null,
+          "after": "e9fd830c7159d5b9f0cef1233db2cacd041305e7"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use-revision.postgres.integration.test.ts": {
+          "before": null,
+          "after": "191f430402dbb9f1276ab18fa88b9a23808983ce"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "4267ab8102ae05a04f3d7d6c02ea2f11470c64db"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.postgres.integration.test.ts": {
+          "before": null,
+          "after": "5b971d4e25181bf3c5d0c9b0e3bf4a95c5c6575c"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/survey-t2-audit.postgres.integration.test.ts": {
+          "before": null,
+          "after": "4ea49d9324d29c65d78a93aef5d82acf11b9a505"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "4f1a1be54c04993ad985f9dea922f413be898d23"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "54513dd4e890effa59183754c96f38e6062646a6"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.browser.postgres.integration.test.ts": {
+          "before": null,
+          "after": "ab721a1e4fbc8b99ada815f6b0d2ff86d6e6a0d7"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "8f66ab26e8bc71c4d873ebd6754cacc0c5d07ed7"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-configuration-management.postgres.integration.test.ts": {
+          "before": null,
+          "after": "baf7b88ce410154aa2ef566ca356aebcbed64002"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "4bcc642081e094615802de79a6446d6bc379d327"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-general-exact-journey.postgres.integration.test.ts": {
+          "before": null,
+          "after": "9cc02d8cd8d9594b3fa82bc454bf5e820ca81367"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "27a5244b65559fe197f0483ab1f16219bc5c1887"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts": {
+          "before": null,
+          "after": "7d8315101c363aee10375393943708dea3052fe5"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-selected-binding.postgres.integration.test.ts": {
+          "before": null,
+          "after": "61607bb84c57bfc43a736163745f0cff1c26959b"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts": {
+          "before": null,
+          "after": "34596947771406dc3928655ff61205aee540a5ab"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-t2-audit.postgres.integration.test.ts": {
+          "before": null,
+          "after": "82e2d491059ef15013383ea68a78e654021a9acc"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts": {
+          "before": null,
+          "after": "123df62476860ff3ef15cb34139050c275c33e13"
+        },
+        "server-version/backend/src/__tests__/cognitive/assignment.service.test.ts": {
+          "before": "ff6a28c281a9eba2efc5165c7098366e2ede6ea3",
+          "after": "20c04bf2807e9abb741682ba2a9f11e3e946fe6a"
+        },
+        "server-version/backend/src/__tests__/composite/training-flow-assignment-snapshot.test.ts": {
+          "before": "722afae85a114a8f4fa8d3c73a3f6da92197030c",
+          "after": "c20f703af16a2e7773b10ab405a13bd052fa3dec"
+        },
+        "server-version/backend/src/__tests__/education-tools/access.test.ts": {
+          "before": "9f7642a5f2ae480b014cb7da8266b351f0fc03c9",
+          "after": "95535923a09adc1b7efa09805df9fbba87d21e60"
+        },
+        "server-version/backend/src/__tests__/education-tools/education-observer-source-read.test.ts": {
+          "before": "4830bbf39a7236a8e9407761556955b7117d8a96",
+          "after": "a9af2a9a9439b329f12b16024c303d6fb5fb6a7b"
+        },
+        "server-version/backend/src/__tests__/education-tools/selected-source-binding.test.ts": {
+          "before": null,
+          "after": "c4fc94108318e62641adf3f8091d4df2a63b79a5"
+        },
+        "server-version/backend/src/__tests__/education-tools/selected-source-catalog.test.ts": {
+          "before": null,
+          "after": "fde93ebd3f1789dad68ca20bf1c84380b6cc2e3e"
+        },
+        "server-version/backend/src/__tests__/huiteacher/field-expert-public-sources.test.ts": {
+          "before": "a24519b4b6d2f798a2e493274c01e229bdba3639",
+          "after": "dbdfe35561fdda992717da759be960777cfa9dd4"
+        },
+        "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts": {
+          "before": "db918593578da68016c291cfe1985350f157115d",
+          "after": "0ceba3ce66382fd11bf31a77a83121d82f03e15d"
+        },
+        "server-version/backend/src/__tests__/measurement-content/standard-report-parameters.test.ts": {
+          "before": null,
+          "after": "f298a63949d7efdff0f4b0bbacb4b8646811e5ae"
+        },
+        "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts": {
+          "before": "864bee4ed8754b81e4c24db02fa2deafc4516353",
+          "after": "d846d9dc11f43cbee80630495412ca9edbd1bb3c"
+        },
+        "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts": {
+          "before": "9a7cd0d3c53574c79434515afb77a0db5a473cee",
+          "after": "1b70e7a466e8a75d5c26628d5bac75fab7d16ddb"
+        },
+        "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approval.ts": {
+          "before": null,
+          "after": "4f0ece1d0aaed6b3063be3c1204c1ba1d68587e8"
+        },
+        "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approved-source.ts": {
+          "before": null,
+          "after": "778dc57df244076142cd4150cf3fc4be21ac3ec6"
+        },
+        "server-version/backend/src/modules/assessment-authorization/cognitive-profile-artifact.ts": {
+          "before": null,
+          "after": "dabe51940a1050becbdfcb8709e43df11cb139b6"
+        },
+        "server-version/backend/src/modules/assessment-authorization/cognitive-profile-assignment.ts": {
+          "before": null,
+          "after": "47d690ebea0d533f66b5b003fa366d75384f4a89"
+        },
+        "server-version/backend/src/modules/assessment-authorization/cognitive-profile-source.ts": {
+          "before": null,
+          "after": "ece0f6f2f960ad65224247f6b0f70b4ad30c77e6"
+        },
+        "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-binding.ts": {
+          "before": null,
+          "after": "c38adda3691f5133357bbfec62de01127c09f329"
+        },
+        "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-management.ts": {
+          "before": null,
+          "after": "daeb3506d17a4fb03c97e438b9d11213b54c95af"
+        },
+        "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-use.ts": {
+          "before": null,
+          "after": "0bfc3159104379d1ebd84b278ec9437b9809826b"
+        },
+        "server-version/backend/src/modules/assessment-authorization/education-standard-management.ts": {
+          "before": null,
+          "after": "c9fc1344765f703f500a5a8d27d0a37810ab2f21"
+        },
+        "server-version/backend/src/modules/assessment-authorization/education-standard-revoke.ts": {
+          "before": null,
+          "after": "4e5a396da773adfe7c26f759a82d0711b38f6047"
+        },
+        "server-version/backend/src/modules/assessment-authorization/education-standard-use-current.ts": {
+          "before": null,
+          "after": "d601456e799cb251c28b310eb7a268084f3aa3cf"
+        },
+        "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts": {
+          "before": null,
+          "after": "019cafd358ef9cd659e1316d5b4759dabe4a4e6e"
+        },
+        "server-version/backend/src/modules/assessment-authorization/selected-configuration.ts": {
+          "before": null,
+          "after": "dde1feafbad3f78e2e6c97ece844ecb2aae0e7c7"
+        },
+        "server-version/backend/src/modules/assessment-authorization/selected-reference-audit.ts": {
+          "before": null,
+          "after": "94bff4869bd9d241ccf18f34349ac7fbddafdb9e"
+        },
+        "server-version/backend/src/modules/assessment-authorization/standard-configuration-binding.ts": {
+          "before": null,
+          "after": "a8d98baf44b4a52a5d4969ec74dd6c389eb0a171"
+        },
+        "server-version/backend/src/modules/assessment-authorization/survey-standard-use.ts": {
+          "before": null,
+          "after": "3ae10f329895328864b7f380a462584ac227061e"
+        },
+        "server-version/backend/src/modules/assessment-authorization/training-cognitive-profile-use.ts": {
+          "before": null,
+          "after": "d68e9cc9ed6ae7de6c949a3ad51730d487ad385a"
+        },
+        "server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts": {
+          "before": "465283dc239bda699883093bca1f3f3fa39829c9",
+          "after": "13b249f37693c42e1ca7d5664c6aff4f02927ae3"
+        },
+        "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts": {
+          "before": "9dc8cb06d48d50d6cb32412bfde49c44c6ff6119",
+          "after": "369688221834549763f4f1f3836ddb53ea4401da"
+        },
+        "server-version/backend/src/modules/assessment-runtime/public-templates.ts": {
+          "before": "186f77518d8026aa349d12656b2bff0b82e9f08b",
+          "after": "1807c80274bf584536e15aecd1a5755fd0eb5b14"
+        },
+        "server-version/backend/src/modules/cognitive/assignment-measurement-release.ts": {
+          "before": "85101728b1b03acdd9583cd0971d0fce55a34302",
+          "after": "3d3282bd46f03e8dc2d3a9224317e79f675f59ff"
+        },
+        "server-version/backend/src/modules/cognitive/assignment.service.ts": {
+          "before": "24641cd9e59a36a3f493f3b6eea9c49cce28ae31",
+          "after": "997b34b1227b541886cfd21114ce7ce550fdf758"
+        },
+        "server-version/backend/src/modules/cognitive/cognitive.controller.ts": {
+          "before": "08438308859dea583a1f4fbbfab56d3b9742fbf7",
+          "after": "e3ef01da098b1d4786700c2b59f327c08c92f79f"
+        },
+        "server-version/backend/src/modules/cognitive/cognitive.routes.ts": {
+          "before": "1605136d0f9e3f58940c2d2033a4eff18f2f7959",
+          "after": "a9a1fbca02d611cb55a2186084b4adf98f56cc74"
+        },
+        "server-version/backend/src/modules/cognitive/cognitive.schema.ts": {
+          "before": "41a1c4b129550687f0ec87590a52d6d9b2f49ba6",
+          "after": "d15e1721486c8852423a9a0cf220f0a1ff1e98c2"
+        },
+        "server-version/backend/src/modules/cognitive/profile-configurations.routes.ts": {
+          "before": null,
+          "after": "ba952b2b9755c8e56e0652da87b3ea3a534d1811"
+        },
+        "server-version/backend/src/modules/cognitive/public.service.ts": {
+          "before": "740ddf6029a892a4eea80ed829f1037dde80c35c",
+          "after": "5dfae622378e2f641c48732f220fcac24b2df4f3"
+        },
+        "server-version/backend/src/modules/cognitive/session.service.ts": {
+          "before": "e1e8aa9042a3a67649678dc71f18a3a59f0c5b65",
+          "after": "25057eb9da732ff17444c814c1e70caa18a99ae2"
+        },
+        "server-version/backend/src/modules/composite/composite.schema.ts": {
+          "before": "374a7627c062194b23353dce5e07f910790a3d2b",
+          "after": "0ecb3841cd4ee1a4803f8e4d97ca83da7620e8cc"
+        },
+        "server-version/backend/src/modules/composite/composite.service.ts": {
+          "before": "b5e2979f25b8e34467e28e5a44cd321c60298c3d",
+          "after": "066853789e82bc7b39c43b63d0d2869c9b0457df"
+        },
+        "server-version/backend/src/modules/composite/training-content-binding.ts": {
+          "before": "bcf668ae35da0a4857ff934a9f0f9d499eb5e22f",
+          "after": "0d70f2e272bcca3ed36384e2c74d9d15cdfe82ac"
+        },
+        "server-version/backend/src/modules/composite/training-flow-assignment-snapshot.ts": {
+          "before": "18b8d1912634698f81f377edb75b2b71615d2fdd",
+          "after": "3ff9d7d07528761997a56e04ccc00fe8965b498d"
+        },
+        "server-version/backend/src/modules/composite/training-reference-audit.ts": {
+          "before": null,
+          "after": "93ceda5091b29abcfef1c712b6f57b15e1eb12c9"
+        },
+        "server-version/backend/src/modules/composite/training-reference-selection.ts": {
+          "before": "99e2c80a147dea2e4f017beec2f5a12d81d38d81",
+          "after": "777fa79d1c33c80d388059dd44c9d1e8e52da25d"
+        },
+        "server-version/backend/src/modules/composite/training-standard-combination.ts": {
+          "before": "cc9115f70de8881dea49af40e84a3a2e152d1c59",
+          "after": "db6e10d8cf02ecd068bcb6a0d8652e95f2bca4a6"
+        },
+        "server-version/backend/src/modules/education-tools/native-source.cognitive.ts": {
+          "before": "251de57975e9d4353e55ff74eeb8514b4a1975fe",
+          "after": "77f5276cb56a36e6890317340a761f74774e9b28"
+        },
+        "server-version/backend/src/modules/education-tools/native-source.contracts.ts": {
+          "before": "7b6337626b5610d38d00c3b94968a530851e7b13",
+          "after": "4c48535fd3692db54cdd4acbd39dda7d274df87b"
+        },
+        "server-version/backend/src/modules/education-tools/native-source.preview.ts": {
+          "before": "a66d085b95bdc809c87b437e9b9640d3d7ef3c2b",
+          "after": "3ae6be2d99c69a2771e7403aecf638ea5ddb2026"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts": {
+          "before": "30dfc2b8d69884548441de058d125afc9c5e08aa",
+          "after": "aaecc14031bbfdff7c7e4997c36fa58e3f94f61b"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts": {
+          "before": "be99ddb22302d30cfae91d6bfd0a4c3fd8869462",
+          "after": "851de59a38be769318e12d362bf16a20034126e5"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-runtime.ts": {
+          "before": "20e0df3994d738979183f7494bf261ff4d63e799",
+          "after": "b52e89325f56187d20c9ff4eeb85258a8d0c7406"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts": {
+          "before": "9c11cc5d703ff6e6cc8e68acd3227a610450dc8d",
+          "after": "e995eedb2dfa6e3f141acb625cd83a4059dab339"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.routes.ts": {
+          "before": "99b6a3225a6e78e76f8655706a01f87b351527cc",
+          "after": "ac81e612fa40d443adb5ea1f04c56e380f389097"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.service.ts": {
+          "before": "d98861f51d2122d2661a8ef40f59ecb7f1509d45",
+          "after": "18f076d2061d58a1cd5cf0f478aaca0936463a4d"
+        },
+        "server-version/backend/src/modules/education-tools/public-source.catalog.ts": {
+          "before": "60846bb28e6829a2810601b14adad0e8697254d6",
+          "after": "b40a47ba77becca7452c105ce2af140bfede1170"
+        },
+        "server-version/backend/src/modules/education-tools/public-source.headers.ts": {
+          "before": "c3b6f7d56d973ee833e1005a190dee37ecb82e16",
+          "after": "b7c15144e008b8b1e7ce4af8d122edcabdfbd125"
+        },
+        "server-version/backend/src/modules/education-tools/public-source.identity.ts": {
+          "before": "784398461762c60ef5d6bbf8ef5a1cbe037e4735",
+          "after": "95d81dab7ad6d8c4c8c34305b22d9471c6d9d978"
+        },
+        "server-version/backend/src/modules/education-tools/selected-source-binding.ts": {
+          "before": null,
+          "after": "435c938fed458c0ce1295af91e6462c65b89bd46"
+        },
+        "server-version/backend/src/modules/education-tools/selected-source-catalog.ts": {
+          "before": null,
+          "after": "251c6c9a740a7e23cb945c957fe1ac6e550ec83c"
+        },
+        "server-version/backend/src/modules/huiteacher/platform.routes.ts": {
+          "before": "5d8001473152516e8e8a8e7acddd7b29af30a9d2",
+          "after": "ada393803814e810217781f39c48102c78a56f5f"
+        },
+        "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": {
+          "before": "b53c4f98e310fe7c24f034e39406f15074c84410",
+          "after": "298bdac3f91a56b7e43e0b5e8b46f076beadd546"
+        },
+        "server-version/backend/src/modules/measurement-content/standard-combination-management.ts": {
+          "before": null,
+          "after": "53349b0b670e5cd8ca895af9a3797e4a1b9c7af9"
+        },
+        "server-version/backend/src/modules/measurement-content/standard-combination-use.ts": {
+          "before": "5329c195230f365684cd40b4cec1fb82e9fe4812",
+          "after": "ba06835a6157c4bfb5f516a27b1bce5b53b9bea9"
+        },
+        "server-version/backend/src/modules/measurement-content/standard-report-parameters.ts": {
+          "before": null,
+          "after": "1046bf43c35007514e1da51b8c89ad6c4a2763ee"
+        },
+        "server-version/backend/src/modules/organization/educationProductAccess.ts": {
+          "before": "650cdd93a876e6dc43ace4d690c83139c8d338dd",
+          "after": "f77662245be98bd1327b305b502a371f59d7f661"
+        },
+        "server-version/backend/src/modules/questionnaire-product/routes.ts": {
+          "before": "bafa43f4864293d431e4051ef382a70923aeb210",
+          "after": "a61aca5a1d7dd54ab844713b9b2ccacd7c36240f"
+        },
+        "server-version/backend/src/modules/questionnaire-product/service.ts": {
+          "before": "0ac4ac853bc99a08b57a7b21f0feb92ee9afeb62",
+          "after": "16e97cd311f3284bdcb1cc06a2a0060c635094de"
+        },
+        "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/report-variants.json": {
+          "before": null,
+          "after": "eff14d98bcef6d81615828c70fd3e25f0085ea7a"
+        },
+        "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json": {
+          "before": null,
+          "after": "84d33c97bd23138f33d68786b459a606d38cb317"
+        },
+        "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json": {
+          "before": null,
+          "after": "b77f0aee395e7066580348804021c0942bb5b178"
+        },
+        "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts": {
+          "before": "384c3aa92bb476e1ef2a6677809657603c9fc5b9",
+          "after": "9e4603c1e626b6d35082af844405af82271703dc"
+        },
+        "server-version/backend/src/modules/scale/onboarding/report-variants.ts": {
+          "before": null,
+          "after": "3741573df0dca43d23e00b3c5eeda33df8736e88"
+        },
+        "server-version/backend/src/modules/scale/onboarding/source-snapshot.ts": {
+          "before": "2e571193fe89a8fce33130e5e1a0147bedad03bc",
+          "after": "986a57f12ce9b9db1719fbcfc544a7b7c51349e4"
+        },
+        "server-version/backend/src/modules/survey/admin-role.ts": {
+          "before": "f47ab9d2a83060d797d0f41503f7669c0f7da751",
+          "after": "1bc726c6f8f87c73475a81d6e4b15fcc0e674ef1"
+        },
+        "server-version/backend/src/modules/survey/analytics.cognitive.ts": {
+          "before": "d06fd5429eec97511e996fc1404ea1814a23cb92",
+          "after": "700d3eb89fbf4457201f50c4502c366bb1e45398"
+        },
+        "server-version/backend/src/modules/survey/catalog.service.ts": {
+          "before": "2daec79a26c55e5a01269028845c24bcfa00bb11",
+          "after": "992bda901d346b5aafd9fec8c0df0022dc344870"
+        },
+        "server-version/backend/src/modules/survey/catalog.sources.ts": {
+          "before": "4ca1ec148f777221fabb04ff3681377d7ba5aa69",
+          "after": "0e4fdc113458c816fed8fc182a60ee070f58f4bb"
+        },
+        "server-version/backend/src/modules/survey/cognitive-profile.definition.ts": {
+          "before": null,
+          "after": "fd8d448ba465faa4a0626c40ce888a04ecc23d92"
+        },
+        "server-version/backend/src/modules/survey/cognitive-profile.source.ts": {
+          "before": null,
+          "after": "dca6bff3560e0273fe4777b2a3109def0f378109"
+        },
+        "server-version/backend/src/modules/survey/cognitive.definition.ts": {
+          "before": "1199da5276d4ca73bd5cf5b9c9410563b82e4c1c",
+          "after": "717e901c88c6c04fd1137c3335fa178f6ace8b00"
+        },
+        "server-version/backend/src/modules/survey/cognitive.public.routes.ts": {
+          "before": "282eafb9fcdda42c37df41d6b0b15e1283ce4c15",
+          "after": "93bb71e90671f57ac35da8e985a0494e638c4f02"
+        },
+        "server-version/backend/src/modules/survey/cognitive.results.ts": {
+          "before": "aa278211bd0b1427f9587e893eb01bb688390846",
+          "after": "2eee594cd210cf7914dbcfaceab16630012afae8"
+        },
+        "server-version/backend/src/modules/survey/cognitive.service.ts": {
+          "before": "36538b9cb22a6c99925b21a93282d06e2e095961",
+          "after": "71a3649d3d74824df7f13fa005740c17c844bf11"
+        },
+        "server-version/backend/src/modules/survey/flow.definition.ts": {
+          "before": "08e34951531138f7147752203b9d954e3e523f60",
+          "after": "39d96b15cdce66bd410a75aae0e30378406399cb"
+        },
+        "server-version/backend/src/modules/survey/measurement-publication.service.ts": {
+          "before": "83889fcb27ed8f3b77c699d8dcad9f9f54cf9e12",
+          "after": "f3b27960fe1f003ab57b3b41cb50d7d8c720ab27"
+        },
+        "server-version/backend/src/modules/survey/measurement.result.ts": {
+          "before": "3c9dbcbe418c6189f49559c9f9c0d3e5ac8dd064",
+          "after": "b337dbbcb173ff76231ce76224d57c637b62754f"
+        },
+        "server-version/backend/src/modules/survey/platform.routes.ts": {
+          "before": "a83c62b96ebf1d27fede3082bcd6a3d73ed065e8",
+          "after": "ff51cd5a2fc28fd22f78261e4818f40915f8094c"
+        },
+        "server-version/backend/src/modules/survey/publication.service.ts": {
+          "before": "401e1c96e0c4c75ebfa3cab6bd0ed1effeee8fb5",
+          "after": "1e9cbf2a76b473f818382ae9fc368bcd0ef08132"
+        },
+        "server-version/backend/src/modules/survey/selected-reference-audit.ts": {
+          "before": null,
+          "after": "0d23634479394a6995d66748640fbb62c805ef2c"
+        },
+        "server-version/backend/src/modules/survey/standard-triplet.model.ts": {
+          "before": "373ddecfc1f017070dcd577a78c7a566d66f8f0a",
+          "after": "a99a4e8b8b6f4c2c0acb740b1b574e49aa6b5b84"
+        },
+        "server-version/backend/src/modules/survey/standard-triplet.routes.ts": {
+          "before": "f571ccabebcd3914c1858cee0b87c53ff8619894",
+          "after": "1fbea738e5c0d2aa83d02e7aee784b9fd3557f8b"
+        },
+        "server-version/backend/src/modules/survey/standard-triplet.service.ts": {
+          "before": "4f6eecd86cec9595488218f751a1d5e26cec1bb4",
+          "after": "f5fb8e84d3cd6d708e4ce7bfac094242d14db607"
+        },
+        "server-version/backend/src/modules/survey/task.public.ts": {
+          "before": "d3466034c0f6c8cdc2d0a45732cb92f1fcc06a1b",
+          "after": "67240d6491d0f9d14a1a50a784f132eeeb7318c1"
+        },
+        "server-version/backend/src/modules/survey/tool-policy.ts": {
+          "before": "ec69e08e425d7e813960c17c21f233064dfd02f1",
+          "after": "530fa5fd0f0545a20b2b1a7d592918e033fc5b67"
+        },
+        "server-version/backend/src/modules/survey/waves.service.ts": {
+          "before": "77037a1de0b89e9d1832c13c0de291f6b2e53f96",
+          "after": "0dfdb288b70c12e3cf80415a10d1b800c92cbb65"
+        },
+        "server-version/backend/src/services/materialGrant.ts": {
+          "before": "525ab08fbaec46ea073ea77fd5ff273ae01fba0a",
+          "after": "d69e7ddd0c863ae726a09d75d6b9edd3c0674f62"
+        },
+        "server-version/e2e/precise-authorization-built-ui.cjs": {
+          "before": null,
+          "after": "15dd85600055b1f43e2b2e2d1a9cf5658618f272"
+        },
+        "server-version/e2e/precise-authorization-compiled-cold-load.cjs": {
+          "before": null,
+          "after": "9102cbebdad192429f6b32c5f276f5c74b49363e"
+        },
+        "server-version/frontend/src/admin/AdminContentPermissions.test.tsx": {
+          "before": "5cd9c5bcc04355a0df1c733cade8f377301ad407",
+          "after": "88fa24a5a73e42cd07be487b6c97f99b926524fb"
+        },
+        "server-version/frontend/src/admin/AdminContentPermissions.tsx": {
+          "before": "752711d8d17ed1c1d0231f065b4da24744bb492e",
+          "after": "3f0cb429c395926659e16d1b27bb5b19e38d8b42"
+        },
+        "server-version/frontend/src/api/__tests__/educationCognitiveConfigurations.test.ts": {
+          "before": null,
+          "after": "037b301eee72b35f22e7b7896d96c9397e733aac"
+        },
+        "server-version/frontend/src/api/__tests__/educationStandardConfigurations.test.ts": {
+          "before": null,
+          "after": "896494cde103c8abc9e7c90e0b21347209b350b1"
+        },
+        "server-version/frontend/src/api/__tests__/surveyStandardConfigurations.test.ts": {
+          "before": null,
+          "after": "5910b0d7da56bc1701800cbee8c11a2855ea78ea"
+        },
+        "server-version/frontend/src/api/cognitiveProfileGrants.ts": {
+          "before": null,
+          "after": "ad064b043947d6fc73dece0620dcbeae5c03b289"
+        },
+        "server-version/frontend/src/api/educationCognitiveConfigurations.ts": {
+          "before": null,
+          "after": "67274c394ed7f041d24cc8e4254945c2770be748"
+        },
+        "server-version/frontend/src/api/educationStandardConfigurations.ts": {
+          "before": null,
+          "after": "0ed7c2da0c9a43dbd53dd1492ae39374448c0b2b"
+        },
+        "server-version/frontend/src/api/standardConfigurationGrants.test.ts": {
+          "before": null,
+          "after": "cd18e750db84fd7e1400da71f23879a9b3d3749a"
+        },
+        "server-version/frontend/src/api/standardConfigurationGrants.ts": {
+          "before": null,
+          "after": "7ee51e753cb364660edc56736a467a2dc82f4471"
+        },
+        "server-version/frontend/src/api/surveyStandardConfigurations.ts": {
+          "before": null,
+          "after": "9f6c589fb0be3b5017a7a297b398326dd5759d9a"
+        },
+        "server-version/frontend/src/components/AssessmentToolPicker.tsx": {
+          "before": "5f39db35af8bc8491978cd8889357439ae5c88f0",
+          "after": "93fe699826270993d8a9c328c23952188ce9f82c"
+        },
+        "server-version/frontend/src/components/__tests__/AssessmentToolPicker.test.tsx": {
+          "before": "c96acbbcc121352dd518f59c427bb988506aa689",
+          "after": "51f3da1379d3b9cf50f5d0962be7ce42e28d28e9"
+        },
+        "server-version/frontend/src/components/assessment-tool-picker.css": {
+          "before": "c892662604199b74beed3b670d7a8d5935eb9157",
+          "after": "383bd010bd5ee5e3ee1b72ea3e5d12a2c76a6411"
+        },
+        "server-version/frontend/src/components/education-tools/EducationCompositionSelectedStandard.test.tsx": {
+          "before": null,
+          "after": "374dcb863154c02ded4e55604bd3a58ff3435279"
+        },
+        "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx": {
+          "before": "66cdf06c5525f8007ba87b81e3f0cf2a9014717c",
+          "after": "b51ba49a8c173cbb78fc3ecb6f2d7c7091d7c646"
+        },
+        "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.exact-cognitive.test.tsx": {
+          "before": null,
+          "after": "31c403b556cbce471a334ece41380e59470bc350"
+        },
+        "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.tsx": {
+          "before": "bd602a59aa6539adb25f1386a29b028d09fdc70e",
+          "after": "964c773839074011d09f31f17b3927e4040e6d16"
+        },
+        "server-version/frontend/src/components/education-tools/educationCompositionClient.ts": {
+          "before": "2d9324c0d5df8a08792d346e190e3743091caca8",
+          "after": "9ebc6ee2bd9823042c7a0687d459cf0038eb8f09"
+        },
+        "server-version/frontend/src/components/education-tools/educationPublicFormClient.ts": {
+          "before": "a423c9be2acd26d56b0796a36bc71028781837d6",
+          "after": "23ac4a60e47acd3faa3c67e4dbce7702770ddda1"
+        },
+        "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.test.tsx": {
+          "before": null,
+          "after": "cdb2d79fc00027179681a032c549ef53cd88aa33"
+        },
+        "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.tsx": {
+          "before": null,
+          "after": "1cf32e800e12c33df8d17ffc94c38a3a1ac3d221"
+        },
+        "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.test.tsx": {
+          "before": "7d70793f94c3216a07c1a83c7305982267e591fd",
+          "after": "0e9e77b3d31e7bb80b8189b5a513b7658b27adff"
+        },
+        "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.tsx": {
+          "before": "98eb14ac8a2f3d58c5d6ffd45d1400604a7d2f7d",
+          "after": "ee6472ab225b852b02ee338233f40ac524734c1c"
+        },
+        "server-version/frontend/src/components/scale-governance/approved-scale-axes.css": {
+          "before": null,
+          "after": "f612dc9ca5147ff5a3e2116b669dcbeeddb020b1"
+        },
+        "server-version/frontend/src/modules/cognitive/api.ts": {
+          "before": "6396ea8962a1971bfd98ea5896b061ca959e1f14",
+          "after": "da26af7129e7f09bea9f34142a67958d963dcbd1"
+        },
+        "server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.test.tsx": {
+          "before": null,
+          "after": "b84807373bda8c371801c4ed7c791960e4896b86"
+        },
+        "server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.tsx": {
+          "before": null,
+          "after": "f52e549375d3bfeefe484c7850a7bf176e6167c8"
+        },
+        "server-version/frontend/src/pages/admin/EducationProductGovernance.tsx": {
+          "before": "784fa17b26cb1a00f71c94b7bc3a692ab5365905",
+          "after": "d9d67522b6003aa0a0b51060b93d20183e986469"
+        },
+        "server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx": {
+          "before": null,
+          "after": "e9b6754a8c0b6a104e28d65f3eee516495d93e21"
+        },
+        "server-version/frontend/src/pages/admin/EducationStandardConfigurations.tsx": {
+          "before": null,
+          "after": "a1cdb43339b2eeb6ed1155e9bbb921c25f68acdf"
+        },
+        "server-version/frontend/src/pages/admin/GovernedCatalogPaging.test.tsx": {
+          "before": "b62cc09f949fdaa3bce450a8e0382a85eb018741",
+          "after": "36a18f135ac604e81d2e254c984d7598339c23d9"
+        },
+        "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx": {
+          "before": "5dabfd32d0b7a34a22853b76e6f4ed952f148307",
+          "after": "ea3f18b033dd0d2e89f29723f019d3ddcb3b0b9d"
+        },
+        "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx": {
+          "before": "9ff8e262d095088b769bac770c462b34b897d2cd",
+          "after": "f3c61739504d80dc39a48d330bfdd57cad870f9e"
+        },
+        "server-version/frontend/src/pages/admin/SurveyCatalogGrants.cognitive-profile.test.tsx": {
+          "before": null,
+          "after": "46f03c43224be76ad7fc4bc64cbffd9000179862"
+        },
+        "server-version/frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx": {
+          "before": "67057f26ec727d2e4be721ffe24c88bb562d547f",
+          "after": "501d997da6891835b4279798a9ae4d7918ac4224"
+        },
+        "server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx": {
+          "before": null,
+          "after": "f768155cc9a5b3c94343208235113ea38b40474b"
+        },
+        "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx": {
+          "before": "8526dcb0294b1cb3f26019f8bf24202db29283c7",
+          "after": "fa80521ace825e14ed90d63007d25ed3fddea62f"
+        },
+        "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.identity.test.tsx": {
+          "before": null,
+          "after": "26d2c0bb4b0103f4a157ca0fa2ed7942727e3be8"
+        },
+        "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.links.test.tsx": {
+          "before": "957862c9fdaf72eb9878ae50e09134814f4c7ec5",
+          "after": "a2bb5ce391f112be1d5538887767804594141459"
+        },
+        "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx": {
+          "before": "e92013edf55dda148e7264d281887153aeb1bdc5",
+          "after": "cc14a6106bc6fbecfaf8be636a15f99eb99848de"
+        },
+        "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.verification.test.tsx": {
+          "before": "8c3d90b85bd55af5fbd787301689d0b934a58f9a",
+          "after": "6a6f17b80de108f10b51425616930e0e84e07832"
+        },
+        "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx": {
+          "before": "f61afac371fe743701f933b2c7091ea14ac9dc75",
+          "after": "7ae2d727d14ca7c0f8ac23c5b06542d34346245b"
+        },
+        "server-version/frontend/src/pages/admin/education-products.css": {
+          "before": "7a95dc595f6f779eb3fa61a6a166a6fe6f949541",
+          "after": "1b6163a05d3ea373966ddef48436a46b17eda3ec"
+        },
+        "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
+          "before": "af8e61c47ea3329107e40fd396a41132ca4080e4",
+          "after": "7d43cdec5d9fb303eede7b090e52a79c3a4ed79d"
+        },
+        "server-version/frontend/src/pages/questionnaire/TrainingContentSelection.tsx": {
+          "before": "bd27f02cb0604da25fbe1a2f3872f78d8cf37ca1",
+          "after": "0182ec65eb6b64cce88aac25d24728acd10cfafe"
+        },
+        "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": {
+          "before": "a6956cde3649f62eb02db3616fa0ac464416ead1",
+          "after": "9ab805ace0d36e807519c951d656f5eb4a90a5e4"
+        },
+        "server-version/frontend/src/pages/questionnaire/__tests__/TrainingContentSelection.test.tsx": {
+          "before": "01f4d98526d6c74c13307f3510abeacdc3be920d",
+          "after": "53ee3f109cc901929b1b5879cd31c202f9b2fa29"
+        },
+        "server-version/frontend/src/pages/teacher/CognitiveAssignmentEdit.tsx": {
+          "before": "eb5925a60c3a02bf0871590b01513358977e6a93",
+          "after": "3091554614e23349aa0cf37e028bd9ca6d8ec0fb"
+        },
+        "server-version/frontend/src/pages/teacher/CognitiveAssignmentList.tsx": {
+          "before": "5f590bbdd638c96db5569859a357415fb441121f",
+          "after": "b3956ab0277fc1e70ccba7c5fee47148fee45a06"
+        },
+        "server-version/frontend/src/pages/teacher/__tests__/CognitiveAssignmentList.precise.test.tsx": {
+          "before": null,
+          "after": "fc3c7cacdd5a086e06bd158110beb31c68d6367b"
+        },
+        "server-version/frontend/src/survey/ResearchCatalog.tsx": {
+          "before": "4435877e0e5d5751ddbc7ff5442a7ecf3e6b6c48",
+          "after": "73f27d5e2dd97560efa79c747532b95865562c3f"
+        },
+        "server-version/frontend/src/survey/useSurveyStandardConfigurationGrant.ts": {
+          "before": null,
+          "after": "04d13e8ec2d0e761b2a824bc5e103a9c38242179"
+        },
+        "server-version/frontend/src/training/TrainingAdminResources.tsx": {
+          "before": "ccbc559cf0ce00a168baa578d2e50241d17f6b51",
+          "after": "3ea72be024ea1af6bfc1bb3c5750dab6cf9830d1"
+        },
+        "server-version/frontend/src/training/TrainingCognitiveProfileGrants.test.tsx": {
+          "before": null,
+          "after": "019f75a9ac2feb5ebacd06ff2b2e5f5002ed990f"
+        },
+        "server-version/frontend/src/training/TrainingCognitiveProfileGrants.tsx": {
+          "before": null,
+          "after": "a4361c86c6ebfd9826e9b3fac6fd9588b14844a2"
+        },
+        "server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx": {
+          "before": null,
+          "after": "c73f79acbe1281729e60a667cca2394a10674503"
+        },
+        "server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx": {
+          "before": null,
+          "after": "7b152c7a1abec458c437c1bec0f1921ac0884f63"
+        },
+        "server-version/frontend/src/training/training-admin-workspace.css": {
+          "before": "d88b632ce515d024142247d04f3b6e0b821e795b",
+          "after": "ab1cb9221ec24ef3230edea10fb17be25ec76bbf"
+        },
+        "server-version/frontend/src/training/useTrainingStandardConfigurationIssue.ts": {
+          "before": null,
+          "after": "f395b882db2f341635c162f27ee3180d88c17f67"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9",
+        ".github/scripts/merge-gate.mjs": "53c7f80151c32c99f56570f18de7246769858fe9",
+        ".github/scripts/onboarding-bindings.json": "7ae0486297c91e51dbe2eeaaf659f3cb418aabc4",
+        ".github/scripts/onboarding-checks.mjs": "8a25ecdac2247f5401b1f21ba22311a9fef8a764",
+        ".github/scripts/onboarding-controls.test.mjs": "aab2eb0982fa983044fad78fc63b04310e65134b",
+        ".github/scripts/onboarding-evidence.json": "424551f60388be5e33b73ddf90e3cfbf73552c33",
+        ".github/scripts/onboarding-scope.mjs": "8bf1888efb11f84b9660044cf220f4dc765bed2f",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/scripts/task1-onboarding-controls.test.mjs": null,
+        ".github/workflows/ci.yml": "c180e2abb959c3267d0d07fa0c272e921f253b8b",
+        "docs/precise-authorization-20261029/ci-control-progress.md": null,
+        "docs/precise-authorization-20261029/ci-control-raw.json": null
+      },
+      "components": {
+        "backend": "05dbc95723e5e4587f4932a3e89302c80c9f73b9",
+        "frontend": "44ac407e011dd17be8636b439b440a4d152b3304"
+      },
+      "activationNote": "Align latest main PR402 catalog-only sources. Old base0e8 success remains its original qualification; retain identical frontend and application evidence, compile changed backend once using the existing bounded formal route. No new CI system or merge authority."
     }
   }
 }

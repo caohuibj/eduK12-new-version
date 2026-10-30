@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "name": "standard-report-parameters-unit",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-t2-audit.py",
+          "training",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/measurement-content/standard-report-parameters.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/standard-report-parameters-unit.json"
+        ],
+        "startedAt": "2026-10-29T22:04:46.893616+00:00",
+        "finishedAt": "2026-10-29T22:04:52.190058+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/standard-report-parameters-unit.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 5,
+        "numPassedTests": 5,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793311487449,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "new exact-combination report requirements"
+                ],
+                "fullName": "new exact-combination report requirements permits explicit no-R or a score-only R without inventing missing threshold requirements",
+                "status": "passed",
+                "title": "permits explicit no-R or a score-only R without inventing missing threshold requirements",
+                "duration": 8.15273200000047,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "new exact-combination report requirements"
+                ],
+                "fullName": "new exact-combination report requirements permits a report to request a subset of available P bands while keeping C/P unchanged",
+                "status": "passed",
+                "title": "permits a report to request a subset of available P bands while keeping C/P unchanged",
+                "duration": 2.271198999999797,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "new exact-combination report requirements"
+                ],
+                "fullName": "new exact-combination report requirements rejects the specifically missing R band and cannot borrow a different reference version",
+                "status": "passed",
+                "title": "rejects the specifically missing R band and cannot borrow a different reference version",
+                "duration": 0.46994400000039604,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "new exact-combination report requirements"
+                ],
+                "fullName": "new exact-combination report requirements does not treat unused thresholds on a distribution as executable criterion bands",
+                "status": "passed",
+                "title": "does not treat unused thresholds on a distribution as executable criterion bands",
+                "duration": 0.596929999999702,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "new exact-combination report requirements"
+                ],
+                "fullName": "new exact-combination report requirements checks actual registered governance bands during assembly without changing the source or historical compiler",
+                "status": "passed",
+                "title": "checks actual registered governance bands during assembly without changing the source or historical compiler",
+                "duration": 26.287389000000076,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793311492078,
+            "endTime": 1793311492116.2874,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/standard-report-parameters.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "standard-report-parameters-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/standard-report-parameters-types.json"
+        ],
+        "startedAt": "2026-10-29T22:04:46.837336+00:00",
+        "finishedAt": "2026-10-29T22:05:07.682048+00:00",
+        "exitCode": 2
+      },
+      "log": "src/modules/organization/access.ts(222,14): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(225,79): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(236,14): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(239,77): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(263,14): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(266,77): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(268,13): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(281,16): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(284,79): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/survey/admin-role.ts(21,10): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/survey/admin-role.ts(21,48): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/survey/admin-role.ts(21,71): error TS7006: Parameter 'g' implicitly has an 'any' type.\nsrc/services/assetStorage.ts(700,46): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\n"
+    },
+    {
+      "name": "standard-report-parameters-types-v2",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/standard-report-parameters-types.json"
+        ],
+        "startedAt": "2026-10-29T22:05:50.581771+00:00",
+        "finishedAt": "2026-10-29T22:06:13.445153+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    }
+  ]
+}
