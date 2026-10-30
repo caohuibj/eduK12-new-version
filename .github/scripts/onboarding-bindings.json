@@ -2555,10 +2555,10 @@
     "420": {
       "schemaVersion": 1,
       "pr": 420,
-      "enabled": false,
+      "enabled": true,
       "base": "9f135a2ce45f0223d39b48ea8797310a81a63970",
       "product": "dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1",
-      "controlCheckpoint": "cf49bde9aa5dbe7471723a42b2705e1cd7500ce4",
+      "controlCheckpoint": "0160a792e913446481ae2dee755a6d55105ed187",
       "components": {
         "backend": "b1c57bf9195379ba0e45e59f9320a7411eb8b068",
         "frontend": "8d7f9214106aa965d1379b75464136d7cc5b90e5"
@@ -2672,7 +2672,7 @@
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
         ".github/workflows/ci.yml": "a15031034ac5349fb7569a85e02ea5f88fa1d33a"
       },
-      "activationNote": "Disabled restored checkpoint. Root independent review and exact candidate activation pending; original local evidence not reconstructed. Official successful build/lint steps in cancelled run remain separate from formal qualification."
+      "activationNote": "Root independent review: bounded GO for exact recovered PR420 candidate. User 2026-10-30 22:42 explicitly authorized the 28-file upload, PR description update and limited CI on the original branch, not merge or deployment. Actual unsigned local execution remains f4fa39bd; remote product dbb76d has its identical full tree. Recovered original official run41082809728 attempt1 remains cancelled: admit only authenticated successful build/lint steps and exact artifact, plus fresh four direct cases and app types. Existing scope/admission/scoped frontend-control CodeQL/stable gate only; no app rebuild, browser, PG or platform suite. Original failures and unavailable old local measurements remain disclosed."
     },
     "task1": {
       "schemaVersion": 1,
