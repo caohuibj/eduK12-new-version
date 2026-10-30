@@ -1,24 +1,27 @@
 {
   "status": "IN_PROGRESS_NOT_MERGE_READY",
   "base": "296c941419d76b360405c2c487d10514cd5c530e",
-  "productHead": "cd19b063615726e5b517045746dfe721ee78d512",
+  "productHead": "95baa41c600b1f6e8ac930a83da04578c3614894",
   "componentTrees": {
-    "backend": "1b598408c21af58e8ba55287bd1c7b3b09b2ba98",
+    "backend": "303a4a4ca919da1ec9d0e7e8c858f5a8fe89aa60",
     "frontend": "83917ae150cafbbe825a269d4c56a0e08a98e0a8"
   },
   "localTypes": [
     {
       "component": "backend",
-      "report": "backend-presentation-types.log",
+      "report": "frozen-privacy-types-repair.json",
+      "componentTree": "303a4a4ca919da1ec9d0e7e8c858f5a8fe89aa60",
       "exitCode": 0
     },
     {
       "component": "frontend app",
       "report": "frontend-final-types.log",
-      "exitCode": 0
+      "componentTree": "83917ae150cafbbe825a269d4c56a0e08a98e0a8",
+      "exitCode": 0,
+      "reusedUnchangedFrontend": true
     }
   ],
-  "distinctUnitAndMockHttpCases": 32,
+  "distinctUnitAndMockHttpCases": 36,
   "postgres": {
     "initial": "failed after historical class/tag/source assertions, invalid staff-role fixture enum",
     "continuation": "one retained staff-class step passed; no fixture reset or replay",
@@ -36,7 +39,7 @@
     "backend types before later source edits retained as earlier checkpoints only"
   ],
   "remaining": [
-    "Mandatory: integrate existing frozen School privacy options before publishing this candidate; current numeric projector alone is insufficient for a frozen restricted profile",
+    "Actual School generation/read service journey with persisted V2 artifact remains to complete before merge-ready",
     "Teacher actual product entry and product-admin adaptation",
     "School Form choices and unsupported standalone/Bundle runtime adapters",
     "group longitudinal awaits stable personal contract"
@@ -104,8 +107,31 @@
       "numPassedTests": 6,
       "numFailedTests": 0,
       "numPendingTests": 28
+    },
+    "frozen-privacy.json": {
+      "sha256": "c1e77020cf51e3f5913a55f3c6e7d96692606cc54cf230f954708609a15dece9",
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "frozen-privacy-types.json": {
+      "sha256": "c80bccc8d5789f488b6e982dc6cd96a7faeb607d4518cd838305b530daee6752",
+      "exitCode": 2
+    },
+    "frozen-privacy-types-repair.json": {
+      "sha256": "1fa8b543cbbe0172901d7d8e4d6fad98ac101835a6f5cca40f0f30b7f39bac89",
+      "exitCode": 0
     }
   },
   "ciExecuted": false,
-  "productionTouched": false
+  "productionTouched": false,
+  "typeFailure": {
+    "original": "frozen-privacy-types.json",
+    "exitCode": 2,
+    "reason": "TS2345 scenario union was not narrowed after arrow-function never call",
+    "repair": "explicit return hidden(); same throwing path, no runtime behavior change",
+    "continuation": "frozen-privacy-types-repair.json",
+    "exitCodeAfter": 0,
+    "policyCasesReplayed": false
+  }
 }
