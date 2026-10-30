@@ -1,0 +1,253 @@
+{
+  "recordedAt": "2026-10-30T12:42:48.216036+00:00",
+  "scope": "PR406 Training qualification in existing personal-tracking workflow",
+  "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+  "frozenApplicationCandidate": "e8d515058554a5e4bbf321074c5906c53d880c7a",
+  "originalApplicationSource": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+  "applicationPins": {
+    "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql": {
+      "before": null,
+      "after": "6f864876d2a10bb9fe9f837ae21cd5c56f7eb88d",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "b767aa24ad90b42f7e2e48a3df4ead711f0122f918733f2789bfd940cc193a8e"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "before": "007cf25fce43a97a7278b4d13277128154d70b6b",
+      "after": "9eda61f452eb26ba2007233e9317805207c6dacb",
+      "originalBase": "2f8829d64b37d2780e7b8546523a7a2d6d8f1a90",
+      "originalDeltaSHA256": "0fadc5340eaba040c0593ca1b9ca980ae3b4f8a4d302f88893ee3938a366ddf2"
+    },
+    "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts": {
+      "before": null,
+      "after": "01339c2f2a86799aaef112576547ddfe22abb265",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "b4f3f39ac0d4aa51cf8c00ff12b32c3201e774c8065bf2dd17477ad815676d31"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts": {
+      "before": "9c1587875c6b15d9b730a387b82715aa2de20520",
+      "after": "2c609d96b7fe5dd7d6f74f5737bb88b52be2d83f",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "531f309b6bf9967c030c07f4baa49185e5baf3517576931b6382e5530c445f84"
+    },
+    "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts": {
+      "before": null,
+      "after": "cb5bd422021cd0f23f06858ffa7121f1b9056b69",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "0f90bfc9f466fe5c9e0956bbd8f46d1f4d9a0d3de076e25d0b4ad704d0dc5961"
+    },
+    "server-version/backend/src/modules/anonymous-study/routes.ts": {
+      "before": "323a19a2a84a67ba16109f0422b43598f85b8659",
+      "after": "0fbe6c19cafa34153a4bb2341733c7477083e9fc",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "8cddc6f7cac290e7b5b795f90ebcf7b39d08902f3f05bcc7bd8192946752084a"
+    },
+    "server-version/backend/src/modules/anonymous-study/service.ts": {
+      "before": "a6ae47192c4c171c3e27086a70227646e4424f5f",
+      "after": "63261260b198fa60bc00f7fcc090ea3fa44220a6",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "64be210a5708945a738904db1748e7d94df3353f2ec214e6b22c0ff277782bc8"
+    },
+    "server-version/backend/src/modules/bundle-product/routes.ts": {
+      "before": "f00d92d4e111948ffa92478d00dbc512426f0944",
+      "after": "4bf98360eeb897c9a5d07b075cb4808d869a5600",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "c0972ef3637bf9110e41b1beac2569d77fd766505c08f4f37650946a5292cb7b"
+    },
+    "server-version/backend/src/modules/bundle-product/service.ts": {
+      "before": "c330f7f35a5a8aea3ad9211cde1f375bc19f0800",
+      "after": "0c8635c4546a2c0a078f3255b2224dfd4310699c",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "54f39a205963b56ea7f02ca3b9c643d2389fda0320fa2af03c178f18e662266a"
+    },
+    "server-version/backend/src/modules/composite/composite.routes.ts": {
+      "before": "244e054f08448948749271b09a47c95fa2e9738e",
+      "after": "d0719f903f96e78499a9ed6303462169437981b8",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "8ce9ca30c7ce8ce55e13ed03dd929a38ef0eff162716f5149226c99546918e99"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "066853789e82bc7b39c43b63d0d2869c9b0457df",
+      "after": "3878a537a413f7349930c285b89b830033eab37e",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "7c599e126fc729433fa7edb730235100a987248819e62d4140bc43d25fe02415"
+    },
+    "server-version/backend/src/modules/composite/personal-tracking-results.ts": {
+      "before": null,
+      "after": "e93c69f08e23ac18c36c42d57f36b655174059c0",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "1d024ff4eda3e1522dd8a0b517d46f57c960ae27302d9df0e615e14d32931fa7"
+    },
+    "server-version/backend/src/modules/composite/personal-tracking.service.ts": {
+      "before": null,
+      "after": "5e81e7e389b9f7d66e8b8c5a460e63fa147ea94a",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "6096e8805749cea6aa755cd5e15b86835e7b15f00e91c00b9edc3e67125fd398"
+    },
+    "server-version/backend/src/modules/composite/personal-tracking.ts": {
+      "before": null,
+      "after": "7ab8d072a566a959c6bbde232a34e92b855d5727",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "faeb4ae0926f3ddaad1d1ce40b36ca4477bfd3d3800f1ae629c4f53fbd5d8b3d"
+    },
+    "server-version/backend/src/modules/composite/training-content-binding.ts": {
+      "before": "0d70f2e272bcca3ed36384e2c74d9d15cdfe82ac",
+      "after": "60c2ed53c328ea6d28a2bfa4bd3abf5a1f77281b",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "f2019bad5fd056bc2f69049b0c29acc6cfce9add8bc13b2cc9089eb27c0334a9"
+    },
+    "server-version/backend/src/modules/composite/training-metric-disclosure.ts": {
+      "before": "26d9c79852d8f15d985f55d0dc75dbe5c5b3d399",
+      "after": "abaa68a0b5dce36d868355321d5c549a33e59d84",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "8b0882a1b701eb23ae57038a37260fb403f53cd0daab76f3fb286e64a148b9cb"
+    },
+    "server-version/backend/src/modules/questionnaire-product/routes.ts": {
+      "before": "ddf46f02c8e30038e18cbb9f104f0175e97c556a",
+      "after": "e72e540a55b40f1e4f6b1aee23603a6c688212fa",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "397c80e033998b719db1b1608f9c0133d08969de7fef73e6a2c5fc4eb36a60b6"
+    },
+    "server-version/backend/src/modules/questionnaire-product/service.ts": {
+      "before": "f2d60e8feb0635ac10160f073a4beb329b332f35",
+      "after": "96ea8096f2c7a537228461da4623f6064df42325",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "25e27cb85eec9d38c6c013bf05e23f9d6d900b5a8a5f473fa62886d297f083cd"
+    },
+    "server-version/frontend/src/api/anonymousStudy.ts": {
+      "before": "87735f316ac201712a0cf6dc28d01574541e3638",
+      "after": "9885f6879cf11fd2533c270315a15e91160e1c77",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "88c73e349d88626c642d9187ba06fbabea2f940a0bd0d81f145aeee312d2a2e0"
+    },
+    "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
+      "before": "14bf92d842753749b6dfc7f040163fa1e84c0901",
+      "after": "c2bbaad8ada2691d23bb4615b20ad6716cd93f45",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "9d37c7d848986d67331062ff9e6e6f18797d1e8ede429efedcf303bec5438356"
+    },
+    "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx": {
+      "before": null,
+      "after": "b3ffb65076ba4119318af6d3314b773394b36c7a",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "5d893f14a081d6e1cc031285d192968838449349c307c9d5585fc5a8066dfe48"
+    },
+    "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx": {
+      "before": null,
+      "after": "7665577adc466b8c6e248dee83a488b806dcdbae",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "e116352e7efb1248405c3974a50cb02b08847554d3f7e0bb685f6643abd693bb"
+    },
+    "server-version/frontend/src/pages/bundle/BundleProducts.tsx": {
+      "before": "5edd1d1d7d4476410cd69f4bbb050541c6a9093e",
+      "after": "20f57cb571df7e6f67999973b871b4de90d77ed4",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "970f1e37695ae72b2586e88dbf2a78fd6d8986648584ece8718a238cdbf5ea14"
+    },
+    "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx": {
+      "before": "440ada5e283d26e68ea8399705c174a05ff17b94",
+      "after": "f7387f506be530eb54020ddf10e550d6d82b3b76",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "61387788a160109f72fa4938db5b68e45affb8596d82e3d7c10335341dfb2e6a"
+    },
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
+      "before": "48d61ec98199cafdc5e1a5b23b8ea6bb0adc7534",
+      "after": "8e904a8dac481fbc142abd9a44bad8076b5d7395",
+      "originalBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+      "originalDeltaSHA256": "1238aa4073d511a6fde32935b509ec402934c394c3fbc91fb69f0aac59590206"
+    }
+  },
+  "protectedInputs": {
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/backend/Dockerfile": "8dfd85f6e843d964eb192cfdf52addffdc3c4132",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/Dockerfile": "45dd87f6a8ed5a5bf45d3ea1e4126ce5e8d9f8b4",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df"
+  },
+  "originalApplicationCases": 31,
+  "historicalDraftScopeCases": 1,
+  "originalSigned": false,
+  "ciApplicationReplay": false,
+  "files": [
+    {
+      "path": "training-qualification-controls-first.log",
+      "sha256": "57b5a1073f8d172a877a600fb8ecb9a3cbc272e810eeb89c53f9b704e5711914",
+      "bytes": 1329
+    },
+    {
+      "path": "training-qualification-actionlint-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "training-native-fixture-control-final.log",
+      "sha256": "40b9afdd6a15fc3e2cd53a7af86edf394069d9c109c4a4e62e9856999c05e37c",
+      "bytes": 240
+    },
+    {
+      "path": "training-original-admission-final.json",
+      "sha256": "d4ebbd1f7b6475784cfabaeed4ef0d77ebca821a32c63627ee8a1e2ffa6b6605",
+      "bytes": 6666
+    },
+    {
+      "path": "training-original-admission-controls-final.log",
+      "sha256": "47364d7e3306e4c673abbffa65aef53520b44c4e8e69fe60ceafe89810021844",
+      "bytes": 321
+    },
+    {
+      "path": "training-native-fixture-preflight.log",
+      "sha256": "8cecc1f48085870aa88b2fc4e2105ba6484d557b1c45f7a38cc2fc2558a46e94",
+      "bytes": 124
+    },
+    {
+      "path": "training-native-fixture-preflight-correct-role.log",
+      "sha256": "7941099ef002f90345df6df9cfcec71cfb7b931b22ea1e725365c3ab2efc2abc",
+      "bytes": 166
+    },
+    {
+      "path": "training-native-fixture-preflight-report-definition.log",
+      "sha256": "88b796be7e4bf15a7c56f11db0070591648bc1660e52f2fbde3743ac81a94a9a",
+      "bytes": 660
+    },
+    {
+      "path": "training-native-fixture-preflight-paired.log",
+      "sha256": "f9ecde000422515bd620e8c113485d1b469f83e0d056f102916f48f22aef98ce",
+      "bytes": 3389
+    }
+  ],
+  "controls": {
+    "firstCompleteRun": {
+      "passed": 12,
+      "failed": 0
+    },
+    "changedFixtureContinuation": {
+      "passed": 1,
+      "failed": 0
+    },
+    "changedOriginalEvidenceAdmissionContinuation": {
+      "passed": 2,
+      "failed": 0
+    },
+    "actionlint": {
+      "exitCode": 0
+    },
+    "inputLimit": "No claim all control cases reexecuted on one final source; only changed fixture/original-report validators rechecked after first12. Original application evidence retains immutable dbcc source and row summaries; missing full original environment signatures not backfilled."
+  },
+  "fixtureFailures": [
+    "First connection assumed CI role ptool; local container uses TEST_DATABASE_URL role. Correct configured role then used.",
+    "Unbound training interpretation correctly refused by TRAINING_INTERPRETATION_REQUIRES_BOUND_FINAL. Fixture now preserves an old legacy report definition instead of claiming a new accepted scientific FINAL.",
+    "Report package snapshot initially omitted key/version/profile pair; original DB guard retained. Paired synthetic legacy definition passes rollback-only preflight."
+  ],
+  "nativeQualification": "Actual nonempty main upgrade/full native dump restore only executes once in the formal job; local preflight is rollback-only fixture DML, not migration/restore qualification. New columns/checks/index/triggers/function metadata and restored immutability/snapshot guards selected, not all unrelated legacy CHECK textual serialization.",
+  "reuse": "Unchanged locked backend and frontend audits authenticate original successful step metadata/24h. New migration and changed production tree cannot reuse Survey native/image/SAST qualification.",
+  "nextJobs": [
+    "scope",
+    "personal-tracking original admission/native upgrade restore/current frontend types+lint",
+    "docker current production build/security",
+    "codeql selected current source/controls",
+    "merge-gate"
+  ],
+  "notion": "Paused migration to Hui; Git/local record only, nonblocking; no old Qiang writes."
+}

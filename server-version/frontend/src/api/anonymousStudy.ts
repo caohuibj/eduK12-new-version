@@ -1,6 +1,7 @@
 import apiClient from './client'
 import { createPublicCapabilityClient } from './publicCapabilityClient'
 import type { ApiResponse } from '../types'
+import type {PersonalChangesResponse} from '../modules/reporting/PersonalChangesReport'
 const data=<T>(response:ApiResponse<T>):T=>{if(response.code!==0 || !response.data)throw new Error(response.message || '研究访问失败');return response.data}
 export type ParticipationMode='PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE'
 export interface ParticipationInput {revision:number;mode:ParticipationMode;label:string;instructions:string;shortCodes:string[]}
@@ -53,6 +54,7 @@ export function publicStudyApi(credential='') {
     recoverCode:async(studyId:string,code:string)=>data(await client.post<StudyIdentity>(`/${encodeURIComponent(studyId)}/code/recover`,{code})),
     resetCode:async(studyId:string,resetCode:string,suffix:string)=>data(await client.post<StudyIdentity>(`/${encodeURIComponent(studyId)}/code/reset`,{resetCode,suffix})),
     home:async(studyId:string)=>data(await client.get<StudyHome>(`/${encodeURIComponent(studyId)}`)),
+    changes:async(studyId:string,attemptId:string)=>data(await client.post<PersonalChangesResponse>(`/${encodeURIComponent(studyId)}/changes`,{attemptId})),
     recover:async(studyId:string,waveId:string)=>data(await client.post<{attemptId:string;state:string;recoveryToken:string}>(`/${encodeURIComponent(studyId)}/waves/${encodeURIComponent(waveId)}/recover`,{})),
     start:async(studyId:string,waveId:string)=>data(await client.post<{attemptId:string;state:string;recoveryToken:string}>(`/${encodeURIComponent(studyId)}/waves/${encodeURIComponent(waveId)}/start`,{})),
     revoke:async(studyId:string)=>data(await client.post(`/${encodeURIComponent(studyId)}/revoke`,{})),

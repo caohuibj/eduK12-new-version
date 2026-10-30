@@ -49,6 +49,15 @@ function scale(capabilities=DISCLOSURE_PRESETS.FULL_REPORT(),legacyClass?:'STAND
  return {runtime,child,core,db,input,key:core.metrics[0].key as string}
 }
 describe('Training shared frozen per-unit disclosure ceiling',()=>{
+ it('keeps the participant subject ceiling independent from teacher scores and cognitive research-only keys',async()=>{
+  const f=scale(),teacher=await loadTrainingMetricDisclosure(f.db,f.input)
+  const participant=await loadTrainingMetricDisclosure(f.db,{...f.input,audience:'participant'})
+  expect(teacher.metricKeys.has(f.key)).toBe(true)
+  expect(participant.metricKeys.size).toBe(0)
+  const c=cognitive(),own=await loadTrainingMetricDisclosure(c.db,{...c.input,audience:'participant'})
+  expect([...own.metricKeys]).toEqual(['accuracy','processCount'])
+  expect(own.metricKeys.has('blockSlopeRt')).toBe(false)
+ })
  it('excludes research-only, nonstandard, product index and nonnumeric cognitive metrics, while preserving standard and QC facts',async()=>{
   const f=cognitive(),before=JSON.stringify({child:f.child,core:f.core,unit:f.unit})
   const result=await loadTrainingMetricDisclosure(f.db,f.input)
