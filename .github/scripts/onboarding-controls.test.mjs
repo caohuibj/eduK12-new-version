@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
+import {verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
@@ -429,4 +429,46 @@ test('Training Bundle leaf formal route admits disclosed native proof without re
  const native=JSON.parse(readFileSync('docs/evidence/group-report-leaf-sources-20261030/bundle-postgres-proof.json')),disclosed=JSON.parse(readFileSync('docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person-proof.json'));
  assert.equal(verifyTrainingBundleGroupObservation(native,'bundle-native').testsExecutedInCI,false);assert.equal(verifyTrainingBundleGroupObservation(disclosed,'bundle-disclosed').testsExecutedInCI,false);
  assert.throws(()=>verifyTrainingBundleGroupObservation({...disclosed,validN:1},'bundle-disclosed'));
+});
+
+
+test('PR420 chart loading stays on exact frontend-only admission and rejects drift without unrelated jobs',()=>{
+ const f=fixture(),paths=['server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx','server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx','docs/evidence/personal-chart-loading-20261030/report-tests-results.json'];
+ const b={...f.b,pr:420,source:Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]))};
+ const entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ const env={...f.env,CI_PR_NUMBER:'420',CI_HEAD_REF:BRANCHES[420]};
+ const call=(binding=b,changed=entries,read=f.read,environment=env)=>onboardingPlan(changed,base,head,read,environment,binding);
+ const p=call(),outputs=onboardingOutputs(p);assert.equal(p.pr,420);assert.equal(outputs.application_route,'onboarding-structure');
+ for(const key of ['frontend','frontend_test','frontend_build','ui_required','run_performance_tests','scale','cognitive','situational','bundle','maintenance'])assert.equal(outputs[key],false,key+' must not run');
+ assert.throws(()=>call({...b,enabled:false}));
+ assert.throws(()=>call(b,entries,(cmd,a,...rest)=>cmd==='rev-parse'&&a===head+':server-version/backend'?h('9'):f.read(cmd,a,...rest)));
+ assert.throws(()=>call(b,entries,(cmd,a,...rest)=>cmd==='rev-parse'&&a===head+':'+paths[0]?h('9'):f.read(cmd,a,...rest)));
+ assert.throws(()=>call(b,entries,(cmd,a,...rest)=>cmd==='rev-parse'&&a===source+'^{tree}'?h('9'):f.read(cmd,a,...rest)));
+ for(const outside of ['server-version/backend/src/unrelated.ts','server-version/frontend/package-lock.json','server-version/frontend/src/App.tsx','docs/evidence/other/tests.json']){
+  const changed=entries.map(e=>e.file===paths[0]?{...e,file:outside}:e),{[paths[0]]:removed,...rest}=b.source;
+  assert.throws(()=>call({...b,source:{...rest,[outside]:removed}},changed));
+ }
+ for(const patch of [{CI_HEAD_REF:BRANCHES[415]},{CI_PR_NUMBER:'415'},{CI_EVENT:'workflow_dispatch'},{CI_FORCE_FULL:'true'}])assert.throws(()=>call(b,entries,f.read,{...env,...patch}));
+ const outcomes={scope:{result:'success',outputs:Object.fromEntries(Object.entries(outputs).map(([key,value])=>[key,String(value)]))},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(outcomes,false),['scope','onboarding-structure','codeql']);assert.deepEqual(failedChecks(outcomes,false),[]);assert(failedChecks(outcomes,true).length);
+ for(const key of ['onboarding-structure','codeql'])for(const result of ['failure','cancelled','skipped',undefined])assert(failedChecks({...outcomes,[key]:{result}},false).length);
+});
+
+
+test('PR420 official reuse accepts only the fixed successful steps and preserves cancelled qualification',()=>{
+ const o=pr420BuildOrigin,now=Date.parse('2026-10-30T22:00:00Z');
+ const run={id:o.run,run_attempt:1,head_sha:o.source,path:'.github/workflows/ci.yml',event:'pull_request',head_branch:BRANCHES[420],status:'completed',conclusion:'cancelled'};
+ const job=(id,name,steps)=>({id,run_id:o.run,run_attempt:1,head_sha:o.source,name,status:'completed',conclusion:'cancelled',steps:steps.map(([number,name])=>({number,name,status:'completed',conclusion:'success'}))});
+ const build=job(o.buildJob,'frontend artifacts / release consumers early / build',[[6,'build production frontend'],[9,'Run actions/upload-artifact@v4']]);
+ const lint=job(o.lintJob,'frontend (lint + types + full tests + build) / frontend checks',[[9,'lint']]);
+ const artifact={id:o.artifact,name:'frontend-dist-'+o.merge,workflow_run:{id:o.run,head_sha:o.source},expired:false,size_in_bytes:o.size,digest:'sha256:'+o.sha256,created_at:'2026-10-30T15:42:34Z',expires_at:'2026-10-31T15:42:32Z'};
+ const verify=(r=run,b=build,l=lint,a=artifact,tree=o.frontend,time=now)=>verifyPr420OfficialMetadata(r,b,l,a,tree,time);
+ const accepted=verify();assert.equal(accepted.originalWholeJobPassed,false);assert.equal(accepted.originalRunConclusion,'cancelled');assert.equal(accepted.buildExecutedThisRun,false);
+ for(const patch of [{id:1},{run_attempt:2},{head_sha:h('9')},{conclusion:'success'}])assert.throws(()=>verify({...run,...patch}));
+ for(const original of [build,lint])for(const conclusion of ['failure','cancelled','skipped']){
+  const bad={...original,steps:original.steps.map((s,i)=>i===0?{...s,conclusion}:s)};
+  assert.throws(()=>original===build?verify(run,bad):verify(run,build,bad));
+ }
+ for(const patch of [{id:1},{expired:true},{size_in_bytes:o.size+1},{digest:'sha256:'+h('9')},{name:'frontend-ui-lab-dist-'+o.merge},{workflow_run:{id:o.run,head_sha:h('9')}}])assert.throws(()=>verify(run,build,lint,{...artifact,...patch}));
+ assert.throws(()=>verify(run,build,lint,artifact,h('9')));assert.throws(()=>verify(run,build,lint,artifact,o.frontend,now+86400000));
 });
