@@ -188,6 +188,37 @@ function admitPr395LocalTypes(p,review){
  assert.deepEqual(review.types,[]);const proof=review.pr395LocalTypes;
  return [verifyPr395LocalTypes(readOriginal(proof),readFileSync(safePath(proof.exit)),readFileSync(safePath(proof.log)),p.components.frontend)];
 }
+// Fixed successful full SAST from PR395's failed first browser run. Keep its
+// identity/findings, and qualify only the genuinely changed recovery controls.
+const pr395Sast={run:40997195433,job:123873065091,artifact:12951772954,source:'23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5',merge:'e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6',tree:'cd8d923e7696dd01c28a0de8a17bad3230572a60',size:72939,sha256:'f9f65b7273c0d089a1801b302d99373ac2a0d0f916016267d3679174f7f23e58'};
+export function verifyPr395SastMetadata(run,job,artifact,now=Date.now()){
+ const o=pr395Sast;assert.equal(run.id,o.run);assert.equal(run.head_sha,o.source);assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.event,'pull_request');assert.equal(run.run_attempt,1);assert.equal(run.status,'completed');assert.equal(run.conclusion,'failure');assert.equal(run.head_branch,'fix/education-draft-review-20261030');
+ assert.equal(job.id,o.job);assert.equal(job.run_id,o.run);assert.equal(job.run_attempt,1);assert.equal(job.head_sha,o.source);assert.equal(job.name,'codeql (javascript/typescript SAST)');assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
+ for(const name of ['initialize CodeQL','analyze with CodeQL','retain original onboarding SAST findings'])assert(job.steps.some(s=>s.name===name&&s.status==='completed'&&s.conclusion==='success'));
+ assert.equal(artifact.id,o.artifact);assert.equal(artifact.name,'onboarding-sast-'+o.merge);assert.equal(artifact.workflow_run.id,o.run);assert.equal(artifact.workflow_run.head_sha,o.source);assert.equal(artifact.expired,false);assert.equal(artifact.size_in_bytes,o.size);assert.equal(artifact.digest,'sha256:'+o.sha256);
+ const age=now-Date.parse(artifact.created_at);assert(Number.isFinite(age)&&age>=0&&age<86400000,'Original SAST evidence expired');return {...o,originalParentConclusion:run.conclusion,originalJobConclusion:job.conclusion};
+}
+async function reusePr395Sast(){
+ assert.equal(process.env.GITHUB_ACTIONS,'true');assert.equal(process.env.CI,'true');assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');const p=JSON.parse(process.env.PLAN);assert.equal(p.pr,395);assert.equal(p.head,git('rev-parse','HEAD'));
+ const o=pr395Sast;git('fetch','--no-tags','--depth=1','origin',o.source);assert.equal(git('rev-parse',o.source+'^{tree}'),o.tree);
+ const controls=['.github/scripts/onboarding-checks.mjs','.github/scripts/onboarding-controls.test.mjs','.github/scripts/pr395-browser.mjs'];
+ const delta=git('diff','--name-only',o.source,'HEAD').split('\n').filter(Boolean);
+ assert(delta.every(path=>controls.includes(path)||['.github/scripts/onboarding-bindings.json','.github/workflows/ci.yml'].includes(path)||path.startsWith('docs/performance/education-post-p6-20261030/')),'Previously scanned application/source drift');
+ for(const component of ['backend','frontend'])assert.equal(git('rev-parse',o.source+':server-version/'+component),git('rev-parse','HEAD:server-version/'+component));
+ const originalWorkflow=git('show',o.source+':.github/workflows/ci.yml'),currentWorkflow=readFileSync('.github/workflows/ci.yml','utf8');
+ const init=s=>s.split('      - name: initialize CodeQL\n')[1].split('      - name: analyze with CodeQL\n')[0];
+ const stable=s=>init(s).split('\n').filter(line=>!line.startsWith('          config:')&&!line.startsWith('            ${{')).join('\n');assert.equal(stable(originalWorkflow),stable(currentWorkflow),'CodeQL action/language/options changed');
+ const api=async path=>{const r=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version'+path,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(60000)});assert.equal(r.status,200);return r.json();};
+ const [run,job,artifact]=await Promise.all([api('/actions/runs/'+o.run),api('/actions/jobs/'+o.job),api('/actions/artifacts/'+o.artifact)]);const identity=verifyPr395SastMetadata(run,job,artifact);
+ const merge=await api('/git/commits/'+o.merge);assert.equal(merge.tree.sha,o.tree);assert.deepEqual(merge.parents.map(p=>p.sha),[p.base,o.source]);
+ const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/actions/artifacts/'+o.artifact+'/zip',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN},redirect:'manual',signal:AbortSignal.timeout(60000)});assert.equal(response.status,302);
+ const url=new URL(response.headers.get('location'));assert.equal(url.protocol,'https:');assert(/(^|\.)(blob\.core\.windows\.net|githubusercontent\.com|s3\.amazonaws\.com)$/.test(url.hostname));
+ const download=await fetch(url,{signal:AbortSignal.timeout(60000)});assert.equal(download.status,200);const bytes=Buffer.from(await download.arrayBuffer());assert.equal(bytes.length,o.size);assert.equal(hash(bytes),o.sha256);
+ mkdirSync('pr395-original-sast',{recursive:true});writeFileSync('pr395-original-sast/original.zip',bytes);
+ const sarif=JSON.parse(execFileSync('python3',['-c',"import zipfile; print(zipfile.ZipFile('pr395-original-sast/original.zip').read('javascript.sarif').decode())"],{encoding:'utf8',maxBuffer:8*1024*1024}));
+ assert(sarif.runs.length);assert(sarif.runs.every(run=>run.invocations.some(i=>i.executionSuccessful===true)));writeFileSync('pr395-original-sast/javascript.sarif',JSON.stringify(sarif));
+ writeFileSync('pr395-original-sast/reuse.json',JSON.stringify({identity,currentHead:p.head,currentRun:process.env.GITHUB_RUN_ID,scanExecuted:false,currentControlScanRequired:true,delta,findings:sarif.runs.flatMap(r=>r.results??[]),disposition:'Original one static-test URL-substring advisory retained for independent review; no finding suppressed or re-labelled.'},null,2)+'\n');
+}
 function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
   const review=[393,395].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
@@ -239,7 +270,8 @@ function admit(){
   writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,admitted,types,observations,...(originalTaskChecks?{originalTaskChecks}:{}),environment:review.environment,testsExecutedInCI:false,rootReviewAuthentication:'Immutable reviewed Git record, not a signed original execution'},null,2)+'\n');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
-  if(process.argv[2]==='admit')admit();
+  if(process.argv[2]==='sast-reuse')await reusePr395Sast();
+  else if(process.argv[2]==='admit')admit();
   else if(process.argv[2]==='source')plan();
   else throw Error('Expected source or admit');
 }

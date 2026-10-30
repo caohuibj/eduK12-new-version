@@ -28,7 +28,7 @@ try{
   const context=await browser.newContext({viewport:{width:product==='SCHOOL'?768:1280,height:900},serviceWorkers:'block'}),page=await context.newPage();
   page.on('pageerror',e=>row.errors.push(e.message));
   const base='/organizations/synthetic-org/private-tools';
-  await context.route('**/api/**',async route=>{const request=route.request(),url=new URL(request.url()),path=url.pathname.slice(4)+url.search;row.api.push({path,method:request.method()});
+  await context.route(url=>url.pathname.startsWith('/api/'),async route=>{const request=route.request(),url=new URL(request.url()),path=url.pathname.slice(4)+url.search;row.api.push({path,method:request.method()});
    if(request.method()!=='GET'||![base,base+'?kind=COMPOSITION',base+'/package-sources'].includes(path)){row.errors.push('Unexpected '+request.method()+' '+path);return route.abort();}
    return route.fulfill({contentType:'application/json',body:JSON.stringify({data:{list:[],nextCursor:null}})});
   });
@@ -46,7 +46,7 @@ try{
    await page.getByText('当前学校下暂无获授权的正式固定包。',{exact:true}).waitFor();
    assert.deepEqual(row.api.map(r=>r.path),[base,base+'?kind=COMPOSITION',base+'/package-sources']);assert.deepEqual(row.errors,[]);
    await page.screenshot({path:resolve(out,product+'.png'),fullPage:true});row.status='PASS';
-  }catch(e){row.status='FAIL';row.error=String(e.stack??e);throw e;}finally{save();await context.close();}
+  }catch(e){row.status='FAIL';row.error=String(e.stack??e);console.error(JSON.stringify({product,api:row.api,errors:row.errors,error:row.error}));throw e;}finally{save();await context.close();}
  }
  result.status='PASS';save();
 }catch(e){result.status='FAIL';result.error=String(e.stack??e);save();throw e;}finally{await browser?.close();await vite?.close();rmSync(html,{force:true});rmSync(entry,{force:true});save();}

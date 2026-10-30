@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes} from './onboarding-checks.mjs';
+import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 function fixture(){
@@ -310,8 +310,24 @@ test('PR395 admits only the original disjoint 21-case union and explicit failed 
 });
 test('PR395 missing browser consumers run without rebuilding, replaying application tests or starting a backend',()=>{
  const yaml=readFileSync('.github/workflows/ci.yml','utf8'),job=yaml.slice(yaml.indexOf('  onboarding-structure:\n'),yaml.indexOf('  report-planning:\n'));
- assert(job.includes('node .github/scripts/pr395-browser.mjs'));assert(yaml.includes(".pr == 395 && 'paths: [server-version/frontend/src/components/education-tools"));
+ assert(job.includes('node .github/scripts/pr395-browser.mjs'));assert(yaml.includes(".pr == 395 && 'paths: [.github/scripts/onboarding-checks.mjs"));
  const script=readFileSync('.github/scripts/pr395-browser.mjs','utf8');assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(!script.includes('--no-sandbox'));
  assert(script.includes("request.method()!=='GET'"));assert(script.includes("['SCHOOL','TEACHER']"));assert(script.includes('dialog.dismiss()'));assert(script.includes('dialog.accept()'));
  assert(!script.includes("['run','build'"));assert(!script.includes('vitest'));assert(script.includes('Not real login, authorization'));
+});
+
+test('PR395 browser interception treats only the actual API prefix as business traffic',()=>{
+ const script=readFileSync('.github/scripts/pr395-browser.mjs','utf8');assert(script.includes("context.route(url=>url.pathname.startsWith('/api/'),async route=>"));assert(!script.includes("context.route('**/api/**'"));
+ const match=url=>new URL(url).pathname.startsWith('/api/');
+ for(const path of ['/api/organizations/synthetic-org/private-tools','/api/unknown'])assert(match('http://127.0.0.1:5187'+path));
+ for(const path of ['/src/api/scaleLibraryGovernance.ts','/node_modules/.vite/deps/react.js','/pr395-fixture.jsx'])assert(!match('http://127.0.0.1:5187'+path));
+ assert(script.includes("request.method()!=='GET'"));assert(script.includes("row.errors.push('Unexpected '"));
+});
+test('PR395 SAST continuation requires the exact official successful scan despite parent failure',()=>{
+ const root='docs/performance/education-post-p6-20261030/evidence/ci-r1/';
+ const run=JSON.parse(readFileSync(root+'run.json')),job=JSON.parse(readFileSync(root+'sast-job.json')),artifact=JSON.parse(readFileSync(root+'sast-artifact.json'));const now=Date.parse(artifact.created_at)+1000;
+ assert.equal(verifyPr395SastMetadata(run,job,artifact,now).originalParentConclusion,'failure');
+ for(const result of ['failure','skipped','cancelled'])assert.throws(()=>verifyPr395SastMetadata(run,{...job,conclusion:result},artifact,now));
+ assert.throws(()=>verifyPr395SastMetadata(run,job,{...artifact,digest:'sha256:'+'0'.repeat(64)},now));assert.throws(()=>verifyPr395SastMetadata(run,job,{...artifact,expired:true},now));assert.throws(()=>verifyPr395SastMetadata(run,job,artifact,now+86400000));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/onboarding-checks.mjs sast-reuse'));assert(yaml.includes('pr395-original-sast-${{ github.sha }}'));assert(yaml.includes(".pr == 395 && 'paths: [.github/scripts/onboarding-checks.mjs, .github/scripts/onboarding-controls.test.mjs, .github/scripts/pr395-browser.mjs]'"));
 });
