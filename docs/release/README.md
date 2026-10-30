@@ -1998,3 +1998,10 @@ upgrade/native restore, source guards, locked audits, actual frontend types/lint
 production artifacts/scans and SAST execute in their selected existing CI jobs.
 SQL fixture data is synthetic; no production, physical timing, all-four-entry,
 merge, deployment, or full disaster-recovery qualification is implied.
+
+The PR399 base was subsequently advanced to
+`1d95bf5d9c104dcc9d0ffa344858cb39a70212bd` after the real GitHub preview included
+a newly merged BAT/COPSOQ catalog commit against an older event base. Only that
+base pin changed; all24 reviewed Survey application/test/schema blobs and locked
+inputs remain fixed. The original failed preview/refusal is retained. Main drift
+continues to stop qualification rather than broadening or starting full CI.

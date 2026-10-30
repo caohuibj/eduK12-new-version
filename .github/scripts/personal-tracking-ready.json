@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "repository": "caohuibj/eduK12-new-version",
   "branch": "feat/personal-longitudinal-survey-20261030",
-  "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
+  "base": "1d95bf5d9c104dcc9d0ffa344858cb39a70212bd",
   "reviewedCandidate": "a62c9a5763da69aa13b4f70d062b0bf55d6db65f",
-  "reviewBasis": "DOT closed source findings on a62; user authorizes reuse of original unchanged 31 and targeted repairs. Original unsigned local execution stays local evidence; no claim CI executed those cases. All Survey product/test/schema bytes pinned to reviewed a62; Training main delta is separate and reviewed by PR407.",
+  "reviewBasis": "DOT closed source findings on a62; user authorizes reuse of original unchanged 31 and targeted repairs. Original unsigned local execution stays local evidence; no claim CI executed those cases. All Survey product/test/schema bytes pinned to reviewed a62; Training main delta is separate and reviewed by PR407. Main advanced to BAT/COPSOQ catalog-only 1d95; no Survey plan/migration/source/fixture or locked tool input changed. Catalog additions are separately governed main content, not the synthetic tracked source.",
   "files": {
     "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql": {
       "before": null,

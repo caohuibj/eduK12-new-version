@@ -382,3 +382,23 @@ was not retained in the concise output; readback confirms PR399 remains Draft,
 so no Ready qualification is claimed. This state transition is not retried via
 another interface. Missing Ready jobs remain NOTRUN pending resolution of that
 specific operation; ordinary independent work may continue.
+
+### Second activation: moving-main preview refused, before application jobs
+
+Run 41027089221 attempt1 source6deb65fb6 reached classification and stopped at job
+123967664202. Actual preview de26f0103e28b059d22e26638e07de19ef3461b0 has parents
+main1d95bf5d9c104dcc9d0ffa344858cb39a70212bd and source6deb; the event base still
+said8cf. This exact preview reproduces the planned unknown-path refusal: newly
+merged BAT/COPSOQ catalog files appear in the old-base diff. This is confirmed
+from the real Git preview, not an inference from a missing job log. All native,
+image, audit/type and SAST stages remained NOTRUN.
+
+Main1d95 was merged without conflict at37a7d20e1db005fe88e63fc4140e3003c8a4e466.
+Only the base pin/review note is updated; the 24 Survey application/test/schema
+blobs still match reviewed a62. These main catalog additions are independently
+governed fixed material, not the synthetic tracked sources. The changed
+base/refusal control alone passes; no old31/application or broad control suite
+is replayed. The failed original run/preview and diagnostic are retained. Before
+any next activation the live PR base event is refreshed again. Another moving
+base stops classification rather than broadening the allowed scope or repeatedly
+launching full CI; no original failed run is rerun.
