@@ -68,6 +68,7 @@ export function trainingSourceHarness(){
       if(sql.includes('FROM material_grants g JOIN survey_standard_releases'))return h.use&&!h.use.revoked_at?[{
         id:h.row.id,combination_hash:h.row.combination_hash,title:h.row.snapshot.title,tool_key:h.row.tool_key,instrument_version:h.row.snapshot.instrumentVersion,
         content_version:h.row.snapshot.parts.CONTENT.version,parameters_version:h.row.snapshot.parts.PARAMETERS.version,report_version:h.row.snapshot.parts.REPORT.version,
+        content_hash:h.row.snapshot.parts.CONTENT.hash,parameters_hash:h.row.snapshot.parts.PARAMETERS.hash,report_hash:h.row.snapshot.parts.REPORT.hash,evidence:structuredClone(h.t1Records),
         scale_id:h.scale.id,measurement_release:structuredClone(h.row.measurement_release),use_id:h.use.id,use_version:h.use.version,
       }]:[]
       if(sql.includes('FROM assessment_management_events'))return structuredClone(h.t1Records)

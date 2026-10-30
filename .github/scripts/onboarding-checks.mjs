@@ -204,9 +204,9 @@ export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
  assert.deepEqual(entry.products,['TRAINING','SURVEY','SCHOOL','TEACHER']);assert.equal(entry.exactNonemptyReportsPerProduct,2);assert.equal(entry.sourcePolicies,8);
  return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false},{kind:'REGISTERED_SAME_CP_NONEMPTY_REPORTS',tools:3,reports:6,actualFinals:2,entryBoundary:'SOURCE_IDENTITY_POLICY_ONLY',ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
 }
-export function task1SastConfig(p,b=binding.candidates?.task1){
- assert.equal(p.pr,'task1');assert.equal(p.product,b.product);
- const paths=[...Object.keys(b.source),'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs','.github/scripts/task1-onboarding-controls.test.mjs'].filter(path=>/\.(?:[cm]?js|jsx|tsx?)$/.test(path));
+export function task1SastConfig(p,b=binding.candidates?.[String(p.pr)]){
+ assert(['task1','choice-page'].includes(p.pr));assert.equal(p.product,b.product);
+ const paths=[...Object.keys(b.source),'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs',p.pr==='task1'?'.github/scripts/task1-onboarding-controls.test.mjs':'.github/scripts/onboarding-controls.test.mjs'].filter(path=>/\.(?:[cm]?js|jsx|tsx?)$/.test(path));
  assert(paths.length);return {paths:[...new Set(paths)].sort()};
 }
 export function verifyTask1ControlEvidence(raw){
@@ -226,6 +226,23 @@ export function verifyTask1ControlEvidence(raw){
  assert.deepEqual(raw.auxiliaryChecks.map(c=>c.name).sort(),['ACTIONLINT','NODE_SYNTAX']);
  for(const item of raw.auxiliaryChecks){assert.equal(item.status.exitCode,0);assert(item.status.command.length&&item.status.startedAt&&item.status.finishedAt);assert.equal(hash(Buffer.from(item.log)),item.logSHA256);}
  return admitted;
+}
+/** Small selector follow-up: accept only its hash-bound original checks. No
+ * application producer, database fixture, build or broad task1 replay in CI. */
+export function verifyChoicePageEvidence(review,p,readBytes=path=>readFileSync(path)){
+ const raw=JSON.parse(readBytes(safePath(review.original.path)));assert.equal(hash(readBytes(review.original.path)),review.original.sha256);
+ assert.equal(raw.ciExecuted,false);assert.equal(raw.originalExecutionSigned,false);
+ const inputs=Object.keys(binding.candidates['choice-page'].source).filter(path=>path.startsWith('server-version/')).sort();assert.deepEqual(Object.keys(raw.inputs).sort(),inputs);
+ for(const path of inputs)assert.equal(hash(readBytes(path)),raw.inputs[path],'Selector check input drift');
+ const admitted=review.reports.map(record=>{
+  const original=task1Pointer(raw,record.pointer);assert.equal(original.status.exitCode,0);assert(original.status.startedAt&&original.status.finishedAt&&original.status.command.length);assert(record.sourceAssociationBasis);
+  return {id:record.id,caseNames:verifyOriginalReport(original.report,record),originalCommand:original.status.command,sourceAssociationBasis:record.sourceAssociationBasis,ciExecuted:false};
+ });
+ assert.equal(admitted.flatMap(r=>r.caseNames).length,13);assert.equal(new Set(admitted.flatMap(r=>r.caseNames)).size,13);
+ const types=review.types.map(record=>{const original=task1Pointer(raw,record.pointer);assert.equal(original.status.exitCode,0);assert(original.status.command.length&&original.status.startedAt&&original.status.finishedAt);assert(record.coverage);return {component:record.component,coverage:record.coverage,originalCommand:original.status.command,ciExecuted:false,wholeComponentClaim:false};});
+ assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
+ const http=task1Pointer(raw,review.http.pointer);assert.equal(http.status.exitCode,0);assert.equal(http.readback.passed,true);assert.equal(http.readback.restrictedRole,'precise_task1_runtime');assert.equal(http.readback.database,'precise_dual_report_test_20261030_v2');assert.deepEqual(http.readback.requests.map(r=>r.status),[200,200,400,200,200,400,401]);
+ assert.equal(p.product,review.product);return {admitted,types,observations:[{scope:http.readback.scope,requests:http.readback.requests,ciExecuted:false}],openAcceptanceItems:[]};
 }
 function qualifyTask1Builds(p,backendOnly=false){
  assert.equal(p.pr,'task1');assert.equal(process.version,'v24.21.0');mkdirSync('onboarding-evidence',{recursive:true});
@@ -367,11 +384,15 @@ async function reusePr395Sast(){
 }
 function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=[393,395,'task1'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
+  const review=[393,395,'task1','choice-page'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
   assert(review,'Missing exact reviewed evidence');
-  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,p.pr===395?'independent Codex pr395_review':'root dot');
+  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,p.pr==='choice-page'?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
+  if(p.pr==='choice-page'){
+    const accepted=verifyChoicePageEvidence(review,p);mkdirSync('onboarding-evidence',{recursive:true});
+    writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,...accepted,environment:review.environment,testsExecutedInCI:false,reviewAuthentication:'Delegated scoped self-review of unsigned original receipts; DOT background review is independent',deploymentQualified:false},null,2)+'\n');return;
+  }
   if(p.pr==='task1'){
     const accepted=verifyTask1Evidence(review),controls=verifyTask1ControlEvidence(JSON.parse(readFileSync('docs/precise-authorization-20261029/ci-control-raw.json')));mkdirSync('onboarding-evidence',{recursive:true});
     writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,...accepted,controls,environment:review.environment,testsExecutedInCI:false,rootReviewAuthentication:'Immutable reviewed Git record, not a signed original execution',taskCompletionClaim:false},null,2)+'\n');return;

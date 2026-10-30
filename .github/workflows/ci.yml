@@ -1422,7 +1422,7 @@ jobs:
           JS
       - name: select exact Task1 changed application and control SAST inputs
         id: task1-codeql-config
-        if: needs.scope.outputs.application_route == 'onboarding-structure' && fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 'task1'
+        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page"]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
         env:
           CI: 'true'
           PLAN: ${{ needs.scope.outputs.onboarding_plan }}
