@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "tses24_zh_hant",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "TSES 作者网站繁体中文24题（按因素重排）（仅目录，未准备施测）",
+      "abbreviation": "TSES24-ZH-HANT",
+      "instrumentFamily": "TSES long 24 author-hosted traditional Chinese factor-grouped table"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [],
+      "constructDefinition": "TSES 作者网站繁体中文24题（按因素重排）：仅记录准确版本、构念维度、已有选题/计分线索与缺件；不含题文、可执行计分或个体结果。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "tses24_zh_hant",
+        "domain:teacher_workplace",
+        "construct:self_efficacy",
+        "population:adult_teacher",
+        "response:self",
+        "locale:zh-Hant",
+        "availability:catalog_only",
+        "rights:public_redist_unknown",
+        "project:source_identity_only",
+        "scoring:not_runtime",
+        "report:original_draft_only"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向成年教师研究资料定位；原文和既有研究不能替代中国K12教师效度或常模。18+是项目应用边界，目录不可施测。"
+    },
+    "administration": {
+      "itemCount": 24,
+      "estimatedMinutes": 8,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "目录来源依精确原作者版本；正式指导语/回忆期和数字施测版本尚未确认",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "本目录仅标记24题版本；该繁体中文表格按因子重排：中文1–8教学策略、9–16课堂管理、17–24学生参与，不是英文长版标准序。中文第24题与英文原长版第1题意义有差异；中文作答锚点、译者和测量验证身份未核，不能静默修订或称官方简体版。",
+        "没有公开题文、选项、指导语、可执行评分规则和用户结果。",
+        "使用、版权、译本、研究效度属真实附注，尚未获得本项目具体公开Git/商业授权。",
+        "用时为目录估计，非实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "目前只能作来源识别、版本交叉审计和受限材料追索；本独立数字执行形式尚无证据。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-Hant",
+    "targetLocale": "zh-Hant",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Author-hosted bilingual Traditional Chinese TSES 24 factor-grouped form, translator/validation information unresolved；本目录无公开题项或新译文。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "该繁体中文表格按因子重排：中文1–8教学策略、9–16课堂管理、17–24学生参与，不是英文长版标准序。中文第24题与英文原长版第1题意义有差异；中文作答锚点、译者和测量验证身份未核，不能静默修订或称官方简体版。 当前语言/译本权利及独立计分、漏答适用条件按来源保持未知，不把报告草稿当已发布版本。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "TSES long 24 author-hosted traditional Chinese factor-grouped table",
+      "citation": "Author-hosted bilingual Traditional Chinese TSES 24 factor-grouped form, translator/validation information unresolved",
+      "url": "https://wmit-pages-prod.s3.amazonaws.com/wp-content/uploads/sites/102/2021/11/01165613/Teacher-Sense-of-Efficacy-Scale-Chinese-Version.pdf"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "教学策略自我效能",
+        "课堂管理自我效能",
+        "学生参与自我效能"
+      ],
+      "limitations": [
+        "目录无可执行题本/计分/报告；不表示当前工具已可施测或已获授权。",
+        "该繁体中文表格按因子重排：中文1–8教学策略、9–16课堂管理、17–24学生参与，不是英文长版标准序。中文第24题与英文原长版第1题意义有差异；中文作答锚点、译者和测量验证身份未核，不能静默修订或称官方简体版。",
+        "作者网站托管繁体表格不等于明确授予当前公开Git逐题再分发、商业数字施测或简体转写权。",
+        "无适用于中国K12教师的常模/阈值；当前只保留原创中文教师报告的编辑方向，不生成结果、分级或图。"
+      ],
+      "disclaimer": "仅为来源目录候选：未授权装载、无独立报告版本、不可施测/计算个人分数。"
+    },
+    "blockers": [
+      "ZH_HANT_RESPONSE_ANCHORS_UNKNOWN",
+      "CHINESE_TRANSLATOR_AND_VALIDATION_UNRESOLVED",
+      "ITEM24_SEMANTIC_CROSSWALK_REVIEW",
+      "PUBLIC_REDISTRIBUTION_SCOPE_UNRESOLVED"
+    ]
+  }
+}
