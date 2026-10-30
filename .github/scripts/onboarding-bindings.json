@@ -562,7 +562,7 @@
       "enabled": true,
       "base": "0e8f1de8e7d68d7c8cc76230315abbbbbf47cf4d",
       "product": "66ace3dc6fc90a9a7f8600c0f7b357a1ffa714ed",
-      "controlCheckpoint": "66ace3dc6fc90a9a7f8600c0f7b357a1ffa714ed",
+      "controlCheckpoint": "d793f328b4f5ce192e56571d84b62c7f277a0833",
       "source": {
         "docs/precise-authorization-20261029/approved-scale-axes-progress.md": {
           "before": null,
