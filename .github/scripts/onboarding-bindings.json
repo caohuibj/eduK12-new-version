@@ -559,10 +559,10 @@
     "404": {
       "schemaVersion": 1,
       "pr": 404,
-      "enabled": false,
+      "enabled": true,
       "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
       "product": "78899e7fefc1ea6ca14ca4d144f6a37bb275472e",
-      "controlCheckpoint": "78899e7fefc1ea6ca14ca4d144f6a37bb275472e",
+      "controlCheckpoint": "42ffcb500183b5b914192dbc83abe96921ed42d1",
       "components": {
         "backend": "b81911415277e35b673dc95300720043ac8ac796",
         "frontend": "dbbeb1ec1230710d5c9108e1f4be7dd42768efdd"
@@ -894,7 +894,7 @@
           "after": "28a9ce5d85c814eb367fe6f7316a09cd15be9684"
         }
       },
-      "activationNote": "Inactive immutable checkpoint; existing reviewed-evidence admission plus SAST only. DOT background review is independent; no local report is claimed signed or executed in CI."
+      "activationNote": "Activate only the existing immutable reviewed-evidence admission and required SAST for PR404 on main8cf. Original unsigned runs retained; missing exact component types and native table restore completed locally. Delegated scoped self-review; DOT background review remains independent. No workflow/job or deployment grant added."
     },
     "task1": {
       "schemaVersion": 1,
