@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {groupReportBranch,groupReportBase,groupReportFiles,groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
+import {groupReportLeafBranch,groupReportBranch,groupReportBase,groupReportFiles,groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const env={CI_EVENT:'pull_request',CI_IS_DRAFT:'true',CI_HEAD_REF:groupReportBranch,CI_PR_NUMBER:'402',GITHUB_REPOSITORY:'caohuibj/eduK12-new-version'};
 const entries=groupReportFiles.map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
@@ -35,4 +35,13 @@ test('existing scope and gate both recompute the same complete candidate before 
 
  // The stable gate continues to execute current content-scope on the real checkout.
  assert(workflow.includes('.github/scripts/merge-gate.mjs'));assert(workflow.includes('.github/scripts/content-scope.mjs'));
+});
+
+test('fixed Training Bundle leaf Draft uses the existing scope-only checkpoint without replay or Ready qualification',()=>{
+ const leafEnv={...env,CI_HEAD_REF:groupReportLeafBranch},leaf=[{file:'server-version/backend/src/modules/training-analysis/group-source.ts',status:'M',oldMode:'100644',newMode:'100644'},{file:'docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person-continuation.json',status:'A',oldMode:'000000',newMode:'100644'}];
+ const p=groupReportDraftPlan(leaf,groupReportBase,head,leafEnv),o=Object.fromEntries(Object.entries(groupReportDraftOutputs(p)).map(([k,v])=>[k,String(v)])),needs={scope:{result:'success',outputs:o}};
+ assert.deepEqual(requiredChecks(needs,true),['scope']);assert.deepEqual(failedChecks(needs,true),[]);assert.equal(o.codeql,'false');assert.equal(o.frontend,'false');
+ assert.throws(()=>groupReportDraftPlan(leaf,groupReportBase,head,{...leafEnv,CI_IS_DRAFT:'false'}));
+ assert.throws(()=>groupReportDraftPlan([{...leaf[0],file:'server-version/backend/src/modules/reporting/personal-tracking.ts'}],groupReportBase,head,leafEnv));
+ const parent='c'.repeat(40),source='d'.repeat(40);assert.equal(groupReportDiffBase(groupReportBase,head,{...leafEnv,CI_SOURCE_HEAD:source},()=>`tree ${'e'.repeat(40)}\nparent ${parent}\nparent ${source}\n`),parent);
 });

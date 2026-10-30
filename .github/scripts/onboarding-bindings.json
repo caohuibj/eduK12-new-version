@@ -2392,6 +2392,166 @@
       },
       "activationNote": "Teacher native Form subgroup/version only on actual merged mainc643;no leaf-source feature. Original retained-stage native scene and browser,plus2-case navigation/directory continuation admitted unsigned;only current component types/new fixed-route control check executed locally. Existing scope/admission/CodeQL/gate,no new workflow,no merge/deploy."
     },
+    "419": {
+      "schemaVersion": 1,
+      "pr": 419,
+      "enabled": true,
+      "base": "f6740969b31f1154e3ffc1a23dd2406bd06a3634",
+      "product": "bcfadfaa5fb9ecdbeb93f8a8e12cefc60dbbcd63",
+      "controlCheckpoint": "13410de76c64ba8fa091dd909bb180594695496c",
+      "components": {
+        "backend": "b1c57bf9195379ba0e45e59f9320a7411eb8b068",
+        "frontend": "c444887f09c20c27d7ffbdd9a115786b65554a68"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/group-report-draft.mjs": "e1aa2119103658100bbbdf2d4b779daa04edf1dd",
+        ".github/scripts/group-report-draft.test.mjs": "11e845ebfc62e23c9b147d12a968a18c838dc851",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "2b5f619a4ddb7639b125009d332c98ba5b9a33b9",
+        ".github/scripts/onboarding-checks.mjs": "471521c342e72b0b4adfbc2ca8411a32d7040340",
+        ".github/scripts/onboarding-controls.test.mjs": "31df29b7d4a535b36afda0ee99e185c913a0c0fc",
+        ".github/scripts/onboarding-evidence.json": "6306b13a764c2c6003f5a5ac90edc690d102c354",
+        ".github/scripts/onboarding-scope.mjs": "7d419daf8db41c515719b056134b878ef854577b",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "7858e6b6f97209490e5661977d57a13eb3cc5e9c"
+      },
+      "source": {
+        "docs/development/group-report-leaf-sources-20261030.md": {
+          "before": null,
+          "after": "82ad869f9d91ea985128ead733c2c32ccfd8ca01"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/backend-types.json": {
+          "before": null,
+          "after": "4593fb6c2f603b6c4b5cb85e954bfc0bfe57bc13"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-leaves.json": {
+          "before": null,
+          "after": "db27035cd394e3e75d420abb168878e471e2536e"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-leaves.log": {
+          "before": null,
+          "after": "bf5d9d64b121de930d2f61a6e9bce2eedd009818"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-other-leaves.json": {
+          "before": null,
+          "after": "0611581bcb3d04d3dabbc1d7d8b11cf4bdd5ea39"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-other-leaves.log": {
+          "before": null,
+          "after": "54ec4ad9f33e53202804c2eb02d07414b75331ef"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-postgres-first.json": {
+          "before": null,
+          "after": "f38d1a467a57e3b8ac9c0f129e8c853fc7a3fc76"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-postgres-first.log": {
+          "before": null,
+          "after": "9afa1b6bf7a00874d15b49c25c37073add108747"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-postgres-key-continuation.json": {
+          "before": null,
+          "after": "7b59aea4d29e28c5ff475674bf73c5cb5e0b2235"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-postgres-key-continuation.log": {
+          "before": null,
+          "after": "15d0dde36b41ff891103d6ea9308690b2b6ebb20"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-postgres-proof.json": {
+          "before": null,
+          "after": "9068610f8819dd2aa8da4e5b251df158e9d6ae5e"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-sjt-continuation.json": {
+          "before": null,
+          "after": "8d147252848cc28a0bbd8d1e51995699a1cd1d7e"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-sjt-continuation.log": {
+          "before": null,
+          "after": "50a70f32c2956f217970b1041369ecb7ab8ed519"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/bundle-sjt-proof.json": {
+          "before": null,
+          "after": "da178f8b0f26745122e45586dab5185415b9a8d3"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/backend-types.json": {
+          "before": null,
+          "after": "5727f431b2a5e25b1243a0f7152d4852dbabdfaa"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person-continuation.json": {
+          "before": null,
+          "after": "2021b2a63f7ed1729140a1e4888f19ef1cb20896"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person-continuation.log": {
+          "before": null,
+          "after": "f006693e6b09b0cc56302dbeffee9572a441acb4"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person-proof.json": {
+          "before": null,
+          "after": "57e3f9035d905418f626d52059f0901e1e5580cc"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person.json": {
+          "before": null,
+          "after": "d1bb9a1fceaf959c42be6747660486a99cb798c6"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person.log": {
+          "before": null,
+          "after": "ff203157d272c22d701589e8cf3a6b277adbe798"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/draft-scope-control.log": {
+          "before": null,
+          "after": "eab8cb9306e6666ec7e0fdb832c90dbecac06448"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/existing-main-migrations.log.gz": {
+          "before": null,
+          "after": "ce9db2b58d6e881c121f4a756529194fdd903be8"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/mainf674/formal-route-control.log": {
+          "before": null,
+          "after": "2cad0f07c5628926fe887053864022f5a5849ab8"
+        },
+        "docs/evidence/group-report-leaf-sources-20261030/manifest.json": {
+          "before": null,
+          "after": "031ad69d923ac626bca6d59de79c23de2cae666a"
+        },
+        "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts": {
+          "before": null,
+          "after": "f3027c7c7a99950c0678d06302eaebd36d9d01ba"
+        },
+        "server-version/backend/src/__tests__/training-analysis/group-bundle-leaves.test.ts": {
+          "before": null,
+          "after": "e38af00025a50b01626fa033b327d7eb45054dbc"
+        },
+        "server-version/backend/src/modules/composite/composite.service.ts": {
+          "before": "4476074c3e87983510288151e8293c473c654a53",
+          "after": "9ca250db58d9dea364c082d55876655ea40d64d6"
+        },
+        "server-version/backend/src/modules/training-analysis/group-source.ts": {
+          "before": "aad76c377f609270e22cd941fa9b985339cf3005",
+          "after": "968ad284663fcbcd785ed725c42c1aae8e2c388b"
+        },
+        "server-version/backend/src/modules/training-analysis/source.ts": {
+          "before": "2bb3951d985ee64ea9f451efaff26aeee15943e1",
+          "after": "785694ca8c7f769cca173036d2f2517c9d25e5a7"
+        }
+      },
+      "activationNote": "Existing backend-only fixed route419;frontend exactly base,one current backend compiler receipt and original4 real passed cases/2 native observations reused unsigned. No old app/PG/browser/shared calculation replay. Existing scope/admission/CodeQL/gate only,no new workflow,no merge/deploy."
+    },
     "task1": {
       "schemaVersion": 1,
       "pr": "task1",

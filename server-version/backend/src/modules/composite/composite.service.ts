@@ -3087,7 +3087,11 @@ const createAttempt = async (
       ...(variantAllocation ? {trainingVariantAllocationEncrypted:encryptUnifiedRuntimePayload(variantAllocation),trainingVariantAllocationHash:variantAllocation.allocationHash} : {}),
       compositeAssessmentId: composite.id,
       ...(trainingTimingSnapshot ? {trainingTimingSnapshot} : {}),
-      ...(composite.productKind === 'QUESTIONNAIRE' ? { deliveryCourseId: composite.deliveryCourseId ?? null } : {}),
+      ...(composite.productKind === 'QUESTIONNAIRE'
+        ? { deliveryCourseId: composite.deliveryCourseId ?? null }
+        : composite.productKind === 'ASSESSMENT_BUNDLE'
+          ? { deliveryCourseId: composite.courseId ?? null }
+          : {}),
       userId,
       accessTokenId,
       recoveryTokenHash: credential?.hash ?? null,
