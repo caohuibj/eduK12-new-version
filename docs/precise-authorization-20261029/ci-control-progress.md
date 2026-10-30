@@ -118,3 +118,9 @@ Draft PR #401 创建后只读发现 main 前移至 `5a39fd7bf29a3c0ae8ec7c26d063
 修复仅控制：重算diff前补取缺失的精确base，不用moving main；真实depth1隔离Git运行实际task1-sast-config成功选226路径。原官方产物12956348062（29332601 bytes，sha256 a27b508bc0801fc78e5ffabc94bc8c462fb89bb1c9bb77704614636b6237947d）已回读；正常成功job、原source/merge、两个组件tree、原Node/argv/flags/log、backend tgz及frontend清单逐项验证，负例拒绝错误source/job/过期/digest和变动产物。新job只依既有family下载/接纳原件；不再安装依赖/构建，binary继续指向原官方artifact。新证据记current consumer、original source，不重标为新build。actionlint当前workflow exit0。没有应用源码、锁、schema或组件tree改动，不重跑任何应用/计分/PG/native链。
 
 下一轮仅当前source重算、原成功build接纳、缺失CodeQL及原稳定gate。激活前依仓库要求先向同一Notion清单追加原失败/修复/下一轮范围，保持累计一次正式失败，不换SHA清零。
+
+## 第二轮精确保护拒绝真实main漂移
+
+指定Notion追加经用户新明确授权成功，marker dd9dd0e5981ea0c70b3402dbf9f33cbb34db3ae5恢复。正式run41010540926/attempt1的事件base仍5a39，实际checkout6e291efca31f7ca51e4d5156eff1eab30c900fdb已合入main0e8f1de8e7d68d7c8cc76230315abbbbbf47cf4d。scope job123915178267正确拒绝source/merge tree drift；onboarding/构建/CodeQL未执行。累计两次正式失败保留，不换SHA清零、不恢复全量CI。
+
+已正常merge PR400七份量表source/instrument及registry/index/docs（16文件），产品66ace3dc6fc90a9a7f8600c0f7b357a1ffa714ed。三份双R素材、C/P/计分器/报告消费者、schema/锁均未变化，不重跑应用证据。前端production imports与alias不消费这些backend来源，完整frontend tree44ac仍相同，原官方frontend产物继续复用。backend tree变为59ed20ba45e87c41a55829e5064aa176cfcf5bad，旧backend binary不能冒称当前；既有build步骤只对该新输入生成backend一次，不安装frontend依赖或重建frontend。复用原件的源/组件声明保持不变；新后端与旧前端分别记录。下一轮仅当前scope、原frontend接纳/新backend编译、缺失CodeQL和稳定gate；无第二套CI或新业务功能。

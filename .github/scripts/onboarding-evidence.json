@@ -876,7 +876,7 @@
     },
     "task1": {
       "schemaVersion": 1,
-      "product": "d38e1e74897cb56120b69fed0d9f170e5de3b3d8",
+      "product": "66ace3dc6fc90a9a7f8600c0f7b357a1ffa714ed",
       "reviewer": "root dot",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -889,8 +889,9 @@
           "Source hashes recorded at save time are not invented historical attestations. Final product/component Git identity is bound independently.",
           "8 component contracts/full app types precede a final isolated restored-state hunk; one new case and its type closure cover only that hunk.",
           "NODE_ENV=test bypasses the existing limiter and MFA is a synthetic recent proof. No human MFA/rate-limit or all-tool/performance claim.",
-          "New dual-nonempty-R evidence is developer-submitted unsigned staged execution, pending DOT independent incremental review; same formal CI disabled until that review. Original failed stages retained.",
-          "Final main5a39 alignment adds only three non-executable COPSOQ catalog sources/index; previous dual-R execution remains at main407 stage. No changed interface/scorer/runtime or this fixture material input; no app replay. Current component trees are bound separately."
+          "New dual-nonempty-R evidence is developer-submitted unsigned staged execution, accepted by DOT at exact54da/47ef; original execution remains unsigned/staged. Original failed stages retained.",
+          "Final main5a39 alignment adds only three non-executable COPSOQ catalog sources/index; previous dual-R execution remains at main407 stage. No changed interface/scorer/runtime or this fixture material input; no app replay. Current component trees are bound separately.",
+          "PR400 main0e8 adds seven scale source/instrument files plus generated registry and docs. Existing three dual-R source/scorer/parameters/consumer code unchanged; no application replay. Frontend production imports/aliases do not consume the changed backend catalog; its exact component/build is reused. Backend source tree changes and needs one new formal compile; no old backend qualification is relabelled."
         ]
       },
       "reports": [
@@ -2320,7 +2321,7 @@
         "pointer": [
           "completion"
         ],
-        "reviewState": "DEVELOPER_SUBMITTED_PENDING_DOT"
+        "reviewState": "ACCEPTED_DOT_REVIEW_54DA_AND_47EF"
       }
     }
   }

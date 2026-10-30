@@ -227,7 +227,7 @@ export function verifyTask1ControlEvidence(raw){
  for(const item of raw.auxiliaryChecks){assert.equal(item.status.exitCode,0);assert(item.status.command.length&&item.status.startedAt&&item.status.finishedAt);assert.equal(hash(Buffer.from(item.log)),item.logSHA256);}
  return admitted;
 }
-function qualifyTask1Builds(p){
+function qualifyTask1Builds(p,backendOnly=false){
  assert.equal(p.pr,'task1');assert.equal(process.version,'v24.21.0');mkdirSync('onboarding-evidence',{recursive:true});
  const run=(component,name,args,extraEnv={})=>{
   const result=spawnSync(process.execPath,args,{cwd:'server-version/'+component,encoding:'utf8',env:{...process.env,...extraEnv}}),log=(result.stdout??'')+(result.stderr??'')+(result.error?String(result.error):'');
@@ -240,6 +240,10 @@ function qualifyTask1Builds(p){
  execFileSync('tar',['-czf','onboarding-evidence/backend-dist.tgz','-C','server-version/backend','dist']);
  const archive=readFileSync('onboarding-evidence/backend-dist.tgz');backend.artifact={path:'backend-dist.tgz',bytes:archive.length,sha256:hash(archive)};
  writeFileSync('onboarding-evidence/task1-backend-artifact.json',JSON.stringify(backend,null,2)+'\n');
+ if(backendOnly){
+  const original=JSON.parse(readFileSync('onboarding-evidence/task1-builds.json','utf8'));assert.equal(original.frontend.componentTree,p.components.frontend);
+  writeFileSync('onboarding-evidence/task1-builds.json',JSON.stringify({backend,frontend:original.frontend,buildExecutedThisRun:{backend:true,frontend:false},productionDeploymentQualified:false},null,2)+'\n');return;
+ }
  const frontend=run('frontend','task1-frontend-build',['node_modules/vite/bin/vite.js','build','--outDir','../../onboarding-evidence/frontend-dist'],{VITE_COGNITIVE_MODULE_ENABLED:'true'});
  const files=[],walk=(path,relative='')=>{for(const name of readdirSync(path)){const absolute=path+'/'+name,key=relative+name;if(statSync(absolute).isDirectory())walk(absolute,key+'/');else{const bytes=readFileSync(absolute);files.push({path:key,bytes:bytes.length,sha256:hash(bytes)});}}};
  walk('onboarding-evidence/frontend-dist');assert(files.some(f=>f.path==='index.html'));frontend.files=files.sort((a,b)=>a.path.localeCompare(b.path));
@@ -272,8 +276,10 @@ export function verifyTask1BuildFiles(receipt,readBytes){
 async function reuseTask1Builds(p){
  assert.equal(p.pr,'task1');assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');const o=task1BuildOrigin;
  const api=async path=>{const r=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version'+path,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(60000)});assert.equal(r.status,200);return r.json();};
- const [run,job,artifact]=await Promise.all([api('/actions/runs/'+o.run),api('/actions/jobs/'+o.job),api('/actions/artifacts/'+o.artifact)]);verifyTask1BuildMetadata(run,job,artifact,p.components);
- git('fetch','--no-tags','--depth=1','origin',o.source);for(const c of ['backend','frontend'])assert.equal(git('rev-parse',o.source+':server-version/'+c),p.components[c]);
+ const [run,job,artifact]=await Promise.all([api('/actions/runs/'+o.run),api('/actions/jobs/'+o.job),api('/actions/artifacts/'+o.artifact)]);verifyTask1BuildMetadata(run,job,artifact,o.components);
+ assert.equal(p.components.frontend,o.components.frontend,'Changed frontend requires its own compilation plan');
+ git('fetch','--no-tags','--depth=1','origin',o.source);for(const c of ['backend','frontend'])assert.equal(git('rev-parse',o.source+':server-version/'+c),o.components[c]);
+ const backendReused=p.components.backend===o.components.backend;
  const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/actions/artifacts/'+o.artifact+'/zip',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN},redirect:'manual',signal:AbortSignal.timeout(60000)});assert.equal(response.status,302);
  const url=new URL(response.headers.get('location'));assert.equal(url.protocol,'https:');assert(/(^|\.)(blob\.core\.windows\.net|githubusercontent\.com|s3\.amazonaws\.com)$/.test(url.hostname));
  const download=await fetch(url,{signal:AbortSignal.timeout(60000)});assert.equal(download.status,200);const bytes=Buffer.from(await download.arrayBuffer());assert.equal(bytes.length,o.size);assert.equal(hash(bytes),o.sha256);
@@ -289,8 +295,9 @@ z.extractall('task1-original-builds')`]);
  const receipt=JSON.parse(readFileSync('task1-original-builds/task1-builds.json'));const verified=verifyTask1BuildFiles(receipt,path=>readFileSync('task1-original-builds/'+safePath(path)));
  // Keep binaries in the one original official artifact. New qualification
  // retains original receipts plus the authenticated immutable artifact pointer.
- for(const name of ['task1-backend-artifact.json','task1-backend-compile.json','task1-backend-compile.log','task1-frontend-build.json','task1-frontend-build.log','task1-builds.json'])cpSync('task1-original-builds/'+name,'onboarding-evidence/'+name,{recursive:true});
- writeFileSync('onboarding-evidence/build-reuse.json',JSON.stringify({origin:o,originalParentConclusion:run.conclusion,originalJobConclusion:job.conclusion,currentSource:p,verified,buildExecutedThisRun:false},null,2)+'\n');appendFileSync(process.env.GITHUB_OUTPUT,'reused=true\n');
+ for(const name of ['task1-frontend-build.json','task1-frontend-build.log',...(backendReused?['task1-backend-artifact.json','task1-backend-compile.json','task1-backend-compile.log']:[])])cpSync('task1-original-builds/'+name,'onboarding-evidence/'+name,{recursive:true});
+ writeFileSync('onboarding-evidence/task1-builds.json',JSON.stringify({...(backendReused?{backend:receipt.backend}:{}),frontend:receipt.frontend,productionDeploymentQualified:false},null,2)+'\n');
+ writeFileSync('onboarding-evidence/build-reuse.json',JSON.stringify({origin:o,originalParentConclusion:run.conclusion,originalJobConclusion:job.conclusion,currentSource:p,verified,reusedComponents:backendReused?['backend','frontend']:['frontend'],backendRecompileRequired:!backendReused,buildExecutedThisRun:false},null,2)+'\n');appendFileSync(process.env.GITHUB_OUTPUT,'reused='+backendReused+'\nbackend-reused='+backendReused+'\nfrontend-reused=true\n');
 }
 
 // PR393 reuses reviewed tests, but its combined main backend has no exact-tree
@@ -414,6 +421,7 @@ function admit(){
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   if(process.argv[2]==='task1-build')qualifyTask1Builds(plan());
+  else if(process.argv[2]==='task1-build-backend')qualifyTask1Builds(plan(),true);
   else if(process.argv[2]==='task1-build-reuse')await reuseTask1Builds(plan());
   else if(process.argv[2]==='task1-sast-config'){
     const p=plan(),config=task1SastConfig(p);appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify(config)+'\n');

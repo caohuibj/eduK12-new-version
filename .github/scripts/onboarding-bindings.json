@@ -560,9 +560,9 @@
       "schemaVersion": 1,
       "pr": "task1",
       "enabled": true,
-      "base": "5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb",
-      "product": "d38e1e74897cb56120b69fed0d9f170e5de3b3d8",
-      "controlCheckpoint": "03265e5dfbd403d163307d8717356fea3c9b40c0",
+      "base": "0e8f1de8e7d68d7c8cc76230315abbbbbf47cf4d",
+      "product": "66ace3dc6fc90a9a7f8600c0f7b357a1ffa714ed",
+      "controlCheckpoint": "66ace3dc6fc90a9a7f8600c0f7b357a1ffa714ed",
       "source": {
         "docs/precise-authorization-20261029/approved-scale-axes-progress.md": {
           "before": null,
@@ -2012,10 +2012,10 @@
         "docs/precise-authorization-20261029/ci-control-raw.json": null
       },
       "components": {
-        "backend": "44013860f1c6ead94f1c4b63491f0f122b01abaa",
+        "backend": "59ed20ba45e87c41a55829e5064aa176cfcf5bad",
         "frontend": "44ac407e011dd17be8636b439b440a4d152b3304"
       },
-      "activationNote": "Specific Notion CI failure append completed after explicit new authorization; resume reviewed targeted SAST recovery and authenticate original successful component builds without recompilation."
+      "activationNote": "Specific Notion append authorized/completed. Align newly merged main PR400; reuse the unchanged frontend official artifact and compile only the genuinely changed backend once, then finish scoped SAST/gate."
     }
   }
 }

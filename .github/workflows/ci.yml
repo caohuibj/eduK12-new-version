@@ -2474,19 +2474,18 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: node .github/scripts/onboarding-checks.mjs task1-build-reuse
     - name: install only Task1 missing compilation dependencies once
-      if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 'task1' && steps.task1-build-reuse.outputs.reused != 'true'
+      if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 'task1' && steps.task1-build-reuse.outputs.backend-reused != 'true'
       env:
         NPM_CONFIG_REGISTRY: https://registry.npmjs.org
         NPM_CONFIG_REPLACE_REGISTRY_HOST: always
       run: |
         npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
         node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
-        npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/frontend
     - name: admit reviewed results and qualify only missing compiler inputs
       run: node .github/scripts/onboarding-checks.mjs admit
     - name: compile each missing Task1 component once and retain those exact artifacts
-      if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 'task1' && steps.task1-build-reuse.outputs.reused != 'true'
-      run: node .github/scripts/onboarding-checks.mjs task1-build
+      if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 'task1' && steps.task1-build-reuse.outputs.backend-reused != 'true'
+      run: node .github/scripts/onboarding-checks.mjs task1-build-backend
     - name: install only missing reviewed browser consumer dependencies
       if: contains(fromJSON('[374,376,378,380,381,395]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
       run: |
