@@ -1,0 +1,475 @@
+{
+  "schemaVersion": 1,
+  "classificationStatus": "PROPOSAL_ONLY_NOT_CONNECTED_TO_PRODUCT_CATALOG",
+  "baseline": {
+    "main": "9f135a2ce45f0223d39b48ea8797310a81a63970",
+    "pr368": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+    "date": "2026-10-31"
+  },
+  "policy": {
+    "multipleGroupsPerTask": true,
+    "discoveryTagDoesNotGrantUseRights": true,
+    "doesNotProvePsychometricOrClinicalOrEmploymentValidity": true,
+    "releaseRequiresIndependentExplicitLifecycle": true,
+    "ageLanguageDeviceEvidenceIsNotInferred": true,
+    "doNotReplaceExistingEighteenSourceTagAxes": true
+  },
+  "groups": [
+    {
+      "key": "sel",
+      "label": "社会情绪学习",
+      "description": "情绪线索分类与自我调节的认知过程支持；不得声称任务直接验证情绪调节、共情或道德",
+      "subgroups": [
+        "emotion_cues",
+        "self_regulation_support"
+      ]
+    },
+    {
+      "key": "career",
+      "label": "职业行为/认知特长研究",
+      "description": "只能作为研究任务的分类入口；没有岗位效标预测证据，不支持自动筛选或岗位匹配",
+      "subgroups": [
+        "monitoring",
+        "learning",
+        "reasoning",
+        "decision",
+        "control",
+        "social_cues"
+      ]
+    },
+    {
+      "key": "cognitive",
+      "label": "认知探索、评估与练习",
+      "description": "已有测量范式不等于经验证的训练干预；自适应训练须另有算法和迁移证据",
+      "subgroups": [
+        "speed",
+        "attention",
+        "memory",
+        "executive",
+        "reasoning",
+        "decision"
+      ]
+    },
+    {
+      "key": "education",
+      "label": "K12学习/执行功能研究",
+      "description": "年龄、语言和年级适配为独立证据字段",
+      "subgroups": [
+        "learning",
+        "executive",
+        "reasoning",
+        "language"
+      ]
+    },
+    {
+      "key": "attention_research",
+      "label": "持续注意/警觉研究",
+      "description": "不能用于ADHD临床诊断，SART/PVT尚为研究建议",
+      "subgroups": []
+    }
+  ],
+  "tasks": [
+    {
+      "testType": "reaction",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:speed",
+        "career:monitoring",
+        "attention_research"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "memory",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:memory",
+        "education:learning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "stroop",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:executive",
+        "career:control",
+        "education:executive",
+        "sel:self_regulation_support"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "gonogo",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:executive",
+        "attention_research",
+        "education:executive",
+        "sel:self_regulation_support"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "cpt",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:attention",
+        "career:monitoring",
+        "attention_research"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "nback",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:memory",
+        "career:learning",
+        "education:learning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "corsi",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:memory",
+        "education:learning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "sst",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:executive",
+        "career:control",
+        "attention_research"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "taskswitch",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:executive",
+        "career:learning",
+        "education:executive"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "patterncompare",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:speed",
+        "career:reasoning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "flanker",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:attention",
+        "career:monitoring",
+        "education:executive"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "cardsort",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:executive",
+        "career:learning",
+        "education:executive"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "digitbackward",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:memory",
+        "education:learning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "picturesequence",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:memory",
+        "education:learning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "pairedassociate",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:memory",
+        "education:learning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "matrix",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:reasoning",
+        "career:reasoning",
+        "education:reasoning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "mentalrotation",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:reasoning",
+        "career:reasoning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "tower",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:reasoning",
+        "career:reasoning",
+        "education:reasoning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "trailmaking",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:executive",
+        "career:monitoring",
+        "attention_research"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "reversallearning",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:decision",
+        "career:learning",
+        "career:decision"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "bart",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:decision",
+        "career:decision"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "wordlist",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:memory",
+        "education:learning"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "lexicaldecision",
+      "source": "main",
+      "proposedFacets": [
+        "cognitive:speed",
+        "education:language"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "emotionrecognition",
+      "source": "main",
+      "proposedFacets": [
+        "sel:emotion_cues",
+        "career:social_cues"
+      ],
+      "status": "SOURCE_REGISTERED_PROFILES_DECLARED",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "mot",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:attention",
+        "cognitive:memory",
+        "career:monitoring"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "enumeration",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:speed",
+        "career:monitoring"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "continuous-recognition",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:memory",
+        "education:learning"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "ant",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:attention",
+        "career:monitoring",
+        "attention_research"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "attentional-blink",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:attention",
+        "career:monitoring",
+        "attention_research"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "balloon-effort",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:decision",
+        "career:decision"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "dual-arrow",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:attention",
+        "career:monitoring"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "gradcpt",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:attention",
+        "career:monitoring",
+        "attention_research"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "hearts-flowers",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:executive",
+        "sel:self_regulation_support",
+        "education:executive",
+        "attention_research"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "horizon-exploration",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:decision",
+        "career:decision",
+        "career:learning"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "precision-working-memory",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:memory",
+        "education:learning"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    },
+    {
+      "testType": "visual-search",
+      "source": "pr368",
+      "proposedFacets": [
+        "cognitive:attention",
+        "career:monitoring"
+      ],
+      "status": "PR368_CANDIDATE_PENDING_FORMAL_RELEASE",
+      "functionalFitEvidence": "theoretical_or_protocol_mapping_only"
+    }
+  ],
+  "plannedMissing": [
+    "sart",
+    "pvt",
+    "information_sampling",
+    "perceptual_decision_confidence",
+    "delay_choice",
+    "ax_cpt",
+    "icar_verbal_letter",
+    "dictator_allocation",
+    "trust_reciprocity",
+    "dccs",
+    "job_sjt"
+  ],
+  "notes": [
+    "Hearts-and-Flowers is already implemented in PR368; exclude from missing queue.",
+    "Simon in PR330 remains source/protocol design only; do not include in the 36 source-implemented tasks.",
+    "continuous-recognition needs authentic frozen images and native/archive integration; do not infer public availability.",
+    "SEL self-regulation-support label does not establish direct SEL measurement.",
+    "All functional-group tags are proposals until explicitly mapped to governed native catalog discovery and frozen versions."
+  ]
+}
