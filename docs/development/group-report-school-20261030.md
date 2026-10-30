@@ -39,3 +39,11 @@ V2 已按 max(父冻结/任务请求、叶内容合同、科学方案) 传播现
 仍不能声称整个披露问题全局关闭：旧 no-leaf V1 整组生成/读取在 reporting.controller.ts 和 resultSource 的历史路径中只绑定父合同；若唯一子指标属于更高人数下限工具，可能仍被扁平化。历史V1未记录叶身份，不能凭新增V2字段证明其下限；需要明确旧整组路径迁移/读取兼容范围。当前 School 子群不传leaf仍400。未擅自停用旧纵向/整组体系，也未覆盖旧快照。PR414仍Draft、不合并、不激活正式CI。
 
 向既有Notion409审阅页追加修复范围/旧V1风险的动作被自动审批拒绝：明确授权被认定只覆盖404 CI页。动作已知未执行，409目标授权问题pending，不换页/接口绕过。代码、脱敏仓库证据和独立开发继续。
+
+## main55 自然对齐与正式资格准备
+
+当前分支无冲突合入已合并 Training 的 main `55fab18e9933e58dcb800b20156f5b7e48858536`，检查点 `199d2807fd634e6fa54fd09163233d4722fd9778`。School 业务源没有新增修改。当前 backend tree `b0ab5f0b0fad5b14d203499deea50640264c2901`、frontend tree `7db01e8ff09cd4f5865e99fbb0438f2f4ff6caea` 分别实际执行一次 tsc 与 app tsc，均 exit0；这补齐上游组件变化后的缺失编译，不将旧编译改称新 tree 结果。
+
+39个不同具名成功观察已去重列出：37个原单元/模拟HTTP、2个保留PGcase。重复原件不重复计数，所有首错、filtered与续行仍保留；没有重播原业务、浏览器或打印。schema tree 与main相同，不新增迁移/恢复检查。人数下限 V2 修订已获后台review认可，旧no-leaf V1仅保留准确兼容限制，不在本批另做迁移。前文409拒绝是历史状态：用户后续明确授权并已成功追加，当前不再以此阻塞。
+
+精确产品差异和下一步资格输入见 main55-qualification-plan.json、main55-source-diff.raw、qualification-case-inventory.json。拟延续现有 onboarding-structure 的原报告 admission、精确源/控制 CodeQL、稳定 gate，不新建 workflow，不走未知范围平台回退。现有候选表尚无414，必须先补精确绑定/受影响控制 review，读取CI清单并核真实PR base/head/merge后才激活；本段不是正式CI通过或可合并声明。PR414保持Draft。
