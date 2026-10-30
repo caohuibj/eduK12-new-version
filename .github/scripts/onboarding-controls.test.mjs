@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
+import {verifyTrainingBundleGroupObservation,verifyTrainingStandaloneCognitiveObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
@@ -429,4 +429,17 @@ test('Training Bundle leaf formal route admits disclosed native proof without re
  const native=JSON.parse(readFileSync('docs/evidence/group-report-leaf-sources-20261030/bundle-postgres-proof.json')),disclosed=JSON.parse(readFileSync('docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person-proof.json'));
  assert.equal(verifyTrainingBundleGroupObservation(native,'bundle-native').testsExecutedInCI,false);assert.equal(verifyTrainingBundleGroupObservation(disclosed,'bundle-disclosed').testsExecutedInCI,false);
  assert.throws(()=>verifyTrainingBundleGroupObservation({...disclosed,validN:1},'bundle-disclosed'));
+});
+
+
+test('Training standalone Cognitive formal route accepts its four original cases without frontend or fixture replay',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/training-analysis/group-source.ts',b={...f.b,pr:422,source:{[file]:{before:null,after:blob}},controlBefore:{...f.b.controlBefore,...Object.fromEntries(GROUP_REPORT_CONTROLS.map(path=>[path,null]))}};
+ const entries=[...f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file}:e),...GROUP_REPORT_CONTROLS.map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}))],env={...f.env,CI_PR_NUMBER:'422',CI_HEAD_REF:BRANCHES[422]};
+ const p=onboardingPlan(entries,base,head,f.read,env,b);assert.equal(p.pr,422);assert(task1SastConfig(p,b).paths.includes(file));assert(task1SastConfig(p,b).paths.includes(GROUP_REPORT_CONTROLS[0]));
+ assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...rest)=>cmd==='rev-parse'&&a===head+':server-version/frontend'?h('9'):f.read(cmd,a,...rest),env,b));
+ const root='docs/evidence/group-report-training-standalone-20261030/',native=JSON.parse(readFileSync(root+'training-standalone-cognitive-group-proof.json')),archived=JSON.parse(readFileSync(root+'training-standalone-cognitive-group-archived-proof.json'));
+ assert.equal(verifyTrainingStandaloneCognitiveObservation(native,'standalone-cognitive').testsExecutedInCI,false);
+ assert.equal(verifyTrainingStandaloneCognitiveObservation(archived,'standalone-archived').testsExecutedInCI,false);
+ assert.throws(()=>verifyTrainingStandaloneCognitiveObservation({...native,participantN:1},'standalone-cognitive'));
+ assert.throws(()=>verifyTrainingStandaloneCognitiveObservation({...archived,oldSnapshotUnchanged:false},'standalone-archived'));
 });
