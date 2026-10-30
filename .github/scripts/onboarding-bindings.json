@@ -2023,7 +2023,7 @@
       "enabled": false,
       "base": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
       "product": "6620e33cbc392f95238419c3e4f848394d72a5d8",
-      "controlCheckpoint": "6620e33cbc392f95238419c3e4f848394d72a5d8",
+      "controlCheckpoint": "9febe652d18fef3716007af7a846fc849d7dba33",
       "source": {
         "docs/precise-authorization-20261029/training-choice-pagination/progress.md": {
           "before": null,
