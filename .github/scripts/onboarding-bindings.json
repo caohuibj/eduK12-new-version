@@ -560,11 +560,11 @@
       "schemaVersion": 1,
       "pr": 404,
       "enabled": true,
-      "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
-      "product": "78899e7fefc1ea6ca14ca4d144f6a37bb275472e",
-      "controlCheckpoint": "0e2731f62fe2f45ae01e21cfb5679fdf21eb0cfd",
+      "base": "8bd86e4059125b9ee868d4777795e513d36cba71",
+      "product": "e576dbefaf55bb81382cb3513a555faf9e334d8c",
+      "controlCheckpoint": "b30b083898c17be5f08597837c595787c11faa7a",
       "components": {
-        "backend": "b81911415277e35b673dc95300720043ac8ac796",
+        "backend": "6209f9ffc617411a6b8d27b25596351fb3873910",
         "frontend": "dbbeb1ec1230710d5c9108e1f4be7dd42768efdd"
       },
       "controlBefore": {
@@ -739,7 +739,7 @@
         },
         "docs/evidence/group-report-20261030/qualification/README.md": {
           "before": null,
-          "after": "c32cfcf2369c1dca73c8bd1d3c53138cb10608c3"
+          "after": "ac8715ea6b879cbb6d7c777ca6e64e12b152f76a"
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.exit": {
           "before": null,
@@ -747,7 +747,7 @@
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.json": {
           "before": null,
-          "after": "14422874d03067ece0e0433096bd6e04a234310a"
+          "after": "f341c668ab7b6a6c86cc76fc11a1aa4ab364ead1"
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.log": {
           "before": null,
@@ -910,7 +910,7 @@
           "after": "28a9ce5d85c814eb367fe6f7316a09cd15be9684"
         }
       },
-      "activationNote": "Scoped inline-classifier repair after preserved Draft41022894812/Ready41022969851. Same application trees, original evidence and three required jobs; no application checks or restore replay. Actual inline and CLI will be previewed on a clearly marked local synthetic merge before a new CI event."
+      "activationNote": "User-authorized main8bd catalog alignment. Existing actual scope/admission/SAST/Ready gate retained. Original88 cases, frontend types and native receipts unchanged; only changed backend component types ran. One local native-input refusal fixture passed once; original two CI fixtures are not replayed. Native reuse requires equal complete base/candidate Prisma trees; Azure ZIP403 remains disclosed."
     },
     "task1": {
       "schemaVersion": 1,
