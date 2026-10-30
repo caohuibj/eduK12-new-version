@@ -1,12 +1,35 @@
 import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {afterEach,expect,it,vi} from 'vitest'
 import HuiteacherApp from './HuiteacherApp'
+import {TeacherFormGroupVersions} from './TeacherFormGroupVersions'
 vi.mock('./HuiteacherPersonalSelf',()=>({HuiteacherPersonalSelf:()=>null}))
 vi.mock('./HuiteacherMyFormTasks',()=>({HuiteacherMyFormTasks:()=>null}))
 vi.mock('./HuiteacherMyScaleTasks',()=>({HuiteacherMyScaleTasks:()=>null}))
 vi.mock('./HuiteacherClassRelationships',()=>({HuiteacherClassRelationships:()=>null}))
 const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,message:'成功',data})})
 afterEach(()=>{cleanup();vi.unstubAllEnvs();vi.unstubAllGlobals();vi.restoreAllMocks()})
+it('keeps a successfully generated Teacher report when the directory refresh fails and retries only GET',async()=>{
+ const report={versionId:'saved',eventId:'event',formId:'form',definitionDigest:'a'.repeat(64),releasedAt:'2026-10-30T12:00:00Z',populationLabel:'全部合格参与教师',independentRespondents:10,minimumRespondents:10,distributions:[]}
+ const index={versioned:true,truncated:false,versions:[] as Array<{versionId:string;releasedAt:string;populationLabel:string}>,groups:{options:[],limitations:[]}}
+ let reads=0
+ const api=vi.fn(async<T,>(_path:string,method?:string):Promise<T>=>{
+  if(method==='POST')return report as T
+  if(++reads===2)throw new Error('目录暂不可用')
+  return {...index,versions:reads>2?[report]:[]} as T
+ })
+ const deliver=vi.fn()
+ render(<TeacherFormGroupVersions api={api} endpoint="/group-report" onReport={deliver}/> )
+ fireEvent.click(await screen.findByRole('button',{name:'生成更新版报告'}))
+ await screen.findByText(/报告已生成，版本目录刷新失败/)
+ expect(deliver).toHaveBeenLastCalledWith(report)
+ expect(screen.getByLabelText('已生成版本')).toHaveValue('saved')
+ fireEvent.click(screen.getByRole('button',{name:'重试读取版本目录'}))
+ await waitFor(()=>expect(screen.queryByText(/版本目录刷新失败/)).not.toBeInTheDocument())
+ expect(deliver).toHaveBeenLastCalledWith(report)
+ expect(screen.getByLabelText('已生成版本')).toHaveValue('saved')
+ expect(api.mock.calls.filter(([,method])=>method==='POST')).toHaveLength(1)
+ expect(reads).toBe(3)
+})
 it('opens existing Teacher Form versions, explicitly generates one class report, and prints only its authorized rounded projection',async()=>{
  vi.stubEnv('VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED','true')
  const print=vi.spyOn(window,'print').mockImplementation(()=>{})

@@ -7,9 +7,10 @@ type Index={versioned:boolean;truncated:boolean;versions:Array<{versionId:string
 export function TeacherFormGroupVersions({api,endpoint,onReport}:{api:Api;endpoint:string;onReport:(report:TeacherFormGroupProjection|null)=>void}){
  const [index,setIndex]=useState<Index|null>(null),[dimension,setDimension]=useState('ALL'),[ids,setIds]=useState<string[]>([])
  const [version,setVersion]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('')
+ const [directoryError,setDirectoryError]=useState('')
  const request=useRef(0),deliver=useRef(onReport);deliver.current=onReport
  useEffect(()=>{
-  const token=++request.current;setIndex(null);setVersion('');setDimension('ALL');setIds([]);setError('');setBusy(true);deliver.current(null)
+  const token=++request.current;setIndex(null);setVersion('');setDimension('ALL');setIds([]);setError('');setDirectoryError('');setBusy(true);deliver.current(null)
   void api<Index>(endpoint+'/versions').then(async result=>{
    if(token!==request.current)return
    setIndex(result)
@@ -29,19 +30,31 @@ export function TeacherFormGroupVersions({api,endpoint,onReport}:{api:Api;endpoi
   finally{if(token===request.current)setBusy(false)}
  }
  async function generate(){
-  const token=++request.current;setBusy(true);setError('')
+  const token=++request.current;setBusy(true);setError('');setDirectoryError('')
   const selection=dimension==='ALL'?{kind:'ALL'}:{kind:dimension==='CLASSES'?'CLASSES':'LABELS',ids}
   try{
    const report=await api<TeacherFormGroupProjection>(endpoint+'/versions','POST',{selection})
-   const result=await api<Index>(endpoint+'/versions')
-   if(token===request.current){setIndex(result);setVersion(report.versionId!);deliver.current(report)}
+   if(token!==request.current)return
+   setVersion(report.versionId!);deliver.current(report)
+   setIndex(previous=>previous?{...previous,versions:[{versionId:report.versionId!,releasedAt:report.releasedAt!,populationLabel:report.populationLabel??'全部合格参与教师'},...previous.versions.filter(row=>row.versionId!==report.versionId)]}:previous)
+   await refreshDirectory(token)
   }catch(e){if(token===request.current)setError(e instanceof Error?e.message:'报告生成条件暂不满足')}
   finally{if(token===request.current)setBusy(false)}
+ }
+ async function refreshDirectory(token:number){
+  setDirectoryError('')
+  try{const result=await api<Index>(endpoint+'/versions');if(token===request.current)setIndex(result)}
+  catch(e){if(token===request.current)setDirectoryError(e instanceof Error?e.message:'版本目录暂不可读取')}
+ }
+ async function retryDirectory(){
+  const token=++request.current;setBusy(true)
+  try{await refreshDirectory(token)}finally{if(token===request.current)setBusy(false)}
  }
  const dimensions=[...new Map(index?.groups.options.filter(row=>row.kind==='LABELS').map(row=>[row.dimensionId!,row.dimensionName!])??[])]
  const options=index?.groups.options.filter(row=>dimension==='CLASSES'?row.kind==='CLASSES':row.kind==='LABELS'&&row.dimensionId===dimension)??[]
  return <section aria-label="教师群体报告版本与人群">
   {error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在处理群体报告…</p>}
+  {directoryError&&<p role="alert">报告已生成，版本目录刷新失败：{directoryError} <button type="button" disabled={busy} onClick={()=>void retryDirectory()}>重试读取版本目录</button></p>}
   {index&&<>
    {index.versions.length>0&&<label className="ht-field"><span>已生成版本</span><select disabled={busy} value={version} onChange={e=>void read(e.target.value)}>
     {index.versions.map(row=><option key={row.versionId} value={row.versionId}>{new Date(row.releasedAt).toLocaleString('zh-CN')} · {row.populationLabel}</option>)}
