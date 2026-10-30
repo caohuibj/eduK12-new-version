@@ -1,0 +1,561 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "talis2018_classroom_disruption_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "选用TALIS2018题集：课堂扰乱回顾（项目描述性均分）",
+      "abbreviation": "T3DISC-RAW",
+      "instrumentFamily": "TALIS2018 selected complete item set; project descriptive raw mean, not OECD factor score"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "按原规则选定目标班级的课堂纪律气氛和扰乱情况；4题含41B反向。 使用完整作答的项目等权原始均分，不是OECD CFA因子分，也未验证为独立施测量表。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "talis2018_classroom_disruption_zh_cn",
+        "domain:teacher_workplace",
+        "construct:classroom_disruption",
+        "population:adult_teacher",
+        "population:shanghai_lower_secondary_source",
+        "response:self",
+        "scoring:project_complete_raw_mean_not_oecd_cfa",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "license:oecd_pre_2024_terms",
+        "language_validation:existing_shanghai_chinese",
+        "language_validation:standalone_validation_pending"
+      ]
+    },
+    "population": {
+      "populationNotes": "复用上海ISCED2教师问卷现成简体中文原题，面向当前初中教师的工作条件回顾候选；18+是项目成人范围，不冒称原作者年龄界线。本独立选用形式与项目描述性均分未建立效度或本地常模。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目标班级/本校的一般教学与工作语境；未额外指定回顾期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留所选原题相对顺序、原响应类别和正式题码。",
+        "本工具只使用T3DISC完整题集；报告为项目原始均分，不是OECD因子分或独立量表效度证明。",
+        "完整作答后等权均分为项目明示规则，不冒称OECD官方缺失算法。",
+        "2分钟为阅读估计，尚未做电子施测时长实测。",
+        "目标班级按原上海初中问卷规则选定；原Q37为完全/主要特殊教育需要者跳至44题，本选用工具保留该不适用边界。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "官方题集依据不证明当前独立选用形式、描述性均分或个体解释有效。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "OECD TALIS2018上海ISCED2教师问卷现成简体中文原题；原文未重译。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "只选取完整T3DISC题集，原题文和响应类别逐项核到现成上海DOCX；项目改造为独立选用、原始均分和原创教师反馈，不称OECD官方计分包或验证独立短表。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "talis2018_classroom_disruption_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "talis2018_classroom_disruption_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "talis2018_classroom_disruption_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "OECD (2018), TALIS2018 Shanghai-China ISCED2 Teacher Questionnaire, https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip",
+      "本项目改编自OECD原作；本改编的观点与论证不代表OECD或其成员国的官方观点。",
+      "署名与改造说明依OECD现行条款§1.2；只选现成2018自有中文文本，不实施商业新译；排除TSES第三方题项、整份题本、封面、版式、标识和图片。 https://www.oecd.org/en/about/terms-conditions.html"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "TALIS2018 T3DISC complete selected item set; project descriptive raw mean",
+        "citation": "OECD (2018), TALIS2018 Shanghai-China ISCED2 Teacher Questionnaire; OECD TALIS2018 Technical Report, table/page 334. Complete item-set selection and project scoring/report adaptation.",
+        "url": "https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "仅针对本包所选2018 OECD自有现成中文题文，依据OECD条款§1.2署名改编；无另见第三方声明。OECD (2018), TALIS2018 Shanghai-China ISCED2 Teacher Questionnaire, https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip。本项目改编自OECD原作；本改编的观点与论证不代表OECD或其成员国的官方观点。排除TSES题项、整份题本、标识/封面/图片；非新商业翻译。 https://www.oecd.org/en/about/terms-conditions.html"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "original_response",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "非常同意",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "TT3G41A",
+          "content": "课堂开始时，我要等很长一段时间学生才会安静下来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G41B",
+          "content": "该班学生在意所营造的愉快学习氛围。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G41C",
+          "content": "我因为学生破坏课堂纪律而损失大量教学时间。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G41D",
+          "content": "该班级非常吵闹。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "TT3G41A",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TT3G41B",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "TT3G41C",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TT3G41D",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "classroom_disruption",
+            "type": "dimension",
+            "label": "课堂扰乱回顾（描述性均分）",
+            "description": "按原规则选定目标班级的课堂纪律气氛和扰乱情况；4题含41B反向。 仅完整作答后等权均分；不代表OECD因子分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "TT3G41A",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G41B",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G41C",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G41D",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "classroom_disruption"
+        ],
+        "scoreOrder": [
+          "classroom_disruption"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "classroom_disruption",
+            "headline": "课堂气氛：从一个具体班级看教学条件",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分帮助你回顾目标班级的开课安静、教学被打断、噪声及学习氛围。方向统一后的1–4均分越大，表示这次自述的课堂扰乱越多，不代表你的课堂管理能力越差，也不意味着学生被定性为“难管理”。例如，开课后需要多久才能开始教学、哪种打断最容易反复出现，都比一个笼统标签更便于讨论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一节最近的目标班级课，记录一次最常见的打断及其发生环节，区分任务说明、课堂转换、学生需要与环境条件。"
+              },
+              {
+                "category": "environment",
+                "text": "与同年级教师或支持人员商量一个小调整，例如统一过渡环节的提示、明确求助方式或协调对特定需要的支持；先观察是否减少同一类打断，而不是要求自己独自解决所有问题。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "只描述按原规则选定的一个班级，不能代表所有任教班级或整所学校。41B须反向；均分不能与OECD因子分或国外常模直接比较。 若目标班级完全或主要针对有特殊教育需要的学生，原问卷跳过该题组，本选用工具也不适用。",
+          "本独立选用工具只给项目等权原始均分，不是OECD因子分；未建立独立施测效度、中国教师常模、百分位或分级线。"
+        ],
+        "disclaimer": "仅用于本次工作条件回顾；不诊断、考核或排名。所有题目均有有效回答才生成项目均分，缺失不补0、不插补；四工具分别解释，不计算JD-R合计。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "talis2018_classroom_disruption_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "TT3G41A",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41B",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TT3G41C",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41D",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "classroom_disruption": 1
+          },
+          "totalScoreKeys": [
+            "classroom_disruption"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "TT3G41A",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TT3G41B",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41C",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TT3G41D",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "classroom_disruption": 4
+          },
+          "totalScoreKeys": [
+            "classroom_disruption"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "TT3G41A",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41B",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41C",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TT3G41D",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "classroom_disruption": 3.0
+          },
+          "totalScoreKeys": [
+            "classroom_disruption"
+          ]
+        }
+      },
+      {
+        "name": "all_original_code_one_preserves_reverse",
+        "answers": [
+          {
+            "itemCode": "TT3G41A",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41B",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41C",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41D",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "classroom_disruption": 1.75
+          },
+          "totalScoreKeys": [
+            "classroom_disruption"
+          ]
+        }
+      },
+      {
+        "name": "missing",
+        "answers": [
+          {
+            "itemCode": "TT3G41A",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41B",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G41C",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "classroom_disruption": null
+          },
+          "totalScoreKeys": [
+            "classroom_disruption"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "classroom_disruption": null
+          },
+          "totalScoreKeys": [
+            "classroom_disruption"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "以下选用TALIS2018上海初中教师问卷的课堂题组。下面就您任教的一个特定班级提问。 这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后一天任教的初中班级。 在下列问题中，这个班级被称为目标班级。 若没有符合该选择规则的班级，或该班教学完全/主要针对有特殊教育需要的学生，请勿填写本工具。您是否同意以下关于该目标班级的描述？ 请每行只勾选一项。本选用形式采用完整作答的项目描述性均分，不是OECD官方因子分。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "上海ISCED2原指导语/题组语境；独立选用、缺失策略说明及原创教师反馈为项目改造。 https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}
