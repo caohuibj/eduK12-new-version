@@ -86,7 +86,7 @@ export const trainingScaleCourseCampaignKey = (scaleId: string) => `training-sta
 export async function assertTrainingCourseScaleStart(db: Db, courseId: string, scaleId: string, userId: string) {
   const membership = await db.courseStudent.findFirst({where: {courseId, studentId: userId,
     status: {in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED]},
-    course: {courseType: 'TRAINING_COURSE', isLibrary: false, courseScales: {some: {scaleId}}},
+    course: {courseType: {in: ['TRAINING_COURSE', 'LEGACY_COURSE']}, isLibrary: false, courseScales: {some: {scaleId}}},
   }, select: {id: true}})
   if (!membership) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '当前课程没有可用的量表投放或参加资格', 403)
 }
