@@ -1,3 +1,5 @@
+import {execFileSync} from 'node:child_process';
+import {personalTrackingReadyPlan} from './personal-tracking-ready.mjs';
 import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
 import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
 export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd()}={}) {
@@ -83,6 +85,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='personal-tracking')return draft?['scope']:['scope','personal-tracking','docker','codeql'];
   if(scope.application_route==='onboarding-structure')return ['scope','onboarding-structure','codeql'];
   if(scope.application_route==='pr364')return ['scope','pr364','codeql'];
   if(scope.application_route==='pr363')return ['scope','pr363','codeql'];
@@ -175,6 +178,7 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='personal-tracking'){try{const p=JSON.parse(scope.personal_tracking_plan);if(p.route!=='personal-tracking'||p.draft!==draft)failed.push('scope');}catch{failed.push('scope');}return [...new Set(failed)];}
   if(scope.application_route==='onboarding-structure'){
     try{const p=JSON.parse(scope.onboarding_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='onboarding-structure'||Object.entries(onboardingOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -511,6 +515,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='personal-tracking'){try{const {changedEntries}=await import('./content-scope.mjs');const p=JSON.parse(needs.scope.outputs.personal_tracking_plan);const actual=personalTrackingReadyPlan(changedEntries(process.env.CI_BASE_SHA),process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event:process.env.CI_EVENT,branch:process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF,draft,forceFull:process.env.CI_FORCE_FULL==='true'});if(JSON.stringify(p)!==JSON.stringify(actual))failed.push('recomputed-personal-tracking-plan');}catch{failed.push('recomputed-personal-tracking-plan');}}
   if(needs.scope?.outputs?.personal_tracking_draft==='true'){
     try{const {changedEntries}=await import('./content-scope.mjs');if(!personalTrackingDraftScope(changedEntries(process.env.CI_BASE_SHA),{event:process.env.CI_EVENT,draft,forceFull:process.env.CI_FORCE_FULL==='true'}))failed.push('recomputed-personal-tracking-draft');}catch{failed.push('recomputed-personal-tracking-draft');}
   }

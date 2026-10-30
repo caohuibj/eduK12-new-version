@@ -1,3 +1,4 @@
+import {personalTrackingReadyPlan,personalTrackingReadyOutputs} from './personal-tracking-ready.mjs';
 import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
 import {selectCognitiveIntake} from './cognitive-intake-scope.mjs';
 import {selectScaleIntake} from './scale-intake-scope.mjs';
@@ -332,6 +333,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const event = process.env.CI_EVENT;
   refuseUnplannedPR356();
   const base = process.env.CI_BASE_SHA;
+  const personal=personalTrackingReadyPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event,branch:process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'});
+  if(personal){const output=personalTrackingReadyOutputs(personal);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const onboarding=onboardingPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(onboarding){const output=onboardingOutputs(onboarding);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const pr364=pr364Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

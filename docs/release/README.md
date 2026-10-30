@@ -1979,3 +1979,22 @@ same explicit pin after validating the normal merge parents and exact tree.
 Keep the manual source proof distinct from the eligible merge-preview consumer.
 The final source commit must not carry skip-ci, because GitHub otherwise leaves
 its PR checks pending. No protection, credential, query or finding policy changes.
+
+## Personal longitudinal bounded Ready qualification (PR399 first slice)
+
+`feat/personal-longitudinal-survey-20261030` uses the existing CI workflow with
+base `8cf07bfd35702222e279cbfeee2f64d73a938b55`, reviewed source a62c9a5763 and
+explicit application/dependency/original-reporter pins. Full raw diff and modes
+must match; unknown paths or changed main stop rather than select whole-platform
+fallback. This is not a new workflow for stacked PR406/409.
+
+Draft classification grants no Ready qualification. Ready requires scope,
+personal-tracking, the unchanged production-image build/HIGH-CRITICAL scan and
+CodeQL jobs, with stable-gate plan recomputation. Original 31 local application
+cases plus targeted repair/consumer originals retain their exact failed/filtered
+rows and local unsigned provenance; admission verifies immutable Git source and
+report bytes and does not claim CI reexecution. Missing exact-main nonempty
+upgrade/native restore, source guards, locked audits, actual frontend types/lint,
+production artifacts/scans and SAST execute in their selected existing CI jobs.
+SQL fixture data is synthetic; no production, physical timing, all-four-entry,
+merge, deployment, or full disaster-recovery qualification is implied.

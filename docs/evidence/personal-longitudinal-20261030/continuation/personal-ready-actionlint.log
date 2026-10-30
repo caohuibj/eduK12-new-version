@@ -1,0 +1,4 @@
+.github/workflows/ci.yml:3509:23: context "job" is not allowed here. available contexts are "github", "inputs", "matrix", "needs", "secrets", "strategy", "vars". see https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability for more details [expression]
+     |
+3509 |       PG_SERVICE: ${{ job.services.postgres.id }}
+     |                       ^~~~~~~~~~~~~~~~~~~~~~~~

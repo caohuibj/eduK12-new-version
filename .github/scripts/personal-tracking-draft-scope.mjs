@@ -18,7 +18,7 @@ const allowed=new Set([
     'modules/reporting/__tests__/PersonalChangesReport.test.tsx','survey/SurveyPersonalChanges.tsx',
     'survey/SurveyPublicApp.tsx','survey/SurveyWaveStudio.tsx','survey/SurveyWaveStudio.tracking.test.tsx',
   ].map(path=>frontend+path),
-  '.github/scripts/personal-tracking-draft-scope.mjs','.github/scripts/content-scope.mjs',
+  '.github/scripts/personal-tracking-draft-scope.mjs','.github/scripts/personal-tracking-ready.mjs','.github/scripts/personal-tracking-ready.json','.github/scripts/personal-tracking-ready.test.mjs','docs/release/README.md','.github/scripts/content-scope.mjs',
   '.github/scripts/content-scope.test.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml',
   'docs/development/personal-longitudinal-survey-20261030.md',
 ]);

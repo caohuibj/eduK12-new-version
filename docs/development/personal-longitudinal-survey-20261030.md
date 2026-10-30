@@ -308,3 +308,54 @@ continuation/untracked-content-manifest.json. A wrong relative git-add path
 initially left the resolved file unmarked; staging the exact absolute path
 completed the merge. It did not change the resolved product source or qualify
 any failed setup as an application pass.
+
+## PR399 bounded Ready qualification after main PR407
+
+Main `8cf07bfd35702222e279cbfeee2f64d73a938b55` was merged without conflict at
+`ef0490e6371ceb7bdebe8c2f84f087977f5f362c`. All 24 changed Survey application,
+test and schema files remain byte-identical to DOT-reviewed `a62c9a5763...`;
+the main delta is the separately reviewed Training choice-pagination change.
+The interrupted cloud environment was restored with that exact local commit,
+tree `bdb0ac23a4e84cd6809286aa3c08feabbcd4e69b`, and retained worktrees/evidence.
+
+The existing CI workflow now has a bounded personal-tracking route. A fixed
+base, original reviewed Git object, complete raw diff/modes, all 24 application
+blobs and locked dependency/build inputs must match. Unknown files, changed
+main, altered originals or whole-platform force fail closed. Draft only
+classifies; Ready requires scope, personal-tracking qualification, the existing
+production-image build/scans and existing CodeQL. The stable gate recomputes the
+source plan and refuses missing/skipped/failed required jobs. PR406/409 keep
+stack order and receive no separate workflow.
+
+The original 31 successful application cases and targeted repair/consumer
+reporters are read, hash-checked against immutable a62 Git originals, and
+validated using the existing original-report/failure-continuation verifier.
+Their union is 71 distinct successful case names. They remain unsigned,
+reviewed-local-evidence with ciExecuted=false; this does not relabel failed
+original reports or claim GitHub replayed those application cases.
+
+Missing qualification executes once in Actions: a nonempty exact-main schema
+fixture is upgraded with the candidate migrations, old publication/attempt/
+opaque FINAL bytes are compared, new defaults and immutable guards are checked,
+and native pg_dump/pg_restore into a separate empty database must reproduce
+facts and normalized schema. This is an isolated SQL schema fixture, not a new
+scientific FINAL submission or a repeated business journey. The transient dump
+is not published. Existing production image HIGH/CRITICAL scanning and changed
+source SAST remain required. Locked audits and actual frontend app types/source
+lint run in the qualification job; no whole-platform/performance/browser suite
+is enabled.
+
+Local preflight: three new admission/refusal/gate contracts passed. After adding
+an immutable Git-original check, only that one changed admission contract was
+rechecked. Actionlint initially found the invalid job-context PG_SERVICE env;
+a targeted edit also caught an unrelated old PG_SERVICE line and was corrected
+by restoring the original workflow before applying only this slice. Original
+failed lints are retained, final Actionlint passes. Six fixture INSERTs passed
+EXPLAIN-only validation on the existing isolated DB, with no insertion/migration
+or application replay. This is preflight only; official run outcomes remain the
+source of truth for Ready qualification.
+
+School explicit-source subset configuration is an authorized following slice:
+a permitted publisher may select only originally permitted own numeric metrics,
+freeze them into a new source/task, and preserve old contracts/completion-only.
+It does not change this frozen first candidate.
