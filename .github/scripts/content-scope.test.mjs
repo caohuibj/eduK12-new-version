@@ -495,3 +495,17 @@ test('guidance documents use only documentation gate; mixed or nonregular change
   for(const bad of ['failure','cancelled','skipped',undefined])
     assert.ok(failedChecks({...needs,documentation:{result:bad}},false).includes('documentation'));
 });
+
+test('Teacher personal tracking stays in the same bounded Draft route with no Ready or unknown-path grant',()=>{
+ const entry=file=>({file,status:'A',oldMode:'000000',newMode:'100644'});
+ const entries=['server-version/backend/src/modules/reporting/education-personal-tracking.ts',
+  'server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql',
+  'server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts',
+  'server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx',
+  'docs/evidence/personal-longitudinal-teacher-20261030/manifest.json'].map(entry);
+ const draft={event:'pull_request',draft:true};
+ assert.equal(personalTrackingDraftScope(entries,draft),true);
+ assert.equal(personalTrackingDraftScope(entries,{...draft,draft:false}),false);
+ assert.throws(()=>personalTrackingDraftScope([...entries,entry('server-version/backend/src/modules/huiteacher/authority.ts')],draft),/no broad fallback/);
+ assert.throws(()=>personalTrackingDraftScope(entries,{...draft,forceFull:true}),/does not authorize/);
+});

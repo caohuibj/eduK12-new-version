@@ -47,6 +47,7 @@ it('opens existing Teacher Form versions, explicitly generates one class report,
   if(url.endsWith('/evaluation-events'))return reply({list:[{id:'event',targetId:'target',title:'学期教师调查',kind:'ASSESSMENT',status:'CLOSED',version:3}]})
   if(url.endsWith('/forms'))return reply({list:[{id:'form',title:'教师体验表',status:'PUBLISHED',definitionDigest:'a'.repeat(64)}]})
   if(url.endsWith('/evaluation-events/event/run'))return reply({eventId:'event',runId:'run',status:'CLOSED',version:4,trackCount:1})
+  if(url.endsWith('/evaluation-events/event/run/tracking'))return reply({baselineId:null})
   if(url.endsWith('/group-report/versions')&&options?.method==='POST'){
    expect(JSON.parse(options.body as string)).toEqual({selection:{kind:'CLASSES',ids:['class-a']}});generated=true;return reply(updated)
   }
@@ -77,5 +78,7 @@ it('opens existing Teacher Form versions, explicitly generates one class report,
  fireEvent.change(screen.getByLabelText('已生成版本'),{target:{value:'old'}})
  await waitFor(()=>expect(screen.getByLabelText('已生成版本')).toHaveValue('old'))
  expect(fetch.mock.calls.filter(([,options])=>options?.method==='POST')).toHaveLength(1)
+ expect(fetch.mock.calls.some(([url])=>url.endsWith('/evaluation-events/event/run/tracking'))).toBe(true)
+ expect(screen.queryByRole('button',{name:'创建下一轮教师自评'})).not.toBeInTheDocument()
  expect(report.textContent).not.toContain('NaN')
 })

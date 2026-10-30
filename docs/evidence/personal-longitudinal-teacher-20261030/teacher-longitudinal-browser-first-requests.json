@@ -1,0 +1,102 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/forms",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-targets",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/a3dc79c0-4e31-4469-80b9-7d8e80064079/run",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/a3dc79c0-4e31-4469-80b9-7d8e80064079/run/tracking",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/a3dc79c0-4e31-4469-80b9-7d8e80064079/run/next-wave",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-targets",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/04568553-c3f4-4c3d-a2e8-e1fd09eed21e/run",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/04568553-c3f4-4c3d-a2e8-e1fd09eed21e/run/tracking",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/04568553-c3f4-4c3d-a2e8-e1fd09eed21e/transition",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-targets",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/04568553-c3f4-4c3d-a2e8-e1fd09eed21e/run",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/04568553-c3f4-4c3d-a2e8-e1fd09eed21e/run/publish",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/04568553-c3f4-4c3d-a2e8-e1fd09eed21e/run",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/organizations/d37b0608-4ea2-43ea-afa6-820538d12317/evaluation-events/04568553-c3f4-4c3d-a2e8-e1fd09eed21e/run/tracking",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/my-scale-tasks",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/huiteacher/run-executions/673d3e8d-8478-4868-b018-19564cf4a296/start-scale",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/huiteacher/composite-attempts/0011b400-3159-4786-b5f5-407322b369e5",
+    "status": 200
+  }
+]

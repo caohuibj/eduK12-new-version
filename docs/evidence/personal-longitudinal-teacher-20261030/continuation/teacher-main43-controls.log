@@ -1,0 +1,11 @@
+✔ exact app pins reject unknown inputs, changed main and full fallback (321.086942ms)
+✔ actual original source-SHA job metadata admits only its unchanged qualification scope (457.124043ms)
+✔ Teacher native-only reuse authenticates the original migration without claiming old frontend for a changed production tree (599.058029ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1517.823753

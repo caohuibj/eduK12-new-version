@@ -35,3 +35,9 @@ Git公开只读fetch成功后，PR414原分支完成mainfb对齐。通过既有�
 无冲突合入真实main43d119c9bfbc7949baab2edea29d96044b04607c，检查点91487d27e12e60cd30895d5e5327016552f9a45a。backend dc9a331f、frontend b672a3fc组件tree都未变化，沿用已实际通过的mainfb类型收据，没有再次编译。五个Reader应用/夹具源blob与产品380b90cd7完全相同，原导航/浏览器/打印不重播；分母、NON_EXCLUSIVE、隐藏人数及取整字段已核对现有原生服务输出，没有新增产品功能。
 
 唯一准备缺口是PR415缺现有精确资格命名空间。沿onboarding-structure增加固定415的frontend-only源/模式/组件绑定与原浏览器观察接纳，不新增workflow或后台服务。仅补一个控制用例，实际1PASS；保持候选禁用和PR Draft，按DOT要求不与正在对齐的409进入合并队列。这里只是准备，后续自然节点再绑定当时真实main/merge，不声称正式资格成功。418的子群/版本与目录刷新修复独立保留，不混入本Reader切片。
+
+## main8bc 稳定基线最终资格
+
+合入已发布的个人Teacher纵向main8bc，仅Studio首行import冲突并保留两边接线。实际新消费者对普通Form活动增加只读GET tracking；夹具明确baselineId:null，真实TeacherApp导航仅此受影响case再次执行1PASS，无虚假下一轮入口。原Reader组件、共享打印CSS和量化投影未变，旧浏览器/PDF保持历史观察，没有重播或声明完整bundle相同。
+
+当前前端在486fa3286冻结输入编译一次；后台完整tree与main8bc相同，frontend-only精确路由拒绝后台漂移，因此本批不要求未变后台的重复编译收据，不伪造原后台执行元数据，不运行PG／迁移／业务回归。现有四作业scope、unsigned原件接纳、当前受影响CodeQL、稳定gate依精确绑定收口；不新建workflow，不扩权，不合并／部署。
