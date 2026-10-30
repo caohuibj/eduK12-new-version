@@ -559,7 +559,7 @@
     "task1": {
       "schemaVersion": 1,
       "pr": "task1",
-      "enabled": true,
+      "enabled": false,
       "base": "5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb",
       "product": "d38e1e74897cb56120b69fed0d9f170e5de3b3d8",
       "controlCheckpoint": "03265e5dfbd403d163307d8717356fea3c9b40c0",
@@ -2015,7 +2015,7 @@
         "backend": "44013860f1c6ead94f1c4b63491f0f122b01abaa",
         "frontend": "44ac407e011dd17be8636b439b440a4d152b3304"
       },
-      "activationNote": "DOT independently accepted exact 54da4552 source/control and new dual-nonempty-R evidence; activate existing bounded formal CI only, no merge/deployment authorization."
+      "activationNote": "Targeted shallow-SAST recovery and original official build reuse prepared; required Notion CI failure append was denied by automatic approval for missing trusted destination/private-page authorization. Do not reactivate until that specific write is authorized and completed."
     }
   }
 }
