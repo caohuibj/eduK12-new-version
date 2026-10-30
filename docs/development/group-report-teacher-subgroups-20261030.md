@@ -43,3 +43,9 @@
 415的retarget main及描述更新被自动审批拒绝，目标和原因见main8bc/preparation.json；已停止该操作，不换接口。其46个精确Git对象已核验上传，但暂不移动候选ref，防止旧stacked base触发已知不匹配CI。418保持其后的小切片准备，未正式激活、合并或部署。
 
 前端续编tree3a56f9d4a76bea2836de1031cd627f71d8dcb175 exit0；backend48d17原本次exit0继续复用，没有重编未变后端。两项交互续验通过；本地准备齐备，尚不称正式CI资格。
+
+## Reader #415 正式资格归档（候选不变）
+
+针对状态／目标／说明及限定CI的新具体授权已收到，回读旧状态后重试成功。415按期望392a9f快进b3e9f35、目标main、Ready。实际preview b2c1e012、tree54319869与source一致。正式41070437105 attempt1四项SUCCESS，完整126作业／122跳过；接纳ZIP1541字节及SAST ZIP71499字节实际下载并核验官方digest。unsigned原件接纳1导航／1前端type／1历史browser，CI未重播应用／PG／编译。SARIF保留与414同rule／message／location的旧测试断言告警，不称零结果、不抑制。
+
+归档在本后续分支reader/main8bc/formal，不改变415已验candidate。416合并优先，415仍待具体合并决定与届时base核对；418目标／Ready／正式资格按授权等415合并后继续，本轮不激活、不合并、不部署。leaf Draft旧拒绝仍停止。
