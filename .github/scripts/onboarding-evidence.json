@@ -614,7 +614,7 @@
       "schemaVersion": 1,
       "product": "d537212929887218f255ee6f654a9522463abff7",
       "reviewer": "independent Codex pr395_review",
-      "decision": "PENDING_INDEPENDENT_REVIEW",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
       "originalExecutionSigned": false,
       "environment": {
@@ -636,8 +636,8 @@
             "server-version/frontend"
           ],
           "reviewedUnrelatedSourceDelta": [],
-          "deltaRationale": "Current tested frontend source equals associated product. Reporter association is retrospective, not an original git execution identity.",
-          "sourceAssociationBasis": "Observed DOT local command and unchanged tested module bytes; unsigned retrospective record.",
+          "deltaRationale": "Retrospective association of the explicitly selected case bodies and their relevant product consumers with the final product. Not proof that every historical frontend byte equaled the final tree.",
+          "sourceAssociationBasis": "DOT observed these local executions on uncommitted bytes and transferred their originals. The selected assertions and relevant consumers were retained in the remote product; no historical commit identity or complete original environment attestation is invented.",
           "cases": [
             {
               "fullName": "shared education registration management real client contracts presents readable frozen metadata and preserves historical missing feedback policy without inventing defaults",
@@ -810,8 +810,8 @@
             "server-version/frontend"
           ],
           "reviewedUnrelatedSourceDelta": [],
-          "deltaRationale": "Current tested frontend source equals associated product. Reporter association is retrospective, not an original git execution identity.",
-          "sourceAssociationBasis": "Observed DOT local command and unchanged tested module bytes; unsigned retrospective record.",
+          "deltaRationale": "Retrospective association of the explicitly selected case bodies and their relevant product consumers with the final product. Not proof that every historical frontend byte equaled the final tree.",
+          "sourceAssociationBasis": "DOT observed these local executions on uncommitted bytes and transferred their originals. The selected assertions and relevant consumers were retained in the remote product; no historical commit identity or complete original environment attestation is invented.",
           "cases": [
             {
               "fullName": "School composition product consumers / synthetic HTTP contracts exposes the shared School editor through its parent authoring studio",
@@ -850,8 +850,8 @@
             "server-version/frontend"
           ],
           "reviewedUnrelatedSourceDelta": [],
-          "deltaRationale": "Current tested frontend source equals associated product. Reporter association is retrospective, not an original git execution identity.",
-          "sourceAssociationBasis": "Observed DOT local command and unchanged tested module bytes; unsigned retrospective record.",
+          "deltaRationale": "Retrospective association of the explicitly selected case bodies and their relevant product consumers with the final product. Not proof that every historical frontend byte equaled the final tree.",
+          "sourceAssociationBasis": "DOT observed these local executions on uncommitted bytes and transferred their originals. The selected assertions and relevant consumers were retained in the remote product; no historical commit identity or complete original environment attestation is invented.",
           "cases": [
             {
               "fullName": "loads Teacher package data only on its tab and keeps an unsaved questionnaire when switching is declined",
