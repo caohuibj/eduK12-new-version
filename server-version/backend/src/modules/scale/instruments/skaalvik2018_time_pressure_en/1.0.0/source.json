@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "skaalvik2018_time_pressure_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Skaalvik & Skaalvik 2018 教师时间压力5题（原版两题缺失，仅来源目录）",
+      "abbreviation": "SK18-TP",
+      "instrumentFamily": "Skaalvik & Skaalvik (2018) time pressure 5-item Norwegian-teacher job-demand scale; source metadata only, no executable"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "2018研究中的教师时间压力工作要求；文章明示五题，公开正文提供三题示例，另两题精确原版文字未取得，不能据2016年同构念的五题直接认定完全一致。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "skaalvik2018_time_pressure_en",
+        "source:skaalvik2018_job_demands_resources",
+        "construct:time_pressure",
+        "jdr_role:demand",
+        "population:teacher",
+        "source_language:en",
+        "response:six_point_endpoint_known_only",
+        "availability:catalog_only",
+        "items:5_original_2018_two_missing",
+        "scoring:unverified_original",
+        "rights:article_cc_by_4_0_unpublished_items_not_supplied"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原研究调查挪威1–10年级教师，不能视为中国K12教师验证或常模。年龄18+为本项目目录边界。"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "公开文章未提供可核验的完整独立原版施测指导语和固定回忆期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "2018文章§3.2.2明示time pressure原量尺五题，但只公开三题示例；其他两题未核原文，当前不得发布实际题本。",
+        "2016单独时间压力五题已作为独立来源版本进入Git main；不能推断它们与2018五题完全逐字一致，也不能把2016 C/R重贴2018标签。",
+        "作者论文六点响应1=Completely disagree、6=Completely agree，未取得中间2–5原文字。当前不给选项、题文、计分、缺失/均分规则。",
+        "无作者正式评分算法、常模、阈值、报告消费者和个体结果；目录用时不是实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅来源版本定位；未收齐2018全文条目，不可据此安排实际研究测评。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Skaalvik & Skaalvik (2018), Job demands and job resources as predictors of teacher motivation and well-being, Social Psychology of Education 21,1251–1275, doi:10.1007/s11218-018-9464-8. Only 3/5 original items quoted in public article. No Chinese translation in this metadata.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "2016 item texts are independently traceable but not verified as exact 2018 protocol. Paper shows 5-item study and three public examples. Unknown remaining two and author missing/individual scoring; no executable."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Job demands and job resources as predictors of teacher motivation and well-being",
+      "citation": "Skaalvik E. M. & Skaalvik S. (2018). Social Psychology of Education 21:1251–1275, §3.2.2 job demands. doi:10.1007/s11218-018-9464-8",
+      "url": "https://link.springer.com/article/10.1007/s11218-018-9464-8",
+      "publicationYear": 2018
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "教师时间压力（2018年来源，仅候选）"
+      ],
+      "limitations": [
+        "2018文献只给出5题中3个示例；余下2题未获原版，不能生成可施测内容。",
+        "2016年5题是已独立注册的另一版来源工具。未经逐题原文确证，不把2016题本默认为2018版。",
+        "六点端点已见，但中间2–5的作者原版标签、个体计分/缺失策略和中文教师效度未核实。",
+        "无可靠中国教师阈值和常模，不制作个人分数或报告。"
+      ],
+      "disclaimer": "目录来源，仅用于溯源和补查，不生成实际评估、分数、教师报告或JD-R总分。"
+    },
+    "blockers": [
+      "TWO_ORIGINAL_2018_ITEMS_NOT_RETRIEVED",
+      "COMPLETE_ADMINISTRATION_AND_RESPONSE_ANCHORS_NOT_VERIFIED",
+      "AUTHOR_SCORING_AND_MISSING_POLICY_NOT_VERIFIED",
+      "CHINESE_VALIDATION_NOT_ESTABLISHED"
+    ]
+  }
+}
