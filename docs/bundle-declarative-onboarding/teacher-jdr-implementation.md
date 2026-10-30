@@ -1,6 +1,6 @@
 # 教师 JD-R 固定 Bundle：实施候选与验收
 
-2026-10-30。起点 main `1cc077a8ee8e9475799788ab2b8bf5a4511630fe`；独立分支 `feat/teacher-jdr-bundle-20261030`。本页是可审阅方案，**不是已采用的科学配置、已安装包或发布证明**。目标是一个可重复 setup 的固定实例，既有 Project 文件随后由这个实际实例收口，不继续扩充所有候选工具。
+2026-10-30。起点 main `1cc077a8ee8e9475799788ab2b8bf5a4511630fe`；独立分支 `feat/teacher-jdr-bundle-20261030`。用户以 `Sentinel_3463f35a75fc8191b757c8c1110fceb4` 批准下述两项内容决定，现已实现源码 DRAFT `teacher_jdr_workplace_zh_cn@0.1.0`，并在隔离开发库正常安装、审核、发布、授权和完成合成任务。**尚未合 main 或部署生产**。目标是一个可重复 setup 的固定实例，不继续扩充所有候选工具。
 
 ## 已读依据与模型身份
 
@@ -34,9 +34,9 @@ HSE 指令为过去六个月；CBI 为当前工作感受，未指定相同固定
 
 实际包还绑定原机制的 C/P/R 版本与 measurement/runtime/source 身份，分别冻结 model/mapping/report 版本，不以本页文件 SHA 代替完整依赖校验。源码 PUBLISHED 不等于 DB 安装、PUBLIC 或已授权；不使用 DRAFT Skaalvik 或目录候选充当可执行依赖。HSE/CBI 原题许可与附注保持原 source，不公开私有研究原件。
 
-## 需要集中决定的两点
+## 已获用户确认的两点
 
-### 1. 是否采用以下独立研究示范配置
+### 1. 独立研究示范配置
 
 推荐上述固定 30 题、四核心，使用现有 `weighted-l1-guarded-v1`。四个候选仅表示本次工作条件，不是永久人格或教师能力：
 
@@ -49,13 +49,13 @@ HSE 指令为过去六个月；CBI 为当前工作感受，未指定相同固定
 
 建议 lowMax=.25、highMin=.75，中间区保持不确定；D 权重 3、三个 R 各 1，使要求域和资源域各占一半。资源仍逐维匹配，方向明显不一致的资源组合不硬塞进四类。minimumMatchingScore=75：对应原型在各自守卫区域内每维最大距离 .25 的几何下限；minimumMargin=10：仅为项目不确定性缓冲，未作实证校准。模糊平台 .25/.5/.75 只服务既有内部规则，不表示概率。
 
-完整守卫内最近相邻原型分差至少 25，因此 10 不改变这些典型输入；守卫外按照已有绝对不匹配→近邻→规则边界次序弃权。本案与旧未采用草稿的 1/3、2/3、margin=0 不混用；推荐更宽的中间区和明确近邻状态，决定后才写正式 profile 配置。缺失、invalid、真实范围外零、支持不齐及人口不适用均不硬分型。
+完整守卫内最近相邻原型分差至少 25，因此 10 不改变这些典型输入；守卫外按照已有绝对不匹配→近邻→规则边界次序弃权。本案与旧未采用草稿的 1/3、2/3、margin=0 不混用；已按较宽中间区和明确近邻状态编制0.1.0配置。缺失、invalid、真实范围外零、支持不齐及人口不适用均不硬分型。
 
-### 2. 是否允许经既有审核的 Bundle 自有画像面向作答教师本人
+### 2. 经既有审核的 Bundle 自有画像仅面向作答教师本人
 
 当前 HSE 的 `scoreDerivedLabels=false`，现有投影因此必须 WITHHELD。建议只在 **Bundle 报告声明** 增加可选的自有画像内容与受众范围，进入原 content hash 和既有内容签审；源工具 numericScores、individualInterpretations 及实际整包/报告访问仍须允许。仅给本人，不能顺带开放学校管理者或研究者。原量表的标签、教育材料、原答卷权限不变。
 
-这属于披露政策决定，不能由工程自选；已批准的 `profileActionContent=BUNDLE_OWNED` 也不自动授权核心画像。未声明的新包和全部旧包沿旧规则，未确认前继续隐藏。教师自评的 R 场景还须沿现有受众合同准确接通，不把系统角色 teacher 当作可读所有教师结果。
+这是用户明确批准的披露政策，落实为可选 `profileInterpretationContent=BUNDLE_OWNED_SELF`，只用于显式成人教师模型、沿原内容 hash 与独立签审；已批准的 `profileActionContent=BUNDLE_OWNED` 本身不自动授权核心画像。未声明的新包和全部旧包沿旧规则。教师自评 R 在冻结合同 `ADULT_SELF/teacher` 下接通既有 participant-self 投影，不把系统角色 teacher 当作可读所有教师结果。
 
 ## 报告样稿与图形
 
@@ -119,3 +119,28 @@ HSE 指令为过去六个月；CBI 为当前工作感受，未指定相同固定
 - 前一成人切片的六个未变断言继续复用；新增可选 subjectKey 无默认值，旧 JSON 不增加字段；fixture 的核心分支仍选择原身份对象。前一后端类型成功只对应成人切片，**最终组合后端类型尚待正式检查**，不冒称新的组合已通过。
 
 当前完整差异没有前端、数据库 schema/迁移、公共授权或 CI 修改。现有 `onboarding-structure` 在 `onboarding-scope.mjs` 明确硬绑定旧分支和候选（含 PR393），本分支不匹配；不能只沿用旧 PR393 资格。待两项内容决定及最终包冻结后，给出现有路线所需的最小绑定与缺失 backend 编译/产物安全/CodeQL/stable gate 计划，保持 Draft，当前不触发 Ready 的通用平台回归。不为本次独立分支新建 workflow，也不修改旧合并候选原件。
+
+## 已批准实例的实际闭环与必要修订
+
+上述“没有前端/公共授权修改”是86bd3efb0第一切片的记录；后续真实实例还需要以下小型修订：
+
+- `profile/report.ts` / `bundle-product/analysis.ts`：新包的自有解释只给 participant-self，仍交集核心来源 numericScores 与 individualInterpretations。HSE 原 scoreDerivedLabels / educationalContent 均保持 false，staff/admin/parent 综合画像仍 WITHHELD。Survey 只兼容传入既有受众参数，没有新开成人 Survey 入口。
+- `bundle-product/definition-provider.ts`：原发布预览要求所有 numeric 年龄边界都有年龄表单；仅为已验证的 ADULT_TEACHER、恰好18+且无上限的声明复用必做布尔 Context，不泛化任意年龄范围。
+- `services/materialGrant.ts` 的 ASSESSMENT_BUNDLE 分支：声明式源码保持 DRAFT，整包授权必须检查实际签审发布记录；不能只按源码 DRAFT 字面值拒绝，也不能用五个叶授权替代整包 U。未改变其他资源类型或角色判断。
+- 前端 `BundleProfileSummary.tsx`：移除写死“数学/三个指标”的界面标题和方法提示，使用统一中性界面文案。原包冻结的 summary/actions/states/model 参数及历史 hash 均未覆盖；不新增模型专用渲染器、图表引擎或图片资产。原单项解释已由现有 `interpretations` 正确消费，不添加不需要的 rawScoreFeedback 适配。
+
+当前精确内容 hash：`05f3747aef60bfd3314c45fa89f570c4d1102e061f859687752d582a8db7024b`；来源/设计记录 canonicalHash：`7b19ab153a6a6c056c72c5c94c205caf8e7e1168d42f4cc2d0628cf0d07f6b54`。后者绑定旁边的 design-reference.json，不假称下载源码ZIP。
+
+本轮新增9个模型用例 PASS；18+发布预览边界1 PASS；报告组件1 PASS。旧10项不重复。真实库是现有 loopback `eduk12_test`，仅补原 main 已有7项迁移，未新建业务表或改生产库。
+
+| 原调用 | 实际结果与已到达阶段 | 后续处理 |
+| --- | --- | --- |
+| jdr-lifecycle | FAIL，五个依赖已正常安装/发布与叶授权；包预览拒绝 AGE_POPULATION_REQUIRES_DECLARED_CONTEXT | 仅补上述18+方式，依赖不重装 |
+| jdr-lifecycle-r1 | 预览边界用例 PASS；旅程 FAIL。已正常独立签审、整包授权、投放、恢复、五工具 FINAL、J2、幂等重放；用例误查不存在的 rawScoreFeedback | 对实际 source 核实它使用 interpretations，改用真实消费断言 |
+| jdr-lifecycle-r2 | PASS，从相同已完成任务只读继续，五份单项解释、J2本人反馈、staff隐藏、同hash重开、INITIAL=1和单元快照=6 | submitted=[]，没有再次计分、发布或FINAL；18ms不是首次FINAL指标 |
+| jdr-workflow / r1 | 普通组合已创建并发布；先后错误假设DTO含内部null协议字段、平铺scaleId | 只读诊断确认DTO的reportPackage/analysisProtocol和嵌套scale；不修改产品、不断言虚假字段 |
+| jdr-workflow-r2 | PASS，既存五工具普通组合无Bundle实例；登记合成0.1.1 DRAFT模板后原JD-R保存报告内容及hash不变 | 未对普通组合再次运行单项计分或发布新理论模型 |
+| jdr-browser / r1 | 默认沙箱启动失败；正式审批允许官方Chromium启动后，记录器误将HTML当API JSON退出 | 保留失败，只改记录器限定/api/，无权限/owner/mode/TLS修改 |
+| jdr-browser-r2 | PASS，真实cookie登录、4条原量尺图和文字表、两条本人建议、键盘详情、刷新同hash、390px无横向溢出 | 云端开发Vite/API环境；不是最终生产镜像验收，未截图归档 |
+
+首个 FINAL 的独立耗时/CPU读数未在失败断言前保存，不能补造或为获取数字再次计分。本次只读续验为单样本：报告重开约24ms；完整响应约字节数及SQL计数见原 jdr-lifecycle-result.json，非性能优化或跨环境基准。资料索引、Project工作流、权限及状态均按实际完成区分；没有部署、真实用户授权或额外PDF/图片存储。
