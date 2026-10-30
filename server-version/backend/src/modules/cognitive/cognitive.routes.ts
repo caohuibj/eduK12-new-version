@@ -13,6 +13,7 @@ import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 import { instrumentError } from '../../utils/response'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
+import {cognitiveProfileConfigurationsRouter} from './profile-configurations.routes'
 
 /**
  * Cognitive 路由（D3 起）。
@@ -42,6 +43,7 @@ const relationalCognitiveFinalConsentGuard = async (req: Request, res: Response,
 router.get('/tests', authenticate, requireTeacher, cognitiveController.listTests)
 router.get('/tests/:testType', authenticate, requireTeacher, cognitiveController.getTest)
 router.get('/configs', authenticate, requireTeacher, cognitiveController.listConfigs)
+router.use('/profile-configurations',cognitiveProfileConfigurationsRouter)
 router.patch('/configs/:id/access-policy', authenticate, requireAdmin, newAuthoring, cognitiveController.updateAccessPolicy)
 router.post('/configs/:id/publish', authenticate, requireAdmin, newAuthoring, cognitiveReleaseController.publishConfig)
 router.post('/configs/:id/retire', authenticate, requireAdmin, cognitiveReleaseController.retireConfig)

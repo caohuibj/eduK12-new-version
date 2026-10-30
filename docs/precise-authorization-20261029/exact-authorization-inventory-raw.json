@@ -1,0 +1,1317 @@
+{
+  "schemaVersion": 1,
+  "runs": [
+    {
+      "name": "exact-inventory-training",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-named.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-training.json"
+        ],
+        "startedAt": "2026-10-29T20:05:30.632956+00:00",
+        "finishedAt": "2026-10-29T20:05:36.711322+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304331324,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "failed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 84.15239299999939,
+                "failureMessages": [
+                  "TypeError: Cannot read properties of undefined (reading 'findMany')\n    at db.$transaction.isolationLevel (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts:42:42)\n    at Proxy._transactionWithCallback (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:8000)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts:28:3\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304336442,
+            "endTime": 1793304336526.1523,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "database": "precise_training_named_configuration_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-legacy-training",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-general.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-legacy-training.json"
+        ],
+        "startedAt": "2026-10-29T20:05:48.244607+00:00",
+        "finishedAt": "2026-10-29T20:06:02.275976+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 0,
+        "numPendingTests": 1,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304349526,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "skipped",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304349526,
+            "endTime": 1793304349526,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "database": ""
+      }
+    },
+    {
+      "name": "exact-inventory-survey",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-standard-use.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-survey.json"
+        ],
+        "startedAt": "2026-10-29T20:05:48.280325+00:00",
+        "finishedAt": "2026-10-29T20:06:02.469704+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304349361,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "failed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 190.19148200000018,
+                "failureMessages": [
+                  "TypeError: Cannot read properties of undefined (reading 'findMany')\n    at db.$transaction.isolationLevel (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts:42:42)\n    at Proxy._transactionWithCallback (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:8000)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts:28:3\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304361964,
+            "endTime": 1793304362154.1914,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "database": "precise_survey_standard_use_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-education",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education-lifecycle.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-education.json"
+        ],
+        "startedAt": "2026-10-29T20:05:48.269866+00:00",
+        "finishedAt": "2026-10-29T20:06:02.469380+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304349426,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "failed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 131.93756199999916,
+                "failureMessages": [
+                  "TypeError: Cannot read properties of undefined (reading 'findMany')\n    at db.$transaction.isolationLevel (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts:42:42)\n    at Proxy._transactionWithCallback (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:8000)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts:28:3\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304362058,
+            "endTime": 1793304362189.9375,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "database": "precise_education_lifecycle_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-training-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-named.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-training-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:06:33.470887+00:00",
+        "finishedAt": "2026-10-29T20:06:48.746399+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304394512,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "failed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 121.82466799999929,
+                "failureMessages": [
+                  "CanonicalJsonError: $.audits[0].createdAt must be a plain object\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:40:13)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:50:23\n    at Array.reduce (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:49:8)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:35:42\n    at Array.map (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:35:20)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:50:23\n    at Array.reduce (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:49:8)"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304408313,
+            "endTime": 1793304408434.8247,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "database": "precise_training_named_configuration_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-legacy-training-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-general.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-legacy-training-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:06:33.488226+00:00",
+        "finishedAt": "2026-10-29T20:06:48.746358+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304395067,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "failed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 132.95752100000027,
+                "failureMessages": [
+                  "CanonicalJsonError: $.audits[0].createdAt must be a plain object\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:40:13)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:50:23\n    at Array.reduce (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:49:8)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:35:42\n    at Array.map (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:35:20)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:50:23\n    at Array.reduce (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:49:8)"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304408376,
+            "endTime": 1793304408508.9575,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "database": "precise_general_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-survey-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-standard-use.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-survey-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:06:33.462587+00:00",
+        "finishedAt": "2026-10-29T20:06:48.280671+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304394733,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "failed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 237.00816499999928,
+                "failureMessages": [
+                  "CanonicalJsonError: $.audits[0].createdAt must be a plain object\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:40:13)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:50:23\n    at Array.reduce (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:49:8)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:35:42\n    at Array.map (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:35:20)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:50:23\n    at Array.reduce (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:49:8)"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304407632,
+            "endTime": 1793304407869.008,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "database": "precise_survey_standard_use_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-education-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education-lifecycle.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-education-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:06:33.658386+00:00",
+        "finishedAt": "2026-10-29T20:06:48.206991+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304394990,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "failed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 171.03781799999888,
+                "failureMessages": [
+                  "CanonicalJsonError: $.audits[0].createdAt must be a plain object\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:40:13)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:50:23\n    at Array.reduce (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:49:8)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:35:42\n    at Array.map (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:35:20)\n    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:50:23\n    at Array.reduce (<anonymous>)\n    at normalize (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts:49:8)"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304407607,
+            "endTime": 1793304407778.0378,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "database": "precise_education_lifecycle_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-training-v3",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-named.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-training-v3.json"
+        ],
+        "startedAt": "2026-10-29T20:07:37.815773+00:00",
+        "finishedAt": "2026-10-29T20:07:48.959623+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304458916,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "passed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 196.71086800000012,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304468538,
+            "endTime": 1793304468734.711,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "databaseReadOnly": true,
+        "inputStateHash": "2c05ea03529f6ca6bf104fb0b269f42e9ba6e14f115c1d239c1c216cf8046264",
+        "outputStateHash": "2c05ea03529f6ca6bf104fb0b269f42e9ba6e14f115c1d239c1c216cf8046264",
+        "sourceCount": 2,
+        "sourceIssues": [],
+        "rows": [
+          {
+            "entry": "TRAINING",
+            "id": "3556d111-ec36-4dde-8f2e-de5ef4ae9f6b",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "9a30d47cccc1feb416f6cd8cfebb0dda6e60388f0c4e0f068ac894958dbc4405",
+            "bindingHash": "501571e82e681e8297159a583f286ee45bcbe0f65108231e6eee28e1f59316c0",
+            "authorizationRevision": 5
+          },
+          {
+            "entry": "TRAINING",
+            "id": "570799ad-b0f3-4bbc-8cb1-910e0df43e3a",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "9a30d47cccc1feb416f6cd8cfebb0dda6e60388f0c4e0f068ac894958dbc4405",
+            "bindingHash": "8e3b671620b4511858a2e8cea99b8aee23919a45d565979327206ad9dd319ef1",
+            "authorizationRevision": 3
+          },
+          {
+            "entry": "TRAINING",
+            "id": "78d5ad04-100c-4752-816b-b8eb6a3ee1cc",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "10909c5ee50c2e8a6fdc0dbae45f17796fb4c671ddf5dcc5d484673c51b68bc4",
+            "bindingHash": "6fc3702dea208075fd4d739c782e2458b1bfef969d4ca4bda0b87d8d508e24b7",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "TRAINING",
+            "id": "b559c930-122a-4183-9d56-89f3cb5f6376",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "10909c5ee50c2e8a6fdc0dbae45f17796fb4c671ddf5dcc5d484673c51b68bc4",
+            "bindingHash": "e58429a72b0f2c70be51b5f3a7184ba1c0159da4f2876384f74d3d99e4265ec8",
+            "authorizationRevision": 3
+          }
+        ],
+        "counts": {
+          "TRAINING": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 4,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "SURVEY": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "SCHOOL": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "TEACHER": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          }
+        },
+        "database": "precise_training_named_configuration_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-legacy-training-v3",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-general.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-legacy-training-v3.json"
+        ],
+        "startedAt": "2026-10-29T20:07:37.839093+00:00",
+        "finishedAt": "2026-10-29T20:07:48.922602+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304458886,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "passed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 209.9527820000003,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304468459,
+            "endTime": 1793304468668.953,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "databaseReadOnly": true,
+        "inputStateHash": "ce48f0510eb5e3fcfdeb44be9b1306cdba570430e85b96a9f5f419fed7b25db7",
+        "outputStateHash": "ce48f0510eb5e3fcfdeb44be9b1306cdba570430e85b96a9f5f419fed7b25db7",
+        "sourceCount": 2,
+        "sourceIssues": [],
+        "rows": [
+          {
+            "entry": "TRAINING",
+            "id": "3556d111-ec36-4dde-8f2e-de5ef4ae9f6b",
+            "revoked": true,
+            "state": "LEGACY_NO_PRECISE_EVIDENCE",
+            "action": "KEEP_LEGACY_NO_BACKFILL"
+          },
+          {
+            "entry": "TRAINING",
+            "id": "570799ad-b0f3-4bbc-8cb1-910e0df43e3a",
+            "revoked": true,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "9a30d47cccc1feb416f6cd8cfebb0dda6e60388f0c4e0f068ac894958dbc4405",
+            "bindingHash": "668151409bf00a012e2714439198d0efb3d18d1179daa6051d05f9de97002acf",
+            "authorizationRevision": 1
+          }
+        ],
+        "counts": {
+          "TRAINING": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 1,
+            "LEGACY_NO_PRECISE_EVIDENCE": 1,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "SURVEY": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "SCHOOL": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "TEACHER": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          }
+        },
+        "database": "precise_general_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-survey-v3",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-standard-use.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-survey-v3.json"
+        ],
+        "startedAt": "2026-10-29T20:07:37.960124+00:00",
+        "finishedAt": "2026-10-29T20:07:49.372333+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304459070,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "passed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 175.0971239999999,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304469029,
+            "endTime": 1793304469204.0972,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "databaseReadOnly": true,
+        "inputStateHash": "751bdfa235595637c1d9aeaa1dc3afd247a340fa73c328c36d27f679d8e214d7",
+        "outputStateHash": "751bdfa235595637c1d9aeaa1dc3afd247a340fa73c328c36d27f679d8e214d7",
+        "sourceCount": 3,
+        "sourceIssues": [],
+        "rows": [
+          {
+            "entry": "SURVEY",
+            "id": "2b966086-f62c-485a-a4a1-7cb9ba6143a0",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "7dfb3934f35999ae1654352169fe2b6725662c940c4b1ad9ea5df6a0796fbe6a",
+            "bindingHash": "28ac421ca34a767172a0934e00a24225ce4594471596dcecd7e7122383096588",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "SURVEY",
+            "id": "47b7edc0-c747-4e1e-b10d-5f4686dfd2b8",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "24476a25f83b463c9c481f6959a44e7fac86c42c2039ab64f5a7d2b9971e9746",
+            "bindingHash": "9f45b626cab99f3a58fae56d71c640d084c2e29f7b71a5b978b431bd9e6e3127",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "SURVEY",
+            "id": "5cbb7250-f64e-42c7-9b01-d7c64e45403c",
+            "revoked": true,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "24476a25f83b463c9c481f6959a44e7fac86c42c2039ab64f5a7d2b9971e9746",
+            "bindingHash": "9e9e87f781a9c3f0e0fe2782a4cc99c5464fb2f11cfa1f18565036aa6fe5990e",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "SURVEY",
+            "id": "909fc124-b1f9-4323-b5eb-6bddcf63c604",
+            "revoked": true,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "24476a25f83b463c9c481f6959a44e7fac86c42c2039ab64f5a7d2b9971e9746",
+            "bindingHash": "ab26304fafc4697db4fc8bac5f8a0e5c4a4de5be7f3f09698e89dd8c2c8c31cf",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "SURVEY",
+            "id": "cc12c33f-8926-4f3e-b8fe-5503a7fabb03",
+            "revoked": false,
+            "state": "LEGACY_NO_PRECISE_EVIDENCE",
+            "action": "KEEP_LEGACY_NO_BACKFILL"
+          },
+          {
+            "entry": "SCHOOL",
+            "id": "7635c2c3-56cb-4cae-8149-2579f9dbcc20",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "e23e2dde097928dfc0b8b32f6e52979ce15d4f5e7b06485d84d2f882f64427f4",
+            "bindingHash": "f45f549a1a11accbb7137e45c85a34a5892bc35a290cad31430c1125e24138c6",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "SCHOOL",
+            "id": "bd28ef3b-c070-40e8-91c8-52e5a550ae04",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "e23e2dde097928dfc0b8b32f6e52979ce15d4f5e7b06485d84d2f882f64427f4",
+            "bindingHash": "3ad85e9d195344ef7d58ee67836f45f920bfafaa0b48724d78aabe23e3be1505",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "TEACHER",
+            "id": "d43b740b-7e42-4415-8d89-0091af97c15d",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "e23e2dde097928dfc0b8b32f6e52979ce15d4f5e7b06485d84d2f882f64427f4",
+            "bindingHash": "efda0284aed29229c79a85181cdca16ede53b59d276753520f5b762a56637855",
+            "authorizationRevision": 1
+          }
+        ],
+        "counts": {
+          "TRAINING": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "SURVEY": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 4,
+            "LEGACY_NO_PRECISE_EVIDENCE": 1,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "SCHOOL": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 2,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "TEACHER": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 1,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          }
+        },
+        "database": "precise_survey_standard_use_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-education-v3",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education-lifecycle.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/exact-inventory-education-v3.json"
+        ],
+        "startedAt": "2026-10-29T20:07:37.849529+00:00",
+        "finishedAt": "2026-10-29T20:07:48.502141+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304458923,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "read-only legacy exact grant evidence inventory without backfill"
+                ],
+                "fullName": "read-only legacy exact grant evidence inventory without backfill classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "status": "passed",
+                "title": "classifies exact original T1/source evidence in a database-enforced read-only snapshot and proposes no writes",
+                "duration": 185.84464300000036,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304468026,
+            "endTime": 1793304468211.8447,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "schemaVersion": 1,
+        "productionAccessed": false,
+        "writeOrBackfill": false,
+        "currentAuthorityEvaluated": false,
+        "scope": "Existing immutable scale grant evidence and source hashes only. No eligibility conversion, task/snapshot migration, permission resurrection or current/latest default.",
+        "databaseReadOnly": true,
+        "inputStateHash": "7f3871d811ee853bee197fcb01caafe491e354fc0dc305f2ac29c36dec99cb5e",
+        "outputStateHash": "7f3871d811ee853bee197fcb01caafe491e354fc0dc305f2ac29c36dec99cb5e",
+        "sourceCount": 1,
+        "sourceIssues": [],
+        "rows": [
+          {
+            "entry": "TEACHER",
+            "id": "16e9df60-aa69-40ee-9d4f-76e6e6c77e5f",
+            "revoked": true,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "e23e2dde097928dfc0b8b32f6e52979ce15d4f5e7b06485d84d2f882f64427f4",
+            "bindingHash": "6a40ecf7522342d1a7110ed2e7ba50f249cd2f3090f8e36a6a6141751cc6c87e",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "SCHOOL",
+            "id": "575e4120-82c9-4c49-8180-a81c086bac9f",
+            "revoked": true,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "e23e2dde097928dfc0b8b32f6e52979ce15d4f5e7b06485d84d2f882f64427f4",
+            "bindingHash": "d55243a2319973878fc98caf13bb50dff607fc123338d6dd959d8967e7874652",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "SCHOOL",
+            "id": "7635c2c3-56cb-4cae-8149-2579f9dbcc20",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "e23e2dde097928dfc0b8b32f6e52979ce15d4f5e7b06485d84d2f882f64427f4",
+            "bindingHash": "f45f549a1a11accbb7137e45c85a34a5892bc35a290cad31430c1125e24138c6",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "SCHOOL",
+            "id": "bd28ef3b-c070-40e8-91c8-52e5a550ae04",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "e23e2dde097928dfc0b8b32f6e52979ce15d4f5e7b06485d84d2f882f64427f4",
+            "bindingHash": "3ad85e9d195344ef7d58ee67836f45f920bfafaa0b48724d78aabe23e3be1505",
+            "authorizationRevision": 1
+          },
+          {
+            "entry": "TEACHER",
+            "id": "d43b740b-7e42-4415-8d89-0091af97c15d",
+            "revoked": false,
+            "state": "EXISTING_PRECISE_SOURCE_VERIFIED",
+            "action": "PRESERVE_EXISTING_BINDING",
+            "configurationHash": "e23e2dde097928dfc0b8b32f6e52979ce15d4f5e7b06485d84d2f882f64427f4",
+            "bindingHash": "efda0284aed29229c79a85181cdca16ede53b59d276753520f5b762a56637855",
+            "authorizationRevision": 1
+          }
+        ],
+        "counts": {
+          "TRAINING": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "SURVEY": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 0,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "SCHOOL": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 3,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          },
+          "TEACHER": {
+            "EXISTING_PRECISE_SOURCE_VERIFIED": 2,
+            "LEGACY_NO_PRECISE_EVIDENCE": 0,
+            "EVIDENCE_REQUIRES_REVIEW": 0
+          }
+        },
+        "database": "precise_education_lifecycle_test_20261029"
+      }
+    },
+    {
+      "name": "exact-inventory-types",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/exact-authorization-inventory-types.json"
+        ],
+        "startedAt": "2026-10-29T20:05:48.238584+00:00",
+        "finishedAt": "2026-10-29T20:06:14.254110+00:00",
+        "exitCode": 2
+      },
+      "log": "src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts(42,26): error TS2339: Property 'surveyToolGrant' does not exist on type 'TransactionClient'.\nsrc/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts(83,122): error TS2551: Property 'subjectKind' does not exist on type '{ product: string; version: number; id: string; createdAt: Date; subjectId: string; issuerId: string; parentGrantId: string | null; scopeKind: string; scopeId: string; resourceKind: string; ... 9 more ...; revokeReason: string | null; }'. Did you mean 'subjectId'?\nsrc/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts(85,15): error TS2339: Property 'sourceHash' does not exist on type '{ product: string; version: number; id: string; createdAt: Date; subjectId: string; issuerId: string; parentGrantId: string | null; scopeKind: string; scopeId: string; resourceKind: string; ... 9 more ...; revokeReason: string | null; }'.\nsrc/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts(95,137): error TS2339: Property 'surveyToolGrant' does not exist on type 'TransactionClient'.\nsrc/modules/organization/access.ts(222,14): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(225,79): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(236,14): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(239,77): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(263,14): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(266,77): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(268,13): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(281,16): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/organization/access.ts(284,79): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/survey/admin-role.ts(21,10): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/survey/admin-role.ts(21,48): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nsrc/modules/survey/admin-role.ts(21,71): error TS7006: Parameter 'g' implicitly has an 'any' type.\nsrc/services/assetStorage.ts(700,46): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.\nnpm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n"
+    },
+    {
+      "name": "exact-inventory-types-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/exact-authorization-inventory-types-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:06:33.660996+00:00",
+        "finishedAt": "2026-10-29T20:07:05.136189+00:00",
+        "exitCode": 0
+      },
+      "log": "npm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n"
+    },
+    {
+      "name": "exact-inventory-types-final",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/exact-authorization-inventory-types-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:09:02.236356+00:00",
+        "finishedAt": "2026-10-29T20:09:25.578357+00:00",
+        "exitCode": 0
+      },
+      "log": "npm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n"
+    }
+  ]
+}

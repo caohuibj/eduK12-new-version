@@ -147,7 +147,7 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
    }
   }
   manifest.push({blockId:block.blockId,instruction:block.instruction,kind:leaf.kind,versionId:leaf.version.id,
-   contentHash:leaf.version.contentHash,toolId:leaf.version.toolId,itemIds,sectionIds,sourceProvider:leaf.provider,
+   contentHash:leaf.version.contentHash,toolId:leaf.version.toolId,itemIds,sectionIds,sourceProvider:leaf.provider,...(leaf.provider==='COGNITIVE_CONFIG'&&leaf.native.descriptor.artifactHash?{profileArtifactHash:leaf.native.descriptor.artifactHash}:{}),
    ...(leaf.provider==='LIBRARY_SCALE'&&leaf.library.row.snapshot.instruction?{sourceInstruction:leaf.library.row.snapshot.instruction}:{}),
    ...(leaf.provider==='PUBLIC_FORM'&&leaf.sourceInstruction?{sourceInstruction:leaf.sourceInstruction}:{})})
  }

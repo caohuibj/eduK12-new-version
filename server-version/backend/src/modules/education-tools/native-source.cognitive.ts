@@ -1,3 +1,7 @@
+import {readApprovedCognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-approved-source'
+import {cognitiveProfileAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
+import {cognitiveProfileAssignmentMeasurement} from '../assessment-authorization/cognitive-profile-source'
+import type {CognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-artifact'
 import {Prisma,type CognitiveTestConfig} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {requireCognitiveRegistryEntry} from '../cognitive/cognitive.registry'
@@ -12,8 +16,8 @@ import {readVerifiedCompositionAttempt,type VerifiedEducationAttempt} from '../a
 
 type Input=z.infer<typeof educationCognitiveSourceSchema>
 export type EducationCognitiveLeaf={config:CognitiveTestConfig;measurement:Extract<StoredRelease,{layer:'MEASUREMENT'}>;
- freeze:ReturnType<typeof freezeAssignmentProfile>;descriptor:Extract<z.infer<typeof educationNativeDescriptorSchema>,{provider:'COGNITIVE_CONFIG'}>}
-export const educationCognitiveLeafKey=(source:{versionId:string;profile:string})=>source.versionId+':'+source.profile
+ artifact?:CognitiveProfileArtifact;freeze:ReturnType<typeof freezeAssignmentProfile>;descriptor:Extract<z.infer<typeof educationNativeDescriptorSchema>,{provider:'COGNITIVE_CONFIG'}>}
+export const educationCognitiveLeafKey=(source:{versionId:string;profile:string})=>source.versionId+':'+source.profile+('artifactHash'in source&&source.artifactHash?':'+source.artifactHash:'')
 export async function assertEducationCognitiveOriginalUse(tx:Prisma.TransactionClient,c:PrivateToolContext,ids:readonly string[],lock=false){
  const exact=[...new Set(ids)];if(!exact.length)return
  const configs=await tx.$queryRaw<Array<{id:string;accessPolicy:string}>>(Prisma.sql`SELECT id,access_policy::text AS "accessPolicy" FROM cognitive_test_configs WHERE id=ANY(${exact}::text[]) ORDER BY id ${lock?Prisma.sql`FOR SHARE`:Prisma.empty}`)
@@ -41,6 +45,15 @@ export async function readEducationCognitiveSources(tx:Prisma.TransactionClient,
   const config=rows.find(row=>row.id===source.versionId),measurement=config?.measurementReleaseId?releases.get(config.measurementReleaseId):null
   if(!config||config.status!=='PUBLISHED'||!measurement||measurement.layer!=='MEASUREMENT'||measurement.family!=='COGNITIVE'
    ||measurement.status!=='PUBLISHED'||measurement.scope.kind!=='PLATFORM'||measurement.contentHash!==source.contentHash)privateToolFail('EDUCATION_COGNITIVE_SOURCE_UNAVAILABLE',404)
+  if(source.artifactHash){
+   const {artifact}=await readApprovedCognitiveProfileArtifact(tx,config.id,source.profile,source.artifactHash,c.entry)
+   if(artifact.identity.measurement.contentHash!==source.contentHash||canonicalHash(artifact.identity)!==source.selectedBinding!.configurationHash)privateToolFail('EDUCATION_COGNITIVE_PROFILE_IDENTITY',409)
+   const freeze={...cognitiveProfileAssignmentFreeze(artifact),resolvedConfig:artifact.resolvedConfig}
+   const descriptor=educationNativeDescriptorSchema.parse({provider:'COGNITIVE_CONFIG',sourceId:config.id,contentHash:source.contentHash,sourceMeasurementReleaseId:measurement.releaseId,
+    profile:artifact.identity.profile,profileDefinitionVersion:artifact.identity.profileDefinitionVersion,resolvedConfigHash:artifact.identity.resolvedConfigHash,reportHash:artifact.identity.reportHash,artifactHash:source.artifactHash,selectedBinding:source.selectedBinding})
+   if(descriptor.provider!=='COGNITIVE_CONFIG')privateToolFail('EDUCATION_COGNITIVE_PROFILE_IDENTITY',409)
+   result.set(key,{config,measurement,artifact,freeze,descriptor});continue
+  }
   if(config.accessPolicy==='GRANT'&&!grants.some(grant=>grant.resource_id===config.id))privateToolFail('EDUCATION_COGNITIVE_ORIGINAL_AUTHORITY_REQUIRED',403)
   const entry=requireCognitiveRegistryEntry(config.testType,config.engineVersion,config.scoringVersion)
   const original=prepareRelease(cognitiveMeasurementRelease({localId:config.testType,version:measurement.version,testType:config.testType,
@@ -62,8 +75,8 @@ export async function readEducationCognitiveSources(tx:Prisma.TransactionClient,
 export async function materializeEducationCognitive(tx:Prisma.TransactionClient,c:PrivateToolContext,leaf:EducationCognitiveLeaf){
  const assignment=await tx.cognitiveAssignment.create({data:{configId:leaf.config.id,createdBy:c.principal.userId,title:leaf.config.name,
   instruction:leaf.config.instruction,status:'PUBLISHED',publishedAt:new Date(),listedStandalone:false,required:true,maxAttempts:1,
-  ...freezeDataForWrite(leaf.freeze)}})
- const input=cognitiveMeasurementRelease({localId:leaf.config.testType,version:'education-profile-v1:'+leaf.freeze.resolvedConfigHash,
+  ...freezeDataForWrite(leaf.freeze),...(leaf.artifact?{courseSnapshot:{selectedEducationCognitiveProfile:{schemaVersion:1,product:c.entry,organizationId:c.organizationId,configId:leaf.config.id,artifactHash:leaf.descriptor.artifactHash,selectedBinding:leaf.descriptor.selectedBinding}}}:{})}})
+ const input=leaf.artifact?await cognitiveProfileAssignmentMeasurement(tx,leaf.artifact,c.principal.userId,assignment.id,c.entry):cognitiveMeasurementRelease({localId:leaf.config.testType,version:'education-profile-v1:'+leaf.freeze.resolvedConfigHash,
   testType:leaf.config.testType,configVersion:leaf.config.configVersion,engineVersion:leaf.config.engineVersion,scoringVersion:leaf.config.scoringVersion,
   config:leaf.freeze.resolvedConfig,scope:{kind:'PRIVATE',product:c.entry,ownerId:c.principal.userId,resourceId:assignment.id}})
  input.provenance={educationNative:leaf.descriptor,configId:leaf.config.id,assignmentId:assignment.id}

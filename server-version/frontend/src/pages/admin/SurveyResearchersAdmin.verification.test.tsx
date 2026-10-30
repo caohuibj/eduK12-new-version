@@ -1,6 +1,6 @@
 import {act,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
-import SurveyResearchersAdmin from './SurveyResearchersAdmin'
+import {SurveyResearchersWorkspace as SurveyResearchersAdmin} from './SurveyResearchersAdmin'
 const {reauth}=vi.hoisted(()=>({reauth:vi.fn()}))
 vi.mock('../../admin/securityKey',()=>({reauthenticateAdmin:reauth}))
 const root='/api/platform/survey'

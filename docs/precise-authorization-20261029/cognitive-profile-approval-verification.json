@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "base": "a84e6d2a7",
+  "main": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+  "recordedAt": "2026-10-30T00:26:03.347251+00:00",
+  "scope": "System-only exact native profile/M/artifact approval with four explicit entry scopes, not recipient usage",
+  "results": {
+    "finalHttpPostgresCasesPassed": 3,
+    "finalRecordedHttpRequests": 17,
+    "priorRecordedHttpRequests": 7,
+    "initialSetupAssertionsExecuted": 0,
+    "initialSetupPendingCases": 3,
+    "secondRunCasesFailed": 3,
+    "secondRunFirstFailure": "Auth rejection lacked no-store; two dependent cases refused to mutate",
+    "finalTypesExit": 0,
+    "migrationCount": 257,
+    "actualRestrictedRuntimeRole": true,
+    "profilePoliciesInitiallyApproved": 8,
+    "experienceFinalTrainingApprovedOtherThreeReturned": true,
+    "researchFinalFourApproved": true,
+    "approvalAuditRowsFinal": 3,
+    "oldRequestReplaysWithoutReapproval": true,
+    "originalUsers": 6,
+    "originalMaterialGrants": 4,
+    "originalTasks": 13,
+    "originalProfilesStored": 2,
+    "newUserUseGrants": 0,
+    "productionAccessed": false
+  },
+  "sourceFilesSha256": {
+    "server-version/backend/prisma/migrations/20261030002000_cognitive_profile_entry_admission/migration.sql": "259c5da73c2e52c64c7ea16c486a7d348e21fecb996d5aa22f94c44e23e04c98",
+    "server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts": "a207fc82815932ba817c6c4fd4a8b6e91a68b334531c72fd8b2d70e1e7376b22",
+    "server-version/backend/src/modules/assessment-authorization/cognitive-profile-source.ts": "7e03522a6e39871139f6889275bb78828472c204b54ce3d92ad14d56f8a8f5ac",
+    "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approval.ts": "53ddba391580cee1a4d63cb1c61b5669751c4f98f938e6fecdd23a17cb5c19f6",
+    "server-version/backend/src/modules/cognitive/profile-configurations.routes.ts": "ada6062499438969fd0006e2a4c7a0d55830460dd6dac7501c1b0f7e8f21eb39",
+    "server-version/backend/src/modules/cognitive/cognitive.routes.ts": "994f2570d355c9c6cf823afc7244d6bcd5f82cd39d88b60ba9925cce25261274",
+    "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts": "0d86bea8b84e41078b705fc055b5f73140ed347737c51f4fe2af1de64caf3577"
+  },
+  "raw": {
+    "file": "cognitive-profile-approval-raw.json",
+    "sha256": "5da1724e1a691ace8699d4eaa0935eaf061954864093b09f10f73995f24efd1d"
+  },
+  "evidenceLimit": "Synthetic users and real JWT/auth/CSRF/step-up checks with synthetic recent-MFA proof. Not browser/MFA registration, recipient grant or task freeze qualification. Original first JSON reporter omitted the hook error; read-only schema inspection identified fixture ORDER BY id on an id-less policy table. Failure not rewritten as a case result.",
+  "notExecuted": [
+    "Training/Survey/School/Teacher recipient profile grants and UIs",
+    "Selected-profile draft/publish/START/seed/resume/FINAL/report chains",
+    "Formal CI/PR/merge/deploy"
+  ]
+}

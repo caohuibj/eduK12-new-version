@@ -1,0 +1,464 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "name": "merged-main-education-saved-read",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_EDUCATION_SELECTED_LIFECYCLE_READBACK=1",
+          "python3",
+          "/workspace/materials-load-20261029/run-education-lifecycle.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/merged-main-education-saved-read.json"
+        ],
+        "startedAt": "2026-10-29T23:14:29.993577+00:00",
+        "finishedAt": "2026-10-29T23:15:30.367703+00:00",
+        "exitCode": 1
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/merged-main-education-saved-read.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 1,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793315671245,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "retained education exact-use completion and original report audience"
+                ],
+                "fullName": "retained education exact-use completion and original report audience SCHOOL retains the completed source and report audience after use withdrawal",
+                "status": "failed",
+                "title": "SCHOOL retains the completed source and report audience after use withdrawal",
+                "duration": 30092.398817,
+                "failureMessages": [
+                  "Error: STACK_TRACE_ERROR\n    at task (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at Object.chain (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:7\n    at Array.forEach (<anonymous>)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2021:10\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts:16:39\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "retained education exact-use completion and original report audience"
+                ],
+                "fullName": "retained education exact-use completion and original report audience TEACHER retains the completed source and report audience after use withdrawal",
+                "status": "passed",
+                "title": "TEACHER retains the completed source and report audience after use withdrawal",
+                "duration": 9968.864082,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793315690065,
+            "endTime": 1793315730126.864,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "merged-main-school-saved-read",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_EDUCATION_SELECTED_LIFECYCLE_READBACK=1",
+          "PRECISE_MAIN_READBACK_PHASES=/workspace/materials-load-20261029/evidence/merged-main-school-saved-read-phases.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-education-lifecycle.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts",
+          "-t",
+          "SCHOOL retains",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/merged-main-school-saved-read.json"
+        ],
+        "startedAt": "2026-10-29T23:16:56.148312+00:00",
+        "finishedAt": "2026-10-29T23:17:04.492378+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/merged-main-school-saved-read.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 1,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793315816735,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "retained education exact-use completion and original report audience"
+                ],
+                "fullName": "retained education exact-use completion and original report audience SCHOOL retains the completed source and report audience after use withdrawal",
+                "status": "passed",
+                "title": "SCHOOL retains the completed source and report audience after use withdrawal",
+                "duration": 175.761751,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "retained education exact-use completion and original report audience"
+                ],
+                "fullName": "retained education exact-use completion and original report audience TEACHER retains the completed source and report audience after use withdrawal",
+                "status": "skipped",
+                "title": "TEACHER retains the completed source and report audience after use withdrawal",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793315824146,
+            "endTime": 1793315824321.7617,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "merged-main-training-saved-read",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_MAIN_SAVED_ENTRY=TRAINING",
+          "PRECISE_MAIN_SAVED_EVIDENCE=/workspace/materials-load-20261029/evidence/merged-main-training-saved-observations.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/merged-main-training-saved-read.json"
+        ],
+        "startedAt": "2026-10-29T23:20:07.877902+00:00",
+        "finishedAt": "2026-10-29T23:20:29.240314+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/merged-main-training-saved-read.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793316008788,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "saved exact TRAINING result after current main native integration"
+                ],
+                "fullName": "saved exact TRAINING result after current main native integration reads the original completed result while preserving frozen selection and ordinary grant lifecycle",
+                "status": "passed",
+                "title": "reads the original completed result while preserving frozen selection and ordinary grant lifecycle",
+                "duration": 271.01553499999864,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793316028791,
+            "endTime": 1793316029062.0156,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "merged-main-survey-saved-read",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_MAIN_SAVED_ENTRY=SURVEY",
+          "PRECISE_MAIN_SAVED_EVIDENCE=/workspace/materials-load-20261029/evidence/merged-main-survey-saved-observations.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-journey.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/merged-main-survey-saved-read.json"
+        ],
+        "startedAt": "2026-10-29T23:22:33.904720+00:00",
+        "finishedAt": "2026-10-29T23:22:43.279076+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/merged-main-survey-saved-read.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793316154303,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "saved exact SURVEY result after current main native integration"
+                ],
+                "fullName": "saved exact SURVEY result after current main native integration reads the original completed result while preserving frozen selection and ordinary grant lifecycle",
+                "status": "passed",
+                "title": "reads the original completed result while preserving frozen selection and ordinary grant lifecycle",
+                "duration": 106.86150700000144,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793316162946,
+            "endTime": 1793316163052.8616,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "merged-main-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/merged-main-types.json"
+        ],
+        "startedAt": "2026-10-29T23:20:08.018586+00:00",
+        "finishedAt": "2026-10-29T23:20:43.008298+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "name": "merged-main-frontend-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "startedAt": "2026-10-29T23:20:07.884793+00:00",
+        "finishedAt": "2026-10-29T23:21:24.323880+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "name": "schema-equivalence-format-source",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/prisma/build/index.js",
+          "format",
+          "--schema",
+          "/workspace/materials-load-20261029/schema-equivalence/source.prisma"
+        ],
+        "startedAt": "2026-10-29T23:24:24.450824+00:00",
+        "finishedAt": "2026-10-29T23:24:25.257397+00:00",
+        "exitCode": 0
+      },
+      "log": "Prisma schema loaded from ../../../materials-load-20261029/schema-equivalence/source.prisma\nFormatted ../../../materials-load-20261029/schema-equivalence/source.prisma in 191ms 🚀\n"
+    },
+    {
+      "name": "schema-equivalence-format-generated",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/prisma/build/index.js",
+          "format",
+          "--schema",
+          "/workspace/materials-load-20261029/schema-equivalence/generated.prisma"
+        ],
+        "startedAt": "2026-10-29T23:24:32.615918+00:00",
+        "finishedAt": "2026-10-29T23:24:33.464553+00:00",
+        "exitCode": 0
+      },
+      "log": "Prisma schema loaded from ../../../materials-load-20261029/schema-equivalence/generated.prisma\nFormatted ../../../materials-load-20261029/schema-equivalence/generated.prisma in 224ms 🚀\n"
+    }
+  ],
+  "observations": {
+    "merged-main-school-saved-read-phases": {
+      "phases": [
+        {
+          "phase": "saved-reader-module-initialization",
+          "milliseconds": 6815.644166
+        },
+        {
+          "phase": "SCHOOL-saved-source-and-feedback",
+          "milliseconds": 174.07854099999986
+        }
+      ]
+    },
+    "merged-main-training-saved-observations": {
+      "entry": "TRAINING",
+      "productionAccessed": false,
+      "scope": "Saved result HTTP only after main integration; no START/FINAL/regrant/browser or content-computation replay.",
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/composite-assessments/d82f9039-74c2-48c1-b812-1f702b3abf52/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1/report",
+          "status": 200
+        }
+      ],
+      "observations": [
+        {
+          "historicalFrozenRevision": 7,
+          "currentUseRevision": 9,
+          "fullReportReadable": true,
+          "originalAttemptAndGrantUnchanged": true,
+          "restrictedRuntimeRole": true
+        }
+      ]
+    },
+    "merged-main-survey-saved-observations": {
+      "entry": "SURVEY",
+      "productionAccessed": false,
+      "scope": "Saved result HTTP only after main integration; no START/FINAL/regrant/browser or content-computation replay.",
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/public/survey/r/2802ef0f-f521-4f42-b680-d0ba6453cc1d/attempts/a94e02d6-5559-4fc1-9f5d-066f030f2005/general",
+          "status": 200
+        }
+      ],
+      "observations": [
+        {
+          "originalUseStillRevoked": true,
+          "generalOnlyAsFrozen": true,
+          "noNativeBundleUpgrade": true,
+          "originalPublicationAttemptAndT1Unchanged": true,
+          "ownerRole": true
+        }
+      ]
+    },
+    "main-candidate-generated-schema-equivalence": {
+      "method": "Unchanged locked Prisma CLI format on isolated file copies; no generation/DB connection",
+      "sameMainAndCandidateSourceSchema": true,
+      "mainSourceSha256": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f",
+      "candidateSourceSha256": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f",
+      "generatedRawSha256": "4874acdaa28e4f1977c29d86613119015b376499543eb8e2941b106eb3b26906",
+      "formattedSourceSha256": "4874acdaa28e4f1977c29d86613119015b376499543eb8e2941b106eb3b26906",
+      "formattedGeneratedSha256": "4874acdaa28e4f1977c29d86613119015b376499543eb8e2941b106eb3b26906",
+      "formattedIdentical": true,
+      "note": "Direct @prisma/internals was unavailable; no package installed. Schema copies only were formatted."
+    }
+  },
+  "readbackAfterInitialTimeout": {
+    "source": "read-only psql, no other active DB sessions observed",
+    "database": "precise_education_lifecycle_test_20261029",
+    "parentAttempts": 2,
+    "privateVersions": 4,
+    "unitSnapshots": 4
+  }
+}

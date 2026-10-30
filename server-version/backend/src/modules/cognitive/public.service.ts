@@ -21,6 +21,18 @@ import * as finalSubmitService from './final-submit.service'
 import { lockSession } from './session-lock'
 import { BAD_REQUEST, CONFLICT, FORBIDDEN, NOT_FOUND } from './cognitive.errors'
 import { isCompositeWrapper } from './assignment.access'
+import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
+import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
+import type {Prisma} from '@prisma/client'
+
+async function frozenProfileForNewPublicStart(tx:Prisma.TransactionClient,assignment:any){
+ const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
+ if(!pin)return undefined
+ if(!assignment.createdBy)throw FORBIDDEN('原固定配置接收者已不可用')
+ const value=await loadPinnedTrainingCognitiveProfile(tx,pin,{userId:assignment.createdBy,configId:assignment.configId},true)
+ assertCognitiveAssignmentFreeze(assignment,value.artifact)
+ return value.artifact
+}
 
 const assertWindow = (token: { isActive: boolean; expiresAt: Date; maxUses: number; usedCount: number }) => {
   if (!token.isActive) throw FORBIDDEN('Public link is disabled')
@@ -157,6 +169,7 @@ export const startPublicSession = async (
         if (existing) return { session: existing, replayed: true }
       }
 
+      const frozenProfile=await frozenProfileForNewPublicStart(tx,token.assignment)
       const claimed = await tx.cognitiveAccessToken.updateMany({
         where: {
           id: token.id,
@@ -175,6 +188,7 @@ export const startPublicSession = async (
         engineVersion: config.engineVersion,
         scoringVersion: config.scoringVersion,
         config: parsedConfig,
+        ...(frozenProfile?{frozenProfile}:{}),
       })
       const created = await tx.cognitiveSession.create({
         data: {
@@ -295,6 +309,7 @@ export const restartPublicSession = async (sessionId: string, recoveryToken: str
     const locked = await lockSession(tx, sessionId)
     if (!locked) throw NOT_FOUND('CognitiveSession not found')
     if (locked.status !== 'IN_PROGRESS') throw CONFLICT('Session is no longer IN_PROGRESS')
+    const frozenProfile=await frozenProfileForNewPublicStart(tx,current.assignment)
 
     const retiredAt = new Date()
     const retired = await tx.cognitiveSession.updateMany({
@@ -310,6 +325,7 @@ export const restartPublicSession = async (sessionId: string, recoveryToken: str
       engineVersion: validated.config.engineVersion,
       scoringVersion: validated.config.scoringVersion,
       config: validated.parsedConfig,
+      ...(frozenProfile?{frozenProfile}:{}),
     })
 
     return tx.cognitiveSession.create({

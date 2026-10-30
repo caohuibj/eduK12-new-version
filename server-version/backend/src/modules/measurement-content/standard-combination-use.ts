@@ -9,11 +9,18 @@ import {readCurrentStandardCombination} from './standard-combination-source'
 import {standardCombinationPointerSchema} from './standard-combination'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {canonicalHash} from '../assessment-runtime/canonical'
+import {selectedConfigurationBindingSchema} from '../assessment-authorization/selected-configuration'
+import {sealTrainingStandardUseConfiguration,readTrainingStandardUseConfigurationReceipt,trainingStandardUseFromEvidence,selectedConfigurationPointer,selectedConfigurationPointerSchema,type TrainingStandardUseEvidence} from '../assessment-authorization/standard-configuration-binding'
 export {standardCombinationPointerSchema} from './standard-combination'
 
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
+const replacementSchema=z.object({grantId:uuid,expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(500)}).strict()
+const supersedesSchema=z.object({selectedBinding:selectedConfigurationPointerSchema,reason:replacementSchema.shape.reason}).strict()
+export function trainingReplacementIntent(supersedes:z.infer<typeof supersedesSchema>|undefined){
+ return supersedes?{grantId:supersedes.selectedBinding.authorizationId,expectedVersion:supersedes.selectedBinding.authorizationRevision,reason:supersedes.reason}:undefined
+}
 const issueSchema=z.object({requestId:uuid,userId:uuid,combinationHash:hash,grantId:uuid.optional(),
- expectedGrantVersion:z.number().int().positive().optional(),expectedUseVersion:z.number().int().positive().optional()}).strict()
+ expectedGrantVersion:z.number().int().positive().optional(),expectedUseVersion:z.number().int().positive().optional(),expectedUseId:uuid.optional(),configurationName:z.string().trim().min(1).max(120).optional(),replaces:replacementSchema.optional()}).strict()
 const revokeSchema=z.object({expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(1000)}).strict()
 const positive=z.number().int().positive()
 const useAuthority={useGrantId:uuid,useGrantVersion:positive,issuerId:z.string().min(1).max(240)}
@@ -22,8 +29,10 @@ export const trainingStandardUseAuthoritySchema=z.union([
  z.object({...useAuthority,authorityGrantId:uuid}).strict(),
  z.object({...useAuthority,authorityEntryGrantId:uuid,authorityEntryGrantVersion:positive}).strict(),
 ])
-const receipt={grantId:uuid,userId:uuid,combinationHash:hash,useVersion:positive,product:z.literal('TRAINING')}
-const receiptSchema=z.union([
+const requestIntentSchema=issueSchema.omit({requestId:true}).extend({actorId:uuid,combinationId:uuid,grantId:uuid.nullable(),expectedGrantVersion:positive.nullable(),expectedUseVersion:positive.nullable()}).strict()
+const receipt={grantId:uuid,userId:uuid,combinationHash:hash,useVersion:positive,product:z.literal('TRAINING'),selectedBinding:selectedConfigurationBindingSchema.optional(),requestIntentHash:hash.optional(),
+ configurationName:issueSchema.shape.configurationName,requestIntent:requestIntentSchema.optional(),selfGrant:z.boolean().optional(),supersedes:supersedesSchema.optional()}
+export const trainingStandardIssueReceiptSchema=z.union([
  z.object({...receipt,authorityGrantId:uuid}).strict(),
  z.object({...receipt,authorityEntryGrantId:uuid,authorityEntryGrantVersion:positive}).strict(),
 ])
@@ -77,6 +86,10 @@ export async function assertTrainingStandardUse(tx:Prisma.TransactionClient,inpu
 
 export async function grantTrainingStandardCombinationUse(actorId:string,combinationId:string,raw:unknown){
  const id=uuid.parse(combinationId),input=issueSchema.parse(raw)
+ const requestIntent={actorId,combinationId:id,userId:input.userId,combinationHash:input.combinationHash,
+  grantId:input.grantId??null,expectedGrantVersion:input.expectedGrantVersion??null,expectedUseVersion:input.expectedUseVersion??null,
+  ...(input.configurationName!==undefined?{configurationName:input.configurationName}:{}),...(input.expectedUseId!==undefined?{expectedUseId:input.expectedUseId}:{}),...(input.replaces?{replaces:input.replaces}:{})}
+ const requestIntentHash=canonicalHash(requestIntent)
  return prisma.$transaction(async tx=>{
   const [header]=await tx.$queryRaw<Array<{tool_key:string;instrument_version:string;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
    SELECT tool_key,snapshot->>'instrumentVersion' AS instrument_version,measurement_release FROM survey_standard_releases WHERE id=${id}`)
@@ -95,16 +108,37 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   // One operation receipt and one versioned use, independent of course. Retrying
   // a previously successful request never reactivates a subsequently revoked use.
   await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'standard-use-request:'+input.requestId}))`)
+  await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'standard-use-tool:'+source.row.tool_key+':'+input.userId}))`)
   await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'standard-use:'+id+':'+input.userId}))`)
   const prior=await tx.materialGrant.findUnique({where:{teacherId_resourceType_resourceId:{teacherId:input.userId,resourceType:MaterialResourceType.STANDARD_COMBINATION,resourceId:id}}})
+  if(input.expectedUseId!==undefined&&prior?.id!==input.expectedUseId)throw new AdminPermissionError(409,'原使用权身份已变化，请回读原授权后再操作')
   const recorded=await tx.assessmentManagementEvent.findUnique({where:{id:input.requestId}})
   if(recorded){
-   const receipt=receiptSchema.safeParse(recorded.metadata)
+   const receipt=trainingStandardIssueReceiptSchema.safeParse(recorded.metadata)
    if(recorded.actorId!==actorId||recorded.resourceId!==id||recorded.action!=='STANDARD_COMBINATION_USE_GRANTED'||!receipt.success
     ||receipt.data.userId!==input.userId||receipt.data.combinationHash!==input.combinationHash||canonicalHash(binding(receipt.data))!==canonicalHash(selected)
-    ||prior?.id!==receipt.data.grantId)deny('请求编号已用于其他授权')
+    ||prior?.id!==receipt.data.grantId||receipt.data.requestIntentHash!==undefined&&receipt.data.requestIntentHash!==requestIntentHash
+    ||input.configurationName!==undefined&&receipt.data.configurationName!==input.configurationName
+    ||receipt.data.requestIntent!==undefined&&canonicalHash(receipt.data.requestIntent)!==requestIntentHash
+    ||canonicalHash(input.replaces??null)!==canonicalHash(trainingReplacementIntent(receipt.data.supersedes)??null))deny('请求编号已用于其他授权')
    return {id:prior.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
-    version:receipt.data.useVersion,currentVersion:prior.version,revoked:prior.revokedAt!==null,changed:false,replayed:true}
+    version:receipt.data.useVersion,currentVersion:prior.version,revoked:prior.revokedAt!==null,changed:false,replayed:true,...(receipt.data.supersedes?{supersedes:receipt.data.supersedes}:{})}
+  }
+  let predecessor:UseRow|undefined,supersedes:z.infer<typeof supersedesSchema>|undefined
+  if(input.replaces){
+   if(input.replaces.grantId===input.requestId)throw new AdminPermissionError(409,'新请求不能替换自身授权编号')
+   ;[predecessor]=await tx.$queryRaw<UseRow[]>(Prisma.sql`SELECT id,teacher_id,resource_id,granted_by,standard_combination_hash,authority_grant_id,authority_entry_grant_id,authority_entry_grant_version,version,revoked_at
+    FROM material_grants WHERE id=${input.replaces.grantId} AND resource_type='STANDARD_COMBINATION' FOR UPDATE`)
+   if(!predecessor||predecessor.teacher_id!==input.userId||predecessor.granted_by!==actorId||predecessor.resource_id===id)
+    throw new AdminPermissionError(409,'替换须选择本人为同一培训师发行的另一份原精确组合；同组合改名请明确撤销后再发行')
+   if(predecessor.revoked_at||predecessor.version!==input.replaces.expectedVersion)throw new AdminPermissionError(409,'原配置授权修订已变化，请回读后明确替换')
+   if(prior&&!prior.revokedAt)throw new AdminPermissionError(409,'目标配置已有生效使用权，请先明确处理该修订，不可覆盖')
+   const oldSource=await readCurrentStandardCombination(tx,{releaseId:predecessor.resource_id,combinationHash:predecessor.standard_combination_hash},'HISTORY')
+   if(oldSource.row.tool_key!==source.row.tool_key)throw new AdminPermissionError(409,'替换必须保留同一工具')
+   const original=await readTrainingStandardUseConfigurationReceipt(tx,oldSource,input.userId,{useGrantId:predecessor.id,useGrantVersion:predecessor.version,
+    issuerId:actorId,...rowBinding(predecessor)})
+   if(!original)throw new AdminPermissionError(409,'原授权缺少可信精确身份，不能自动升级 legacy')
+   supersedes={selectedBinding:selectedConfigurationPointer(original.selectedBinding),reason:input.replaces.reason}
   }
   const request=await tx.materialGrant.findUnique({where:{id:input.requestId}})
   if(request&&request.id!==prior?.id)deny('请求编号已用于其他授权')
@@ -118,12 +152,30 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
    data:{revokedAt:null,version:{increment:1},grantedBy:actorId,...columns(selected)}}):prior
    :await tx.materialGrant.create({data:{id:input.requestId,teacherId:input.userId,resourceType:MaterialResourceType.STANDARD_COMBINATION,
     resourceId:id,grantedBy:actorId,...columns(selected),standardCombinationHash:input.combinationHash}})
+  const exactUse={useGrantId:use.id,useGrantVersion:use.version,issuerId:actorId,...selected}
+  // An active legacy revision must not acquire new fields under an old draft.
+  // Its explicit revoke/reissue creates a new revision eligible for T1 sealing.
+  const existing=prior&&!prior.revokedAt?await readTrainingStandardUseConfigurationReceipt(tx,source,input.userId,exactUse):null
+  if(prior&&!prior.revokedAt&&input.configurationName!==undefined&&(!existing||existing.configurationName!==input.configurationName))
+   throw new AdminPermissionError(409,'当前授权修订不能改名或升级；请先明确撤销，再按新修订分配')
+  const selectedBinding=!prior||prior.revokedAt?sealTrainingStandardUseConfiguration(source,input.userId,exactUse,authority.version):existing?.selectedBinding??null
+  if(predecessor&&!selectedBinding)throw new AdminPermissionError(409,'新使用配置缺少完整精确绑定，本次替换未保存')
+  const configurationName=!prior||prior.revokedAt?input.configurationName:existing?.configurationName??undefined
   await tx.assessmentManagementEvent.create({data:{id:input.requestId,actorId,resourceId:id,action:'STANDARD_COMBINATION_USE_GRANTED',
-   metadata:{grantId:use.id,userId:input.userId,combinationHash:input.combinationHash,...selected,useVersion:use.version,product:'TRAINING'}}})
+   metadata:{grantId:use.id,userId:input.userId,combinationHash:input.combinationHash,...selected,useVersion:use.version,product:'TRAINING',requestIntentHash,requestIntent,selfGrant:actorId===input.userId,
+    ...(configurationName?{configurationName}:{}),...(selectedBinding?{selectedBinding}:{}),...(supersedes?{supersedes}:{})}}})
   await assertTrainingStandardUse(tx,{userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
    measurementReleaseId:source.measurement.releaseId,useGrantId:use.id,useGrantVersion:use.version})
+  if(predecessor&&supersedes&&selectedBinding){
+   const changed=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`UPDATE material_grants SET revoked_at=clock_timestamp() AT TIME ZONE 'UTC',version=version+1
+    WHERE id=${predecessor.id} AND version=${predecessor.version} AND revoked_at IS NULL RETURNING id`)
+   if(changed.length!==1)throw new AdminPermissionError(409,'原配置授权已变化，本次替换未保存')
+   await tx.assessmentManagementEvent.create({data:{actorId,resourceId:id,action:'STANDARD_COMBINATION_USE_REPLACED',metadata:{
+    previous:supersedes.selectedBinding,next:selectedConfigurationPointer(selectedBinding),reason:supersedes.reason,
+    policy:'STOP_NEW_ADMISSION_KEEP_EXISTING_ATTEMPTS_AND_HISTORY'}}})
+  }
   return {id:use.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},version:use.version,
-   currentVersion:use.version,revoked:false,changed:!prior||prior.revokedAt!==null,replayed:false}
+   currentVersion:use.version,revoked:false,changed:!prior||prior.revokedAt!==null,replayed:false,...(supersedes?{supersedes}:{})}
  },options)
 }
 
@@ -162,38 +214,86 @@ export async function revokeTrainingStandardCombinationUse(actorId:string,useId:
  },options)
 }
 
-/** Training's owned-source picker only, not a public/bulk catalog read model.
- * Returns at most 100 currently usable choices, not the first 100 raw grants.
- * Keyset batches keep memory bounded; the existing transaction timeout bounds work.
- * Metadata is a hint; add/publish repeat exact source and current rights checks. */
-export async function listTrainingStandardCombinationChoices(userId:string){
- return prisma.$transaction(async tx=>{
-  await assertTrainingStandardRecipient(tx,userId)
-  const choices=[]
-  let cursor:{toolKey:string;releaseId:string;useId:string}|undefined
-  const pageSize=100
-  while(choices.length<pageSize){
-  const rows=await tx.$queryRaw<Array<{id:string;combination_hash:string;title:string;tool_key:string;instrument_version:string;content_version:string;parameters_version:string;report_version:string;scale_id:string;measurement_release:{releaseId:string};use_id:string;use_version:number}>>(Prisma.sql`
-   SELECT r.id,r.combination_hash,r.snapshot->>'title' AS title,r.tool_key,r.snapshot->>'instrumentVersion' AS instrument_version,
+type ChoiceRow={id:string;combination_hash:string;title:string;tool_key:string;instrument_version:string;content_version:string;parameters_version:string;report_version:string;
+ content_hash:string;parameters_hash:string;report_hash:string;scale_id:string;measurement_release:{releaseId:string;contentHash:string};use_id:string;use_version:number;evidence:TrainingStandardUseEvidence[]}
+const choicePageQuery=z.object({afterToolKey:z.string().min(1).max(300).optional(),afterReleaseId:uuid.optional(),afterUseId:uuid.optional()}).strict().superRefine((v,ctx)=>{
+ if([v.afterToolKey,v.afterReleaseId,v.afterUseId].filter(x=>x!==undefined).length%3)ctx.addIssue({code:'custom',message:'配置分页游标不完整'})
+})
+function choiceRowsQuery(userId:string,filter:Prisma.Sql){return Prisma.sql`   SELECT r.id,r.combination_hash,r.snapshot->>'title' AS title,r.tool_key,r.snapshot->>'instrumentVersion' AS instrument_version,
     r.snapshot#>>'{parts,CONTENT,version}' AS content_version,r.snapshot#>>'{parts,PARAMETERS,version}' AS parameters_version,r.snapshot#>>'{parts,REPORT,version}' AS report_version,
-    s.id AS scale_id,r.measurement_release,g.id AS use_id,g.version AS use_version
+    r.snapshot#>>'{parts,CONTENT,hash}' AS content_hash,r.snapshot#>>'{parts,PARAMETERS,hash}' AS parameters_hash,r.snapshot#>>'{parts,REPORT,hash}' AS report_hash,
+    s.id AS scale_id,r.measurement_release,g.id AS use_id,g.version AS use_version,
+    COALESCE((SELECT jsonb_agg(a) FROM (SELECT DISTINCT e.actor_id,e.metadata->'selectedBinding' AS selected,e.metadata->>'configurationName' AS "configurationName"
+     FROM assessment_management_events e WHERE e.action='STANDARD_COMBINATION_USE_GRANTED' AND e.resource_id=r.id
+      AND e.metadata->>'grantId'=g.id AND e.metadata->>'useVersion'=g.version::text AND e.metadata?'selectedBinding' ORDER BY e.actor_id LIMIT 2) a),'[]'::jsonb) AS evidence
    FROM material_grants g JOIN survey_standard_releases r ON r.id=g.resource_id AND r.combination_hash=g.standard_combination_hash
+   JOIN measurement_content_releases m ON m.id=r.measurement_release->>'releaseId' AND m.content_hash=r.measurement_release->>'contentHash'
+    AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
    JOIN scales s ON s.code=r.tool_key AND s.instrument_version=r.snapshot->>'instrumentVersion'
    WHERE g.teacher_id=${userId} AND g.resource_type='STANDARD_COMBINATION' AND g.revoked_at IS NULL AND r.state='ONLINE'
     AND s.status='PUBLISHED' AND s.instrument_class='STANDARD' AND s.library_entry_id IS NULL
-    ${cursor?Prisma.sql`AND (r.tool_key,r.id,g.id)>(${cursor.toolKey},${cursor.releaseId},${cursor.useId})`:Prisma.empty}
-   ORDER BY r.tool_key,r.id,g.id LIMIT 100`)
-  for(const row of rows){
-   try{await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+row.id,fingerprint:row.combination_hash},'TRAINING');await assertTrainingStandardUse(tx,{userId,combination:{releaseId:row.id,combinationHash:row.combination_hash},measurementReleaseId:row.measurement_release.releaseId,useGrantId:row.use_id,useGrantVersion:row.use_version})}
-   catch(e){if(e instanceof AdminPermissionError||(e instanceof Error&&'statusCode'in e&&e.statusCode===403))continue;throw e}
-   choices.push({combination:{releaseId:row.id,combinationHash:row.combination_hash},scaleId:row.scale_id,title:row.title,
-    toolKey:row.tool_key,instrumentVersion:row.instrument_version,axisVersions:{CONTENT:row.content_version,PARAMETERS:row.parameters_version,REPORT:row.report_version},useGrantId:row.use_id,useGrantVersion:row.use_version})
-   if(choices.length===pageSize)break
+    ${filter}
+   ORDER BY r.tool_key,r.id,g.id LIMIT 101`}
+async function resolveTrainingChoice(tx:Prisma.TransactionClient,userId:string,row:ChoiceRow){
+ let authority:Awaited<ReturnType<typeof assertTrainingStandardUse>>
+ try{await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+row.id,fingerprint:row.combination_hash},'TRAINING');authority=await assertTrainingStandardUse(tx,{userId,combination:{releaseId:row.id,combinationHash:row.combination_hash},measurementReleaseId:row.measurement_release.releaseId,useGrantId:row.use_id,useGrantVersion:row.use_version})}
+ catch(e){if(e instanceof AdminPermissionError||(e instanceof Error&&'statusCode'in e&&e.statusCode===403))return null;throw e}
+ let selected:ReturnType<typeof trainingStandardUseFromEvidence>=null,unavailableReason:string|null=null
+ if(row.evidence.length)try{
+  selected=trainingStandardUseFromEvidence({row:{id:row.id,combination_hash:row.combination_hash,snapshot:{toolKey:row.tool_key,instrumentVersion:row.instrument_version,
+   parts:{CONTENT:{version:row.content_version,hash:row.content_hash},PARAMETERS:{version:row.parameters_version,hash:row.parameters_hash},REPORT:{version:row.report_version,hash:row.report_hash}}}},measurement:row.measurement_release},userId,authority,row.evidence)
+ }catch{unavailableReason='原固定配置证据不完整，请管理员核对原授权修订。'}
+ return {combination:{releaseId:row.id,combinationHash:row.combination_hash},scaleId:row.scale_id,title:row.title,toolKey:row.tool_key,instrumentVersion:row.instrument_version,
+  axisVersions:{CONTENT:row.content_version,PARAMETERS:row.parameters_version,REPORT:row.report_version},useGrantId:row.use_id,useGrantVersion:row.use_version,
+  authorizationMode:row.evidence.length?'PRECISE' as const:'LEGACY' as const,configurationName:selected?.configurationName??null,
+  ...(selected?{selectedBinding:selectedConfigurationPointer(selected.selectedBinding)}:{}),available:!unavailableReason,unavailableReason}
+}
+type TrainingChoice=NonNullable<Awaited<ReturnType<typeof resolveTrainingChoice>>>
+
+/** Owned-source hints, not authority. At most 100 raw candidates per page;
+ * stale rights cannot turn this into an unbounded scan. The cursor always
+ * follows the last scanned row, including when a page contains no valid rows. */
+export async function listTrainingStandardCombinationChoicePage(userId:string,raw:unknown={}){
+ const input=choicePageQuery.parse(raw)
+ return prisma.$transaction(async tx=>{
+  await assertTrainingStandardRecipient(tx,userId)
+  const filter=input.afterToolKey?Prisma.sql`AND (r.tool_key,r.id,g.id)>(${input.afterToolKey},${input.afterReleaseId!},${input.afterUseId!})`:Prisma.empty
+  const rows=await tx.$queryRaw<ChoiceRow[]>(choiceRowsQuery(userId,filter)),scanned=rows.slice(0,100),choices:TrainingChoice[]=[],cache=new Map<string,TrainingChoice|null>()
+  for(const row of scanned){const choice=await resolveTrainingChoice(tx,userId,row);cache.set(row.use_id,choice);if(choice)choices.push(choice)}
+  const eligible=choices.filter(c=>c.available),groups=new Map<string,TrainingChoice>()
+  const ambiguous=(choice:TrainingChoice)=>{choice.available=false;choice.unavailableReason='同一工具存在同名或未命名配置，请管理员明确业务配置名称。'}
+  for(const choice of eligible){
+   if(choice.authorizationMode!=='PRECISE')continue
+   const peers=eligible.filter(other=>other.toolKey===choice.toolKey&&(!choice.configurationName||other.configurationName===choice.configurationName))
+   if(peers.length>1){ambiguous(choice);continue}
+   groups.set(JSON.stringify([choice.toolKey,choice.configurationName]),choice)
   }
-  if(rows.length<pageSize)break
-  const last=rows[rows.length-1]
-  cursor={toolKey:last.tool_key,releaseId:last.id,useId:last.use_id}
+  // Probe only potential naming collisions, including beyond this page. Never
+  // treat an unchecked raw row as a currently eligible peer. One batch, bounded
+  // to 101 candidates per distinct name/tool; ordinary unique names need none.
+  if(groups.size){
+   const requests=[...groups.values()]
+   const peers=await tx.$queryRaw<Array<ChoiceRow&{choice_use_id:string}>>(Prisma.sql`
+    SELECT requested.use_id AS choice_use_id,peer.* FROM (VALUES ${Prisma.join(requests.map(c=>Prisma.sql`(${c.useGrantId}::text,${c.toolKey}::text,${c.configurationName}::text)`))}) AS requested(use_id,tool_key,configuration_name)
+    CROSS JOIN LATERAL (${choiceRowsQuery(userId,Prisma.sql`AND r.tool_key=requested.tool_key AND g.id<>requested.use_id
+     AND (requested.configuration_name IS NULL OR EXISTS (SELECT 1 FROM assessment_management_events n WHERE n.action='STANDARD_COMBINATION_USE_GRANTED' AND n.resource_id=r.id
+      AND n.metadata->>'grantId'=g.id AND n.metadata->>'useVersion'=g.version::text AND n.metadata?'selectedBinding' AND btrim(n.metadata->>'configurationName')=requested.configuration_name))`)}) peer`)
+   for(const choice of requests){
+    const candidates=peers.filter(p=>p.choice_use_id===choice.useGrantId)
+    let collision=false
+    for(const row of candidates.slice(0,100)){
+     if(!cache.has(row.use_id))cache.set(row.use_id,await resolveTrainingChoice(tx,userId,row))
+     const peer=cache.get(row.use_id)
+     if(peer?.available&&peer.toolKey===choice.toolKey&&(!choice.configurationName||peer.configurationName===choice.configurationName)){collision=true;break}
+    }
+    if(collision)ambiguous(choice)
+    else if(candidates.length>100){choice.available=false;choice.unavailableReason='同名授权候选较多，暂不能核对唯一配置，请管理员整理后重试。'}
+   }
   }
-  return choices
+  const last=scanned[scanned.length-1]
+  return {list:choices,nextCursor:rows.length>100&&last?{afterToolKey:last.tool_key,afterReleaseId:last.id,afterUseId:last.use_id}:null}
  },options)
 }
+/** Existing small-catalog callers keep their array contract. UI pagination uses
+ * the explicit page API; this wrapper never silently selects another version. */
+export async function listTrainingStandardCombinationChoices(userId:string){return (await listTrainingStandardCombinationChoicePage(userId)).list}

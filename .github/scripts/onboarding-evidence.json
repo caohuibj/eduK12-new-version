@@ -873,6 +873,2312 @@
         "log": "docs/performance/education-post-p6-20261030/evidence/frontend-typecheck-deps-recheck.log",
         "exit": "docs/performance/education-post-p6-20261030/evidence/frontend-typecheck-deps-recheck.exit"
       }
+    },
+    "task1": {
+      "schemaVersion": 1,
+      "product": "7403128fed365351cacbaa59c75cbe57a7cf810e",
+      "reviewer": "root dot",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Finite root-reviewed unsigned local records, not authenticated original execution or CI tests.",
+          "Original failed/filtered stages remain in the hash-bound complete review records and are never promoted to passing.",
+          "Source hashes recorded at save time are not invented historical attestations. Final product/component Git identity is bound independently.",
+          "8 component contracts/full app types precede a final isolated restored-state hunk; one new case and its type closure cover only that hunk.",
+          "NODE_ENV=test bypasses the existing limiter and MFA is a synthetic recent proof. No human MFA/rate-limit or all-tool/performance claim.",
+          "New dual-nonempty-R evidence is developer-submitted unsigned staged execution, accepted by DOT at exact54da/47ef; original execution remains unsigned/staged. Original failed stages retained.",
+          "Final main5a39 alignment adds only three non-executable COPSOQ catalog sources/index; previous dual-R execution remains at main407 stage. No changed interface/scorer/runtime or this fixture material input; no app replay. Current component trees are bound separately.",
+          "PR400 main0e8 adds seven scale source/instrument files plus generated registry and docs. Existing three dual-R source/scorer/parameters/consumer code unchanged; no application replay. Frontend production imports/aliases do not consume the changed backend catalog; its exact component/build is reused. Backend source tree changes and needs one new formal compile; no old backend qualification is relabelled.",
+          "Final baseline PR402/main dfd506 adds only seven CATALOG_ONLY source/instrument modules plus generated registry/docs (16 paths); no authorization interface or existing dual-R definition changed. Old official success40c07/base0e8 is not renamed to the new merge tree. Frontend exact tree unchanged and reused; changed backend source compiled once in the existing formal route. No application/scoring/native evidence replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "cognitive-management-review-raw-1",
+          "path": "docs/precise-authorization-20261029/cognitive-management-review-raw.json",
+          "sha256": "d5483f42fe7834dbb01a520b28b1f0474d5f3bf89465fe5fef877fbc1fde418a",
+          "reportPointer": [
+            "invocations",
+            1,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            1,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 8,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: manages recipient 26 and grant 101 and pins the replacement recipient outside the returned page",
+              "status": "passed"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: a definite fresh POST rejection unlocks correction with a new request",
+              "status": "passed"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: accepted POST followed by a rejected readback keeps the original pending request",
+              "status": "passed"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: an unknown write and its rejected retry retain the original intent after an absent readback",
+              "status": "passed"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: historical unavailable sources stay selectable for grant inspection and revocation, not issuance",
+              "status": "passed"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only HUISCHOOL previews without writing and confirms one exact named profile operation",
+              "status": "passed"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only HUITEACHER previews without writing and confirms one exact named profile operation",
+              "status": "passed"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only retains an unknown original request without password and resolves it by readback without another POST",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Education cognitive management UI contracts, mocked transport only review: manages recipient 26 and grant 101 and pins the replacement recipient outside the returned page",
+            "Education cognitive management UI contracts, mocked transport only review: a definite fresh POST rejection unlocks correction with a new request",
+            "Education cognitive management UI contracts, mocked transport only review: accepted POST followed by a rejected readback keeps the original pending request",
+            "Education cognitive management UI contracts, mocked transport only review: an unknown write and its rejected retry retain the original intent after an absent readback",
+            "Education cognitive management UI contracts, mocked transport only review: historical unavailable sources stay selectable for grant inspection and revocation, not issuance",
+            "Education cognitive management UI contracts, mocked transport only HUISCHOOL previews without writing and confirms one exact named profile operation",
+            "Education cognitive management UI contracts, mocked transport only HUITEACHER previews without writing and confirms one exact named profile operation",
+            "Education cognitive management UI contracts, mocked transport only retains an unknown original request without password and resolves it by readback without another POST"
+          ],
+          "coverage": "management initial eight contracts",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "cognitive-management-review-raw-5",
+          "path": "docs/precise-authorization-20261029/cognitive-management-review-raw.json",
+          "sha256": "d5483f42fe7834dbb01a520b28b1f0474d5f3bf89465fe5fef877fbc1fde418a",
+          "reportPointer": [
+            "invocations",
+            5,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            5,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 8
+          },
+          "cases": [
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: manages recipient 26 and grant 101 and pins the replacement recipient outside the returned page",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: a definite fresh POST rejection unlocks correction with a new request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: accepted POST followed by a rejected readback keeps the original pending request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: an unknown write and its rejected retry retain the original intent after an absent readback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: historical unavailable sources stay selectable for grant inspection and revocation, not issuance",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only review: a restored request is uncertain even if its last saved flag preceded the POST",
+              "status": "passed"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only HUISCHOOL previews without writing and confirms one exact named profile operation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only HUITEACHER previews without writing and confirms one exact named profile operation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Education cognitive management UI contracts, mocked transport only retains an unknown original request without password and resolves it by readback without another POST",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "Education cognitive management UI contracts, mocked transport only review: a restored request is uncertain even if its last saved flag preceded the POST"
+          ],
+          "coverage": "restored pending isolated continuation",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "cognitive-management-review-raw-2",
+          "path": "docs/precise-authorization-20261029/cognitive-management-review-raw.json",
+          "sha256": "d5483f42fe7834dbb01a520b28b1f0474d5f3bf89465fe5fef877fbc1fde418a",
+          "reportPointer": [
+            "invocations",
+            2,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            2,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Education cognitive own-issuance management after authority/source withdrawal SCHOOL keeps own history inspectable and revocable without permitting new distribution",
+              "status": "passed"
+            },
+            {
+              "fullName": "Education cognitive own-issuance management after authority/source withdrawal TEACHER keeps own history inspectable and revocable without permitting new distribution",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Education cognitive own-issuance management after authority/source withdrawal SCHOOL keeps own history inspectable and revocable without permitting new distribution",
+            "Education cognitive own-issuance management after authority/source withdrawal TEACHER keeps own history inspectable and revocable without permitting new distribution"
+          ],
+          "coverage": "own history after real entry/delegation withdrawal",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "education-cognitive-runtime-raw-2",
+          "path": "docs/precise-authorization-20261029/education-cognitive-runtime-raw.json",
+          "sha256": "067ddae6478d42aa70e7c69dffa6fddef81536a691b068d1d18f3bb01470e84f",
+          "reportPointer": [
+            "invocations",
+            2,
+            "recordedOutputs",
+            1,
+            "value"
+          ],
+          "statusPointer": [
+            "invocations",
+            2,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 5,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Exact education native profiles through formal protected Run and participant routes creates only two counterpart workflows using the same qualified people and existing exact M delegation",
+              "status": "passed"
+            },
+            {
+              "fullName": "Exact education native profiles through formal protected Run and participant routes SCHOOL issues exact use, freezes two roots and publishes the real participant Run",
+              "status": "passed"
+            },
+            {
+              "fullName": "Exact education native profiles through formal protected Run and participant routes TEACHER issues exact use, freezes two roots and publishes the real participant Run",
+              "status": "passed"
+            },
+            {
+              "fullName": "Exact education native profiles through formal protected Run and participant routes SCHOOL preserves admitted seed and FINAL after ordinary revoke while stopping a waiting new START",
+              "status": "passed"
+            },
+            {
+              "fullName": "Exact education native profiles through formal protected Run and participant routes TEACHER preserves admitted seed and FINAL after ordinary revoke while stopping a waiting new START",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Exact education native profiles through formal protected Run and participant routes SCHOOL issues exact use, freezes two roots and publishes the real participant Run",
+            "Exact education native profiles through formal protected Run and participant routes TEACHER issues exact use, freezes two roots and publishes the real participant Run",
+            "Exact education native profiles through formal protected Run and participant routes SCHOOL preserves admitted seed and FINAL after ordinary revoke while stopping a waiting new START",
+            "Exact education native profiles through formal protected Run and participant routes TEACHER preserves admitted seed and FINAL after ordinary revoke while stopping a waiting new START"
+          ],
+          "coverage": "counterpart formal Runs and native completion",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "education-cognitive-runtime-raw-1",
+          "path": "docs/precise-authorization-20261029/education-cognitive-runtime-raw.json",
+          "sha256": "067ddae6478d42aa70e7c69dffa6fddef81536a691b068d1d18f3bb01470e84f",
+          "reportPointer": [
+            "invocations",
+            1,
+            "recordedOutputs",
+            0,
+            "value"
+          ],
+          "statusPointer": [
+            "invocations",
+            1,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "formal education START distinguishes precise profiles from existing legacy Cognitive use retains the original Cognitive MaterialGrant requirement for an untyped legacy manifest",
+              "status": "passed"
+            },
+            {
+              "fullName": "formal education START distinguishes precise profiles from existing legacy Cognitive use requires the exact profile use and entry-scoped source header rather than accepting a legacy config use",
+              "status": "passed"
+            },
+            {
+              "fullName": "formal education START distinguishes precise profiles from existing legacy Cognitive use retains admitted collection independently of ordinary use withdrawal while preserving emergency stops",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "formal education START distinguishes precise profiles from existing legacy Cognitive use retains the original Cognitive MaterialGrant requirement for an untyped legacy manifest",
+            "formal education START distinguishes precise profiles from existing legacy Cognitive use requires the exact profile use and entry-scoped source header rather than accepting a legacy config use",
+            "formal education START distinguishes precise profiles from existing legacy Cognitive use retains admitted collection independently of ordinary use withdrawal while preserving emergency stops"
+          ],
+          "coverage": "formal native/legacy collection guard boundaries",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "education-cognitive-runtime-raw-13",
+          "path": "docs/precise-authorization-20261029/education-cognitive-runtime-raw.json",
+          "sha256": "067ddae6478d42aa70e7c69dffa6fddef81536a691b068d1d18f3bb01470e84f",
+          "reportPointer": [
+            "invocations",
+            13,
+            "recordedOutputs",
+            0,
+            "value"
+          ],
+          "statusPointer": [
+            "invocations",
+            13,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Main package-key merge with exact native profile authority keeps an independently legal whole-package U in the shared reader without manufacturing a typed profile",
+              "status": "passed"
+            },
+            {
+              "fullName": "Main package-key merge with exact native profile authority retains main whole-package root syntax while still refusing an untyped exact profile root",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Main package-key merge with exact native profile authority keeps an independently legal whole-package U in the shared reader without manufacturing a typed profile",
+            "Main package-key merge with exact native profile authority retains main whole-package root syntax while still refusing an untyped exact profile root"
+          ],
+          "coverage": "main package/profile key compatibility",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "survey-cognitive-profile-raw-22",
+          "path": "docs/precise-authorization-20261029/survey-cognitive-profile-raw.json",
+          "sha256": "776c165320e0c29460492195bb2d4cc3a928101489dc351edd52cb6beeb8980d",
+          "reportPointer": [
+            "invocations",
+            22,
+            "reporter"
+          ],
+          "statusPointer": [
+            "invocations",
+            22,
+            "status"
+          ],
+          "format": "retained-reporter-projection",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Survey exact native profiles through real manager, researcher and anonymous participant routes normally installs the exact main source and separately approves both native profiles for Survey",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact native profiles through real manager, researcher and anonymous participant routes issues a named exact source, checks original intent, imports readonly and freezes the published profile",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact native profiles through real manager, researcher and anonymous participant routes stops new admission after revoke while admitted native FINAL and the parent result remain fixed",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Survey exact native profiles through real manager, researcher and anonymous participant routes normally installs the exact main source and separately approves both native profiles for Survey",
+            "Survey exact native profiles through real manager, researcher and anonymous participant routes issues a named exact source, checks original intent, imports readonly and freezes the published profile",
+            "Survey exact native profiles through real manager, researcher and anonymous participant routes stops new admission after revoke while admitted native FINAL and the parent result remain fixed"
+          ],
+          "coverage": "experience native final staged continuation",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "survey-cognitive-profile-raw-25",
+          "path": "docs/precise-authorization-20261029/survey-cognitive-profile-raw.json",
+          "sha256": "776c165320e0c29460492195bb2d4cc3a928101489dc351edd52cb6beeb8980d",
+          "reportPointer": [
+            "invocations",
+            25,
+            "reporter"
+          ],
+          "statusPointer": [
+            "invocations",
+            25,
+            "status"
+          ],
+          "format": "retained-reporter-projection",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Survey exact research profile through existing real routes previews read-only, grants the exact research artifact, freezes sixty trials and completes with unchanged general feedback policy",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Survey exact research profile through existing real routes previews read-only, grants the exact research artifact, freezes sixty trials and completes with unchanged general feedback policy"
+          ],
+          "coverage": "research native final",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "survey-cognitive-profile-raw-10",
+          "path": "docs/precise-authorization-20261029/survey-cognitive-profile-raw.json",
+          "sha256": "776c165320e0c29460492195bb2d4cc3a928101489dc351edd52cb6beeb8980d",
+          "reportPointer": [
+            "invocations",
+            10,
+            "reporter"
+          ],
+          "statusPointer": [
+            "invocations",
+            10,
+            "status"
+          ],
+          "format": "retained-reporter-projection",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Connected built Survey manager cognitive exact configuration selects a real approved report, grants to a qualified recipient and reads the actual T1 audit",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Connected built Survey manager cognitive exact configuration selects a real approved report, grants to a qualified recipient and reads the actual T1 audit"
+          ],
+          "coverage": "historical built manager retained-locator recovery; not a final whole-tree claim",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "training-cognitive-profile-general-raw-1",
+          "path": "docs/precise-authorization-20261029/training-cognitive-profile-general-raw.json",
+          "sha256": "0a01efbc8350920e29e9614aff98dd1966a52b081eddcc3e3cbe83965a4250cf",
+          "reportPointer": [
+            "invocations",
+            1,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            1,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke preserves the exact scientific/report source through anonymous admission, revoke, FINAL and historical read",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke preserves the exact scientific/report source through anonymous admission, revoke, FINAL and historical read"
+          ],
+          "coverage": "ordinary questionnaire profile new START withdrawal fence",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "training-cognitive-profile-raw-9",
+          "path": "docs/precise-authorization-20261029/training-cognitive-profile-raw.json",
+          "sha256": "b9a768590586f48f77efbdb1d3ef7e566e0e71f77ed2f0f6a644459b8796af65",
+          "reportPointer": [
+            "invocations",
+            9,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            9,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Training exact cognitive profile actual authorization and native lifecycle shows approved execution profiles and issues one precise grant with original intent recovery",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training exact cognitive profile actual authorization and native lifecycle pins the admin profile at draft and publishes an exact private measurement",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training exact cognitive profile actual authorization and native lifecycle retains admitted seed after revoke while denying new START and stale draft publish",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Training exact cognitive profile actual authorization and native lifecycle shows approved execution profiles and issues one precise grant with original intent recovery",
+            "Training exact cognitive profile actual authorization and native lifecycle pins the admin profile at draft and publishes an exact private measurement",
+            "Training exact cognitive profile actual authorization and native lifecycle retains admitted seed after revoke while denying new START and stale draft publish"
+          ],
+          "coverage": "native Training staged retained-start continuation",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "training-cognitive-profile-raw-11",
+          "path": "docs/precise-authorization-20261029/training-cognitive-profile-raw.json",
+          "sha256": "b9a768590586f48f77efbdb1d3ef7e566e0e71f77ed2f0f6a644459b8796af65",
+          "reportPointer": [
+            "invocations",
+            11,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            11,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Exact cognitive profile through the real revisioned Training questionnaire adapter preserves profile through revisioned publish, parent START, deferred child and immutable source reader",
+              "status": "passed"
+            },
+            {
+              "fullName": "Exact cognitive profile through the real revisioned Training questionnaire adapter checks both self-grant qualifications and recovers explicit revoke original intent",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Exact cognitive profile through the real revisioned Training questionnaire adapter preserves profile through revisioned publish, parent START, deferred child and immutable source reader",
+            "Exact cognitive profile through the real revisioned Training questionnaire adapter checks both self-grant qualifications and recovers explicit revoke original intent"
+          ],
+          "coverage": "Training COURSE questionnaire exact profile adapter",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "training-cognitive-profile-raw-0",
+          "path": "docs/precise-authorization-20261029/training-cognitive-profile-raw.json",
+          "sha256": "b9a768590586f48f77efbdb1d3ef7e566e0e71f77ed2f0f6a644459b8796af65",
+          "reportPointer": [
+            "invocations",
+            0,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            0,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 8,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "exact cognitive profile content before recipient authorization keeps one reaction config identity while freezing distinct existing experience/research profiles without an attempt seed",
+              "status": "passed"
+            },
+            {
+              "fullName": "exact cognitive profile content before recipient authorization rejects config/report/protocol mutation and unknown envelope fields rather than accepting supplied identity hashes",
+              "status": "passed"
+            },
+            {
+              "fullName": "exact cognitive profile content before recipient authorization reads an original saved artifact after the same-named registry profile changes without resolving it again",
+              "status": "passed"
+            },
+            {
+              "fullName": "exact cognitive profile content before recipient authorization shares one encrypted content record between independently scoped recipients without sharing their authorization binding",
+              "status": "passed"
+            },
+            {
+              "fullName": "exact cognitive profile content before recipient authorization validates each expected identity after cache hits and refuses a different storage kind or missing source",
+              "status": "passed"
+            },
+            {
+              "fullName": "exact cognitive profile content before recipient authorization rejects mechanically missing report metrics and inconsistent protocol/presentation even if inner hashes are recomputed",
+              "status": "passed"
+            },
+            {
+              "fullName": "exact cognitive profile content before recipient authorization does not substitute a registry implementation, a requested profile or an expected historical version",
+              "status": "passed"
+            },
+            {
+              "fullName": "exact cognitive profile content before recipient authorization retains v1 content-only records without upgrading them from current definitions, and rejects forged v2 execution",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "exact cognitive profile content before recipient authorization keeps one reaction config identity while freezing distinct existing experience/research profiles without an attempt seed",
+            "exact cognitive profile content before recipient authorization rejects config/report/protocol mutation and unknown envelope fields rather than accepting supplied identity hashes",
+            "exact cognitive profile content before recipient authorization reads an original saved artifact after the same-named registry profile changes without resolving it again",
+            "exact cognitive profile content before recipient authorization shares one encrypted content record between independently scoped recipients without sharing their authorization binding",
+            "exact cognitive profile content before recipient authorization validates each expected identity after cache hits and refuses a different storage kind or missing source",
+            "exact cognitive profile content before recipient authorization rejects mechanically missing report metrics and inconsistent protocol/presentation even if inner hashes are recomputed",
+            "exact cognitive profile content before recipient authorization does not substitute a registry implementation, a requested profile or an expected historical version",
+            "exact cognitive profile content before recipient authorization retains v1 content-only records without upgrading them from current definitions, and rejects forged v2 execution"
+          ],
+          "coverage": "v2 immutable profile dependency closure",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "education-cognitive-profile-raw-0",
+          "path": "docs/precise-authorization-20261029/education-cognitive-profile-raw.json",
+          "sha256": "982d461fa2227294b11addde4debc1ac04be6e0e2b9cceda484e0e94a8250b2d",
+          "reportPointer": [
+            "invocations",
+            0,
+            "reporter"
+          ],
+          "statusPointer": [
+            "invocations",
+            0,
+            "status"
+          ],
+          "format": "retained-reporter-projection",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School and Teacher precise cognitive T1/T2 through real entry routes SCHOOL binds one named precise use to its original immutable profile at author freeze",
+              "status": "passed"
+            },
+            {
+              "fullName": "School and Teacher precise cognitive T1/T2 through real entry routes TEACHER binds one named precise use to its original immutable profile at author freeze",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School and Teacher precise cognitive T1/T2 through real entry routes SCHOOL binds one named precise use to its original immutable profile at author freeze",
+            "School and Teacher precise cognitive T1/T2 through real entry routes TEACHER binds one named precise use to its original immutable profile at author freeze"
+          ],
+          "coverage": "education exact T1/T2 staged freeze",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "runtime-role-raw-2",
+          "path": "docs/precise-authorization-20261029/runtime-role-raw.json",
+          "sha256": "b8ad73124f7aa7800cdb2dc488862005dd95490911125a621c9593d0584899b9",
+          "reportPointer": [
+            "records",
+            2,
+            "reporter"
+          ],
+          "statusPointer": [
+            "records",
+            2,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Exact use and frozen report under the actual restricted application role reads original T1/report evidence while the actual runtime cannot alter the migration ledger",
+              "status": "passed"
+            },
+            {
+              "fullName": "Exact use and frozen report under the actual restricted application role issues the next exact revision atomically through ordinary protected HTTP and retains the old published report",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Exact use and frozen report under the actual restricted application role reads original T1/report evidence while the actual runtime cannot alter the migration ledger",
+            "Exact use and frozen report under the actual restricted application role issues the next exact revision atomically through ordinary protected HTTP and retains the old published report"
+          ],
+          "coverage": "restricted runtime and source ledger protection",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "report-parameter-compatibility-raw-0",
+          "path": "docs/precise-authorization-20261029/report-parameter-compatibility-raw.json",
+          "sha256": "996136bd2d978f43c4d728634a99863062f7d7fe80f3ca1a0b1df00685b595b5",
+          "reportPointer": [
+            "records",
+            0,
+            "reporter"
+          ],
+          "statusPointer": [
+            "records",
+            0,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 5,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "new exact-combination report requirements permits explicit no-R or a score-only R without inventing missing threshold requirements",
+              "status": "passed"
+            },
+            {
+              "fullName": "new exact-combination report requirements permits a report to request a subset of available P bands while keeping C/P unchanged",
+              "status": "passed"
+            },
+            {
+              "fullName": "new exact-combination report requirements rejects the specifically missing R band and cannot borrow a different reference version",
+              "status": "passed"
+            },
+            {
+              "fullName": "new exact-combination report requirements does not treat unused thresholds on a distribution as executable criterion bands",
+              "status": "passed"
+            },
+            {
+              "fullName": "new exact-combination report requirements checks actual registered governance bands during assembly without changing the source or historical compiler",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "new exact-combination report requirements permits explicit no-R or a score-only R without inventing missing threshold requirements",
+            "new exact-combination report requirements permits a report to request a subset of available P bands while keeping C/P unchanged",
+            "new exact-combination report requirements rejects the specifically missing R band and cannot borrow a different reference version",
+            "new exact-combination report requirements does not treat unused thresholds on a distribution as executable criterion bands",
+            "new exact-combination report requirements checks actual registered governance bands during assembly without changing the source or historical compiler"
+          ],
+          "coverage": "mechanical report metric/parameter boundary",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "approved-scale-axes-raw-0",
+          "path": "docs/precise-authorization-20261029/approved-scale-axes-raw.json",
+          "sha256": "a1fbcf5f697b33e1a84112a7f159339e99bd01de0e3a70e77a4c8cae93fc4988",
+          "reportPointer": [
+            "runs",
+            0,
+            "vitest"
+          ],
+          "statusPointer": [
+            "runs",
+            0,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 6,
+            "numFailedTests": 0,
+            "numPendingTests": 35
+          },
+          "cases": [
+            {
+              "fullName": "Training administrator exact combination distribution sends the selected combination identity through the dedicated issuer API and never the legacy SCALE writer",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training administrator exact combination distribution does not let a late read for another recipient populate or authorize the current selection",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training administrator exact combination distribution blocks a second mutation after an uncertain outcome until the full original intent is read back",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training administrator exact combination distribution keeps another issuer grant visible without exposing overwrite or revoke actions",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training administrator exact combination distribution allows readback and versioned revocation after withdrawal while refusing new assignment",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training administrator exact combination distribution refuses incomplete or cross-configuration readback instead of writing against an empty grant list",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery recovers the original recipient, label and revision after closing the dialog and never substitutes current grants",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery retries only after verified absence and with the complete same original body",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery keeps the original unknown outcome when its retry is now refused",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original userId",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original configurationName",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original actorId",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original expectedUseVersion",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery restores a prior revoked grant identity and reports its subsequently superseded operation as historical",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery keeps malformed absence and legacy results unresolved",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact issuance durable original-intent recovery scopes restored state and late responses to the current live account and hides the workspace on logout",
+              "status": "skipped"
+            },
+            {
+              "fullName": "opens the exact Training grant editor chosen by the shared C/P/R finder without issuing immediately",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared administrator approved scale axis discovery requires all explicit axes and the exact combination before selecting, without issuing or constructing content",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared administrator approved scale axis discovery refuses to imply a new approval when individually existing axes have no approved combination",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared administrator approved scale axis discovery never resolves equal displayed versions by first/latest row and requires the actual selected source",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared administrator approved scale axis discovery does not substitute an alternative after withdrawal or refresh removes the explicitly chosen source",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared administrator approved scale axis discovery treats explicitly absent parameters/report as selectable facts and resets all choices when changing tools",
+              "status": "passed"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery School uses its own manager path and shows the original report audience before saving the psychologist configuration",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery selects an approved exact source, legal recipient and delegation and keeps passwords out of retained request data",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery requires readback before an unknown issuance retries the identical ID and complete parameters",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery does not accept a resource-only match when readback names another recipient",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery restores an unknown revoke without replaying it and confirms the exact revision/reason through readback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery does not let a late old-scope readback replace the next school screen",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery recovers a replacement only when the original prior revision and reason also match",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education manager exact configuration and unknown-result recovery cannot substitute another receiver when the original replacement recipient has lost current eligibility",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey named fixed standard configuration and exact request recovery requires a business name, issues one exact server-bound request and never lets the researcher choose R",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey named fixed standard configuration and exact request recovery retains no secret and confirms a lost response through original complete intent without a second write",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey named fixed standard configuration and exact request recovery allows only an original-number retry after explicit absent readback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey named fixed standard configuration and exact request recovery keeps a conflicting request blocked and cannot turn a different recipient into the original grant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey named fixed standard configuration and exact request recovery recovers the original recipient even after the manager changes the visible researcher",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey named fixed standard configuration and exact request recovery does not fall back to untyped standard issuance when the authenticated catalog lacks actor identity",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey named fixed standard configuration and exact request recovery requires the live authenticated account to match the issuer returned by the source catalog",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey named fixed standard configuration and exact request recovery rejects malformed absence readback and keeps the original operation blocked without a retry button",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey named fixed standard configuration and exact request recovery shows a researcher the fixed business configuration and imports its exact grant without an R selector",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "opens the exact Training grant editor chosen by the shared C/P/R finder without issuing immediately",
+            "shared administrator approved scale axis discovery requires all explicit axes and the exact combination before selecting, without issuing or constructing content",
+            "shared administrator approved scale axis discovery refuses to imply a new approval when individually existing axes have no approved combination",
+            "shared administrator approved scale axis discovery never resolves equal displayed versions by first/latest row and requires the actual selected source",
+            "shared administrator approved scale axis discovery does not substitute an alternative after withdrawal or refresh removes the explicitly chosen source",
+            "shared administrator approved scale axis discovery treats explicitly absent parameters/report as selectable facts and resets all choices when changing tools"
+          ],
+          "coverage": "scale registered C/P/R compatibility; no second R qualification",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "approved-scale-axes-raw-5",
+          "path": "docs/precise-authorization-20261029/approved-scale-axes-raw.json",
+          "sha256": "a1fbcf5f697b33e1a84112a7f159339e99bd01de0e3a70e77a4c8cae93fc4988",
+          "reportPointer": [
+            "runs",
+            5,
+            "vitest"
+          ],
+          "statusPointer": [
+            "runs",
+            5,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Survey axis discovery labels outside immutable source/grant identity labels only the original exact combination in one batched header query and preserves every source/grant/publication field",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Survey axis discovery labels outside immutable source/grant identity labels only the original exact combination in one batched header query and preserves every source/grant/publication field"
+          ],
+          "coverage": "approved scale source continuation",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "training-course-journey-raw-1",
+          "path": "docs/precise-authorization-20261029/training-course-journey-raw.json",
+          "sha256": "cf368f1e99e13a38425d6ac7fc00d2ecb38853f03f0c6b4c74991ffc003c553b",
+          "reportPointer": [
+            "records",
+            1,
+            "reporter"
+          ],
+          "statusPointer": [
+            "records",
+            1,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "Training COURSE exact configuration through actual enrolled participant HTTP freezes the administrator-selected configuration and requires normal course enrollment before START",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training COURSE exact configuration through actual enrolled participant HTTP denies a new enrolled participant after revoke but completes the old frozen attempt and rereads its exact report",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Training COURSE exact configuration through actual enrolled participant HTTP denies a new enrolled participant after revoke but completes the old frozen attempt and rereads its exact report"
+          ],
+          "coverage": "Training COURSE final retained continuation",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "id": "survey-exact-journey-raw-3",
+          "path": "docs/precise-authorization-20261029/survey-exact-journey-raw.json",
+          "sha256": "2af5f8a53f2c638f423e4796f664e7e7b7e355e85aac88a32e73b5939f9a3dc7",
+          "reportPointer": [
+            "records",
+            3,
+            "reporter"
+          ],
+          "statusPointer": [
+            "records",
+            3,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "Survey existing exact use through protected author and anonymous participant HTTP imports the administered exact use, blocks consumer edits and freezes the original identity before actual anonymous START",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey existing exact use through protected author and anonymous participant HTTP denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Survey existing exact use through protected author and anonymous participant HTTP denies new starts after ordinary use revocation while an admitted participant completes and rereads one frozen result"
+          ],
+          "coverage": "Survey exact-scale journey retained continuation",
+          "sourceAssociationBasis": "DOT independently reviewed the retained staged evidence and final source association; unsigned original WIP execution, not retrospective exact whole-tree or CI execution."
+        },
+        {
+          "path": "docs/precise-authorization-20261029/registered-dual-report-raw.json",
+          "sha256": "9d5612fd67380413bbe714fd40042b80d36eee063dba4b434337f82fa3021d3c",
+          "id": "registered-dual-report-contract",
+          "reportPointer": [
+            "invocations",
+            0,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            0,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 4,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'cfq7_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
+              "status": "passed"
+            },
+            {
+              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
+              "status": "passed"
+            },
+            {
+              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'bps9_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
+              "status": "passed"
+            },
+            {
+              "fullName": "Reviewed nonempty reports register against the original independent C/P axes rejects stale C/P bindings, reused R versions and empty report variants without changing the source",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Reviewed nonempty reports register against the original independent C/P axes 'cfq7_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
+            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
+            "Reviewed nonempty reports register against the original independent C/P axes 'bps9_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
+            "Reviewed nonempty reports register against the original independent C/P axes rejects stale C/P bindings, reused R versions and empty report variants without changing the source"
+          ],
+          "coverage": "three tools exact C/P, independent real R; default and mechanical shape; original pre-label compiler invocation",
+          "sourceAssociationBasis": "Developer-submitted incremental evidence pending DOT review; source/fixture staged limits and original failures retained in raw record. Existing final registered R JSON unchanged. Current compiler-title path covered by v2 actual protected reads, not retrospective exact earlier unit source claim."
+        },
+        {
+          "path": "docs/precise-authorization-20261029/registered-dual-report-raw.json",
+          "sha256": "9d5612fd67380413bbe714fd40042b80d36eee063dba4b434337f82fa3021d3c",
+          "id": "registered-dual-report-admin-ui",
+          "reportPointer": [
+            "invocations",
+            1,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            1,
+            "status"
+          ],
+          "format": "retained-ui-report-with-duplicate-filtered-titles",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 17
+          },
+          "cases": [
+            {
+              "fullName": "standard workflow and unified management design UI identifies standard and fun nonempty reports and changes only the selected REPORT hash",
+              "status": "passed"
+            },
+            {
+              "fullName": "standard workflow and unified management design UI submits explicitly selected School and Teacher approval without granting recipient use",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard workflow and unified management design UI loads only read-only catalog and defers details until expansion",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard workflow and unified management design UI allows explicit no-report selection and invalidates prior preview",
+              "status": "passed"
+            },
+            {
+              "fullName": "standard workflow and unified management design UI requires explicit approval confirmation and never grants researcher use",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard workflow and unified management design UI displays unified roles and both composition types without mutation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard catalog server-side classification search submits trimmed keywords and stable facet IDs, resets the page, and renders server matches without local filtering",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard catalog server-side classification search keeps applied filters for pagination and refresh, and clears all filters back to page one",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard catalog server-side classification search shows Chinese classification badges before expansion and catalog-wide facet choices even with no matches",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard catalog server-side classification search ignores an older successful response after a newer search has completed",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older success",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older failure",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard catalog server-side classification search keeps loading the newest request when an older request fails first",
+              "status": "skipped"
+            },
+            {
+              "fullName": "standard catalog server-side classification search does not surface a stale failure after the latest search succeeds",
+              "status": "skipped"
+            },
+            {
+              "fullName": "explicit standard product entry selection submits exactly the selected entry scope \"TRAINING\" without assigning use",
+              "status": "skipped"
+            },
+            {
+              "fullName": "explicit standard product entry selection submits exactly the selected entry scope \"SURVEY\" without assigning use",
+              "status": "skipped"
+            },
+            {
+              "fullName": "explicit standard product entry selection submits exactly the selected entry scope \"TRAINING\" without assigning use",
+              "status": "skipped"
+            },
+            {
+              "fullName": "explicit standard product entry selection fetches onboarding status only after selecting the read-only tab",
+              "status": "skipped"
+            },
+            {
+              "fullName": "keeps one approval intent after an uncertain result and refuses a changed entry scope",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "standard workflow and unified management design UI identifies standard and fun nonempty reports and changes only the selected REPORT hash",
+            "standard workflow and unified management design UI allows explicit no-report selection and invalidates prior preview"
+          ],
+          "coverage": "system admin R labels and selection, component mock only",
+          "sourceAssociationBasis": "Developer-submitted incremental evidence pending DOT review; source/fixture staged limits and original failures retained in raw record. Existing final registered R JSON unchanged. Current compiler-title path covered by v2 actual protected reads, not retrospective exact earlier unit source claim."
+        },
+        {
+          "path": "docs/precise-authorization-20261029/registered-dual-report-raw.json",
+          "sha256": "9d5612fd67380413bbe714fd40042b80d36eee063dba4b434337f82fa3021d3c",
+          "id": "registered-dual-report-v2-setup",
+          "reportPointer": [
+            "invocations",
+            4,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            4,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Normal isolated scale setup registers two nonempty reports without changing the default loads basic/fun R through the existing seed materializer, repeats idempotently and keeps all sources DRAFT/HIDDEN",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Normal isolated scale setup registers two nonempty reports without changing the default loads basic/fun R through the existing seed materializer, repeats idempotently and keeps all sources DRAFT/HIDDEN"
+          ],
+          "coverage": "fresh v2 normal setup, six nonempty R, repeat idempotence and default protection",
+          "sourceAssociationBasis": "Developer-submitted incremental evidence pending DOT review; source/fixture staged limits and original failures retained in raw record. Existing final registered R JSON unchanged. Current compiler-title path covered by v2 actual protected reads, not retrospective exact earlier unit source claim."
+        },
+        {
+          "path": "docs/precise-authorization-20261029/registered-dual-report-raw.json",
+          "sha256": "9d5612fd67380413bbe714fd40042b80d36eee063dba4b434337f82fa3021d3c",
+          "id": "registered-dual-report-v2-journey-resume",
+          "reportPointer": [
+            "invocations",
+            6,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            6,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 1,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers normally approves both R, grants different recipients and binds drafts without changing C/P or the installed default",
+              "status": "passed"
+            },
+            {
+              "fullName": "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers delivers different frozen nonempty participant reports with identical scores from the same C/P and answers",
+              "status": "failed"
+            }
+          ],
+          "selectedCases": [
+            "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers normally approves both R, grants different recipients and binds drafts without changing C/P or the installed default"
+          ],
+          "coverage": "real protected approval/grant/draft input; preserved failed later report expectation",
+          "sourceAssociationBasis": "Developer-submitted incremental evidence pending DOT review; source/fixture staged limits and original failures retained in raw record. Existing final registered R JSON unchanged. Current compiler-title path covered by v2 actual protected reads, not retrospective exact earlier unit source claim.",
+          "allowPartialFailure": true,
+          "failureContinuations": [
+            {
+              "caseName": "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers delivers different frozen nonempty participant reports with identical scores from the same C/P and answers",
+              "reportId": "registered-dual-report-frozen-readonly-continuation"
+            }
+          ]
+        },
+        {
+          "path": "docs/precise-authorization-20261029/registered-dual-report-raw.json",
+          "sha256": "9d5612fd67380413bbe714fd40042b80d36eee063dba4b434337f82fa3021d3c",
+          "id": "registered-dual-report-frozen-readonly-continuation",
+          "reportPointer": [
+            "invocations",
+            8,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            8,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers normally approves both R, grants different recipients and binds drafts without changing C/P or the installed default",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers delivers different frozen nonempty participant reports with identical scores from the same C/P and answers",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers delivers different frozen nonempty participant reports with identical scores from the same C/P and answers"
+          ],
+          "coverage": "read-only continuation of two real persisted FINALs, exact selected prose, same total21 and no other R text",
+          "sourceAssociationBasis": "Developer-submitted incremental evidence pending DOT review; source/fixture staged limits and original failures retained in raw record. Existing final registered R JSON unchanged. Current compiler-title path covered by v2 actual protected reads, not retrospective exact earlier unit source claim."
+        },
+        {
+          "path": "docs/precise-authorization-20261029/registered-dual-report-raw.json",
+          "sha256": "9d5612fd67380413bbe714fd40042b80d36eee063dba4b434337f82fa3021d3c",
+          "id": "registered-dual-report-four-entry-source-readback",
+          "reportPointer": [
+            "invocations",
+            9,
+            "report"
+          ],
+          "statusPointer": [
+            "invocations",
+            9,
+            "status"
+          ],
+          "format": "retained-complete-reporter",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers normally approves both R, grants different recipients and binds drafts without changing C/P or the installed default",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers delivers different frozen nonempty participant reports with identical scores from the same C/P and answers",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers reads both registered exact identities and their normal source policies at each entry adapter boundary",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Registered standard/fun reports: exact grants, real anonymous FINAL and frozen report consumers reads both registered exact identities and their normal source policies at each entry adapter boundary"
+          ],
+          "coverage": "four entry exact shared source and normal policy boundary only",
+          "sourceAssociationBasis": "Developer-submitted incremental evidence pending DOT review; source/fixture staged limits and original failures retained in raw record. Existing final registered R JSON unchanged. Current compiler-title path covered by v2 actual protected reads, not retrospective exact earlier unit source claim."
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/precise-authorization-20261029/cognitive-management-review-raw.json",
+          "sha256": "d5483f42fe7834dbb01a520b28b1f0474d5f3bf89465fe5fef877fbc1fde418a",
+          "id": "backend scoped types",
+          "component": "backend",
+          "statusPointer": [
+            "invocations",
+            3,
+            "status"
+          ],
+          "coverage": "Changed runtime/management transitive closure after main merge",
+          "sourceAssociationBasis": "DOT reviewed staged original receipt; exact retained command and 0 exit, scoped coverage only. No final whole-component execution invented."
+        },
+        {
+          "path": "docs/precise-authorization-20261029/cognitive-management-review-raw.json",
+          "sha256": "d5483f42fe7834dbb01a520b28b1f0474d5f3bf89465fe5fef877fbc1fde418a",
+          "id": "frontend prior app types",
+          "component": "frontend",
+          "statusPointer": [
+            "invocations",
+            4,
+            "status"
+          ],
+          "coverage": "Full app before isolated restored-initial-state hunk",
+          "sourceAssociationBasis": "DOT reviewed staged original receipt; exact retained command and 0 exit, scoped coverage only. No final whole-component execution invented."
+        },
+        {
+          "path": "docs/precise-authorization-20261029/cognitive-management-review-raw.json",
+          "sha256": "d5483f42fe7834dbb01a520b28b1f0474d5f3bf89465fe5fef877fbc1fde418a",
+          "id": "frontend final isolated delta types",
+          "component": "frontend",
+          "statusPointer": [
+            "invocations",
+            7,
+            "status"
+          ],
+          "coverage": "Final component/test type closure for the isolated restored-state hunk",
+          "sourceAssociationBasis": "DOT reviewed staged original receipt; exact retained command and 0 exit, scoped coverage only. No final whole-component execution invented."
+        },
+        {
+          "path": "docs/precise-authorization-20261029/registered-dual-report-raw.json",
+          "sha256": "9d5612fd67380413bbe714fd40042b80d36eee063dba4b434337f82fa3021d3c",
+          "id": "registered-dual-report-backend-types-ambient",
+          "component": "backend",
+          "statusPointer": [
+            "invocations",
+            11,
+            "status"
+          ],
+          "coverage": "Current direct report registration/installer/compiler closure",
+          "sourceAssociationBasis": "New scoped tsc invocation has original command/times/exit0, not full final app build; pending independent incremental review."
+        },
+        {
+          "path": "docs/precise-authorization-20261029/registered-dual-report-raw.json",
+          "sha256": "9d5612fd67380413bbe714fd40042b80d36eee063dba4b434337f82fa3021d3c",
+          "id": "registered-dual-report-ui-types",
+          "component": "frontend",
+          "statusPointer": [
+            "invocations",
+            12,
+            "status"
+          ],
+          "coverage": "Current system triplet page and its test closure",
+          "sourceAssociationBasis": "New scoped tsc invocation has original command/times/exit0, not full final app build; pending independent incremental review."
+        }
+      ],
+      "educationNativeReadback": {
+        "path": "docs/precise-authorization-20261029/education-cognitive-runtime-raw.json",
+        "sha256": "067ddae6478d42aa70e7c69dffa6fddef81536a691b068d1d18f3bb01470e84f",
+        "pointer": [
+          "education-cognitive-runtime-final-database-readback.json"
+        ]
+      },
+      "openAcceptanceItems": [],
+      "registeredReports": {
+        "path": "docs/precise-authorization-20261029/registered-dual-report-raw.json",
+        "sha256": "9d5612fd67380413bbe714fd40042b80d36eee063dba4b434337f82fa3021d3c",
+        "pointer": [
+          "completion"
+        ],
+        "reviewState": "ACCEPTED_DOT_REVIEW_54DA_AND_47EF"
+      }
+    },
+    "choice-page": {
+      "schemaVersion": 1,
+      "product": "6620e33cbc392f95238419c3e4f848394d72a5d8",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "vitest": "4.1.11",
+        "database": "Existing isolated synthetic precise_dual_report_test_20261030_v2",
+        "role": "precise_task1_runtime",
+        "limitations": [
+          "Unsigned local WIP execution; final input digests recorded at save time, not invented historical exact Git SHA or signed execution.",
+          "Only relevant source/test paths changed from base1cc; unchanged transitive source/schema/locks are identified by base and final complete Git binding.",
+          "The 8-case fixture intercepts the base candidate query; a later shared-fixture projection repair is outside that intercepted path. Two direct old-picker adapters ran against that repaired projection. The last added peer-cap case ran alone; earlier cases were not repeated.",
+          "Types are affected transitive closures, not full app/image builds. Frontend UI is a component API mock, while separate HTTP/PG observations use actual protected GET and existing synthetic users.",
+          "NODE_ENV=test and synthetic JWT, not human login/MFA or production limiter evidence. No production, seed/grant/FINAL writes, 136 native trial replay or performance test."
+        ]
+      },
+      "original": {
+        "path": "docs/precise-authorization-20261029/training-choice-pagination/raw.json",
+        "sha256": "75df7f17c2c6f74e6165906976e3c1fa54141195e13daf63fc8c2ae3cdf602a3"
+      },
+      "reports": [
+        {
+          "id": "choice-pagination-pages-and-names",
+          "pointer": [
+            "invocations",
+            2
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 8,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity exposes page two without replacing page-one bindings or scanning an unbounded stale prefix",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity returns a cursor after 100 inadmissible rows so the valid 101st choice is still reachable",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity keeps distinct business names usable across pages of the same tool",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity blocks both same-name configurations even when their exact R bindings occur on different pages",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity does not treat an unchecked same-name raw candidate with withdrawn entry approval as a current peer",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity rejects partial cursors before any database query",
+              "status": "passed"
+            }
+          ],
+          "sourceAssociationBasis": "Unsigned scoped WIP execution, final nine changed application inputs fixed in raw; staged fixture projection and final added-case limits disclosed. Not historical signed Git execution or whole-platform qualification."
+        },
+        {
+          "id": "choice-pagination-old-cursor-adapter",
+          "pointer": [
+            "invocations",
+            3
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 79
+          },
+          "cases": [
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant pins C/P/R and the original 21B root without requiring a legacy Scale grant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant uses the same exact user use across two owned courses without another grant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant pins the same exact grant in an owned anonymous GENERAL draft without borrowing a course",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects mixed or legacy anonymous scope: foreign-course",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects mixed or legacy anonymous scope: legacy-course",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects mixed or legacy anonymous scope: legacy-container",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects mixed or legacy anonymous scope: unknown-type",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant cannot start from a use row that is not the exact current combination use: missing-use",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant cannot start from a use row that is not the exact current combination use: wrong-recipient",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant cannot start from a use row that is not the exact current combination use: wrong-combo",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant cannot start from a use row that is not the exact current combination use: wrong-hash",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant entry distribution never borrows system authority: system-issuer",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: replaced-root",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: missing-root",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: wrong-product",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: course-root",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: wrong-content",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: wrong-subject",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: no-distribute",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: revoked-root",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: expired-root",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: future-root",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: wrong-entry",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: revoked-entry",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant a current formal entry admin distributes without per-content re-approval",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: foreign-owner",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: foreign-course-owner",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: library-course",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: wrong-course-type",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: frozen-owner",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: survey-realm",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: wrong-item",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: changed-scale-version",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: changed-scale-key",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant refuses new use in WITHDRAWN",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant refuses new use in TRIAL_FAILED",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant refuses new use in APPROVED",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant refuses new use in TRIAL_RUNNING",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps missing-license non-gating after license retirement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps revoked-license non-gating after license retirement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps expired-license non-gating after license retirement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant preserves deployment policy integrity: wrong-mode",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant preserves deployment policy integrity: changed-policy-hash",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: missing-measurement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: revoked-measurement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: axis-tamper",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: report-tamper",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: template-tamper",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: parameters-tamper",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: emergency-stop",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects owner and original root expiry after source-lock waits",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps deployment-policy expiry checks while the license gate is retired",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects client axes, self-authored and PUBLIC fields before any SQL",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current freezes formal entry authority without inventing a delegated content root",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: missing-role",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: wrong-entry",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: system-issuer",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: replaced-role",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: reissued-role",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: mixed-bases",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: partial-basis",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current refuses a changed compositeId context before SQL",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current refuses a changed itemId context before SQL",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current refuses a changed scaleId context before SQL",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current refuses a changed ownerId context before SQL",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current does not silently adopt a newly issued use id",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current does not revive an old frozen reference when the same use UUID is explicitly reissued",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current preserves frozen C/P/R through installed-version changes, but not current grant or emergency revocation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "the persisted Training source is exact, while live use remains current keeps start-only hold semantics and current combination withdrawal separate",
+              "status": "skipped"
+            },
+            {
+              "fullName": "exact Training entry approval precedes grant and publication rejects PENDING during source binding instead of waiting for student START",
+              "status": "skipped"
+            },
+            {
+              "fullName": "exact Training entry approval precedes grant and publication rejects RETURNED during source binding instead of waiting for student START",
+              "status": "skipped"
+            },
+            {
+              "fullName": "exact Training entry approval precedes grant and publication rejects PAUSED during source binding instead of waiting for student START",
+              "status": "skipped"
+            },
+            {
+              "fullName": "exact Training entry approval precedes grant and publication does not issue a Training use for a combination without Training entry approval",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original missing root even while issuer has a current entry role",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original revoked root even while issuer has a current entry role",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original expired root even while issuer has a current entry role",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original wrong-content root even while issuer has a current entry role",
+              "status": "skipped"
+            },
+            {
+              "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original wrong-product root even while issuer has a current entry role",
+              "status": "skipped"
+            },
+            {
+              "fullName": "projects each approved C/P/R version label for the authorized Training picker without exposing its snapshot",
+              "status": "passed"
+            },
+            {
+              "fullName": "projects only validated frozen version labels into teacher summaries without current authority reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "continues past 100 stale grants through an explicit page cursor, retaining current use checks",
+              "status": "passed"
+            }
+          ],
+          "sourceAssociationBasis": "Unsigned scoped WIP execution, final nine changed application inputs fixed in raw; staged fixture projection and final added-case limits disclosed. Not historical signed Git execution or whole-platform qualification."
+        },
+        {
+          "id": "choice-pagination-ui",
+          "pointer": [
+            "invocations",
+            4
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 85
+          },
+          "cases": [
+            {
+              "fullName": "questionnaire draft feedback hides the cognitive authoring type while disabled and preserves stored cognitive content",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback explicitly publishes the current cognitive configuration using the saved revision without publishing delivery",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback holds an unknown cognitive publication without resending after read-only refresh",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback restores the original actor/composite revision after remount and only archives after explicit verified-pointer review",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback blocks edits while the original publication is pending and safely ends an obsolete revision without claiming success",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback keeps a late publication response in its original composite scope after navigation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback unlocks a first definitive 400 publication rejection for correction",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback unlocks a first definitive 403 publication rejection for correction",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback unlocks a first definitive 409 publication rejection for correction",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback preserves an earlier unknown outcome when its original-revision retry gets 403",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback exposes the active composition section to keyboard and screen-reader users",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback prefills only an authorized course passed by the Training course route",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback does not preselect an unlisted course from a tampered URL",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback discards a previous questionnaire response after switching pages",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback offers publication for a saved draft while preserving the revision guard",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback identifies and focuses an empty name without sending a request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback preserves API message objects and permits course-less drafts under the actual rule",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback shows a field-level deadline requirement for public drafts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback rejects a deadline earlier than the opening time before saving",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback blocks publication and hides stale checks after editing delivery settings",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback rejects incomplete and invalid calendar dates before creating a public draft",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire draft feedback authors an ordinary optional Form with the original revision and no context binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training guided delivery settings explains the three base steps and keeps optional features off without writing any settings",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training guided delivery settings keeps server retention separate from local cleanup and sends the unchanged policy shape on save",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training guided delivery settings shows editable group probabilities and explains the incompatible flow without changing saved groups",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training guided delivery settings opens nested flow rules and focuses invalid JSON when saving",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training guided delivery settings keeps published retention and collection read-only while disclosure permissions remain independently controlled",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C04 typed authoring creates number using the public Form definition without a client itemKey",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C04 typed authoring creates long_text using the public Form definition without a client itemKey",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C04 typed authoring creates date using the public Form definition without a client itemKey",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C04 typed authoring creates time using the public Form definition without a client itemKey",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C05 structured authoring creates likert as one public FormQuestion",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C05 structured authoring creates matrix as one public FormQuestion",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C05 structured authoring creates matrix_multiple as one public FormQuestion",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C05 structured authoring creates rank_order as one public FormQuestion",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C05 structured authoring creates slider as one public FormQuestion",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C05 structured authoring creates constant_sum as one public FormQuestion",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C05 incomplete single question stays editable retains title, options and matrix rows when the server rejects adding an incomplete question",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C06 stable policy authoring adds a conditional question to the chosen existing section using its stable source key",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shows typed export actions from the actual nested teacher form DTO",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C19 Training conditional flow authoring saves with the latest revision after metadata and blocks publication until successful",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C19 Training conditional flow authoring focuses invalid flow JSON and keeps unsaved edits after server conflict",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C20 material flow editor and attempt budget C20 guided authoring exposes delivery and advanced JSON before saving and publishing",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C20 material flow editor and attempt budget loads the saved budget and sends budget-only changes with V2 config",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C20 material flow editor and attempt budget upgrades the existing V1 blocks only explicitly and adds an editable quota sample",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C20 material flow editor and attempt budget hydrates copied V2 config and budget from the returned draft detail",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training persistence authoring starts both independent retention controls off",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training persistence authoring freezes both settings after publication",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C22 Training feedback release authoring defaults a newly bound Training questionnaire to immediate feedback after completion and generation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C22 Training feedback release authoring requires a valid release time before saving scheduled feedback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C22 Training feedback release authoring defaults to immediate feedback when a course-less draft first binds Training",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C22 Training feedback release authoring saves the scheduled device-local time as an ISO timestamp with the current revision",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C22 Training feedback release authoring allows returning an existing scheduled draft to immediate feedback without a stale timestamp",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C22 Training feedback release authoring keeps published policy and timestamp read-only",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C22 Training feedback release authoring preserves an unconfigured legacy policy while saving unrelated metadata",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C22 Training feedback release authoring clears a configured draft policy when its author changes delivery out of Training scope",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C22 Training feedback release authoring does not add Training feedback to a non-Training creation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training questionnaire guided editor selects SCALE through searchable cards while keeping the existing item API",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training questionnaire guided editor selects COGNITIVE through searchable cards while keeping the existing item API",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training questionnaire guided editor selects SITUATIONAL through searchable cards while keeping the existing item API",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training questionnaire guided editor keeps the cognitive type discoverable but disabled when capability is unavailable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training questionnaire guided editor explains an empty cognitive catalog without inventing an available task",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training questionnaire guided editor keeps unsaved metadata across steps and saves through the existing revision contract",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training questionnaire guided editor reveals and focuses an invalid feedback time when saving from another step",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training questionnaire guided editor opens the publish deep link and routes a server preflight issue back to its unit",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training questionnaire guided editor creates with the existing request payload and opens real content authoring",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages adds library materials without opening advanced rules and persists them with the typed Form policy",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages hides manual grouping and automatically appends ordinary questions without enabling V3",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages starts a new stage only on request, then appends subsequent questions to that new stage",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages provides same-stage condition sources and clears a condition when starting another stage",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages sends a selected same-stage condition with the existing stable item key",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages starts automatically after another instrument instead of appending to an earlier section",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages keeps the special background section separate from ordinary questions",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages saves row-based legacy options with punctuation intact and preserves them on a rejected request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages saves bulk matrix rows and options using the existing typed definition shape",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training automatic Form stages preserves supplied background codes and requires unlinking other/exclusive roles before deleting an option",
+              "status": "skipped"
+            },
+            {
+              "fullName": "guided anonymous publication explains the three steps before publishing without generating a public credential",
+              "status": "skipped"
+            },
+            {
+              "fullName": "guided anonymous publication shows links directly after publication, outside the collapsed management actions",
+              "status": "skipped"
+            },
+            {
+              "fullName": "guided anonymous publication opens one anonymous settings area from delivery and preserves changes through saving",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training toolkit separation keeps the three advanced controls in toolkit with the saved course context",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training toolkit separation hides advanced controls in course editing while retaining an unconfirmed selection guard",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selects and submits an exact approved Training combination without collapsing versions to the physical Scale",
+              "status": "skipped"
+            },
+            {
+              "fullName": "distinguishes approved parameter/report versions sharing one content version and submits the selected exact combination",
+              "status": "skipped"
+            },
+            {
+              "fullName": "offers granted exact configurations in GENERAL while retaining authorized native Scale choices",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses named precise Training choices and sends the original selected binding while disabling ambiguous choices",
+              "status": "skipped"
+            },
+            {
+              "fullName": "loads the next authorized configuration page without replacing the current exact selection",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps a failed configuration-page cursor retryable and explicitly selects the 101st authorized binding",
+              "status": "passed"
+            }
+          ],
+          "sourceAssociationBasis": "Unsigned scoped WIP execution, final nine changed application inputs fixed in raw; staged fixture projection and final added-case limits disclosed. Not historical signed Git execution or whole-platform qualification."
+        },
+        {
+          "id": "choice-pagination-peer-cap",
+          "pointer": [
+            "invocations",
+            10
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 8
+          },
+          "cases": [
+            {
+              "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity exposes page two without replacing page-one bindings or scanning an unbounded stale prefix",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity returns a cursor after 100 inadmissible rows so the valid 101st choice is still reachable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity keeps distinct business names usable across pages of the same tool",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity blocks both same-name configurations even when their exact R bindings occur on different pages",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity does not treat an unchecked same-name raw candidate with withdrawn entry approval as a current peer",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity rejects partial cursors before any database query",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Training exact configuration picker capacity bounds same-name verification and limits an indeterminate result to that naming group",
+              "status": "passed"
+            }
+          ],
+          "sourceAssociationBasis": "Unsigned scoped WIP execution, final nine changed application inputs fixed in raw; staged fixture projection and final added-case limits disclosed. Not historical signed Git execution or whole-platform qualification."
+        }
+      ],
+      "types": [
+        {
+          "component": "backend",
+          "pointer": [
+            "invocations",
+            5
+          ],
+          "coverage": "Affected production route/service transitive closure"
+        },
+        {
+          "component": "frontend",
+          "pointer": [
+            "invocations",
+            6
+          ],
+          "coverage": "Affected picker/editor/test transitive closure"
+        }
+      ],
+      "http": {
+        "pointer": [
+          "invocations",
+          7
+        ]
+      }
     }
   }
 }

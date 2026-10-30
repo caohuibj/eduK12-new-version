@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "base": "736ebfdb4585805d3d513c0ccf2af19aec043a7b",
+  "main": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "scope": "Atomic education exact use replacement lineage and manager UI, no source/runtime registration change",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost55439 test owner role",
+    "serviceDatabase": "precise_education_replacement_test_20261029",
+    "httpDatabase": "precise_education_replacement_http_test_20261029",
+    "redisHttp": "localhost56389 db3",
+    "productionAccessed": false
+  },
+  "results": {
+    "postgres": 4,
+    "http": 2,
+    "frontendPage": 10,
+    "frontendApi": 6,
+    "backendFinalTypesExit": 0,
+    "frontendFinalTypesExit": 0,
+    "frontendLintExit": 0
+  },
+  "raw": {
+    "file": "education-replacement-raw.json",
+    "sha256": "c017d8727918910dfcba255542376d684d655830b33af69d036f9633833a50cc"
+  },
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.http.postgres.integration.test.ts",
+      "sha256": "2e9dada0990ef3347550813589c286780ebb346ebe39acb8b0391555a437fe94"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.postgres.integration.test.ts",
+      "sha256": "8c558032c6e749092b567afbc9a9cf7238c6216f6b0b695cd572ebc32220d6b6"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-management.ts",
+      "sha256": "fee373e85fe3901c5a38f3f3eb2b9abbd691f3139da3696dbafc8f8e22a793f7"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+      "sha256": "a7d0b4b070ee9f9df6f558d2588b9149f04d1e899bc72dacadde93057f0c9a1c"
+    },
+    {
+      "path": "server-version/frontend/src/api/__tests__/educationStandardConfigurations.test.ts",
+      "sha256": "26f6081197c0d3a51204d14bdae4c0386ca1ec8d4f6e5696aa55e924926b5903"
+    },
+    {
+      "path": "server-version/frontend/src/api/educationStandardConfigurations.ts",
+      "sha256": "17b52894581459fa5c28474d4a8ae6ddb02cdf41d0c975c858ffe80d6c1d9076"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx",
+      "sha256": "e459ab5129909678892576bc492d61d6012f50b6f6ec1cbac776a6ac8862e223"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationStandardConfigurations.tsx",
+      "sha256": "eb5d56192213e3abc377e9481bc8fe8abe3624028a78dc2dae1bc4f7e0f66259"
+    }
+  ],
+  "inputCapture": {
+    "at": "2026-10-29T18:57:46.692687+00:00",
+    "kind": "Post-execution direct source inventory, not a signed CI admission or complete contemporaneous dependency manifest"
+  },
+  "retainedFailure": "Initial backend type check found operation possibly null and ISSUE/REVOKE request union in new fixture. Runtime four cases passed including exact request.replaces equality. Explicit ISSUE branch narrows the existing observed result; only final type closure reran.",
+  "reuseBoundary": "Existing middleware negatives, normal completion/report behavior and content/scoring not replayed. Fresh replacement writer/draft versions and race exercised4 cases, actual new replacement HTTP2, changed frontend16. No old DB reset or schema/approval bypass.",
+  "notExecuted": [
+    "Participant START/submit/report or real MFA ceremony",
+    "T2 explicit source-change audit",
+    "Training/Survey authorization replacement",
+    "Arbitrary approved-axis composition UI",
+    "Trusted legacy migration dry-run and representative performance",
+    "Formal CI/merge gate",
+    "Production deployment/runtime role"
+  ]
+}

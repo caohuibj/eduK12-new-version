@@ -104,8 +104,13 @@ export async function listTrainingReferenceChoices(tx:Prisma.TransactionClient,i
    AND scope->>'ownerId'=${input.ownerId} AND scope->>'resourceId'=${input.snapshot.compositeId}
   ORDER BY published_at DESC,id LIMIT 1001 FOR SHARE`)
  if(reportRows.length>1000)trainingReferenceFail('LIST_BOUND_EXCEEDED')
- const units:Array<{itemId:string;family:Unit['family'];measurementReleaseId:string;reports:Array<{releaseId:string;version:string;title:string|null;audience:string}>;choices:Array<{releaseId:string;entryKey:string;version:string;metricKey:string;referenceKind:string;scope:'PRIVATE'|'PLATFORM';population:AssessmentReferenceEntry['population'];limitations:string[]}>}>=[]
+ const units:Array<{itemId:string;family:Unit['family'];measurementReleaseId:string;fixedConfiguration?:{name:string|null};reports:Array<{releaseId:string;version:string;title:string|null;audience:string}>;choices:Array<{releaseId:string;entryKey:string;version:string;metricKey:string;referenceKind:string;scope:'PRIVATE'|'PLATFORM';population:AssessmentReferenceEntry['population'];limitations:string[]}>}>=[]
  for(const unit of input.snapshot.units){
+  if(unit.source.standardCombination){
+   units.push({itemId:unit.itemId,family:unit.family,measurementReleaseId:unit.measurement.releaseId,
+    fixedConfiguration:{name:unit.source.standardCombination.reference.configurationName??null},choices:[],reports:[]})
+   continue
+  }
   const choices:typeof units[number]['choices']=[]
   for(const row of rows){
    let release=input.releases.get(row.id)

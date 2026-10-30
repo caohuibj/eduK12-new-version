@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_work_pace_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III 目录：工作节奏（英文，暂不可施测）",
+      "abbreviation": "COPSOQ3-WP",
+      "instrumentFamily": "COPSOQ III international English LONG scale — Work Pace; metadata only"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "拟测工作的快节奏要求，分数方向应为要求更多。不是效率、胜任力或个人抗压能力的评价。 本记录只标记精确题组，不提供正式题文、评分或报告。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "copsoq3_work_pace_en",
+        "domain:teacher_workplace",
+        "source:COPSOQ_III_international_English_LONG",
+        "construct:wp",
+        "population:adult_teacher",
+        "response:self",
+        "jdr_role:demand",
+        "availability:catalog_only",
+        "rights:country_version_coordination_pending",
+        "rights:executable_redistribution_unresolved",
+        "scoring:not_implemented",
+        "norms:none_verified"
+      ]
+    },
+    "population": {
+      "populationNotes": "原国际量表面向工作人群；本项目关注成年K12教师，但中国研究对象为医疗人员，不能据此推定教师常模或效度。目录不支持实际施测。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "原国际长版相关工作情境，具体回顾/指导语需以确认的国家/语言版本为准",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "只登记国际英文Long完整WP尺度原题码：WP1（CORE，频次1型）、WP2（CORE，程度2型）、WP3（LONG，程度2型）；不提供题文、数字选项或可执行定义。",
+        "保留频次1型与程度2型的区分；不猜测响应标签，不能擅自并项、改题、重算中国版。",
+        "本记录可发现，但不可施测；不提供原量尺分/参考阈值/个人报告。",
+        "2分钟仅为目录预计，尚未电子施测实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅候选来源和构念整理；实际中国场景活动需按COPSOQ网络条款核版本/协调与相应使用范围。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "国际英文COPSOQ III原量表目录，不复制英文题文；中国医疗人员研究版是另一语言/研究版本，尚未选择。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文教师报告仅原创草稿，未绑定执行R；本包未提交中国译文。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "COPSOQ III international English Long, Work Pace (WP)",
+      "citation": "COPSOQ International Network (2018), COPSOQ III Guidelines and Questionnaire, international English Annex 1.",
+      "url": "https://www.copsoq-network.org/licence-guidelines-and-questionnaire",
+      "publicationYear": 2018
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "工作节奏要求"
+      ],
+      "limitations": [
+        "当前只登记独立完整尺度来源、题码和作答类型；无可执行题本/计分/结果。",
+        "WP有频次与程度两种原响应选项，不能使用一套标签；中国适用版本和完整抽取许可未确定；中国医疗人员研究不能当教师常模。",
+        "中国国家版本协调与拆分为可执行电子题库的具体再分发条件尚未确认；不自行宣布获得许可。",
+        "未来若采用项目完全作答均分须另建C/P/R且由真实消费者验证，不得冒充中国或瑞典官方缺失算法。"
+      ],
+      "disclaimer": "目录资料，暂无可作答包、个人报告、常模、阈值或临床解释。"
+    },
+    "blockers": [
+      "COUNTRY_LANGUAGE_VERSION_COORDINATION_PENDING",
+      "EXECUTABLE_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "EXECUTABLE_SCORING_AND_REPORT_NOT_PREPARED"
+    ]
+  }
+}

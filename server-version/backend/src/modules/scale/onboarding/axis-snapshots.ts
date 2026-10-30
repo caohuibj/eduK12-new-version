@@ -4,6 +4,7 @@ import { referenceSetHash } from '../../assessment-runtime/reference-binding'
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale-definition'
 import type { ScaleInstrumentSourceV1 } from './types'
 import {snapshotScaleInstrumentSource} from './source-snapshot'
+import {listScaleReportVariants} from './report-variants'
 const newer=(a:string,b:string)=>{const x=a.split('.').map(Number),y=b.split('.').map(Number);return x.some((n,i)=>n>y[i] && x.slice(0,i).every((v,j)=>v===y[j]))}
 /** Only explicitly versioned report/reference revisions may retain measurement identity. */
 export function allowsScaleAxisRevision(previous:unknown,next:ScaleDefinitionV2):boolean {
@@ -33,6 +34,11 @@ export function allowsScaleAxisRevision(previous:unknown,next:ScaleDefinitionV2)
  return true
 }
 export async function freezeScaleAxisSnapshot(db:PrismaClient|Prisma.TransactionClient,scaleId:string,source:ScaleInstrumentSourceV1) {
+ const variants=listScaleReportVariants(source)
+ const sources=[source,...variants.map(variant=>({...source,executable:{...source.executable!,definition:{...source.executable!.definition,report:variant.report}}}))]
+ for(const selected of sources)await freezeOneScaleAxisSnapshot(db,scaleId,selected)
+}
+async function freezeOneScaleAxisSnapshot(db:PrismaClient|Prisma.TransactionClient,scaleId:string,source:ScaleInstrumentSourceV1) {
  const e=source.executable!,d=e.definition
  if(!d.versionAxes)return
  const axes={instrumentVersion:source.identity.instrumentVersion,measurementHash:hashScaleDefinition(d),scoringVersion:d.scoring.scoringVersion,reportVersion:d.report.reportVersion,referenceVersions:e.references.map(r=>({version:r.referenceVersion,hash:referenceSetHash(r)})),localizationVersion:source.localization!.localizationVersion,catalogManifestVersion:source.catalog.catalogManifestVersion,...(source.instruction?{instructionVersion:source.instruction.version}:{})}

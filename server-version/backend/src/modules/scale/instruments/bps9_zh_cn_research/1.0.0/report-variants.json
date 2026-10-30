@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "bps9_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "bedtime_procrastination"
+        ],
+        "scoreOrder": [
+          "bedtime_procrastination"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "bedtime_procrastination",
+            "headline": "给今天一个“保存并退出”",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：给没做完的事留个续点，也给今天留个终点。\n\n先读懂上方的数字\n\n这九题关注的是上床前怎样结束手头活动。统一计分方向后的平均数范围1–5，数值越大，表示晚于原打算上床、难以停下活动等情况在这次回答中整体报告得更常出现。这个数字不是睡眠时长，也不是上床钟点；“上床晚”和“晚于自己的打算”不是一回事。这里只说明方向，不给你划等级，更不是越高就越会安排生活。\n\n“再做最后一件”，可能还有下一件\n\n假设你本来准备洗漱，随后想“再看一段”“再回一条”“再收拾一下”，回过神来已经比打算晚了。另一种情况则是，你已经想休息，却必须照顾家人或处理临时工作。表面上都是上床变晚，能调整的地方却未必一样；一个分数不能替你分清原因。\n\n如果你已有容易执行的收尾习惯，可以继续保留，不用把夜晚改造成一套严格流程。若你常卡在“最后一件”，可以看看：是当前活动难停、准备步骤太多，还是白天几乎没留出放松时间？这些是可核对的线索，不是问卷已经认定你的动机。受排班、照护或工作要求限制时，也需要现实支持，不只是多加一个闹钟。\n\n“退出今天”不是命令你必须马上睡着，也不是要求你把必要责任一键清空。做得到的部分可以试，暂时做不到的部分也值得被理解。\n\n这些例子和小尝试供你核对生活，不代表系统已从分数发现你的具体原因。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给时间留个脚印：选两三个晚上，简单记下原打算何时上床、实际何时上床、当时在做什么。分清必须处理的事与可以稍后再做的事。记录是为了看见环节，不是给每晚打成功或失败的分数。"
+              },
+              {
+                "category": "strategy",
+                "text": "为当前活动“存档”：结束前，写下“明天从哪里继续”：留一个书签、一行待办，或一句未完成事项。然后开始原有的洗漱或睡前准备。先选一个顺手的动作，不必一次打造完美仪式。"
+              },
+              {
+                "category": "environment",
+                "text": "提前少绕一次路：如果你常因明早用品、充电器或非紧急消息重新忙起来，可提前处理其中一项，或与相关的人约好何时再回复。过几晚再看有没有更容易收尾；如果没有，就调整办法，不必把方法不合适等同于自己不自律。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是尚未完成本地验证的中文工作译稿，没有可用的中文分档或人群排名；分数较小也不能证明睡得好。九题需完整作答，漏答不算零分。"
+        ],
+        "disclaimer": "供成年人回顾上床习惯；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T13:41:59Z",
+            "basis": "本次AI内容自审对应bps9_zh_cn_research趣味R1.1.0：读取当前source及既有趣味草稿，核对得分范围与方向、固定解释与条件式例子、三条可选行动及简短限制；不继承基本R的历史审核结论，不声称人工专家、作者或本地验证批准。未运行计分器、报告生成、schema validator或测试。"
+          }
+        }
+      }
+    }
+  ]
+}

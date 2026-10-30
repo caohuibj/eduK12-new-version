@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "base": "564209f580089346f66d4d8e9d6bf668d39db22c",
+  "main": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "scope": "Survey admin fixed configuration names/unknown request recovery/live account boundary, researcher business catalog and actual protected HTTP",
+  "environment": {
+    "node": "24.21.0",
+    "database": "precise_survey_standard_use_test_20261029",
+    "postgres": "16.15 localhost55439 test owner role",
+    "redis": "localhost56389 db0",
+    "productionAccessed": false,
+    "realMfaCeremony": false
+  },
+  "results": {
+    "httpOriginalPassed": 1,
+    "httpTargetedContinuationPassed": 3,
+    "uiOriginalRetainedPassed": 28,
+    "uiFinalAffectedManagerAndAccountPassed": 9,
+    "uiDistinctUnion": 38,
+    "frontendTypesExit": 0,
+    "frontendLintExit": 0,
+    "existingWarnings": 1,
+    "backendHttpTypesExit": 0,
+    "uiExplicitAbsenceSupplementPassed": 1
+  },
+  "raw": {
+    "file": "survey-standard-ui-raw.json",
+    "sha256": "9f99dea16c9134e8640f18498fbf8bfe94c503f1068ad3277ac1399a816fa57a"
+  },
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.http.postgres.integration.test.ts",
+      "sha256": "9e6643787ab58b944fb00c79f6f5bdff9af080b7cc5713ab403f6db0f276b96b"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.postgres.integration.test.ts",
+      "sha256": "9f71aef3f955ffd5f307dcff432b42b71e893905c0fec29915433eab5067faf6"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "sha256": "92d3f44191ff725931c73ad13a44502809b88ead87f3af537d64586a9f29b1cc"
+    },
+    {
+      "path": "server-version/frontend/src/api/__tests__/surveyStandardConfigurations.test.ts",
+      "sha256": "1c258701cb26ad1545f3afd8289965a2d39960602e6904e971c315b1f296781c"
+    },
+    {
+      "path": "server-version/frontend/src/api/surveyStandardConfigurations.ts",
+      "sha256": "742ca18da5e59e719d755a1fce0fdbf275a90c88ee0a2f1a1800ba6496e55814"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+      "sha256": "e4a7769aa1ec5cba812ab9b0121f0e144369558f51af9e5e4d079f86abad415c"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx",
+      "sha256": "6e20eb599db437032902cc828f94cb65612f50da823a87d39fc04fb3e767f4f3"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+      "sha256": "0e1d50e3819b66ad5bc4e94fc65d62070395e2715758aa0400a15a92833554a6"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx",
+      "sha256": "8fdcf39e23e22c04ae8beb6f3d9f6d350555b9e91c23177a61216d1e695586c6"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.identity.test.tsx",
+      "sha256": "2e991b2698af8e7f29f96e5c7460e7ea0b2f853aeb07c3a14eede8be76a434b2"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.links.test.tsx",
+      "sha256": "d899f26cfb8a4eb08ee6bbe5a6f9d16667d7ab969b09d26d034958bb6226dd80"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx",
+      "sha256": "84c74935be41fe2f52217217f0b787154d3c41b47a93bf96cc2d41304380a37c"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.verification.test.tsx",
+      "sha256": "0ebf886dd732e5e5cb5dc356731e99da324fef444edd95383fb9d09a36af7b8f"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx",
+      "sha256": "529d5ac87f93209cc8802f0c0b17f7584d149052128e5daa82babb696e60f55a"
+    },
+    {
+      "path": "server-version/frontend/src/survey/ResearchCatalog.tsx",
+      "sha256": "3aff3a13fb7f05651dd8903ecce786c50ade9414fe5fa392b63d50fad4fc3d97"
+    },
+    {
+      "path": "server-version/frontend/src/survey/useSurveyStandardConfigurationGrant.ts",
+      "sha256": "5c192365a7c6eed97211bc619995d4e5ddf7f38590fc601cc453cac90f7fd2be"
+    }
+  ],
+  "inputCapture": {
+    "at": "2026-10-29T18:45:10.722883+00:00",
+    "kind": "Post-execution direct source hashes; original invocation identities retained; not a contemporaneous full dependency manifest or signature"
+  },
+  "retainedFailures": [
+    "HTTP expected403 but actual original proof guard401; no issue occurred. Known fixture readback before continuation.",
+    "UI28PASS/6FAIL input exact-label mismatch; targeted continuation5PASS/1FAIL readiness wait; one-case continuation1PASS.",
+    "No failed invocation is reclassified as success. Final identity change reran affected manager paths (9PASS), keeping original 28 distinct unrelated passes."
+  ],
+  "reuseBoundary": "Legacy discovery fixtures changed their invalid standard prefixes to native legacy source IDs because they qualify legacy selection, not precise UUID/hash issuance. Real standard path has separate new cases. Four old parent tests import the unchanged workspace body by alias; no claim that those parent files reran. Component input aria label and final authenticated boundary require selected new manager cases, not unrelated legacy/catalog/scoring/lifecycle replay. Backend types precede fixture-only status/readback corrections; production API types unchanged. Final malformed-absence branch accepts only explicit null; one new adversarial case and final frontend types/lint passed, unchanged valid operation/null recovery observations retain their original identity.",
+  "notExecuted": [
+    "Compiled browser",
+    "Participant attempt/submit/report UI",
+    "Arbitrary approved C/P/R composition and atomic authorization replacement",
+    "Legacy dry-run/representative performance comparison",
+    "Formal CI/merge gate",
+    "Production runtime role/deployment"
+  ]
+}

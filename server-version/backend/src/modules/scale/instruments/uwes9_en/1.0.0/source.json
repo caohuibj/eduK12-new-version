@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "uwes9_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "UWES-9 工作投入英文9题候选（仅目录，未准备施测）",
+      "abbreviation": "UWES9-EN",
+      "instrumentFamily": "Utrecht Work Engagement Scale 9-item short form (manual v1.1 Dec 2004)"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "UWES-9 工作投入英文9题候选：仅记录准确版本、构念维度、已有选题/计分线索与缺件；不含题文、可执行计分或个体结果。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "uwes9_en",
+        "domain:teacher_workplace",
+        "construct:engagement",
+        "population:adult_teacher",
+        "response:self",
+        "locale:en",
+        "availability:catalog_only",
+        "rights:public_redist_unknown",
+        "project:source_identity_only",
+        "scoring:not_runtime",
+        "report:original_draft_only"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向成年教师研究资料定位；原文和既有研究不能替代中国K12教师效度或常模。18+是项目应用边界，目录不可施测。"
+    },
+    "administration": {
+      "itemCount": 9,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "目录来源依精确原作者版本；正式指导语/回忆期和数字施测版本尚未确认",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "本目录仅标记9题版本；原17位置1/4/5/7/8/9/10/11/14；9题位置活力1/2/5、奉献3/4/7、专注6/8/9。手册按题均分0–6无反向；当前缺失分母政策未核，不把0视为漏答。无中国K12教师常模。",
+        "没有公开题文、选项、指导语、可执行评分规则和用户结果。",
+        "使用、版权、译本、研究效度属真实附注，尚未获得本项目具体公开Git/商业授权。",
+        "用时为目录估计，非实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "目前只能作来源识别、版本交叉审计和受限材料追索；本独立数字执行形式尚无证据。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Schaufeli & Bakker, Utrecht Work Engagement Scale Test Manual v1.1 (December 2004), pp33,48; 9 starred17 selections；本目录无公开题项或新译文。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原17位置1/4/5/7/8/9/10/11/14；9题位置活力1/2/5、奉献3/4/7、专注6/8/9。手册按题均分0–6无反向；当前缺失分母政策未核，不把0视为漏答。无中国K12教师常模。 当前语言/译本权利及独立计分、漏答适用条件按来源保持未知，不把报告草稿当已发布版本。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Utrecht Work Engagement Scale 9-item short form (manual v1.1 Dec 2004)",
+      "citation": "Schaufeli & Bakker, Utrecht Work Engagement Scale Test Manual v1.1 (December 2004), pp33,48; 9 starred17 selections",
+      "url": "https://www.wilmarschaufeli.nl/publications/Schaufeli/Test%20Manuals/Test_manual_UWES_English.pdf",
+      "publicationYear": 2004
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "工作投入整体",
+        "活力",
+        "奉献",
+        "专注"
+      ],
+      "limitations": [
+        "目录无可执行题本/计分/报告；不表示当前工具已可施测或已获授权。",
+        "原17位置1/4/5/7/8/9/10/11/14；9题位置活力1/2/5、奉献3/4/7、专注6/8/9。手册按题均分0–6无反向；当前缺失分母政策未核，不把0视为漏答。无中国K12教师常模。",
+        "旧表限非商业科研；当前网页学术用途免费并涉及数据共享要求，其他用途需另行合同。公开Git题项再分发权限未确证；未接受数据共享条件。",
+        "无适用于中国K12教师的常模/阈值；当前只保留原创中文教师报告的编辑方向，不生成结果、分级或图。"
+      ],
+      "disclaimer": "仅为来源目录候选：未授权装载、无独立报告版本、不可施测/计算个人分数。"
+    },
+    "blockers": [
+      "PUBLIC_QUESTIONNAIRE_REDISTRIBUTION_NOT_ESTABLISHED",
+      "USE_AND_DATA_SHARING_TERMS_NOT_ACCEPTED",
+      "MISSING_ITEM_POLICY_NOT_VERIFIED"
+    ]
+  }
+}

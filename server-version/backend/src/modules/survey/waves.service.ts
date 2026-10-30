@@ -13,6 +13,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { compileSurveyFlow,parseSurveyFlowDraft,SurveyFlowError } from './flow.definition'
 import { compileGroupQuotaPolicy,compileCheckpointPolicy,
   groupQuotaPolicySchema,surveyCheckpointPolicySchema } from './operations.definition'
+import {surveyWaveReferenceChanges} from './selected-reference-audit'
 
 import { groupIpDraftPolicySchema,freezeGroupIpPolicy,resolveGroupIpOpenWindow } from './group-ip-policy'
 
@@ -151,6 +152,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
       return existing
     }
     await validateDraftRefs(tx,pid,input.instrumentIds)
+    const selectedSourceChanges=await surveyWaveReferenceChanges(tx,uid,pid,[],input.instrumentIds)
     const ordinal=await tx.surveyWave.aggregate({where:{projectId:pid},_max:{ordinal:true}})
     const next=(ordinal._max.ordinal||0)+1
     if(next>100)fail(400,'首版单项目最多 100 个波次')
@@ -171,7 +173,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
     }})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:uid,
       projectId:pid,action:'WAVE_DRAFT_CREATED',
-      metadata:{waveId:row.id,ordinal:row.ordinal,collectionMode:project.collectionMode}}})
+      metadata:{waveId:row.id,ordinal:row.ordinal,collectionMode:project.collectionMode,...(selectedSourceChanges?{selectedSourceChanges}:{})}}})
     return row
   })
 }
@@ -192,6 +194,7 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
     if(old.status!=='DRAFT'||old.publicationId!==null||old.revision!==input.revision)
       fail(409,'仅能修改当前版本的未发布波次')
     await validateDraftRefs(tx,pid,input.instrumentIds)
+    const selectedSourceChanges=await surveyWaveReferenceChanges(tx,uid,pid,Array.isArray(old.instrumentIds)?old.instrumentIds as string[]:[],input.instrumentIds)
     const changed=await tx.surveyWave.updateMany({
       where:{id:wid,projectId:pid,status:'DRAFT',publicationId:null,revision:input.revision},
       data:{title:input.title,consentText:input.consentText,generalText:input.generalText??'',instrumentIds:input.instrumentIds,
@@ -209,7 +212,7 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
     })
     if(changed.count!==1)fail(409,'另一个研究者会话已修改波次')
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:uid,projectId:pid,
-      action:'WAVE_DRAFT_UPDATED',metadata:{waveId:wid,revision:input.revision+1}}})
+      action:'WAVE_DRAFT_UPDATED',metadata:{waveId:wid,revision:input.revision+1,...(selectedSourceChanges?{fromRevision:input.revision,selectedSourceChanges}:{})}}})
     return ownWave(tx,pid,wid)
   })
 }

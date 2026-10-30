@@ -9,16 +9,20 @@ import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 
 /** Metadata only. A selected config/profile is compiled at freeze, while task
  * stimuli and native results are served exclusively through the admitted host. */
-export async function readEducationNativePreview(c:PrivateToolContext,input:{provider:'COGNITIVE_CONFIG'|'SJT_RELEASE';versionId:string;contentHash:string;profile?:unknown;responseMode?:string}){
+export async function readEducationNativePreview(c:PrivateToolContext,input:{provider:'COGNITIVE_CONFIG'|'SJT_RELEASE';versionId:string;contentHash:string;profile?:unknown;artifactHash?:string;responseMode?:string}){
  if((input.responseMode??'SELF')!=='SELF')privateToolFail('EDUCATION_NATIVE_SELF_REQUIRED',400)
  const profile=input.provider==='COGNITIVE_CONFIG'?educationCognitiveProfileSchema.parse(input.profile):undefined
  if(input.provider==='SJT_RELEASE'&&input.profile!==undefined)privateToolFail('EDUCATION_NATIVE_INPUT_INVALID',400)
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
-  const source={kind:input.provider,id:input.versionId,hash:input.contentHash},key=educationPublicSourceKey(source)
+  const source={kind:input.provider==='COGNITIVE_CONFIG'&&input.artifactHash?'COGNITIVE_PROFILE' as const:input.provider,id:input.versionId,hash:input.artifactHash??input.contentHash},key=educationPublicSourceKey(source)
   if(!(await readEducationPublicUse(tx,c,[key])).has(key))privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
-  const header=(await readEducationPublicSourceHeaders(tx,[source])).get(key)
+  const header=(await readEducationPublicSourceHeaders(tx,[source],false,c.entry)).get(key)
   if(!header)privateToolFail('EDUCATION_NATIVE_SOURCE_UNAVAILABLE',404)
+  if(input.provider==='COGNITIVE_CONFIG'&&input.artifactHash){
+   if(header.versions.profile!==profile||header.versions.measurementHash!==input.contentHash)privateToolFail('EDUCATION_COGNITIVE_PROFILE_IDENTITY',409)
+   return {id:input.versionId,contentHash:input.contentHash,artifactHash:input.artifactHash,title:header.title,kind:'COGNITIVE',profile,instruction:'',previewOnly:true,canEditOriginal:false}
+  }
   if(input.provider==='COGNITIVE_CONFIG'){
    const [original]=await tx.$queryRaw<Array<{allowed:boolean;instruction:string|null;profiles:string[]}>>(Prisma.sql`SELECT c.instruction,
     (c.access_policy='OPEN' OR EXISTS(SELECT 1 FROM material_grants WHERE teacher_id=${c.principal.userId} AND resource_type='COGNITIVE_CONFIG' AND resource_id=c.id)) AS allowed,
