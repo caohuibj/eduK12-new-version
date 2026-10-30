@@ -24,6 +24,7 @@ import {submitSituationalAttemptFinal} from '../../modules/situational/situation
 import {listTrainingAnalysisSources,loadTrainingAnalysisSources} from '../../modules/training-analysis/source'
 import {listTrainingGroupReports,trainingGroupTools,generateTrainingGroupReport,readTrainingGroupReport} from '../../modules/training-analysis/group-report.service'
 import * as canonicalReader from '../../modules/assessment-runtime/compact-assessment-storage'
+import {TRAINING_ANALYSIS_MINIMUM_N} from '../../modules/training-analysis/core'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL');if(!url)throw Error('isolated PostgreSQL required');requireIsolatedReleaseDatabase(url)
 process.env.BUNDLE_PRODUCTS_ENABLED='true'
 afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()})
@@ -105,3 +106,46 @@ it.each(['COGNITIVE','SJT'])('projects the retained native %s leaf with its froz
   expect(new Set(numeric.map(row=>row.parentId))).toEqual(new Set([ready.attemptId]))
  writeFileSync(`/tmp/training-native-bundle-group-${kind}.json`,JSON.stringify({passed:true,kind,metricKeys:source.group!.definitions.map(metric=>metric.key),numericObservations:numeric.length,reusedCompletedParent:true,newAdministration:false},null,2))
 },30_000)
+
+it('generates and reopens a disclosed five-person native Bundle Scale aggregate from retained publication',async()=>{
+ const ready=JSON.parse(readFileSync(process.env.TRAINING_BUNDLE_GROUP_FIXTURE??'/tmp/training-native-bundle-group-fixture.json','utf8'))
+ expect(TRAINING_ANALYSIS_MINIMUM_N).toBe(5)
+ const fixturePath='/tmp/training-native-bundle-group-disclosed-fixture.json'
+ const completed=process.env.TRAINING_BUNDLE_GROUP_DISCLOSED_FIXTURE
+  ?JSON.parse(readFileSync(process.env.TRAINING_BUNDLE_GROUP_DISCLOSED_FIXTURE,'utf8')) as Array<{student:string;attemptId:string;value:number}>
+  :[{student:ready.student,attemptId:ready.attemptId,value:0}]
+ // Only four new synthetic participants are needed. The published task and
+ // original completed participant stay intact; no existing answer is replayed.
+ for(let index=completed.length;index<5;index++){
+  const student='bundle-group-aggregate-'+randomUUID(),value=index%2
+  await db.user.create({data:{id:student,username:student,passwordHash:'synthetic',role:'STUDENT',accountDomain:'TRAINING'}})
+  await db.courseStudent.create({data:{studentId:student,courseId:ready.courseId,status:'ACTIVE'}})
+  const started=await startUserAttempt(student,ready.taskId),attemptId=started.attempt.id,form=started.attempt.currentItem as any
+  const section=await db.compositeFormSection.findFirstOrThrow({where:{compositeAssessmentId:ready.taskId},include:{items:true}})
+  await submitCompositeFormSectionFinal({attemptId,sectionId:section.id,userId:student,submissionId:randomUUID(),attemptEpoch:1,definitionHash:form.definitionHash,answers:section.items.map(item=>({formItemId:item.id,value:'25'}))})
+  const scale=await db.assessment.findFirstOrThrow({where:{compositeAttemptId:attemptId}})
+  await submitScaleAssessmentFinal({assessmentId:scale.id,submissionId:randomUUID(),attemptEpoch:1,definitionHash:hashScaleDefinition(MIXED_SCALE_DEFINITION),contextSnapshotHash:null,answers:[{itemCode:'mixed-scale-item-1',responseValue:value?'yes':'no'}],userId:student})
+  const cog=await db.cognitiveSession.findFirstOrThrow({where:{compositeAttemptId:attemptId},include:{assignment:true}})
+  await submitCognitiveSessionFinal(student,{sessionId:cog.id,submissionId:randomUUID(),attemptEpoch:1,definitionHash:cog.assignment!.resolvedConfigHash!,contextSnapshotHash:null,trials:gonogoSequence(cog.randomSeed,120,.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1000,endedAtPerfMs:trialIndex*1000+300,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?300:null,interrupted:false}}))})
+  const child=await db.situationalAttempt.findFirstOrThrow({where:{compositeAttemptId:attemptId}})
+  await submitSituationalAttemptFinal({attemptId:child.id,userId:student,submissionId:randomUUID(),attemptEpoch:1,definitionHash:child.definitionHash,instrumentVersion:child.instrumentVersion,compiledRuntimeHash:child.compiledRuntimeHash,scoringVersion:child.scoringVersion,responses:[{sceneKey:'AS-01',channelKey:'behavior',responseValue:'A'},{sceneKey:'AS-02',channelKey:'behavior',responseValue:'B'}],embedded:{compositeAttemptId:attemptId,compositeItemId:child.compositeItemId!,compositeSlotKey:compositeItemSlotKey(child.compositeItemId!,'SITUATIONAL'),userId:student}})
+  await finalizeCompositeAttemptIfReady(attemptId)
+  completed.push({student,attemptId,value});writeFileSync(fixturePath,JSON.stringify(completed))
+ }
+ expect(new Set(completed.map(row=>row.student)).size).toBe(5)
+ const parents=await db.compositeAssessmentAttempt.findMany({where:{id:{in:completed.map(row=>row.attemptId)}},select:{status:true,deliveryCourseId:true}})
+ expect(parents).toHaveLength(5);expect(parents.every(row=>row.status==='COMPLETED'&&row.deliveryCourseId===ready.courseId)).toBe(true)
+ const scope={actor:ready.actor,courseId:ready.courseId},catalog=await trainingGroupTools({...scope,taskId:ready.taskId})
+ const tool=catalog.tools.find(tool=>tool.key===ready.scaleItemId)!
+ const {publication,configDigest,variantKey}=tool.source
+ const generated=await generateTrainingGroupReport({...scope,selection:{taskId:ready.taskId,toolKey:tool.key,publication,configDigest,variantKey}})
+ expect(generated.projection).toMatchObject({completedN:5,countUnit:'PERSON',assignedN:null,tool:{kind:'SCALE'}})
+ const metric=generated.projection.metrics.find(metric=>metric.key==='total')!
+ expect(metric).toMatchObject({state:'present',validN:5,missingN:0,observedRange:{min:0,max:1}})
+ expect(metric.mean).toBeCloseTo(.4,12)
+ expect(metric.sdSample).toBeCloseTo(Math.sqrt(.3),12)
+ const reader=vi.spyOn(canonicalReader,'loadStoredCanonicalUnitResults')
+ expect(await readTrainingGroupReport({...scope,taskId:ready.taskId,artifactId:generated.artifactId})).toEqual(generated)
+ expect(reader).not.toHaveBeenCalled();reader.mockRestore()
+ writeFileSync('/tmp/training-native-bundle-group-disclosed-proof.json',JSON.stringify({passed:true,minimumRespondents:5,actualCompletedParticipants:5,newSyntheticParticipants:4,retainedOriginalParticipant:true,scaleValues:[0,1,0,1,0],validN:metric.validN,mean:metric.mean,sdSample:metric.sdSample,publicMetricState:metric.state,storedReadEqualsGeneration:true,readCanonicalMaterializations:reader.mock.calls.length,originalPublicationReplayed:false,browserReplayed:false,productionAccessed:false,coverage:'Scale leaf disclosed generation/read;original Cognitive and SJT metric projections retain their own single-parent/continuation evidence,not separate disclosed multi-person claims'},null,2))
+},90_000)
