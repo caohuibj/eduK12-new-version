@@ -6,6 +6,7 @@ import { assertOrganizationReportingWorkspaceAccess, resolveOrganizationReportin
 import { resolveProtectedFeedbackManagerContext } from './protectedFeedback'
 import { readReportingSeriesBatch, readReportingSeriesWavesBatch } from './series'
 import { getPublishedReportingSpec } from './spec'
+import { reportingAudienceForContext, reportingGroupContract } from './governedDisclosure'
 import { type ReportingAnalysisKindV1, type ReportingAnalysisSpecDefinitionV1 } from './types'
 
 const MAX_SERIES_WAVES = 100
@@ -118,6 +119,7 @@ export async function listOrganizationReportingSources(input: {
   organizationId: string
   page?: number
   pageSize?: number
+  analysisKind?: 'GROUP'
 }) {
   const context = await resolveOrganizationReportingWorkspaceContext(input)
   const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
@@ -130,11 +132,12 @@ export async function listOrganizationReportingSources(input: {
     resourceFamily: string
     resourceKey: string
     resourceVersion: string
+    frozenResourcePolicy: Record<string,unknown>|null
   }>>`
     SELECT
       r."id" AS "runId", r."name" AS "runName", r."status" AS "runStatus", r."published_at" AS "publishedAt",
       t."id" AS "trackId", t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
-      t."resource_version" AS "resourceVersion"
+      t."resource_version" AS "resourceVersion",t."frozen_resource_policy" AS "frozenResourcePolicy"
     FROM "assessment_runs" r
     JOIN "assessment_run_tracks" t
       ON t."organization_id"=r."organization_id" AND t."run_id"=r."id"
@@ -151,7 +154,7 @@ export async function listOrganizationReportingSources(input: {
       AND t."resource_family" <> 'FORM'
       AND (${organizationManager} OR r."created_by_user_id"=${input.principal.userId})
     GROUP BY r."id", r."name", r."status", r."published_at", r."created_at",
-             t."id", t."resource_family", t."resource_key", t."resource_version"
+             t."id", t."resource_family", t."resource_key", t."resource_version",t."frozen_resource_policy"
     HAVING COUNT(e."id") > 0
       AND BOOL_AND(
         relationship."relationship_kind"='SELF'
@@ -163,7 +166,7 @@ export async function listOrganizationReportingSources(input: {
   `
   await assertOrganizationReportingWorkspaceAccess(input)
   return {
-    list: rows.map<ReportingSourceSummary>((row) => ({
+    list: rows.filter(row=>input.analysisKind!=='GROUP'||reportingGroupContract(row.frozenResourcePolicy,reportingAudienceForContext(context))).map<ReportingSourceSummary>((row) => ({
       runId: row.runId,
       runName: row.runName,
       runStatus: row.runStatus,

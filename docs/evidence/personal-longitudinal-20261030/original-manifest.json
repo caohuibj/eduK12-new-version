@@ -1,0 +1,146 @@
+{
+  "sourceCandidate": "68bfc81ed731ca97825df852c75738e1f0c41a1f",
+  "note": "Original raw outputs retained byte-for-byte from /tmp; execution identities/statuses are in each reporter. Not retroactively signed or reexecuted. Intermediate working snapshots preceded the candidate; see implementation note for scope.",
+  "files": [
+    {
+      "file": "longitudinal-core-vitest.json",
+      "bytes": 3370,
+      "sha256": "b601e01d8817f9495b8d78d0e6c446d1600ec53fd4ddedc983cdd3b8f34821c4"
+    },
+    {
+      "file": "longitudinal-core-vitest.log",
+      "bytes": 342,
+      "sha256": "adf3d5afd4d400fcdb385a4a98f218b4c6c6f057ae67026492fba0a8709b58d3"
+    },
+    {
+      "file": "longitudinal-core-quality.json",
+      "bytes": 4148,
+      "sha256": "662a0d452a9702235f402ad3e31d08cbd143a092bba517af1e102585261efb6d"
+    },
+    {
+      "file": "longitudinal-core-quality.log",
+      "bytes": 343,
+      "sha256": "d4675b1775aa0d1b11933de5abe6decd265c311c4539d60c6d4a4901a28cfcd8"
+    },
+    {
+      "file": "longitudinal-ui-vitest.json",
+      "bytes": 1373,
+      "sha256": "5c77b9648cb46bc10daa150de942f0bb7f3ec221c7f0526cbde02d43c181c473"
+    },
+    {
+      "file": "longitudinal-ui-vitest.log",
+      "bytes": 340,
+      "sha256": "21c1a31dbf4b550c825016f9af06cc18ddeffbd591554c8750b90b2eea573c43"
+    },
+    {
+      "file": "longitudinal-wave-ui.json",
+      "bytes": 7587,
+      "sha256": "6684f57991e86c3f755d2629e1fa6fcb9d7125e6de126bccd0268660cf9733df"
+    },
+    {
+      "file": "longitudinal-wave-ui.log",
+      "bytes": 338,
+      "sha256": "cf6da5919f312330bcf7ead0b28b6359f4dc0822b00b9b9d323d612a0c973d0a"
+    },
+    {
+      "file": "longitudinal-survey-pg.json",
+      "bytes": 2429,
+      "sha256": "26bea20a54a5513277a72da6bb0b632a7e5b436e5d370851852da81d384e0d45"
+    },
+    {
+      "file": "longitudinal-survey-pg.log",
+      "bytes": 340,
+      "sha256": "3058a76d91f2e5a4505e4edb0ee5fb21eaf93147081c5ebf7eaefa3b900039d5"
+    },
+    {
+      "file": "longitudinal-survey-pg-browser.json",
+      "bytes": 2035,
+      "sha256": "b56418a43aa2fe9e8daf26ffa0ada19e46c91254ea4860a5fc956d751eb28a2d"
+    },
+    {
+      "file": "longitudinal-survey-pg-browser.log",
+      "bytes": 348,
+      "sha256": "46e2b6efd8d460b0838f0a92aca28724ceba64f96aa252b16b96d610f46b7c56"
+    },
+    {
+      "file": "longitudinal-survey-browser-continuation.json",
+      "bytes": 2012,
+      "sha256": "2f137d6b4f2f382ad72adcdbb66508323b2fac1bc023f9918a21b6614c4bbfbb"
+    },
+    {
+      "file": "longitudinal-survey-browser-continuation.log",
+      "bytes": 358,
+      "sha256": "91f391e6671c5740411c6cf74fa5c02d1e7253b49fb8231117901ae5f2a0cb64"
+    },
+    {
+      "file": "longitudinal-survey-browser-final.json",
+      "bytes": 1606,
+      "sha256": "d1720d4fe8c1105f9c84485a06184dc8b8f3559a4aa1f3a90cc2d1c65ed1964e"
+    },
+    {
+      "file": "longitudinal-survey-browser-final.log",
+      "bytes": 351,
+      "sha256": "2ac4202fbaa07a16a114fc154d13ad45ded1a448c2bc2b881aef3e2120513b0e"
+    },
+    {
+      "file": "longitudinal-guards-pg.json",
+      "bytes": 1975,
+      "sha256": "7d5eaca67d31750a569e24f86a07d86b7fa27cebd46f8c3d901de4c7172f906f"
+    },
+    {
+      "file": "longitudinal-guards-pg.log",
+      "bytes": 340,
+      "sha256": "94e33a81ac672ca8af0f15128035b89a76ea845487e8839b5398d1ba4c985143"
+    },
+    {
+      "file": "longitudinal-backend-types.log",
+      "bytes": 564,
+      "sha256": "c018f186125f1b67a9f99553673393fee4c0a1598bbba998d380062f0905d76b"
+    },
+    {
+      "file": "longitudinal-backend-types-frozen.log",
+      "bytes": 284,
+      "sha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+    },
+    {
+      "file": "longitudinal-frontend-types-frozen.log",
+      "bytes": 284,
+      "sha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+    },
+    {
+      "file": "longitudinal-frontend-lint.log",
+      "bytes": 1111,
+      "sha256": "cabb3fe2cdb04c8f3addcd8cb684e47a1c4c2c7453c5b78384688f05c519a399"
+    },
+    {
+      "file": "longitudinal-migrate.log",
+      "bytes": 450,
+      "sha256": "7d1920e36771db1eb9a045d670f50006b45bba406ea4f5f3e8fd0c8aa583d62d"
+    },
+    {
+      "file": "longitudinal-migrate-ready.log",
+      "bytes": 23742,
+      "sha256": "34121b7da1cc2793e219e7a64e25dd3ea6d4108634b083b49284da37ba122dd6"
+    },
+    {
+      "file": "longitudinal-migrate-guards.log",
+      "bytes": 728,
+      "sha256": "8d4afd38002b63e82ce8740b58e21a5d7b7e96e5f29947754e705912cba721b4"
+    },
+    {
+      "file": "longitudinal-draft-scope.json",
+      "bytes": 12395,
+      "sha256": "58b900ceb72bb6204633de2a31225622110a6e045167563c42eacae6c15c31ab"
+    },
+    {
+      "file": "longitudinal-survey-browser.png",
+      "bytes": 268766,
+      "sha256": "5fe82b37c9a667a4ac8ff8f50b258ca956f40f5ef398e7b6ad6e800d17ca8077"
+    },
+    {
+      "file": "longitudinal-survey-browser-failure.png",
+      "bytes": 69351,
+      "sha256": "f0211b83de2ec09da0799e43a163e20e17b4d4d98ab247bc95e97a2a138bddec"
+    }
+  ]
+}

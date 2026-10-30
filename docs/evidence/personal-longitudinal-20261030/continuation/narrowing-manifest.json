@@ -1,0 +1,50 @@
+[
+  {
+    "file": "longitudinal-review-narrowing-locked.json",
+    "bytes": 5924,
+    "sha256": "96fa0684c07abedb8691998c7b044cf08b69aa5156a5764fcd3b763c361a9fd5",
+    "qualified": true
+  },
+  {
+    "file": "longitudinal-review-narrowing-locked.log",
+    "bytes": 70,
+    "sha256": "54d71896300297e7c44faef6bfafbf119d44fb47ae00baf976db4a53cbc258d3",
+    "qualified": true
+  },
+  {
+    "file": "longitudinal-review-narrowing-consumers.json",
+    "bytes": 12703,
+    "sha256": "8abf44ad69344e919daabb022b14fc849e8291addec644779938fe58b72bde3f",
+    "qualified": true
+  },
+  {
+    "file": "longitudinal-review-narrowing-consumers.log",
+    "bytes": 73,
+    "sha256": "2df2a3729524a00621c1aaff5e4ebbf5e5d48ddab1b55c450cf4325f728226f9",
+    "qualified": true
+  },
+  {
+    "file": "longitudinal-review-narrowing-types.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "qualified": true
+  },
+  {
+    "file": "longitudinal-review-narrowing-scope.log",
+    "bytes": 232,
+    "sha256": "c532babfdf92513c3c872c89efe6c40e640c69bd2278d13d5a1e8d06c6a3c052",
+    "qualified": true
+  },
+  {
+    "file": "longitudinal-review-narrowing.json",
+    "bytes": 6150,
+    "sha256": "a49a2416944555b3ba5902b547f66b1225439eee62a5dea99e231d9eab2f5b2a",
+    "qualified": false
+  },
+  {
+    "file": "longitudinal-review-narrowing.log",
+    "bytes": 808,
+    "sha256": "deb875de1070fbfc6cd046ff8965a1b13ad8e263fef122a7408a1781aad87ca8",
+    "qualified": false
+  }
+]

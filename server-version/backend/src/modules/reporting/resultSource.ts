@@ -3,7 +3,8 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { parseStoredCanonicalUnitResult } from '../assessment-runtime/persistence'
-import { reportingLeafDisclosureContract } from './governedDisclosure'
+import { reportingGroupContract, reportingLeafDisclosureContract } from './governedDisclosure'
+import type { ResultAudience } from '../assessment-policy/result-disclosure'
 import {
   ReportingError,
   reportingFail,
@@ -223,10 +224,13 @@ const prepareTrackInTransaction = async (
   selection?: TrackSelection,
   leaf?: ReportingLeafSourceV2,
   catalog = false,
+  catalogAudience?: ResultAudience,
 ): Promise<PreparedTrack> => {
   const executions = await queryTrackRows(tx, input)
   const first = executions[0]
   if (!first) reportingFail('REPORT_COHORT_EMPTY', 'reporting Track has no executions', 409)
+  if(catalogAudience&&!reportingGroupContract(first.frozenResourcePolicy,catalogAudience))
+    reportingFail('REPORT_NOT_FOUND','reporting resource not found',404)
   if (!['BUNDLE', 'SCALE', 'COGNITIVE', 'SITUATIONAL'].includes(first.resourceFamily)) {
     reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'resource family has no enabled authoritative reporting adapter', 409)
   }
@@ -508,9 +512,10 @@ export const resolveAuthoritativeRunResults = async (
  * canonical result per slot/definition, never expose participant values. */
 export const listAuthoritativeRunLeafSources = async (input: {
   organizationId: string; runId: string; trackId: string
+  groupAudience?: ResultAudience
 }): Promise<Array<{ leaf: ReportingLeafSourceV2; metrics: Array<{ key: string; unit?: string }> }>> => {
   const samples = await prisma.$transaction(async tx => {
-    const prepared = await prepareTrackInTransaction(tx, input, undefined, undefined, true)
+    const prepared = await prepareTrackInTransaction(tx, input, undefined, undefined, true, input.groupAudience)
     const epochs = new Map(prepared.completed.map(({ attempt }) => [attempt.id, attempt.attemptEpoch]))
     const unique = new Map<string, string>()
     for (const row of prepared.snapshots) {
@@ -527,11 +532,21 @@ export const listAuthoritativeRunLeafSources = async (input: {
   const ciphers = samples.map(row => row.canonicalResultEncrypted
     ?? reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500))
   const views = await loadStoredCanonicalUnitResults(ciphers)
-  return samples.map((sample, i) => {
+  const tools=samples.map((sample, i) => {
     const { core } = views[i]
     return { leaf: { slotKey: sample.slotKey, unitType: core.unitType,
       instrumentKey: core.instrumentKey, instrumentVersion: core.instrumentVersion,
       compiledRuntimeHash: core.compiledRuntimeHash },
     metrics: core.metrics.map(metric => ({ key: metric.key, ...(metric.unit ? { unit: metric.unit } : {}) })) }
   })
+  if(!input.groupAudience)return tools
+  const allowed:typeof tools=[]
+  for(const tool of tools){
+    try{
+      const contract=await reportingLeafDisclosureContract(tool.leaf),rule=contract.audiences[input.groupAudience]
+      const metrics=tool.metrics.filter(metric=>rule.metricKeys.includes(metric.key))
+      if(rule.mode.includes('AGGREGATE')&&metrics.length)allowed.push({...tool,metrics})
+    }catch(error){if(!(error instanceof ReportingError&&error.code==='REPORT_NOT_FOUND'))throw error}
+  }
+  return allowed
 }

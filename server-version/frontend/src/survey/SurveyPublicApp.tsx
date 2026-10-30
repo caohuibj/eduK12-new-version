@@ -1,3 +1,4 @@
+import {SurveyPersonalChanges} from './SurveyPersonalChanges'
 import BundleProfileSummary,{type BundleProfileView} from '../pages/bundle/BundleProfileSummary'
 import {clearSurveySituationalSessions,rememberSurveySituationalSession} from './survey-situational-local'
 import {deferredPage} from '../components/page-loading/deferredPage'
@@ -1196,6 +1197,7 @@ export default function SurveyPublicApp(){
         </section>}
         {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
         <p className="survey-completion-time">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
+        {info.project.collectionMode==='LINKED_WAVES'&&completion&&<SurveyPersonalChanges publicId={publicId} attemptId={completion.attemptId} proof={completion.proof}/>}
         {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">
           <button type="button" className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>
         </div>}

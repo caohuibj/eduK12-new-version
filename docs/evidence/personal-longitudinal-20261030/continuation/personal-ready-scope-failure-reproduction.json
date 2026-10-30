@@ -1,0 +1,39 @@
+{
+  "runId": 41027089221,
+  "attempt": 1,
+  "jobId": 123967664202,
+  "eventBase": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
+  "preview": "de26f0103e28b059d22e26638e07de19ef3461b0",
+  "parents": [
+    "parent 1d95bf5d9c104dcc9d0ffa344858cb39a70212bd",
+    "parent 6deb65fb662aeb93c21f751c4e4067f8e224f170"
+  ],
+  "diagnosis": "Main advanced after event base; preview includes new BAT/COPSOQ catalog files absent from event base",
+  "unexpectedExamples": [
+    {
+      "file": "docs/scale-intake/jdr-20261030/bat-copsoq-outstanding-catalog.md",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A"
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/bat12_general_en/1.0.0/instrument.ts",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A"
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/bat12_general_en/1.0.0/source.json",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A"
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/bat12_general_zh_hans/1.0.0/instrument.ts",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A"
+    }
+  ],
+  "error": "Personal tracking Draft has unplanned paths or modes; no broad fallback"
+}

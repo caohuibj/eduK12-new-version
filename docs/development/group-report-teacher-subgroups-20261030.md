@@ -23,3 +23,7 @@
 ## main55 依赖同步
 
 已沿 School1612d7a29 → Reader e0b40d5e5 → Subgroup addbcdea881 的依赖关系无冲突对齐 main `55fab18e9933e58dcb800b20156f5b7e48858536`。Teacher 子群 backend tree `08e1af56b33962b0f9ec22c9db3973a164a7b7a2` 与 frontend tree `6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103` 均与原已验证组件完全相同，继续复用现有类型/PG/浏览器结果，未重复执行。前文 PR408 等待状态为历史；现已由 DOT 合并，不修改其分支或被拒绝的文档动作。PR418保持Draft，自己的正式资格尚未激活。
+
+## 生成成功与目录读取分离
+
+按 DOT review 修复 TeacherFormGroupVersions：POST成功先在原请求token下交付报告并将新版本加到选择列表，目录GET不再决定生成是否成功。GET失败只显示目录刷新提示；重试按钮仅执行GET，不再次POST。只新增并运行一项POST成功/GET失败/GET重试用例，1PASS，原导航用例filtered，后端与PG输入未变不重跑。旧frontend类型收据仍只代表旧tree，后续正式冻结处理当前类型证据。

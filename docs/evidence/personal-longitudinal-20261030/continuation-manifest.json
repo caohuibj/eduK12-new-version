@@ -1,0 +1,96 @@
+{
+  "baseCandidate": "68bfc81ed731ca97825df852c75738e1f0c41a1f",
+  "note": "Targeted review continuation; filtered old cases remain filtered. Raw outputs are not rewritten or signed.",
+  "files": [
+    {
+      "file": "longitudinal-review-disclosure.json",
+      "bytes": 4704,
+      "sha256": "6161a8da9196ee9bd1bad8897be5b992998a3ed980ed28a1c4886110e2b66f12"
+    },
+    {
+      "file": "longitudinal-review-disclosure.log",
+      "bytes": 348,
+      "sha256": "3d0390a273b7c51c4fd45f15c33a544c51fb9f7fe99837295027e2101b81288d"
+    },
+    {
+      "file": "longitudinal-review-disclosure-complete.json",
+      "bytes": 5091,
+      "sha256": "080053afc87ccfcfe6bf1115caeb16c526e01bceecfd94dd24025384929f67ab"
+    },
+    {
+      "file": "longitudinal-review-disclosure-complete.log",
+      "bytes": 357,
+      "sha256": "2c8b5f575aa46f8a41dbef84e82b374632f50d730f684f62466e2f7bba47c843"
+    },
+    {
+      "file": "longitudinal-review-inheritance.json",
+      "bytes": 2413,
+      "sha256": "25da85bae123de40bd2c3700a2fce851f569aa508e9f4edfd8794d770e9678f7"
+    },
+    {
+      "file": "longitudinal-review-inheritance.log",
+      "bytes": 349,
+      "sha256": "b159f3580a66d5c5b834d4a8ee4e309add533f11cb4d02c20ef6a1a6aeabdfe8"
+    },
+    {
+      "file": "longitudinal-review-feedback-consumers.json",
+      "bytes": 10363,
+      "sha256": "7747d8d95cdb26da348d16aab4bdaeccd5070f0113aaff863830b7fa26c79d5a"
+    },
+    {
+      "file": "longitudinal-review-feedback-consumers.log",
+      "bytes": 356,
+      "sha256": "f1dab32f46c91c34e2af64de16b46ff26a788cece72b1e268e243d3f1eba908a"
+    },
+    {
+      "file": "longitudinal-review-null-ui.json",
+      "bytes": 1632,
+      "sha256": "5f7defe48b491ff161b5c911df2bff7d60914efee3aebe4edf66c3fc962a7063"
+    },
+    {
+      "file": "longitudinal-review-null-ui.log",
+      "bytes": 345,
+      "sha256": "eb8fc6ca1015f9aa2dc48c9968e4e2981aaa89bc3879db2adbc1996c17f48472"
+    },
+    {
+      "file": "longitudinal-review-bundle-source.json",
+      "bytes": 5062,
+      "sha256": "f12d41deaf5af268075a3e1c7825324b797c151423afb35bb3dd52216972cfda"
+    },
+    {
+      "file": "longitudinal-review-bundle-source.log",
+      "bytes": 351,
+      "sha256": "f4de5f84cb24dd0ab82e68ae05d909be33121afa72f3723dd998f68b5a35bc5d"
+    },
+    {
+      "file": "longitudinal-review-backend-types.log",
+      "bytes": 284,
+      "sha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+    },
+    {
+      "file": "longitudinal-review-frontend-types.log",
+      "bytes": 284,
+      "sha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+    },
+    {
+      "file": "longitudinal-review-frontend-lint.log",
+      "bytes": 721,
+      "sha256": "25722235ed9be588bd610b6b428c1e8af66597e23e303d774047ee44267f48d6"
+    },
+    {
+      "file": "longitudinal-review-actionlint-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-review-draft-control-final.log",
+      "bytes": 232,
+      "sha256": "a9b96b6efd062609b109423b02b353d09a7786970e3ecfb934addfc680f70578"
+    },
+    {
+      "file": "longitudinal-review-bounded-evidence-control.log",
+      "bytes": 232,
+      "sha256": "e9149ac6d60679a01ec4681fc65d735b3696a6d0b254f24872e47f38736c5f7f"
+    }
+  ]
+}

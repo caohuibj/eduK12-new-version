@@ -1,0 +1,45 @@
+{
+  "recordedAfterExecutionAt": "2026-10-30T11:37:26.590694+00:00",
+  "main": "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
+  "mergedLocalHead": "0e8f4aea229bce6379692b6d3c3e36f4a048926e",
+  "sourceState": "Post-execution current control bytes; only last test display name clarified after successful9 control cases. Not a pre-execution signature.",
+  "controlWorkingSHA256": {
+    ".github/scripts/personal-tracking-ready.json": "1d4c462adb9bbce91bf1129c0b1f3d180ed9abf303a5679940a40084c2e01233",
+    ".github/scripts/personal-tracking-ready.mjs": "7509bca22cb4d37ee5390dc5a177876ecc962dfd6cc60824abd932fb7bd1c77c",
+    ".github/scripts/personal-tracking-ready.test.mjs": "afe0e8b88cccdd58616ef940ed7129949e313183dbc4bcb8660b644f1349e0a1",
+    ".github/workflows/ci.yml": "bb5904d3475180cbd09a2aebf9631e01d661c2196ad0e7939743dfd0bb8ceed2"
+  },
+  "checks": {
+    "personal-main2fc-control-tests.log": {
+      "exitCode": 0,
+      "tests": 9
+    },
+    "personal-main2fc-actionlint.log": {
+      "exitCode": 0
+    }
+  },
+  "nativeProof": {
+    "sourceHead": "e6585ebed49e5cd92e858c19fd930230c791adbb",
+    "runId": 41038456712,
+    "jobId": 124005165894,
+    "currentCandidatePrismaTree": "ba21974eef50397589e9fec671eab73d188dffba",
+    "originalCandidatePrismaTree": "ba21974eef50397589e9fec671eab73d188dffba",
+    "currentMainPrismaTree": "1ad68f7381709a5bf4a336e38afd2775cc4d52f1",
+    "originalMainPrismaTree": "1ad68f7381709a5bf4a336e38afd2775cc4d52f1",
+    "frontendAdmitted": false
+  },
+  "nextJobs": [
+    "scope",
+    "personal-tracking: authenticate original application/native/backend-audit; execute current frontend audit/types/lint",
+    "docker: current images/security checks",
+    "codeql: current selected Survey/reporting sources and changed control",
+    "merge-gate"
+  ],
+  "notExecuted": [
+    "old31 application journeys",
+    "native migration/restore replay",
+    "production",
+    "deploy",
+    "merge"
+  ]
+}

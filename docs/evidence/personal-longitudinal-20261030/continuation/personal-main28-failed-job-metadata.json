@@ -1,0 +1,1 @@
+{"check_run_url":"https://api.github.com/repos/caohuibj/eduK12-new-version/check-runs/124044901601","conclusion":"failure","head_sha":"52b4cbdb4463a7ffcaf5192cc577a6d4d71774dc","id":124044901601,"run_id":41050414835,"status":"completed","steps":[{"conclusion":"failure","name":"actual frontend app types and affected source lint","number":10}]}

@@ -1,3 +1,6 @@
+import {execFileSync} from 'node:child_process';
+import {personalTrackingReadyPlan} from './personal-tracking-ready.mjs';
+import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
 import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
 import {groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
 export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd()}={}) {
@@ -83,6 +86,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='personal-tracking'){let p;try{p=JSON.parse(scope.personal_tracking_plan)}catch{}return draft?['scope']:['scope','personal-tracking',...(p?.imageReuse?[]:['docker']),'codeql'];}
   if(scope.application_route==='group-report-draft')return draft?['scope']:['scope','group-report-ready-qualification-required'];
   if(scope.application_route==='onboarding-structure')return ['scope','onboarding-structure','codeql'];
   if(scope.application_route==='pr364')return ['scope','pr364','codeql'];
@@ -119,6 +123,7 @@ export function requiredChecks(needs, draft) {
   if(scope.application_route==='scale-library-governance')return ['scope','scale-library-governance','codeql'];
   if(scope.application_route==='composite-csv-memory')return ['scope','composite-csv-memory','codeql'];
   if(scope.application_route === 'training-workspace') return ['scope','training-workspace','codeql'];
+  if(draft&&scope.personal_tracking_draft==='true')return ['scope','pr-light-backend','pr-light-frontend'];
   if(scope.scenario === 'survey-wave-selection') return ['scope','backend-regression','frontend','docker','codeql'];
   if(scope.scenario === 'frontend-performance') return ['scope','frontend','frontend-build','docker','codeql'];
   if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
@@ -175,6 +180,7 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='personal-tracking'){try{const p=JSON.parse(scope.personal_tracking_plan);if(p.route!=='personal-tracking'||p.draft!==draft)failed.push('scope');}catch{failed.push('scope');}return [...new Set(failed)];}
   if(scope.application_route==='group-report-draft'){
     try{const p=JSON.parse(scope.group_report_plan);if(!draft||p.preflightOnly!==true||p.route!=='group-report-draft'||Object.entries(groupReportDraftOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -471,6 +477,8 @@ export function failedChecks(needs, draft) {
   if(scope.cognitive_intake_light !== undefined && (!['true','false'].includes(scope.cognitive_intake_light) || scope.cognitive_intake_light==='true' &&
     (scope.content!=='true'||scope.cognitive!=='true'||scope.frontend!=='false'||scope.codeql!=='true'||scope.scenario!=='content'||scope.scale_intake_light==='true'||scope.scale==='true'||scope.situational==='true'||scope.bundle==='true')))
     failed.push('scope');
+  if(scope.personal_tracking_draft!==undefined&&!['true','false'].includes(scope.personal_tracking_draft))failed.push('scope');
+  if(scope.personal_tracking_draft==='true'&&(!draft||scope.application_route!=='legacy'||scope.scenario!=='platform'))failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
   const scenarios = {'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
@@ -513,6 +521,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='personal-tracking'){try{const {changedEntries}=await import('./content-scope.mjs');const p=JSON.parse(needs.scope.outputs.personal_tracking_plan);const actual=personalTrackingReadyPlan(changedEntries(process.env.CI_BASE_SHA),process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event:process.env.CI_EVENT,branch:process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF,draft,forceFull:process.env.CI_FORCE_FULL==='true'});if(JSON.stringify(p)!==JSON.stringify(actual))failed.push('recomputed-personal-tracking-plan');}catch{failed.push('recomputed-personal-tracking-plan');}}
+  if(needs.scope?.outputs?.personal_tracking_draft==='true'){
+    try{const {changedEntries}=await import('./content-scope.mjs');if(!personalTrackingDraftScope(changedEntries(process.env.CI_BASE_SHA),{event:process.env.CI_EVENT,draft,forceFull:process.env.CI_FORCE_FULL==='true'}))failed.push('recomputed-personal-tracking-draft');}catch{failed.push('recomputed-personal-tracking-draft');}
+  }
   if(needs.scope?.outputs?.application_route==='group-report-draft'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),base=groupReportDiffBase(process.env.CI_BASE_SHA,head);const p=JSON.parse(needs.scope.outputs.group_report_plan);if(p.base!==base||JSON.stringify(groupReportDraftPlan(changedEntries(base,head),base,head))!==JSON.stringify(p))failed.push('recomputed-group-report-draft');}catch{failed.push('recomputed-group-report-draft');}
   }

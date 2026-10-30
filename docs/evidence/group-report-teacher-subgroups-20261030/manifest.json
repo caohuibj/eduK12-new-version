@@ -166,6 +166,14 @@
     "teacher-group-report.pdf": {
       "sha256": "fe57a2dd1599373571295794a15e0b415e1f2b6962f6ddaa406903eba2e433c8",
       "bytes": 405078
+    },
+    "directory-failure.json": {
+      "sha256": "391d35f2f5c902218cddd3fc183d8058c477b594e65452b625e278931201162c",
+      "bytes": 1399
+    },
+    "directory-failure.log": {
+      "sha256": "3f13dc18484238372bddf7ec42439c30ef0e3d558634c66e26f12ece6819b89e",
+      "bytes": 130
     }
   },
   "main55Integration": {
@@ -178,5 +186,13 @@
     "testsAndTypesReexecuted": false,
     "priorCurrentComponentEvidenceRetained": true,
     "formalCiActivated": false
+  },
+  "directoryRefreshFix": {
+    "scope": "POST success immediately delivers report/version under current request token; directory GET failure has separate warning and read-only retry",
+    "report": "directory-failure.json",
+    "passedNewCases": 1,
+    "oldNavigationCaseReexecuted": false,
+    "backendChanged": false,
+    "priorFrontendTypes": "Earlier receipt retained for its original tree only; this UI source changed, current types pending next qualification freeze."
   }
 }

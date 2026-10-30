@@ -2,16 +2,16 @@
   "status": "PREPARED_NOT_ACTIVATED",
   "pr": 414,
   "base": "55fab18e9933e58dcb800b20156f5b7e48858536",
-  "productCheckpoint": "199d2807fd634e6fa54fd09163233d4722fd9778",
+  "productCheckpoint": "a2b20a6e66ac68fd38ca8c37b9128613c2a725f4",
   "branch": "feat/group-report-school-teacher-20261030",
   "components": {
-    "backend": "b0ab5f0b0fad5b14d203499deea50640264c2901",
+    "backend": "95198c4740897cb76e4fddb8db8dbd78a232f1e7",
     "frontend": "7db01e8ff09cd4f5865e99fbb0438f2f4ff6caea"
   },
   "completeProductDiff": {
     "path": "docs/evidence/group-report-school-20261030/main55-source-diff.raw",
     "format": "git diff --raw --no-abbrev --no-renames -z base productCheckpoint",
-    "sha256": "aa293be63e2d11f893d5dfbadfabc70ef8e978d681a8cabbfd2759dcec9f5ac7"
+    "sha256": "b3e929c7915f0c07aabc14d3b0850b4b458edcd897232b7ce2e3870a716c7f58"
   },
   "scope": "Existing School single selected Scale/Cognitive/SJT leaf and one-dimension subgroup, V2 snapshot/read/print; existing authorization, enrollment histories, floor and differencing retained",
   "schemaTree": {
@@ -31,7 +31,7 @@
     "Read the designated CI checklist, finish scoped control review and verify live PR base/source/merge identity before actual activation; do not send an unknown branch to full fallback."
   ],
   "checksNotToReplay": [
-    "37 original distinct unit/mockHTTP cases and2 retained PG cases; old failures remain.",
+    "39 distinct unit/mockHTTP +2 retained PG; original37 not replayed, only2 new source-discovery cases executed.",
     "Actual School browser/navigation/print outputs; synthetic authentication/API attribution stays visible.",
     "No schema delta: no new migration, dump/restore or platform scientific regression.",
     "Original Training175 and Survey81 remain outside the new candidate test scope."
@@ -48,5 +48,6 @@
   ],
   "ciExecuted": false,
   "deployed": false,
-  "productionAccessed": false
+  "productionAccessed": false,
+  "previousProductCheckpoint": "199d2807fd634e6fa54fd09163233d4722fd9778"
 }
