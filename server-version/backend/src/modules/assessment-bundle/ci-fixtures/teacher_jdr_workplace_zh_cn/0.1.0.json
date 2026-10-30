@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "context": {
+    "adult_confirmed": true,
+    "teaching_confirmed": true
+  },
+  "slots": {
+    "demands": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "HSE-03",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-06",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-09",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-12",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-16",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-18",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-20",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-22",
+          "responseValue": "often"
+        }
+      ]
+    },
+    "control": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "HSE-02",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-10",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-15",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-19",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-25",
+          "responseValue": "agree"
+        },
+        {
+          "itemCode": "HSE-30",
+          "responseValue": "agree"
+        }
+      ]
+    },
+    "manager": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "HSE-08",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-23",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-29",
+          "responseValue": "agree"
+        },
+        {
+          "itemCode": "HSE-33",
+          "responseValue": "agree"
+        },
+        {
+          "itemCode": "HSE-35",
+          "responseValue": "agree"
+        }
+      ]
+    },
+    "peer": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "HSE-07",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "HSE-24",
+          "responseValue": "agree"
+        },
+        {
+          "itemCode": "HSE-27",
+          "responseValue": "agree"
+        },
+        {
+          "itemCode": "HSE-31",
+          "responseValue": "agree"
+        }
+      ]
+    },
+    "burnout": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "CBI-W1",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-W2",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-W3",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-W4",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-W5",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-W6",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-W7",
+          "responseValue": "sometimes"
+        }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": []
+}

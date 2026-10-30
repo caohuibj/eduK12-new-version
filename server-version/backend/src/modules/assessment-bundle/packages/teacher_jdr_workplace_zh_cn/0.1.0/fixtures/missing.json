@@ -1,0 +1,33 @@
+{
+  "values": {
+    "demands": {
+      "state": "missing"
+    },
+    "control": {
+      "state": "present",
+      "value": 4
+    },
+    "manager": {
+      "state": "present",
+      "value": 4
+    },
+    "peer": {
+      "state": "present",
+      "value": 4
+    },
+    "adult": {
+      "state": "present",
+      "value": true
+    },
+    "teaching": {
+      "state": "present",
+      "value": true
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "COMPUTED",
+  "expectedProfile": {
+    "state": "INSUFFICIENT",
+    "profileId": null
+  }
+}

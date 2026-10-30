@@ -916,12 +916,12 @@
       "schemaVersion": 1,
       "pr": 408,
       "enabled": true,
-      "base": "31845e3a14dd5edf6e03c90e7f71c014bcf0aa06",
-      "product": "33750283bda22a24eb698fd14f35858c4ebfe50d",
-      "controlCheckpoint": "d10399486338f5094557c2b2a195583ffa5fe3fb",
+      "base": "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
+      "product": "e0c993ef672e889c9373d68d1c90541f61b53e5e",
+      "controlCheckpoint": "131fad32c002e3b1a0915d7661daed78bc32856a",
       "components": {
-        "backend": "bb14d816fe41247b7872c06acc48eedf7e7842d7",
-        "frontend": "509e0d9f6303c945f7569087140ecdc5017c514e"
+        "backend": "94f9e5bb921ec587774857e7dc85ef4518616eb6",
+        "frontend": "f9d4530ad115402477acdaed7993d7b0f51ac804"
       },
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "2e1dde28b2d1269b2c7565df7c9bae17764e85c5",
@@ -940,12 +940,12 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "04cd5a8ac238aab570030a506aa45051460979b7"
+        ".github/workflows/ci.yml": "021cf3022aa87bf8206c380f7aa8929024c8a7c8"
       },
       "source": {
         "docs/development/group-report-training-20261030.md": {
           "before": null,
-          "after": "f5b2187735a7f520bccc937ce18ddfb2ce797a9e"
+          "after": "25f922e55fdff409189a2518e0997ff4630a0daa"
         },
         "docs/evidence/group-report-training-20261030/backend-tests-first.json": {
           "before": null,
@@ -1066,6 +1066,30 @@
         "docs/evidence/group-report-training-20261030/leaf-scope.log": {
           "before": null,
           "after": "b43598e33d7ae06889e821013016770e66ae418e"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/README.md": {
+          "before": null,
+          "after": "ae74fc32ed1c03a23302db68e9775d15669f8b46"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/backend-types.json": {
+          "before": null,
+          "after": "9c93fa1a5880c7435232f87f2db10fa5edb164d4"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/frontend-types.json": {
+          "before": null,
+          "after": "69201d55c694e1bf518326399739287acc5019fe"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/original-formal-result.json": {
+          "before": null,
+          "after": "2a6d726333a09415133a485a526ab05b9048a5d7"
         },
         "docs/evidence/group-report-training-20261030/main-alignment/backend-types.exit": {
           "before": null,
@@ -1264,7 +1288,7 @@
           "after": "22e5b980e43b74a130699a754787522f901febf8"
         }
       },
-      "activationNote": "Delegated scoped self-review under current autonomous CI authorization; DOT background review remains independent, not claimed performed here. Existing actual scope/admission/SAST/Ready only, no extra job. Reuse175 case owners, same frontend types and both browser receipts. Current changed backend types and new local control passed once; neither old suites nor new local fixture replayed in CI. Separate concrete merge approval for408 remains required."
+      "activationNote": "Current main2fc exact alignment under existing autonomous qualification authorization. Delegated scoped static delta review; DOT background review not claimed performed here. Both actual current component compilers passed once. Original175 successful case owners and two browser receipts unchanged; no application/PG/native/local control replay. Existing actual scope/admission/affected CodeQL/Ready only. No merge/deployment authority."
     },
     "task1": {
       "schemaVersion": 1,
