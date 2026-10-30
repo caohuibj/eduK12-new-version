@@ -1,0 +1,9 @@
+✔ PR381 keeps one compiled GET-only editor and live sandbox verification before the sole build (3.479048ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 110.028485

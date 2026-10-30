@@ -1,0 +1,11 @@
+✔ PR395 exact frontend scope refuses drift and preserves the stable required checks (10.375316ms)
+✔ PR395 admits only the original disjoint 21-case union and explicit failed School continuation (6.012069ms)
+✔ PR395 missing browser consumers run without rebuilding, replaying application tests or starting a backend (3.551819ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 204.672693
