@@ -1071,3 +1071,55 @@ export type MazeTrialPayload = {
   completed: boolean
   interrupted: boolean
 }
+
+/** Auditoryrt 冻结 config（与后端 auditoryrt.config schema 一致）。 */
+export interface AuditoryrtConfig {
+  totalTrials: number
+  foreperiodMinMs: number
+  foreperiodMaxMs: number
+  toneFrequencyHz: number
+  toneDurationMs: number
+  maxRtWindowMs: number
+  interTrialIntervalMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Auditoryrt 单 trial payload（与后端 auditoryrt.trial schema 一致）。 */
+export type AuditoryrtTrialPayload = {
+  trialIndex: number
+  foreperiodMs: number
+  rtMs: number | null
+  interrupted: boolean
+  audioLatencyMs: number | null
+}
+
+/** Auditorynback 冻结 config（与后端 auditorynback.config schema 一致）。 */
+export interface AuditorynbackConfig {
+  nLevel: number
+  totalTrials: number
+  targetRatio: number
+  stimulusMs: number
+  isiMs: number
+  toneFrequenciesHz: number[]
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Auditorynback 单 trial payload（与后端 auditorynback.trial schema 一致）。 */
+export type AuditorynbackTrialPayload = {
+  trialIndex: number
+  toneIndex: number
+  responded: boolean
+  rtMs: number | null
+  interrupted: boolean
+  audioLatencyMs: number | null
+}

@@ -371,6 +371,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['迷宫结构（seed 生成 + frozen config 尺寸）', '最短路径（BFS）'],
     serverDerivedFacts: ['路径合法性判定', 'metrics（路径效率/完成率）', 'quality flags'],
   },
+  auditoryrt: {
+    testType: 'auditoryrt',
+    clientObservedFacts: ['逐试次 rtMs 与提前/漏失事实', 'interrupted', 'audioLatencyMs 留痕'],
+    runtimeReconstructableFacts: ['前瞻期调度（seed 均匀抖动 + frozen config 上下限）', '纯音参数（frozen config）'],
+    serverDerivedFacts: ['有效窗口与预期/漏失判定', 'metrics（medianRtMs/rtCv）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -651,6 +657,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'maze',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐迷宫移动序列与完成用时'],
     futureCaptureFacts: ['指针/按键轨迹采样', '真实 input modality', 'device provenance'],
+  },
+  auditoryrt: {
+    testType: 'auditoryrt',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 rtMs/foreperiodMs/audioLatencyMs'],
+    futureCaptureFacts: ['音频输出延迟自动校准事实', '真实 input modality（事件级区分 key/pointer）', 'device provenance'],
   },
 }
 

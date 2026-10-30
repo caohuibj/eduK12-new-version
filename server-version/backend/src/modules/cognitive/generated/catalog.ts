@@ -53,6 +53,7 @@ import { catalog as task50 } from '../tasks/proofread/governance'
 import { catalog as task51 } from '../tasks/visualwm/governance'
 import { catalog as task52 } from '../tasks/cogest/governance'
 import { catalog as task53 } from '../tasks/maze/governance'
+import { catalog as task54 } from '../tasks/auditoryrt/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -108,4 +109,5 @@ export const cognitiveCatalog = {
   'visualwm': task51,
   'cogest': task52,
   'maze': task53,
+  'auditoryrt': task54,
 }

@@ -54,6 +54,7 @@ import { executionEntries as task51 } from '../tasks/proofread/package'
 import { executionEntries as task52 } from '../tasks/visualwm/package'
 import { executionEntries as task53 } from '../tasks/cogest/package'
 import { executionEntries as task54 } from '../tasks/maze/package'
+import { executionEntries as task55 } from '../tasks/auditoryrt/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -113,5 +114,6 @@ export const cognitiveExecutionEntries = [
   task52[0],
   task53[0],
   task54[0],
+  task55[0],
   task21[1],
 ]

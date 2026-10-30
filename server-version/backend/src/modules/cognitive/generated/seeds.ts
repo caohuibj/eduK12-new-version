@@ -54,6 +54,7 @@ import { seeds as task51 } from '../tasks/proofread/seeds'
 import { seeds as task52 } from '../tasks/visualwm/seeds'
 import { seeds as task53 } from '../tasks/cogest/seeds'
 import { seeds as task54 } from '../tasks/maze/seeds'
+import { seeds as task55 } from '../tasks/auditoryrt/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -113,5 +114,6 @@ export const cognitiveSeeds = [
   task49[0],
   task52[0],
   task54[0],
+  task55[0],
   task21[1],
 ]
