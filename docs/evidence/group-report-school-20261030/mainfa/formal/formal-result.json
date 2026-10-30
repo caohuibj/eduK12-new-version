@@ -1,0 +1,144 @@
+{
+  "status": "QUALIFIED_OLD_BASE_PENDING_MAIN406_ALIGNMENT",
+  "pr": 414,
+  "candidate": "77e2767248d171f8914fe94b9f3debada424a4d4",
+  "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+  "actualMerge": "7007f01f997ce828f15422dc7dc98f4aedd89e11",
+  "tree": "db86d3f899fb337392d39aa7973f054444b31026",
+  "run": {
+    "id": 41057783824,
+    "event": "pull_request",
+    "path": ".github/workflows/ci.yml",
+    "head_sha": "77e2767248d171f8914fe94b9f3debada424a4d4",
+    "head_branch": "feat/group-report-school-teacher-20261030",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-10-30T12:45:40Z",
+    "run_started_at": "2026-10-30T12:45:40Z",
+    "updated_at": "2026-10-30T12:47:36Z",
+    "html_url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/41057783824"
+  },
+  "requiredJobs": [
+    {
+      "id": 124069652432,
+      "run_id": 41057783824,
+      "run_attempt": 1,
+      "head_sha": "77e2767248d171f8914fe94b9f3debada424a4d4",
+      "name": "classify changed content",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-30T12:45:55Z",
+      "completed_at": "2026-10-30T12:46:11Z",
+      "html_url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/41057783824/job/124069652432"
+    },
+    {
+      "id": 124069788752,
+      "run_id": 41057783824,
+      "run_attempt": 1,
+      "head_sha": "77e2767248d171f8914fe94b9f3debada424a4d4",
+      "name": "codeql (javascript/typescript SAST)",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-30T12:46:14Z",
+      "completed_at": "2026-10-30T12:47:16Z",
+      "html_url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/41057783824/job/124069788752"
+    },
+    {
+      "id": 124069788988,
+      "run_id": 41057783824,
+      "run_attempt": 1,
+      "head_sha": "77e2767248d171f8914fe94b9f3debada424a4d4",
+      "name": "reviewed onboarding evidence admission",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-30T12:46:14Z",
+      "completed_at": "2026-10-30T12:46:32Z",
+      "html_url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/41057783824/job/124069788988"
+    },
+    {
+      "id": 124070248133,
+      "run_id": 41057783824,
+      "run_attempt": 1,
+      "head_sha": "77e2767248d171f8914fe94b9f3debada424a4d4",
+      "name": "merge gate / ready PR",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-30T12:47:19Z",
+      "completed_at": "2026-10-30T12:47:36Z",
+      "html_url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/41057783824/job/124070248133"
+    }
+  ],
+  "allJobsRead": 126,
+  "skippedJobs": 122,
+  "testsExecutedInCI": false,
+  "admittedDistinctObservations": 41,
+  "artifacts": [
+    {
+      "id": 12976893220,
+      "name": "onboarding-admission-7007f01f997ce828f15422dc7dc98f4aedd89e11",
+      "zipSHA256": "7678e4847e1a2e4651cafaf9fbea259d7d42498cef5549af08acf51cb53d91e1",
+      "bytes": 4656,
+      "zipActuallyVerified": true
+    },
+    {
+      "id": 12977801611,
+      "name": "onboarding-sast-7007f01f997ce828f15422dc7dc98f4aedd89e11",
+      "zipSHA256": "fb498ffe538b3a392b06c3c7a04ce32ee754a4c2895a2f18d69ff701b16db083",
+      "bytes": 72015,
+      "zipActuallyVerified": true
+    }
+  ],
+  "originalSarif": {
+    "transport": "lossless gzip",
+    "originalSHA256": "2165660399261c62662672d2b6f303d36a32a7740dcfb4e06f719dac6229be97",
+    "findings": 1,
+    "disposition": "Retained existing test-assertion advisory for DOT review; no suppressed findings or zero-findings claim."
+  },
+  "newMain": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+  "newMainAlignment": "NOTDONE: Git fetch failed authentication; new commit object unavailable locally. No credential values printed or replacement credentials configured. GitHub API still readable.",
+  "oldQualifiedCandidateModified": false,
+  "businessPgOrBrowserReexecuted": false,
+  "merged": false,
+  "deployed": false,
+  "huiReviewAppendSucceeded": "409190e0-cc30-81e9-8dae-c09d973e7304",
+  "files": {
+    "draft-run.json": {
+      "sha256": "1504c9b11197388740b7881f268bdae41fdfeef9923e170eb1196cfe1fd1df15",
+      "bytes": 496
+    },
+    "sast-download.json": {
+      "sha256": "abbf2c23e362a0c136869d79503d789bccdab6043606ffc7f4b2f17724e9f417",
+      "bytes": 255
+    },
+    "javascript.sarif.gz": {
+      "sha256": "d6caa8cc983e4851431c6541a497c439f917525a2215a6053773ed75eb83a301",
+      "bytes": 71486
+    },
+    "admission-inspection.json": {
+      "sha256": "c8c12416064ba94b8ff1d606dd18226985b48735cf1512c847471e1b622cae71",
+      "bytes": 607
+    },
+    "sast-inspection.json": {
+      "sha256": "b183541e9624a36f32f78ab0684ec32288b38563bac79ab225467f6f22c8698c",
+      "bytes": 1055
+    },
+    "job-results.json": {
+      "sha256": "cb637e1ddd8b85cdf30bc0dd8fa5b7ae4e2c176bd63b6faec2f5e9bb2bfaa5c6",
+      "bytes": 54026
+    },
+    "admission.json": {
+      "sha256": "c0c3dde4cd29ddd3e05e127dbf20896db5db678bf635829f73cc6a57fee50786",
+      "bytes": 16997
+    },
+    "run.json": {
+      "sha256": "31077c1b4ca60b62a4fc73c40c0d14ca999f919537c228d9d0a007d95fb8ef0e",
+      "bytes": 494
+    },
+    "sast-review.json": {
+      "sha256": "d557831c4fc0fa8d741875c23177d5f182f38e6f62dd06ad2c68fc6232af6678",
+      "bytes": 842
+    }
+  },
+  "newMainApiImpact": "main406-api-impact.json and main406-ci.diff: read-only API review completed; no School/Teacher/reporting production source changed; no Git alignment implied."
+}

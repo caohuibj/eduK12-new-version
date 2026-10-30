@@ -75,4 +75,5 @@ router.post('/:id/preflight', handle(req => service.preflight(req.user!, req.par
 router.post('/:id/archive', handle(req => service.archive(req.user!, req.params.id, req.body)))
 router.post('/:id/remove', handle(req => service.remove(req.user!, req.params.id, req.body).then(() => ({ removed: true }))))
 router.post('/:id/copy', handle(req => service.copy(req.user!, req.params.id, req.body)))
+router.post('/:id/next-wave', handle(req => service.copy(req.user!, req.params.id, req.body,{trackingNext:true})))
 export default router

@@ -1,0 +1,40 @@
+[
+  {
+    "path": "javascript.sarif",
+    "runs": [
+      {
+        "tool": "CodeQL",
+        "results": 1,
+        "levels": {
+          "warning": 1
+        },
+        "rules": {
+          "js/incomplete-url-substring-sanitization": 1
+        },
+        "samples": [
+          {
+            "rule": "js/incomplete-url-substring-sanitization",
+            "level": null,
+            "message": "'[https://registry.npmjs.org](1)' can be anywhere in the URL, and arbitrary hosts may come before or after it.",
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": ".github/scripts/onboarding-controls.test.mjs",
+                    "uriBaseId": "%SRCROOT%",
+                    "index": 0
+                  },
+                  "region": {
+                    "startLine": 279,
+                    "startColumn": 9,
+                    "endColumn": 51
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

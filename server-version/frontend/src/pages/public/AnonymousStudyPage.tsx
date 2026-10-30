@@ -5,6 +5,7 @@ import { publicStudyApi, studyIdentityKey, type AcceptResearchConsent, type Requ
 import {PersonalParticipationLink} from '../../components/participation/PersonalParticipationLink'
 import {ParticipationCodeSetup,ParticipationCodeSaved,ParticipationCodeRecovery,type MemorableEnrollment} from '../../components/participation/ParticipationCode'
 import {trainingStudyLink} from '../../components/participation/training-participation-link'
+import {TrainingPersonalChanges} from '../../modules/composite/TrainingPersonalChanges'
 
 function ResearchConsentPanel({studyId,credential}:{studyId:string;credential:string}) {
   const [research,setResearch]=useState<ResearchParticipation|null>(null)
@@ -184,7 +185,7 @@ export default function AnonymousStudyPage() {
           <h2 className="text-lg font-semibold">任务与历史个人报告</h2>
           <p className="text-sm text-gray-600">继续原作答，不会新建另一份答卷。已完成表示作答完成，报告仍按本测评的生成状态与开放权限显示。</p>
           {!home.waves.length && <p>暂无研究任务。</p>}
-          {home.waves.map(wave=><article key={wave.id} className="space-y-3 rounded-xl border bg-white p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold">第 {wave.ordinal} 波：{wave.title}</h3><p className="rounded-full bg-gray-100 px-3 py-1 text-sm">{wave.state==='COMPLETED'?'已完成':wave.attemptId?'进行中':wave.accepting?'可参与':'暂未开放'}</p></div>{wave.completedAt && <p className="text-sm text-gray-600">完成时间：{new Date(wave.completedAt).toLocaleString()}</p>}{(wave.attemptId || wave.accepting) && <button className="btn-primary" disabled={busy} onClick={()=>void open(wave)}>{wave.state==='COMPLETED'?'查看本次个人报告':wave.attemptId?'继续作答':'开始本波次测评'}</button>}</article>)}
+          {home.waves.map(wave=><article key={wave.id} className="space-y-3 rounded-xl border bg-white p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold">第 {wave.ordinal} 波：{wave.title}</h3><p className="rounded-full bg-gray-100 px-3 py-1 text-sm">{wave.state==='COMPLETED'?'已完成':wave.attemptId?'进行中':wave.accepting?'可参与':'暂未开放'}</p></div>{wave.completedAt && <p className="text-sm text-gray-600">完成时间：{new Date(wave.completedAt).toLocaleString()}</p>}{(wave.attemptId || wave.accepting) && <button className="btn-primary" disabled={busy} onClick={()=>void open(wave)}>{wave.state==='COMPLETED'?'查看本次个人报告':wave.attemptId?'继续作答':'开始本波次测评'}</button>}{wave.state==='COMPLETED'&&wave.attemptId&&<TrainingPersonalChanges attemptId={wave.attemptId} study={{studyId:home.studyId,credential}}/>}</article>)}
           {home.limitations.map(text=><p key={text} className="text-sm text-gray-600">{text}</p>)}
         </section>
         <ResearchConsentPanel key={home.studyId} studyId={home.studyId} credential={credential}/>

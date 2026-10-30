@@ -129,13 +129,14 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
     if(!row?.measurement_release_id)fail('RELEASE_REQUIRED')
     if(item.type==='SCALE'&&row.owner_id!==item.scale.creatorId)fail('SOURCE_MISMATCH')
     if(item.type==='COGNITIVE'&&row.owner_id!==item.cognitiveAssignment.createdBy)fail('SOURCE_MISMATCH')
-    const release=await read(row.measurement_release_id)
+    const inherited=(composite as any).personalTrackingInheritedUnits?.find((unit:Unit)=>unit.itemId===item.id) as Unit|undefined
+    const release=await read(inherited?.measurement.releaseId??row.measurement_release_id)
     if(release.layer!=='MEASUREMENT'||release.status==='REVOKED'||purpose==='NEW_ADMINISTRATION'&&release.status!=='PUBLISHED')fail('RELEASE_NOT_PUBLISHED')
     const source:Unit['source']={kind:row.kind,id:row.id,...(row.library_entry_id?{libraryEntryId:row.library_entry_id}:{}),...(row.kind==='STATIC_SJT_REGISTRY'?{}:{ownerId:row.owner_id??item.cognitiveAssignment?.createdBy}),
       ...(item.type==='COGNITIVE'?{assignmentId:item.cognitiveAssignment.id,...(readTrainingCognitiveTaskBinding(item.cognitiveAssignment.courseSnapshot)?{cognitiveProfile:readTrainingCognitiveTaskBinding(item.cognitiveAssignment.courseSnapshot)!}:{})}:{}),
       ...(identity?{instrumentKey:identity.instrumentKey,instrumentVersion:identity.instrumentVersion}:{})}
     const original=trainingContentSnapshotSchema.safeParse((composite as any).trainingContentSnapshot)
-    const privateId=original.success?original.data.units.find(unit=>unit.itemId===item.id)?.source.privateVersionId:undefined
+    const privateId=inherited?.source.privateVersionId??(original.success?original.data.units.find(unit=>unit.itemId===item.id)?.source.privateVersionId:undefined)
     const privateSource=privateId?await readExactPrivateSource(db,release,{...source,privateVersionId:privateId}):null
     if(privateSource)source.privateVersionId=privateId
     const library=source.libraryEntryId?await readExactLibrarySource(db,release,source,'NEW_USE'):null

@@ -1,0 +1,14 @@
+{
+  "artifact": 12980335951,
+  "kind": "admission",
+  "sha256": "302c38d338adcc93e284d1025078f99e13c5083b73aa11daac0c8b09229f19e1",
+  "bytes": 4778,
+  "cases": 41,
+  "testsExecutedInCI": false,
+  "source": {
+    "base": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+    "head": "78c76f508d80ba227e9af494121c92498ddb5417",
+    "sourceHead": "f5fabe490334f06c7f97436e82545d3b55b921f6",
+    "tree": "122aceed8cb0b26a614f3742c7f7fadcd93caa9a"
+  }
+}

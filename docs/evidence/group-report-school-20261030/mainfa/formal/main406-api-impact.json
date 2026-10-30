@@ -1,0 +1,682 @@
+{
+  "status": "READ_ONLY_API_IMPACT_REVIEW_NOT_GIT_ALIGNMENT",
+  "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+  "head": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+  "comparedFiles": [
+    {
+      "path": ".github/scripts/content-scope.test.mjs",
+      "status": "modified",
+      "additions": 11,
+      "deletions": 0
+    },
+    {
+      "path": ".github/scripts/personal-tracking-draft-scope.mjs",
+      "status": "modified",
+      "additions": 16,
+      "deletions": 2
+    },
+    {
+      "path": ".github/scripts/personal-tracking-ready.json",
+      "status": "modified",
+      "additions": 308,
+      "deletions": 685
+    },
+    {
+      "path": ".github/scripts/personal-tracking-ready.mjs",
+      "status": "modified",
+      "additions": 58,
+      "deletions": 12
+    },
+    {
+      "path": ".github/scripts/personal-tracking-ready.test.mjs",
+      "status": "modified",
+      "additions": 22,
+      "deletions": 1
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "status": "modified",
+      "additions": 20,
+      "deletions": 8
+    },
+    {
+      "path": "docs/development/personal-longitudinal-training-20261030.md",
+      "status": "added",
+      "additions": 186,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/frontend-audit-original-job.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-native-fixture-control-final.log",
+      "status": "added",
+      "additions": 9,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-native-fixture-preflight-correct-role.log",
+      "status": "added",
+      "additions": 5,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-native-fixture-preflight-paired.log",
+      "status": "added",
+      "additions": 6,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-native-fixture-preflight-report-definition.log",
+      "status": "added",
+      "additions": 4,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-native-fixture-preflight.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-original-admission-controls-final.log",
+      "status": "added",
+      "additions": 10,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-original-admission-final.json",
+      "status": "added",
+      "additions": 111,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-qualification-actionlint-final.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-qualification-controls-first.log",
+      "status": "added",
+      "additions": 20,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/continuation/training-qualification-plan.json",
+      "status": "added",
+      "additions": 253,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-continuation.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-continuation.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-corrected-submit.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-corrected-submit.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-failure.png",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-first-failure.png",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-first.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-first.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-navigation-failure.png",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-navigation.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-navigation.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-response-failure.png",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-response-fixed.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-response-fixed.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-submit.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-submit.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser.png",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-frontend-types.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-context.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-context.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-course.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-course.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-key.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-key.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-population.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-population.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-candidate-frontend-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-candidate-lint.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-candidate-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-frontend-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-lint.log",
+      "status": "added",
+      "additions": 6,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-v2-frontend-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-v2-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-contract.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-contract.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-disclosure.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-disclosure.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-draft-scope.log",
+      "status": "added",
+      "additions": 9,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-contract-corrected.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-contract-corrected.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-pg.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-pg.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-frontend-types.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-initial-types.log",
+      "status": "added",
+      "additions": 10,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg-access.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg-access.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-lint.log",
+      "status": "added",
+      "additions": 9,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-main401-frontend-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-main401-merge.log",
+      "status": "added",
+      "additions": 655,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-main401-prisma.log",
+      "status": "added",
+      "additions": 8,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-main401-types.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-migrate.log",
+      "status": "added",
+      "additions": 14,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-corrected.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-corrected.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-first.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-first.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-prisma-generate.log",
+      "status": "added",
+      "additions": 8,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-types-final.log",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-ui-scope.json",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-ui-scope.log",
+      "status": "added",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-wiring-types.log",
+      "status": "added",
+      "additions": 2,
+      "deletions": 0
+    },
+    {
+      "path": "docs/evidence/personal-longitudinal-training-20261030/manifest.json",
+      "status": "added",
+      "additions": 791,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+      "status": "added",
+      "additions": 30,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/prisma/schema.prisma",
+      "status": "modified",
+      "additions": 5,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+      "status": "added",
+      "additions": 215,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+      "status": "modified",
+      "additions": 9,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+      "status": "added",
+      "additions": 20,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/modules/anonymous-study/routes.ts",
+      "status": "modified",
+      "additions": 5,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/modules/anonymous-study/service.ts",
+      "status": "modified",
+      "additions": 14,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/modules/bundle-product/routes.ts",
+      "status": "modified",
+      "additions": 6,
+      "deletions": 2
+    },
+    {
+      "path": "server-version/backend/src/modules/bundle-product/service.ts",
+      "status": "modified",
+      "additions": 36,
+      "deletions": 7
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.routes.ts",
+      "status": "modified",
+      "additions": 9,
+      "deletions": 1
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.service.ts",
+      "status": "modified",
+      "additions": 20,
+      "deletions": 6
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+      "status": "added",
+      "additions": 105,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+      "status": "added",
+      "additions": 79,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/personal-tracking.ts",
+      "status": "added",
+      "additions": 206,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-content-binding.ts",
+      "status": "modified",
+      "additions": 3,
+      "deletions": 2
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+      "status": "modified",
+      "additions": 4,
+      "deletions": 4
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/routes.ts",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/service.ts",
+      "status": "modified",
+      "additions": 32,
+      "deletions": 7
+    },
+    {
+      "path": "server-version/frontend/src/api/anonymousStudy.ts",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/frontend/src/modules/composite/CompositeReportPage.tsx",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx",
+      "status": "added",
+      "additions": 25,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx",
+      "status": "added",
+      "additions": 31,
+      "deletions": 0
+    },
+    {
+      "path": "server-version/frontend/src/pages/bundle/BundleProducts.tsx",
+      "status": "modified",
+      "additions": 19,
+      "deletions": 2
+    },
+    {
+      "path": "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 1
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+      "status": "modified",
+      "additions": 20,
+      "deletions": 3
+    }
+  ],
+  "schoolTeacherReportingProductionChanges": [],
+  "interpretation": "No School/Teacher/reporting production module changed. PR406 adds Training personal tracking, its Prisma schema/migration and product consumers. CI YAML changes are scoped to personal-tracking branch/route/audit/lint selection; existing School onboarding job definitions are unchanged.",
+  "reuseBoundary": "Do not replay School business/PG cases. Combined compiler inputs and exact base/control bindings must reflect new main. Actual Git alignment/new-main qualification NOTDONE."
+}

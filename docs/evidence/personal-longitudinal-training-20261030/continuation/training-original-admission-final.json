@@ -1,0 +1,111 @@
+{
+  "reviewedCandidate": "e8d515058554a5e4bbf321074c5906c53d880c7a",
+  "caseCount": 31,
+  "admitted": [
+    {
+      "id": "training-browser-response-fixed",
+      "caseNames": [
+        "Training personal longitudinal native publication and SELF results runs native next-wave publication, real learner answer and both reports in Chromium"
+      ],
+      "ciExecuted": false,
+      "originalSigned": false,
+      "provenance": "reviewed-local-evidence"
+    },
+    {
+      "id": "training-bundle-pg-course",
+      "caseNames": [
+        "Training personal longitudinal native publication and SELF results keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment"
+      ],
+      "ciExecuted": false,
+      "originalSigned": false,
+      "provenance": "reviewed-local-evidence"
+    },
+    {
+      "id": "training-contract",
+      "caseNames": [
+        "Training entry measurement adapter uses C plus actual cognitive mode, while full config report changes do not change raw-score identity"
+      ],
+      "ciExecuted": false,
+      "originalSigned": false,
+      "provenance": "reviewed-local-evidence"
+    },
+    {
+      "id": "training-disclosure",
+      "caseNames": [
+        "Training shared frozen per-unit disclosure ceiling keeps the participant subject ceiling independent from teacher scores and cognitive research-only keys",
+        "Training shared frozen per-unit disclosure ceiling excludes research-only, nonstandard, product index and nonnumeric cognitive metrics, while preserving standard and QC facts",
+        "Training shared frozen per-unit disclosure ceiling does not promote an ADMIN-derived researcher label or a researcher template into extra cognitive data permission",
+        "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive parent source",
+        "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive item source",
+        "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive assignment source",
+        "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive config source",
+        "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive submission source",
+        "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive profile source",
+        "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive runtime source",
+        "Training shared frozen per-unit disclosure ceiling rejects a mismatched cognitive provenance source",
+        "Training shared frozen per-unit disclosure ceiling retains QC numeric diagnostics without allowing them to acquire individual reference interpretation",
+        "Training shared frozen per-unit disclosure ceiling uses the frozen Scale V2 policy, independently gates references, and never reads answers or result bodies",
+        "Training shared frozen per-unit disclosure ceiling cannot promote researcher disclosure over an educational-only frozen teacher policy",
+        "Training shared frozen per-unit disclosure ceiling also retains a stricter frozen researcher audience restriction rather than replacing it with teacher permission",
+        "Training shared frozen per-unit disclosure ceiling preserves only explicit V1 custom-descriptive compatibility and denies unknown standard instruments",
+        "Training shared frozen per-unit disclosure ceiling fails closed for Scale epoch corruption",
+        "Training shared frozen per-unit disclosure ceiling fails closed for Scale scale corruption",
+        "Training shared frozen per-unit disclosure ceiling fails closed for Scale submission corruption",
+        "Training shared frozen per-unit disclosure ceiling fails closed for Scale hash corruption",
+        "Training shared frozen per-unit disclosure ceiling fails closed for Scale snapshot corruption"
+      ],
+      "ciExecuted": false,
+      "originalSigned": false,
+      "provenance": "reviewed-local-evidence"
+    },
+    {
+      "id": "training-form-contract-corrected",
+      "caseNames": [
+        "Training entry measurement adapter preserves numeric Form meaning across copied slot keys, and refuses category encodings"
+      ],
+      "ciExecuted": false,
+      "originalSigned": false,
+      "provenance": "reviewed-local-evidence"
+    },
+    {
+      "id": "training-form-pg",
+      "caseNames": [
+        "Training personal longitudinal native publication and SELF results tracks a typed numeric Form response through copy and real FINAL without creating a psychological score"
+      ],
+      "ciExecuted": false,
+      "originalSigned": false,
+      "provenance": "reviewed-local-evidence"
+    },
+    {
+      "id": "training-latest-pg-access",
+      "caseNames": [
+        "Training personal longitudinal native publication and SELF results selects the latest completed whole Training parent while retaining prior snapshots and rechecking course access"
+      ],
+      "ciExecuted": false,
+      "originalSigned": false,
+      "provenance": "reviewed-local-evidence"
+    },
+    {
+      "id": "training-pg-corrected",
+      "caseNames": [
+        "Training personal longitudinal native publication and SELF results publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+        "Training personal longitudinal native publication and SELF results uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads"
+      ],
+      "ciExecuted": false,
+      "originalSigned": false,
+      "provenance": "reviewed-local-evidence"
+    },
+    {
+      "id": "training-ui-scope",
+      "caseNames": [
+        "Training own changes request scope discards an old response when the account/attempt changes",
+        "Training own changes request scope uses the stable study credential and clears the rendered view when it changes"
+      ],
+      "ciExecuted": false,
+      "originalSigned": false,
+      "provenance": "reviewed-local-evidence"
+    }
+  ],
+  "ciExecuted": false,
+  "reviewBasis": "Training original32 records remain local unsigned evidence:31 passed application/consumer JSON cases plus one historical Draft-scope Node control. Every Training application added/removed-line delta matches immutable dbcc (schema compared to its Survey base2f8829; other files to main1cc). Mainfa context is separately merged/qualified. Current frozen e8d source is the candidate anchor for independent DOT review, not a claim DOT approved this PR. Current formal new migration/native restore and changed production source checks still execute."
+}

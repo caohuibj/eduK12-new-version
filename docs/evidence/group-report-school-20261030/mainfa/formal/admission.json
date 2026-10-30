@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "schema": 1,
+    "route": "onboarding-structure",
+    "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "head": "7007f01f997ce828f15422dc7dc98f4aedd89e11",
+    "sourceHead": "77e2767248d171f8914fe94b9f3debada424a4d4",
+    "tree": "db86d3f899fb337392d39aa7973f054444b31026",
+    "product": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+    "components": {
+      "backend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+      "frontend": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8"
+    },
+    "controlCheckpoint": "880223ffdd8092731438b0b25ec27dd8f03ab3d3",
+    "pr": 414,
+    "postMerge": false,
+    "draft": false
+  },
+  "runId": "41057783824",
+  "attempt": "1",
+  "admitted": [
+    {
+      "id": "backend-unit",
+      "caseNames": [
+        "Huischool internal group reporting privacy boundary requires a separately reviewed group floor and independent metric coverage floor",
+        "Huischool internal group reporting privacy boundary rejects students, generic teachers and training accounts before looking up any report",
+        "Huischool internal group reporting privacy boundary rejects a denied or cross-domain school organization",
+        "Huischool internal group reporting privacy boundary does not launch calculation when whole-source or delay checks fail",
+        "Huischool internal group reporting privacy boundary uses canonical generation and a second governed read, with no arbitrary cohort selector",
+        "Huischool internal group reporting privacy boundary blocks overlapping non-identical school cohorts, including old exposed artifacts",
+        "Huischool internal group reporting privacy boundary withholds cross-kind historical longitudinal partial-overlap aggregates",
+        "Huischool internal group reporting privacy boundary allows disjoint or exactly identical populations only, never a narrow override",
+        "Huischool internal group reporting privacy boundary suppresses incomplete contributors, missing values and insufficient published mean",
+        "Huischool internal group reporting privacy boundary rejects wrong audience for existing artifact and re-checks historical source",
+        "Huischool internal group reporting privacy boundary rejects a historic filtered 10-person cohort from a larger Run despite adequate metric N",
+        "Huischool internal group reporting privacy boundary refuses an old partial cohort even if its selector is spelled as whole-Run",
+        "Huischool internal group reporting privacy boundary catalog is bounded, exposes no student identities, and omits unreviewed low-floor plans"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "dc9929e6495d8c761eef42dd37c61560fa74852ed06672b6b2f8a0965d329e9d",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "backend-final-delta",
+      "caseNames": [
+        "School selected leaf and subgroup disclosure permits an adequately separated subgroup, withholding a small difference across parent containers"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "25acc300726464e0c0f40781288da36a3708a340ad4898260f56306dd82dd11c",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "presentation-delta",
+      "caseNames": [
+        "School selected leaf and subgroup disclosure shows only existing numeric aggregates and preserves zero, units and independent effective N",
+        "School selected leaf and subgroup disclosure withholds a tiny missing complement rather than disclosing one excluded student"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "4dd4fb5464ff20de9258ba45805194e6a657948f3a565eca17c539b7c0a1b57e",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "leaf-current-epoch",
+      "caseNames": [
+        "selected Organization Run leaf observations isolates equal metric names in different tools and uses only the current completed epoch",
+        "selected Organization Run leaf observations keeps a missing latest leaf missing instead of borrowing its prior high score",
+        "selected Organization Run leaf observations rejects another measurement definition at the selected slot",
+        "selected Organization Run leaf observations does not turn a new unfinished execution into a completed contribution",
+        "selected Organization Run leaf observations discovers current leaf definitions without returning participant values or decrypting every parent",
+        "leaf artifact identity and measurement metadata retains the V1 payload shape and binds V2 identity to the selected leaf, unit and source floor"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "eeae411c7413e1a7d8a5d0c0efbd91008402c7bcf20096911a669b66a5cd85e5",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "routes",
+      "caseNames": [
+        "Huischool governed report HTTP surface does not permit TRAINING or unauthenticated group reporting",
+        "Huischool governed report HTTP surface denies school group generation without recent TOTP or matching CSRF",
+        "Huischool governed report HTTP surface disallows arbitrary membership selection and subject-targeted filters in school aggregate POST",
+        "Huischool governed report HTTP surface accepts only whole-source arguments in the authorized school report path",
+        "Huischool governed report HTTP surface accepts a selected leaf with single-dimension class OR selection",
+        "Huischool governed report HTTP surface reads an old group artifact only through fresh current school authorization"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "e2cada086cd988e05da342cd15dece86c150b6e7b398d020058bbb924748a04e",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "frontend-renderer-delta",
+      "caseNames": [
+        "School group workbench generates a selected leaf subgroup and prints the same authorized snapshot",
+        "School group workbench reopens the latest artifact without discovering sources or recalculating"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "437a3d269d34e12fb83b1c04312c3e85a091baf94c9a1e0de070bb529b406603",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "frontend-unit",
+      "caseNames": [
+        "School group workbench recovers a failed catalogue request with a GET only",
+        "School group workbench does not restore a previous school from a late response"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "3e6dcaefa9273816f5885a871b65696d2b6ab04f0a700571563e57f62daebcee",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "frozen-privacy",
+      "caseNames": [
+        "School selected leaf preserves the existing frozen privacy projection keeps a legacy Run strict instead of exposing counts, SD or cells through the new path",
+        "School selected leaf preserves the existing frozen privacy projection uses the general frozen policy precision and numeric fields without adding item cells",
+        "School selected leaf preserves the existing frozen privacy projection honors sensitive and require-all-completed options for subgroups",
+        "School selected leaf preserves the existing frozen privacy projection retains exact single-scenario, product and frozen-hash rejection in the shared reader"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "c1e77020cf51e3f5913a55f3c6e7d96692606cc54cf230f954708609a15dece9",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "leaf-floor-review-fix",
+      "caseNames": [
+        "content-owned leaf minimum enforces parent10 leaf20 spec10 cohort12 for generation and retained snapshot reads"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "c53655e4267b1e05f503806e5b781eea5035584aeea9d3507cb7182c5e21907b",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "postgres-continuation",
+      "caseNames": [
+        "School leaf source and historical subgroup in PostgreSQL continues only the retained staff-class deduplication step after the fixture enum repair"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "b9f0441d384e03089ff70df3f3f7f91376714c66f51bd70ff7653475471a1653",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "service-postgres-read-continuation",
+      "caseNames": [
+        "School actual reporting service with isolated PostgreSQL generates and persists a selected class V2, reads it without canonical reprocessing, and retains the old version after rename"
+      ],
+      "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "2869d7a74016c34ea3364b8ebb360ed33bab5ef906b5a8fa995eb6c2527732db",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "group-discovery-contract",
+      "caseNames": [
+        "SCHOOL protected source discovery is not an all-student directory GROUP discovery excludes personal-only compositions and uses the actual professional audience without changing generic discovery",
+        "selected Organization Run leaf observations GROUP discovery rejects a personal-only parent and does not advertise an unresolved private leaf as a registered measurement"
+      ],
+      "originalSourceAssociation": "a2b20a6e66ac68fd38ca8c37b9128613c2a725f4",
+      "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+      "originalReportSHA256": "9e64c85b2921b6454c87fbd724bcb09c4afc6566d31cfb407eb18a9d9bd61799",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    }
+  ],
+  "types": [
+    {
+      "originalExitCode": 0,
+      "originalNode": "v24.21.0",
+      "originalSigned": false,
+      "component": "backend",
+      "currentComponentTree": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+      "currentBackend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+      "coverage": "exact-backend-tree"
+    },
+    {
+      "originalExitCode": 0,
+      "originalNode": "v24.21.0",
+      "originalSigned": false,
+      "component": "frontend",
+      "currentComponentTree": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8",
+      "coverage": "exact-frontend-tree"
+    }
+  ],
+  "observations": [
+    {
+      "kind": "browser",
+      "originalSHA256": "7791ffd1feecb7227a8ef682bfe013eef5d0b28e15ee3b73054837cc8e1b6daa",
+      "ciExecuted": false,
+      "sourceAssociationBasis": "Original retained School observation; generation/read/rename/version/revocation are stage continuations, not replayed full lifecycle. Browser uses actual School navigation/components with synthetic API/auth.",
+      "limitations": [
+        "Unsigned local original; no production/capacity claim.",
+        "Private composition GROUP permission is not inferred; current unsupported leaves are filtered."
+      ]
+    },
+    {
+      "kind": "school-service",
+      "originalSHA256": "b1c07e34d3eecd7de7b33b208b523f128c0b260506e4781536fcce84837d0db5",
+      "ciExecuted": false,
+      "sourceAssociationBasis": "Original retained School observation; generation/read/rename/version/revocation are stage continuations, not replayed full lifecycle. Browser uses actual School navigation/components with synthetic API/auth.",
+      "limitations": [
+        "Unsigned local original; no production/capacity claim.",
+        "Private composition GROUP permission is not inferred; current unsupported leaves are filtered."
+      ]
+    }
+  ],
+  "environment": {
+    "node": "v24.21.0",
+    "database": "Existing isolated synthetic loopback eduk12_group_report_test_20261030; no production.",
+    "limitations": [
+      "Original School WIP reports are unsigned. Commit references are retrospective source associations; no reconstructed execution signature or historical dependency fingerprint.",
+      "41 distinct selected successful names =39 unit/mockHTTP plus2 retained PG. Duplicate reports, failed setup, filtered cases and repaired failures remain in the repository; only successful case ownership is admitted once.",
+      "Full School service used synthetic content registry while actual authority, independent spec review, canonical statistics, artifact persistence, renamed historical range, versions and revocation were real. First generation and already completed fixture stages were not replayed.",
+      "Browser uses actual School navigation/React/printing with synthetic auth/backend; not full live backend browser or fresh production login.",
+      "Current backend95198 and frontend7db compile receipts bind exact component trees. No schema change, new migrations, dump/restore, platform scientific regression or old Survey/Training replay.",
+      "Legacy no-leaf V1 limitation remains documented. Private composition parent currently INDIVIDUAL_ONLY, so no fabricated GROUP entitlement or full-source-completion claim.",
+      "This is scoped merge qualification only; no runtime images, deployment, all-source completion or group longitudinal claim.",
+      "After mainfa038041 integration, current backend2342ff04/frontend3346bc7d receipts passed once on checkpoint7cc7edb0. Only Prisma client generation occurred; no DB migration, native publication, PG or application cases were rerun. Mainfa itself carries the personal longitudinal schema, so this PR has no schema delta."
+    ]
+  },
+  "testsExecutedInCI": false,
+  "rootReviewAuthentication": "Immutable reviewed Git record, not a signed original execution"
+}

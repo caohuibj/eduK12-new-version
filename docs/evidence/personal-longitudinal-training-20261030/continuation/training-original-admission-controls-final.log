@@ -1,0 +1,10 @@
+✔ original local cases and failed continuations retain their provenance without replay (84.829678ms)
+✔ actual entrypoint child resolves original admission without a top-level-await cycle (192.259428ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 448.026008

@@ -16,6 +16,8 @@ import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { assertCognitiveProductEligible, isCognitiveProductEligible, isCognitiveNewAdmissionEnabled } from '../cognitive/product-eligibility'
 import { assertCognitiveCatalogConfiguration } from '../cognitive/assignment.service'
 import { Prisma, UserRole } from '@prisma/client'
+import {trainingTrackingSelectionSchema,copiedTrainingTracking,readTrainingTracking,trainingTrackingPreviewChoices} from '../composite/personal-tracking'
+import {getContentRelease} from '../measurement-content/repository'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { config } from '../../config'
@@ -453,6 +455,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
     if (row.revision !== revision) throw compositeConflict('草稿已变化，请刷新后重新自检')
     const inspectedSituational = await inspectCompositeSituationalItems(row.items, tx, compositeSjtGrantScope(row))
     const checks: Array<{ key: string; label: string; status: 'passed' | 'failed'; message: string; targetId?: string }> = []
+    const trackingCandidates:Array<{itemId:string;scoreKey:string;label:string;unit:string}>=[]
     for (const [key, label, validate] of [
       ['delivery', '课程、公开投放与时间', () => validateDelivery(tx, actor, row)],
       ['training-persistence', 'Training 草稿策略与课程来源', () => validateTrainingPersistenceAuthoring(tx, row, row.trainingPersistencePolicy)],
@@ -460,9 +463,18 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
       ['training-variants', 'Training 加权分组、完整覆盖与次数限制', () => validateTrainingVariants(tx, row)],
       ['training-flow', 'Training 条件路径、材料与结束规则', () => validateTrainingFlow(tx, row)],
       ['resources', '内容依赖与当前权限', () => validateResources(tx, actor, row, inspectedSituational)],
-      ['content', '区段、背景顺序、字段与冻结定义', () => {
+      ['content', '区段、背景顺序、字段与冻结定义', async () => {
         if (inspectedSituational.errors.size) throw inspectedSituational.errors.values().next().value
-        return prepareCompositePublication(actor.userId, actor.role, id, tx, inspectedSituational.releases)
+        const prepared=await prepareCompositePublication(actor.userId, actor.role, id, tx, inspectedSituational.releases)
+        const snapshot=prepared.trainingContentSnapshot as import('../composite/training-content-binding').TrainingContentSnapshot|undefined
+        for(const unit of snapshot?.units??[]){
+          const release=await getContentRelease(tx,unit.measurement.releaseId)
+          const item=row.items.find(i=>i.id===unit.itemId)
+          if(release?.layer==='MEASUREMENT')for(const metric of release.content.metrics)trackingCandidates.push({
+            itemId:unit.itemId,scoreKey:metric.metricKey,label:(item?.scale?.name??item?.cognitiveAssignment?.title??item?.situationalInstrumentKey??'工具')+' · '+metric.metricKey,unit:metric.unit})
+        }
+        trackingCandidates.push(...trainingTrackingPreviewChoices(row.items.filter(item=>item.type==='FORM')).map(choice=>({...choice,unit:'raw'})))
+        return prepared
       }],
     ] as const) {
       try { await validate(); checks.push({ key, label, status: 'passed', message: '通过' }) }
@@ -484,7 +496,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
       for (const section of row.formSections.filter(section => !section.items.length)) checks.push({ key: 'section:' + section.id, label: section.title, status: 'failed', message: '移除空区段或在当前草稿补齐字段，再重新自检。', targetId: section.id })
     }
     if(row.trainingTimingPolicy){try{await timingPolicy(tx,row,true);checks.push({key:'timing',label:'可选计时来源',status:'passed',message:'通过'})}catch(cause:any){if(!(cause.statusCode>=400&&cause.statusCode<500))throw cause;checks.push({key:'timing',label:'可选计时来源',status:'failed',message:cause.message})}}
-    return { revision, ok: checks.every(check => check.status === 'passed'), checks, reportMode: 'COLLECTION_ONLY' }
+    return { revision, ok: checks.every(check => check.status === 'passed'), checks, reportMode: 'COLLECTION_ONLY',trackingCandidates }
   }, { timeout: 30000 })
 }
 
@@ -576,7 +588,8 @@ export async function publishMeasurementInstances(actor:Actor,id:string,raw:unkn
 }
 
 export async function publish(actor: Actor, id: string, raw: unknown) {
-  return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
+  const input=revisionSchema.extend({tracking:trainingTrackingSelectionSchema.optional()}).parse(raw)
+  return mutate(actor, id, input.revision, async (tx, row) => {
     if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
     if(row.trainingVariantDraft!=null)await validateTrainingVariants(tx,row)
     await validateDelivery(tx, actor, row)
@@ -590,7 +603,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
       await retainFormSectionVideos({ owner: mediaOwner, presentations: compositeFormSectionVideoPresentations(definition), db: tx })
     }
     if(row.trainingTimingPolicy){readTrainingTimingPolicy(row.trainingTimingPolicy);await tx.compositeAssessment.update({where:{id},data:{trainingTimingPolicy:await timingPolicy(tx,row,true)}})}
-    await publishComposite(actor.userId, actor.role, id, tx, situational)
+    await publishComposite(actor.userId, actor.role, id, tx, situational,input.tracking)
     await recheckMeasurementPublisherExpiry(tx,measurementPublisherExpiry)
   })
 }
@@ -663,12 +676,12 @@ export async function standardCombinationChoices(actor:Actor,raw:unknown){
 }
 
 /** Copy definitions only; no attempts, responses, tokens or report ciphertext. */
-export async function copy(actor: Actor, id: string, raw: unknown, options: { allowTrainingVariants?: boolean; allowTrainingFlow?: boolean } = {}) {
+export async function copy(actor: Actor, id: string, raw: unknown, options: { allowTrainingVariants?: boolean; allowTrainingFlow?: boolean;trackingNext?:boolean } = {}) {
   author(actor)
   if (process.env.QUESTIONNAIRE_PRODUCTS_ENABLED === 'false') throw compositeConflict('暂未开放新版问卷创建')
   const { requestId } = z.object({ requestId: z.string().guid() }).strict().parse(raw)
   const creationKey = actor.userId + ':' + requestId
-  const creationHash = canonicalHash({ copySource: id })
+  const creationHash = canonicalHash({ copySource: id,...(options.trackingNext?{trackingNext:true}:{}) })
   const run = () => prisma.$transaction(async tx => {
     const existing = await tx.compositeAssessment.findUnique({ where: { creationKey } })
     if (existing) {
@@ -704,6 +717,14 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
       }
     }
     const source = legacy ?? composite!
+    let trackingOrdinal:number|undefined
+    if(options.trackingNext){
+      if(!composite||composite.status!=='PUBLISHED'||!composite.personalTrackingBaselineId||!readTrainingTracking(composite.personalTracking))throw compositeBadRequest('请从已发布的纵向测评创建下一轮')
+      await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.personalTrackingBaselineId} FOR UPDATE`
+      const last=await tx.compositeAssessment.findFirst({where:{personalTrackingBaselineId:composite.personalTrackingBaselineId},orderBy:{personalTrackingOrdinal:'desc'}})
+      trackingOrdinal=(last?.personalTrackingOrdinal??0)+1
+      if(trackingOrdinal>100)throw compositeBadRequest('纵向计划最多100轮')
+    }
     if (composite && (composite.productKind === 'ASSESSMENT_BUNDLE' || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('固定报告包不能复制为问卷')
     const questionnaireType = legacy?.type ?? composite!.questionnaireType ?? 'COURSE'
     const sourceCourses = legacy ? legacy.courseQuestionnaires.map(v => v.courseId) : composite!.productKind === 'LEGACY_COMPOSITE' ? (composite!.courseId ? [composite!.courseId] : []) : composite!.questionnaireCourses.map(v => v.courseId)
@@ -787,6 +808,10 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
       }
     }
     await ensureCompositeFormSections(target.id, tx)
+    if(options.trackingNext)await tx.compositeAssessment.update({where:{id:target.id},data:{
+      name:source.name+' · T'+trackingOrdinal,personalTrackingBaselineId:composite!.personalTrackingBaselineId,
+      personalTrackingOrdinal:trackingOrdinal,personalTracking:copiedTrainingTracking(composite,copiedIds,copiedKeys),
+    }})
     if (composite?.trainingVariantDraft != null) {
       const original = weightedVariantConfigSchema.parse(composite.trainingVariantDraft)
       const remapped = { ...original, groups: original.groups.map(group => ({ ...group,

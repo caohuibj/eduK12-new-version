@@ -1,10 +1,10 @@
 {
   "status": "PREPARED_NOT_MERGE_READY",
-  "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
-  "productHead": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+  "base": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+  "productHead": "f736217fc2426cbcee35b602eafbed43a5a16164",
   "componentTrees": {
-    "backend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
-    "frontend": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8"
+    "backend": "dc9a331f08901238236ec3664e3173aba3f15030",
+    "frontend": "cba77e36ec1ba531a20f7775ea00a34c91699fe5"
   },
   "localTypes": [
     {
@@ -65,6 +65,22 @@
       "componentTree": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8",
       "exitCode": 0,
       "sourceCheckpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "backend",
+      "report": "mainfb/backend-types.json",
+      "componentTree": "dc9a331f08901238236ec3664e3173aba3f15030",
+      "exitCode": 0,
+      "sourceCheckpoint": "f736217fc2426cbcee35b602eafbed43a5a16164",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "frontend",
+      "report": "mainfb/frontend-types.json",
+      "componentTree": "cba77e36ec1ba531a20f7775ea00a34c91699fe5",
+      "exitCode": 0,
+      "sourceCheckpoint": "f736217fc2426cbcee35b602eafbed43a5a16164",
       "originalExecutionSigned": false
     }
   ],
@@ -345,6 +361,31 @@
     "mainfa/receipt-review.json": {
       "sha256": "0bc318b2af1cc16f7d95f32235f4e88767638c3d0e457ad8d207739ce2fc0632",
       "bytes": 806
+    },
+    "mainfb/backend-types.json": {
+      "sha256": "5c58f97910b464ebf6899f5b4fc99d43ab03822082c5f557ff5a47ec8991d4e9",
+      "bytes": 492
+    },
+    "mainfb/backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfb/frontend-types.json": {
+      "sha256": "6311a7169e2a703e1b27b614364f99fb6bead0e931a9f9902f58a9d94c8e3773",
+      "bytes": 528
+    },
+    "mainfb/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfb/prisma-generate.log.gz": {
+      "sha256": "8f400f00c074d76cebe0c850ac644a0472470ad43474b5d51584046a1d3ae2d5",
+      "bytes": 239,
+      "originalSHA256": "5b93bcfd901faeec05c6cdd43445ea5d66ae4aada45df94218caa3e83ab795a0"
+    },
+    "mainfb/qualification-plan.json": {
+      "sha256": "0ffb3b4f2bef8fab78e8f862092abe758e742319b5bd7d63ef4cebd9a5e2664f",
+      "bytes": 1329
     }
   },
   "ciExecuted": false,
@@ -394,14 +435,14 @@
     ]
   },
   "qualificationPreparation": {
-    "plan": "mainfa/qualification-plan.json",
+    "plan": "mainfb/qualification-plan.json",
     "deduplicatedCases": "qualification-case-inventory.json",
     "distinctNamedPassed": 41,
     "unitAndMockHttp": 39,
     "retainedPg": 2,
     "businessChecksReexecuted": false,
     "formalActivation": false,
-    "remainingControlWork": "Final actual candidate binding verification and checklist/live PR identity before activation; existing fixed route only."
+    "remainingControlWork": "Final binding verification and existing Ready PR synchronize on exact mainfb; no new workflow."
   },
   "groupDiscoveryContractFix": {
     "scope": "School GROUP source catalog uses actual audience and frozen parent GROUP contract; leaf tools require the same parent ceiling and a resolvable leaf GROUP contract/metric keys",
@@ -421,5 +462,24 @@
     "databaseMigrationApplied": false,
     "oldBusinessTestsReexecuted": false,
     "groupLongitudinalStarted": false
+  },
+  "mainfbIntegration": {
+    "main": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+    "checkpoint": "f736217fc2426cbcee35b602eafbed43a5a16164",
+    "mergeConflicts": false,
+    "schoolTeacherReportingSourceChangesFromMainfa": [],
+    "prismaClientGenerated": true,
+    "databaseMigrationApplied": false,
+    "old41BusinessOrPgObservationsReexecuted": false,
+    "previousFormal": {
+      "run": 41057783824,
+      "candidate": "77e2767248d171f8914fe94b9f3debada424a4d4",
+      "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+      "requiredJobsAllSuccess": true,
+      "admissionZipVerified": true,
+      "sarifZipVerified": true,
+      "sarifFindings": 1,
+      "baselineTestAdvisoryRetained": true
+    }
   }
 }

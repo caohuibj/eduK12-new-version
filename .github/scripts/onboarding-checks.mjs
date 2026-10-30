@@ -219,7 +219,7 @@ export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
  return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false},{kind:'REGISTERED_SAME_CP_NONEMPTY_REPORTS',tools:3,reports:6,actualFinals:2,entryBoundary:'SOURCE_IDENTITY_POLICY_ONLY',ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
 }
 export function task1SastConfig(p,b=binding.candidates?.[String(p.pr)]){
- assert(['task1','choice-page',404,408,414].includes(p.pr));assert.equal(p.product,b.product);
+ assert(['task1','choice-page',404,408,414,415].includes(p.pr));assert.equal(p.product,b.product);
  const paths=[...Object.keys(b.source),...(p.pr===404?['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/scripts/group-report-draft.mjs','.github/scripts/group-report-draft.test.mjs']:[]),'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs',p.pr==='task1'?'.github/scripts/task1-onboarding-controls.test.mjs':'.github/scripts/onboarding-controls.test.mjs'].filter(path=>/\.(?:[cm]?js|jsx|tsx?)$/.test(path));
  assert(paths.length);return {paths:[...new Set(paths)].sort()};
 }
@@ -410,11 +410,18 @@ export function verifySchoolGroupObservation(value,kind){
  return {kind,originalSigned:false,testsExecutedInCI:false};
 }
 
+export function verifyTeacherReadingObservation(value,kind){
+ assert.equal(kind,'browser');assert.equal(value.passed,true);
+ for(const key of ['actualTeacherAppAndEvaluationNavigation','syntheticAuthAndBackend','readOnlyPublishedProjection','noBackendOrProductionAuthorityClaim'])assert.equal(value[key],true);
+ for(const check of ['real product admin navigation','existing published Form release GET','print all items including withholding reasons; hide surrounding management UI'])assert(value.checks.includes(check));
+ return {kind,originalSigned:false,testsExecutedInCI:false};
+}
+
 function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=[393,395,404,408,414,'task1','choice-page'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
+  const review=[393,395,404,408,414,415,'task1','choice-page'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
   assert(review,'Missing exact reviewed evidence');
-  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
+  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414,415].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
   if(p.pr==='choice-page'){
@@ -434,7 +441,7 @@ function admit(){
     assert(Array.isArray(roots)&&roots.length&&new Set(roots).size===roots.length);
     for(const root of roots)assert(['server-version/backend','server-version/frontend'].includes(root));
     const delta=git('diff','--name-only',original.originalSourceAssociation,p.product,'--',...roots).split('\n').filter(Boolean);
-    assert.deepEqual(delta,[404,408,414].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
+    assert.deepEqual(delta,[404,408,414,415].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
     assert(original.deltaRationale&&original.sourceAssociationBasis);
     const caseNames=verifyOriginalReport(readOriginal(original),original);
     admitted.push({id:original.id,caseNames,originalSourceAssociation:original.originalSourceAssociation,sourceAssociationBasis:original.sourceAssociationBasis,originalReportSHA256:original.sha256,originalReportSuccess:original.summary.success,originalFailedCount:original.summary.numFailedTests,ciExecuted:false});
@@ -450,14 +457,15 @@ function admit(){
   }else assert(!review.pr381LocalChecks);
   const types=p.pr===395?admitPr395LocalTypes(p,review):p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
-  if([372,374,404,408,414].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
+  if([372,374,404,408,414,415].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   const observations=[];
-  if([404,408,414].includes(p.pr)){
-    assert.equal(review.groupReportObservations.length,2);
+  if([404,408,414,415].includes(p.pr)){
+    assert.equal(review.groupReportObservations.length,p.pr===415?1:2);
     for(const record of review.groupReportObservations){
       const value=readOriginal(record);assert.equal(value.passed,true);assert(record.sourceAssociationBasis&&record.limitations?.length);
       let nativeBaseReuse;
-      if(p.pr===414){verifySchoolGroupObservation(value,record.kind)}
+      if(p.pr===415){verifyTeacherReadingObservation(value,record.kind)}
+      else if(p.pr===414){verifySchoolGroupObservation(value,record.kind)}
       else if(record.kind==='browser'){assert.equal(value.actualReactComponents,true);assert(value.checks.includes(p.pr===408?'print all metrics':'all metrics printed'));assert.equal(value.synthetic,true);}
       else if(record.kind==='course-entry'){assert.equal(p.pr,408);assert.equal(value.actualCoursePageRouterTabsAndFlags,true);assert.equal(value.syntheticBackendAndOwner,true);assert(value.checks.includes('actual course assessment tab to group report'));assert(value.checks.includes('direct analysis URL after reload'));}
       else {assert.equal(p.pr,404);assert.equal(record.kind,'native');nativeBaseReuse=verifyGroupReportNativeBaseReuse(value,p,review.nativeBaseReuse,
