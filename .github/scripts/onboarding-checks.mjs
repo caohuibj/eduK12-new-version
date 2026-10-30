@@ -174,11 +174,25 @@ function qualifyPr393BackendTypes(p,review){
   return [receipt];
 }
 
+// Read the original saved exit file alongside DOT's explicitly retrospective index.
+// The empty compiler log is never treated as evidence of exit status.
+export function verifyPr395LocalTypes(receipt,exitBytes,logBytes,currentTree){
+ assert.equal(receipt.command,'./node_modules/.bin/tsc -p tsconfig.app.json --noEmit');
+ assert.equal(receipt.exitCode,0);assert.equal(exitBytes.toString('utf8'),'0\n');
+ assert.equal(receipt.componentTree,currentTree);assert.match(receipt.sourceAssociationBasis,/Retrospectively/);
+ assert.match(receipt.sourceAssociationBasis,/Not an original signed execution receipt/);
+ assert.equal(hash(logBytes),receipt.logSHA256);
+ return {component:'frontend',currentComponentTree:currentTree,originalExitCode:0,originalSigned:false,ciExecuted:false,indexKind:'RETROSPECTIVE_DOT_OBSERVATION',sourceAssociationBasis:receipt.sourceAssociationBasis};
+}
+function admitPr395LocalTypes(p,review){
+ assert.deepEqual(review.types,[]);const proof=review.pr395LocalTypes;
+ return [verifyPr395LocalTypes(readOriginal(proof),readFileSync(safePath(proof.exit)),readFileSync(safePath(proof.log)),p.components.frontend)];
+}
 function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=p.pr===393?allReviews.candidates?.['393']:allReviews;
+  const review=[393,395].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
   assert(review,'Missing exact reviewed evidence');
-  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,'root dot');
+  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,p.pr===395?'independent Codex pr395_review':'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
   const admitted=[];
@@ -204,7 +218,7 @@ function admit(){
     assert.deepEqual(review.types,[],'PR381 does not fabricate an argv-style original receipt');
     originalTaskChecks=verifyPr381CommandRecords(readOriginal(record.commands),readOriginal(record.inputs),readOriginal(record.firstInputs),p.components.frontend,path=>readFileSync(path));
   }else assert(!review.pr381LocalChecks);
-  const types=p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
+  const types=p.pr===395?admitPr395LocalTypes(p,review):p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
   if([372,374].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   const observations=[];
