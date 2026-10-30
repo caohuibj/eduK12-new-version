@@ -220,3 +220,30 @@ main-schema upgrade plus native dump/restore of rows containing the plan,
 source pointer, encrypted snapshots and existing FINALs, followed by unchanged
 source/identity reads. That work remains NOTRUN in official CI. It is not waived
 because the host backup smoke is unrelated, and no broad Ready run is started.
+
+### Scope-only run 41010101874: advanced main / stale event base
+
+The revised source `64c8389a0` received publication SUCCESS in 41010101744,
+then CI 41010101874 failed at scope step 24 before any application job ran.
+Its recorded PR base was still `40799e96f`, while the actual GitHub merge preview
+`3dcaf7e31dac80c0c32ba8b29967c5beddf8246f` had parents
+`0e8f1de8e7d68d7c8cc76230315abbbbbf47cf4d` and `64c8389a0`.
+The preview tree therefore included 23 additional files already merged on main
+(Skaalvik/COPSOQ materials and their generated index). The exact same scope
+consumer reproduced an unplanned-path refusal with that old base and actual
+preview. This matches the failing stage; the original raw stdout is unavailable
+because its Azure Blob GET returned HTTP403. No alternate log retrieval was
+attempted; annotations, run metadata and Git parent/tree/diff evidence are saved
+separately in `continuation/merge-base-reproduction.json` and the original JSON
+API responses. An annotation alone is not represented as the full error log.
+
+A normal merge aligned the branch with main `0e8f1de8e` without widening the
+allowlist or changing the product repair. Merge commit `71fc66ece` has exactly
+that previously observed preview tree, `de3f3d76c70d8bd7a7d384bfa75e68b364da5839`.
+Using the new base, the full current diff selects personal_tracking_draft=true.
+No application suite was replayed for this metadata/base correction. The new
+main's change consists of added instrument declarations/materials and their
+index, not changes to the repaired projection, publisher, scorer or credential
+logic. Existing local assertions retain their original execution identities;
+formal compilation still consumes the actual integrated source. The failed
+scope run and earlier cancelled workflow remain retained, with no rerun.
