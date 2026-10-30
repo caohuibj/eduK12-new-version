@@ -1,4 +1,6 @@
-# PR3: Bundle declarative onboarding
+# Bundle declarative onboarding
+
+本页保留最初PR3的工程说明。当前操作入口见 [Project工作指令](project/PROJECT-INSTRUCTIONS.md) 与 [最小工作流](project/workflow.md)；CI以实际完整差异、AGENTS及release README为准，下方全套命令是初次能力验收历史，不是每个包默认重跑项。Profile子能力、受众投影和冻结报告沿现有引擎，未升级整个SnapshotV3。
 
 ## Scope and release boundary
 
@@ -49,7 +51,7 @@ npm run bundle:package:retire -- my_bundle 1.0.0 ADMIN_USER_ID
 
 Install creates DRAFT only. Identical key/version/hash is idempotent; different content at the same identity is rejected, including drafts. Legacy code identities cannot be replaced. `publication.json.requestedStatus` expresses intent only, is excluded from immutable execution content identity, and does not authorize any state transition. The database release record is the admission authority.
 
-A review object has exactly these fields: contentHash, reviewerId, expiresAt (UTC ISO timestamp), claims (independent_summary/cross_source_condition/joint_conclusion), scientific=true, rights=true, language=true, report=true, and signature. Signature is lowercase SHA-256 HMAC over `canonicalJsonString` of all preceding fields, with the configured review key. The repository helper is `src/modules/assessment-runtime/canonical.ts`. Signing is done by the trusted review process after reviewing the exact preview hash; the importer deliberately does not offer a sign-and-publish shortcut. A reviewer must be an existing ADMIN distinct from the publishing ADMIN.
+A review object has exactly these fields: contentHash, reviewerId, expiresAt (UTC ISO timestamp), claims (independent_summary/cross_source_condition/joint_conclusion), scientific=true, rights=true, language=true, report=true, and signature. Signature is lowercase SHA-256 HMAC over `canonicalJsonString` of all preceding fields, with the configured review key. The repository helper is `src/modules/assessment-runtime/canonical.ts`. Signing is done by the trusted review process after reviewing the exact preview hash; the importer deliberately does not offer a sign-and-publish shortcut. A reviewer must be an existing ADMIN distinct from the package installer; the actual publisher may be that reviewer. This follows package-release.ts and does not require an additional third administrator.
 
 Publication validates signature, expiry, content binding, independent reviewer, claim scope and available exact dependencies. EXPERIMENTAL/PILOT descriptive packages require review appropriate to their limited claims; the system does not automatically raise scientific maturity. Review renewal binds the same immutable content; content changes require a new version.
 
