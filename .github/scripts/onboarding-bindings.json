@@ -325,7 +325,7 @@
       "enabled": true,
       "base": "dc796e04203696b4a579aa6fd2428df592031ee3",
       "product": "d537212929887218f255ee6f654a9522463abff7",
-      "controlCheckpoint": "5f6e82df42e9657c84f942be4d523b7df531b1b0",
+      "controlCheckpoint": "66a7c60042fbc37e811e6fee6d1a621066e9b85a",
       "components": {
         "backend": "7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc",
         "frontend": "5c0402cdbc06239dd3fde86cf59c69c294a49d2a"
@@ -354,9 +354,13 @@
           "before": null,
           "after": "28a8d1c7b272f5527976e8c8e083ca3cdf0311f9"
         },
+        "docs/performance/education-post-p6-20261030/CI-FAILURE-R1.md": {
+          "before": null,
+          "after": "8debb38898fff295b58e67539560094101d15387"
+        },
         "docs/performance/education-post-p6-20261030/INDEPENDENT-REVIEW.md": {
           "before": null,
-          "after": "93e8f86bdbc322a405d37813b5ce65934f4baa47"
+          "after": "33b312d9b25e63f01c49e8cb5f5685e6add7ee3d"
         },
         "docs/performance/education-post-p6-20261030/README.md": {
           "before": null,
@@ -397,6 +401,42 @@
         "docs/performance/education-post-p6-20261030/evidence/ci-controls/controls-r1.tap": {
           "before": null,
           "after": "0dedd5d791efde24e41d0764069b5e82931829be"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/admission-failure.log": {
+          "before": null,
+          "after": "633230a4ea57347d5a3deff2e45811dfe6681323"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/admission.json": {
+          "before": null,
+          "after": "815afee86003ec693fe3d3ba3969cff7da63a9e2"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/artifacts.json": {
+          "before": null,
+          "after": "8dd9d3182b6ad02b17efc9d69b28e0d57f54e649"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/browser.json": {
+          "before": null,
+          "after": "91c0cfbdd31ab93e601f15a371c7c1e1f87d950a"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/recovery-actionlint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/recovery-controls.tap": {
+          "before": null,
+          "after": "e818c28deeb0efb05e8bbf4b9a3fddb110a38dfd"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/run.json": {
+          "before": null,
+          "after": "88a63c9654c5f29b2a058d0916b44ee88c401ab6"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/sast-artifact.json": {
+          "before": null,
+          "after": "a1449336ec1c205dbf3b6b69de8d0f0d652effe4"
+        },
+        "docs/performance/education-post-p6-20261030/evidence/ci-r1/sast-job.json": {
+          "before": null,
+          "after": "46045b535828c4c3e68ea47e7a38f4d3a9f9bfba"
         },
         "docs/performance/education-post-p6-20261030/evidence/editor-byte-comparison.json": {
           "before": null,
@@ -501,11 +541,19 @@
       },
       "activationReview": {
         "reviewer": "independent Codex pr395_review",
-        "reviewedSource": "58659b99b8474828f22102b06a99016f5bafd091",
-        "reviewedTree": "1da4b2f09c5650359b69d0dc2617fba4f47dbea0",
+        "reviewedSource": "adec07f9c647afec22ca22d79c49b0efd94c77cb",
+        "reviewedTree": "1af698eaac14a0d8c1e9dbc29983dd9a86b24f3e",
         "record": "docs/performance/education-post-p6-20261030/INDEPENDENT-REVIEW.md",
-        "recordSHA256": "e90cf0748350f8c0505430f44c59977d1da2700953e6c233cb7d30126802f249",
-        "scope": "Independent actual product/control/original evidence review; authorized final metadata-only delta. Not DOT, GitHub APPROVE or signed original execution."
+        "recordSHA256": "9f3595114177403402b2f8b8911e6e391b38076bb246bc93dcd2c0cf8918260c",
+        "scope": "Independent diagnosed continuation review; metadata-only final binding authorized. Original first failure and full SAST retained; no DOT/GitHub APPROVE/signed execution claim.",
+        "priorReview": {
+          "reviewer": "independent Codex pr395_review",
+          "reviewedSource": "58659b99b8474828f22102b06a99016f5bafd091",
+          "reviewedTree": "1da4b2f09c5650359b69d0dc2617fba4f47dbea0",
+          "record": "docs/performance/education-post-p6-20261030/INDEPENDENT-REVIEW.md",
+          "recordSHA256": "e90cf0748350f8c0505430f44c59977d1da2700953e6c233cb7d30126802f249",
+          "scope": "Independent actual product/control/original evidence review; authorized final metadata-only delta. Not DOT, GitHub APPROVE or signed original execution."
+        }
       }
     }
   }
