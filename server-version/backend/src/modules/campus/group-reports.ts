@@ -316,6 +316,13 @@ async function reviewedSpec(specId:string){
   return spec
 }
 
+export async function listCampusGroupReportSources(actor:AuthenticatedPrincipal,organizationId:string,page=1){
+  const principal=await requireCampusGroupManager(actor,organizationId)
+  const result=await listOrganizationReportingSources({principal,organizationId,page,pageSize:100,analysisKind:'GROUP'})
+  return {sources:result.list.map(s=>({runId:s.runId,trackId:s.trackId,name:s.runName,
+    resource:{family:s.resource.family,key:s.resource.key,version:s.resource.version}})),nextSourcePage:result.nextPage}
+}
+
 export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,organizationId:string){
   const principal=await requireCampusGroupManager(actor,organizationId)
   const [specs,sources,artifacts]=await Promise.all([
@@ -342,7 +349,7 @@ export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,
   })),sources:sourceList.map(s=>({
     runId:s.runId,trackId:s.trackId,name:s.runName,
     resource:{family:s.resource.family,key:s.resource.key,version:s.resource.version},
-  })),artifacts,truncated:!!sources.truncated||specs.total>50}
+  })),artifacts,nextSourcePage:sources.nextPage,truncated:!!sources.truncated||specs.total>50}
 }
 
 export async function listCampusGroupReportTools(input:{actor:AuthenticatedPrincipal;organizationId:string;runId:string;trackId:string}){

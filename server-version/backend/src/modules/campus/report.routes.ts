@@ -13,7 +13,7 @@ import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
 import { readCampusStudentFeedback } from './student-feedback'
-import { listCampusGroupReportCatalog, listCampusGroupReportTools, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
+import { listCampusGroupReportCatalog, listCampusGroupReportSources, listCampusGroupReportTools, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
 import {educationGroupSelectionSchema,reportingLeafSourceSchema} from '../reporting/education-group-selection'
 import {listCampusGeneralGroupV2Catalog,publishCampusGeneralGroupV2,
   readCampusGeneralGroupV2} from './generalGroupV2.service'
@@ -92,6 +92,10 @@ router.get('/reports/groups/general-v2/:organizationId/:runId/:trackId/:specId',
 router.get('/reports/groups/catalog', guarded(req => {
   const q=z.object({organizationId:id}).strict().parse(req.query)
   return listCampusGroupReportCatalog(req.user!,q.organizationId)
+}))
+router.get('/reports/groups/sources',guarded(req=>{
+  const q=z.object({organizationId:id,page:z.coerce.number().int().min(1).max(10000)}).strict().parse(req.query)
+  return listCampusGroupReportSources(req.user!,q.organizationId,q.page)
 }))
 router.get('/reports/groups/tools',guarded(req=>{
   const input=z.object({organizationId:id,runId:id,trackId:id}).strict().parse(req.query)

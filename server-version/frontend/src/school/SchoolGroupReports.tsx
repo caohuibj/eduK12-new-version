@@ -6,7 +6,7 @@ import {TaskGroupReport,type TaskGroupArtifact} from '../modules/reporting/TaskG
 type Source={runId:string;trackId:string;name:string;resource:{family:string;key:string;version:string}}
 type Leaf={slotKey:string;unitType:'SCALE'|'COGNITIVE'|'SITUATIONAL';instrumentKey:string;instrumentVersion:string;compiledRuntimeHash:string}
 type Catalog={specs:Array<{specId:string;title:string;version:number;metricIds:string[]}>;sources:Source[];
-  artifacts:Array<{artifactId:string;generatedAt:string}>;truncated:boolean}
+  artifacts:Array<{artifactId:string;generatedAt:string}>;truncated:boolean;nextSourcePage?:number|null}
 type Tools={tools:Array<{leaf:Leaf;metrics:Array<{key:string;unit?:string}>}>;
   groups:{options:Array<{kind:'CLASSES'|'LABELS';id:string;name:string;dimensionId:string|null;dimensionName:string|null}>;limitations:string[]}}
 const reason=(error:unknown)=>error instanceof Error?error.message:'当前报告不可访问'
@@ -64,6 +64,11 @@ export function SchoolGroupReports({api,organizationId,compact=false}:{api:Schoo
       <label className="hs-field"><span>测评来源</span><select disabled={busy} value={sourceKey} onChange={e=>{request.current++;setSourceKey(e.target.value);setTools(null);setToolKey('');setDimension('ALL');setSelected([])}}>
         <option value="">选择任务</option>{catalog.sources.map(row=><option key={`${row.runId}:${row.trackId}`} value={`${row.runId}:${row.trackId}`}>{row.name} · {row.resource.key}</option>)}
       </select></label>
+      {catalog.nextSourcePage&&<button type="button" disabled={busy} onClick={()=>void run(async token=>{
+        const next=await api<Pick<Catalog,'sources'|'nextSourcePage'>>(`${base}/sources?${new URLSearchParams({organizationId,page:String(catalog.nextSourcePage)})}`)
+        if(token===request.current)setCatalog(current=>current?{...current,nextSourcePage:next.nextSourcePage,
+          sources:[...new Map([...current.sources,...next.sources].map(row=>[`${row.runId}:${row.trackId}`,row])).values()]}:current)
+      })}>加载更多测评来源</button>}
       <button type="button" disabled={busy||!source} onClick={()=>void run(async token=>{
         const result=await api<Tools>(`${base}/tools?${new URLSearchParams({organizationId,runId:source!.runId,trackId:source!.trackId})}`)
         if(token===request.current){setTools(result);setToolKey('');setDimension('ALL');setSelected([])}
@@ -88,7 +93,7 @@ export function SchoolGroupReports({api,organizationId,compact=false}:{api:Schoo
           if(token===request.current){setArtifact(result);setCatalog(current=>current?{...current,artifacts:[{artifactId:result.artifactId,generatedAt:result.generatedAt},...(current.artifacts??[]).filter(row=>row.artifactId!==result.artifactId)]}:current)}
         })}>生成更新版报告</button>
       </>}
-      {catalog.truncated&&<p>目录仅显示近期有限来源。</p>}
+      {catalog.truncated&&<p>目录按页提供近期记录；有更多测评来源时，可继续加载。</p>}
       {!catalog.specs.length&&<p>尚无符合学校人数下限的已发布统计方案。</p>}
       {(catalog.artifacts??[]).length>0&&<label className="hs-field"><span>已生成版本</span><select disabled={busy} value={artifact?.artifactId??''} onChange={e=>{if(e.target.value)void run(token=>read(e.target.value,token))}}>
         <option value="">选择报告</option>{catalog.artifacts.map(row=><option key={row.artifactId} value={row.artifactId}>{new Date(row.generatedAt).toLocaleString('zh-CN')} · {row.artifactId.slice(0,8)}</option>)}

@@ -16,7 +16,7 @@ const state = vi.hoisted(() => ({
   participant: { list: vi.fn(), read: vi.fn() },
   professional: { list: vi.fn(), read: vi.fn() },
   respondentSummary: vi.fn(),
-  group: {catalog:vi.fn(),tools:vi.fn(),generate:vi.fn(),read:vi.fn()},
+  group: {catalog:vi.fn(),sources:vi.fn(),tools:vi.fn(),generate:vi.fn(),read:vi.fn()},
   protectedStudio: {catalog:vi.fn(),generate:vi.fn()},
   longitudinal: {catalog:vi.fn(),sources:vi.fn(),generate:vi.fn()},
   groupLongitudinal: {catalog:vi.fn(),generate:vi.fn()},
@@ -33,6 +33,7 @@ vi.mock('../../modules/reporting/respondentSummary', () => ({ readRespondentRunS
 vi.mock('../../modules/campus/student-feedback', () => ({ readCampusStudentFeedback: state.respondentSummary }))
 vi.mock('../../modules/campus/group-reports',()=>({
   listCampusGroupReportCatalog:state.group.catalog,
+  listCampusGroupReportSources:state.group.sources,
   listCampusGroupReportTools:state.group.tools,
   generateCampusGroupReport:state.group.generate,
   readCampusGroupReport:state.group.read,
@@ -95,6 +96,15 @@ async function request(path: string, method = 'GET', body?: unknown, headers: Re
 }
 
 describe('Huischool governed report HTTP surface', () => {
+  it('routes paged group sources with a validated page to the current School actor',async()=>{
+    state.group.sources.mockResolvedValue({sources:[],nextSourcePage:null})
+    const response=await request('/reports/groups/sources?organizationId='+CHILD+'&page=2','GET',undefined,{'x-school-role':'ADMIN'})
+    expect(response.status).toBe(200)
+    expect(state.group.sources).toHaveBeenCalledWith(expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),CHILD,2)
+    const invalid=await request('/reports/groups/sources?organizationId='+CHILD+'&page=0','GET',undefined,{'x-school-role':'ADMIN'})
+    expect(invalid.status).toBe(400)
+    expect(state.group.sources).toHaveBeenCalledTimes(1)
+  })
   beforeAll(async () => {
     const app = express()
     app.use(express.json())
