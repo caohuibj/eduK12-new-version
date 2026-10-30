@@ -327,7 +327,7 @@
       "enabled": false,
       "base": "dc796e04203696b4a579aa6fd2428df592031ee3",
       "product": "af56bca1560fe2043f7b5788a19d8f7f1998c6f4",
-      "controlCheckpoint": "af56bca1560fe2043f7b5788a19d8f7f1998c6f4",
+      "controlCheckpoint": "c5bbe29cff8bf076c958542f88394ff1bb6aeabe",
       "components": {
         "backend": "ee13766f86b78ad393bacae6b0c441cb9abbd561",
         "frontend": "391d7fd729cff3f55d46b4c3bbba1b81e4a05d69"
