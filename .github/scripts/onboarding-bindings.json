@@ -197,7 +197,7 @@
     "393": {
       "schemaVersion": 1,
       "pr": 393,
-      "enabled": false,
+      "enabled": true,
       "base": "4a3aaa2ebbae712002a2d349c5e83368085c437e",
       "product": "b00712d2887cccf3117a9095184f6afd301f0e6f",
       "controlCheckpoint": "7829c09ef217c237007ce3c9babcdd9e94eb19fe",
@@ -312,6 +312,11 @@
           "before": "1f304835921957b9fc4f42b3a102c6b62076dece",
           "after": "dac3746688abe3ef09d20c631d19aab8a712bd0b"
         }
+      },
+      "activationReview": {
+        "reviewedSource": "ca2d773fc126b47ae92bb966d357e14578d5c3b7",
+        "recordSHA256": "136cb9cc54a834996e8d64bcdba7f2445558affc145fb5ab7e4819129313cea5",
+        "scope": "Independent actual control and original-evidence review; not a GitHub APPROVE or signed original execution"
       }
     }
   }
