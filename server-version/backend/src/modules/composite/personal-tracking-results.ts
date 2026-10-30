@@ -45,7 +45,7 @@ export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,inpu
  const formIds=selected.flatMap(s=>s.numeric.map(b=>b.itemId))
  const formAnswers=formIds.length?await db.compositeFormAnswer.findMany({where:{attemptId:{in:input.parents.map(p=>p.id)},itemId:{in:formIds}},include:{item:true,formSectionAttempt:true}}):[]
  const result:PersonalLeafResult[]=[],releases=new Map<string,Awaited<ReturnType<typeof getContentRelease>>>()
- const bundleIds=input.parents.filter(p=>p.compositeAssessment.productKind==='ASSESSMENT_BUNDLE').map(p=>p.compositeAssessmentId)
+ const bundleIds=input.parents.filter(p=>['ASSESSMENT_BUNDLE','ORGANIZATION_RESOURCE'].includes(p.compositeAssessment.productKind)).map(p=>p.compositeAssessmentId)
  const bundleRows=bundleIds.length?await db.bundleInstance.findMany({where:{compositeId:{in:bundleIds}}}):[]
  const bundles=new Map(bundleRows.map(row=>[row.compositeId,readInstance(row)]))
  for(const {parent,tracking,receipt,items,numeric} of selected){
@@ -82,7 +82,7 @@ export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,inpu
     ||(envelope.persistenceProvenance.sourceSubmissionId??null)!==(row.sourceSubmissionId??null))fail()
    const disclosure=await loadTrainingMetricDisclosure(db,{parent,unit,source:row,audience:'participant',core})
    let bundleVisible=true
-   if(parent.compositeAssessment.productKind==='ASSESSMENT_BUNDLE'&&unit.family==='SCALE'){
+   if((parent.compositeAssessment.productKind==='ASSESSMENT_BUNDLE'||bundles.has(parent.compositeAssessmentId))&&unit.family==='SCALE'){
     const ceiling=bundles.get(parent.compositeAssessmentId)?.bindings.slots.find(slot=>slot.itemId===unit.itemId)?.scaleDisclosure
     bundleVisible=!!ceiling&&ceiling.disposition!=='UNKNOWN'&&resolveAudienceDisclosure(ceiling.disclosure,'subject').numericScores
    }

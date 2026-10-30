@@ -1,0 +1,116 @@
+{
+  "recordedAt": "2026-10-30T12:05:39.672362+00:00",
+  "scope": "School registered standalone Cognitive and Teacher fixed two-Scale Bundle exact two-wave lifecycle; trusted tracked-Run nonce",
+  "implementationHead": "fd7c07c1d266936b0497c806222bcdcdc3d7afe4",
+  "checks": {
+    "quota-guards": {
+      "passed": 10,
+      "failed": 0,
+      "includes": "Nine directly affected existing composition nonce cases and one registered longitudinal case covering replay/copy/rebinding/single scope"
+    },
+    "tracked-run": {
+      "passed": 2,
+      "failed": 0
+    },
+    "backend-types": {
+      "exitCode": 0,
+      "inputRecord": "education-native-longitudinal-final-inputs.json",
+      "subsequentChange": "Explanatory comment only"
+    }
+  },
+  "files": [
+    {
+      "path": "education-native-longitudinal-first.json",
+      "sha256": "0a5d2fec888eb177a7a095efc0d65f83a0e242c15dda2a955d364adb03ad8594",
+      "bytes": 4234
+    },
+    {
+      "path": "education-native-longitudinal-first.log",
+      "sha256": "50f7dd4e69aaad54368e3a0dea8e670ca279efaf2164ef4f7cc792d0e3ac20d1",
+      "bytes": 69
+    },
+    {
+      "path": "education-native-longitudinal-setup-repair.json",
+      "sha256": "3c4316be0db98f85cbdf6b02888921d5f729700e5033e160648518eebb4b6fcf",
+      "bytes": 5521
+    },
+    {
+      "path": "education-native-longitudinal-setup-repair.log",
+      "sha256": "05727425562839144d2d1e69a3f41f751c6dad4ab24b6d82f5a4f6751da786d3",
+      "bytes": 76
+    },
+    {
+      "path": "education-native-longitudinal-source-course.json",
+      "sha256": "f719adfa8437ecb96084bfa759c41bf3502fb2bbdb946b64e4422af98a1d7a25",
+      "bytes": 3309
+    },
+    {
+      "path": "education-native-longitudinal-source-course.log",
+      "sha256": "24cd3d67db917179e49c440a72c9230089b100214412dfc72817d484d346f8ff",
+      "bytes": 77
+    },
+    {
+      "path": "education-native-longitudinal-standalone-source.json",
+      "sha256": "e4270239f0a41e2f09a9500d19fbb17b61db7d0a0a30237d2181b1f3dd90b1e2",
+      "bytes": 2302
+    },
+    {
+      "path": "education-native-longitudinal-standalone-source.log",
+      "sha256": "68267ba8956b350353b86ba8e5ce27740b87aa41120d490698243513747c187a",
+      "bytes": 81
+    },
+    {
+      "path": "education-native-longitudinal-tracked-run.json",
+      "sha256": "089a55bd4c3f8758bd7ce21c5991a9bd33f62eac6bfff0eb39be0d75a62b1a51",
+      "bytes": 1604
+    },
+    {
+      "path": "education-native-longitudinal-tracked-run.log",
+      "sha256": "32c7f93da5798324ad46b295942136192d1f57d21c171d32537350ee4e1bd156",
+      "bytes": 75
+    },
+    {
+      "path": "education-native-longitudinal-quota-guards.json",
+      "sha256": "0ff826795514f4152b57d8a01333b763891ec979a4ffeaf96bc2791430a17ba3",
+      "bytes": 4621
+    },
+    {
+      "path": "education-native-longitudinal-quota-guards.log",
+      "sha256": "e3dd164ca1271a6457352e6c7bc63d11713a4027d0c68e722855daf2b6d3c6f4",
+      "bytes": 76
+    },
+    {
+      "path": "education-native-longitudinal-final-inputs.json",
+      "sha256": "d89a92aa45409c52e7fd4cdcb5c188ec2795a73f0795b3b35e419979ca3a13bf",
+      "bytes": 1602
+    },
+    {
+      "path": "education-native-longitudinal-backend-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "education-native-longitudinal-teacher-retained-read.json",
+      "sha256": "264e22c508bb173ff6523d390c337cebf68a604566c1d8af6cb48c54d9799223",
+      "bytes": 123
+    },
+    {
+      "path": "education-native-longitudinal-teacher-retained-read.log",
+      "sha256": "d2185a5ab9a571dcd40675fabc7c0bfd7456b4d9215b2d4101b6b2019243a985",
+      "bytes": 124
+    }
+  ],
+  "failures": [
+    "Standalone source fixture initially omitted the normal course and standalone capability. An attempted questionnaire kind also correctly failed its required-type DB constraint. Unpublished fixture corrected; guards unchanged.",
+    "Synthetic Bundle category scale was invalid; changed to existing scale_self before source publication.",
+    "Bundle fixture omitted original post-FINAL runner GET refresh. Retained accepted children were complete; the original GET finished the same parent without replacement FINALs or fabricated results.",
+    "Standalone T2 exposed actual global source quota collision; only verified registered longitudinal Runs now use per-parent/slot/epoch admission. Original single and standalone quota remains."
+  ],
+  "evidenceLimits": [
+    "PG/nonce reports preceded final type input capture; earlier full environment/source signatures are not backfilled.",
+    "Fixed Bundle is an explicitly synthetic self-authored two-required-Scale definition using real product/registration/review/publication, not scientific approval of real instruments.",
+    "One extra read-only diagnosis used a wrong synthetic decryption-key override and failed, with no write or accepted result; successful retained read uses the original environment.",
+    "No previous16/31/32/5 replay, browser, frontend build, formula matrix, Profile narrative, roster redesign or production operation.",
+    "PR399 repair remains local because the existing required Notion CI page now returns404."
+  ]
+}

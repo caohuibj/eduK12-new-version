@@ -387,7 +387,11 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
       </div>
       {runMap[event.id]&&<div>
         <p>任务状态：{statusLabel(runMap[event.id].status)} · 已配置工具 {runMap[event.id].trackCount??0} 项</p>
-        <SelectedToolOutline className="ht-selected-tool-outline" items={runMap[event.id].tracks?.map((track,index)=>({
+        <SelectedToolOutline disabled={working} onRemove={event.status==='DRAFT'&&runMap[event.id].status==='DRAFT'?trackId=>perform(async()=>{
+          if(!window.confirm('从本轮草稿移除此投放？追踪工具缺失或定义变化将阻止发布；请加入保留冻结指标的新问卷版本。'))return
+          await api(base+'/evaluation-events/'+event.id+'/run/tracks/'+encodeURIComponent(trackId),'DELETE',{expectedVersion:runMap[event.id].version})
+          await fetchRun(event)
+        }):undefined} className="ht-selected-tool-outline" items={runMap[event.id].tracks?.map((track,index)=>({
           id:track.id,title:track.title??((track.resourceKey.startsWith('education-composition:')?'普通问卷':
             ({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具')+' '+(index+1)),
           kind:track.resourceKey.startsWith('education-composition:')?'普通问卷':({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具',

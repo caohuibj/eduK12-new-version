@@ -39,6 +39,7 @@ export async function listCampusActivityEligibleClasses(input:{
 }
 
 export async function allocateCampusActivityParticipants(input:{
+  tx?:Prisma.TransactionClient;
   actor:AuthenticatedPrincipal;organizationId:string;courseId:string
   classUnitIds:string[];membershipIds?:string[]
   requestKey:string;expectedVersion:number
@@ -51,7 +52,7 @@ export async function allocateCampusActivityParticipants(input:{
   const hash=createHash('sha256').update(JSON.stringify({
     classes,members,expectedVersion:input.expectedVersion,
   })).digest('hex')
-  return prisma.$transaction(async tx=>{
+  const execute=async(tx:Prisma.TransactionClient)=>{
     const {activity,context}=await lockAndAssertCampusActivityEditor(tx,input)
     if(activity.status!=='DRAFT'
       ||activity.version!==input.expectedVersion)deny('ACTIVITY_ALLOCATION_FROZEN')
@@ -141,7 +142,8 @@ export async function allocateCampusActivityParticipants(input:{
       domainEventId:randomUUID(),payload:{count:candidates.length,classCount:classes.length},
     })
     return {selected:candidates.length,replayed:false,version:activity.version}
-  })
+  }
+  return input.tx?execute(input.tx):prisma.$transaction(execute)
 }
 
 /** Governed removal is immediate; task reads and START recheck activity scope. */

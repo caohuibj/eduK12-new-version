@@ -1,0 +1,372 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-30T10:35:41.033476+00:00",
+  "repository": "caohuibj/eduK12-new-version",
+  "branch": "feat/personal-longitudinal-school-20261030",
+  "base": "2160f195f67b211cc62ab8eda1ecf3f698927900",
+  "sourceCommit": "b2722b3084df3157cb96e29fc7e9798842ddb084",
+  "sourceTree": "3f2f7610877e2cdb9c57528d3dd8e73eeea42cf6",
+  "provenance": "unsigned-local-review-evidence",
+  "sourceIdentityLimitation": "This final input table was captured after the validations. Intermediate executions have original raw reporters/commands and retained patch history, but no retrospectively fabricated contemporaneous complete-source tables or signatures. Formal admission remains pending exact-source review.",
+  "environment": {
+    "node": "24.21.0",
+    "npm": "11.9.0",
+    "database": "existing isolated loopback eduk12_test; PG16.15; no production",
+    "browser": "/usr/bin/chromium, real cookie JWT and CSRF, no identity/FINAL/report mocks"
+  },
+  "sourceInputs": {
+    "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts": "25a8d8895ea835d28d2a0db8bf2b1544b1db3372",
+    "server-version/backend/src/__tests__/integration/educationPrivateScaleExecutionFixture.ts": "521570184613e4123e73ad4ead7a21398592832b",
+    "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.browser.postgres.integration.test.ts": "6e88c0d55a606729e336e64395ac5484fcb12284",
+    "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts": "479790ac16dc063201617b57780f5ab7cc612e22",
+    "server-version/backend/src/__tests__/reporting/education-longitudinal-source.test.ts": "8c359528150357559ec2eb5d7554ab8cd9b8485d",
+    "server-version/backend/src/modules/assessment-run/registeredResources.ts": "ff6bb5f3cb8f72f8da6d9ad7229d1625515010ec",
+    "server-version/backend/src/modules/assessment-run/run.controller.ts": "5410e58fffec10a1162d746b966b0975bc214af4",
+    "server-version/backend/src/modules/campus/activity.allocation.ts": "0c3c6f50ed9833420883a75c7dfc6581f5507a80",
+    "server-version/backend/src/modules/campus/activity.run.routes.ts": "b3518f096c679b76bd480589c01f7151c292e6d7",
+    "server-version/backend/src/modules/campus/activity.runs.ts": "898e864499cf85a5f1d4db095e6d7a230ee2d318",
+    "server-version/backend/src/modules/campus/activity.service.ts": "0f41e01425ef605fc426c934ca00a09cb525a1d3",
+    "server-version/backend/src/modules/campus/personal-tracking.ts": "aebda427d68b7dfa084b2b9b44d1e66c83b165df",
+    "server-version/backend/src/modules/campus/report.routes.ts": "55969920c80c6d2cb6316ca72a3f251300852808",
+    "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": "eb61e88f84ea455eebc29fb66dd9e721d19a0763",
+    "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts": "2612c469f0f9089041ecbae4032a3a839e249a53",
+    "server-version/backend/src/modules/huiteacher/run.service.ts": "629e2274121beb89a60bff218cc7bc9f586f0f4a",
+    "server-version/backend/src/modules/reporting/education-personal-tracking.ts": "6507e537f1a2fc25679a05d67318cacc5d31d2a4",
+    "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": "33f7e42416cc3d3c4114e838b11d1a9211b22e92",
+    "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts": "714c875fd4fdcc841ed1e1df443743906a5a3c76",
+    "server-version/backend/src/modules/scale/scale-definition.ts": "b7e67baa27ebe89c488e62de010de1e13781f508",
+    "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx": "adf71e9a0b5a87416551e1e04f7eb52e83b95200",
+    "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx": "e75156197bf28dd7a0103ba15c2c9a0359b8931b",
+    "server-version/frontend/src/modules/reporting/EducationPersonalTracking.tsx": "16290a04d23515546f29af834018e3a986cb3a54",
+    "server-version/frontend/src/pages/ScaleDefinitionEditor.tsx": "4ad5d2bcb0caa514e3c2b2d8d1c0c41fed785e1e",
+    "server-version/frontend/src/pages/ScaleLongitudinalMetricChoice.tsx": "3bcd55e9fbbf296661dcc4ce2b5b8f19cb5178e2",
+    "server-version/frontend/src/pages/scaleDefinitionEditorModel.ts": "382967dac2b54eae961c88774ecda66d9ff66b70",
+    "server-version/frontend/src/school/SchoolActivityManager.tsx": "29180dbf91013413598710c4d25d3089cfb0eda8",
+    "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx": "83e86f8f48b80f5015b61f1fda6b34a807749635",
+    "server-version/frontend/src/school/SchoolStudentTasks.tsx": "9abef87d58d805a42056004205b5bca05004b45f"
+  },
+  "reportSelections": [
+    {
+      "file": "school-source-declaration-unit-repair.json",
+      "successfulCaseNames": [
+        "new fixed education SELF longitudinal disclosure keeps absent old declarations absent and accepts an explicit numeric subset or empty set",
+        "new fixed education SELF longitudinal disclosure rejects unknown, duplicate, observer and mismatched SELF numeric declarations"
+      ],
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    {
+      "file": "school-source-runtime-rights.json",
+      "successfulCaseNames": [
+        "preserves old private numeric rights without adding longitudinal disclosure and freezes only explicit SELF keys"
+      ],
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 2
+    },
+    {
+      "file": "school-teacher-adult-source.json",
+      "successfulCaseNames": [
+        "accepts the existing generic participant SELF declaration for an explicitly adult Teacher audience"
+      ],
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 3
+    },
+    {
+      "file": "school-native-private-lane-repair.json",
+      "successfulCaseNames": [
+        "School explicitly configured new SELF longitudinal source publishes native T1/T2, saves real answers, reads both reports and rejects wrong or currently denied identity"
+      ],
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    {
+      "file": "school-retained-source-read.json",
+      "successfulCaseNames": [
+        "School explicitly configured new SELF longitudinal source reads retained current SELF waves after source batching and rejects the Teacher entry for a student"
+      ],
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 1
+    },
+    {
+      "file": "school-teacher-shared-reader.json",
+      "successfulCaseNames": [
+        "Teacher personal longitudinal native Run reads retained native T3 with tracked-task bounds and stable cached ordering"
+      ],
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 3
+    },
+    {
+      "file": "school-completion-single-feedback.json",
+      "successfulCaseNames": [
+        "School authoritative completion feedback consumer (synthetic transport) opens feedback once independently of a slow or failed list refresh"
+      ],
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 5
+    },
+    {
+      "file": "school-longitudinal-browser-report-resume.json",
+      "successfulCaseNames": [
+        "School native next activity, SELF answers and both reports in Chromium creates native T3, opens and publishes it, saves an actual SELF answer and shows single plus independent changes"
+      ],
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    }
+  ],
+  "uniqueSuccessfulSelectedCases": 9,
+  "files": [
+    {
+      "file": "school-source-declaration-unit.log",
+      "sha256": "fc3e9d875818974f03a858a4dae473f58580761df096ee27b686c2304c5f5900",
+      "bytes": 1566
+    },
+    {
+      "file": "school-source-declaration-unit-repair.json",
+      "sha256": "5fdbe8f9747de3b27c648fd1251ccc020dd747c3a5a9e9832ef6c174e4e0e279",
+      "bytes": 1513
+    },
+    {
+      "file": "school-source-declaration-unit-repair.log",
+      "sha256": "0d19f8c81eaf442c1b0f29284a7530caa7cabdc8e822c88395f8ee5a8288d15f",
+      "bytes": 71
+    },
+    {
+      "file": "school-source-runtime-rights.json",
+      "sha256": "a8128e878e927b3d18108454454cd3d75f4906a9031789d03de9801f3fa94f45",
+      "bytes": 1812
+    },
+    {
+      "file": "school-source-runtime-rights.log",
+      "sha256": "fa87ea0e1f437c179d3fe2c1756e60cc3f94ec6a4a03af7dd8d65d8a8aad67a4",
+      "bytes": 62
+    },
+    {
+      "file": "school-teacher-adult-source.json",
+      "sha256": "185b16d1f20ecf7263199e611558f21b25583fca312ac74277dc3424d4342155",
+      "bytes": 2117
+    },
+    {
+      "file": "school-teacher-adult-source.log",
+      "sha256": "783bc2938076bd930f241d529ab5b5457d48bdfae0a9f00869367379d4cde937",
+      "bytes": 61
+    },
+    {
+      "file": "school-native-first.json",
+      "sha256": "b404e54ff4b0008a456b3dd1a0fb7ae849eafdacafb791dfc5200c6065e38bb5",
+      "bytes": 483
+    },
+    {
+      "file": "school-native-first.log",
+      "sha256": "1d869055a981ad98a621969e27f0b4fab7173c31bf00fc5206d37c86b9724732",
+      "bytes": 53
+    },
+    {
+      "file": "school-native-first-execution.json",
+      "sha256": "38a26201ea211a29b0d919df2ad4fd3472d5f17a68711df94a5e4e99de39310c",
+      "bytes": 2524
+    },
+    {
+      "file": "school-native-first-execution.log",
+      "sha256": "557832e9b69f43e7c92f78b7b750a700f26850d87c92f375d63ff9c26be7d39d",
+      "bytes": 63
+    },
+    {
+      "file": "school-native-key-repair.json",
+      "sha256": "b4aeb620fd58336c77fde8b21f7f5a48c73d4d1fe78a5ab070955f82eea688da",
+      "bytes": 2547
+    },
+    {
+      "file": "school-native-key-repair.log",
+      "sha256": "efc08ccd2c458c7a621b31aad5a9800df6e44265da875aa8578d016d78001517",
+      "bytes": 58
+    },
+    {
+      "file": "school-native-private-lane-repair.json",
+      "sha256": "8497ea4ce151ea4fe9c9e182196821ea3832ca73610bd4553476751c5274c917",
+      "bytes": 1204
+    },
+    {
+      "file": "school-native-private-lane-repair.log",
+      "sha256": "bc5259fc09dd6c3b8f23dbf71c19517bf4d55ad5af6b12d58bd3459e0158f756",
+      "bytes": 67
+    },
+    {
+      "file": "school-retained-source-read.json",
+      "sha256": "625783e68e8d32682dd7bd1476c19f988aa260f73b87edf2148cdaec66691bd4",
+      "bytes": 1625
+    },
+    {
+      "file": "school-retained-source-read.log",
+      "sha256": "15705824a32d30a5f9439881bacff373a5ffcc81b3b5b715e69e7e92428e7c13",
+      "bytes": 61
+    },
+    {
+      "file": "school-teacher-shared-reader.json",
+      "sha256": "4f84b85519d641bdc9992a935bd24159fc4c2b1f54a0cccff3106483c9f06794",
+      "bytes": 2241
+    },
+    {
+      "file": "school-teacher-shared-reader.log",
+      "sha256": "c51ef91deeb3597bf01d079bc3543124026137df0372ed981fc2fc9a5a3733b4",
+      "bytes": 62
+    },
+    {
+      "file": "school-completion-single-feedback.json",
+      "sha256": "aea61398a51ee8dc2380fb86cd83b73039e66ca269b840e1edee9e56bb046cdf",
+      "bytes": 2844
+    },
+    {
+      "file": "school-completion-single-feedback.log",
+      "sha256": "1cec4ba35edb4977140ba0d84c587347859ddeb1cd499244e27449a51f7c07a5",
+      "bytes": 67
+    },
+    {
+      "file": "school-tracking-first-types.log",
+      "sha256": "08cdacf9e8c29784357c1950223f0ff5a22b61ab4b78d09de48aeb3099885a75",
+      "bytes": 1128
+    },
+    {
+      "file": "school-tracking-repair-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "school-tracking-final-types.log",
+      "sha256": "88251d28434afb99d99bf205daaa8b413e4da57617877288a46cd0c5f56e3e95",
+      "bytes": 304
+    },
+    {
+      "file": "school-tracking-version-types-repair.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "school-tracking-frontend-first-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "school-tracking-frontend-final-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "school-tracking-frontend-lint.log",
+      "sha256": "a8d69bbda6536941c645d1ed239daa52efaa225205994be6c08bff1a2f3f9908",
+      "bytes": 1556
+    },
+    {
+      "file": "school-longitudinal-browser-first.json",
+      "sha256": "a4cb5bb6e508bb38cce31c92d50c73f597a8bd44d8c1cffab3b318df72d4242f",
+      "bytes": 1597
+    },
+    {
+      "file": "school-longitudinal-browser-first.log",
+      "sha256": "f0b6b639129eac8f04435fb02761cc3c55b373e4235941807c0ef062ff109438",
+      "bytes": 67
+    },
+    {
+      "file": "school-longitudinal-browser-first-requests.json",
+      "sha256": "44cb38aa6efb6fbad7dd09ebccc9c5124f1eb38b5283494a7065c21e5e35b57f",
+      "bytes": 538
+    },
+    {
+      "file": "school-longitudinal-browser-first-failure.png",
+      "sha256": "2f03df35c9a1d197c5901d5fc29dfdb4315f7aade3e4884ce8c57937d846ee84",
+      "bytes": 132583
+    },
+    {
+      "file": "school-longitudinal-browser-resume.json",
+      "sha256": "66fc1edd6a8f109ddd1f2e84c8e3b1eb846c6ce2de0fe42ae7e51ad5250b0cec",
+      "bytes": 2591
+    },
+    {
+      "file": "school-longitudinal-browser-resume.log",
+      "sha256": "58f17affe8dbc979d09698bb1baa4b181663e54f048b3bb88fba2d1d5d04204d",
+      "bytes": 68
+    },
+    {
+      "file": "school-longitudinal-browser-media-first-requests.json",
+      "sha256": "870e17e49d202ef50be8d16492ba7e8489ac97e6a3acc854c15c1b8087ec277e",
+      "bytes": 3603
+    },
+    {
+      "file": "school-longitudinal-browser-media-first-failure.png",
+      "sha256": "0e942ea3c98d3c19b239935d3e80f17e6f2821bf185a79df21ac485f7af08c14",
+      "bytes": 59058
+    },
+    {
+      "file": "school-longitudinal-browser-media-resume.json",
+      "sha256": "a863be300d40de3d1ea4e4ee7ad82abe7bd1ea6882cc33419af7b9f5acb15dd5",
+      "bytes": 2199
+    },
+    {
+      "file": "school-longitudinal-browser-media-resume.log",
+      "sha256": "8d499faab6c3c580f9a0c55ce5c830a2023e3edbe708b332dedeba0c03d6f3e9",
+      "bytes": 74
+    },
+    {
+      "file": "school-longitudinal-browser-feedback-first-requests.json",
+      "sha256": "ae024ff1d658c48f1fca67d5646a0b698eb08145ddb7ced778d49698b731dc51",
+      "bytes": 3355
+    },
+    {
+      "file": "school-longitudinal-browser-feedback-first-failure.png",
+      "sha256": "8ba83d3dceb8cf80bd388911d968f5f8fb4249628b22417aa5c76525eade83dd",
+      "bytes": 215547
+    },
+    {
+      "file": "school-longitudinal-browser-report-resume.json",
+      "sha256": "6ea52940eb9e084fe548d2eb8323a8448a9f376b8a258f624816b3cfeb5172dc",
+      "bytes": 1245
+    },
+    {
+      "file": "school-longitudinal-browser-report-resume.log",
+      "sha256": "0e0c9623f543f4e817c6e25f08edd5850366f9e6289270b6046f6c81d1691bbb",
+      "bytes": 75
+    },
+    {
+      "file": "school-longitudinal-browser-requests.json",
+      "sha256": "b89a43c1e4070f876fadccf4d2b2e276a6e49d21065824cda22190151c3aba0a",
+      "bytes": 1202
+    },
+    {
+      "file": "school-longitudinal-browser-published.png",
+      "sha256": "06c60abc8fea5372a2e7ac616cc9642d04f73ece7071df7023bf2d6bfe04bd23",
+      "bytes": 47856
+    },
+    {
+      "file": "school-longitudinal-browser-reports.png",
+      "sha256": "9e02fdff29f1d4352e9240a5592d2b8001b07f6f1d36c26d6717b0a79d418229",
+      "bytes": 200998
+    },
+    {
+      "file": "school-personal-longitudinal-state.json",
+      "sha256": "305ae40549c1adffc5a4a97c99f9eddd0b58830343cc50c51ba3b61fe29287bf",
+      "bytes": 698
+    }
+  ],
+  "browserContinuation": {
+    "creationAndPublish": "T3 created by original first UI click and native transaction; original logger missed the in-flight POST response before teardown, but the next invocation found the same persisted DRAFT. Resume completed native submit/open/preview/publish/START, then stopped at the metadata-only decorative stimulus image.",
+    "finalSaved": "Same T3 and real parent attempt continued with narrowly fulfilled bytes for the two synthetic decoration assets; protected scale FINAL returned success and actual single report loaded, then duplicate React keys caused two feedback panels.",
+    "finalRead": "Fixed only the added changes component key, targeted completion consumer confirms one feedback/one changes button. Final browser resumes the same completed T3, reads single plus independent changes [1,2,1] and -1 points; no republish, new attempt or resubmission.",
+    "mediaExcluded": "Synthetic decorative asset byte fulfillment only; actual media storage/delivery/permission behavior is not accepted by this test. Report decoration can remain unavailable while text is visible."
+  },
+  "validationLimits": [
+    "No migration added in this slice; uses dependency PR409 education tracking fields/guards and existing encrypted append snapshots.",
+    "Frontend types passed before the string-only React key repair; that repair was verified by the targeted consumer and actual browser continuation, without replaying full types.",
+    "Backend types passed after private adapter version guards; later adult SELF validation is a boolean-only change covered by its new targeted test.",
+    "4 existing hook warnings, no frontend lint errors.",
+    "No old31/32/5 journey, cognitive timing, full formulas/platform performance/security baseline or formal CI replay.",
+    "School implemented slice is SELF single fixed Scale private source, explicit new version declaration; library source policy wiring included but its full new longitudinal journey is not claimed. Existing composite/Bundle/Cognitive/SJT/numeric Form longitudinal adapters remain follow-up scope.",
+    "Roster inheritance currently refuses source members no longer allocatable; it never broadens allocation to all class members. Mixed departed cohorts may need the existing draft allocation workflow adapted in a later small fix.",
+    "No Ready/APPROVE/merge/deploy/production changes for this School branch."
+  ]
+}

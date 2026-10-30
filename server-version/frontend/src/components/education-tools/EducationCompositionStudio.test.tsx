@@ -48,8 +48,13 @@ describe('education ordinary questionnaire authoring and fixed task attachment',
   fireEvent.change(screen.getByLabelText('问卷说明'),{target:{value:'固定问卷说明'}})
   fireEvent.change(screen.getByLabelText('工具衔接说明 1'),{target:{value:'进入表单前的固定说明'}})
   fireEvent.change(screen.getByLabelText('工具衔接说明 2'),{target:{value:'进入量表前的固定说明'}})
+  const longitudinal=screen.getAllByRole('checkbox',{name:/允许本工具已获准的本人数字指标/})
+  expect(longitudinal).toHaveLength(1);expect(longitudinal[0]).not.toBeChecked()
+  fireEvent.click(longitudinal[0])
   fireEvent.click(screen.getByRole('button',{name:'保存问卷草稿'}))
   await screen.findByText('问卷草稿已保存。')
+  expect(root.definition.blocks.find(block=>block.source.kind==='SCALE')?.longitudinal).toBe(true)
+  expect(root.definition.blocks.find(block=>block.source.kind==='FORM')).not.toHaveProperty('longitudinal')
   expect(root.definition.blocks.map(block=>block.source)).toEqual([
    {provider:'PRIVATE_VERSION',kind:'FORM',versionId:formVersion,contentHash:hash('d')},
    {provider:'PRIVATE_VERSION',kind:'SCALE',versionId:scaleVersion,contentHash:hash('c')},

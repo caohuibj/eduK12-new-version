@@ -63,3 +63,12 @@ it('freezes an explicit shared feedback policy and refuses null or malformed tim
  for(const bad of [null,{schemaVersion:1,mode:'SCHEDULED',releaseAt:'tomorrow'},{schemaVersion:1,mode:'IMMEDIATE',releaseAt:'2026-11-01T00:00:00Z'}])
   expect(()=>educationAssessmentOriginSchema.parse({...origin,feedbackPolicy:bad})).toThrow()
 })
+
+it('allows an explicit own longitudinal numeric subset without changing other audiences or old origins',()=>{
+ const disclosure=testDisclosure();disclosure.audiences.RESPONDENT={mode:'INDIVIDUAL_SUMMARY',metricKeys:['latency','accuracy'],longitudinalMetricKeys:['latency']}
+ const entry=draftEducationAssessmentEntry({origin,title:'Explicit own longitudinal subset',disclosure})
+ expect(entry.resultDisclosure!.audiences.RESPONDENT.longitudinalMetricKeys).toEqual(['latency'])
+ expect(entry.educationOrigin).not.toHaveProperty('feedbackPolicy')
+ disclosure.audiences.RESPONDENT.longitudinalMetricKeys=['unapproved']
+ expect(()=>draftEducationAssessmentEntry({origin,title:'Refuse expanded subset',disclosure})).toThrow()
+})

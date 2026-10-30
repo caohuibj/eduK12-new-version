@@ -1796,12 +1796,12 @@
       "schemaVersion": 1,
       "pr": 415,
       "enabled": true,
-      "base": "8bc677156a3548333450363a31e33812ad2a9f0c",
-      "product": "486fa3286f264d6321b8140373aaf4dce0593154",
-      "controlCheckpoint": "6a2ab3879f754d1cedf2c9e28975a66a20a6d566",
+      "base": "228f953e31dd768e7a8481e813f5fd90fdaeb321",
+      "product": "0367785f19fadc20b9e9368d8e435377f298bcca",
+      "controlCheckpoint": "c37c61912ca2cda210a775bbba8d84e6cbb70804",
       "components": {
-        "backend": "d3d7ba830a009c7e28fcedeab6830ba6a1f9c548",
-        "frontend": "84e0aa6ee03428bff0cc0c68de09e39fd5fbd542"
+        "backend": "acd54f1e946bfae679e4fd5fecfa90b70a6a984f",
+        "frontend": "3227cd02582e5322a765d4483c4ad2b1ea8a7b77"
       },
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
@@ -1820,7 +1820,7 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "b1b48d5591aa26b5b189de4a3fa9663bc6a25b9c"
+        ".github/workflows/ci.yml": "ddf35c696a1f6b4d1249fd8d6007d5772f585471"
       },
       "source": {
         "docs/development/group-report-teacher-reading-20261030.md": {
@@ -1935,6 +1935,18 @@
           "before": null,
           "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
         },
+        "docs/evidence/group-report-teacher-reading-20261030/main228/alignment.json": {
+          "before": null,
+          "after": "9b88ee3f8e1c4235219ff4e08b03e6de507f2124"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main228/frontend-types.json": {
+          "before": null,
+          "after": "fee9b89476716dd94d9f9bc2bb1247328204398d"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main228/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
         "docs/evidence/group-report-teacher-reading-20261030/main8bc/frontend-types.json": {
           "before": null,
           "after": "6c52e3b8a31908c616c5281b9acacb6f9ed08ef7"
@@ -2032,8 +2044,8 @@
           "after": "0ac6bb94e4092016e22fa711157f95050e4859de"
         },
         "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
-          "before": "b6bab50a6a827937877e8534469ca5fabd363ec5",
-          "after": "8ab73c5362256bd72ea1b48eaaaa9a3fd66c86d7"
+          "before": "c95c07f6bd7d038e4fc330fb58c2e396f387d7b2",
+          "after": "7aa7c3e6e32c3857615cb32fb425d9139fc4e4ad"
         },
         "server-version/frontend/src/huiteacher/HuiteacherGroupReportReading.test.tsx": {
           "before": null,
@@ -2044,7 +2056,7 @@
           "after": "7d759c77aaf90613f7e64981bb7f766591e6c6ef"
         }
       },
-      "activationNote": "Actual stable main8bc;frontend-only415 scope refuses backend drift. Fresh affected navigation and current frontend type receipt, historical unchanged Reader layout/browser observation retained with explicit shared Studio delta. Existing scope/admission/CodeQL/gate only; no application/PG replay, no merge/deploy."
+      "activationNote": "Exact main228 after416 merge;no418 mixed in. Actual shared boundary reviewed;original app/PG/browser retained and only changed whole frontend compiler input checked once. Existing four-job route only;no merge/deploy."
     },
     "task1": {
       "schemaVersion": 1,

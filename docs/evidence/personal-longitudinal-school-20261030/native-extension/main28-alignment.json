@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-10-30T12:07:06.343846+00:00",
+  "main": "28c5d75f73b3569e1f799e3f8daaf3ab71f67fee",
+  "surveyPublished": "52b4cbdb4463a7ffcaf5192cc577a6d4d71774dc",
+  "surveyLocalHeld": "4a98a54a7cf82ed4592906a744079693ba904040",
+  "training": "99b6e569035a1abb901a992506f15348006a9362",
+  "teacher": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+  "schoolBeforeEvidence": "84572ac159ed731d65c74b05bc20cc1fc73648f2",
+  "backendBeforeAlignment": "163fd181808567107811d65153f3b5f6c4755882",
+  "backendAfterAlignment": "163fd181808567107811d65153f3b5f6c4755882",
+  "frontendBeforeAlignment": "41a3b5a6572a868649a012507f23e31c2a356e8e",
+  "frontendAfterAlignment": "41a3b5a6572a868649a012507f23e31c2a356e8e",
+  "applicationReplay": false,
+  "note": "Only published Survey52/main28 control baseline propagated. Unpushed CI repair4a is deliberately not in this stack. Application trees equal across alignment; no repeated application checks."
+}

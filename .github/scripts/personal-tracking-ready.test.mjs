@@ -120,3 +120,27 @@ test('Teacher native-only reuse authenticates the original migration without cla
   await assert.rejects(verifyOriginalQualification(plan,read({...original,completed_at:new Date(Date.now()-25*3600000).toISOString()})),/expired/);
  }finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
 });
+
+test('School exact source admission retains37 observations and all12 failed reporters without replay',async()=>{
+ if(binding.slice!=='school')return;
+ const originals=await admitOriginalReports();assert.equal(originals.caseCount,37);assert.equal(originals.admitted.length,18);assert.equal(originals.historicalFailures.length,12);assert.equal(originals.ciExecuted,false);
+ const item=binding.historicalFailures[0],old=item.continuations[0].successfulReportId;
+ try{item.continuations[0].successfulReportId='missing-successful-case';await assert.rejects(admitOriginalReports(),/Retained-state continuation missing/);}finally{item.continuations[0].successfulReportId=old;}
+});
+test('School candidate-state native reuse refuses a different Prisma baseline, failed migration or expired official producer',async()=>{
+ if(binding.slice!=='school')return;
+ const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),original=JSON.parse(readFileSync('docs/evidence/personal-longitudinal-teacher-20261030/continuation/teacher-ready-original-native-success.json')),old=process.env.GH_TOKEN,base=binding.base;process.env.GH_TOKEN='synthetic-exact-native-state-metadata';const read=value=>async()=>({ok:true,json:async()=>value});
+ try{
+  const admitted=await verifyOriginalQualification(plan,read(original));assert.equal(admitted.status,'ADMITTED_NATIVE_QUALIFICATION_ONLY');assert.equal(admitted.candidateAsBaseline,true);assert.equal(admitted.frontendAdmitted,false);assert.equal(admitted.reexecuted,false);
+  binding.base='43d119c9bfbc7949baab2edea29d96044b04607c';await assert.rejects(verifyOriginalQualification(plan,read(original)),/Qualified candidate state differs from current base/);binding.base=base;
+  await assert.rejects(verifyOriginalQualification(plan,read({...original,steps:original.steps.map(s=>s.name==='real nonempty main upgrade and native dump restore'?{...s,conclusion:'skipped'}:s)})),/Original qualification step missing or failed/);
+  await assert.rejects(verifyOriginalQualification(plan,read({...original,completed_at:new Date(Date.now()-25*3600000).toISOString()})),/expired/);
+ }finally{binding.base=base;if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
+});
+test('School fixed55 source deltas include native quota controls and reject a changed implementation',()=>{
+ if(binding.slice!=='school')return;
+ const entries=changedEntries(binding.base,head),plan=personalTrackingReadyPlan(entries,binding.base,head,options);assert.equal(Object.keys(binding.files).length,55);assert(plan.qualificationReuse.nativeOnly&&plan.qualificationReuse.candidateAsBaseline);assert(!plan.imageReuse&&!plan.applicationSastReuse);
+ assert(plan.sastPaths.some(p=>p.endsWith('/native-source.cognitive.ts')));assert(plan.frontendLintPaths.includes('src/school/SchoolStudentTasks.tsx'));
+ const pin=binding.files['server-version/backend/src/modules/campus/report.routes.ts'],old=pin.originalDeltaSHA256;
+ try{pin.originalDeltaSHA256='0'.repeat(64);assert.throws(()=>personalTrackingReadyPlan(entries,binding.base,head,options),/Original longitudinal delta changed/);}finally{pin.originalDeltaSHA256=old;}
+});
