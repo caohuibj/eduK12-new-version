@@ -7,40 +7,52 @@ vi.mock('./HuiteacherMyScaleTasks',()=>({HuiteacherMyScaleTasks:()=>null}))
 vi.mock('./HuiteacherClassRelationships',()=>({HuiteacherClassRelationships:()=>null}))
 const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,message:'成功',data})})
 afterEach(()=>{cleanup();vi.unstubAllEnvs();vi.unstubAllGlobals();vi.restoreAllMocks()})
-it('opens an existing Teacher Form release through the real product navigation and prints only its authorized rounded projection',async()=>{
+it('opens existing Teacher Form versions, explicitly generates one class report, and prints only its authorized rounded projection',async()=>{
  vi.stubEnv('VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED','true')
  const print=vi.spyOn(window,'print').mockImplementation(()=>{})
- const fetch=vi.fn(async(url:string)=>{
+ const saved={versionId:'old',eventId:'event',formId:'form',definitionDigest:'a'.repeat(64),releasedAt:'2026-10-20T00:00:00Z',independentRespondents:null,minimumRespondents:10,distributions:[
+  {itemKey:'single',prompt:'教学支持',status:'READY',precision:'ROUNDED_10_PERCENT',cells:[{key:'yes',label:'支持充分',percentage:60},{key:'none',label:'未选',percentage:0}]},
+  {itemKey:'multi',prompt:'所需资源',status:'READY',selectionMode:'NON_EXCLUSIVE',precision:'ROUNDED_10_PERCENT',cells:[{key:'time',label:'时间',percentage:60},{key:'training',label:'培训',percentage:60}]},
+  {itemKey:'text',prompt:'补充文字',status:'WITHHELD',reason:'PRIVATE_FREE_TEXT'},
+ ]}
+ const updated={...saved,versionId:'new',populationLabel:'任教班级：甲班（任一匹配）'}
+ let generated=false
+ const fetch=vi.fn(async(url:string,options?:RequestInit)=>{
   if(url.endsWith('/auth/me'))return reply({id:'admin',username:'Teacher admin',role:'TEACHER',mustChangePassword:false,organizations:[{organizationId:'school',organizationName:'合成学校',productAdmin:true}]})
+  if(url.endsWith('/auth/csrf'))return reply({csrfToken:'synthetic-csrf'})
   if(url.endsWith('/evaluation-targets'))return reply({list:[{id:'target',name:'学校',kind:'ORGANIZATION'}]})
   if(url.endsWith('/evaluation-events'))return reply({list:[{id:'event',targetId:'target',title:'学期教师调查',kind:'ASSESSMENT',status:'CLOSED',version:3}]})
   if(url.endsWith('/forms'))return reply({list:[{id:'form',title:'教师体验表',status:'PUBLISHED',definitionDigest:'a'.repeat(64)}]})
   if(url.endsWith('/evaluation-events/event/run'))return reply({eventId:'event',runId:'run',status:'CLOSED',version:4,trackCount:1})
-  if(url.endsWith('/forms/form/group-report/released'))return reply({eventId:'event',formId:'form',definitionDigest:'a'.repeat(64),releasedAt:'2026-10-20T00:00:00Z',independentRespondents:null,minimumRespondents:10,distributions:[
-   {itemKey:'single',prompt:'教学支持',status:'READY',precision:'ROUNDED_10_PERCENT',cells:[{key:'yes',label:'支持充分',percentage:60},{key:'none',label:'未选',percentage:0}]},
-   {itemKey:'multi',prompt:'所需资源',status:'READY',selectionMode:'NON_EXCLUSIVE',precision:'ROUNDED_10_PERCENT',cells:[{key:'time',label:'时间',percentage:60},{key:'training',label:'培训',percentage:60}]},
-   {itemKey:'text',prompt:'补充文字',status:'WITHHELD',reason:'PRIVATE_FREE_TEXT'},
-  ]})
+  if(url.endsWith('/group-report/versions')&&options?.method==='POST'){
+   expect(JSON.parse(options.body as string)).toEqual({selection:{kind:'CLASSES',ids:['class-a']}});generated=true;return reply(updated)
+  }
+  if(url.endsWith('/group-report/versions'))return reply({versioned:true,truncated:false,versions:(generated?[updated,saved]:[saved]).map(report=>({versionId:report.versionId,releasedAt:report.releasedAt,populationLabel:'populationLabel' in report?report.populationLabel:'全部合格参与教师'})),groups:{options:[{kind:'CLASSES',id:'class-a',name:'甲班',dimensionId:null,dimensionName:null}],limitations:['按发布时的任教关系选人。']}})
+  if(url.endsWith('/versions/old'))return reply(saved)
+  if(url.endsWith('/versions/new'))return reply(updated)
   return reply({list:[],nextCursor:null})
  })
  vi.stubGlobal('fetch',fetch)
  render(<HuiteacherApp/>)
  const schoolButton=within(await screen.findByRole('navigation',{name:'Teacher 工作台'})).getByRole('button',{name:'学校改进'})
- fireEvent.click(schoolButton)
- await waitFor(()=>expect(schoolButton).toHaveAttribute('aria-pressed','true'))
+ fireEvent.click(schoolButton);await waitFor(()=>expect(schoolButton).toHaveAttribute('aria-pressed','true'))
  fireEvent.click(await screen.findByRole('link',{name:'评价活动'}))
  fireEvent.click(await screen.findByRole('button',{name:'查看任务配置'}))
  fireEvent.change(await screen.findByLabelText('报告对应 Form'),{target:{value:'form'}})
- fireEvent.click(screen.getByRole('button',{name:'查看已发布群体报告'}))
- const report=await screen.findByRole('article',{name:'教师群体报告阅读'})
- expect(within(report).getByRole('heading',{name:'教师体验表'})).toBeInTheDocument()
+ await screen.findByRole('article',{name:'教师群体报告阅读'})
+ expect(generated).toBe(false)
+ fireEvent.change(screen.getByLabelText('报告人群'),{target:{value:'CLASSES'}})
+ fireEvent.click(screen.getByLabelText('甲班'))
+ fireEvent.click(screen.getByRole('button',{name:'生成更新版报告'}))
+ await screen.findByText(/任教班级：甲班/, {selector:'p'})
+ const report=screen.getByRole('article',{name:'教师群体报告阅读'})
  expect(within(report).getByText('0%')).toBeInTheDocument()
  expect(within(report).getAllByText(/不据此推算人数/)).toHaveLength(2)
  fireEvent.change(within(report).getByLabelText('阅读题目'),{target:{value:'multi'}})
  expect(within(report).getByText(/合计可能超过 100%/)).toBeInTheDocument()
- fireEvent.click(within(report).getByRole('button',{name:'打印 / 保存 PDF'}))
- expect(print).toHaveBeenCalledOnce()
- expect(fetch.mock.calls.some(([url])=>url.endsWith('/group-report/released'))).toBe(true)
- expect(fetch.mock.calls.some(([url])=>url.endsWith('/group-report/release'))).toBe(false)
+ fireEvent.click(within(report).getByRole('button',{name:'打印 / 保存 PDF'}));expect(print).toHaveBeenCalledOnce()
+ fireEvent.change(screen.getByLabelText('已生成版本'),{target:{value:'old'}})
+ await waitFor(()=>expect(screen.getByLabelText('已生成版本')).toHaveValue('old'))
+ expect(fetch.mock.calls.filter(([,options])=>options?.method==='POST')).toHaveLength(1)
  expect(report.textContent).not.toContain('NaN')
 })

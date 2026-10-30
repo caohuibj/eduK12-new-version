@@ -1,0 +1,171 @@
+{
+  "status": "DRAFT_NOT_MERGE_READY",
+  "stackedBase": "380b90cd700d2180015f60b44aad4fbd2131029c",
+  "mainAligned": "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
+  "mergeCheckpoint": "804009d59e62e0368980fe4b625d6034b9737fc5",
+  "componentTrees": {
+    "backend": "08e1af56b33962b0f9ec22c9db3973a164a7b7a2",
+    "frontend": "6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103"
+  },
+  "scope": "Existing native Teacher adult Form SELF report: historical staff-class/people-label OR, immutable new versions, snapshot-only reads, same-Run disclosure guard extension",
+  "noNewTablesOrEngines": true,
+  "privatePopulationPersistence": "existing reporting_cohort_snapshots hold selected eligible members; existing release report_projection.__population holds cohort reference plus actual FINAL execution IDs for frozen cross-disclosure comparison. Private key included in existing digest and stripped by shared released-report reader; no raw FINAL duplication.",
+  "permissions": "Existing HUITEACHER product admin and MFA session; POST versions preserves original recent-MFA release requirement. Same exact closed linked Run/Form, frozen privacy required. Legacy endpoints retained.",
+  "postgres": {
+    "status": "PASSED_BY_RETAINED_STAGE_CONTINUATION",
+    "initial": "postgres-first.json: fixture CLASS lacked GRADE parent before form/run creation",
+    "fixtureContinuation": "postgres-grade-continuation.json: real Form publish/start/12 FINAL complete; first release failed existing 64hex scope-key constraint",
+    "scopeRepair": "canonicalHash keeps 64hex scope key, UUID release/version ID remains distinct",
+    "behaviorContinuation": "postgres-scope-continuation.json: all subgroup/duplicate/differencing/version/read assertions passed; last fixture revoke failed because revokedByUserId omitted",
+    "lastStage": "postgres-revocation-continuation.json: corrected read measurement and last revocation stage passed; no replay of completed publication/finals/stats assertions",
+    "instrumentationCorrection": "initial check compared $queryRaw but Prisma action is queryRaw; corrected live counter observed 3 raw read operations and zero FINAL queries; old zero alone not used as proof",
+    "proof": "postgres-proof.json"
+  },
+  "frontend": {
+    "target": "updated original TeacherApp navigation case for changed API and explicit class generation",
+    "report": "navigation.json",
+    "freshPass": 1,
+    "oldPR415EvidenceNotReplayed": "old source differs; updated case executed once",
+    "browser": "browser.json",
+    "pdfPages": 2,
+    "identityAndApiSynthetic": true,
+    "firstFailure": "browser-selector-failure.log: exact label matcher timed out after initial snapshot read",
+    "repair": "same accessible label with non-exact text match; no product change",
+    "continuation": "browser-selector-continuation.log",
+    "fixtureBundleRebuildOnce": true,
+    "typesAndLint": "backend/frontend types exit0; four frontend files lint0 errors/2 cleanup-ref warnings; raw log retained lossless gzip"
+  },
+  "remaining": [
+    "Other Teacher Scale/Cognitive/SJT/Bundle and private-composition sources remain contract-limited; no INDIVIDUAL_ONLY bypass",
+    "School Form/other runtime adapters",
+    "Old V1 no-leaf limitation remains recorded, no unrelated migration",
+    "Group longitudinal waits existing personal interface",
+    "PR408 new-main formal qualification remains separate; do not merge"
+  ],
+  "ciExecuted": false,
+  "merged": false,
+  "deployed": false,
+  "productionAccessed": false,
+  "localEvidenceAttribution": "Unsigned original local runs; exact current unchanged inputs subsequently staged and component-bound; no backfilled execution signature.",
+  "reports": {
+    "backend-types.json": {
+      "sha256": "aca645fd659cc9f38c4ff2f9a1a6dfe225d7a47c7606f2567a2fa5f44e0d663c",
+      "bytes": 460,
+      "exitCode": 0
+    },
+    "backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "browser-bundle.json": {
+      "sha256": "81275f81dc7ccc0188f7c209f668972bdacc718dcb198b8cb643be551de53aa7",
+      "bytes": 515
+    },
+    "browser-selector-continuation.log": {
+      "sha256": "62e0339d9cad1fe0560eaab3ddad1f37195ac649776acdced8273679059de348",
+      "bytes": 73
+    },
+    "browser-selector-failure.log": {
+      "sha256": "1c723c7c4e5b5705bce6b9170f7db3d6877b3d488c505eb4e22a474e630f3207",
+      "bytes": 331
+    },
+    "browser.json": {
+      "sha256": "60ddefe79860b919d9be220f269ef363e49630f43cba6509e28e092477b83e0c",
+      "bytes": 2907,
+      "passed": true
+    },
+    "browser.log": {
+      "sha256": "1c723c7c4e5b5705bce6b9170f7db3d6877b3d488c505eb4e22a474e630f3207",
+      "bytes": 331
+    },
+    "frontend-lint.json": {
+      "sha256": "e3ddb43e87a7cbef95a0ac0c10bf7e02d25ca9a8a0a3ac54e85c2c3281cf9f48",
+      "bytes": 747,
+      "exitCode": 0
+    },
+    "frontend-lint.log.gz": {
+      "sha256": "7938596da15ae0624f4f257e0e5fabbcdbbf7529ad5d39fe917a44369ad56703",
+      "bytes": 344
+    },
+    "frontend-types.json": {
+      "sha256": "466081160086e74112a4ee8ec64d8391f2a5b70dcee1d147321857d18fbfe671",
+      "bytes": 482,
+      "exitCode": 0
+    },
+    "frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "navigation.json": {
+      "sha256": "c58864736c0951667fa2dc15520021c59e3833c404235b3eb0bcf1586558b553",
+      "bytes": 1093,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "navigation.log": {
+      "sha256": "92d77e37bde3e098a2a4f5a990aae5d619893c14ce80bfc084907c55ed754f5f",
+      "bytes": 123
+    },
+    "postgres-first.json": {
+      "sha256": "2537c0d032f74d43252f97bd0a0a197fe680b0a56bce856bb1881d6b94add4ff",
+      "bytes": 2354,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "postgres-first.log": {
+      "sha256": "c6ea46297762abcf9a9ea867612880ebb2ac34e6b7e6adcf3004cfb02a3b8436",
+      "bytes": 127
+    },
+    "postgres-grade-continuation.json": {
+      "sha256": "f35cdcca2e3d4fa6c9a5f07729bcff11c73422fbb6e5a1213001999b181d5cf1",
+      "bytes": 3935,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "postgres-grade-continuation.log": {
+      "sha256": "9055fb1f081a704457103cebf3c202d1c5448bb4fbdb0d3f4dde2c573257dc52",
+      "bytes": 140
+    },
+    "postgres-proof.json": {
+      "sha256": "5cc1e6b26ec75a91cad36bc2d6aa69bcd2e68f5029c26704677aa7ffca2c1b87",
+      "bytes": 600
+    },
+    "postgres-revocation-continuation.json": {
+      "sha256": "2fcef78762a8825ad38345d0ef40b1a9e4864e38bd4487489bd93547f199d6d6",
+      "bytes": 1129,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "postgres-revocation-continuation.log": {
+      "sha256": "303212c6e6afd6c84e0a876fbb0bce1b6fcab5fcdbab8ab9771d9e5a1905762d",
+      "bytes": 145
+    },
+    "postgres-scope-continuation.json": {
+      "sha256": "5008fd71f8b99b2c70e4ea65a32cdd4d3c6a9b6de14b847ad1b7babd9c35d814",
+      "bytes": 3437,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "postgres-scope-continuation.log": {
+      "sha256": "76c2d9b767c5e0e9636bbdba29ab04ed638397400590cc0522b8fe91d8d8c816",
+      "bytes": 140
+    },
+    "teacher-group-1440.png": {
+      "sha256": "c1e15eda842ac2144723e25069a68dc7c48a00579f055214ea1f0f4219483810",
+      "bytes": 281000
+    },
+    "teacher-group-390.png": {
+      "sha256": "694a9567206e7f89cda582b5c6627f7530f9aa7ef7d3e8de1adf29d2a80f6116",
+      "bytes": 256385
+    },
+    "teacher-group-report.pdf": {
+      "sha256": "fe57a2dd1599373571295794a15e0b415e1f2b6962f6ddaa406903eba2e433c8",
+      "bytes": 405078
+    }
+  }
+}

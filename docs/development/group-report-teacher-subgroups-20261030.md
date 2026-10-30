@@ -1,0 +1,21 @@
+# Teacher Form 子群与版本（2026-10-30）
+
+在独立后续分支 feat/group-report-teacher-subgroups-20261030，基于 PR415 的380b90cd7并无冲突合入main2fccefaf838fe24c3d2ec3a63b32d016dbe18866（PR405）。不改PR414/415冻结提交、不合并PR408。
+
+沿原 Teacher Form groupReport.service 选择和汇总已有 native FINAL，不造第二套计分/权限/报告存储。真实产品管理员在原评价活动选择正式Form，默认读取最新既有版本，按单维任教班级或已有人员标签OR选人，显式生成新版；旧版保存并可切换读取。班级采用staff-class历史关系，按membership去重；人员标签沿任务发布时的有效期，年级/性别缺可靠历史来源不伪造。
+
+复用既有 reporting_cohort_snapshots 冻结实际所选成员，cohort仅对已通过原生Teacher Form来源授权的内部调用增加FORM身份适配，通用Form统计许可不打开。原native FINAL查询按同一冻结execution集合限缩，原人数、缺失补集、全体完成、分布、发布等待与产品授权规则保留。新POST版本保留原正式发布要求的近期MFA；GET版本只读，不增加新MFA门槛。未扩大角色或共享教育账号权限。
+
+新版复用 education_report_release_records，以既有64hex scope key绑定每次显式生成的UUID版本。报告projection追加范围文字与选择；私有__population只保存既有cohort引用和本次实际FINAL execution IDs，以便跨版本比较冻结贡献者，而不以今天成员或新增FINAL重写过去。它在原reportDigest内，统一读函数剥离私有字段；前端、打印不收到成员清单。没有新增表、队列、全局缓存、原始作答副本或新计划系统。成人Teacher既有差分函数沿用，扩展到同Run不同版本；已有整组/Legacy历史保留原FINAL适配，学生评教/专家共识不混入SELF。
+
+真实隔离PG：原生Form创建/发布、Run发布、12位教师真实start/FINAL，6人班级通过，跨班OR去重12人，4人小群拒绝，7人标签群相对6人既有群只有1人差异而拒绝，改名旧版文字与digest不变、新版保留、产品管理员grant撤销后拒绝读取。私有manifest未进入返回。读操作计数纠正后实际观察到3条raw查询、0 FINAL查询。没有复验School37项或Training175。
+
+失败原件/续行完整保留：首次准备命令cwd错误未写入测试/未启动PG；首个PG夹具CLASS少GRADE父节点，复用已有学校及12成员后续修（同时按真实DDL补label字段）；原生12份FINAL完成后，首个版本key误用UUID触发既有scope64hex约束，代码改canonicalHash后从ready fixture续行。所有行为断言通过后，最后revoke夹具漏revokedByUserId；仅补最后撤销阶段与修正的读测量，没有重放已过的统计/发布/FINAL。不得把原失败case说成原轮全过；整体为分阶段续验完成。
+
+更新原TeacherApp导航用例适配新版本API，单case通过；浏览器真实学校改进/评价活动路径完成自动旧版读取、单维班级生成一次POST、旧/新版切换、切题、全屏、1440/390报告布局和两页中文PDF。首次浏览器只在下拉accessible label的exact匹配超时，夹具改非exact后续验；产品未改。该次locator修复误重编译了一次未变esbuild测试夹具，明确记录，不称生产构建或无重复；不再重播。
+
+当前 backend08e1af56b33962b0f9ec22c9db3973a164a7b7a2、frontend6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103真实types exit0，4个前端触达文件lint exit0（2条cleanup-ref警告，未改阈值）。新TeacherGroupVersions复用平台ReportPrimitives/打印CSS，所有输出均使用同一获准投影。
+
+仍限现有原生Teacher Form。其他个人工具INDIVIDUAL_ONLY合同不绕过，其他来源接线与群体纵向待后续；旧无leaf V1限制照实记录，不扩大成无关迁移。本批仅Draft，不激活正式CI、不合并、不部署、不访问真实用户或生产。
+
+此前409目标写入拒绝已获得用户明确新授权，原拒绝动作未执行；随后成功向同一页追加既有PR414修复/验证与旧V1限制记录，未修改旧正文或分享状态。

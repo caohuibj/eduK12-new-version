@@ -1,3 +1,4 @@
+import {TeacherFormGroupVersions} from './TeacherFormGroupVersions'
 import {TeacherFormGroupReport,type TeacherFormGroupProjection} from './TeacherFormGroupReport'
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
@@ -290,17 +291,6 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     await api(base+'/evaluation-events/'+event.id+'/run/cancel','POST',{})
     await fetchRun(event);setNotice('评价任务已取消。')
   })
-  const releaseGroup=(event:Event)=>perform(async()=>{
-    const formId=formChoice[event.id]
-    if(!formId)throw new Error('请先选择报告对应的正式 Form')
-    if(!window.confirm('确认正式发布冻结后的教师群体调查报告？后续读取将使用同一快照。'))return
-    const report=await api<TeacherFormGroupProjection>(
-      base+'/evaluation-events/'+event.id+'/forms/'+formId+'/group-report/release',
-      'POST',{})
-    if(previewContext.current.base!==base||previewContext.current.api!==api||previewContext.current.actorKey!==actorKey)return
-    setReports({[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formId)?.title??formId}})
-    setNotice('群体报告已正式发布，后续授权访问只读取同一份快照。')
-  })
   const readGroup=(event:Event,historical=false)=>perform(async()=>{
     const formId=formChoice[event.id]||releasedForms[0]?.id
     if(!formId)throw new Error('请先选择报告对应的发布表单')
@@ -498,14 +488,11 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
               <option value="">选择已发布表单</option>
               {releasedForms.map(form=><option key={form.id} value={form.id}>{form.title}</option>)}
             </select></label>
-            {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'&&
-              <button onClick={()=>releaseGroup(event)} disabled={working||!formChoice[event.id]}>
-                正式发布群体报告
-              </button>}
-            <button onClick={()=>readGroup(event)} disabled={working||!formChoice[event.id]}>
-              {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
-                ?'查看已发布群体报告':'查看学校群体报告'}
-            </button>
+            {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+              ?formChoice[event.id]&&<TeacherFormGroupVersions key={event.id+':'+formChoice[event.id]}
+                api={api} endpoint={base+'/evaluation-events/'+event.id+'/forms/'+formChoice[event.id]+'/group-report'}
+                onReport={report=>setReports(report?{[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formChoice[event.id])?.title??formChoice[event.id]}}:{})}/>
+              :<button onClick={()=>readGroup(event)} disabled={working||!formChoice[event.id]}>查看学校群体报告</button>}
             {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'&&
               <button onClick={()=>readGroup(event,true)} disabled={working||!formChoice[event.id]}>
                 查看历史规则报告（首次读取需近期验证）
