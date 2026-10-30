@@ -1,0 +1,35 @@
+{
+  "status": "DRAFT_NOT_MERGE_READY",
+  "sourceCheckpoint": "463199f0990ccb38ff8ce8ab038fe25e90013135",
+  "nextMainAlignment": "55fab18e9933e58dcb800b20156f5b7e48858536",
+  "scope": "Training native fixed Bundle declared measurement leaves through existing course group source, canonical results, statistics and artifact readers; persist actual course on new native Bundle parent",
+  "noNewTablesOrEngines": true,
+  "historicalUnscopedParents": "No backfill or present-day roster inference. Old parents without deliveryCourseId are not consumed. Standalone legacy Assessment remains unsupported.",
+  "sourceFilesAtRecordTime": {
+    "server-version/backend/src/modules/composite/composite.service.ts": "856346ac3b3476f55e79440160367974e9a4e4524574d0f8aaacceb6a470b198",
+    "server-version/backend/src/modules/training-analysis/group-source.ts": "ac64b577a459e82bf6145d01568f691357368f44cc6575ed3f355c234e43e194",
+    "server-version/backend/src/modules/training-analysis/source.ts": "339d1bad0129b942c764415007660d85a87981414972f7f4ba288d65be94600d",
+    "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts": "2ed871c4969fb4475264ad3d5106ec86e07bb4ededa6c00ad8f7b5c285d7884b",
+    "server-version/backend/src/__tests__/training-analysis/group-bundle-leaves.test.ts": "737f80f3c03753fd13f83c66de006ff9611dea482cc4dae9b15ca17acc720184"
+  },
+  "evidenceAttribution": "Unsigned local original reports. These source fingerprints were recorded after execution, not execution-time attestation or formal CI admission. Final fixture differs by additive split into separate Cognitive/SJT cases; original reports retain their actual names and failures. Composite course binding expression was only reformatted after successful PG execution.",
+  "checks": {
+    "unit": "bundle-leaves.json: one leaf-binding case passed, no replay",
+    "nativePostgres": "bundle-postgres-key-continuation.json: actual publication/start/all required Context+Scale+Cognitive+SJT FINAL, then Scale canonical zero, old multiwave exclusion, Context rejection, existing floor and snapshot read passed",
+    "initialNativeFailure": "bundle-postgres-first.json: synthetic bundleKey contained hyphens. Resources had already been published. Reused those resources; corrected fixture key only, no publication setup replay.",
+    "otherLeavesInitial": "bundle-other-leaves.json: Cognitive definitions/numeric canonical observations and own parent assertions completed before SJT lookup failed. Fixture used internal SITUATIONAL instead of public SJT kind. This failed case is not counted as a fresh passed case.",
+    "sjtContinuation": "bundle-sjt-continuation.json: only SJT executed after fixing fixture kind. One passed; original Bundle journey and Cognitive case filtered, no administration replay.",
+    "frontend": "Unchanged frontend tree 6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103; PR418 browser/types evidence retained without replay. Training PR408 175 assertions not rerun.",
+    "backendTypes": "Pending one current-tree compile after source freeze and main alignment."
+  },
+  "remaining": [
+    "Standalone Assessment source adapters need actual frozen product scope; no inference from mutable ownership or rosters.",
+    "School Form and other Teacher tool sources retain their existing contract limits.",
+    "Group longitudinal waits stable personal longitudinal contract.",
+    "Formal qualification remains separate from local unsigned evidence."
+  ],
+  "ciExecuted": false,
+  "merged": false,
+  "deployed": false,
+  "productionAccessed": false
+}

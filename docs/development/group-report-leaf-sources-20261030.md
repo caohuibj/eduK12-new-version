@@ -1,0 +1,11 @@
+# Training 固定 Bundle 叶工具群体报告
+
+本批沿现有培训师课程的单次群体报告消费原生 ASSESSMENT_BUNDLE。只用已冻结 Bundle slot 与实际 item 绑定定位 Scale、Cognitive、SJT；Context 仍必需完成，不作为表单群体统计，Bundle Profile 不作聚合。原来的多波分析入口不随之放开。权限、正式结果选择、指标身份、质量政策、统计、人数下限、Artifact 与快照读取继续使用原实现，没有新表或第二套引擎。
+
+发现原生 Bundle 新 parent 未保存实际课程来源；在已有创建路径写入当次真实 courseId 到 deliveryCourseId。无课程发布保持 null，旧缺失来源的结果不回填、不按今天名单猜归属。独立旧 Assessment 尚未接入，不称所有来源完成。
+
+本地只做新来源的必要检查：一个绑定单元用例；一份真实 native 发布、必需 Context+Scale+Cognitive+SJT 正式完成后的叶消费与快照读取旅程；同一份保留结果的认知/SJT 指标补验；最终源冻结后一次受影响 backend 编译，预算约一分钟。沿用 PR408 的175项和 PR418 未变 frontend 证据，不重复应用测试、浏览器或科学协议整验。具体原报告、失败及续行边界见 evidence manifest。
+
+真实 PG 首错是测试 bundleKey 含连字符。保留已发布素材，改合法 key 后续行通过，没有重复建发布数据。补验中认知断言完成，随后因测试把公开 SJT 写成内部 SITUATIONAL 而未找到工具；修测试命名后只续行 SJT。原失败保留，未将部分完成的认知阶段伪称为独立绿色 case。量表零值、单人隐藏、Context 拒绝和读取不物化 canonical 结果均已实际验证。
+
+当前仅 Draft 工程证据。正式资格、具体 PR 合并与部署没有由这些本地结果自动获得授权。无生产访问。

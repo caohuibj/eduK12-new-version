@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "realNativePublicationAndAllRequiredInputs": true,
+  "newParentCourseBinding": true,
+  "onlyDeclaredMeasurementLeaves": true,
+  "contextRejectedAsMetric": true,
+  "profileNotAggregated": true,
+  "canonicalZeroPreservedBeforeDisclosure": true,
+  "onePersonSuppressedByExistingFloor": true,
+  "storedReadDoesNotMaterializeCanonicalFacts": true,
+  "oldMultiWaveEntryUnchanged": true,
+  "productionAccessed": false
+}
