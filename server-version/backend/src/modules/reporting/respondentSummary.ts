@@ -59,7 +59,7 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
   const rule = contract.audiences.RESPONDENT
   if (rule.mode === 'NONE' || rule.mode === 'COMPLETION_ONLY') return projectAudienceResult({contract,audience:'RESPONDENT',metrics:{}})
   if (rule.mode !== 'INDIVIDUAL_SUMMARY' || row.policy.analysisMode !== 'INDIVIDUAL_ONLY'
-    && !(row.subjectUserId===userId&&row.relationship==='SELF'&&row.perspective==='SELF_REPORT'&&isSelfGroupV2Entry(entry))) return hidden()
+    && !(options?.disclosureOnly&&row.subjectUserId===userId&&row.relationship==='SELF'&&row.perspective==='SELF_REPORT'&&isSelfGroupV2Entry(entry))) return hidden()
   const assertCurrent=async()=>{
     const current = (await readOwn())[0]
     const currentEntry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version},db)

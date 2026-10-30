@@ -1,0 +1,3 @@
+# Public inbox SELF GROUP refusal
+
+One new targeted contract case passed; five existing cases were filtered, not rerun. The new SELF GROUP exception is now restricted to the internal disclosureOnly call. Public two-argument inbox reads reject GROUP before canonical metrics are materialized. The internal response contains only state and the declared metric whitelist; the dedicated education reader remains responsible for frozen feedback timing and per-leaf projection. Existing INDIVIDUAL_ONLY behavior is unchanged. No full test suite, frontend, database or repeat typecheck was run for this boolean-boundary correction. Local only; no external upload, merge or deployment.
