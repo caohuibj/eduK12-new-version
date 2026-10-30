@@ -16,6 +16,25 @@ const unit=()=>({draftId:iid,kind:'SCALE',measurementRelease:measurement} as any
 const selection=()=>({instrumentId:iid,reportReleaseId:pid,references:[{releaseId:rid,entryKey:referenceEntryKey(entry),priority:1}]})
 beforeEach(()=>{vi.clearAllMocks();mocks.get.mockImplementation(async(_tx,id)=>id===rid?reference():report())})
 describe('actual Wave content selection freezer',()=>{
+ it('leaves private P/R unselected when an untracked D changes C, while explicit new choices still validate',async()=>{
+  const prior={...unit(),instrumentKey:'D',contentSelection:undefined}
+  await freezeSurveyContentSelections({} as never,'owner','project',[prior],[selection()])
+  const changed={...unit(),instrumentKey:'D',measurementRelease:{...measurement,releaseId:'new-D-C',contentHash:'e'.repeat(64)}}
+  const source={units:[prior],longitudinal:{metrics:[{draftId:'tracked-A'}]}} as any
+  expect(inheritedSurveyTrackingUnit(source,{id:iid,instrumentKey:'D'})).toBeUndefined()
+  const defaults=surveyTrackingDefaultSelections(source,[changed])
+  expect(defaults.contentSelections).toEqual([])
+  await freezeSurveyContentSelections({} as never,'owner','project',[changed],defaults.contentSelections)
+  expect(changed).not.toHaveProperty('contentSelection')
+  await expect(freezeSurveyContentSelections({} as never,'owner','project',[changed],[selection()])).rejects.toMatchObject({statusCode:409})
+  mocks.get.mockImplementation(async(_tx,id)=>{
+   const release=id===rid?reference():report()
+   const pointer={releaseId:changed.measurementRelease.releaseId,contentHash:changed.measurementRelease.contentHash}
+   return {...release,content:{...release.content,...(id===rid?{measurement:pointer}:{measurements:[pointer]})}}
+  })
+  await freezeSurveyContentSelections({} as never,'owner','project',[changed],[selection()])
+  expect((changed as any).contentSelection.reportRelease.releaseId).toBe(pid)
+ })
  it('clears an explicit empty continuation selection, but revalidates intentionally inherited private P/R',async()=>{
   const old={...unit(),instrumentKey:'A',contentSelection:undefined}
   await freezeSurveyContentSelections({} as never,'owner','project',[old],[selection()])
