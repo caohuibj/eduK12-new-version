@@ -4,11 +4,11 @@
   "repository": "caohuibj/eduK12-new-version",
   "branch": "feat/teacher-jdr-bundle-20261030",
   "enabled": true,
-  "base": "8bd86e4059125b9ee868d4777795e513d36cba71",
-  "productHead": "47a00dabda5767d01b9c1eb0f27e1beafeed27ca",
-  "productTree": "3f758aa1d3646622df45fbc02a093a7134e92daf",
-  "frontendTree": "f9be4ad6cd12a0fa39b88ba4c10ca637b72a4fae",
-  "backendTree": "89c27fa1b5fcc660debdb75a146e23c6732f7f6d",
+  "base": "31845e3a14dd5edf6e03c90e7f71c014bcf0aa06",
+  "productHead": "ee72a4a3949652e9dd067bd1cb5d0cd1c27b3bd4",
+  "productTree": "a39f954a8b4b437ee64d9e2dc394286da24f54db",
+  "frontendTree": "5ccee9ffe412bd93f912821b3aad698619aa0671",
+  "backendTree": "c042e2783d094c62c7bdadaec3623641e86d0b64",
   "review": {
     "status": "INDEPENDENTLY_REVIEWED",
     "recordSha256": "1d9e2fb4ae69ea79b96142c5984cd9367f435fc3c2363d4672ed9d0969864fa4",
@@ -210,11 +210,11 @@
   "controls": {
     ".github/scripts/school-teacher-checks.mjs": {
       "before": "8d565a850bd576d057635b7276b488949ee07199",
-      "after": "cc367656dcdf33d553381cbfc54d8ed2f61f6b69"
+      "after": "aa1d2124c1ebc5b70078040ceea300211c6e80fd"
     },
     ".github/scripts/school-teacher-native.mjs": {
       "before": "67f19b19724bab9a52cb7b7dbffd152c73217f47",
-      "after": "bd12e49fa1348799d5e5225484b6aa0fa2ac4155"
+      "after": "8d2f4c8df49ab85bc0d23b38732348fed94c6d61"
     },
     ".github/scripts/school-teacher-native-evidence.mjs": {
       "before": "68236e41ec233c71d75198b909c115f35ddeb039",
@@ -225,8 +225,8 @@
       "after": "daa9edb4379a2268ec42a7a6ce14e867782f8b6a"
     },
     ".github/workflows/ci.yml": {
-      "before": "8c717d88d6cdc5673d8c11a05714ad56caf09ef8",
-      "after": "12bbb37d2f3cafbc40fc0ba9049928966ced9b93"
+      "before": "04cd5a8ac238aab570030a506aa45051460979b7",
+      "after": "021cf3022aa87bf8206c380f7aa8929024c8a7c8"
     },
     ".github/scripts/school-teacher-jdr-bindings.json": {
       "before": null,
@@ -234,19 +234,19 @@
     },
     ".github/scripts/school-teacher-jdr-evidence.json": {
       "before": null,
-      "after": "61d60dccf61289e9c5ab029b6fe7c73d6a6d488d"
+      "after": "43bc8023d1eac04090024c61246d3e47c5c6c79c"
     },
     ".github/scripts/school-teacher-jdr.test.mjs": {
       "before": null,
-      "after": "9f4a0719108028b04204e646d448706ff76124f2"
+      "after": "1826719d3de3f04b756938da1055810980bab8d7"
     },
     "docs/bundle-declarative-onboarding/teacher-jdr-ci-plan.md": {
       "before": null,
-      "after": "0327b2ea280333d0c2456c14aa0cc8aa72a8e889"
+      "after": "a0f01647f0e696504c95bb415a389fc192f2958e"
     },
     "docs/bundle-declarative-onboarding/teacher-jdr-implementation.md": {
       "before": null,
-      "after": "a28963f445e9fc524fe8beb51c0e0091c1e2ecd4"
+      "after": "c4c6428a43476989f5c7702893232e21db114902"
     },
     "docs/release/README.md": {
       "before": "cd7858296514a91a892fdb44e03e1715a1625414",
@@ -306,7 +306,8 @@
         "HIGH"
       ],
       "ignoreUnfixed": true
-    }
+    },
+    "officialAuditReuse": 41031648227
   },
   "evidence": {
     "status": "REVIEWED_LOCAL_EVIDENCE_BOUNDED_ORIGINALS",
@@ -317,8 +318,31 @@
       "ordinary-collection-and-frozen-history",
       "generic-four-axis-report-and-development-browser"
     ],
-    "manifestSha256": "2d07e1c7c132acb80dccd1f3f062366d70e8b15d7b1833af9778fc83d6ea77fb",
-    "reviewSha256": "e98575d938a7f75b8b70e8daaf88027fba44353cc452dc7d3a5eba70b5d83552",
-    "selectionSha256": "826bf6fb9a793a8fbb4d1c69b2b4ce86976088cf8760fcb3805c106f876acf9a"
+    "manifestSha256": "c016b5a7e9b9f6c2337bcee451a28abd7e4fa7186e824a183d79c0c1ddc7a2bd",
+    "reviewSha256": "7804bbaa6832e764f94a4542ada809818907630d5012cbc8b92ebc8d36aa2045",
+    "selectionSha256": "88bb98351efb4794e20e04a17f35c7ec3735e6e468ccddff913c1f0e537dbd94"
+  },
+  "baselineReview": {
+    "recordSha256": "4ca4d0c19315bbedac919ae1cdee815166ed75d9f5db7b644e2e986ae04f3b9b",
+    "record": {
+      "kind": "delegated-baseline-closure-review",
+      "date": "2026-10-30",
+      "reviewer": "Bundle cloud node scoped self-review; DOT background review continues",
+      "authority": "Parent explicitly directed autonomous closure against main31845e3a, reuse valid evidence and no per-commit approval pause.",
+      "priorIndependentReviewRecordSha256": "1d9e2fb4ae69ea79b96142c5984cd9367f435fc3c2363d4672ed9d0969864fa4",
+      "priorFormalRun": 41031648227,
+      "base": "31845e3a14dd5edf6e03c90e7f71c014bcf0aa06",
+      "productHead": "ee72a4a3949652e9dd067bd1cb5d0cd1c27b3bd4",
+      "directBusinessSourceFilesUnchanged": 41,
+      "protectedInputsUnchanged": 32,
+      "applicationSelectionsUnchanged": 23,
+      "change": "New component trees from upstream Survey reporting/catalogs; existing native route retained. New audit-only glue uses existing officialApi/officialZip/verifyCompletedAudit against one exact successful job, unchanged lock/manifests/workflow/audit policies and 24h age.",
+      "controlVerification": "Four directly affected controls PASS once; changed workflow actionlint exit0. Old SAST/main controls and application assertions not replayed.",
+      "limits": [
+        "This baseline glue self-review is not a new DOT independent review or signature. Prior independent core/engine/content review remains explicitly bounded.",
+        "Original cloud artifact HTTP403 is not retried. Normal Actions qualification consumer validates the ZIP privately and emits only its receipt; no ZIP is returned to cloud.",
+        "Both changed component inputs require new actual artifacts/scans and CodeQL. No model/PG/browser/application case replay."
+      ]
+    }
   }
 }

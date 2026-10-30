@@ -7,7 +7,7 @@ import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {binding,actualPlan,requireSuccess,sha256,git} from './school-teacher-scope.mjs';
 import observerReuse from './school-teacher-observer-reuse.cjs';
-import {requireNativeEvidence,requireNativeProducerAttempt} from './school-teacher-native.mjs';
+import {requireNativeEvidence,requireNativeProducerAttempt,JDR_AUDIT,verifyJdrAuditReuse} from './school-teacher-native.mjs';
 const out=resolve('school-teacher-evidence');
 function receipt(name,value){mkdirSync(out,{recursive:true});writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2)+'\n')}
 const RESUME={run:39867718449,head:'dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c',checkout:'81ee1f6d6a097e0c9e0aca3da05582f614325878',frontendJob:120134202466,auditJob:120134202442,sastJob:120134095190,frontendArtifact:12465090917,frontendDigest:'7663300255799eff7bd3e8f4ac7f79fef42e3ad62af40da66d5f947876241451',auditArtifact:12464502959,auditDigest:'dac8363a31ff8e8a05809ec80d9b31929624e0be9a9f06bc549d2fb0e66fda1b',workflowSha256:'3711b141411280f2775ba9475d72b4011ecbfd664789b5228114eefee58331d7'};
@@ -519,7 +519,13 @@ async function nativePhase(phase,b,plan){
  else if(phase==='verify-backend-artifact')freshArtifact('backend');
  else if(phase==='native-evidence')receipt('native-reviewed-local-evidence',requireNativeEvidence(b,{inspectHistoricalCase,requireReviewedCase}));
  else if(phase==='native-runtime')command('native-runtime','python3',['.github/scripts/school-teacher-native-runtime.py']);
- else if(phase==='audit')auditComponents(b.execution.auditComponents,auditComponent,value=>receipt('audit',value));
+ else if(phase==='audit'){
+  if(b.execution.officialAuditReuse!==undefined){
+   const proof=verifyJdrAuditReuse(b,await officialApi('/actions/runs/'+JDR_AUDIT.run),await officialApi('/actions/jobs/'+JDR_AUDIT.job),git);
+   const zip=await officialZip(JDR_AUDIT.artifact,JDR_AUDIT.digest,'school-teacher-audit-'+JDR_AUDIT.checkout,JDR_AUDIT.run,JDR_AUDIT.head,JDR_AUDIT.bytes);
+   receipt('audit-official-reuse',{status:'VERIFIED_OFFICIAL_AUDIT',currentHead:plan.head,currentRun:process.env.GITHUB_RUN_ID,...proof,original:verifyCompletedAudit(jsonZip(zip))});
+  }else auditComponents(b.execution.auditComponents,auditComponent,value=>receipt('audit',value));
+ }
  else if(phase==='aggregate')requireSuccess(plan,JSON.parse(process.env.NEEDS_JSON));
  else throw Error('Native Bundle refuses historical/unselected phase: '+phase);
 }
