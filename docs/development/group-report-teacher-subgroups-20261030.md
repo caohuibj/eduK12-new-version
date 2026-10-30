@@ -27,3 +27,25 @@
 ## 生成成功与目录读取分离
 
 按 DOT review 修复 TeacherFormGroupVersions：POST成功先在原请求token下交付报告并将新版本加到选择列表，目录GET不再决定生成是否成功。GET失败只显示目录刷新提示；重试按钮仅执行GET，不再次POST。只新增并运行一项POST成功/GET失败/GET重试用例，1PASS，原导航用例filtered，后端与PG输入未变不重跑。旧frontend类型收据仍只代表旧tree，后续正式冻结处理当前类型证据。
+
+## main414 / Reader准备同步
+
+沿Reader392a9f249无冲突合入已合并main43d119c9，检查点af39a01b22e340dd15ae15bd6e45a24b024bf300。Native子群/版本涉及的11个应用与夹具源路径已与DOT已审阅ef2554926对比，未产生本切片新增功能改动；POST成功、目录GET失败保留报告与只读重试修订仍在。原12人PG、浏览器和该定向case不重复执行。
+
+当前整组件tree与旧08e1/6fbb不同，旧收据仅归属原tree，不冒称当前编译成功；等409基线稳定、最终资格冻结时一次补当前缺失类型输入，避免现在提前编译后立刻因上游变化重做。PR418保持Draft，不激活正式CI、不进合并队列。GenericForm统计权限、其他个人INDIVIDUAL_ONLY来源、学生评教与专家共识边界没有扩大。
+
+## main8bc 稳定基线接续
+
+本批正常合入Reader最终候选b3e9f35和main8bc，保持子群／版本API，不退回415单版本fixture；Studio同时保留个人tracking和本批版本选择。仅对新tracking只读查询补baselineId:null，后台自己的群报算法／权限／存储文件仍与ef255相同。后端48d17当前types一次通过，未重跑PG。
+
+前端首次types揭示目录刷新修复测试的generic vi.fn类型不兼容，保留首错；改为真实泛型适配器包装unknown请求spy。导航首次在配置按钮等待1371ms超时，保留原件，仅增加3秒有界等待及失败请求诊断，续验2项通过。并发编译资源竞争只是可能原因，不声称查明生产故障。仅重编修复影响的前端，不重复后端／PG／浏览器。
+
+415的retarget main及描述更新被自动审批拒绝，目标和原因见main8bc/preparation.json；已停止该操作，不换接口。其46个精确Git对象已核验上传，但暂不移动候选ref，防止旧stacked base触发已知不匹配CI。418保持其后的小切片准备，未正式激活、合并或部署。
+
+前端续编tree3a56f9d4a76bea2836de1031cd627f71d8dcb175 exit0；backend48d17原本次exit0继续复用，没有重编未变后端。两项交互续验通过；本地准备齐备，尚不称正式CI资格。
+
+## Reader #415 正式资格归档（候选不变）
+
+针对状态／目标／说明及限定CI的新具体授权已收到，回读旧状态后重试成功。415按期望392a9f快进b3e9f35、目标main、Ready。实际preview b2c1e012、tree54319869与source一致。正式41070437105 attempt1四项SUCCESS，完整126作业／122跳过；接纳ZIP1541字节及SAST ZIP71499字节实际下载并核验官方digest。unsigned原件接纳1导航／1前端type／1历史browser，CI未重播应用／PG／编译。SARIF保留与414同rule／message／location的旧测试断言告警，不称零结果、不抑制。
+
+归档在本后续分支reader/main8bc/formal，不改变415已验candidate。416合并优先，415仍待具体合并决定与届时base核对；418目标／Ready／正式资格按授权等415合并后继续，本轮不激活、不合并、不部署。leaf Draft旧拒绝仍停止。

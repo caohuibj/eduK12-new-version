@@ -39,7 +39,7 @@ export function descriptiveResourceEntry(input: { scaleId: string; name: string;
   const isIndividual = input.mode !== 'GROUP'
   const key = isTeacher ? `teacher-scale:${input.scaleId}:INDIVIDUAL` : `custom-scale:${input.scaleId}:${input.mode}`
   const metricKeys = input.definition.scoring.scores.map(score => score.key)
-  const individual = { mode: 'INDIVIDUAL_SUMMARY' as const, metricKeys, longitudinalMetricKeys: metricKeys }
+  const individual = { mode: 'INDIVIDUAL_SUMMARY' as const, metricKeys, longitudinalMetricKeys: input.definition.report.audienceContract?.longitudinalMetricKeys ?? metricKeys }
   const none = { mode: 'NONE' as const, metricKeys: [], longitudinalMetricKeys: [] }
   const adultIndividual = {RESPONDENT:individual,SUBJECT:individual,TEACHER:none,PROFESSIONAL:none,PARENT:none,RESEARCH:none,ORGANIZATION:none}
   const entry: RelationalProductEntryV1 = {

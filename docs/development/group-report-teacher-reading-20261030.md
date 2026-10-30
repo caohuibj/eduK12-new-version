@@ -13,3 +13,31 @@
 当前仅 Draft 准备，不激活正式CI、不合并、不部署、不修改真实用户/数据/权限。
 
 最终frontend树00a843d3164e16ae7b7b4045ee0597db2812d790真实 app types exit0，3个触达前端文件lint exit0（原有scopeGeneration cleanup-ref警告1条，未改规则/阈值）。原执行无签名，报告和输入后续精确归档，不伪造历史签名或称本地等于正式CI。
+
+## mainfa / PR414 资格等待期间的独立收口
+
+只在本Reader分支合入School已冻结候选77e276724，检查点68f047824a940595a9a9346298235c3f4cddaa56；不修改PR414候选。当前backend tree2342ff04dd851b9c82383fd5835f35935ecb67fa与School实际已验tree完全相同，复用原类型收据，不运行后端检查。当前Reader frontend treeb6e7cfb9d6bd52c9f67fcb3b744f3d9b8936f31f实际仅补一次app类型检查，exit0。原导航/浏览器/PDF不重播。PR415保持Draft，尚无自己的正式CI资格。
+
+## PR414旧基线正式原件归档（不改其已验候选）
+
+正式41057783824在candidate77e276724/basefa038041上四作业成功，41个观察实际接纳而非重播；完整126作业列表、原件接纳JSON、两个ZIP的真实下载哈希及原SARIF lossless gzip已在本后续分支归档。SARIF保留一条主线既有测试断言告警，不声称零告警，不改旧源码/阈值。School已验77候选不变。
+
+用户批准406/414依次合并后，新mainfb3a0cab6f3f28e737a38550167ff6b2affcae56尚未在此节点对齐：Git fetch认证失败，新对象本地不存在。GitHub API仍可读，Hui新审阅页已成功追加正式原件与准确阻碍，未重复两项修复结论。停止Git凭据重试，不用旧run代替新基线资格；这些归档先本地保存，恢复Git传输后再推送。没有合并或部署。
+
+## main406 / School最终资格归档
+
+Git公开只读fetch成功后，PR414原分支完成mainfb对齐。通过既有授权官方Git数据API逐对象保留并验证本地SHA（40对象），再按期望旧head77e276724快进原School分支到f5fabe490；未新建凭据、未改main。实际merge78c76f50父提交为mainfb和该candidate，tree122aceed8与source相同。正式41062520295四作业全部success、126作业完整分页核对；41观察继续接纳未重播，两个ZIP均实际核验，SARIF保留同一条历史测试断言告警。旧凭据故障为历史，当前资格完成，node不合并/部署。正式原件在本后续分支mainfb/formal目录，School已通过candidate不改。
+
+本Reader独立合入该School候选后，检查点704a0ab779929592f201a54d367a9d9e295f29c9当前frontend treeb672a3fcf90f535079675048a7a013fbbbf660fb只补一次app类型检查，exit0。backend tree与School dc9a331f完全相同，复用其新收据，不重复后端/业务/PG/浏览器。PR415仍Draft，无自己的正式资格。旧d1fe67归档保留为祖先。
+
+## main414 后的 Reader 准备
+
+无冲突合入真实main43d119c9bfbc7949baab2edea29d96044b04607c，检查点91487d27e12e60cd30895d5e5327016552f9a45a。backend dc9a331f、frontend b672a3fc组件tree都未变化，沿用已实际通过的mainfb类型收据，没有再次编译。五个Reader应用/夹具源blob与产品380b90cd7完全相同，原导航/浏览器/打印不重播；分母、NON_EXCLUSIVE、隐藏人数及取整字段已核对现有原生服务输出，没有新增产品功能。
+
+唯一准备缺口是PR415缺现有精确资格命名空间。沿onboarding-structure增加固定415的frontend-only源/模式/组件绑定与原浏览器观察接纳，不新增workflow或后台服务。仅补一个控制用例，实际1PASS；保持候选禁用和PR Draft，按DOT要求不与正在对齐的409进入合并队列。这里只是准备，后续自然节点再绑定当时真实main/merge，不声称正式资格成功。418的子群/版本与目录刷新修复独立保留，不混入本Reader切片。
+
+## main8bc 稳定基线最终资格
+
+合入已发布的个人Teacher纵向main8bc，仅Studio首行import冲突并保留两边接线。实际新消费者对普通Form活动增加只读GET tracking；夹具明确baselineId:null，真实TeacherApp导航仅此受影响case再次执行1PASS，无虚假下一轮入口。原Reader组件、共享打印CSS和量化投影未变，旧浏览器/PDF保持历史观察，没有重播或声明完整bundle相同。
+
+当前前端在486fa3286冻结输入编译一次；后台完整tree与main8bc相同，frontend-only精确路由拒绝后台漂移，因此本批不要求未变后台的重复编译收据，不伪造原后台执行元数据，不运行PG／迁移／业务回归。现有四作业scope、unsigned原件接纳、当前受影响CodeQL、稳定gate依精确绑定收口；不新建workflow，不扩权，不合并／部署。

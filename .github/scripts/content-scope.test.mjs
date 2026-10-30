@@ -57,6 +57,17 @@ test('personal tracking Draft reuses existing producers without qualifying Ready
   assert.ok(failedChecks(needs,false).includes('scope'));
   assert.ok(requiredChecks({scope:{outputs:{...scope,personal_tracking_draft:'false'}}},false).includes('backend-regression'));
 });
+test('Training personal tracking selects the same bounded Draft producers and refuses unrelated writes',()=>{
+  const entry=file=>({file,status:'A',oldMode:'000000',newMode:'100644'});
+  const entries=['server-version/backend/src/modules/composite/personal-tracking.ts',
+    'server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql',
+    'server-version/backend/src/modules/bundle-product/service.ts',
+    'docs/evidence/personal-longitudinal-training-20261030/manifest.json'].map(entry);
+  assert.equal(personalTrackingDraftScope(entries,{event:'pull_request',draft:true}),true);
+  assert.equal(personalTrackingDraftScope(entries,{event:'pull_request',draft:false}),false);
+  assert.throws(()=>personalTrackingDraftScope([...entries,entry('server-version/backend/src/modules/auth/changed.ts')],{event:'pull_request',draft:true}),/no broad fallback/);
+  assert.throws(()=>personalTrackingDraftScope(entries,{event:'pull_request',draft:true,forceFull:true}),/does not authorize/);
+});
 test('aggregate checks only selected jobs, and fails closed for every selected job', () => {
   assert.ok(requiredChecks({ scope: { outputs: scopeOutputs() } }, false).includes('backend-regression'));
   for (const [content, presentation, draft] of [
@@ -483,4 +494,18 @@ test('guidance documents use only documentation gate; mixed or nonregular change
   assert.deepEqual(failedChecks(needs,false),[]);
   for(const bad of ['failure','cancelled','skipped',undefined])
     assert.ok(failedChecks({...needs,documentation:{result:bad}},false).includes('documentation'));
+});
+
+test('Teacher personal tracking stays in the same bounded Draft route with no Ready or unknown-path grant',()=>{
+ const entry=file=>({file,status:'A',oldMode:'000000',newMode:'100644'});
+ const entries=['server-version/backend/src/modules/reporting/education-personal-tracking.ts',
+  'server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql',
+  'server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts',
+  'server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx',
+  'docs/evidence/personal-longitudinal-teacher-20261030/manifest.json'].map(entry);
+ const draft={event:'pull_request',draft:true};
+ assert.equal(personalTrackingDraftScope(entries,draft),true);
+ assert.equal(personalTrackingDraftScope(entries,{...draft,draft:false}),false);
+ assert.throws(()=>personalTrackingDraftScope([...entries,entry('server-version/backend/src/modules/huiteacher/authority.ts')],draft),/no broad fallback/);
+ assert.throws(()=>personalTrackingDraftScope(entries,{...draft,forceFull:true}),/does not authorize/);
 });

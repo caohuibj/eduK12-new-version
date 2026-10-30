@@ -1,5 +1,6 @@
 import {TeacherFormGroupVersions} from './TeacherFormGroupVersions'
 import {TeacherFormGroupReport,type TeacherFormGroupProjection} from './TeacherFormGroupReport'
+import {TeacherTrackingPublish,TeacherTrackingNext} from './TeacherPersonalTracking'
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
@@ -267,13 +268,13 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     setPreviews(old=>({...old,[event.id]:{data,base,api,actorKey,eventVersion:event.version,eventStatus:event.status}}))
     setNotice('预览已生成，人数以对应工具为单位；发布时仍会重新校验当前资格。')
   })
-  const publishRun=(event:Event)=>perform(async()=>{
+  const publishRun=(event:Event,tracking?:unknown)=>perform(async()=>{
     const run=await fetchRun(event)
     if(event.status!=='OPEN')throw new Error('请先开放评价活动')
     if(!window.confirm('确认按当前固定版本配置，向本校符合资格的教师分配测评任务吗？发布时将重新校验参与资格。'))return
     const publication=await api<{executionCount:number;version:number}>(
       base+'/evaluation-events/'+event.id+'/run/publish','POST',
-      {expectedVersion:run.version})
+      {expectedVersion:run.version,...(tracking===undefined?{}:{tracking})})
     await fetchRun(event)
     setNotice('评价任务已发布；共冻结 '+publication.executionCount+' 个作答任务。')
   })
@@ -386,7 +387,11 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
       </div>
       {runMap[event.id]&&<div>
         <p>任务状态：{statusLabel(runMap[event.id].status)} · 已配置工具 {runMap[event.id].trackCount??0} 项</p>
-        <SelectedToolOutline className="ht-selected-tool-outline" items={runMap[event.id].tracks?.map((track,index)=>({
+        <SelectedToolOutline disabled={working} onRemove={event.status==='DRAFT'&&runMap[event.id].status==='DRAFT'?trackId=>perform(async()=>{
+          if(!window.confirm('从本轮草稿移除此投放？追踪工具缺失或定义变化将阻止发布；请加入保留冻结指标的新问卷版本。'))return
+          await api(base+'/evaluation-events/'+event.id+'/run/tracks/'+encodeURIComponent(trackId),'DELETE',{expectedVersion:runMap[event.id].version})
+          await fetchRun(event)
+        }):undefined} className="ht-selected-tool-outline" items={runMap[event.id].tracks?.map((track,index)=>({
           id:track.id,title:track.title??((track.resourceKey.startsWith('education-composition:')?'普通问卷':
             ({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具')+' '+(index+1)),
           kind:track.resourceKey.startsWith('education-composition:')?'普通问卷':({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具',
@@ -470,11 +475,10 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
               加入表单
             </button>
             <button onClick={()=>previewRun(event)} disabled={working}>预览任务配置</button>
-            <button onClick={()=>publishRun(event)} disabled={working||event.status!=='OPEN'}>
-              发布教师评价任务
-            </button>
+            <TeacherTrackingPublish key={event.id+':'+runMap[event.id].version+':'+actorKey} api={api} path={base+'/evaluation-events/'+event.id+'/run'} disabled={working||event.status!=='OPEN'} publish={tracking=>publishRun(event,tracking)}/>
           </div>
         </>}
+        {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherTrackingNext key={event.id+':'+actorKey} api={api} path={base+'/evaluation-events/'+event.id+'/run'} disabled={working} create={()=>perform(async()=>{await api(base+'/evaluation-events/'+event.id+'/run/next-wave','POST',{requestId:crypto.randomUUID()});await refresh();setNotice('下一轮活动草稿已创建，继承固定追踪来源；请查看配置并开放、发布。')})}/>}
         {runMap[event.id].status==='PUBLISHED'&&<>
           <button onClick={()=>readProgress(event)} disabled={working}>查看正式完成进度</button>
           <button onClick={()=>closeRun(event)} disabled={working||event.status!=='OPEN'}>关闭评价任务</button>

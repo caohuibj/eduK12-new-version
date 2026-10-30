@@ -336,9 +336,94 @@
     ]
   },
   "candidates": {
+    "415": {
+      "schemaVersion": 1,
+      "product": "0367785f19fadc20b9e9368d8e435377f298bcca",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Unsigned original local evidence;navigation remains actual main8bc invocation on486fa and was not reexecuted for unrelated main228 updates.",
+          "Main228 actual shared Studio/Next/outline boundary reviewed in main228/alignment.json;closed Form path unchanged. Current complete frontend type tree compiled once.",
+          "Historical380b90 browser/PDF retains its original input boundary;no whole bundle equality claim.",
+          "Exact scope rejects backend drift from main228;no backend/PG/browser replay and no production authority claim."
+        ]
+      },
+      "reports": [
+        {
+          "id": "teacher-reading-navigation",
+          "path": "docs/evidence/group-report-teacher-reading-20261030/main8bc/navigation.json",
+          "sha256": "7b9298b345053d7b92dd857eb52bdd42b3bdff2a163afb1d211ffb789560d76b",
+          "originalSourceAssociation": "486fa3286f264d6321b8140373aaf4dce0593154",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+            "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx",
+            "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx",
+            "server-version/frontend/src/modules/assessment-core/composition/SelectedToolOutline.tsx",
+            "server-version/frontend/src/modules/reporting/EducationPersonalTracking.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/EducationPersonalTracking.test.tsx",
+            "server-version/frontend/src/pages/ScaleDefinitionEditor.tsx",
+            "server-version/frontend/src/pages/ScaleLongitudinalMetricChoice.tsx",
+            "server-version/frontend/src/pages/scaleDefinitionEditorModel.ts",
+            "server-version/frontend/src/school/SchoolActivityManager.tsx",
+            "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx",
+            "server-version/frontend/src/school/SchoolStudentTasks.tsx"
+          ],
+          "sourceAssociationBasis": "Actual local navigation invocation on the current main8bc merged source and explicit baselineId:null tracking fixture; unsigned original receipt.",
+          "deltaRationale": "Main228 adds personal longitudinal leaf authoring/runtime and shared Education tracking. Reviewed shared Studio changes are draft-only removal;the existing CLOSED Form GET/Boolean(null) Next behavior and all four own reader/test/browser source blobs remain exact. Original main8bc navigation receipt retained without replay;actual changed complete frontend compiler input checked once for main228. Backend equals new main;no compile or PG replay.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "opens an existing Teacher Form release through the real product navigation and prints only its authorized rounded projection",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-teacher-reading-20261030/main228/frontend-types.json",
+          "sha256": "79d91c0d2d1fb1bc9a1745a2186a1b287e8fcc083429a7b5edeb00527bcf0ada",
+          "component": "frontend",
+          "componentTree": "3227cd02582e5322a765d4483c4ad2b1ea8a7b77",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-teacher-reading-20261030/main228/frontend-types.log"
+        }
+      ],
+      "groupReportObservations": [
+        {
+          "kind": "browser",
+          "path": "docs/evidence/group-report-teacher-reading-20261030/browser.json",
+          "sha256": "7484e30d26f2c7781d485159ccdd04b64a3035e794db000f27f600dd82880f87",
+          "sourceAssociationBasis": "Original380b90 actual TeacherApp browser layout/fullscreen/printing observation. Reader component and shared rendering CSS unchanged; current shared Studio tracking-query delta separately covered by the fresh main8bc navigation receipt. Not an identical full browser bundle claim. Main228 shared Studio draft-only removal and re-exported Next preserve current CLOSED Form behavior;reviewed in main228/alignment.json.",
+          "limitations": [
+            "Unsigned original browser observation.",
+            "No real backend or production authority claim; no browser replay."
+          ]
+        }
+      ]
+    },
     "414": {
       "schemaVersion": 1,
-      "product": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+      "product": "f736217fc2426cbcee35b602eafbed43a5a16164",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -354,7 +439,8 @@
           "Current backend95198 and frontend7db compile receipts bind exact component trees. No schema change, new migrations, dump/restore, platform scientific regression or old Survey/Training replay.",
           "Legacy no-leaf V1 limitation remains documented. Private composition parent currently INDIVIDUAL_ONLY, so no fabricated GROUP entitlement or full-source-completion claim.",
           "This is scoped merge qualification only; no runtime images, deployment, all-source completion or group longitudinal claim.",
-          "After mainfa038041 integration, current backend2342ff04/frontend3346bc7d receipts passed once on checkpoint7cc7edb0. Only Prisma client generation occurred; no DB migration, native publication, PG or application cases were rerun. Mainfa itself carries the personal longitudinal schema, so this PR has no schema delta."
+          "After mainfa038041 integration, current backend2342ff04/frontend3346bc7d receipts passed once on checkpoint7cc7edb0. Only Prisma client generation occurred; no DB migration, native publication, PG or application cases were rerun. Mainfa itself carries the personal longitudinal schema, so this PR has no schema delta.",
+          "Final main406 alignment: source f736217f includes mainfb3a0cab, current backenddc9a331f/frontendcba77e36 passed once after client generation only. No database migration or School business/PG replay. Original formal41057783824/basefa remains historical. This PR changes no schema relative to its new base."
         ]
       },
       "reports": [
@@ -369,6 +455,7 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
@@ -378,11 +465,16 @@
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
             "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
             "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
             "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
             "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
@@ -406,9 +498,19 @@
             "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
             "server-version/backend/src/modules/bundle-product/analysis.ts",
             "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
             "server-version/backend/src/modules/bundle-product/service.ts",
             "server-version/backend/src/modules/bundle-product/survey-native.ts",
             "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/discovery.ts",
             "server-version/backend/src/modules/reporting/governedDisclosure.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
@@ -426,7 +528,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 21,
@@ -546,6 +648,7 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
@@ -555,11 +658,16 @@
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
             "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
             "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
             "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
             "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
@@ -583,9 +691,19 @@
             "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
             "server-version/backend/src/modules/bundle-product/analysis.ts",
             "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
             "server-version/backend/src/modules/bundle-product/service.ts",
             "server-version/backend/src/modules/bundle-product/survey-native.ts",
             "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/discovery.ts",
             "server-version/backend/src/modules/reporting/governedDisclosure.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
@@ -603,7 +721,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 9,
@@ -715,6 +833,7 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
@@ -724,11 +843,16 @@
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
             "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
             "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
             "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
             "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
@@ -752,9 +876,19 @@
             "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
             "server-version/backend/src/modules/bundle-product/analysis.ts",
             "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
             "server-version/backend/src/modules/bundle-product/service.ts",
             "server-version/backend/src/modules/bundle-product/survey-native.ts",
             "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/discovery.ts",
             "server-version/backend/src/modules/reporting/governedDisclosure.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
@@ -772,7 +906,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 3,
@@ -885,6 +1019,7 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
@@ -894,11 +1029,16 @@
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
             "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
             "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
             "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
             "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
@@ -922,9 +1062,19 @@
             "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
             "server-version/backend/src/modules/bundle-product/analysis.ts",
             "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
             "server-version/backend/src/modules/bundle-product/service.ts",
             "server-version/backend/src/modules/bundle-product/survey-native.ts",
             "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/discovery.ts",
             "server-version/backend/src/modules/reporting/governedDisclosure.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
@@ -942,7 +1092,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 6,
@@ -995,6 +1145,7 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
@@ -1004,11 +1155,16 @@
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
             "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
             "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
             "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
             "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
@@ -1032,9 +1188,19 @@
             "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
             "server-version/backend/src/modules/bundle-product/analysis.ts",
             "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
             "server-version/backend/src/modules/bundle-product/service.ts",
             "server-version/backend/src/modules/bundle-product/survey-native.ts",
             "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/discovery.ts",
             "server-version/backend/src/modules/reporting/governedDisclosure.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
@@ -1052,7 +1218,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 6,
@@ -1215,18 +1381,25 @@
             "server-version/frontend"
           ],
           "reviewedSourceDelta": [
+            "server-version/frontend/src/api/anonymousStudy.ts",
+            "server-version/frontend/src/modules/composite/CompositeReportPage.tsx",
+            "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx",
+            "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx",
             "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
             "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.test.tsx",
             "server-version/frontend/src/modules/reporting/longitudinalVisualization.ts",
+            "server-version/frontend/src/pages/bundle/BundleProducts.tsx",
             "server-version/frontend/src/pages/bundle/BundleProfileSummary.tsx",
             "server-version/frontend/src/pages/bundle/__tests__/BundleProfileSummary.jdr.test.tsx",
+            "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx",
+            "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
             "server-version/frontend/src/survey/SurveyPersonalChanges.tsx",
             "server-version/frontend/src/survey/SurveyPublicApp.tsx",
             "server-version/frontend/src/survey/SurveyWaveStudio.tracking.test.tsx",
             "server-version/frontend/src/survey/SurveyWaveStudio.tsx"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 2,
@@ -1265,18 +1438,25 @@
             "server-version/frontend"
           ],
           "reviewedSourceDelta": [
+            "server-version/frontend/src/api/anonymousStudy.ts",
+            "server-version/frontend/src/modules/composite/CompositeReportPage.tsx",
+            "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx",
+            "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx",
             "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
             "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.test.tsx",
             "server-version/frontend/src/modules/reporting/longitudinalVisualization.ts",
+            "server-version/frontend/src/pages/bundle/BundleProducts.tsx",
             "server-version/frontend/src/pages/bundle/BundleProfileSummary.tsx",
             "server-version/frontend/src/pages/bundle/__tests__/BundleProfileSummary.jdr.test.tsx",
+            "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx",
+            "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
             "server-version/frontend/src/survey/SurveyPersonalChanges.tsx",
             "server-version/frontend/src/survey/SurveyPublicApp.tsx",
             "server-version/frontend/src/survey/SurveyWaveStudio.tracking.test.tsx",
             "server-version/frontend/src/survey/SurveyWaveStudio.tsx"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 4,
@@ -1317,6 +1497,7 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
@@ -1326,11 +1507,16 @@
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
             "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
             "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
             "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
             "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
@@ -1354,9 +1540,19 @@
             "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
             "server-version/backend/src/modules/bundle-product/analysis.ts",
             "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
             "server-version/backend/src/modules/bundle-product/service.ts",
             "server-version/backend/src/modules/bundle-product/survey-native.ts",
             "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/discovery.ts",
             "server-version/backend/src/modules/reporting/governedDisclosure.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
@@ -1374,7 +1570,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 4,
@@ -1417,6 +1613,7 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
@@ -1426,11 +1623,16 @@
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
             "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
             "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
             "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
             "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
@@ -1454,9 +1656,19 @@
             "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
             "server-version/backend/src/modules/bundle-product/analysis.ts",
             "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
             "server-version/backend/src/modules/bundle-product/service.ts",
             "server-version/backend/src/modules/bundle-product/survey-native.ts",
             "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/discovery.ts",
             "server-version/backend/src/modules/reporting/governedDisclosure.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
@@ -1474,7 +1686,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -1526,6 +1738,7 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
@@ -1535,11 +1748,16 @@
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
             "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
             "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
             "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
             "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
@@ -1563,9 +1781,19 @@
             "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
             "server-version/backend/src/modules/bundle-product/analysis.ts",
             "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
             "server-version/backend/src/modules/bundle-product/service.ts",
             "server-version/backend/src/modules/bundle-product/survey-native.ts",
             "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/discovery.ts",
             "server-version/backend/src/modules/reporting/governedDisclosure.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
@@ -1583,7 +1811,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -1615,6 +1843,7 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
@@ -1624,11 +1853,16 @@
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
             "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
             "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
             "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
             "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
             "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
@@ -1652,9 +1886,19 @@
             "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
             "server-version/backend/src/modules/bundle-product/analysis.ts",
             "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
             "server-version/backend/src/modules/bundle-product/service.ts",
             "server-version/backend/src/modules/bundle-product/survey-native.ts",
             "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/discovery.ts",
             "server-version/backend/src/modules/reporting/governedDisclosure.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
@@ -1672,7 +1916,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -1700,10 +1944,27 @@
           "reviewedSourceDelta": [
             "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
             "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
             "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
             "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
             "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
             "server-version/backend/src/modules/reporting/personal-tracking.ts",
             "server-version/backend/src/modules/survey/measurement.result.ts",
             "server-version/backend/src/modules/survey/participant-feedback.ts",
@@ -1717,7 +1978,7 @@
             "server-version/backend/src/modules/survey/waves.service.ts"
           ],
           "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
-          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
           "summary": {
             "success": true,
             "numPassedTests": 2,
@@ -1778,20 +2039,20 @@
       ],
       "types": [
         {
-          "path": "docs/evidence/group-report-school-20261030/mainfa/backend-types.json",
-          "sha256": "dd458fa11d29e5c4e63bd36987d6abff9d76b996d1ee3508083c6330b9b962bc",
+          "path": "docs/evidence/group-report-school-20261030/mainfb/backend-types.json",
+          "sha256": "5c58f97910b464ebf6899f5b4fc99d43ab03822082c5f557ff5a47ec8991d4e9",
           "component": "backend",
-          "componentTree": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+          "componentTree": "dc9a331f08901238236ec3664e3173aba3f15030",
           "exitField": "exitCode",
-          "log": "docs/evidence/group-report-school-20261030/mainfa/backend-types.log"
+          "log": "docs/evidence/group-report-school-20261030/mainfb/backend-types.log"
         },
         {
-          "path": "docs/evidence/group-report-school-20261030/mainfa/frontend-types.json",
-          "sha256": "676d4b28428ce44964d660035e9046b5b58ef07e629302ccfac1ab105c9288e4",
+          "path": "docs/evidence/group-report-school-20261030/mainfb/frontend-types.json",
+          "sha256": "6311a7169e2a703e1b27b614364f99fb6bead0e931a9f9902f58a9d94c8e3773",
           "component": "frontend",
-          "componentTree": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8",
+          "componentTree": "cba77e36ec1ba531a20f7775ea00a34c91699fe5",
           "exitField": "exitCode",
-          "log": "docs/evidence/group-report-school-20261030/mainfa/frontend-types.log"
+          "log": "docs/evidence/group-report-school-20261030/mainfb/frontend-types.log"
         }
       ],
       "groupReportObservations": [
@@ -2276,8 +2537,8 @@
           ],
           "historicalTestDifference": {
             "path": "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
-            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'普通问卷'})).toBeEnabled())",
-            "afterAwait": "await waitFor(()=>expect(screen.queryByText('正在读取或保存，请稍候…')).not.toBeInTheDocument())",
+            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'\u666e\u901a\u95ee\u5377'})).toBeEnabled())",
+            "afterAwait": "await waitFor(()=>expect(screen.queryByText('\u6b63\u5728\u8bfb\u53d6\u6216\u4fdd\u5b58\uff0c\u8bf7\u7a0d\u5019\u2026')).not.toBeInTheDocument())",
             "affectsSelectedCases": false,
             "failedCaseQualifiedBy": "school-recheck"
           }
@@ -2790,7 +3051,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "task group leaf statistics keeps zero, signed values and per-metric missing denominators, using existing statistics",
@@ -2817,11 +3078,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
@@ -2837,11 +3098,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
               "status": "passed"
             },
             {
@@ -2857,11 +3118,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
               "status": "passed"
             },
             {
@@ -3724,7 +3985,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -4164,7 +4425,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -4565,7 +4826,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -4796,7 +5057,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
@@ -5044,7 +5305,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "exact main task artifact migration and native backup upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows",
@@ -9603,7 +9864,7 @@
               "status": "passed"
             },
             {
-              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
+              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
               "status": "passed"
             },
             {
@@ -9617,7 +9878,7 @@
           ],
           "selectedCases": [
             "Reviewed nonempty reports register against the original independent C/P axes 'cfq7_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
-            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
+            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes 'bps9_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes rejects stale C/P bindings, reused R versions and empty report variants without changing the source"
           ],
@@ -10824,6 +11085,218 @@
           7
         ]
       }
+    },
+    "418": {
+      "schemaVersion": 1,
+      "product": "b4dd0f7be5d9e064534ad02d7a73b942d68efe23",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Unsigned original local evidence,not backfilled execution signatures.",
+          "Native stage continuation preserves all original fixture failures and preceding completed assertions;not a fresh full native lifecycle execution. No current migration/restore or production qualification claim.",
+          "Original browser uses actual TeacherApp with synthetic identity/API;directory-refresh repair separately covered by main8bc2-case original. No identical complete historical browser bundle claim.",
+          "Current component types executed once;no PG/browser/shared stats replay. Prior POST/GET generic mock repair and failed type/navigation originals retained."
+        ]
+      },
+      "reports": [
+        {
+          "id": "teacher-native-retained-final-stage",
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/postgres-revocation-continuation.json",
+          "sha256": "2fcef78762a8825ad38345d0ef40b1a9e4864e38bd4487489bd93547f199d6d6",
+          "originalSourceAssociation": "9b3e29ed413865fd232cb01f59d2f9bfc2dd5c44",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts",
+            "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/__tests__/integration/educationLongitudinalLeafs.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationNativeLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationPrivateScaleExecutionFixture.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-longitudinal-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-personal-changes-timing.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-tracking-leafs.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+            "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts",
+            "server-version/backend/src/modules/assessment-run/publish.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/assessment-run/repository.ts",
+            "server-version/backend/src/modules/assessment-run/run.controller.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/campus/activity.allocation.ts",
+            "server-version/backend/src/modules/campus/activity.run.routes.ts",
+            "server-version/backend/src/modules/campus/activity.runs.ts",
+            "server-version/backend/src/modules/campus/activity.service.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/campus/personal-tracking.ts",
+            "server-version/backend/src/modules/campus/report.routes.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts",
+            "server-version/backend/src/modules/huiteacher/evaluation.service.ts",
+            "server-version/backend/src/modules/huiteacher/run.routes.ts",
+            "server-version/backend/src/modules/huiteacher/run.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+            "server-version/backend/src/modules/scale/scale-definition.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original last-stage continuation on retained real12 FINAL scene;earlier publication,subgroup,overlap and version assertions remain in failed scope report solely due final fixture revoke metadata. This last invocation validates corrected read instrumentation and revoked current grant,not a whole lifecycle replay.",
+          "deltaRationale": "All own native group/subgroup/privacy/cohort and versions implementation inputs retain reviewed original behavior. Upstream School/personal longitudinal changes are independently qualified;current shared Studio changes are draft-only removal and Next implementation re-export with same CLOSED Form GET/null contract. No original PG/browser/shared calculation replay. Exact changed whole component compiler inputs qualified once here.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "freezes real staff/tag subgroups, enforces the existing same-Form disclosure guard, and reopens native versions without FINAL work",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "teacher-versions-navigation-directory",
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation-continuation.json",
+          "sha256": "3d1428175975192561f7eee155347235c999fb53a809b687e95317d6bc2cdd40",
+          "originalSourceAssociation": "478670cef348ce0c686bb889708fa4ddfbe12c14",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+            "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx",
+            "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx",
+            "server-version/frontend/src/modules/assessment-core/composition/SelectedToolOutline.tsx",
+            "server-version/frontend/src/modules/reporting/EducationPersonalTracking.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/EducationPersonalTracking.test.tsx",
+            "server-version/frontend/src/pages/ScaleDefinitionEditor.tsx",
+            "server-version/frontend/src/pages/ScaleLongitudinalMetricChoice.tsx",
+            "server-version/frontend/src/pages/scaleDefinitionEditorModel.ts",
+            "server-version/frontend/src/school/SchoolActivityManager.tsx",
+            "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx",
+            "server-version/frontend/src/school/SchoolStudentTasks.tsx"
+          ],
+          "sourceAssociationBasis": "Actual unsigned main8bc local2-case continuation after generic API fixture repair and diagnostic async wait;covers real product navigation/class generation/version reads and POST-success/directory-GET-failure behavior.",
+          "deltaRationale": "All own native group/subgroup/privacy/cohort and versions implementation inputs retain reviewed original behavior. Upstream School/personal longitudinal changes are independently qualified;current shared Studio changes are draft-only removal and Next implementation re-export with same CLOSED Form GET/null contract. No original PG/browser/shared calculation replay. Exact changed whole component compiler inputs qualified once here.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "keeps a successfully generated Teacher report when the directory refresh fails and retries only GET",
+              "status": "passed"
+            },
+            {
+              "fullName": "opens existing Teacher Form versions, explicitly generates one class report, and prints only its authorized rounded projection",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/backend-types.json",
+          "sha256": "75480f4577fde8ec45ff9a3f12f2142aff7cc1ecc874f371c691b3704b905187",
+          "component": "backend",
+          "componentTree": "2ea6fd8d6e44388995a9d8ca9d0ba6b51a68ea05",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/frontend-types.json",
+          "sha256": "d1828a3b3eb6fd7f5760371a498593ed7ef0f58c325eb56cdccdb64646d6bc55",
+          "component": "frontend",
+          "componentTree": "c444887f09c20c27d7ffbdd9a115786b65554a68",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/frontend-types.log"
+        }
+      ],
+      "groupReportObservations": [
+        {
+          "kind": "browser",
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/browser.json",
+          "sha256": "60ddefe79860b919d9be220f269ef363e49630f43cba6509e28e092477b83e0c",
+          "sourceAssociationBasis": "Original actual TeacherApp version selection,explicit class generation and print observation;current reader/versions behavior retained,shared upstream closed Form contract reviewed.",
+          "limitations": [
+            "Synthetic auth/backend;not native permission proof.",
+            "No browser replay;POST-success/directory-failure extension covered by the retained2-case unit/navigation original."
+          ]
+        },
+        {
+          "kind": "teacher-native",
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/postgres-proof.json",
+          "sha256": "5cc1e6b26ec75a91cad36bc2d6aa69bcd2e68f5029c26704677aa7ffca2c1b87",
+          "sourceAssociationBasis": "Actual retained native scene:12 published/start/FINAL participants,6-person staff class,12 dedup OR,existing overlap guard,old versions,corrected3 read queries/0 FINAL and revoked current product grant. Original staged failures preserved.",
+          "limitations": [
+            "Retained stage continuation,not a green rewrite of failed full original reports.",
+            "No PG replay,no migration/restore claim,no production data."
+          ]
+        }
+      ]
     }
   }
 }

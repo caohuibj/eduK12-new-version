@@ -1,0 +1,13 @@
+{
+  "status": "PREEXISTING_TEST_ASSERTION_FOR_DOT_REVIEW",
+  "rule": "js/incomplete-url-substring-sanitization",
+  "defaultLevel": "warning",
+  "securitySeverity": "7.8",
+  "path": ".github/scripts/onboarding-controls.test.mjs",
+  "line": 279,
+  "lineUnchangedFromMain": true,
+  "originCommit": "7829c09ef2",
+  "context": "Node test reads repository CI YAML as text and asserts that the job includes the official registry literal. The substring result is an assertion, not a production URL allowlist or URL later used for network access. Existing source line predates this patch; current PR changes only the import and new School fixed-route case in this file.",
+  "decision": "Retain original SARIF and warning for DOT review; no runtime source, test, threshold or suppression changes. No zero-findings claim.",
+  "newScanExecuted": false
+}

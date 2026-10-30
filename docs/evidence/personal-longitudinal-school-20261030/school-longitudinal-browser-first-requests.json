@@ -1,0 +1,17 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/campus/organizations/f20c4699-4221-4c2b-a0de-add0705511c2/activities",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/organizations/f20c4699-4221-4c2b-a0de-add0705511c2/activities/92f50cec-43d0-43a1-a679-428a277ad4cd",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/organizations/f20c4699-4221-4c2b-a0de-add0705511c2/activities/92f50cec-43d0-43a1-a679-428a277ad4cd/runs/65125b4d-80c5-4877-81f1-be09c97962e7/tracking",
+    "status": 200
+  }
+]

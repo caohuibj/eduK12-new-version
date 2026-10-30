@@ -3,7 +3,7 @@ import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} fro
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
 import {freezeExactStandardScaleDefinition} from './training-standard-combination'
-import {readVerifiedEducationStart,readVerifiedCompositionStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
+import {readVerifiedEducationStart,readVerifiedCompositionStart,readVerifiedLongitudinalEducationAttempt,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 import {readVerifiedFieldStart,fieldCompositionBinding,type VerifiedFieldStart} from '../huiteacher/fieldComposition.contract'
 import {resolveEducationAssessmentSituationalItems} from '../education-tools/assessment-resource.source'
 import {readEducationSjtSources} from '../education-tools/native-source.sjt'
@@ -21,6 +21,7 @@ import {attachTrainingReferenceSelection} from './training-reference-selection'
 import {freezeTrainingReferenceBinding} from './training-reference-binding'
 import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from './training-report-selection'
 import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding} from './training-content-binding'
+import {inheritTrainingTrackingSources,freezeTrainingTracking,readTrainingTracking} from './personal-tracking'
 import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime,trainingStandardCombinationSummary} from './training-standard-combination'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
@@ -239,6 +240,9 @@ const reportPackageSummary = (row: {
 
 const withoutAnalysisProtocolCipher = <T extends Record<string, unknown>>(row: T) => {
   const {
+    personalTracking: _ignoredPersonalTracking,
+    personalTrackingInheritedUnits: _ignoredInheritedTracking,
+    personalChangesSnapshots: _ignoredPersonalChanges,
     trainingReportSelectionDraft: _ignoredTrainingReportSelection,
     trainingReferenceSelectionDraft: _ignoredTrainingReferenceSelection,
     trainingContentSnapshot: _ignoredTrainingContent,
@@ -252,7 +256,11 @@ const withoutAnalysisProtocolCipher = <T extends Record<string, unknown>>(row: T
     reportPackageProfile: _ignoredPackageProfile,
     ...safe
   } = row
-  return { ...safe, reportPackage: reportPackageSummary(row) }
+  const tracking=readTrainingTracking(row.personalTracking)
+  return { ...safe, reportPackage: reportPackageSummary(row),...(tracking?{personalTracking:{
+    baselineId:row.personalTrackingBaselineId,ordinal:row.personalTrackingOrdinal,
+    metrics:tracking.plan?.metrics.map(m=>({itemId:tracking.bindings.find(b=>b.metricId===m.id)?.itemId,scoreKey:m.scoreKey,label:m.label,unit:m.unit}))??[],
+  }}:{}) }
 }
 
 const isTeacherOrAdmin = (role: UserRole) => role === UserRole.TEACHER || role === UserRole.ADMIN
@@ -314,7 +322,7 @@ const loadComposite = async (id: string, includeItems = false, db: Db = prisma) 
     },
   })
   if (!composite) throw compositeNotFound()
-  return composite as any
+  return includeItems?inheritTrainingTrackingSources(db as Prisma.TransactionClient,composite):composite as any
 }
 
 const validateCourse = async (
@@ -1060,6 +1068,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     id: composite.id,
     productKind: composite.productKind,
     questionnaireType: composite.questionnaireType,
+    ...(composite.personalTracking?{personalTracking:{baselineId:composite.personalTrackingBaselineId,ordinal:composite.personalTrackingOrdinal}}:{}),
     trainingFlowDraft:composite.trainingFlowDraft??null,trainingFlowFrozen:composite.trainingFlowFrozen??null,trainingFlowDigest:composite.trainingFlowDigest??null,
     trainingVariantDraft:composite.trainingVariantDraft??null,trainingVariantFrozen:composite.trainingVariantFrozen??null,trainingVariantDigest:composite.trainingVariantDigest??null,
     trainingFeedbackPolicy:composite.trainingFeedbackPolicy??null,trainingFeedbackPolicyHash:composite.trainingFeedbackPolicyHash??null,
@@ -2179,10 +2188,11 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     ...(content?{trainingContentSnapshot:content.snapshot as Prisma.InputJsonValue,trainingContentSnapshotHash:content.snapshotHash}:{}) }
 }
 
-const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
+const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>,trackingSelection?:unknown) => {
   await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${id} FOR UPDATE`
   const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational,'PUBLISH')
   const publicationSource=await loadComposite(id,true,db)
+  const tracking=await freezeTrainingTracking(db as Prisma.TransactionClient,publicationSource,prepared.trainingContentSnapshot,trackingSelection)
   await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId))
   await assertTrainingMaterialsUsable(db as Prisma.TransactionClient,publicationSource.createdBy,trainingFormMaterials(publicationSource.formSections??[]))
   // Shared P/R insertion or material locks may have waited past expiry. Repeat
@@ -2196,14 +2206,15 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
       status: 'PUBLISHED',
       publishedAt: new Date(),
       ...prepared,
+      ...tracking,
     },
   })
   return withoutAnalysisProtocolCipher(published)
 }
 
-export const publishComposite = async (userId: string, role: UserRole, id: string, db: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>): Promise<any> =>
-  db === defaultPrisma ? defaultPrisma.$transaction(tx => publishCompositeInTransaction(userId, role, id, tx, resolvedSituational))
-    : publishCompositeInTransaction(userId, role, id, db, resolvedSituational)
+export const publishComposite = async (userId: string, role: UserRole, id: string, db: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>,trackingSelection?:unknown): Promise<any> =>
+  db === defaultPrisma ? defaultPrisma.$transaction(tx => publishCompositeInTransaction(userId, role, id, tx, resolvedSituational,trackingSelection))
+    : publishCompositeInTransaction(userId, role, id, db, resolvedSituational,trackingSelection)
 
 const assertTokenWindow = (token: { isActive: boolean; expiresAt: Date; maxUses: number; usedCount: number }) => {
   if (!token.isActive) throw compositeForbidden('公开链接已停用')
@@ -2496,7 +2507,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   })
   if(userId){
     const native=attempt.trainingContentBinding?.units?.some((unit:any)=>unit.itemId===item.id&&unit.source.educationNative?.provider==='COGNITIVE_CONFIG')
-    if(native)await admitEducationNativeCognitive(db as Prisma.TransactionClient,{proof:educationAttempt,parent:attempt,actorUserId:userId,itemId:item.id,assignmentId:assignment.id,configId:config.id})
+    if(native||readVerifiedLongitudinalEducationAttempt(educationAttempt,db,attempt,userId))await admitEducationNativeCognitive(db as Prisma.TransactionClient,{proof:educationAttempt,parent:attempt,actorUserId:userId,itemId:item.id,assignmentId:assignment.id,configId:config.id})
     else await admitCognitiveAttempt(db,userId,assignment.id)
   }
   return db.cognitiveSession.create({
@@ -2532,7 +2543,8 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
   // A composition may reference several sources in different orders. Always
   // acquire their locks in the same order to avoid cross-composition deadlocks.
   if (userId && !prepared) {
-    const nativeIds=new Set(attempt.trainingContentBinding?.units?.filter((unit:any)=>unit.source.educationNative?.provider==='COGNITIVE_CONFIG').map((unit:any)=>unit.itemId)??[])
+    const longitudinal=readVerifiedLongitudinalEducationAttempt(educationAttempt,db,attempt,userId)
+    const nativeIds=new Set(attempt.trainingContentBinding?.units?.filter((unit:any)=>unit.source.educationNative?.provider==='COGNITIVE_CONFIG'||longitudinal&&unit.family==='COGNITIVE').map((unit:any)=>unit.itemId)??[])
     const sources = await Promise.all(items.filter(item => item.type === 'COGNITIVE'&&!nativeIds.has(item.id)).map(item => cognitiveQuotaSource(db, item.cognitiveAssignmentId)))
     for (const id of [...new Set(sources.map(source => source.id))].sort()) await lockCognitiveQuota(db, userId, id)
   }
@@ -2779,6 +2791,7 @@ const createAttempt = async (
     // paths retain their outer exclusive publication/token locks.
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
       select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
+        personalTracking:true,personalTrackingBaselineId:true,personalTrackingOrdinal:true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
         trainingContentSnapshot:true,trainingContentSnapshotHash:true,
         trainingFeedbackPolicy: true, trainingFeedbackPolicyHash: true } })
@@ -2787,6 +2800,7 @@ const createAttempt = async (
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     // Read the publication-owned policy under the same admission lock as status.
     composite = { ...composite, trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash,
+      personalTracking:current.personalTracking,personalTrackingBaselineId:current.personalTrackingBaselineId,personalTrackingOrdinal:current.personalTrackingOrdinal,
       trainingPersistencePolicy: current.trainingPersistencePolicy,
       trainingPersistencePolicyHash: current.trainingPersistencePolicyHash,
       trainingFeedbackPolicy: current.trainingFeedbackPolicy, trainingFeedbackPolicyHash: current.trainingFeedbackPolicyHash }
@@ -2845,6 +2859,7 @@ const createAttempt = async (
       studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false,...(composite.trainingTimingPolicy?{courseType:'TRAINING_COURSE'}:{}) },
     } })) throw compositeForbidden('不是问卷投放课程的有效学生')
   }
+  if(composite.personalTracking&&!composite.personalTrackingInheritedUnits)composite=await inheritTrainingTrackingSources(db as Prisma.TransactionClient,composite)
   const nativeBundleInstance = composite.productKind === 'ASSESSMENT_BUNDLE'
     ? await db.bundleInstance.findUniqueOrThrow({where:{compositeId:composite.id}})
     : composite.productKind === 'ORGANIZATION_RESOURCE' && composite.creationKey?.startsWith('education-assessment:')

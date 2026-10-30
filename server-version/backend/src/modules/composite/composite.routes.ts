@@ -12,7 +12,7 @@ import { situationalVideoController } from '../situational/situational-video.con
 import { authenticate, requireAdmin, requireRole, requireTeacher } from '../../middleware/auth'
 import { UserRole } from '../../types'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
-import { instrumentError } from '../../utils/response'
+import { instrumentError,success } from '../../utils/response'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { relationalProductReportService } from '../assessment-relational/product-report.service'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
@@ -96,6 +96,14 @@ router.post('/attempts/:attemptId/bundle-retry', authenticate, respondentAttempt
 router.get('/attempts/:attemptId/report-status', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.reportStatus)
 router.post('/attempts/:attemptId/report-retry', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.retryReport)
 router.get('/attempts/:attemptId/report', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.report)
+router.post('/attempts/:attemptId/changes',authenticate,respondentAttemptAccess,relationalGenericReportGuard,async(req,res,next)=>{
+  try{
+    const {readTrainingPersonalChanges}=await import('./personal-tracking.service')
+    return success(res,await readTrainingPersonalChanges(req.params.attemptId,{userId:req.user!.userId}))
+  }catch(cause){const status=(cause as {statusCode?:number}).statusCode
+    if(status&&status>=400&&status<500)return instrumentError(res,'PERSONAL_CHANGES_UNAVAILABLE',(cause as Error).message,status)
+    return next(cause)}
+})
 router.get('/attempts/:attemptId/report/assets/:assetId', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.report)
 router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), relationalGenericReportGuard, compositeController.analysisExport)
 router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)

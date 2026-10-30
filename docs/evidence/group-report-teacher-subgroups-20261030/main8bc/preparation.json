@@ -1,0 +1,42 @@
+{
+  "status": "PREPARATION_NOT_FORMALLY_QUALIFIED",
+  "main": "8bc677156a3548333450363a31e33812ad2a9f0c",
+  "readerCandidate": "b3e9f35bac2700200c3b099a52ba11a4e74ae34e",
+  "sourceCheckpoint": "478670cef348ce0c686bb889708fa4ddfbe12c14",
+  "ownBackendCodeUnchangedFrom": "ef2554926777363e5389fd281d17b15d832b0dd7",
+  "mergeResolution": "Retained versioned subgroup APIs in fixtures plus explicit baselineId:null tracking read; kept both imports and subgroup rendering in Studio. No product algorithm/storage change.",
+  "freshChecks": {
+    "backend": "backend-types.json:exit0 once on current48d17 tree",
+    "frontendFirst": "frontend-types.json:exit2;generic vi.fn API Promise<unknown> incompatible with generic component API",
+    "navigationFirst": "navigation.json:1 failed/1 filtered;navigation button query timed out after1371ms while concurrent component compiles;contention is a plausible cause, not confirmed product defect",
+    "repair": "Keep generic API adapter distinct from its unknown-valued request spy. Diagnostic navigation bound3s includes request trace if it fails.",
+    "navigationContinuation": "navigation-continuation.json:2PASS;both changed mock and affected current navigation, no PG/browser replay",
+    "frontendContinuation": "frontend-types-continuation.json:exit0 on current 3a56f9d4a76bea2836de1031cd627f71d8dcb175;only failed frontend recompiled after actual mock repair"
+  },
+  "priorProofs": "Native PG/subgroup/privacy/historical snapshots/browser/PDF retained at exact original inputs. Not replayed. No whole-browser-bundle equality claim.",
+  "publication": {
+    "415ObjectsVerified": 46,
+    "415RefStill": "392a9f2498398b2159d6886c3881a98453669208",
+    "whyHeld": "Auto-review rejected retarget415 main plus description update; known unexecuted. No alternate interface. Candidate ref deliberately held to avoid activating main8bc binding against old stacked base.",
+    "418": "Local source aligned; no formal route activated;preserve small slice order415 then418."
+  },
+  "notion": "415/418 preparation append succeeded after user-specific new authorization;first request400 missing content did not write.",
+  "leafDraft": "Previously denied twice;not retried.",
+  "mergeOrDeploy": false,
+  "componentTrees": {
+    "backend": "48d17b12343febb22eb0f8aae256491c2dfda40a",
+    "frontend": "3a56f9d4a76bea2836de1031cd627f71d8dcb175"
+  },
+  "rawEvidenceSHA256": {
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/backend-types.json": "35cd7b472585560be230d741a623d9a0b262c5537b6bc914c5a9d28e6b97e23c",
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/frontend-types.json": "db9ca2288da35ee1864493ee0c00bda76b83a0a36dc1910df3e58c5983f03f10",
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/frontend-types.log": "4d95c28065f507358d9835fb68dfbb40f83e0d9a6ed3e3bab97c86b1f7bd9d7d",
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/frontend-types-continuation.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/frontend-types-continuation.json": "1daa5f79b417588ee6150e8607ac0f7a87dcdb3560b2112d3ae8efdbb834270d",
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation-continuation.log": "177fbac5ad150e7d9a8141eac33cb7fefd10188eb336b879f05c165fa4bd61b9",
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation-continuation.json": "3d1428175975192561f7eee155347235c999fb53a809b687e95317d6bc2cdd40",
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation.log": "89351586d359348d786b82706c6622c758263cbdd7a33284a784f14e097da8e3",
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/backend-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation.json": "19d404c4b5ac66172cd687950d24c17a7c3018de190e60744ed3be128593362c"
+  }
+}

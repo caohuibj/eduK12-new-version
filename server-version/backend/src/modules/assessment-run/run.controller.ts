@@ -5,6 +5,7 @@ import {prisma} from '../../config/database'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { acceptRunExecutionConsent } from './consent'
+import {educationTrackingSelectionSchema} from '../reporting/education-personal-tracking'
 import { z } from 'zod'
 import type { Request, Response } from 'express'
 import { error, success, unauthorized } from '../../utils/response'
@@ -57,6 +58,7 @@ const addTrackSchema = z.object({
 })
 const educationTrackSchema=addTrackSchema.strict().refine(value=>value.expectedVersion!==undefined&&value.expectedRunId!==undefined,{message:'固定教育测评必须绑定当前任务批次和版本'})
 const publishSchema = z.object({ expectedVersion: z.number().int().min(1) })
+const trackingPublishSchema = publishSchema.extend({tracking: educationTrackingSelectionSchema.optional()})
 const listRunSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(50),
@@ -221,7 +223,7 @@ export const assessmentRunController = {
 
   async publish(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
-    const parsed = publishSchema.safeParse(req.body)
+    const parsed = trackingPublishSchema.safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
     try {
       await assertCurrentRunPublisherBoundary({
@@ -233,7 +235,7 @@ export const assessmentRunController = {
         organizationId: req.params.organizationId,
         runId: req.params.runId,
         actorUserId: req.user.userId,
-        expectedVersion: parsed.data.expectedVersion,
+        expectedVersion: parsed.data.expectedVersion,tracking:parsed.data.tracking,
       }))
     } catch (err) { return fail(res, err) }
   },

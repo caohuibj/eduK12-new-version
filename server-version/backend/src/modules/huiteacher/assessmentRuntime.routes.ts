@@ -1,3 +1,4 @@
+import {readTeacherPersonalChanges} from '../reporting/teacher-personal-changes.service'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {readTeacherOrdinaryFeedback} from '../reporting/education-ordinary-feedback.service'
 import {serveProjectedReportImage} from '../reporting/report-image-delivery'
@@ -80,7 +81,7 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
  // Authentication itself validates the HUITEACHER credential audience; this
  // separate current-account check prevents an accidental non-Teacher mount.
  router.use(['/my-assessment-tasks','/run-executions/:executionId/assessment-consent/accept',
-  '/run-executions/:executionId/start-assessment','/run-executions/:executionId/feedback','/assessment-composite-attempts/:attemptId'],authenticateHuiteacher,(req,res,next)=>{
+  '/run-executions/:executionId/start-assessment','/run-executions/:executionId/changes','/run-executions/:executionId/feedback','/assessment-composite-attempts/:attemptId'],authenticateHuiteacher,(req,res,next)=>{
   if(audience==='STUDENT_EVALUATION'&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')
    return runtimeError(new TeacherAssessmentRuntimeError(),res,next)
   if(req.user?.accountDomain!=='SCHOOL'||(audience==='STUDENT_EVALUATION'?req.user.role!=='STUDENT':!['TEACHER','ADMIN'].includes(req.user.role)))
@@ -107,6 +108,10 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   }).then(()=>next()).catch(error=>runtimeError(error,res,next))
  }
  router.get('/my-assessment-tasks',wrapped(req=>access.page(req.user!.userId,req.query)))
+ router.post('/run-executions/:executionId/changes',wrapped(req=>{
+  if(audience!=='TEACHER_SELF')throw new TeacherAssessmentRuntimeError()
+  return readTeacherPersonalChanges({actorUserId:req.user!.userId,executionId:uuid.parse(req.params.executionId)})
+ }))
  router.get('/run-executions/:executionId/feedback',wrapped(req=>{
   if(Object.keys(req.query).length)throw new TeacherAssessmentRuntimeError()
   return readTeacherOrdinaryFeedback({executionId:uuid.parse(req.params.executionId),actorUserId:req.user!.userId})

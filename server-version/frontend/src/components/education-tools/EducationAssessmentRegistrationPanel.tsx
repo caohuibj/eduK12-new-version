@@ -50,6 +50,7 @@ function Panel({api,organizationId,actorId,product,publicPackage,onDraftStateCha
  const [selectedP,setP]=useState<Record<string,string[]>>({}),[selectedR,setR]=useState<Record<string,string>>({})
  const policyKey=resourceId?`education-assessment:${resourceId}:disclosure:v1`:''
  const [disclosure,setDisclosure]=useState<'NONE'|'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY'>('COMPLETION_ONLY')
+ const [longitudinalMetricKeys,setLongitudinalMetricKeys]=useState<string[]>([])
  const [feedback,setFeedback]=useState<''|'IMMEDIATE'|'SCHEDULED'>(''),[releaseAt,setReleaseAt]=useState('')
  const [registration,setRegistration]=useState<EducationAssessmentRegistration|null>(null),[reason,setReason]=useState(''),[uncertain,setUncertain]=useState(false)
  const epoch=useRef(0),alive=useRef(true),locked=useRef(false),writing=useRef(false),mutationSent=useRef(false),context=useRef(api);context.current=api
@@ -65,6 +66,7 @@ function Panel({api,organizationId,actorId,product,publicPackage,onDraftStateCha
   }}finally{if(valid()){locked.current=false;writing.current=false;setBusy(false)}}
  }
  useEffect(()=>{onDraftStateChange?.({dirty:!registration&&(!!preparation||!!title||!!sourceId||family!=='BUNDLE'),writing:busy&&writing.current})},[preparation,registration,title,sourceId,family,busy,onDraftStateChange])
+ useEffect(()=>{setLongitudinalMetricKeys([])},[api,resourceId,sourceId])
  const applyFixed=(result:EducationAssessmentPreparation)=>{
   setP(Object.fromEntries(result.fixedSelection?.references.units.map(unit=>[unit.itemId,unit.choices.map(choice=>JSON.stringify([choice.releaseId,choice.entryKey]))])??[]))
   setR(Object.fromEntries(result.fixedSelection?.reports.map(report=>[report.itemId,report.releaseId])??[]))
@@ -109,7 +111,7 @@ function Panel({api,organizationId,actorId,product,publicPackage,onDraftStateCha
    licenseGroups.push(report.licenses);return [{itemId:unit.itemId,releaseId:report.releaseId}]
   })
   const audiences=Object.fromEntries(['RESPONDENT','SUBJECT','TEACHER','PARENT','PROFESSIONAL','ORGANIZATION','RESEARCH'].map(audience=>[audience,{
-   mode:audience==='RESPONDENT'?disclosure:'NONE',metricKeys:audience==='RESPONDENT'&&disclosure==='INDIVIDUAL_SUMMARY'?[...new Set(choices.units.flatMap(unit=>unit.reports.find(row=>row.releaseId===selectedR[unit.itemId])?.metricKeys??[]))]:[],longitudinalMetricKeys:[],
+   mode:audience==='RESPONDENT'?disclosure:'NONE',metricKeys:audience==='RESPONDENT'&&disclosure==='INDIVIDUAL_SUMMARY'?[...new Set(choices.units.flatMap(unit=>unit.reports.find(row=>row.releaseId===selectedR[unit.itemId])?.metricKeys??[]))]:[],longitudinalMetricKeys:audience==='RESPONDENT'&&disclosure==='INDIVIDUAL_SUMMARY'?longitudinalMetricKeys.filter(key=>choices.units.some(unit=>unit.reports.find(row=>row.releaseId===selectedR[unit.itemId])?.metricKeys.includes(key))):[],
   }])) as EducationAssessmentDisclosure['audiences']
   if(disclosure==='INDIVIDUAL_SUMMARY'&&!reports.length)throw Error('本人摘要需要明确选择已批准报告版本。')
   let feedbackPolicy:{schemaVersion:1;mode:'IMMEDIATE'}|{schemaVersion:1;mode:'SCHEDULED';releaseAt:string}
@@ -159,7 +161,8 @@ function Panel({api,organizationId,actorId,product,publicPackage,onDraftStateCha
     </section>)}
     {choices.nextCursor&&<button onClick={()=>void perform(async valid=>{const next=await client.choices(preparation.resourceId,choices.nextCursor!);if(valid())setChoices(appendEducationAssessmentChoices(choices,next))})}>继续加载参考与报告版本</button>}
     <label>披露政策编号（系统标识）<input readOnly value={policyKey}/></label>
-    <label>本人披露<select value={disclosure} onChange={e=>setDisclosure(e.target.value as typeof disclosure)}><option value="NONE">不展示反馈</option><option value="COMPLETION_ONLY">仅完成确认</option>{choices.units.length>0&&<option value="INDIVIDUAL_SUMMARY">已批准报告的本人摘要</option>}</select></label>
+    <label>本人披露<select value={disclosure} onChange={e=>{setDisclosure(e.target.value as typeof disclosure);if(e.target.value!=='INDIVIDUAL_SUMMARY')setLongitudinalMetricKeys([])}}><option value="NONE">不展示反馈</option><option value="COMPLETION_ONLY">仅完成确认</option>{choices.units.length>0&&<option value="INDIVIDUAL_SUMMARY">已批准报告的本人摘要</option>}</select></label>
+    {disclosure==='INDIVIDUAL_SUMMARY'&&<fieldset><legend>允许本人纵向查看的原始指标</legend><p>仅选择已获准本人数字反馈的指标子集；新教育版本固定后生效，不改变历史来源或其他受众。</p>{[...new Set(choices.units.flatMap(unit=>unit.reports.find(row=>row.releaseId===selectedR[unit.itemId])?.metricKeys??[]))].map(key=><label key={key}><input type="checkbox" checked={longitudinalMetricKeys.includes(key)} onChange={event=>setLongitudinalMetricKeys(old=>event.target.checked?[...new Set([...old,key])]:old.filter(value=>value!==key))}/>{key}</label>)}</fieldset>}
     <label>反馈开放方式<select value={feedback} onChange={e=>setFeedback(e.target.value as typeof feedback)}><option value="">请明确选择</option><option value="IMMEDIATE">完成后按权限开放</option><option value="SCHEDULED">按冻结时间开放</option></select></label>
     {feedback==='SCHEDULED'&&<label>开放时间（本地时区）<LocalDateTimeInput picker aria-label="开放时间（本地时区）" value={releaseAt} onChange={e=>setReleaseAt(e.target.value)}/><small>{localTimeZoneLabel()}；保存时转换为 UTC，冻结后不可原地修改。</small></label>}
     <button disabled={uncertain||!feedback||!policyKey.trim()} onClick={register}>冻结登记为草稿</button>

@@ -10,7 +10,7 @@ export type EducationAssessmentPreparation={resourceId:string;product:'SCHOOL'|'
  publicPackage?:EducationPackageRef;fixedSelection?:Pick<EducationAssessmentRegisterInput,'references'|'reports'>}
 export type EducationAssessmentDisclosure={schemaVersion:1;policyKey:string;minimumRespondents:null;
  audiences:Record<'RESPONDENT'|'SUBJECT'|'TEACHER'|'PARENT'|'PROFESSIONAL'|'ORGANIZATION'|'RESEARCH',{
- mode:'NONE'|'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY';metricKeys:string[];longitudinalMetricKeys:[]}>}
+ mode:'NONE'|'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY';metricKeys:string[];longitudinalMetricKeys:string[]}>}
 export type EducationFeedbackPolicy={schemaVersion:1;mode:'IMMEDIATE'}|{schemaVersion:1;mode:'SCHEDULED';releaseAt:string}
 export type EducationAssessmentRegistration={resourceId:string;resourceKey?:string;version?:'1.0.0';status:EducationAssessmentStatus;entryHash:string;entry?:unknown;createdBy?:string;reviewedBy?:string|null}
 export type EducationAssessmentRegisterInput={expectedPreparationHash:string;disclosure:EducationAssessmentDisclosure;feedbackPolicy:EducationFeedbackPolicy;

@@ -1,0 +1,10 @@
+src/modules/composite/personal-tracking-results.ts(28,27): error TS18047: 'tracking' is possibly 'null'.
+src/modules/composite/personal-tracking-results.ts(52,17): error TS18047: 'tracking' is possibly 'null'.
+src/modules/composite/personal-tracking-results.ts(67,22): error TS18047: 'release' is possibly 'null'.
+src/modules/composite/personal-tracking-results.ts(67,38): error TS2339: Property 'metrics' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'metrics' does not exist on type '{ projectionVersion: 1; measurements: { releaseId: string; contentHash: string; }[]; metricKeys: string[]; audience: string; language: string; generatorVersion: string; template: { blocks: ({ type: "TEXT"; text: string; } | { ...; } | { ...; } | { ...; } | { ...; })[]; limitations: string[]; title?: string | undefin...'.
+src/modules/composite/personal-tracking-results.ts(67,51): error TS7006: Parameter 'm' implicitly has an 'any' type.
+src/modules/composite/personal-tracking.ts(23,64): error TS2554: Expected 2-3 arguments, but got 1.
+src/modules/composite/personal-tracking.ts(24,15): error TS2554: Expected 2-3 arguments, but got 1.
+src/modules/composite/personal-tracking.ts(45,16): error TS18048: 'original.sources' is possibly 'undefined'.
+src/modules/composite/personal-tracking.ts(62,16): error TS18048: 'original.sources' is possibly 'undefined'.

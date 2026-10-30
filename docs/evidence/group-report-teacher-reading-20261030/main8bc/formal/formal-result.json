@@ -1,0 +1,50 @@
+{
+  "status": "FORMAL_SUCCESS_CURRENT_BASE8BC",
+  "pr": 415,
+  "candidate": "b3e9f35bac2700200c3b099a52ba11a4e74ae34e",
+  "base": "8bc677156a3548333450363a31e33812ad2a9f0c",
+  "preview": "b2c1e012dc409ab08bd786f09b70f3bd00b76685",
+  "tree": "54319869523c4dd66b85f6358edb68cfdc7f65ed",
+  "run": 41070437105,
+  "attempt": 1,
+  "jobs": [
+    {
+      "id": 124112808790,
+      "name": "classify changed content",
+      "conclusion": "success"
+    },
+    {
+      "id": 124112975962,
+      "name": "codeql (javascript/typescript SAST)",
+      "conclusion": "success"
+    },
+    {
+      "id": 124112976115,
+      "name": "reviewed onboarding evidence admission",
+      "conclusion": "success"
+    },
+    {
+      "id": 124113711174,
+      "name": "merge gate / ready PR",
+      "conclusion": "success"
+    }
+  ],
+  "totalJobs": 126,
+  "skipped": 122,
+  "admissionArtifact": 12984902346,
+  "sastArtifact": 12982939881,
+  "testsExecutedInCI": false,
+  "databaseTypesBrowserNotReplayed": true,
+  "candidateFrozen": true,
+  "mergeOrDeploy": false,
+  "ordering": "416 before415;418 state/formal closeout after415 merged",
+  "sourceZipSHA256": "d8e10f9a567eefd467f3ff8e3522a050072f5d9a91c68849d3e05b8467c7d3a8",
+  "sastZipSHA256": "b02e3e37ff6164632508c31e298a3252399dcafaaefefabc57648a3538c4a622",
+  "artifactInspection": "Actual ZIP bytes downloaded,digests verified,admission and SARIF read;one unchanged test assertion advisory retained",
+  "historicalSyncRun": {
+    "id": 41070327452,
+    "conclusion": "cancelled",
+    "completedScopeOnly": true,
+    "cause": "existing concurrency on ready event;no replayed producers"
+  }
+}

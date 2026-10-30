@@ -1,9 +1,9 @@
 {
   "status": "DRAFT_NOT_MERGE_READY",
-  "base": "a7969866f2f1106f82e810b550675badce0f1656",
+  "base": "43d119c9bfbc7949baab2edea29d96044b04607c",
   "scope": "Existing Teacher adult Form report reading only; existing permission/release/statistics/store reused",
-  "frontendTree": "00a843d3164e16ae7b7b4045ee0597db2812d790",
-  "backendTreeUnchanged": "315616d1b8fead0cbbd340822ef8828498007cb9",
+  "frontendTree": "b672a3fcf90f535079675048a7a013fbbbf660fb",
+  "backendTreeUnchanged": "dc9a331f08901238236ec3664e3173aba3f15030",
   "freshDistinctNavigationCases": 1,
   "unitFinal": "navigation-projection-continuation.json",
   "unitFailuresRetained": [
@@ -21,11 +21,10 @@
   "localInputAttribution": "Original local executions unsigned. Reports preceded index freeze; unchanged exact input contents then staged and bound to component trees. No backfilled execution signature.",
   "lint": "exit0, one existing scopeGeneration cleanup-ref warning remains; no threshold/rule changes",
   "remaining": [
-    "Teacher subgroups and other measurement sources not implemented in this reading tranche",
-    "Teacher personal COGNITIVE/SJT/Bundle currently frozen INDIVIDUAL_ONLY; do not bypass content/assignment policy for group reports",
-    "School old no-leaf V1 floor scope open in PR414",
-    "School Form/other runtime adapters",
-    "group longitudinal waits stable existing personal interface"
+    "PR415 exact existing-route binding stays disabled while PR409 aligns; no Ready/qualification/merge queue activation.",
+    "PR418 contains Teacher native Form subgroup/version work and POST-success/directory-failure correction; not part of this reading-only tranche.",
+    "Other sources retain their actual GROUP ceilings; personal INDIVIDUAL_ONLY is not group authorization.",
+    "Group longitudinal follows existing configured plans after stable longitudinal interface; no Bundle Profile aggregate."
   ],
   "ciExecuted": false,
   "merged": false,
@@ -120,7 +119,79 @@
     "frontend-lint.log.gz": {
       "sha256": "0def6a4ca42738764b513ccc8e794f60b99e280edd6533693ba0d108fa9c3043",
       "bytes": 302
+    },
+    "mainfa/frontend-types.json": {
+      "sha256": "6e3ed12d1457bfe76d23beb01e02a8ae287b341495d3ce2da69062057568c1da",
+      "bytes": 528
+    },
+    "mainfa/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfb/frontend-types.json": {
+      "sha256": "fc4cd9fc51b83b2d96f1081b7a471726606ce2ee69741f9be7be067664f97de0",
+      "bytes": 528
+    },
+    "mainfb/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "qualification-controls.log": {
+      "sha256": "f26b0f8a821c72d2e91bec19aa36c0c933077c5dffaec8096a215ab382269780",
+      "bytes": 238
     }
   },
-  "rawLogTransport": "frontend-lint.log.gz losslessly preserves original lint output, including trailing blank line; no output trimming"
+  "rawLogTransport": "frontend-lint.log.gz losslessly preserves original lint output, including trailing blank line; no output trimming",
+  "mainfaQualificationPreparation": {
+    "main": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "schoolDependency": "77e2767248d171f8914fe94b9f3debada424a4d4",
+    "sourceCheckpoint": "68f047824a940595a9a9346298235c3f4cddaa56",
+    "frontendTree": "b6e7cfb9d6bd52c9f67fcb3b744f3d9b8936f31f",
+    "frontendTypes": "mainfa/frontend-types.json: actual once exit0",
+    "backendTree": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+    "backendTypes": "Exact unchanged backend tree equals PR414 current mainfa/backend-types.json receipt; no backend replay.",
+    "oldNavigationBrowserReexecuted": false,
+    "formalCiActivated": false,
+    "schoolCandidateModified": false
+  },
+  "mainfbPreparation": {
+    "main": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+    "schoolDependency": "f5fabe490334f06c7f97436e82545d3b55b921f6",
+    "sourceCheckpoint": "704a0ab779929592f201a54d367a9d9e295f29c9",
+    "frontendTree": "b672a3fcf90f535079675048a7a013fbbbf660fb",
+    "frontendTypes": "mainfb/frontend-types.json: once exit0",
+    "backendTree": "dc9a331f08901238236ec3664e3173aba3f15030",
+    "backendTypesReused": "Exact same tree as School mainfb/backend-types.json; no backend replay.",
+    "businessOrBrowserReexecuted": false,
+    "formalCiActivated": false,
+    "schoolFinalCandidateModified": false
+  },
+  "historicalReaderTrees": {
+    "frontend": "00a843d3164e16ae7b7b4045ee0597db2812d790",
+    "backend": "315616d1b8fead0cbbd340822ef8828498007cb9"
+  },
+  "main414Preparation": {
+    "sourceCheckpoint": "91487d27e12e60cd30895d5e5327016552f9a45a",
+    "componentTreesChangedByMainMerge": false,
+    "frontendReceiptReused": "mainfb/frontend-types.json",
+    "backendReceiptReused": "../group-report-school-20261030/mainfb/backend-types.json",
+    "ownFiveReaderSourceBlobsUnchangedFrom": "380b90cd700d2180015f60b44aad4fbd2131029c",
+    "oldNavigationBrowserPgOrTypesReexecuted": false,
+    "newControlCheck": "qualification-controls.log:1 passed",
+    "qualificationBinding": "Prepared existing exact candidate415; disabled until PR409 baseline settles",
+    "formalCiActivated": false,
+    "draft": true,
+    "mergeQueueEntered": false
+  },
+  "main8bcFinalPreparation": {
+    "main": "8bc677156a3548333450363a31e33812ad2a9f0c",
+    "sourceCheckpoint": "486fa3286f264d6321b8140373aaf4dce0593154",
+    "sharedConflict": "preserved both reporting and personal-tracking imports",
+    "affectedNavigation": "main8bc/navigation.json:1 PASS, explicit nonconfigured tracking reply",
+    "frontendTypes": "main8bc/frontend-types.json:current frontend tree once",
+    "backend": "exact main8bc tree; no backend diff, compile or PG replay",
+    "oldBrowser": "retained original380b90 observation; no identical complete bundle claim",
+    "notion": "415/418 preparation append confirmed success after corrected content argument; earlier INVALID_ARGUMENT did not write",
+    "remaining": "existing formal scope/admission/CodeQL/gate; no merge/deploy"
+  }
 }

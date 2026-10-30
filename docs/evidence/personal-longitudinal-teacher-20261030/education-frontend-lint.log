@@ -1,0 +1,6 @@
+
+/workspace/eduK12-new-version/server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx
+  141:33  warning  The ref value 'scopeGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'scopeGeneration.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+

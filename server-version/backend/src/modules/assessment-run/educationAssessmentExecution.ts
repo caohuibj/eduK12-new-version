@@ -16,16 +16,18 @@ export async function assertEducationAssessmentExecutionSource(tx:Prisma.Transac
  function fail():never{throw new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_EXECUTION_BINDING')}
  const [row]=await tx.$queryRaw<Array<{organizationId:string;key:string;version:string;family:string;policy:unknown;policyHash:string;
   school:boolean;teacher:boolean;subjectRole:string;respondentRole:string;relationship:string;perspective:string;
-  assignmentRef:string;subjectId:string;respondentId:string;binding:string|null;boundComposite:string|null}>>(Prisma.sql`
+  assignmentRef:string;subjectId:string;respondentId:string;binding:string|null;boundComposite:string|null;longitudinal:boolean;trackingEntry:string|null}>>(Prisma.sql`
   SELECT e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,t.resource_family AS family,
    t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",
    EXISTS(SELECT 1 FROM campus_activity_runs c WHERE c.organization_id=e.organization_id AND c.run_id=e.run_id) AS school,
    EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h WHERE h.organization_id=e.organization_id AND h.run_id=e.run_id) AS teacher,
    a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",a.relationship_kind AS relationship,a.perspective,
    a.id AS "assignmentRef",a.subject_user_id AS "subjectId",a.respondent_user_id AS "respondentId",e.runtime_binding_ref AS binding,
-   parent.composite_assessment_id AS "boundComposite"
+   parent.composite_assessment_id AS "boundComposite",run.personal_tracking->>'entry' AS "trackingEntry",
+   (run.personal_tracking_baseline_id IS NOT NULL AND EXISTS(SELECT 1 FROM jsonb_array_elements(COALESCE(run.personal_tracking->'bindings','[]'::jsonb)) chosen WHERE chosen->>'trackId'=t.id)) AS longitudinal
   FROM assessment_run_executions e JOIN assessment_run_tracks t
    ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
+  JOIN assessment_runs run ON run.id=e.run_id AND run.organization_id=e.organization_id
   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
    AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
   LEFT JOIN composite_assessment_attempts parent ON e.runtime_binding_kind='COMPOSITE' AND parent.id=e.runtime_binding_ref
@@ -47,5 +49,5 @@ export async function assertEducationAssessmentExecutionSource(tx:Prisma.Transac
   for(const proof of source.authority)await assertEducationDeliveryIssuerCurrent(tx,{proof,organizationId:row.organizationId,product})
   await assertEducationAssessmentDistributionCurrent(tx,source.origin)
  }
- return {...source,startProof:input.purpose==='NEW_START'?issueVerifiedEducationStart({tx,product,compositeId:input.compositeId,assignmentRef:row.assignmentRef,respondentUserId:row.respondentId}):undefined}
+ return {...source,startProof:input.purpose==='NEW_START'?issueVerifiedEducationStart({tx,product,compositeId:input.compositeId,assignmentRef:row.assignmentRef,respondentUserId:row.respondentId,longitudinal:row.longitudinal&&row.trackingEntry===product}):undefined}
 }

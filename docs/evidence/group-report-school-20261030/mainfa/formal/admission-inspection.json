@@ -1,0 +1,22 @@
+{
+  "artifact": 12976893220,
+  "status": "VERIFIED",
+  "sha256": "7678e4847e1a2e4651cafaf9fbea259d7d42498cef5549af08acf51cb53d91e1",
+  "bytes": 4656,
+  "files": [
+    "admission.json"
+  ],
+  "runId": "41057783824",
+  "attempt": "1",
+  "selectedCases": 41,
+  "testsExecutedInCI": false,
+  "source": {
+    "pr": 414,
+    "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "head": "7007f01f997ce828f15422dc7dc98f4aedd89e11",
+    "sourceHead": "77e2767248d171f8914fe94b9f3debada424a4d4",
+    "tree": "db86d3f899fb337392d39aa7973f054444b31026",
+    "draft": false,
+    "route": "onboarding-structure"
+  }
+}

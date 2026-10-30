@@ -1,0 +1,2 @@
+server-version/backend/src/modules/reporting/education-personal-tracking.ts(28,80): error TS2322: Type 'string' is not assignable to type '"1.0.0"'.
+server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts(60,110): error TS2322: Type 'string' is not assignable to type '"1.0.0"'.

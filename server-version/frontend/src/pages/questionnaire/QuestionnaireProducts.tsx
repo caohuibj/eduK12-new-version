@@ -391,7 +391,9 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   }
   const actionInFlight = useRef(false)
   useEffect(()=>{actionInFlight.current=false;setBusy(false)},[measurementRecoveryKey])
-  const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
+  const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; trackingCandidates?:Array<{itemId:string;scoreKey:string;label:string;unit:string}>; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
+  const [trackingMode,setTrackingMode]=useState<'SINGLE'|'LONGITUDINAL'>('SINGLE'),[trackingKeys,setTrackingKeys]=useState<string[]>([])
+  useEffect(()=>{setTrackingMode('SINGLE');setTrackingKeys([])},[id,user?.id])
   const [nameError, setNameError] = useState('')
   const [expiryError, setExpiryError] = useState('')
   const [requestId] = useState(() => crypto.randomUUID())
@@ -722,7 +724,9 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     if (trainingDesign && !await confirmManagement({ title: '确认发布组合测评', body: '发布后内容、投放范围和相关策略将冻结。确认后系统会再次检查当前草稿与权限。', confirmLabel: '确认发布' })) return
     return action(async () => {
       hydrate(
-        await request('/' + id + '/publish', { revision: detail.revision }),
+        await request('/' + id + '/publish', { revision: detail.revision,
+          ...(trainingDesign&&!detail.personalTracking&&trackingMode==='LONGITUDINAL'?{tracking:{mode:trackingMode,
+            metrics:(preflight?.trackingCandidates??[]).filter(m=>trackingKeys.includes(JSON.stringify([m.itemId,m.scoreKey]))).map(({itemId,scoreKey})=>({itemId,scoreKey}))}}:{}) }),
       )
     })
   }
@@ -1428,15 +1432,28 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   </>
 
   const publishPanel = <>
+      {trainingDesign&&detail?.personalTracking&&!draft&&<ProductButton disabled={busy} onClick={()=>void action(async()=>{
+        const row=await request('/'+id+'/next-wave',{requestId:crypto.randomUUID()})
+        navigate(assessmentContextHref(base+'/'+row.id,location.pathname,location.search))
+      })}>创建下一轮</ProductButton>}
       {detail && !draft && <section className="questionnaire-publish-panel" aria-label="发布状态"><div className="questionnaire-publish-summary"><div><h2>{labels[detail.status] || detail.status} · {detail.name}</h2><p>当前版本的内容与投放设置已锁定。如需调整，请复制为新草稿后重新编制。</p></div><Link className="hui-button hui-button--primary" to={'/composite-assessments/' + id + '/results'}>查看作答与结果</Link></div></section>}
       {detail && draft && <section id="questionnaire-publish" aria-label="正式发布" className="questionnaire-publish-panel">
+        {trainingDesign&&detail.questionnaireType==='COURSE'&&<fieldset className="space-y-2 border-b pb-4"><legend>测评方式</legend>
+          {detail.personalTracking?<p>纵向追踪 · T{detail.personalTracking.ordinal}。已继承基线计分定义，未追踪内容可调整。本人可见范围仍受各工具原披露上限和反馈开放时间限制。</p>:<>
+            <label><input type="radio" name="tracking-mode" checked={trackingMode==='SINGLE'} disabled={busy} onChange={()=>setTrackingMode('SINGLE')}/> 单次测评</label>
+            <label><input type="radio" name="tracking-mode" checked={trackingMode==='LONGITUDINAL'} disabled={busy} onChange={()=>setTrackingMode('LONGITUDINAL')}/> Longitudinal 纵向追踪</label>
+            {trackingMode==='LONGITUDINAL'&&<div><p>先运行发布前自检，再选择需要追踪的子工具指标。选择输出不会删评分所需题目。本人只可查看原工具允许披露且已开放的指标；一次性匿名身份不能跨轮配对。</p>
+              {preflight&&preflight.revision===detail.revision&&!dirty&&preflight.trackingCandidates?.map(metric=>{const key=JSON.stringify([metric.itemId,metric.scoreKey]);return <label key={key} className="block"><input type="checkbox" checked={trackingKeys.includes(key)} disabled={busy} onChange={event=>setTrackingKeys(old=>event.target.checked?[...old,key]:old.filter(k=>k!==key))}/> {metric.label}（{metric.unit}）</label>})}
+            </div>}
+          </>}
+        </fieldset>}
         <div className="questionnaire-publish-summary"><div><h2>草稿 · 尚未发布</h2><p>{dirty ? '设置有未保存的修改，请先保存设置。' : '确认内容与投放设置后，可自检或正式发布。'}</p></div>
         <div className="flex flex-wrap gap-3">
                 {dirty && !trainingDesign && <ProductButton variant="primary" disabled={busy} onClick={() => void save()}>保存全部设置</ProductButton>}
                 {draft && <ProductButton variant="secondary" disabled={busy || dirty || authoringLocked} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
                 {draft && (
                   <ProductButton
-                    disabled={busy || dirty || authoringLocked}
+                    disabled={busy || dirty || authoringLocked || (trainingDesign&&!detail.personalTracking&&trackingMode==='LONGITUDINAL'&&(!trackingKeys.length||preflight?.revision!==detail.revision))}
                     variant="primary"
                     onClick={() => void publish()}
                   >
