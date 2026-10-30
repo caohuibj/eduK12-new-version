@@ -1,4 +1,5 @@
 import { calculateScoreRanges } from '../scale/scale-scoring'
+import { groupFormMetricType } from '../reporting/group-summary'
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import {DEIDENTIFIED_SURVEY_RESPONSE_TYPES} from './deidentified-export'
 import {missingSurveyFlowUnit} from './flow.runtime'
@@ -249,6 +250,8 @@ export const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResu
   }
   return output
 }
+export const projectGroupRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResult,onlyItemKey?:string)=>
+  projectRawItems(items.filter(item=>groupFormMetricType(item.responseType)!==null),unit,onlyItemKey)
 const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;researchCode:string|null;completedAt:string;sourceFinalHash:string
 }):FrozenScoreObservation[]=>{
@@ -1129,8 +1132,12 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
                   ...(variantConfigByWave.get(wave.id)?{variantConfiguration:variantConfigByWave.get(wave.id)}:{})}})))
           if(input.selectRaw!==false&&(!input.selectRaw||
             frozen.instrumentKey===input.selectRaw.instrumentKey)){
-            const items=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
-            for(const {item:r,value,missingReason:baseMissingReason,scorerOptionKey} of projectRawItems(items,unit,input.selectRaw?input.selectRaw.itemKey:undefined,input.deidentifiedChoicesOnly)){
+            const allItems=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
+            // Group reports do not need text, ranking or structured allocation
+            // fields. Filter before projecting/counting the 25k raw-row budget.
+            const projected=input.includeGroupParents?projectGroupRawItems(allItems,unit,input.selectRaw?input.selectRaw.itemKey:undefined)
+              :projectRawItems(allItems,unit,input.selectRaw?input.selectRaw.itemKey:undefined,input.deidentifiedChoicesOnly)
+            for(const {item:r,value,missingReason:baseMissingReason,scorerOptionKey} of projected){
             const missingReason=nativeMissing.get(r.itemKey)??baseMissingReason
             const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,r.itemKey)
             if(raw.length>=25000)

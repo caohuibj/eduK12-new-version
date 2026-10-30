@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { summarizeGroupMetrics, type GroupMetricDefinition, type GroupMetricObservation, type TaskGroupProjection } from '../reporting/group-summary'
+import { groupFormMetricType, summarizeGroupMetrics, type GroupMetricDefinition, type GroupMetricObservation, type TaskGroupProjection } from '../reporting/group-summary'
 import { listTaskGroupArtifacts, readTaskGroupArtifact, publicTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
 import { authorizedProject } from './builder.service'
 import { SurveyAnalyticsError } from './analytics.errors'
@@ -35,15 +35,18 @@ export function surveyGroupFacts(source: SurveySourceProjection, instrumentKey: 
   const definitions: GroupMetricDefinition[] = []
   const observations: GroupMetricObservation[] = []
   if (tool.kind === 'FORM') {
+    const rawByColumn = new Map<string, SurveySourceProjection['raw']>()
+    for (const row of source.raw) if (row.instrumentKey === instrumentKey) {
+      const rows = rawByColumn.get(row.columnKey) ?? []
+      rows.push(row); rawByColumn.set(row.columnKey, rows)
+    }
     for (const item of source.codebook.filter(row => row.instrumentKey === instrumentKey && row.kind === 'FORM')) {
-      const type = ['NUMBER', 'SLIDER'].includes(item.responseType) ? 'NUMBER'
-        : ['SINGLE', 'LIKERT', 'MATRIX'].includes(item.responseType) ? 'SINGLE'
-          : ['MULTIPLE', 'MATRIX_MULTIPLE'].includes(item.responseType) ? 'MULTIPLE' : null
+      const type = groupFormMetricType(item.responseType)
       if (!type) continue
       definitions.push({ key: item.itemKey, label: item.prompt, type, unit: null, range: null,
         measurement: { definitionDigest: item.definitionDigest, responseType: item.responseType, instrumentKey },
         ...(type !== 'NUMBER' ? { options: item.options.filter(option => !option.nonanswerReason).map(option => ({ value: option.code, label: option.label })) } : {}) })
-      for (const row of source.raw.filter(row => row.instrumentKey === instrumentKey && row.columnKey === item.columnKey)) {
+      for (const row of rawByColumn.get(item.columnKey) ?? []) {
         let value: GroupMetricObservation['value'] = row.value
         if (type === 'MULTIPLE' && typeof value === 'string') value = JSON.parse(value) as string[]
         observations.push({ parentId: row.attemptId, metricKey: item.itemKey, value, missingReason: row.missingReason, quality: null })
@@ -70,21 +73,26 @@ export async function generateSurveyGroupReport(input: Scope & { instrumentKey: 
   const dictionary = await loadSurveyItemDictionary({ ...input, includeGroupTools: true })
   const selectedTool = dictionary.tools?.find(tool => tool.instrumentKey === input.instrumentKey)
   if (!selectedTool) return fail(404, '请选择当前冻结问卷中的工具')
+  const expandedFields = selectedTool.kind === 'FORM' ? dictionary.variables.filter(variable =>
+    variable.instrumentKey === input.instrumentKey && groupFormMetricType(variable.responseType) !== null).length : 0
+  const pageSize = Math.min(200, Math.max(1, Math.floor(25000 / Math.max(1, expandedFields))))
   let source: SurveySourceProjection | undefined
   let afterFinal: { id: string; completedAt: Date } | undefined
   const parents: NonNullable<SurveySourceProjection['groupParents']> = []
   const scores: SurveySourceProjection['scores'] = [], raw: SurveySourceProjection['raw'] = []
-  for (let page = 0; page < 30; page++) {
-    const chunk = await loadSurveySource({ ...input, waveIds: [input.waveId], maxFinals: 200, pageMode: true,
-      stableIdCursor: true, includeWideSchema: page === 0, includeAttendance: false, includeGroupParents: true,
-      selectRaw: selectedTool.kind === 'FORM' ? { instrumentKey: input.instrumentKey } : false, selectScore: { instrumentKey: input.instrumentKey },
+  while (true) {
+    const chunk = await loadSurveySource({ ...input, waveIds: [input.waveId], maxFinals: pageSize, pageMode: true,
+      stableIdCursor: true, includeWideSchema: source === undefined, includeAttendance: false, includeGroupParents: true,
+      selectRaw: expandedFields ? { instrumentKey: input.instrumentKey } : false, selectScore: { instrumentKey: input.instrumentKey },
       afterFinal, ...(source ? { snapshotCutOff: new Date(source.cutOff), expectedSourceRevision: source.sourceRevision,
         expectedFinalCount: source.sourceFinalCount ?? undefined } : {}) })
     rejectPooledVariants(chunk)
     source ??= chunk
     parents.push(...(chunk.groupParents ?? [])); scores.push(...chunk.scores); raw.push(...chunk.raw)
+    if ((source.sourceFinalCount ?? parents.length) > 6000 || parents.length > 6000)
+      return fail(413, '有效答卷超过现有 6000 份分析上限，请缩小来源')
     if (!chunk.nextFinalCursor) break
-    if (page === 29) return fail(413, '有效答卷超过现有 6000 份分析上限，请缩小来源')
+    if (parents.length === 6000 || !chunk.groupParents?.length) return fail(413, '有效答卷超过上限或分页没有进展，请缩小来源')
     afterFinal = { id: chunk.nextFinalCursor.id, completedAt: new Date(chunk.nextFinalCursor.completedAt) }
   }
   const frozen = source!

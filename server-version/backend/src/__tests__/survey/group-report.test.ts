@@ -75,4 +75,36 @@ describe('Survey task group artifacts', () => {
     const input = source(); input.scores[0].measurement = { ...input.scores[0].measurement, scoringDigest: canonicalHash('other C') }
     expect(() => surveyGroupFacts(input, 'scale')).toThrow('不能混合统计')
   })
+  it('pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages', async () => {
+    const { projectGroupRawItems } = await vi.importActual<typeof import('../../modules/survey/analytics.source')>('../../modules/survey/analytics.source')
+    const items = Array.from({ length: 500 }, (_, i) => ({ itemKey: `q${i}`, answerKey: `q${i}`, prompt: `Q${i}`,
+      responseType: i < 126 ? 'SINGLE' : 'LONG_TEXT', options: i < 126 ? [{ code: 'a', label: '甲' }] : [] }))
+    const unit = { instrumentKey: 'form', kind: 'FORM' as const, sourceDigest: 'c', scoringDigest: null,
+      rawAnswers: Object.fromEntries(items.map(item => [item.itemKey, item.responseType === 'SINGLE' ? 'a' : 'private free text'])), missing: [], privateScoring: null }
+    const projected = projectGroupRawItems(items, unit)
+    expect(projected).toHaveLength(126); expect(projected.every(row => row.item.responseType === 'SINGLE')).toBe(true)
+    const baseSource = source(), book = items.map((item, i) => ({ columnKey: `c${i}`, itemKey: item.itemKey, prompt: item.prompt,
+      instrumentKey: 'form', kind: 'FORM' as const, responseType: item.responseType, waveId: 'wave', waveOrdinal: 1,
+      title: 'Wide Form', definitionDigest: 'c', scoringDigest: null, publicationVersion: 1, instrumentRevision: 1, options: item.options }))
+    m.dictionary.mockResolvedValue({ tools: [tool('FORM')], variables: book })
+    let processed = 0
+    m.source.mockImplementation(async (request: { maxFinals: number; afterFinal?: { id: string } }) => {
+      expect(request.maxFinals).toBe(198); expect(request.maxFinals * projected.length).toBeLessThanOrEqual(25000)
+      if (processed) expect(request.afterFinal?.id).toBe(`f${processed}`)
+      const count = Math.min(request.maxFinals, 6000 - processed)
+      const groupParents = Array.from({ length: count }, (_, i) => ({ finalId: `f${processed + i + 1}`, attemptId: `p${processed + i + 1}`, sourceFinalHash: 'h' }))
+      processed += count
+      return { ...baseSource, completeAttempts: count, sourceFinalCount: 6000, groupTools: [tool('FORM')], groupParents, codebook: book,
+        nextFinalCursor: processed < 6000 ? { id: `f${processed}`, completedAt: baseSource.cutOff } : null,
+        scores: [], raw: groupParents.flatMap(parent => projected.map((answer, i) => ({ projectId: 'project', waveId: 'wave', waveOrdinal: 1,
+          attemptId: parent.attemptId, researchCode: null, sourceFinalHash: 'h', instrumentKey: 'form', kind: 'FORM', responseType: 'SINGLE',
+          itemKey: answer.item.itemKey, columnKey: `c${i}`, publicationVersion: 1, value: answer.value, missingReason: null, completedAt: baseSource.cutOff, sourceVerified: true }))) }
+    })
+    await generateSurveyGroupReport({ ...scope, instrumentKey: 'form' })
+    expect(m.source).toHaveBeenCalledTimes(31); expect(processed).toBe(6000)
+    expect(m.save.mock.calls[0][1].projection).toMatchObject({ completedN: 6000, metrics: expect.arrayContaining([
+      expect.objectContaining({ key: 'q0', validN: 6000, frequencies: [{ value: 'a', label: '甲', count: 6000, proportion: 1 }] }),
+    ]) })
+    expect(m.save.mock.calls[0][1].projection.metrics).toHaveLength(126)
+  },15000)
 })

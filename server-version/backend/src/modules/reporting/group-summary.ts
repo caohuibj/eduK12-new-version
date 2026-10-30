@@ -1,6 +1,11 @@
 import { reportingAggregations, finiteReportingNumber } from './statistics'
 
 export type GroupToolKind = 'SCALE' | 'COGNITIVE' | 'SJT' | 'FORM'
+export function groupFormMetricType(responseType: string): 'NUMBER' | 'SINGLE' | 'MULTIPLE' | null {
+  return ['NUMBER', 'SLIDER'].includes(responseType) ? 'NUMBER'
+    : ['SINGLE', 'LIKERT', 'MATRIX'].includes(responseType) ? 'SINGLE'
+      : ['MULTIPLE', 'MATRIX_MULTIPLE'].includes(responseType) ? 'MULTIPLE' : null
+}
 export interface GroupMetricDefinition {
   key: string
   label: string
@@ -46,8 +51,13 @@ export interface TaskGroupProjection {
  * No scoring, thresholds, reference populations or participant inference. */
 export function summarizeGroupMetrics(definitions: GroupMetricDefinition[], observations: GroupMetricObservation[], parentIds: string[]): GroupMetricSummary[] {
   const parents = new Set(parentIds)
+  const byMetric = new Map<string, GroupMetricObservation[]>()
+  for (const row of observations) if (parents.has(row.parentId)) {
+    const rows = byMetric.get(row.metricKey) ?? []
+    rows.push(row); byMetric.set(row.metricKey, rows)
+  }
   return definitions.map(definition => {
-    const rows = observations.filter(row => row.metricKey === definition.key && parents.has(row.parentId))
+    const rows = byMetric.get(definition.key) ?? []
     const byParent = new Map(rows.map(row => [row.parentId, row]))
     if (byParent.size !== rows.length) throw new Error('同一父结果包含重复叶指标')
     const qualityCounts: Record<string, number> = {}
