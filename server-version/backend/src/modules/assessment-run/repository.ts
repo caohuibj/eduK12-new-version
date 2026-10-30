@@ -327,3 +327,19 @@ export async function insertRunExecution(tx: Tx, input: {
   `
   return rows[0]
 }
+
+/** Draft-only native authoring; published/frozen reports are never removed. */
+export async function removeAssessmentRunTrackDraft(input:{organizationId:string;runId:string;trackId:string;expectedVersion:number;tx?:Tx}){
+ const work=async(tx:Tx)=>{
+  const [run]=await tx.$queryRaw<Array<{status:string;version:number}>>`SELECT status,version FROM assessment_runs WHERE organization_id=${input.organizationId} AND id=${input.runId} FOR UPDATE`
+  if(!run||run.status!=='DRAFT')throw new AssessmentRunRepositoryError('RUN_NOT_DRAFT','Only an unpublished draft may change sources',409)
+  if(run.version!==input.expectedVersion)throw new AssessmentRunRepositoryError('RUN_VERSION_CONFLICT','Re-read the current draft version',409)
+  const executions=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_run_executions WHERE organization_id=${input.organizationId} AND run_id=${input.runId} LIMIT 1`
+  if(executions.length)throw new AssessmentRunRepositoryError('RUN_HAS_EXECUTIONS','An admitted runtime source cannot be removed',409)
+  const removed=await tx.$executeRaw`DELETE FROM assessment_run_tracks WHERE organization_id=${input.organizationId} AND run_id=${input.runId} AND id=${input.trackId}`
+  if(!removed)throw new AssessmentRunRepositoryError('TRACK_NOT_FOUND','Draft source not found',404)
+  const [next]=await tx.$queryRaw<Array<{version:number}>>`UPDATE assessment_runs SET version=version+1 WHERE organization_id=${input.organizationId} AND id=${input.runId} RETURNING version`
+  return {removedTrackId:input.trackId,version:next.version}
+ }
+ return input.tx?work(input.tx):prisma.$transaction(work)
+}

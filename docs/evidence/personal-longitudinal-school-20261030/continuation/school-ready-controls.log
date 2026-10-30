@@ -1,0 +1,15 @@
+✔ original local cases and failed continuations retain their provenance without replay (231.390654ms)
+✔ exact app pins reject unknown inputs, changed main and full fallback (1222.747353ms)
+✔ Ready requires actual native/image/SAST success; Draft never qualifies (1296.257248ms)
+✔ actual entrypoint child resolves original admission without a top-level-await cycle (296.620217ms)
+✔ School exact source admission retains37 observations and all12 failed reporters without replay (321.943037ms)
+✔ School candidate-state native reuse refuses a different Prisma baseline, failed migration or expired official producer (1363.328661ms)
+✔ School fixed55 source deltas include native quota controls and reject a changed implementation (1481.862015ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6364.447898

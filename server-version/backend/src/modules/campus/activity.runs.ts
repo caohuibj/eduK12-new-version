@@ -43,10 +43,11 @@ export async function assertCampusActivityRunGovernor(input:{
   return {activity,run}
 }
 export async function createCampusActivityRunDraft(input:{
+  tx?:Prisma.TransactionClient;
   actor:AuthenticatedPrincipal;organizationId:string;courseId:string
   name:string;intakeDeadline?:Date|null
 }){
-  return prisma.$transaction(async tx=>{
+  const execute=async(tx:Prisma.TransactionClient)=>{
     const {activity}=await lockAndAssertCampusActivityEditor(tx,input)
     if(activity.status!=='DRAFT')deny('ACTIVITY_RUN_DRAFT_FROZEN')
     const run=await createAssessmentRunDraft({
@@ -66,7 +67,8 @@ export async function createCampusActivityRunDraft(input:{
       domainEventId:randomUUID(),payload:{courseId:input.courseId},
     })
     return run
-  })
+  }
+  return input.tx?execute(input.tx):prisma.$transaction(execute)
 }
 /** Optional association of existing SAME-ORG unpublished Run. No legacy,
  * published or second-Activity linkage is accepted.

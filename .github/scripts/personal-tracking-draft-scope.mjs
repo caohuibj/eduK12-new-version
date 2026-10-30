@@ -4,6 +4,64 @@ const backend='server-version/backend/';
 const frontend='server-version/frontend/src/';
 const markers=new Set([backend+'src/modules/reporting/personal-tracking.ts',backend+'src/modules/survey/personal-tracking.ts',backend+'src/modules/composite/personal-tracking.ts',backend+'src/modules/reporting/education-personal-tracking.ts']);
 const allowed=new Set([
+  // Exact School source/consumer paths; no directory wildcard or Ready grant.
+  ...[
+  "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts",
+  "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts",
+  "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+  "server-version/backend/src/__tests__/integration/educationLongitudinalLeafs.postgres.integration.test.ts",
+  "server-version/backend/src/__tests__/integration/educationNativeLongitudinal.postgres.integration.test.ts",
+  "server-version/backend/src/__tests__/integration/educationPrivateScaleExecutionFixture.ts",
+  "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.browser.postgres.integration.test.ts",
+  "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts",
+  "server-version/backend/src/__tests__/reporting/education-longitudinal-source.test.ts",
+  "server-version/backend/src/__tests__/reporting/education-personal-changes-timing.test.ts",
+  "server-version/backend/src/__tests__/reporting/education-tracking-leafs.test.ts",
+  "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+  "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts",
+  "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+  "server-version/backend/src/modules/assessment-run/repository.ts",
+  "server-version/backend/src/modules/assessment-run/run.controller.ts",
+  "server-version/backend/src/modules/campus/activity.allocation.ts",
+  "server-version/backend/src/modules/campus/activity.run.routes.ts",
+  "server-version/backend/src/modules/campus/activity.runs.ts",
+  "server-version/backend/src/modules/campus/activity.service.ts",
+  "server-version/backend/src/modules/campus/personal-tracking.ts",
+  "server-version/backend/src/modules/campus/report.routes.ts",
+  "server-version/backend/src/modules/composite/composite.service.ts",
+  "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+  "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+  "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+  "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+  "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+  "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+  "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts",
+  "server-version/backend/src/modules/huiteacher/run.routes.ts",
+  "server-version/backend/src/modules/huiteacher/run.service.ts",
+  "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+  "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+  "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+  "server-version/backend/src/modules/scale/scale-definition.ts",
+  "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+  "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+  "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx",
+  "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+  "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx",
+  "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+  "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+  "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+  "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx",
+  "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx",
+  "server-version/frontend/src/modules/assessment-core/composition/SelectedToolOutline.tsx",
+  "server-version/frontend/src/modules/reporting/EducationPersonalTracking.tsx",
+  "server-version/frontend/src/modules/reporting/__tests__/EducationPersonalTracking.test.tsx",
+  "server-version/frontend/src/pages/ScaleDefinitionEditor.tsx",
+  "server-version/frontend/src/pages/ScaleLongitudinalMetricChoice.tsx",
+  "server-version/frontend/src/pages/scaleDefinitionEditorModel.ts",
+  "server-version/frontend/src/school/SchoolActivityManager.tsx",
+  "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx",
+  "server-version/frontend/src/school/SchoolStudentTasks.tsx"
+],
   ...['prisma/schema.prisma','prisma/migrations/20261030100000_survey_personal_tracking/migration.sql',
     'prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql',
     'src/modules/reporting/personal-tracking.ts','src/modules/survey/personal-tracking.ts',
@@ -44,13 +102,16 @@ const allowed=new Set([
   'docs/development/personal-longitudinal-survey-20261030.md',
   'docs/development/personal-longitudinal-training-20261030.md',
   'docs/development/personal-longitudinal-teacher-20261030.md',
+  'docs/development/personal-longitudinal-school-20261030.md',
+  'docs/development/personal-longitudinal-education-leafs-20261030.md',
+  'docs/development/personal-longitudinal-native-20261030.md',
 ]);
 export function personalTrackingDraftScope(entries,{event,draft,forceFull=false}={}){
   if(event!=='pull_request'||draft!==true||!entries.some(entry=>markers.has(entry.file)))return false;
   if(forceFull)throw new Error('Personal tracking Draft does not authorize full-platform execution');
   if(!entries.every(entry=>entry.newMode==='100644'&&
     (entry.status==='A'&&entry.oldMode==='000000'||entry.status==='M'&&entry.oldMode==='100644')&&
-    (allowed.has(entry.file)||/^docs\/evidence\/personal-longitudinal-(?:20261030|training-20261030|teacher-20261030)\/(?:(?:originals|continuation)\/)?[a-zA-Z0-9_.-]+\.(?:json|log|png)$/.test(entry.file))))
+    (allowed.has(entry.file)||/^docs\/evidence\/personal-longitudinal-(?:20261030|training-20261030|teacher-20261030|school-20261030)\/(?:(?:originals|continuation|leaf-extension|native-extension)\/)?[a-zA-Z0-9_.-]+\.(?:json|log|png)$/.test(entry.file))))
     throw new Error('Personal tracking Draft has unplanned paths or modes; no broad fallback');
   return true;
 }

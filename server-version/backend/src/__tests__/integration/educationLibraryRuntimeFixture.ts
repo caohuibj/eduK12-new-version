@@ -168,7 +168,7 @@ export async function setupEducationLibraryRuntimeFixture(input: {
   const readVersion = async () => (await db.$queryRaw<Array<{ version: number }>>`SELECT version FROM assessment_runs WHERE id=${runId}`)[0].version
   const expectedVersion = await readVersion()
   const preview = async () => previewAssessmentRun({ organizationId, runId, actorUserId: managerUserId, expectedVersion: await readVersion() })
-  const publish = async () => publishAssessmentRun({ organizationId, runId, actorUserId: managerUserId, expectedVersion: await readVersion() })
+  const publish = async (tracking?:unknown) => publishAssessmentRun({ organizationId, runId, actorUserId: managerUserId, expectedVersion: await readVersion(),tracking })
   const executions = () => db.$queryRaw<Array<{ id: string }>>`SELECT e.id FROM assessment_run_executions e
     JOIN assessment_run_actor_snapshots r ON r.id=e.respondent_actor_snapshot_id AND r.run_id=e.run_id AND r.organization_id=e.organization_id
     WHERE e.run_id=${runId} AND e.organization_id=${organizationId} AND r.user_id=${participantUserId} ORDER BY e.id`

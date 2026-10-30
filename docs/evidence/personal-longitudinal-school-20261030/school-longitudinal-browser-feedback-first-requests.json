@@ -1,0 +1,97 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/campus/organizations/f20c4699-4221-4c2b-a0de-add0705511c2/activities",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/organizations/f20c4699-4221-4c2b-a0de-add0705511c2/activities/006f10ad-4de4-409d-a8c1-995c63d1196f",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/organizations/f20c4699-4221-4c2b-a0de-add0705511c2/activities/006f10ad-4de4-409d-a8c1-995c63d1196f/runs/c6fa608b-3839-4e0a-b8d6-4335ae5bd080/tracking",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/my/student-reference",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/my/activity-tasks",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/campus/organizations/f20c4699-4221-4c2b-a0de-add0705511c2/activities/006f10ad-4de4-409d-a8c1-995c63d1196f/runs/c6fa608b-3839-4e0a-b8d6-4335ae5bd080/executions/1a6802ad-e4d8-41fe-86ad-4d63c565b0c9/start",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/composite-attempts/2ea8ed1a-f415-44f1-bcd5-7b110070fa0e",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/composite-attempts/2ea8ed1a-f415-44f1-bcd5-7b110070fa0e/items/95bb847a-00d6-4d17-9eaf-5d729e789b62/scale/assets/9be08252-ae84-43dd-b90a-b79d6113477a/content",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/composite-attempts/2ea8ed1a-f415-44f1-bcd5-7b110070fa0e/items/95bb847a-00d6-4d17-9eaf-5d729e789b62/scale/assets/9be08252-ae84-43dd-b90a-b79d6113477a/content",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/composite-attempts/2ea8ed1a-f415-44f1-bcd5-7b110070fa0e/items/95bb847a-00d6-4d17-9eaf-5d729e789b62/scale/assets/9be08252-ae84-43dd-b90a-b79d6113477a/content",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/composite-attempts/2ea8ed1a-f415-44f1-bcd5-7b110070fa0e/items/95bb847a-00d6-4d17-9eaf-5d729e789b62/scale/assets/9be08252-ae84-43dd-b90a-b79d6113477a/content",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/campus/composite-attempts/2ea8ed1a-f415-44f1-bcd5-7b110070fa0e/items/95bb847a-00d6-4d17-9eaf-5d729e789b62/scale/submit",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/composite-attempts/2ea8ed1a-f415-44f1-bcd5-7b110070fa0e/items/95bb847a-00d6-4d17-9eaf-5d729e789b62/scale/assets/9be08252-ae84-43dd-b90a-b79d6113477a/content",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/composite-attempts/2ea8ed1a-f415-44f1-bcd5-7b110070fa0e",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/reports/student/executions/1a6802ad-e4d8-41fe-86ad-4d63c565b0c9",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/library-scale/executions/1a6802ad-e4d8-41fe-86ad-4d63c565b0c9/report/images/983affcc-1b63-4133-b1ef-c896748784d1",
+    "status": 404
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/my/activity-tasks",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/reports/student/executions/1a6802ad-e4d8-41fe-86ad-4d63c565b0c9",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/campus/library-scale/executions/1a6802ad-e4d8-41fe-86ad-4d63c565b0c9/report/images/983affcc-1b63-4133-b1ef-c896748784d1",
+    "status": 404
+  }
+]

@@ -1,3 +1,4 @@
+import {schoolTrackingOptions} from '../../modules/campus/personal-tracking'
 import type {ScaleDefinitionV2} from '../../modules/scale/scale-definition'
 import { randomUUID } from 'node:crypto'
 import type { PrismaClient } from '@prisma/client'
@@ -12,7 +13,7 @@ import { addTeacherPrivateRunTrack, previewTeacherRun, publishTeacherRun } from 
 /** Synthetic account and storage metadata, real private version freezing/pins,
  * product draft attachment and publication. No fake execution or FINAL. */
 export async function setupPrivateScaleExecutionFixture(db: PrismaClient, product: 'SCHOOL' | 'TEACHER',
-  responseMode: 'SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' = 'SELF', trackCount = 1, prepareDefinition?: (context:PrivateToolContext,toolId:string,definition:ScaleDefinitionV2)=>Promise<void>) {
+  responseMode: 'SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' = 'SELF', trackCount = 1, prepareDefinition?: (context:PrivateToolContext,toolId:string,definition:ScaleDefinitionV2)=>Promise<void>,longitudinal=false) {
   if (!Number.isSafeInteger(trackCount) || trackCount < 1) throw new Error('Positive test track count required')
   const f = await setupEducationLibraryRuntimeFixture({ db, product, responseMode, publisher: 'PSYCHOLOGY', trackCount: 0, publish: false })
   if (product === 'TEACHER') {
@@ -62,11 +63,12 @@ export async function setupPrivateScaleExecutionFixture(db: PrismaClient, produc
         parent: { kind: 'SCHOOL_ACTIVITY', id: f.workflow.id } }, selected))
   }
   const track = tracks[0]
+  const tracking=longitudinal?{mode:'LONGITUDINAL',metrics:(await schoolTrackingOptions({actor:f.manager,organizationId:f.organizationId,courseId:f.workflow.id,runId:f.runId})).choices.map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey}))}:undefined
   await f.open()
   if (product === 'TEACHER') {
     await previewTeacherRun({ ...teacher, expectedVersion: f.expectedVersion + trackCount })
     await publishTeacherRun({ ...teacher, expectedVersion: f.expectedVersion + trackCount })
-  } else { await f.preview(); await f.publish() }
+  } else { await f.preview(); await f.publish(tracking) }
   const [execution] = await f.executions()
   if (!execution) throw new Error('Actual private publication did not create an execution')
   return { ...f, executionId: execution.id, track, privateVersion: version, privateDraft: saved, privateContext: context,

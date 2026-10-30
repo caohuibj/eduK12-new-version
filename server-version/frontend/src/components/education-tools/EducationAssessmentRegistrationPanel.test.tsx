@@ -76,6 +76,20 @@ describe('shared education registration management real client contracts',()=>{
   expect(payload).not.toHaveProperty('approved');expect(screen.queryByLabelText('反馈开放方式')).not.toBeInTheDocument()
   expect(screen.queryByRole('button',{name:'独立审核'})).not.toBeInTheDocument()
  })
+ it('freezes only an explicitly selected own longitudinal subset in the new registration',async()=>{
+  const {api}=setup();await prepare()
+  fireEvent.change(screen.getByLabelText('精确报告 R'),{target:{value:id(7)}})
+  fireEvent.change(screen.getByLabelText('本人披露'),{target:{value:'INDIVIDUAL_SUMMARY'}})
+  const field=within(screen.getByRole('group',{name:'允许本人纵向查看的原始指标'}))
+  expect(field.getByRole('checkbox',{name:'accuracy'})).not.toBeChecked()
+  fireEvent.click(field.getByRole('checkbox',{name:'accuracy'}))
+  fireEvent.change(screen.getByLabelText('反馈开放方式'),{target:{value:'IMMEDIATE'}})
+  fireEvent.click(screen.getByRole('button',{name:'冻结登记为草稿'}))
+  await screen.findByLabelText('冻结登记详情')
+  const input=api.mock.calls.find(([path])=>path.endsWith('/register'))![2]
+  expect(input.disclosure.audiences.RESPONDENT.longitudinalMetricKeys).toEqual(['accuracy'])
+  expect(Object.entries(input.disclosure.audiences).filter(([key])=>key!=='RESPONDENT').every(([,rule])=>(rule as any).longitudinalMetricKeys.length===0)).toBe(true)
+ })
  it('requires an explicit immediate choice and supports pure Form with explicit empty P/R and completion only',async()=>{
   const {api}=setup(path=>path.endsWith('/content-choices')?{emptySelectionAllowed:true,units:[]}:undefined);await prepare()
   expect(screen.getByRole('button',{name:'冻结登记为草稿'})).toBeDisabled()

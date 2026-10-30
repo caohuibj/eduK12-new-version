@@ -1,7 +1,7 @@
 /** Server-only, transaction-bound proof issued after exact education START admission.
  * A serialized product hint cannot select the education SJT runtime path. */
 export interface VerifiedEducationStart { readonly kind: 'VERIFIED_EDUCATION_START' }
-type Facts={tx:object;product:'SCHOOL'|'TEACHER';compositeId:string;assignmentRef:string;subjectUserId?:string;respondentUserId:string;composition?:EducationCompositionPolicyBinding}
+type Facts={tx:object;product:'SCHOOL'|'TEACHER';compositeId:string;assignmentRef:string;subjectUserId?:string;respondentUserId:string;composition?:EducationCompositionPolicyBinding;longitudinal?:boolean}
 const proofs=new WeakMap<object,Facts>()
 export function issueVerifiedEducationStart(facts:Facts):VerifiedEducationStart {
  const origin=facts.composition?.origin
@@ -46,3 +46,11 @@ export function readVerifiedCompositionAttempt(proof:VerifiedEducationAttempt|un
  return facts.composition
 }
 import type {EducationCompositionPolicyBinding} from '../education-tools/private-tool.composition-contracts'
+
+/** Only a real registered longitudinal Run START may use per-parent admission. */
+export function readVerifiedLongitudinalEducationAttempt(proof:VerifiedEducationAttempt|undefined,tx:object,parent:{id:string;compositeAssessmentId:string;assignmentRef:string|null},userId:string|null){
+ if(!readVerifiedEducationAttempt(proof,tx,parent.id,userId))return false
+ const facts=attempts.get(proof!)!
+ if(facts.compositeId!==parent.compositeAssessmentId||facts.assignmentRef!==parent.assignmentRef)throw new Error('EDUCATION_START_CONTEXT_MISMATCH')
+ return facts.longitudinal===true&&!facts.composition
+}
