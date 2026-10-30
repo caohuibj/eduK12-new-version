@@ -299,3 +299,34 @@ export async function resolveTrainingCognitiveProfileForNewTask(tx:Tx,userId:str
  const pin=trainingCognitiveTaskBindingSchema.parse({schemaVersion:1,artifactHash:meta.artifactHash,selectedBinding:pointer})
  return {...await loadPinnedTrainingCognitiveProfile(tx,pin,{userId,configId},true),pin}
 }
+
+/** Management metadata only: no executable-body decrypt on recipient lists. */
+export async function listTrainingCognitiveProfileUses(actorId:string,configId:string,raw:unknown){
+ id.parse(configId);const {userId}=z.object({userId:id}).strict().parse(raw)
+ return prisma.$transaction(async tx=>{
+  await assertEntryAdmin(tx,actorId,'TRAINING')
+  const rows=await tx.$queryRaw<Array<{id:string;metadata:unknown}>>`SELECT e.id,e.metadata FROM assessment_management_events e
+   WHERE e.action=${TRAINING_COGNITIVE_USE_ACTION} AND e.resource_id=${configId} AND e.metadata->>'userId'=${userId}
+   ORDER BY e.created_at DESC,e.id DESC LIMIT 51`
+  const grants=await tx.contentCapabilityGrant.findMany({where:{id:{in:rows.map(row=>row.id)}}})
+  return {hasMore:rows.length>50,list:rows.slice(0,50).map(row=>{
+   const meta=receipt(row.metadata,row.id,configId),grant=grants.find(g=>g.id===row.id)
+   if(!grant)conflict('原认知配置使用权缺失');grantMatches(grant,meta,configId)
+   return {id:grant.id,version:grant.version,userId,issuerId:grant.issuerId,configurationName:meta.configurationName,
+    profile:meta.requestIntent.profile,artifactHash:meta.artifactHash,selectedBinding:selectedConfigurationPointer(meta.selectedBinding),
+    validFrom:grant.validFrom,expiresAt:grant.expiresAt,revokedAt:grant.revokedAt,canManage:grant.issuerId===actorId}
+  })}
+ },options)
+}
+export async function previewTrainingCognitiveProfile(actorId:string,configId:string,selected:unknown,raw:unknown){
+ const {artifactHash}=z.object({artifactHash:hash}).strict().parse(raw)
+ return prisma.$transaction(async tx=>{
+  await assertEntryAdmin(tx,actorId,'TRAINING')
+  const {artifact}=await readApprovedTrainingCognitiveArtifact(tx,configId,selected,artifactHash)
+  const report=artifact.resolvedReport
+  return {artifactHash,configuration:artifact.identity,reportStyle:{title:report.reportDefinition.title??'本次任务表现报告',
+   profile:artifact.identity.profile,caveats:report.reportCaveats??[],disclaimer:report.reportDefinition.disclaimer??'',
+   headline:report.reportDefinition.primaryMetrics.map(key=>({key,label:(report.metricDefinitions[key] as {label?:string})?.label??key})),
+   detail:report.reportDefinition.secondaryMetrics.map(key=>({key,label:(report.metricDefinitions[key] as {label?:string})?.label??key}))}}
+ },options)
+}

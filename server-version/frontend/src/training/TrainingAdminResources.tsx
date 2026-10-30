@@ -7,6 +7,7 @@ import {useStaffFeedback} from '../components/staff-ui/useStaffFeedback'
 import TrainingResourceActions from './TrainingResourceActions'
 const MaterialGrants=lazy(()=>import('../pages/admin/MaterialGrants'))
 const TrainingStandardConfigurationGrants=lazy(()=>import('./TrainingStandardConfigurationGrants'))
+const TrainingCognitiveProfileGrants=lazy(()=>import('./TrainingCognitiveProfileGrants'))
 const labels={SCALE:'量表',COGNITIVE_CONFIG:'认知配置',ASSESSMENT_BUNDLE:'固定测评包'}
 const statusName=(status:string)=>({PUBLISHED:'已发布',DRAFT:'草稿',DEPRECATED:'已停用',ARCHIVED:'已归档'}[status]||status)
 const errorMessage=(cause:unknown)=>cause&&typeof cause==='object'&&'message'in cause?String(cause.message):'读取失败，请重试'
@@ -74,9 +75,9 @@ function ResourceCatalog({pageTitle,navigation}:{pageTitle:string;navigation:Rea
  </section></>
 }
 export default function TrainingAdminResources({pageTitle="资源与授权"}:{pageTitle?:string}={}){
- const [view,setView]=useState<'catalog'|'grants'|'standard'>('catalog')
- const navigation=<div className="training-resource-views" role="group" aria-label="资源与授权视图">{([['catalog','资源目录'],['standard','固定量表配置'],['grants','使用授权']] as const).map(([key,label])=><button type="button" key={key} aria-pressed={view===key} onClick={()=>setView(key)}>{label}</button>)}</div>
+ const [view,setView]=useState<'catalog'|'grants'|'standard'|'cognitive'>('catalog')
+ const navigation=<div className="training-resource-views" role="group" aria-label="资源与授权视图">{([['catalog','资源目录'],['standard','固定量表配置'],['cognitive','固定认知配置'],['grants','使用授权']] as const).map(([key,label])=><button type="button" key={key} aria-pressed={view===key} onClick={()=>setView(key)}>{label}</button>)}</div>
  return <div className="training-resource-management">
-  {view==='catalog'?<ResourceCatalog pageTitle={pageTitle} navigation={navigation}/>:<><header className="training-management-page-heading training-course-page-heading"><h1>{pageTitle}</h1></header>{navigation}<Suspense fallback={<p role="status">正在读取授权管理…</p>}>{view==='standard'?<TrainingStandardConfigurationGrants/>:<MaterialGrants training/>}</Suspense></>}
+  {view==='catalog'?<ResourceCatalog pageTitle={pageTitle} navigation={navigation}/>:<><header className="training-management-page-heading training-course-page-heading"><h1>{pageTitle}</h1></header>{navigation}<Suspense fallback={<p role="status">正在读取授权管理…</p>}>{view==='standard'?<TrainingStandardConfigurationGrants/>:view==='cognitive'?<TrainingCognitiveProfileGrants/>:<MaterialGrants training/>}</Suspense></>}
  </div>
 }

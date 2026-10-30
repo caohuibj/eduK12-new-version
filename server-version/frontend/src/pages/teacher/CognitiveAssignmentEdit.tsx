@@ -150,7 +150,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
         description={(
           <span className="flex flex-wrap items-center gap-2">
             <span>{statusLabel[detail.status] || detail.status}{detail.config?.name ? ` · ${detail.config.name}` : ''}</span>
-            {isWrapper && <span className="staff-badge">综合测评用</span>}
+            {isWrapper && <span className="staff-badge">综合测评用</span>}{detail.profileLocked&&<span className="staff-badge">{detail.configurationName||'管理员固定配置'}</span>}
           </span>
         )}
         actions={(
