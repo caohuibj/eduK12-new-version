@@ -198,16 +198,16 @@
       "schemaVersion": 1,
       "pr": 414,
       "enabled": false,
-      "base": "55fab18e9933e58dcb800b20156f5b7e48858536",
-      "product": "d2a820ced8695bdf0e5ae5d045379c6d5f1958c0",
-      "controlCheckpoint": "4ec8dca99e622eef203532aef866644f5fe523bc",
+      "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+      "product": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+      "controlCheckpoint": "c81e11ccda2a006949dd7c91f084fb75b4cf953e",
       "components": {
-        "backend": "95198c4740897cb76e4fddb8db8dbd78a232f1e7",
-        "frontend": "7db01e8ff09cd4f5865e99fbb0438f2f4ff6caea"
+        "backend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+        "frontend": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8"
       },
       "controlBefore": {
-        ".github/scripts/content-scope.mjs": "2e1dde28b2d1269b2c7565df7c9bae17764e85c5",
-        ".github/scripts/merge-gate.mjs": "9fcd7c78ed892066bb84bd9975bfdc9e7523776c",
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
         ".github/scripts/onboarding-bindings.json": "1737eb2322da2046b11ab546a8d6620a20f38d66",
         ".github/scripts/onboarding-checks.mjs": "923e0eb5a317e587b5eed0f0c7416be5822f758a",
         ".github/scripts/onboarding-controls.test.mjs": "8e47a7f0d5a2a80a349a13c69ecaa044be43589f",
@@ -222,12 +222,12 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "eb1f0c922943a942d08585378d05fd2d9c017847"
+        ".github/workflows/ci.yml": "574f24bb2eee4b7528cdb38ea506dc1472429c1b"
       },
       "source": {
         "docs/development/group-report-school-20261030.md": {
           "before": null,
-          "after": "58e8debad9b65e230f75f101382e9f3397145384"
+          "after": "128f9b070513f836fceca053a56678b8fd2c7eeb"
         },
         "docs/evidence/group-report-school-20261030/backend-delta.json": {
           "before": null,
@@ -429,9 +429,41 @@
           "before": null,
           "after": "5965fe51febf73c42f0b40c68ad97e8b160cc450"
         },
+        "docs/evidence/group-report-school-20261030/mainfa/backend-types.json": {
+          "before": null,
+          "after": "403a1393eec936bf2a45c1161b09198274386c3f"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/frontend-types.json": {
+          "before": null,
+          "after": "772ef35d831729006a0850582569da92ca77cf1c"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/prisma-generate.log.gz": {
+          "before": null,
+          "after": "125942b82a0e115a7932d5bc5fb1259127d602f3"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/qualification-plan.json": {
+          "before": null,
+          "after": "9421e08379e8ed21880447a3f135d3830a7414c2"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/receipt-review.json": {
+          "before": null,
+          "after": "1799f86e018d7b84202c385d5834028c21bb666a"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/source-diff.raw": {
+          "before": null,
+          "after": "a267e9779f8b3ecd8323b6c893e4ca1d54fbd30c"
+        },
         "docs/evidence/group-report-school-20261030/manifest.json": {
           "before": null,
-          "after": "8b8db7fcfa786c0f57064d61198d08437d462ba9"
+          "after": "29c1103b185939d7a85ffa211fc854dbb94cb8bd"
         },
         "docs/evidence/group-report-school-20261030/postgres-continuation.json": {
           "before": null,
@@ -634,7 +666,7 @@
           "after": "24f7d521a70de4e058f382a62623cd1039045d49"
         }
       },
-      "activationNote": "Prepared exact School candidate under existing autonomous qualification authorization. Disabled until binding self-review, designated checklist read and live base/head/merge identity are complete. No application replay, new workflow, merge or deployment."
+      "activationNote": "Exact mainfa School source/control/evidence preparation; candidate disabled pending final actual source binding check, designated checklist and live PR identity before activation. Two new source cases and one control case only, original41 observations read without business replay; both current combined component compilers passed. No new workflow, merge or deployment."
     },
     "393": {
       "schemaVersion": 1,
