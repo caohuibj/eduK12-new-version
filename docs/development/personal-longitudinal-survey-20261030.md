@@ -359,3 +359,26 @@ School explicit-source subset configuration is an authorized following slice:
 a permitted publisher may select only originally permitted own numeric metrics,
 freeze them into a new source/task, and preserve old contracts/completion-only.
 It does not change this frozen first candidate.
+
+### First official activation: workflow definition rejected
+
+Source f4647a7aa produced workflow-level failure 41026381661, attempt1, eventpush,
+with no runnable jobs/check-run annotations; publication 41026390424 succeeded.
+No migration, image, audit, types or SAST ran. `gh run view` identifies a workflow
+file issue. The CodeQL config expression grew from 20,768 to 21,201 characters;
+Actions' expression parser defines MaxLength=21,000 in its primary source:
+https://github.com/actions/runner/blob/main/src/Sdk/DTExpressions2/Expressions2/ExpressionConstants.cs
+This identifies an independently reproducible definition defect; GitHub did not
+provide a more specific annotation through the available run/check-suite APIs.
+
+The personal CodeQL paths now come from a short existing-style config-output
+step. The longest expression is 20,815; Actionlint and the explicit length guard
+pass. Only workflow configuration changed; original application cases and the
+three admission/gate contracts are not replayed. Raw first failure and new
+preflight records are retained in continuation evidence.
+
+A separate mark-ready tool call returned isError=true. Its detailed error text
+was not retained in the concise output; readback confirms PR399 remains Draft,
+so no Ready qualification is claimed. This state transition is not retried via
+another interface. Missing Ready jobs remain NOTRUN pending resolution of that
+specific operation; ordinary independent work may continue.
