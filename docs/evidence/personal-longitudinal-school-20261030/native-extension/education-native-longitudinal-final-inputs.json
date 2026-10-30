@@ -1,0 +1,20 @@
+{
+  "capturedBeforeTypesAt": "2026-10-30T12:02:50.167365+00:00",
+  "head": "59817c57739502cd5941a19cd67d25ee87f38555",
+  "indexTree": "02ea947e407aeae9592fe97cdb5c54580008415c",
+  "changedBlobs": {
+    "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts": "c67f7af4eed24c9077dbeeb95607b7b46446e461",
+    "server-version/backend/src/__tests__/integration/educationNativeLongitudinal.postgres.integration.test.ts": "563987c89a05086e03a88eae3a09eae3c38a6f7b",
+    "server-version/backend/src/modules/assessment-run/education-start-context.ts": "2a2a0672e9a2855db27dc572de7b93c3c17f76ee",
+    "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts": "b88589e5ecfb7107b5f387af2b78d9271b74a700",
+    "server-version/backend/src/modules/composite/composite.service.ts": "4476074c3e87983510288151e8293c473c654a53",
+    "server-version/backend/src/modules/education-tools/native-source.cognitive.ts": "43a5bbe2d0fbb5ac62fae4943b6cb1686e0c040c"
+  },
+  "backendPrismaTree": "eeeafc08104fd303620a5a8fbf069b6599c4c87f",
+  "locks": {
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d"
+  },
+  "testProvenance": "PG/nonce reporters executed before this final capture; not signed pre-execution full-environment manifests. No source edits between successful nonce/PG reports and this capture. Early failed fixture versions not recreated."
+}

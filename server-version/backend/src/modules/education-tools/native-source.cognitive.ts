@@ -88,7 +88,8 @@ export async function materializeEducationCognitive(tx:Prisma.TransactionClient,
 
 /** A fixed source can be assigned in several legitimate Runs. The real parent
  * assignment admits one native child per slot/epoch; it does not spend a global
- * Training wrapper quota. Only the same-transaction START nonce can select this
+ * Training wrapper quota. Registered sources require a configured longitudinal
+ * Run; ordinary single/standalone quotas remain unchanged. Only the same-transaction START nonce can select this
  * scope. A source marker or a copied object cannot grant it. */
 export async function admitEducationNativeCognitive(tx:Prisma.TransactionClient,input:{proof:VerifiedEducationAttempt|undefined;
  parent:{id:string;compositeAssessmentId:string;attemptEpoch:number;userId:string|null;subjectUserId:string|null;respondentUserId:string|null;assignmentRef:string|null;trainingContentBinding:unknown};
