@@ -11,7 +11,7 @@
     ".github/scripts/personal-tracking-draft-scope.mjs": "c4006f5298cdbc2ac69f1c1c9f2c769c1dd65114a3a1d0d875f77e32ab664c58",
     "server-version/backend/src/modules/assessment-run/publish.ts": "e460ad105712af15f36e3ab594ea02169a4e73a498114071899e1dae387dfbc5",
     "server-version/backend/src/modules/assessment-run/repository.ts": "e8a370506a66cad3c92bba90be81bc9cdee7d4ca6ef39f16cdd32396a868d605",
-    "server-version/backend/src/modules/assessment-run/run.controller.ts": "73d8278e8c9b217290c1cbc3631561686b1ab3c376b3c38c05254af235d9c0e2",
+    "server-version/backend/src/modules/assessment-run/run.controller.ts": "9aff0d901f843ebd82863f7efbd59ea1d5052f8571ccfad9659fd1b308837bae",
     "server-version/backend/src/modules/huiteacher/evaluation.service.ts": "f9a426a01541eca23a88f5624e2bd6f1a0759a087eacd151eb0013ffc040db7d",
     "server-version/backend/src/modules/huiteacher/run.routes.ts": "b7b8f0e25275c66e7ab151c51a9b9570c195d0aed21ba6eaf3b81e46a5dd2582",
     "server-version/backend/src/modules/huiteacher/run.service.ts": "f658fedf90f7bf631169e26740986b3cc4510d7d81494673df67b6a3e8eccac8",
@@ -20,8 +20,8 @@
     "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx": "69b4eba2f9ac6eae986363c74bee551c0cc439ca273e1a77347cb1f9774a289c",
     "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql": "ee636ec6949c116174c943e86413fae4d380a62bdd26562fa15b16b9a5936875",
     "server-version/backend/src/modules/reporting/education-personal-tracking.ts": "cf191a2625ec5b482073c0efcf76ef2caf948709014539c07ac282386034cbd1",
-    "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": "35a35da2b4ece5fa30ddff69315df3574ff8b69a9b924298f7f5981cca0f45df",
-    "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts": "09359063cb408dbd85b5037350ba122b7ef4de61cd121925b1875998a46ca332",
+    "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": "c96e2f7133056a32c4eb30554e62fb992f20c91036630dbe4331eb31f8574b8c",
+    "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts": "600c7aa3327c8d5cd57133147305a8ba2981c234a69f6bae498832ebcd8a1140",
     "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts": "44480be4344f713f37ec46be6110df53dcb541dbce7c9cbcece2de1ad679a7fd",
     "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx": "24ad991a277c8ff102398bde0d25e2d98d85406a9162d0c0f7bf991d078fb8e4"
   },
@@ -50,7 +50,9 @@
     "education-frontend-lint.log": "ae5125e890561af48d1ebc73b6b4d6dff172eef51220d63296f3f3081fb6e215",
     "education-control-test.log": "fabdd420ae8e9d4dddaa53ff4bcba4c1dbfc259ebee71b9b16eeb32696f83e4b",
     "education-migrate.log": "dc5a1a5d0b137e97c57173d5757c97a86ea7f371629c249d25945796a57fd6bb",
-    "full-diff-scope.json": "074f9352cd64ca3d648ba34cd961b7c65c657085c88b6dd7d9b4940768f3b98b"
+    "full-diff-scope.json": "074f9352cd64ca3d648ba34cd961b7c65c657085c88b6dd7d9b4940768f3b98b",
+    "teacher-longitudinal-bounded-read.json": "a57a785abe88459e43b10a9917bb8b7bdc06f8771ce08b1c203324558d54a86a",
+    "teacher-longitudinal-bounded-read.log": "86764bc7ca5b2a58b39e82daa1450860a34598bccef70683293d63c99237976c"
   },
   "environment": {
     "node": "24.21.0",
@@ -64,10 +66,11 @@
     "invariants": "PASS1: published Teacher Run tracking immutable and own execution snapshots append-only",
     "browser": "PASS1 across retained stages. Original browser really created/published native T3 and started own attempt, then exact-text selector missed required-marker suffix. Resume reuses same T3/attempt; no repeat publish or new attempt. Three browser responses accepted, own single6 plus [3,9,6], adjacent -3. Original screenshots/requests/failure retained.",
     "control": "PASS1 new exact-path Teacher Draft case, Ready/unknown/force-full still refused",
-    "types": "backend tsc --noEmit EXIT0, frontend tsc -p tsconfig.app.json --noEmit EXIT0; root frontend empty references-only tsc was setup-only, not qualification",
+    "types": "backend types, actual frontend app types and lint qualified 65fa source input. Follow-up changes only tracked-task SQL predicate/stable leaf sort and restores generic controller to dbcc. Targeted retained-T3 PostgreSQL read PASS on changed reader; no repeat full types/application suite.",
     "lint": "affected frontend ESLint EXIT0, one existing scopeGeneration ref cleanup warning at HuiteacherEvaluationStudio.tsx:141",
-    "distinctSuccessfulCases": 4,
-    "whitespace": "Code/document diff --check passed; original raw lint/migration logs retain original trailing whitespace rather than rewriting evidence."
+    "distinctSuccessfulCases": 5,
+    "whitespace": "Code/document diff --check passed; original raw lint/migration logs retain original trailing whitespace rather than rewriting evidence.",
+    "boundedFollowup": "One PG retained-T3 read PASS: filter tracked task before SQL LIMIT, deterministic ordinal snapshot ordering, unchanged own [3,9,6] and repeat cached response. No publication/answer/browser replay. Generic Run controller remains byte-identical to prerequisite dbcc; Teacher publication uses the product service."
   },
   "notRun": [
     "School closure: no existing eligible SELF source with longitudinal disclosure",
@@ -75,5 +78,36 @@
     "old Survey31, Training32, formula/trial suites and full platform",
     "Teacher formal CI/Ready, exact main migration/native restore, image/security/CodeQL, merge/deploy"
   ],
-  "acceptance": "Development evidence, not signed admission or merge qualification. PR remains Draft."
+  "acceptance": "Development evidence, not signed admission or merge qualification. PR remains Draft.",
+  "inputEpochs": [
+    {
+      "head": "65fae0086a36aa58e7e53e7bddf35cda0a8dbad9",
+      "sourceHashes": {
+        ".github/scripts/content-scope.test.mjs": "bd4df8cb398e407f13a7e293fdcb66c0f0375fefd10bfaf1f566b11e27d8d6e7",
+        ".github/scripts/personal-tracking-draft-scope.mjs": "c4006f5298cdbc2ac69f1c1c9f2c769c1dd65114a3a1d0d875f77e32ab664c58",
+        "server-version/backend/src/modules/assessment-run/publish.ts": "e460ad105712af15f36e3ab594ea02169a4e73a498114071899e1dae387dfbc5",
+        "server-version/backend/src/modules/assessment-run/repository.ts": "e8a370506a66cad3c92bba90be81bc9cdee7d4ca6ef39f16cdd32396a868d605",
+        "server-version/backend/src/modules/assessment-run/run.controller.ts": "73d8278e8c9b217290c1cbc3631561686b1ab3c376b3c38c05254af235d9c0e2",
+        "server-version/backend/src/modules/huiteacher/evaluation.service.ts": "f9a426a01541eca23a88f5624e2bd6f1a0759a087eacd151eb0013ffc040db7d",
+        "server-version/backend/src/modules/huiteacher/run.routes.ts": "b7b8f0e25275c66e7ab151c51a9b9570c195d0aed21ba6eaf3b81e46a5dd2582",
+        "server-version/backend/src/modules/huiteacher/run.service.ts": "f658fedf90f7bf631169e26740986b3cc4510d7d81494673df67b6a3e8eccac8",
+        "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts": "78426c56339850fe99a8df8422d473e053157cb45233db266f09807b1d23b366",
+        "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": "90e30c58d04f0a8c05c6f9f674e2005392410da983ced6956c93a39b544e73a6",
+        "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx": "69b4eba2f9ac6eae986363c74bee551c0cc439ca273e1a77347cb1f9774a289c",
+        "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql": "ee636ec6949c116174c943e86413fae4d380a62bdd26562fa15b16b9a5936875",
+        "server-version/backend/src/modules/reporting/education-personal-tracking.ts": "cf191a2625ec5b482073c0efcf76ef2caf948709014539c07ac282386034cbd1",
+        "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": "35a35da2b4ece5fa30ddff69315df3574ff8b69a9b924298f7f5981cca0f45df",
+        "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts": "09359063cb408dbd85b5037350ba122b7ef4de61cd121925b1875998a46ca332",
+        "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts": "44480be4344f713f37ec46be6110df53dcb541dbce7c9cbcece2de1ad679a7fd",
+        "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx": "24ad991a277c8ff102398bde0d25e2d98d85406a9162d0c0f7bf991d078fb8e4"
+      },
+      "qualifiedCases": [
+        "native retained PG",
+        "immutability",
+        "browser native T3",
+        "Draft control"
+      ],
+      "types": "backend/frontend types and affected lint at 65fa input"
+    }
+  ]
 }

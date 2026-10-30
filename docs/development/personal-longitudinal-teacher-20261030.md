@@ -103,3 +103,17 @@ are present, but these Teacher sources are not declared completed or opened by
 this batch. No scoring/report wording/scientific review or real permission was
 changed to manufacture eligibility. Group longitudinal, Profile trends,
 tool-specific narratives and production activation remain outside this batch.
+
+
+## Bounded read follow-up
+
+After the 65fa development checkpoint, the own wave query now filters to the
+tracked task before its 101-row bound. Untracked tasks therefore cannot consume
+the wave budget. Leaf inputs are sorted by wave ordinal before hashing, preserving
+stable encrypted-cache identity. One retained-T3 PG case passed on the changed
+reader: [3,9,6] plus equal cached response, no repeated publication or answers.
+This makes five distinct successful cases across retained stages. The generic
+Run publish controller is byte-identical to prerequisite dbcc; the Teacher product
+service owns this optional publication field. Types/lint remain qualified at
+65fa inputs; this follow-up is qualified by the selected actual-PG read. It does
+not relabel earlier browser/type output as a new execution.

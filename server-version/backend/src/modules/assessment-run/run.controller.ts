@@ -56,7 +56,7 @@ const addTrackSchema = z.object({
   requestedPolicy: policySchema,
 })
 const educationTrackSchema=addTrackSchema.strict().refine(value=>value.expectedVersion!==undefined&&value.expectedRunId!==undefined,{message:'固定教育测评必须绑定当前任务批次和版本'})
-const publishSchema = z.object({ expectedVersion: z.number().int().min(1),tracking:z.unknown().optional() })
+const publishSchema = z.object({ expectedVersion: z.number().int().min(1) })
 const listRunSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(50),
@@ -234,7 +234,6 @@ export const assessmentRunController = {
         runId: req.params.runId,
         actorUserId: req.user.userId,
         expectedVersion: parsed.data.expectedVersion,
-        tracking:parsed.data.tracking,
       }))
     } catch (err) { return fail(res, err) }
   },

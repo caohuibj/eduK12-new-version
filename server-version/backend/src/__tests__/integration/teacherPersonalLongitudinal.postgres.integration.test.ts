@@ -228,4 +228,16 @@ await import('node:fs/promises').then(fs=>fs.writeFile('/tmp/teacher-longitudina
   await expect(db.$executeRaw`UPDATE assessment_run_executions SET personal_changes_snapshots='{}'::jsonb WHERE id=${fixture.executionId}`).rejects.toThrow('Personal changes snapshots are append-only')
  },30000)
 
+ ;(process.env.TEACHER_TRACKING_PROJECTION_ONLY==='true'?it:it.skip)('reads retained native T3 with tracked-task bounds and stable cached ordering',async()=>{
+  const fixture=JSON.parse(await import('node:fs/promises').then(fs=>fs.readFile('/tmp/teacher-longitudinal-fixture.json','utf8')))
+  const [row]=await db.$queryRaw<Array<{id:string}>>`SELECT e.id FROM assessment_run_executions e JOIN assessment_runs run ON run.id=e.run_id AND run.organization_id=e.organization_id
+   JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id AND subject.user_id=${fixture.teacherId}
+   WHERE run.organization_id=${fixture.organizationId} AND run.personal_tracking_ordinal=3 AND run.personal_tracking_baseline_id=(SELECT personal_tracking_baseline_id FROM assessment_runs WHERE id=(SELECT run_id FROM assessment_run_executions WHERE id=${fixture.executionId})) AND e.status='COMPLETED'`
+  expect(row).toBeTruthy()
+  const proof={actorUserId:fixture.teacherId,executionId:row.id},report=await readTeacherPersonalChanges(proof)
+  expect(report.status).toBe('AVAILABLE')
+  if(report.status==='AVAILABLE')expect(report.metrics[0].points.map(p=>p.value)).toEqual([3,9,6])
+  expect(await readTeacherPersonalChanges(proof)).toEqual(report)
+ },30000)
+
 })

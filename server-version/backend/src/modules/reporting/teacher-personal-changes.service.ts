@@ -31,7 +31,7 @@ export async function readTeacherPersonalChanges(input:{actorUserId:string;execu
    JOIN users person ON person.id=${input.actorUserId} AND person.account_domain='SCHOOL' AND person.role IN ('TEACHER','ADMIN') AND person.teacher_approved AND person.is_active AND NOT person.is_frozen
    WHERE e.status NOT IN ('REVOKED','CANCELLED') AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`,'REPORT_READ')}
     AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=e.organization_id AND d.user_id=${input.actorUserId} AND d.lifted_at IS NULL AND d.permission IN ('*','REPORT_READ','PARTICIPANT_REPORT_READ'))
-    AND ${baselineId?Prisma.sql`run.personal_tracking_baseline_id=${baselineId}`:Prisma.sql`e.id=${input.executionId}`}
+    AND ${baselineId?Prisma.sql`run.personal_tracking_baseline_id=${baselineId} AND EXISTS(SELECT 1 FROM jsonb_array_elements(run.personal_tracking->'bindings') chosen WHERE chosen->>'trackId'=e.track_id)`:Prisma.sql`e.id=${input.executionId}`}
    ORDER BY run.personal_tracking_ordinal,e.id LIMIT 101`)
   const end=(await read())[0]
   if(!end)denied()
@@ -67,6 +67,7 @@ export async function readTeacherPersonalChanges(input:{actorUserId:string;execu
   })
   const leaves=await readTrainingPersonalLeafs(tx,{scopedSubjectId:end.organizationId+':'+input.actorUserId,plan:plan!,parents:adapted})
   for(const leaf of leaves){const parent=parents.find(p=>p.id===leaf.attemptId)!;leaf.waveId=eligible.find(w=>w.assignmentId===parent.assignmentRef)!.runId}
+  leaves.sort((a,b)=>a.ordinal-b.ordinal)
   await tx.$queryRaw`SELECT id FROM assessment_run_executions WHERE id=${input.executionId} FOR UPDATE`
   const sourceHash=canonicalHash({kind:'TEACHER_PERSONAL_CHANGES_V1',plan,subject:input.actorUserId,organizationId:end.organizationId,waves,leaves})
   const [cached]=await tx.$queryRaw<Array<{cipher:string|null}>>`SELECT personal_changes_snapshots->>${sourceHash} AS cipher FROM assessment_run_executions WHERE id=${input.executionId}`
