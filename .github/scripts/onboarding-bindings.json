@@ -2552,6 +2552,128 @@
       },
       "activationNote": "Existing backend-only fixed route419;frontend exactly base,one current backend compiler receipt and original4 real passed cases/2 native observations reused unsigned. No old app/PG/browser/shared calculation replay. Existing scope/admission/CodeQL/gate only,no new workflow,no merge/deploy."
     },
+    "420": {
+      "schemaVersion": 1,
+      "pr": 420,
+      "enabled": true,
+      "base": "9f135a2ce45f0223d39b48ea8797310a81a63970",
+      "product": "dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1",
+      "controlCheckpoint": "0160a792e913446481ae2dee755a6d55105ed187",
+      "components": {
+        "backend": "b1c57bf9195379ba0e45e59f9320a7411eb8b068",
+        "frontend": "8d7f9214106aa965d1379b75464136d7cc5b90e5"
+      },
+      "source": {
+        "docs/evidence/personal-chart-loading-20261030/README.md": {
+          "before": null,
+          "after": "6cc65ba501e06b1a85273325cb29457b074279c2"
+        },
+        "docs/evidence/personal-chart-loading-20261030/backend-types-dependencies.log": {
+          "before": null,
+          "after": "322bef635a8b36ffcd992fb2644f74958edd0505"
+        },
+        "docs/evidence/personal-chart-loading-20261030/frontend-install-writable-cache.log": {
+          "before": null,
+          "after": "9a2a1c8e18ae022102623f30d6d31b3c1641dd69"
+        },
+        "docs/evidence/personal-chart-loading-20261030/frontend-install.log": {
+          "before": null,
+          "after": "ead31a31b8a5f17e7c9b9ca0b32e1db7788f6d2e"
+        },
+        "docs/evidence/personal-chart-loading-20261030/frontend-types-qualified.json": {
+          "before": null,
+          "after": "d53718d584873e894c40a6e21fc0297476d8592c"
+        },
+        "docs/evidence/personal-chart-loading-20261030/frontend-types-qualified.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/personal-chart-loading-20261030/frontend-types.json": {
+          "before": null,
+          "after": "b84392c74e86f9cff0c18dae0fa326d1cd91b496"
+        },
+        "docs/evidence/personal-chart-loading-20261030/frontend-types.log": {
+          "before": null,
+          "after": "a006f6645ddf3ebfb161a113a03b42a9794be674"
+        },
+        "docs/evidence/personal-chart-loading-20261030/official-artifact.json": {
+          "before": null,
+          "after": "ef573add95a6cde8940baa7a540046dc232bc6cc"
+        },
+        "docs/evidence/personal-chart-loading-20261030/official-build-files.json": {
+          "before": null,
+          "after": "1e401a705ffe680975a723b8388a6b09090d8697"
+        },
+        "docs/evidence/personal-chart-loading-20261030/official-build-receipt.json": {
+          "before": null,
+          "after": "503303a9326f5ee091a94ea4a77d489b40eb7de0"
+        },
+        "docs/evidence/personal-chart-loading-20261030/official-job-124156942109.json": {
+          "before": null,
+          "after": "0ab9791d7bf5da49ffbc321ea32411539db79ee2"
+        },
+        "docs/evidence/personal-chart-loading-20261030/official-job-124156942591.json": {
+          "before": null,
+          "after": "9811d2f6cf7cee924def13506df07347ed7b27e1"
+        },
+        "docs/evidence/personal-chart-loading-20261030/official-jobs.json": {
+          "before": null,
+          "after": "2bdbe94e524e525e4af26f68dedc5b06f143c7c5"
+        },
+        "docs/evidence/personal-chart-loading-20261030/official-run.json": {
+          "before": null,
+          "after": "b98bcf3b67479dde98acc90bb40accfad7ec674c"
+        },
+        "docs/evidence/personal-chart-loading-20261030/original-ci-build-job-124156942109.log": {
+          "before": null,
+          "after": "9a9ca48fb7c1d3dfefb03fad311dbd66eec09f3c"
+        },
+        "docs/evidence/personal-chart-loading-20261030/original-ci-frontend-job-124156942591.log": {
+          "before": null,
+          "after": "cf91ff35a5bc3bb71543de8ec32b4f02f580f444"
+        },
+        "docs/evidence/personal-chart-loading-20261030/report-tests-results.json": {
+          "before": null,
+          "after": "46073ab1c0429b975f4f1e31fd09adbab3f920d3"
+        },
+        "docs/evidence/personal-chart-loading-20261030/report-tests.json": {
+          "before": null,
+          "after": "1e0ec6959eccdd924b87484993de23438a576aed"
+        },
+        "docs/evidence/personal-chart-loading-20261030/report-tests.log": {
+          "before": null,
+          "after": "df3f5849d1b74a78edf1b5d1f1d5f6f01530a95f"
+        },
+        "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx": {
+          "before": "bccd7ad9c0d7110269c42e48d4781c9203f4102e",
+          "after": "ddb175e5c2156aad911852e2d62d63d3e6b24adf"
+        },
+        "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx": {
+          "before": null,
+          "after": "3f9531643258b4d5b5c23bba95c94a87f0868adf"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "5e933d8a97eed22958b8ccf7a0a02c4fa4ac491c",
+        ".github/scripts/onboarding-checks.mjs": "db72eb2ff31d0c3184f210367983087182234a14",
+        ".github/scripts/onboarding-controls.test.mjs": "2f8ef48f9e067b290a3ab74f6445e881cf950410",
+        ".github/scripts/onboarding-evidence.json": "dabc5e7de46004846d32144f307b14728703fb64",
+        ".github/scripts/onboarding-scope.mjs": "5fdfedd6047392b75ff4a212e3fe015ee0060478",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "a15031034ac5349fb7569a85e02ea5f88fa1d33a"
+      },
+      "activationNote": "Root independent review: bounded GO for exact recovered PR420 candidate. User 2026-10-30 22:42 explicitly authorized the 28-file upload, PR description update and limited CI on the original branch, not merge or deployment. Actual unsigned local execution remains f4fa39bd; remote product dbb76d has its identical full tree. Recovered original official run41082809728 attempt1 remains cancelled: admit only authenticated successful build/lint steps and exact artifact, plus fresh four direct cases and app types. Existing scope/admission/scoped frontend-control CodeQL/stable gate only; no app rebuild, browser, PG or platform suite. Original failures and unavailable old local measurements remain disclosed."
+    },
     "task1": {
       "schemaVersion": 1,
       "pr": "task1",
@@ -4095,23 +4217,23 @@
       "schemaVersion": 1,
       "pr": 422,
       "enabled": true,
-      "base": "9f135a2ce45f0223d39b48ea8797310a81a63970",
-      "product": "49538293f19cc8dea5d1d2df5292906d5e483a0e",
+      "base": "0a9c565ce9a46793363fd1b40a3e7a0b1d124019",
+      "product": "676063e8989b8119fbae176d99dcbd0c8c331a97",
       "controlCheckpoint": "78cb9322f89abc6167424cdae192c109cf27ade7",
       "components": {
         "backend": "3981ae7a7afa5716834f69315b708075b93c6c76",
-        "frontend": "c444887f09c20c27d7ffbdd9a115786b65554a68"
+        "frontend": "8d7f9214106aa965d1379b75464136d7cc5b90e5"
       },
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
         ".github/scripts/group-report-draft.mjs": "4d4f3723852831f5658cedca7581c8db6f5d903b",
         ".github/scripts/group-report-draft.test.mjs": "74fd84665dfb994ec7474fdaebf24ca38b806ced",
         ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "5e933d8a97eed22958b8ccf7a0a02c4fa4ac491c",
-        ".github/scripts/onboarding-checks.mjs": "db72eb2ff31d0c3184f210367983087182234a14",
-        ".github/scripts/onboarding-controls.test.mjs": "2f8ef48f9e067b290a3ab74f6445e881cf950410",
-        ".github/scripts/onboarding-evidence.json": "dabc5e7de46004846d32144f307b14728703fb64",
-        ".github/scripts/onboarding-scope.mjs": "5fdfedd6047392b75ff4a212e3fe015ee0060478",
+        ".github/scripts/onboarding-bindings.json": "7e9a0c3f0253d2488a492e52300063a91a6aa014",
+        ".github/scripts/onboarding-checks.mjs": "5a66ec97be97383964746ef00b604e4a369d11c0",
+        ".github/scripts/onboarding-controls.test.mjs": "b208f5ff03f0a4ab9f0b23debc22112489608159",
+        ".github/scripts/onboarding-evidence.json": "1e7596adb0f37da1dbc29937e27abe9aee451ecf",
+        ".github/scripts/onboarding-scope.mjs": "ec582fcd083c1411f528e973e11c1aed394f582e",
         ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
         ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
         ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
@@ -4121,7 +4243,7 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "a15031034ac5349fb7569a85e02ea5f88fa1d33a"
+        ".github/workflows/ci.yml": "7af093473eb685e3c449f2eab3e0c9f85e57eea5"
       },
       "source": {
         "docs/development/group-report-source-matrix-20261030.md": {
