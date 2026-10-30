@@ -1,0 +1,45 @@
+{
+  "status": "FAIL",
+  "scope": "Real shared authoring components in a Vite browser harness with synthetic GET-only responses. Not real login, authorization, START/FINAL, or production network timing.",
+  "cases": [
+    {
+      "product": "SCHOOL",
+      "status": "FAIL",
+      "api": [
+        {
+          "path": "/api/scaleLibraryGovernance.ts",
+          "method": "GET"
+        }
+      ],
+      "errors": [
+        "Unexpected GET /api/scaleLibraryGovernance.ts"
+      ],
+      "error": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByText('暂无私有工具，可先创建一份量表或表单。', { exact: true }) to be visible\n\n    at /home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr395-browser.mjs:37:61"
+    }
+  ],
+  "sandbox": {
+    "ok": true,
+    "code": "CHROME_SANDBOX_VERIFIED",
+    "seccompBpf": true,
+    "suidSandbox": false,
+    "pidNamespaces": true
+  },
+  "source": {
+    "schema": 1,
+    "route": "onboarding-structure",
+    "base": "dc796e04203696b4a579aa6fd2428df592031ee3",
+    "head": "e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6",
+    "sourceHead": "23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5",
+    "tree": "cd8d923e7696dd01c28a0de8a17bad3230572a60",
+    "product": "d537212929887218f255ee6f654a9522463abff7",
+    "components": {
+      "backend": "7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc",
+      "frontend": "5c0402cdbc06239dd3fde86cf59c69c294a49d2a"
+    },
+    "controlCheckpoint": "5f6e82df42e9657c84f942be4d523b7df531b1b0",
+    "pr": 395,
+    "postMerge": false,
+    "draft": false
+  },
+  "error": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByText('暂无私有工具，可先创建一份量表或表单。', { exact: true }) to be visible\n\n    at /home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr395-browser.mjs:37:61"
+}

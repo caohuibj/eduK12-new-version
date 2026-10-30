@@ -1,0 +1,11 @@
+✔ PR395 missing browser consumers run without rebuilding, replaying application tests or starting a backend (3.322415ms)
+✔ PR395 browser interception treats only the actual API prefix as business traffic (0.311554ms)
+✔ PR395 SAST continuation requires the exact official successful scan despite parent failure (4.690763ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 127.409228

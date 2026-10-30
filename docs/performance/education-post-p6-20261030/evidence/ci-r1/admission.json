@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "schema": 1,
+    "route": "onboarding-structure",
+    "base": "dc796e04203696b4a579aa6fd2428df592031ee3",
+    "head": "e6f4a27a5823fd3121960bcb2c9e0b9b990f4cc6",
+    "sourceHead": "23ee17b2b52bb3a4d2ca69f41a6122ef2b9940f5",
+    "tree": "cd8d923e7696dd01c28a0de8a17bad3230572a60",
+    "product": "d537212929887218f255ee6f654a9522463abff7",
+    "components": {
+      "backend": "7e8dfec40c96c70cb4a7f9adf748bdf1e69d9cfc",
+      "frontend": "5c0402cdbc06239dd3fde86cf59c69c294a49d2a"
+    },
+    "controlCheckpoint": "5f6e82df42e9657c84f942be4d523b7df531b1b0",
+    "pr": 395,
+    "postMerge": false,
+    "draft": false
+  },
+  "runId": "40997195433",
+  "attempt": "1",
+  "admitted": [
+    {
+      "id": "registration",
+      "caseNames": [
+        "shared education registration management real client contracts presents readable frozen metadata and preserves historical missing feedback policy without inventing defaults",
+        "shared education registration management real client contracts does not expose operations before actual issuer read succeeds and keeps denial closed",
+        "shared education registration management real client contracts freezes exact P/R, real grant ids, explicit scheduled UTC and respondent-only disclosure without publication flags",
+        "shared education registration management real client contracts requires an explicit immediate choice and supports pure Form with explicit empty P/R and completion only",
+        "shared education registration management real client contracts recovers a lost registration response by original id without repeating the mutation",
+        "shared education registration management real client contracts discards a pending read after organization switches",
+        "shared education registration management real client contracts recovers an existing preparation by id and reloads actual source and grant choices without creating another preparation",
+        "shared education registration management real client contracts refuses multiple grant conflicts before POST rather than replacing a pinned source asset",
+        "shared education registration management real client contracts disables unavailable sources and P/R without guessing missing authority",
+        "shared education registration management real client contracts submits NONE disclosure with stable readonly policy id and only original licenses when P/R are not selected",
+        "shared education registration management real client contracts clears an old source selection when the current source list refreshes",
+        "shared education registration management real client contracts cancels a pending permission read without late resurrection",
+        "shared education registration management real client contracts reviews an independent frozen registration with its hash and reads the result back",
+        "bounded resource pagination continues an empty eligible source page and preserves the selected source grant",
+        "bounded resource pagination appends P/R choices without clearing selections or replacing the original grant",
+        "bounded resource pagination refuses a changed measurement on later pages and preserves the prior selection",
+        "reports unsaved registration title to the parent before prepare so switching authoring modes can protect it"
+      ],
+      "originalSourceAssociation": "d537212929887218f255ee6f654a9522463abff7",
+      "sourceAssociationBasis": "DOT observed these local executions on uncommitted bytes and transferred their originals. The selected assertions and relevant consumers were retained in the remote product; no historical commit identity or complete original environment attestation is invented.",
+      "originalReportSHA256": "4f9b9d7dbb64c9363f7e40f8c6db23594af6acb876b5ff3f7844a0bc7260a8e1",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "shared-editors-initial",
+      "caseNames": [
+        "education editor reload boundary clears discarded FORM buffers on successful same-id reload",
+        "education editor reload boundary clears discarded SCALE buffers on successful same-id reload"
+      ],
+      "originalSourceAssociation": "d537212929887218f255ee6f654a9522463abff7",
+      "sourceAssociationBasis": "DOT observed execution on uncommitted bytes. The selected two shared-editor case bodies and their product consumers were unchanged; the School await changed before the successful recheck. No historical Git or complete environment attestation exists.",
+      "originalReportSHA256": "b92a78da1f6a797fc4d7191447681d66a6b0a8fd36a5dbc63557795f22870c32",
+      "originalReportSuccess": false,
+      "originalFailedCount": 1,
+      "ciExecuted": false
+    },
+    {
+      "id": "school-recheck",
+      "caseNames": [
+        "School composition product consumers / synthetic HTTP contracts exposes the shared School editor through its parent authoring studio"
+      ],
+      "originalSourceAssociation": "d537212929887218f255ee6f654a9522463abff7",
+      "sourceAssociationBasis": "DOT observed these local executions on uncommitted bytes and transferred their originals. The selected assertions and relevant consumers were retained in the remote product; no historical commit identity or complete original environment attestation is invented.",
+      "originalReportSHA256": "e54ade3ceb7b1969f4e819c3582d3e812c6ceb30725afddaa40205045e0797cd",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    },
+    {
+      "id": "teacher-tabs",
+      "caseNames": [
+        "loads Teacher package data only on its tab and keeps an unsaved questionnaire when switching is declined"
+      ],
+      "originalSourceAssociation": "d537212929887218f255ee6f654a9522463abff7",
+      "sourceAssociationBasis": "DOT observed these local executions on uncommitted bytes and transferred their originals. The selected assertions and relevant consumers were retained in the remote product; no historical commit identity or complete original environment attestation is invented.",
+      "originalReportSHA256": "9aa965f4a08e4a0355bfed97634d4e019ad38617f223a2b49e3f0f0534af3dde",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    }
+  ],
+  "types": [
+    {
+      "component": "frontend",
+      "currentComponentTree": "5c0402cdbc06239dd3fde86cf59c69c294a49d2a",
+      "originalExitCode": 0,
+      "originalSigned": false,
+      "ciExecuted": false,
+      "indexKind": "RETROSPECTIVE_DOT_OBSERVATION",
+      "sourceAssociationBasis": "Retrospectively indexed from observed DOT command completion and saved log. Not an original signed execution receipt. Source frontend tree unchanged between execution and product. Matching backend dependency lock and schema were supplied after the retained first failure."
+    }
+  ],
+  "observations": [],
+  "environment": {
+    "limitations": [
+      "Local observations are unsigned and retrospectively associated with the unchanged product tree, not a signed original execution.",
+      "Component tests use synthetic API replies; browser, real authorization and FINAL are not established.",
+      "Original School synchronization failure and compiler missing-dependency failure remain saved.",
+      "Static gzip estimates are build results, not network latency or throughput.",
+      "The partial initial loading reporter predates the School wait correction; only its two unchanged shared-editor cases are admitted. All other partial rows retain original status."
+    ]
+  },
+  "testsExecutedInCI": false,
+  "rootReviewAuthentication": "Immutable reviewed Git record, not a signed original execution"
+}

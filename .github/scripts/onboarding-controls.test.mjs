@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords} from './onboarding-checks.mjs';
+import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 function fixture(){
@@ -112,7 +112,7 @@ test('observer follow-up admits only its HTTP test, scoped CSS and evidence; bro
  const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
  assert.equal(onboardingPlan(entries,base,head,read,env,b).pr,376);
  for(const outside of ['server-version/backend/src/middleware/auth.ts','server-version/backend/prisma/schema.prisma'])assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
- const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376,378,380,381]')"));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376,378,380,381,395]')"));
  const script=readFileSync('.github/scripts/pr376-browser.mjs','utf8');assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(script.includes('results.cases.length,6'));assert(script.includes('row.warning.ratio>=4.5'));assert(script.includes('Display fixture forbids simulated writes'));
 });
 test('observer display retry keeps failed report and narrows execution without weakening contrast',()=>{
@@ -200,7 +200,7 @@ test('PR381 keeps one compiled GET-only editor and live sandbox verification bef
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');
  const job=yaml.slice(yaml.indexOf('  onboarding-structure:\n'),yaml.indexOf('  report-planning:\n'));
  assert(job.includes('node .github/scripts/pr381-browser.mjs'));
- assert(job.includes(".pr == 381 && 10"));assert(job.includes("contains(fromJSON('[374,376,378,380,381]')"));
+ assert(job.includes(".pr == 381 && 10"));assert(job.includes("contains(fromJSON('[374,376,378,380,381,395]')"));
  assert(yaml.includes(".pr == 381 && 'paths: [server-version/frontend/src, .github/scripts]'"));
  const script=readFileSync('.github/scripts/pr381-browser.mjs','utf8');
  assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox(browser)'));assert(!script.includes('--no-sandbox'));
@@ -271,10 +271,63 @@ test('PR393 keeps only missing backend types, changed SAST and the existing mand
  assert(job.includes('npm ci --ignore-scripts --no-audit --no-fund'));assert(job.includes('node node_modules/prisma/build/index.js generate'));
  assert(job.includes('https://registry.npmjs.org'));assert(!job.includes('npm run build'));
  assert(yaml.includes(".pr == 393 && 'paths: [server-version/backend/src/modules/assessment-bundle,"));
- assert(job.includes("contains(fromJSON('[374,376,378,380,381]')")); // PR393 never selects a browser.
+ assert(job.includes("contains(fromJSON('[374,376,378,380,381,395]')")); // PR393 never selects a browser.
  assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
  const script=readFileSync('.github/scripts/onboarding-checks.mjs','utf8');
  assert(script.includes("spawnSync(process.execPath,argv,{cwd:'server-version/backend',encoding:'utf8'})"));
  assert(script.includes("assert.equal(execution.status,0,'Current combined backend types failed"));
  assert(script.indexOf("writeFileSync('onboarding-evidence/backend-types.json'")<script.indexOf("assert.equal(execution.status,0"));
+});
+
+
+test('PR395 exact frontend scope refuses drift and preserves the stable required checks',()=>{
+ const f=fixture(),path='server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx';
+ const b={...f.b,pr:395,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e),env={...f.env,CI_PR_NUMBER:'395',CI_HEAD_REF:BRANCHES[395]};
+ const p=onboardingPlan(entries,base,head,f.read,env,b);assert.equal(p.pr,395);
+ for(const outside of ['server-version/backend/src/middleware/auth.ts','server-version/frontend/package-lock.json','server-version/frontend/src/school/SchoolApp.tsx'])
+  assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...r)=>a===base+':server-version/backend'?h('9'):f.read(cmd,a,...r),env,b));
+ for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_HEAD_REF:BRANCHES[381]},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(entries,base,head,f.read,{...env,...patch},b));
+ assert.throws(()=>onboardingPlan(entries,base,head,f.read,env,{...b,enabled:false}));
+ const needs={scope:{result:'success',outputs:Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)]))},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','onboarding-structure','codeql']);assert.deepEqual(failedChecks(needs,false),[]);
+ for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...needs,'onboarding-structure':{result}},false).length);
+ assert(failedChecks(needs,true).length);
+});
+test('PR395 admits only the original disjoint 21-case union and explicit failed School continuation',()=>{
+ const v=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['395'];
+ const admitted=v.reports.map(r=>({id:r.id,caseNames:verifyOriginalReport(JSON.parse(readFileSync(r.path)),r)}));
+ assert.equal(new Set(admitted.flatMap(r=>r.caseNames)).size,21);assert.equal(admitted.flatMap(r=>r.caseNames).length,21);verifyFailureContinuations(v.reports,admitted);
+ const partial=v.reports.find(r=>r.id==='shared-editors-initial');assert.equal(partial.summary.success,false);assert.equal(partial.historicalTestDifference.affectsSelectedCases,false);
+ assert(partial.deltaRationale.includes('OLD initial-loading await'));assert.equal(partial.selectedCases.length,2);
+ assert.throws(()=>verifyFailureContinuations(v.reports,admitted.filter(r=>r.id!=='school-recheck')));
+ const t=v.pr395LocalTypes,receipt=JSON.parse(readFileSync(t.path)),exit=readFileSync(t.exit),log=readFileSync(t.log);
+ assert.equal(verifyPr395LocalTypes(receipt,exit,log,receipt.componentTree).indexKind,'RETROSPECTIVE_DOT_OBSERVATION');
+ for(const value of ['', '1\n','unknown\n'])assert.throws(()=>verifyPr395LocalTypes(receipt,Buffer.from(value),log,receipt.componentTree));
+ assert.throws(()=>verifyPr395LocalTypes({...receipt,exitCode:null},exit,log,receipt.componentTree));
+ assert.throws(()=>verifyPr395LocalTypes(receipt,exit,log,h('9')));
+});
+test('PR395 missing browser consumers run without rebuilding, replaying application tests or starting a backend',()=>{
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8'),job=yaml.slice(yaml.indexOf('  onboarding-structure:\n'),yaml.indexOf('  report-planning:\n'));
+ assert(job.includes('node .github/scripts/pr395-browser.mjs'));assert(yaml.includes(".pr == 395 && 'paths: [.github/scripts/onboarding-checks.mjs"));
+ const script=readFileSync('.github/scripts/pr395-browser.mjs','utf8');assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(!script.includes('--no-sandbox'));
+ assert(script.includes("request.method()!=='GET'"));assert(script.includes("['SCHOOL','TEACHER']"));assert(script.includes('dialog.dismiss()'));assert(script.includes('dialog.accept()'));
+ assert(!script.includes("['run','build'"));assert(!script.includes('vitest'));assert(script.includes('Not real login, authorization'));
+});
+
+test('PR395 browser interception treats only the actual API prefix as business traffic',()=>{
+ const script=readFileSync('.github/scripts/pr395-browser.mjs','utf8');assert(script.includes("context.route(url=>url.pathname.startsWith('/api/'),async route=>"));assert(!script.includes("context.route('**/api/**'"));
+ const match=url=>new URL(url).pathname.startsWith('/api/');
+ for(const path of ['/api/organizations/synthetic-org/private-tools','/api/unknown'])assert(match('http://127.0.0.1:5187'+path));
+ for(const path of ['/src/api/scaleLibraryGovernance.ts','/node_modules/.vite/deps/react.js','/pr395-fixture.jsx'])assert(!match('http://127.0.0.1:5187'+path));
+ assert(script.includes("request.method()!=='GET'"));assert(script.includes("row.errors.push('Unexpected '"));
+});
+test('PR395 SAST continuation requires the exact official successful scan despite parent failure',()=>{
+ const root='docs/performance/education-post-p6-20261030/evidence/ci-r1/';
+ const run=JSON.parse(readFileSync(root+'run.json')),job=JSON.parse(readFileSync(root+'sast-job.json')),artifact=JSON.parse(readFileSync(root+'sast-artifact.json'));const now=Date.parse(artifact.created_at)+1000;
+ assert.equal(verifyPr395SastMetadata(run,job,artifact,now).originalParentConclusion,'failure');
+ for(const result of ['failure','skipped','cancelled'])assert.throws(()=>verifyPr395SastMetadata(run,{...job,conclusion:result},artifact,now));
+ assert.throws(()=>verifyPr395SastMetadata(run,job,{...artifact,digest:'sha256:'+'0'.repeat(64)},now));assert.throws(()=>verifyPr395SastMetadata(run,job,{...artifact,expired:true},now));assert.throws(()=>verifyPr395SastMetadata(run,job,artifact,now+86400000));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/onboarding-checks.mjs sast-reuse'));assert(yaml.includes('pr395-original-sast-${{ github.sha }}'));assert(yaml.includes(".pr == 395 && 'paths: [.github/scripts/onboarding-checks.mjs, .github/scripts/onboarding-controls.test.mjs, .github/scripts/pr395-browser.mjs]'"));
 });
