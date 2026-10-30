@@ -34,3 +34,19 @@ commit/WIP 审阅，未签名，不宣称原运行已与完整 Git tree 或 node
 旧 SQL 46/8 仍只是 N=2 合成 SQL 事件（含事务），不是生产性能或容量承诺。
 新的两个 binding/gate 合同只在正式 CI 的既有 admission job 首次运行；不是业务测试重播。
 实际 CI run/merge SHA/Ready 结果以 GitHub 后续回读为准；此目录本身不是 CI 成功。
+
+## 首次正式激活的分类链错误
+
+`b1290b33c601ed62b269c1bb7a0663efc73cc9b0` 的 Draft run 41022894812 / scope
+123954126406 在 workflow 内嵌轻量分类器失败：它先调用旧 groupReportDraftPlan，
+拒绝新的 onboarding-bindings.json。取消请求发出时 run 已结束；同一命令序列随后已把 PR
+标为 Ready，所以 Ready run 41022969851 / scope 123954373030 再被旧 Draft-only 断言拒绝。
+两个 run 和原日志均保留；admission、两个新控制合同、CodeQL、应用检查均尚未执行。
+不是业务统计失败，也没有把原 run 重试或改写成功。
+
+真正遗漏在 workflow inline 分类器，不在已调整的 content-scope CLI。修订只让同一个
+现有 onboardingPlan 在 inline 也优先验证精确绑定，并补真实 head-repo 环境；通过该绑定
+才走 dependency-free 分类，未知来源仍失败。新合同同时检查 inline/CLI 调用顺序和 Ready
+三项结果要求。准备阶段将执行实际 inline 脚本和 CLI 在一个明确标注的本地合成 merge
+checkout（同源树、真实base/source父提交）中产生的计划；不冒称 GitHub 真实检查通过。
+当前失败尚未归因前没有继续重试或放大全量。修复及下一检查清单先写回既有 Notion，再激活。
