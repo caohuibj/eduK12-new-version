@@ -27,3 +27,11 @@
 首错为保留隔离库缺少main已合入的personal_tracking列，发生在新parent创建前。原件保留；仅补齐四个已存在主线迁移后续验该一条通过，不新造迁移、不reset数据。首错产生一名未完成合成成员，不纳入完成群体，不据此补assignedN。当前新backend树只编译一次通过；frontend与main418相同，未复编。
 
 新Draft在明确授权后向main创建；此前拒绝保持历史，先查重。为防止Draft开立机械重跑旧业务，沿现有group-report-draft明确该来源分支的3生产／2测试与原件目录边界，只做scope和稳定gate，不新增workflow或Ready／合并资格；单条新控制已通过。正式资格留独立授权／冻结点，当前无合并或部署。
+
+## 稳定消费接口与正式资格范围
+
+本来源线仅持有三处生产切片：training-analysis/group-source.ts、source.ts，及 composite.service.ts 的课程来源冻结。`TrainingGroupSource` 保持 parents（attemptId/attemptEpoch/nullable stableIdentity）、definitions、observations、snapshots；`trainingGroupLeafItems` 只从冻结 Bundle slot/item bindings 取声明的测量叶，不消费 Context/Profile。`loadTrainingAnalysisSources(tx, actor, selector, {group:...})` 保留同一事务、真实课程权限和单任务来源限制。纵向同伴可逐已配置计划波次消费原接口，不应放松限制任意拼任务；没有稳定身份不可制造配对。
+
+不修改计划／波次／公共纵向投影文件，不把个人可见数值当GROUP授权。当前不支持独立旧Assessment，不补缺失历史courseId，不扩展Survey／School／Teacher新来源。Context必需输入仍保留；Profile分布／转移和专属解释均不在本批。
+
+正式阶段沿现有onboarding-structure固定419命名空间绑定实际base/source/tree，只运行scope、unsigned原件接纳、当前受影响CodeQL和稳定gate。接纳4个不同真实原始用例（保留筛除行）、2项native观察、已有当前backend类型；未变frontend由精确base-tree guard约束，不复编。仅补一条路由／原件控制用例，不新建workflow，不重跑旧应用证明。最终合并交DOT当次确认，不部署。
