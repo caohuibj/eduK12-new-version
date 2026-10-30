@@ -27,3 +27,9 @@
 ## 生成成功与目录读取分离
 
 按 DOT review 修复 TeacherFormGroupVersions：POST成功先在原请求token下交付报告并将新版本加到选择列表，目录GET不再决定生成是否成功。GET失败只显示目录刷新提示；重试按钮仅执行GET，不再次POST。只新增并运行一项POST成功/GET失败/GET重试用例，1PASS，原导航用例filtered，后端与PG输入未变不重跑。旧frontend类型收据仍只代表旧tree，后续正式冻结处理当前类型证据。
+
+## main414 / Reader准备同步
+
+沿Reader392a9f249无冲突合入已合并main43d119c9，检查点af39a01b22e340dd15ae15bd6e45a24b024bf300。Native子群/版本涉及的11个应用与夹具源路径已与DOT已审阅ef2554926对比，未产生本切片新增功能改动；POST成功、目录GET失败保留报告与只读重试修订仍在。原12人PG、浏览器和该定向case不重复执行。
+
+当前整组件tree与旧08e1/6fbb不同，旧收据仅归属原tree，不冒称当前编译成功；等409基线稳定、最终资格冻结时一次补当前缺失类型输入，避免现在提前编译后立刻因上游变化重做。PR418保持Draft，不激活正式CI、不进合并队列。GenericForm统计权限、其他个人INDIVIDUAL_ONLY来源、学生评教与专家共识边界没有扩大。

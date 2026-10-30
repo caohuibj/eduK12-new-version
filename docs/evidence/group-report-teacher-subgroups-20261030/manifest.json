@@ -194,5 +194,35 @@
     "oldNavigationCaseReexecuted": false,
     "backendChanged": false,
     "priorFrontendTypes": "Earlier receipt retained for its original tree only; this UI source changed, current types pending next qualification freeze."
+  },
+  "main414Preparation": {
+    "main": "43d119c9bfbc7949baab2edea29d96044b04607c",
+    "readerDependency": "392a9f2498398b2159d6886c3881a98453669208",
+    "mergeCheckpoint": "af39a01b22e340dd15ae15bd6e45a24b024bf300",
+    "componentTrees": {
+      "backend": "dd45e5de22b7b82bdfa086ad2c77c1f5d7819967",
+      "frontend": "13d89e4e6df866bcd6c2f15d6560798fb0dd44dc"
+    },
+    "reviewedNativeSourceCheckpoint": "ef2554926777363e5389fd281d17b15d832b0dd7",
+    "nativeOwnedPaths": [
+      "server-version/backend/src/__tests__/integration/teacherFormGroupSubgroups.postgres.integration.test.ts",
+      "server-version/backend/src/modules/huiteacher/disclosureOverlap.service.ts",
+      "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
+      "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
+      "server-version/backend/src/modules/huiteacher/privacyReleaseV2.service.ts",
+      "server-version/backend/src/modules/reporting/cohort.ts",
+      "server-version/e2e/teacher-group-report-browser.cjs",
+      "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+      "server-version/frontend/src/huiteacher/HuiteacherGroupReportReading.test.tsx",
+      "server-version/frontend/src/huiteacher/TeacherFormGroupReport.tsx",
+      "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx"
+    ],
+    "changedNativeOwnedPaths": [],
+    "originalPgBrowserAndPostDirectoryCasesReexecuted": false,
+    "wholeCurrentTypes": "NOTRUN: old08e1/6fbb receipts retain their original trees; defer current combined types until PR409 baseline stabilizes.",
+    "newFunctionalCodeChanges": false,
+    "formalCiActivated": false,
+    "draft": true,
+    "mergeQueueEntered": false
   }
 }
