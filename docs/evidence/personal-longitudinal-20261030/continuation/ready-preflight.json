@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
+  "applicationReviewedSource": "a62c9a5763da69aa13b4f70d062b0bf55d6db65f",
+  "applicationReplay": false,
+  "newDistinctControlCases": 3,
+  "sourceSHA256": {
+    ".github/scripts/personal-tracking-ready.mjs": "d01b40498e345dd480497ebc70ba1a8bfb252e6597d96c610ac1045eca612b84",
+    ".github/scripts/personal-tracking-ready.test.mjs": "3821ced98c0e2fc6dbb3be362747e9b6e09ed45a339c18f1c27287cd536f0245",
+    ".github/scripts/personal-tracking-ready.json": "a97b66ac893bf3442d5a845797155d267456a0c38806e184cbf9f52c12aaaa47",
+    ".github/scripts/personal-tracking-draft-scope.mjs": "79eb0d0a71dbb2507dcc712d017a64defd75d3252a92582a6a0642434f3bd264",
+    ".github/scripts/content-scope.mjs": "ef604df511127441026d558eb094a92538993dabdba511078a923d69fe859537",
+    ".github/scripts/merge-gate.mjs": "8b670d4fb316d0a37b435f382571eb03408b34690aaa63efbd88e1f68181b5b9",
+    ".github/workflows/ci.yml": "8742759a97b91c2615afd958fadf5a3ebf659469f92e052bd7074d2f9d58c2be"
+  },
+  "rawEvidenceSHA256": {
+    "personal-ready-controls-first.log": "22e480f88420839b049e8383293f2806e2f5b6f7b0027952f6e08a0fc479ffea",
+    "personal-ready-actionlint-fixed.log": "c79b0693cb0dae9a1f392f39f715b044b45a04f38918ce9c0cbe669ddd3f0268",
+    "personal-ready-actionlint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "personal-ready-anchor-test.log": "159bf3139c2517c3784e729014d05c85ea1ed131d4eb4165473c17abc8361e9c",
+    "personal-ready-sql-preflight.log": "5075ea428aceffffd36e7a7b891368469733de7dc23741d0e0aec1836928bc9f",
+    "personal-ready-actionlint-scoped.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "personal-ready-actionlint.log": "9f8a009db06a2e993b748b076b3dfed80bd34e9df3f42f13b0ef7353dc69bccc"
+  },
+  "formalQualification": "NOTRUN at creation; use actual Actions outcomes",
+  "originalCases": "31 original application cases retained; with targeted repair/consumer originals union71. Unsigned reviewed local evidence; never marked CI-executed."
+}

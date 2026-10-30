@@ -11,16 +11,16 @@ export interface BundleProfileView {
 }
 const display=(value:number)=>new Intl.NumberFormat('zh-CN',{maximumFractionDigits:2}).format(value)
 export default function BundleProfileSummary({view}:{view:BundleProfileView}){
-  return <div className="space-y-5" aria-label="学习动机理论画像">
-    <ReportCoreSummary label="理论试验 · 本次数学学习信念">
+  return <div className="space-y-5" aria-label="综合理论画像">
+    <ReportCoreSummary label="理论试验 · 本次组合结果">
       <div><h3 className="text-lg font-semibold">{view.title}</h3>
         {view.explanation && <p className="mt-2 text-sm font-normal leading-7">{view.explanation}</p>}
         {view.alternatives?.length>0 && <p className="mt-2 text-sm font-normal">较接近的两种解释：{view.alternatives.join('；')}。本次不选定单一画像。</p>}
       </div>
     </ReportCoreSummary>
     <p className="text-sm leading-6 text-gray-600 dark:text-gray-300">{view.limitation}</p>
-    {view.constructs.length>0 && <ReportSection title="三个原量尺结果" eyebrow="不同量尺分别阅读">
-      <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">圆点表示本次结果；出现菱形时，表示预设理论参照，并非常模。量尺长度不能用于比较不同构念的强弱。成本越高，表示报告的时间与取舍负担越突出。</p>
+    {view.constructs.length>0 && <ReportSection title="原量尺结果" eyebrow="不同量尺分别阅读">
+      <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">圆点表示本次结果；出现菱形时，表示预设理论参照，并非常模。量尺长度不能用于比较不同构念的强弱；各指标的方向请分别阅读。</p>
       <div className="grid gap-4 md:grid-cols-3">
         {view.constructs.map(c=>{
           const x=(value:number)=>24+(value-c.min)/(c.max-c.min)*252
@@ -46,7 +46,7 @@ export default function BundleProfileSummary({view}:{view:BundleProfileView}){
     </ReportSection>}
     {view.methods && <ReportDetails title="模型版本与方法">
       <p className="text-sm">{view.methods.key} · {view.methods.version} · 理论试验版</p>
-      <p className="mt-2 text-sm">模型使用预设规则与加权平均绝对距离，不在线拟合潜在类别。重要性/用途价值不等于兴趣，时间与取舍成本不等于情绪成本；自我效能保留下学期题干，三个指标的时间取向并不完全相同。</p>
+      <p className="mt-2 text-sm">模型使用预设规则与加权平均绝对距离，不在线拟合潜在类别。各指标的含义、方向与时间范围以本次冻结版本说明和获准单项报告为准。</p>
       <dl className="mt-3 break-all text-xs"><dt>映射 / 模板版本</dt><dd>{view.methods.mappingVersion} / {view.methods.templateVersion}</dd><dt className="mt-2">冻结模型标识</dt><dd>{view.methods.hash}</dd></dl>
       {view.candidates.length>0 && <table className="mt-4 w-full text-left text-sm"><caption className="text-left">模型内匹配分，不是归类概率</caption><thead><tr><th>理论参照</th><th>匹配分 / 100</th></tr></thead><tbody>
         {view.candidates.map(c=><tr key={c.profileId}><td className="py-2">{c.name}</td><td>{display(c.matchingScore)}</td></tr>)}

@@ -308,3 +308,238 @@ continuation/untracked-content-manifest.json. A wrong relative git-add path
 initially left the resolved file unmarked; staging the exact absolute path
 completed the merge. It did not change the resolved product source or qualify
 any failed setup as an application pass.
+
+## PR399 bounded Ready qualification after main PR407
+
+Main `8cf07bfd35702222e279cbfeee2f64d73a938b55` was merged without conflict at
+`ef0490e6371ceb7bdebe8c2f84f087977f5f362c`. All 24 changed Survey application,
+test and schema files remain byte-identical to DOT-reviewed `a62c9a5763...`;
+the main delta is the separately reviewed Training choice-pagination change.
+The interrupted cloud environment was restored with that exact local commit,
+tree `bdb0ac23a4e84cd6809286aa3c08feabbcd4e69b`, and retained worktrees/evidence.
+
+The existing CI workflow now has a bounded personal-tracking route. A fixed
+base, original reviewed Git object, complete raw diff/modes, all 24 application
+blobs and locked dependency/build inputs must match. Unknown files, changed
+main, altered originals or whole-platform force fail closed. Draft only
+classifies; Ready requires scope, personal-tracking qualification, the existing
+production-image build/scans and existing CodeQL. The stable gate recomputes the
+source plan and refuses missing/skipped/failed required jobs. PR406/409 keep
+stack order and receive no separate workflow.
+
+The original 31 successful application cases and targeted repair/consumer
+reporters are read, hash-checked against immutable a62 Git originals, and
+validated using the existing original-report/failure-continuation verifier.
+Their union is 71 distinct successful case names. They remain unsigned,
+reviewed-local-evidence with ciExecuted=false; this does not relabel failed
+original reports or claim GitHub replayed those application cases.
+
+Missing qualification executes once in Actions: a nonempty exact-main schema
+fixture is upgraded with the candidate migrations, old publication/attempt/
+opaque FINAL bytes are compared, new defaults and immutable guards are checked,
+and native pg_dump/pg_restore into a separate empty database must reproduce
+facts and normalized schema. This is an isolated SQL schema fixture, not a new
+scientific FINAL submission or a repeated business journey. The transient dump
+is not published. Existing production image HIGH/CRITICAL scanning and changed
+source SAST remain required. Locked audits and actual frontend app types/source
+lint run in the qualification job; no whole-platform/performance/browser suite
+is enabled.
+
+Local preflight: three new admission/refusal/gate contracts passed. After adding
+an immutable Git-original check, only that one changed admission contract was
+rechecked. Actionlint initially found the invalid job-context PG_SERVICE env;
+a targeted edit also caught an unrelated old PG_SERVICE line and was corrected
+by restoring the original workflow before applying only this slice. Original
+failed lints are retained, final Actionlint passes. Six fixture INSERTs passed
+EXPLAIN-only validation on the existing isolated DB, with no insertion/migration
+or application replay. This is preflight only; official run outcomes remain the
+source of truth for Ready qualification.
+
+School explicit-source subset configuration is an authorized following slice:
+a permitted publisher may select only originally permitted own numeric metrics,
+freeze them into a new source/task, and preserve old contracts/completion-only.
+It does not change this frozen first candidate.
+
+### First official activation: workflow definition rejected
+
+Source f4647a7aa produced workflow-level failure 41026381661, attempt1, eventpush,
+with no runnable jobs/check-run annotations; publication 41026390424 succeeded.
+No migration, image, audit, types or SAST ran. `gh run view` identifies a workflow
+file issue. The CodeQL config expression grew from 20,768 to 21,201 characters;
+Actions' expression parser defines MaxLength=21,000 in its primary source:
+https://github.com/actions/runner/blob/main/src/Sdk/DTExpressions2/Expressions2/ExpressionConstants.cs
+This identifies an independently reproducible definition defect; GitHub did not
+provide a more specific annotation through the available run/check-suite APIs.
+
+The personal CodeQL paths now come from a short existing-style config-output
+step. The longest expression is 20,815; Actionlint and the explicit length guard
+pass. Only workflow configuration changed; original application cases and the
+three admission/gate contracts are not replayed. Raw first failure and new
+preflight records are retained in continuation evidence.
+
+A separate mark-ready tool call returned isError=true. Its detailed error text
+was not retained in the concise output; readback confirms PR399 remains Draft,
+so no Ready qualification is claimed. This state transition is not retried via
+another interface. Missing Ready jobs remain NOTRUN pending resolution of that
+specific operation; ordinary independent work may continue.
+
+### Second activation: moving-main preview refused, before application jobs
+
+Run 41027089221 attempt1 source6deb65fb6 reached classification and stopped at job
+123967664202. Actual preview de26f0103e28b059d22e26638e07de19ef3461b0 has parents
+main1d95bf5d9c104dcc9d0ffa344858cb39a70212bd and source6deb; the event base still
+said8cf. This exact preview reproduces the planned unknown-path refusal: newly
+merged BAT/COPSOQ catalog files appear in the old-base diff. This is confirmed
+from the real Git preview, not an inference from a missing job log. All native,
+image, audit/type and SAST stages remained NOTRUN.
+
+Main1d95 was merged without conflict at37a7d20e1db005fe88e63fc4140e3003c8a4e466.
+Only the base pin/review note is updated; the 24 Survey application/test/schema
+blobs still match reviewed a62. These main catalog additions are independently
+governed fixed material, not the synthetic tracked sources. The changed
+base/refusal control alone passes; no old31/application or broad control suite
+is replayed. The failed original run/preview and diagnostic are retained. Before
+any next activation the live PR base event is refreshed again. Another moving
+base stops classification rather than broadening the allowed scope or repeatedly
+launching full CI; no original failed run is rerun.
+
+### Authorized Ready run: preserve successful images; fix admission CLI cycle
+
+The user explicitly authorized Draft→Ready. The original tool succeeded at
+source171f. Ready run41028537466 passed scope123972428313, SAST123972543793 and
+production images123972544793. The personal qualification job123972544549 failed
+before migration at original-reporter admission: Node exit13, unsettled top-level
+await. The CLI dynamically imported onboarding-checks→content-scope→its own
+still-evaluating CLI module. Imported unit tests did not exercise that entrypoint.
+The exact first failure section and run/job metadata are retained; the failed run
+is not relabelled successful.
+
+The CLI now invokes the same original verifier in a short separate Node process,
+where the Ready module has completed import. A new real child-entry contract
+passes, along with the changed gate contract. No original business test reruns.
+To honor one-build execution, the next qualification authenticates the successful
+original image job via the existing Actions read token: fixed run/job/source,
+completed successful required build/scan steps, <24h age, identical full
+server-version tree and original reusable-image workflow/build script. Original
+whole-run failure remains failure. Missing/failed/skipped/expired or changed
+producer inputs refuse admission. The existing image workflow is unchanged.
+
+With that explicit receipt, the required image checks are admitted within the
+personal-tracking qualification job instead of rebuilding identical sources.
+Scope/qualification/current SAST remain required. Two new entry/provenance
+contracts and the affected gate contract passed; failed/expired/scan-skipped
+producer fixtures are refused. Actual new Actions metadata verification and
+native migration still must run. There is no retained deployable image archive
+and no deployment qualification. Current SAST is selected again because the
+qualification control code changed; application31/32/5 are not replayed.
+
+### Freeze final catalog main8bd; historical images no longer match its input
+
+Main advanced again to8bd86e4059125b9ee868d4777795e513d36cba71 (PR410 approved
+Chinese catalog). It changes backend instrument/registry bytes. That exact main
+was merged once without conflict and is the final frozen qualification base;
+no repeated application or catalog formula tests are selected. All24 Survey
+product/test/schema pins and locked dependencies still match the reviewed inputs.
+
+The image-success receipt from source171f is retained as historicalImageSuccess,
+not active admission: the backend image input tree changed. The existing combined
+production-image workflow has no supported frontend/backend partial receipt, so
+its necessary compound check must execute for the new input tree. No old image
+run is called current qualification. The optional whole-input reuse code still
+refuses differing trees; the required current jobs are again scope, personal-
+tracking, docker and current CodeQL. No new per-PR workflow is added.
+
+Static SQL review also caught the old-schema owner FK to survey_accounts.
+The schema fixture now creates its synthetic SURVEY user and alias before the
+project, using the candidate Prisma client whose User/Alias fields are unchanged
+from main. This is fixture setup, not a new real account or grant. The native
+job explicitly generates that client once after install (postinstall generation
+skipped). Original app31/32/5 are not replayed. Only changed gate/image-refusal
+contracts, the actual child entry and workflow syntax were checked locally;
+actual native upgrade/restore is still first execution in the next selected CI.
+
+### Actual8bd run: successful admission/audit/images retained; schema archive IO fixed
+
+Ready run41031885906 source571a passed source, original-report admission, locked
+backend audit/client setup, production images123983441024 and SAST123983440232.
+Qualification123983441600 stopped before schema migration on git archive
+ENOBUFS: Node's default stdout buffer truncated the actual >1MiB Prisma tar.
+The first error/metadata remain retained. The archive now writes straight to a
+private temporary file. Its actual large Git archive/extraction contract passed;
+source schema bytes match. Schema-only dump output also has a bounded64MiB
+buffer; a read-only isolated schema-capacity preflight returned979455 bytes.
+No new migration/business execution is claimed by those preflights.
+
+Only CI controls changed after571a, so its exact whole-input successful image
+job is now admissible (<24h, matching tree/producer/required steps). Its completed
+backend audit step is independently authenticated with matching locked inputs
+and age; the original native job and whole run remain failures. Tool installation
+is still necessary on the new runner, but that passed audit is not rerun. Failed
+or stale audit receipts are refused by a new boundary contract. Native SQL,
+frontend actual types/lint/audit and changed-control SAST still execute. Scope
+fetches both the immutable reviewed a62 and original571a producer objects for
+its shallow Git comparison. No previous successful application case is replayed.
+
+### Actual main31845 qualification checkpoint
+
+Merged main31845e3a14dd5edf6e03c90e7f71c014bcf0aa06, retaining both personal and
+group scope/gate branches in the only merge conflict. Original24 Survey
+application/test/schema blobs and locked backend audit inputs remain unchanged.
+The successful571a image producer is now historical because separately merged
+group/catalog production inputs changed; existing image job is required for
+this current tree. Original locked backend audit remains admitted by exact
+source/step/lock pins. Seven bounded changed-control tests passed, with original
+CLI admission71 successes preserved as unsigned local evidence and no app replay.
+
+The group native original already documents PostgreSQL16.15 rewriting redundant
+parentheses in unrelated CHECK constraints after restore. This qualification
+therefore compares native DDL for the three changed Survey tables, constraints,
+indexes and triggers, matching the existing group native approach. Native custom
+dump/restore still covers the full database; exact opaque old report/attempt/
+publication bytes and changed guards remain verified. No global SQL text
+normalization or assertion deletion. Original failed logs remain retained.
+
+### Linkage fixture continuation, no application replay
+
+Official run41037266506/source af8/execution bb54 has successful scope,
+CodeQL124001202537 and production images124001203658. Native124001203409
+applied exact-main migrations, then the synthetic closed Wave INSERT failed
+the pre-existing explicit linkage-disclosure gate. Original logs retained.
+The fixture now sets linkage_notice_confirmed=true. A local rollback-only
+check on the existing isolated migrated test DB additionally found the old
+placeholder research code violated its original R-[A-Z0-9]{8,32} check; it
+was corrected to R-SYNTHETIC, and the exact shared six-row SQL now passes.
+Opaque FINAL insertion verified; all synthetic rows rolled back. This is not
+a migration/restore qualification or a repeat of an application journey.
+
+Same-af8 image inputs/producer are reused through the existing strict receipt.
+The current CodeQL job authenticates original successful application extraction
+with exact full server-version tree/source/job/required steps and24h age, then
+scans only the changed personal-tracking-ready.mjs controls. A new targeted
+positive/failed/missing/wrong-source/expired receipt contract passed; original
+application SAST findings/disposition are not changed. Existing audit success
+remains retained. Main31845 is unchanged. Only missing native/frontend checks
+remain; no CI activation until required Notion failure/checking-list append
+and exact-target writes succeed under the newly supplied authorization.
+
+### Official native/frontend qualification success and SAST metadata repair
+
+Run41038456712/sourcee658/executiona4019 job124005165894 SUCCESS:
+exact-main upgrade, full native dump/restore, affected DDL, old opaque bytes,
+immutable guards, frontend locked audit/types/lint and retained original checks.
+Artifact12969576293/ZIPsha2563d59e25890432fb8b3dc6e7fd34792a516a93deebb441df9cce18db93acf2d71
+retains the official qualification receipt. The overall run remains failed:
+SAST job124005164672 refused original af8 source SHA because the verifier
+incorrectly required checkout merge-preview SHA in GitHub job.head_sha. Official
+job metadata returns PR sourceSHA; both are fixed original identities, as in
+the existing image verifier. No scan had begun in this failed continuation.
+
+The exact official saved job metadata now exercises the corrected verifier.
+Complete original native/frontend job reuse requires successful whole original
+job and every selected step, age24h, unchanged complete server tree and base,
+byte-equal native function section and tool/job inputs (only explicit receipt
+reuse conditions excluded). Failed/missing/changed proof refuses. The first
+local parser assertion caught its own marker literal; anchored newline markers
+fix that without changing original qualification input. All raw failures remain.
+Only original receipt acceptance plus changed control SAST execute next; no
+repeated migration, frontend compile/audit, production build or application test.

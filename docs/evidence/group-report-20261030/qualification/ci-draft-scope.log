@@ -1,0 +1,252 @@
+classify changed content	Set up job	﻿2026-10-30T07:53:58.5608631Z Current runner version: '2.338.0'
+classify changed content	Set up job	2026-10-30T07:53:58.5651880Z ##[group]Runner Image Provisioner
+classify changed content	Set up job	2026-10-30T07:53:58.5653186Z Hosted Compute Agent
+classify changed content	Set up job	2026-10-30T07:53:58.5654609Z Version: 20261021.618
+classify changed content	Set up job	2026-10-30T07:53:58.5656246Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+classify changed content	Set up job	2026-10-30T07:53:58.5657480Z Build Date: 2026-10-21T00:45:21Z
+classify changed content	Set up job	2026-10-30T07:53:58.5658833Z Worker ID: {92d3cc6e-74b4-4cc6-ab3e-41cd3e121ceb}
+classify changed content	Set up job	2026-10-30T07:53:58.5660012Z Region: eastus2
+classify changed content	Set up job	2026-10-30T07:53:58.5661098Z Cloud: Azure
+classify changed content	Set up job	2026-10-30T07:53:58.5662021Z ##[endgroup]
+classify changed content	Set up job	2026-10-30T07:53:58.5664620Z ##[group]Operating System
+classify changed content	Set up job	2026-10-30T07:53:58.5665819Z Ubuntu
+classify changed content	Set up job	2026-10-30T07:53:58.5666671Z 24.04.5
+classify changed content	Set up job	2026-10-30T07:53:58.5667578Z LTS
+classify changed content	Set up job	2026-10-30T07:53:58.5668429Z ##[endgroup]
+classify changed content	Set up job	2026-10-30T07:53:58.5669475Z ##[group]Runner Image
+classify changed content	Set up job	2026-10-30T07:53:58.5670542Z Image: ubuntu-24.04
+classify changed content	Set up job	2026-10-30T07:53:58.5671470Z Version: 20261025.353.1
+classify changed content	Set up job	2026-10-30T07:53:58.5673508Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+classify changed content	Set up job	2026-10-30T07:53:58.5677268Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+classify changed content	Set up job	2026-10-30T07:53:58.5679067Z ##[endgroup]
+classify changed content	Set up job	2026-10-30T07:53:58.5681270Z ##[group]GITHUB_TOKEN Permissions
+classify changed content	Set up job	2026-10-30T07:53:58.5684429Z Actions: read
+classify changed content	Set up job	2026-10-30T07:53:58.5685608Z Contents: read
+classify changed content	Set up job	2026-10-30T07:53:58.5686677Z Metadata: read
+classify changed content	Set up job	2026-10-30T07:53:58.5687563Z PullRequests: read
+classify changed content	Set up job	2026-10-30T07:53:58.5688632Z ##[endgroup]
+classify changed content	Set up job	2026-10-30T07:53:58.5691578Z Secret source: Actions
+classify changed content	Set up job	2026-10-30T07:53:58.5693255Z Cache mode: write
+classify changed content	Set up job	2026-10-30T07:53:58.5694757Z Prepare workflow directory
+classify changed content	Set up job	2026-10-30T07:53:58.6256488Z Prepare all required actions
+classify changed content	Set up job	2026-10-30T07:53:58.6327069Z Getting action download info
+classify changed content	Set up job	2026-10-30T07:53:58.8704119Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+classify changed content	Set up job	2026-10-30T07:53:58.9739684Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+classify changed content	Set up job	2026-10-30T07:53:59.0637250Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+classify changed content	Set up job	2026-10-30T07:53:59.2685666Z Complete job name: classify changed content
+classify changed content	Run actions/checkout@v4	﻿2026-10-30T07:53:59.3834295Z ##[group]Run actions/checkout@v4
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3835205Z with:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3835628Z   fetch-depth: 1
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3836095Z   repository: caohuibj/eduK12-new-version
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3839729Z   token: ***
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3840157Z   ssh-strict: true
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3840588Z   ssh-user: git
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3841007Z   persist-credentials: true
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3841473Z   clean: true
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3841901Z   sparse-checkout-cone-mode: true
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3842406Z   fetch-tags: false
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3842833Z   show-progress: true
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3843263Z   lfs: false
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3843652Z   submodules: false
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3844283Z   set-safe-directory: true
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3844782Z   allow-unsafe-pr-checkout: false
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3845537Z env:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3846019Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3846651Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.3847185Z ##[endgroup]
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.6854436Z Syncing repository: caohuibj/eduK12-new-version
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.6856653Z ##[group]Getting Git version info
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.6857600Z Working directory is '/home/runner/work/eduK12-new-version/eduK12-new-version'
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.6858839Z [command]/usr/bin/git version
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.6958808Z git version 2.56.0
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.6982480Z ##[endgroup]
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.6997851Z Temporarily overriding HOME='/home/runner/work/_temp/74638ed7-6b1c-4c34-a292-152661955958' before making global git config changes
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7000554Z Adding repository directory to the temporary git global config as a safe directory
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7003455Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7067393Z Deleting the contents of '/home/runner/work/eduK12-new-version/eduK12-new-version'
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7073711Z ##[group]Initializing the repository
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7079545Z [command]/usr/bin/git init /home/runner/work/eduK12-new-version/eduK12-new-version
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7205647Z hint: Using 'master' as the name for the initial branch. This default branch name
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7207468Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7209088Z hint: to use in all of your new repositories, which will suppress this warning,
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7210081Z hint: call:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7210544Z hint:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7211637Z hint: 	git config --global init.defaultBranch <name>
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7212420Z hint:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7213063Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7215100Z hint: 'development'. The just-created branch can be renamed via this command:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7216791Z hint:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7217633Z hint: 	git branch -m <name>
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7218582Z hint:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7219820Z hint: Disable this message with "git config set advice.defaultBranchName false"
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7222318Z Initialized empty Git repository in /home/runner/work/eduK12-new-version/eduK12-new-version/.git/
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7235608Z [command]/usr/bin/git remote add origin https://github.com/caohuibj/eduK12-new-version
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7289527Z ##[endgroup]
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7290901Z ##[group]Disabling automatic garbage collection
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7293619Z [command]/usr/bin/git config --local gc.auto 0
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7331542Z ##[endgroup]
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7332857Z ##[group]Setting up auth
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7340984Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7399093Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7847577Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.7892193Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.8130631Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.8175101Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.8418693Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.8468981Z ##[endgroup]
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.8470720Z ##[group]Fetching the repository
+classify changed content	Run actions/checkout@v4	2026-10-30T07:53:59.8482078Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +43a249f54d5f9d9c1f174e1cba9498b865911e5a:refs/remotes/pull/404/merge
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:03.4120708Z From https://github.com/caohuibj/eduK12-new-version
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:03.4135067Z  * [new ref]         43a249f54d5f9d9c1f174e1cba9498b865911e5a -> pull/404/merge
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:03.4137072Z ##[endgroup]
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:03.4137560Z ##[group]Determining the checkout info
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:03.4138071Z ##[endgroup]
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:03.4146691Z [command]/usr/bin/git sparse-checkout disable
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:03.4209473Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:03.4248532Z ##[group]Checking out the ref
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:03.4252245Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/404/merge
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3787024Z Note: switching to 'refs/remotes/pull/404/merge'.
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3787699Z 
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3788159Z You are in 'detached HEAD' state. You can look around, make experimental
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3789617Z changes and commit them, and you can discard any commits you make in this
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3790544Z state without impacting any branches by switching back to a branch.
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3791259Z 
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3791621Z If you want to create a new branch to retain commits you create, you may
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3792179Z do so (now or later) by using -c with the switch command. Example:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3792488Z 
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3792631Z   git switch -c <new-branch-name>
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3792843Z 
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3792991Z Or undo this operation with:
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3793181Z 
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3793297Z   git switch -
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3793467Z 
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3794018Z Turn off this advice by setting config variable advice.detachedHead to false
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3794473Z 
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3794860Z HEAD is now at 43a249f Merge b1290b33c601ed62b269c1bb7a0663efc73cc9b0 into 8cf07bfd35702222e279cbfeee2f64d73a938b55
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3839263Z ##[endgroup]
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3896245Z [command]/usr/bin/git log -1 --format=%H
+classify changed content	Run actions/checkout@v4	2026-10-30T07:54:04.3930709Z 43a249f54d5f9d9c1f174e1cba9498b865911e5a
+classify changed content	Run actions/setup-node@v4	﻿2026-10-30T07:54:04.4221204Z ##[group]Run actions/setup-node@v4
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.4221591Z with:
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.4221853Z   node-version: 24.21.0
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.4222129Z   always-auth: false
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.4222394Z   check-latest: false
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.4225108Z   token: ***
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.4225376Z env:
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.4225695Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.4226105Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.4226431Z ##[endgroup]
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.5690373Z Attempting to download 24.21.0...
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.5855204Z (node:2330) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:04.5856224Z (Use `node --trace-deprecation ...` to show where the warning was created)
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:05.2213131Z Acquiring 24.21.0 - x64 from https://github.com/actions/node-versions/releases/download/24.21.0-34304089047/node-24.21.0-linux-x64.tar.gz
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:05.5795947Z Extracting ...
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:05.5932730Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/38c521f3-65d1-4483-b782-57a303bf9868 -f /home/runner/work/_temp/4f68b3ac-86b1-4990-be1f-e1b6be8e547f
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:06.8733928Z Adding to the cache ...
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:08.7054813Z ##[group]Environment details
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:08.9426132Z node: v24.21.0
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:08.9426476Z npm: 11.19.0
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:08.9426825Z yarn: 1.22.22
+classify changed content	Run actions/setup-node@v4	2026-10-30T07:54:08.9429095Z ##[endgroup]
+classify changed content	fetch the exact diff base without full history	﻿2026-10-30T07:54:08.9650945Z ##[group]Run node .github/scripts/runner-preflight.mjs --control
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:08.9651516Z [36;1mnode .github/scripts/runner-preflight.mjs --control[0m
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:08.9651931Z [36;1mnode .github/scripts/fetch-ci-base.mjs[0m
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:08.9677364Z shell: /usr/bin/bash -e {0}
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:08.9677658Z env:
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:08.9677927Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:08.9678275Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:08.9678602Z   CI_BASE_SHA: 8cf07bfd35702222e279cbfeee2f64d73a938b55
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:08.9678907Z ##[endgroup]
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:09.0011434Z {"environment":"github-hosted","os":"linux","freeBytes":91088154624,"memoryBytes":16760344576,"light":false,"frontend":false,"control":true,"runner":"GitHub Actions 1000011782","cpus":"X64"}
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:09.2941045Z From https://github.com/caohuibj/eduK12-new-version
+classify changed content	fetch the exact diff base without full history	2026-10-30T07:54:09.2941682Z  * branch            8cf07bfd35702222e279cbfeee2f64d73a938b55 -> FETCH_HEAD
+classify changed content	fetch the actual group report merge base	﻿2026-10-30T07:54:09.3030250Z ##[group]Run node --input-type=module <<'JS'
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3030648Z [36;1mnode --input-type=module <<'JS'[0m
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3031003Z [36;1mimport {execFileSync} from 'node:child_process';[0m
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3031506Z [36;1mimport {groupReportDiffBase} from './.github/scripts/group-report-draft.mjs';[0m
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3032284Z [36;1mconst head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();[0m
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3032806Z [36;1mconst base=groupReportDiffBase(process.env.CI_BASE_SHA,head);[0m
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3033333Z [36;1mexecFileSync('git',['fetch','--no-tags','--depth=1','origin',base],{stdio:'inherit'});[0m
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3034052Z [36;1mJS[0m
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3054685Z shell: /usr/bin/bash -e {0}
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3054939Z env:
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3055198Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3055550Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3055885Z   CI_BASE_SHA: 8cf07bfd35702222e279cbfeee2f64d73a938b55
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3056292Z   CI_HEAD_REF: feat/group-report-snapshots-20261030
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3056649Z   CI_SOURCE_HEAD: b1290b33c601ed62b269c1bb7a0663efc73cc9b0
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.3056960Z ##[endgroup]
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.5736356Z From https://github.com/caohuibj/eduK12-new-version
+classify changed content	fetch the actual group report merge base	2026-10-30T07:54:09.5736992Z  * branch            8cf07bfd35702222e279cbfeee2f64d73a938b55 -> FETCH_HEAD
+classify changed content	detect the fixed PR356 entry before any legacy classification	﻿2026-10-30T07:54:09.5853184Z ##[group]Run node .github/scripts/pr356-entry.mjs --detect
+classify changed content	detect the fixed PR356 entry before any legacy classification	2026-10-30T07:54:09.5853632Z [36;1mnode .github/scripts/pr356-entry.mjs --detect[0m
+classify changed content	detect the fixed PR356 entry before any legacy classification	2026-10-30T07:54:09.5876590Z shell: /usr/bin/bash -e {0}
+classify changed content	detect the fixed PR356 entry before any legacy classification	2026-10-30T07:54:09.5876862Z env:
+classify changed content	detect the fixed PR356 entry before any legacy classification	2026-10-30T07:54:09.5877119Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+classify changed content	detect the fixed PR356 entry before any legacy classification	2026-10-30T07:54:09.5877467Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+classify changed content	detect the fixed PR356 entry before any legacy classification	2026-10-30T07:54:09.5877793Z   CI_BASE_SHA: 8cf07bfd35702222e279cbfeee2f64d73a938b55
+classify changed content	detect the fixed PR356 entry before any legacy classification	2026-10-30T07:54:09.5878097Z ##[endgroup]
+classify changed content	detect the fixed PR356 entry before any legacy classification	2026-10-30T07:54:09.6209139Z {"candidate":false,"event":"pull_request","reason":"unrelated-event"}
+classify changed content	select dependency-free documentation or tooling classification	﻿2026-10-30T07:54:09.6545348Z ##[group]Run node --input-type=module <<'JS'
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6545760Z [36;1mnode --input-type=module <<'JS'[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6546079Z [36;1mimport {appendFileSync} from 'node:fs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6546580Z [36;1mimport {changedEntries,classifyChanges} from './.github/scripts/content-scope.mjs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6547241Z [36;1mimport {trainingFollowupPlan} from './.github/scripts/training-followup-scope.mjs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6547951Z [36;1mimport {groupReportDraftPlan,groupReportDiffBase} from './.github/scripts/group-report-draft.mjs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6548529Z [36;1mimport {execFileSync} from 'node:child_process';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6548980Z [36;1mimport {toolingOnly} from './server-version/scripts/release/policy.mjs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6549716Z [36;1mconst actualBase=groupReportDiffBase(process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6550490Z [36;1mconst entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(actualBase);[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6551149Z [36;1mconst docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6552066Z [36;1mconst followup=process.env.CI_EVENT==='pull_request' && trainingFollowupPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6553127Z [36;1mconst groupDraft=groupReportDraftPlan(entries,actualBase,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6557484Z [36;1mconst lightweight=process.env.CI_FORCE_FULL!=='true' && (Boolean(groupDraft)||docs||toolingOnly(entries)||Boolean(followup)||entries.some(e=>['.github/scripts/survey-governance-bindings.json','.github/scripts/training-polish-bindings.json','.github/scripts/survey-review-bindings.json','.github/scripts/training-admin-integration-bindings.json','.github/scripts/training-entry-bindings.json','.github/scripts/participant-capacity-bindings.json','.github/scripts/survey-assessment-bindings.json','.github/scripts/training-assessment-bindings.json','.github/scripts/school-teacher-visual-bindings.json','.github/scripts/participant-access-bindings.json','.github/scripts/training-manual-ui-bindings.json','.github/scripts/training-appearance-bindings.json','.github/scripts/shared-authoring-bindings.json','.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-self-bindings.json','.github/scripts/school-teacher-native-bindings.json','.github/scripts/school-teacher-package-bindings.json'].includes(e.file)));[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6561947Z [36;1mappendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6562437Z [36;1mJS[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6582967Z shell: /usr/bin/bash -e {0}
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6583218Z env:
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6583469Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6584137Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6584493Z   CI_SOURCE_HEAD: b1290b33c601ed62b269c1bb7a0663efc73cc9b0
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6584864Z   CI_HEAD_REF: feat/group-report-snapshots-20261030
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6585179Z   CI_IS_DRAFT: true
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6585387Z   CI_PR_NUMBER: 404
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6585626Z   CI_BASE_SHA: 8cf07bfd35702222e279cbfeee2f64d73a938b55
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6585929Z   CI_EVENT: pull_request
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6586146Z   CI_FORCE_FULL: 
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.6586339Z ##[endgroup]
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7647676Z node:internal/modules/run_main:107
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7648475Z     triggerUncaughtException(
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7650291Z     ^
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7650704Z 
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7651554Z AssertionError [ERR_ASSERTION]: Unknown group-report path: .github/scripts/onboarding-bindings.json
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7652710Z     at groupReportDraftPlan (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/group-report-draft.mjs:49:27)
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7653582Z     at file:///home/runner/work/eduK12-new-version/eduK12-new-version/[eval1]:11:18
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7655166Z     at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7655682Z   generatedMessage: false,
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7655948Z   code: 'ERR_ASSERTION',
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7656186Z   actual: false,
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7656410Z   expected: true,
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7656624Z   operator: '==',
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7656831Z   diff: 'simple'
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7657028Z }
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7657142Z 
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7657231Z Node.js v24.21.0
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T07:54:09.7693281Z ##[error]Process completed with exit code 1.
+classify changed content	Post Run actions/checkout@v4	﻿2026-10-30T07:54:09.8010874Z Post job cleanup.
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.8880753Z [command]/usr/bin/git version
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.8927990Z git version 2.56.0
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.8968995Z Temporarily overriding HOME='/home/runner/work/_temp/737b279e-cc68-469e-9514-c0d831d98ccd' before making global git config changes
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.8970513Z Adding repository directory to the temporary git global config as a safe directory
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.8974506Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.9016212Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.9056015Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.9354576Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.9385600Z http.https://github.com/.extraheader
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.9402627Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.9466575Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.9778860Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+classify changed content	Post Run actions/checkout@v4	2026-10-30T07:54:09.9839433Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+classify changed content	Complete job	﻿2026-10-30T07:54:10.0304803Z Evaluate and set job outputs
+classify changed content	Complete job	2026-10-30T07:54:10.0336275Z Cleaning up orphan processes
+classify changed content	Complete job	2026-10-30T07:54:10.0755912Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

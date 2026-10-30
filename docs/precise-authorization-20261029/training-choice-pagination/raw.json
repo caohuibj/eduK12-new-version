@@ -1,0 +1,2642 @@
+{
+  "schemaVersion": 1,
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "base": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+  "inputs": {
+    "server-version/backend/src/modules/measurement-content/standard-combination-use.ts": "610c20ff5a13bc6b49a341efaac2c43f01b7a40a16dc1bb3c1641ae7e1eac1cc",
+    "server-version/backend/src/modules/questionnaire-product/service.ts": "3d3d1b2d6e7b5e50c0ce47428ba3d3eb445d7a8fd64a7cd29a1cac671f1e5b7c",
+    "server-version/backend/src/modules/questionnaire-product/routes.ts": "bfc882146a076d2fdbd2aa18bc63c24268562047431c89e6ee44157ddf58ac6c",
+    "server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts": "e3808c930c76cd0659bf83b56bb9298d8176f1a02fee2c4a8ad7f6cedb387126",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts": "e6551fe114d1b7eb5155c031a04d8ce99b8598223141581a3092f5351f352b89",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts": "9f68083a734417ca2e2b0f7470606f22a0c02598b9a140497e6baa63a92665d0",
+    "server-version/frontend/src/components/AssessmentToolPicker.tsx": "0174fd63997a76302dee0d9c40804d7992e9b247340797e4fdf544bb85bd458e",
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": "3d84f322168bbb440efa0e61740c5b8d3bc9cb4a0d8a08e638e54fc98df7bfed",
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": "5a47500ab261fc17d7422c766d263dd580d449deefb8f3da6e342e5565f05ee0"
+  },
+  "invocations": [
+    {
+      "id": "choice-pagination-boundary-red",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/measurement-content/training-choice-pagination.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/training-choice-pagination-20261030/evidence/boundary-red.json"
+        ],
+        "startedAt": "2026-10-30T06:33:29.233145+00:00",
+        "finishedAt": "2026-10-30T06:33:40.790158+00:00",
+        "exitCode": 1
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > retains the first 100 qualified choices when there are 100 distinct authorized configurations 1295ms\n × src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > retains the first 100 qualified choices when there are 101 distinct authorized configurations 190ms\n   → expected false to be true // Object.is equality\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > retains the first 100 qualified choices when there are 101 distinct authorized configurations\nAssertionError: expected false to be true // Object.is equality\n\n- Expected\n+ Received\n\n- true\n+ false\n\n ❯ src/__tests__/measurement-content/training-choice-pagination.test.ts:47:271\n\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed (1)\n      Tests  1 failed | 1 passed (2)\n   Start at  06:33:29\n   Duration  11.00s (transform 6.37s, setup 0ms, import 9.31s, tests 1.49s, environment 0ms)\n\nJSON report written to /workspace/training-choice-pagination-20261030/evidence/boundary-red.json\n",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 1,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793342009586,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+                "status": "passed",
+                "title": "retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+                "duration": 1295.0752300000004,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+                "status": "failed",
+                "title": "retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+                "duration": 190.13899700000002,
+                "failureMessages": [
+                  "AssertionError: expected false to be true // Object.is equality\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts:47:271\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793342019116,
+            "endTime": 1793342020602.139,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "id": "choice-pagination-boundary-green",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/measurement-content/training-choice-pagination.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/training-choice-pagination-20261030/evidence/boundary-green.json"
+        ],
+        "startedAt": "2026-10-30T06:37:36.661000+00:00",
+        "finishedAt": "2026-10-30T06:37:41.880204+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > retains the first 100 qualified choices when there are 100 distinct authorized configurations 299ms\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > retains the first 100 qualified choices when there are 101 distinct authorized configurations 110ms\n\n Test Files  1 passed (1)\n      Tests  2 passed (2)\n   Start at  06:37:37\n   Duration  4.75s (transform 3.08s, setup 0ms, import 4.18s, tests 411ms, environment 0ms)\n\nJSON report written to /workspace/training-choice-pagination-20261030/evidence/boundary-green.json\n",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793342257037,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+                "status": "passed",
+                "title": "retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+                "duration": 298.51648699999987,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+                "status": "passed",
+                "title": "retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+                "duration": 110.30415499999981,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793342261404,
+            "endTime": 1793342261813.3042,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "id": "choice-pagination-pages-and-names",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/measurement-content/training-choice-pagination.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/training-choice-pagination-20261030/evidence/pages-and-names.json"
+        ],
+        "startedAt": "2026-10-30T06:38:38.940894+00:00",
+        "finishedAt": "2026-10-30T06:38:44.100977+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > retains the first 100 qualified choices when there are 100 distinct authorized configurations 250ms\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > retains the first 100 qualified choices when there are 101 distinct authorized configurations 82ms\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > exposes page two without replacing page-one bindings or scanning an unbounded stale prefix 58ms\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > returns a cursor after 100 inadmissible rows so the valid 101st choice is still reachable 27ms\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > keeps distinct business names usable across pages of the same tool 61ms\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > blocks both same-name configurations even when their exact R bindings occur on different pages 65ms\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > does not treat an unchecked same-name raw candidate with withdrawn entry approval as a current peer 64ms\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > rejects partial cursors before any database query 2ms\n\n Test Files  1 passed (1)\n      Tests  8 passed (8)\n   Start at  06:38:39\n   Duration  4.76s (transform 2.99s, setup 0ms, import 4.00s, tests 611ms, environment 0ms)\n\nJSON report written to /workspace/training-choice-pagination-20261030/evidence/pages-and-names.json\n",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793342319255,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+                "status": "passed",
+                "title": "retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+                "duration": 249.9046330000001,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+                "status": "passed",
+                "title": "retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+                "duration": 82.47387500000059,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity exposes page two without replacing page-one bindings or scanning an unbounded stale prefix",
+                "status": "passed",
+                "title": "exposes page two without replacing page-one bindings or scanning an unbounded stale prefix",
+                "duration": 58.06666700000005,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity returns a cursor after 100 inadmissible rows so the valid 101st choice is still reachable",
+                "status": "passed",
+                "title": "returns a cursor after 100 inadmissible rows so the valid 101st choice is still reachable",
+                "duration": 26.892431000000215,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity keeps distinct business names usable across pages of the same tool",
+                "status": "passed",
+                "title": "keeps distinct business names usable across pages of the same tool",
+                "duration": 60.56785800000034,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity blocks both same-name configurations even when their exact R bindings occur on different pages",
+                "status": "passed",
+                "title": "blocks both same-name configurations even when their exact R bindings occur on different pages",
+                "duration": 64.58860100000038,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity does not treat an unchecked same-name raw candidate with withdrawn entry approval as a current peer",
+                "status": "passed",
+                "title": "does not treat an unchecked same-name raw candidate with withdrawn entry approval as a current peer",
+                "duration": 63.64533300000039,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity rejects partial cursors before any database query",
+                "status": "passed",
+                "title": "rejects partial cursors before any database query",
+                "duration": 2.30709300000035,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793342323441,
+            "endTime": 1793342324050.3071,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "id": "choice-pagination-old-cursor-adapter",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "--testNamePattern=through an explicit page cursor|projects each approved C/P/R version label",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/training-choice-pagination-20261030/evidence/old-cursor-adapter.json"
+        ],
+        "startedAt": "2026-10-30T06:40:52.831564+00:00",
+        "finishedAt": "2026-10-30T06:40:58.956841+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > pins C/P/R and the original 21B root without requiring a legacy Scale grant\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > uses the same exact user use across two owned courses without another grant\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > pins the same exact grant in an owned anonymous GENERAL draft without borrowing a course\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects mixed or legacy anonymous scope: foreign-course\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects mixed or legacy anonymous scope: legacy-course\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects mixed or legacy anonymous scope: legacy-container\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects mixed or legacy anonymous scope: unknown-type\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > cannot start from a use row that is not the exact current combination use: missing-use\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > cannot start from a use row that is not the exact current combination use: wrong-recipient\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > cannot start from a use row that is not the exact current combination use: wrong-combo\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > cannot start from a use row that is not the exact current combination use: wrong-hash\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > entry distribution never borrows system authority: system-issuer\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: replaced-root\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: missing-root\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: wrong-product\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: course-root\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: wrong-content\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: wrong-subject\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: no-distribute\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: revoked-root\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: expired-root\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: future-root\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: wrong-entry\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: revoked-entry\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > a current formal entry admin distributes without per-content re-approval\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: foreign-owner\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: foreign-course-owner\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: library-course\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: wrong-course-type\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: frozen-owner\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: survey-realm\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: wrong-item\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: changed-scale-version\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: changed-scale-key\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > refuses new use in WITHDRAWN\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > refuses new use in TRIAL_FAILED\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > refuses new use in APPROVED\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > refuses new use in TRIAL_RUNNING\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps missing-license non-gating after license retirement\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps revoked-license non-gating after license retirement\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps expired-license non-gating after license retirement\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > preserves deployment policy integrity: wrong-mode\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > preserves deployment policy integrity: changed-policy-hash\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: missing-measurement\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: revoked-measurement\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: axis-tamper\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: report-tamper\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: template-tamper\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: parameters-tamper\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: emergency-stop\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects owner and original root expiry after source-lock waits\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps deployment-policy expiry checks while the license gate is retired\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects client axes, self-authored and PUBLIC fields before any SQL\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > freezes formal entry authority without inventing a delegated content root\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: missing-role\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: wrong-entry\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: system-issuer\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: replaced-role\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: reissued-role\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: mixed-bases\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: partial-basis\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > refuses a changed compositeId context before SQL\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > refuses a changed itemId context before SQL\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > refuses a changed scaleId context before SQL\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > refuses a changed ownerId context before SQL\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not silently adopt a newly issued use id\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not revive an old frozen reference when the same use UUID is explicitly reissued\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > preserves frozen C/P/R through installed-version changes, but not current grant or emergency revocation\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > keeps start-only hold semantics and current combination withdrawal separate\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > exact Training entry approval precedes grant and publication > rejects PENDING during source binding instead of waiting for student START\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > exact Training entry approval precedes grant and publication > rejects RETURNED during source binding instead of waiting for student START\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > exact Training entry approval precedes grant and publication > rejects PAUSED during source binding instead of waiting for student START\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > exact Training entry approval precedes grant and publication > does not issue a Training use for a combination without Training entry approval\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original missing root even while issuer has a current entry role\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original revoked root even while issuer has a current entry role\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original expired root even while issuer has a current entry role\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original wrong-content root even while issuer has a current entry role\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original wrong-product root even while issuer has a current entry role\n ✓ src/__tests__/measurement-content/training-standard-source.test.ts > projects each approved C/P/R version label for the authorized Training picker without exposing its snapshot 44ms\n ↓ src/__tests__/measurement-content/training-standard-source.test.ts > projects only validated frozen version labels into teacher summaries without current authority reads\n ✓ src/__tests__/measurement-content/training-standard-source.test.ts > continues past 100 stale grants through an explicit page cursor, retaining current use checks 13ms\n\n Test Files  1 passed (1)\n      Tests  2 passed | 79 skipped (81)\n   Start at  06:40:53\n   Duration  5.64s (transform 4.01s, setup 0ms, import 5.38s, tests 59ms, environment 0ms)\n\nJSON report written to /workspace/training-choice-pagination-20261030/evidence/old-cursor-adapter.json\n",
+      "report": {
+        "numTotalTestSuites": 5,
+        "numPassedTestSuites": 5,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 81,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 79,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793342453220,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant pins C/P/R and the original 21B root without requiring a legacy Scale grant",
+                "status": "skipped",
+                "title": "pins C/P/R and the original 21B root without requiring a legacy Scale grant",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant uses the same exact user use across two owned courses without another grant",
+                "status": "skipped",
+                "title": "uses the same exact user use across two owned courses without another grant",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant pins the same exact grant in an owned anonymous GENERAL draft without borrowing a course",
+                "status": "skipped",
+                "title": "pins the same exact grant in an owned anonymous GENERAL draft without borrowing a course",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects mixed or legacy anonymous scope: foreign-course",
+                "status": "skipped",
+                "title": "rejects mixed or legacy anonymous scope: foreign-course",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects mixed or legacy anonymous scope: legacy-course",
+                "status": "skipped",
+                "title": "rejects mixed or legacy anonymous scope: legacy-course",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects mixed or legacy anonymous scope: legacy-container",
+                "status": "skipped",
+                "title": "rejects mixed or legacy anonymous scope: legacy-container",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects mixed or legacy anonymous scope: unknown-type",
+                "status": "skipped",
+                "title": "rejects mixed or legacy anonymous scope: unknown-type",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant cannot start from a use row that is not the exact current combination use: missing-use",
+                "status": "skipped",
+                "title": "cannot start from a use row that is not the exact current combination use: missing-use",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant cannot start from a use row that is not the exact current combination use: wrong-recipient",
+                "status": "skipped",
+                "title": "cannot start from a use row that is not the exact current combination use: wrong-recipient",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant cannot start from a use row that is not the exact current combination use: wrong-combo",
+                "status": "skipped",
+                "title": "cannot start from a use row that is not the exact current combination use: wrong-combo",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant cannot start from a use row that is not the exact current combination use: wrong-hash",
+                "status": "skipped",
+                "title": "cannot start from a use row that is not the exact current combination use: wrong-hash",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant entry distribution never borrows system authority: system-issuer",
+                "status": "skipped",
+                "title": "entry distribution never borrows system authority: system-issuer",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: replaced-root",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: replaced-root",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: missing-root",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: missing-root",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: wrong-product",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: wrong-product",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: course-root",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: course-root",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: wrong-content",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: wrong-content",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: wrong-subject",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: wrong-subject",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: no-distribute",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: no-distribute",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: revoked-root",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: revoked-root",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: expired-root",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: expired-root",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: future-root",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: future-root",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: wrong-entry",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: wrong-entry",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant without a current entry role the exact 21B delegation root is still enforced: revoked-entry",
+                "status": "skipped",
+                "title": "without a current entry role the exact 21B delegation root is still enforced: revoked-entry",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant a current formal entry admin distributes without per-content re-approval",
+                "status": "skipped",
+                "title": "a current formal entry admin distributes without per-content re-approval",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: foreign-owner",
+                "status": "skipped",
+                "title": "keeps the actual container/source boundary: foreign-owner",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: foreign-course-owner",
+                "status": "skipped",
+                "title": "keeps the actual container/source boundary: foreign-course-owner",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: library-course",
+                "status": "skipped",
+                "title": "keeps the actual container/source boundary: library-course",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: wrong-course-type",
+                "status": "skipped",
+                "title": "keeps the actual container/source boundary: wrong-course-type",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: frozen-owner",
+                "status": "skipped",
+                "title": "keeps the actual container/source boundary: frozen-owner",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: survey-realm",
+                "status": "skipped",
+                "title": "keeps the actual container/source boundary: survey-realm",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: wrong-item",
+                "status": "skipped",
+                "title": "keeps the actual container/source boundary: wrong-item",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: changed-scale-version",
+                "status": "skipped",
+                "title": "keeps the actual container/source boundary: changed-scale-version",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps the actual container/source boundary: changed-scale-key",
+                "status": "skipped",
+                "title": "keeps the actual container/source boundary: changed-scale-key",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant refuses new use in WITHDRAWN",
+                "status": "skipped",
+                "title": "refuses new use in WITHDRAWN",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant refuses new use in TRIAL_FAILED",
+                "status": "skipped",
+                "title": "refuses new use in TRIAL_FAILED",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant refuses new use in APPROVED",
+                "status": "skipped",
+                "title": "refuses new use in APPROVED",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant refuses new use in TRIAL_RUNNING",
+                "status": "skipped",
+                "title": "refuses new use in TRIAL_RUNNING",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps missing-license non-gating after license retirement",
+                "status": "skipped",
+                "title": "keeps missing-license non-gating after license retirement",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps revoked-license non-gating after license retirement",
+                "status": "skipped",
+                "title": "keeps revoked-license non-gating after license retirement",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps expired-license non-gating after license retirement",
+                "status": "skipped",
+                "title": "keeps expired-license non-gating after license retirement",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant preserves deployment policy integrity: wrong-mode",
+                "status": "skipped",
+                "title": "preserves deployment policy integrity: wrong-mode",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant preserves deployment policy integrity: changed-policy-hash",
+                "status": "skipped",
+                "title": "preserves deployment policy integrity: changed-policy-hash",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: missing-measurement",
+                "status": "skipped",
+                "title": "rejects a broken/stopped source: missing-measurement",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: revoked-measurement",
+                "status": "skipped",
+                "title": "rejects a broken/stopped source: revoked-measurement",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: axis-tamper",
+                "status": "skipped",
+                "title": "rejects a broken/stopped source: axis-tamper",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: report-tamper",
+                "status": "skipped",
+                "title": "rejects a broken/stopped source: report-tamper",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: template-tamper",
+                "status": "skipped",
+                "title": "rejects a broken/stopped source: template-tamper",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: parameters-tamper",
+                "status": "skipped",
+                "title": "rejects a broken/stopped source: parameters-tamper",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects a broken/stopped source: emergency-stop",
+                "status": "skipped",
+                "title": "rejects a broken/stopped source: emergency-stop",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects owner and original root expiry after source-lock waits",
+                "status": "skipped",
+                "title": "rejects owner and original root expiry after source-lock waits",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant keeps deployment-policy expiry checks while the license gate is retired",
+                "status": "skipped",
+                "title": "keeps deployment-policy expiry checks while the license gate is retired",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training consumes one exact shared combination through one user MaterialGrant"
+                ],
+                "fullName": "Training consumes one exact shared combination through one user MaterialGrant rejects client axes, self-authored and PUBLIC fields before any SQL",
+                "status": "skipped",
+                "title": "rejects client axes, self-authored and PUBLIC fields before any SQL",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current freezes formal entry authority without inventing a delegated content root",
+                "status": "skipped",
+                "title": "freezes formal entry authority without inventing a delegated content root",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: missing-role",
+                "status": "skipped",
+                "title": "does not substitute a changed or malformed formal entry basis: missing-role",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: wrong-entry",
+                "status": "skipped",
+                "title": "does not substitute a changed or malformed formal entry basis: wrong-entry",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: system-issuer",
+                "status": "skipped",
+                "title": "does not substitute a changed or malformed formal entry basis: system-issuer",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: replaced-role",
+                "status": "skipped",
+                "title": "does not substitute a changed or malformed formal entry basis: replaced-role",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: reissued-role",
+                "status": "skipped",
+                "title": "does not substitute a changed or malformed formal entry basis: reissued-role",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: mixed-bases",
+                "status": "skipped",
+                "title": "does not substitute a changed or malformed formal entry basis: mixed-bases",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current does not substitute a changed or malformed formal entry basis: partial-basis",
+                "status": "skipped",
+                "title": "does not substitute a changed or malformed formal entry basis: partial-basis",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current refuses a changed compositeId context before SQL",
+                "status": "skipped",
+                "title": "refuses a changed compositeId context before SQL",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current refuses a changed itemId context before SQL",
+                "status": "skipped",
+                "title": "refuses a changed itemId context before SQL",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current refuses a changed scaleId context before SQL",
+                "status": "skipped",
+                "title": "refuses a changed scaleId context before SQL",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current refuses a changed ownerId context before SQL",
+                "status": "skipped",
+                "title": "refuses a changed ownerId context before SQL",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current does not silently adopt a newly issued use id",
+                "status": "skipped",
+                "title": "does not silently adopt a newly issued use id",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current does not revive an old frozen reference when the same use UUID is explicitly reissued",
+                "status": "skipped",
+                "title": "does not revive an old frozen reference when the same use UUID is explicitly reissued",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current preserves frozen C/P/R through installed-version changes, but not current grant or emergency revocation",
+                "status": "skipped",
+                "title": "preserves frozen C/P/R through installed-version changes, but not current grant or emergency revocation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "the persisted Training source is exact, while live use remains current"
+                ],
+                "fullName": "the persisted Training source is exact, while live use remains current keeps start-only hold semantics and current combination withdrawal separate",
+                "status": "skipped",
+                "title": "keeps start-only hold semantics and current combination withdrawal separate",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact Training entry approval precedes grant and publication"
+                ],
+                "fullName": "exact Training entry approval precedes grant and publication rejects PENDING during source binding instead of waiting for student START",
+                "status": "skipped",
+                "title": "rejects PENDING during source binding instead of waiting for student START",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact Training entry approval precedes grant and publication"
+                ],
+                "fullName": "exact Training entry approval precedes grant and publication rejects RETURNED during source binding instead of waiting for student START",
+                "status": "skipped",
+                "title": "rejects RETURNED during source binding instead of waiting for student START",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact Training entry approval precedes grant and publication"
+                ],
+                "fullName": "exact Training entry approval precedes grant and publication rejects PAUSED during source binding instead of waiting for student START",
+                "status": "skipped",
+                "title": "rejects PAUSED during source binding instead of waiting for student START",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact Training entry approval precedes grant and publication"
+                ],
+                "fullName": "exact Training entry approval precedes grant and publication does not issue a Training use for a combination without Training entry approval",
+                "status": "skipped",
+                "title": "does not issue a Training use for a combination without Training entry approval",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "frozen delegation is not replaced by a later entry appointment"
+                ],
+                "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original missing root even while issuer has a current entry role",
+                "status": "skipped",
+                "title": "rejects the original missing root even while issuer has a current entry role",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "frozen delegation is not replaced by a later entry appointment"
+                ],
+                "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original revoked root even while issuer has a current entry role",
+                "status": "skipped",
+                "title": "rejects the original revoked root even while issuer has a current entry role",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "frozen delegation is not replaced by a later entry appointment"
+                ],
+                "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original expired root even while issuer has a current entry role",
+                "status": "skipped",
+                "title": "rejects the original expired root even while issuer has a current entry role",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "frozen delegation is not replaced by a later entry appointment"
+                ],
+                "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original wrong-content root even while issuer has a current entry role",
+                "status": "skipped",
+                "title": "rejects the original wrong-content root even while issuer has a current entry role",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "frozen delegation is not replaced by a later entry appointment"
+                ],
+                "fullName": "frozen delegation is not replaced by a later entry appointment rejects the original wrong-product root even while issuer has a current entry role",
+                "status": "skipped",
+                "title": "rejects the original wrong-product root even while issuer has a current entry role",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "projects each approved C/P/R version label for the authorized Training picker without exposing its snapshot",
+                "status": "passed",
+                "title": "projects each approved C/P/R version label for the authorized Training picker without exposing its snapshot",
+                "duration": 43.617497000000185,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "projects only validated frozen version labels into teacher summaries without current authority reads",
+                "status": "skipped",
+                "title": "projects only validated frozen version labels into teacher summaries without current authority reads",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "continues past 100 stale grants through an explicit page cursor, retaining current use checks",
+                "status": "passed",
+                "title": "continues past 100 stale grants through an explicit page cursor, retaining current use checks",
+                "duration": 13.363816000000043,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793342458829,
+            "endTime": 1793342458885.3638,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "id": "choice-pagination-ui",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+          "--testNamePattern=loads the next authorized configuration page|keeps a failed configuration-page cursor",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/training-choice-pagination-20261030/evidence/ui.json"
+        ],
+        "startedAt": "2026-10-30T06:40:51.259164+00:00",
+        "finishedAt": "2026-10-30T06:40:56.214494+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend\n\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > hides the cognitive authoring type while disabled and preserves stored cognitive content\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > explicitly publishes the current cognitive configuration using the saved revision without publishing delivery\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > holds an unknown cognitive publication without resending after read-only refresh\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > restores the original actor/composite revision after remount and only archives after explicit verified-pointer review\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > blocks edits while the original publication is pending and safely ends an obsolete revision without claiming success\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > keeps a late publication response in its original composite scope after navigation\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > unlocks a first definitive 400 publication rejection for correction\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > unlocks a first definitive 403 publication rejection for correction\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > unlocks a first definitive 409 publication rejection for correction\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > preserves an earlier unknown outcome when its original-revision retry gets 403\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > exposes the active composition section to keyboard and screen-reader users\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > prefills only an authorized course passed by the Training course route\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > does not preselect an unlisted course from a tampered URL\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > discards a previous questionnaire response after switching pages\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > offers publication for a saved draft while preserving the revision guard\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > identifies and focuses an empty name without sending a request\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > preserves API message objects and permits course-less drafts under the actual rule\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > shows a field-level deadline requirement for public drafts\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > rejects a deadline earlier than the opening time before saving\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > blocks publication and hides stale checks after editing delivery settings\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > rejects incomplete and invalid calendar dates before creating a public draft\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > authors an ordinary optional Form with the original revision and no context binding\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training guided delivery settings > explains the three base steps and keeps optional features off without writing any settings\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training guided delivery settings > keeps server retention separate from local cleanup and sends the unchanged policy shape on save\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training guided delivery settings > shows editable group probabilities and explains the incompatible flow without changing saved groups\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training guided delivery settings > opens nested flow rules and focuses invalid JSON when saving\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training guided delivery settings > keeps published retention and collection read-only while disclosure permissions remain independently controlled\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C04 typed authoring > creates number using the public Form definition without a client itemKey\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C04 typed authoring > creates long_text using the public Form definition without a client itemKey\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C04 typed authoring > creates date using the public Form definition without a client itemKey\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C04 typed authoring > creates time using the public Form definition without a client itemKey\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates likert as one public FormQuestion\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates matrix as one public FormQuestion\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates matrix_multiple as one public FormQuestion\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates rank_order as one public FormQuestion\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates slider as one public FormQuestion\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates constant_sum as one public FormQuestion\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 incomplete single question stays editable > retains title, options and matrix rows when the server rejects adding an incomplete question\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C06 stable policy authoring > adds a conditional question to the chosen existing section using its stable source key\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > shows typed export actions from the actual nested teacher form DTO\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C19 Training conditional flow authoring > saves with the latest revision after metadata and blocks publication until successful\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C19 Training conditional flow authoring > focuses invalid flow JSON and keeps unsaved edits after server conflict\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C20 material flow editor and attempt budget > C20 guided authoring exposes delivery and advanced JSON before saving and publishing\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C20 material flow editor and attempt budget > loads the saved budget and sends budget-only changes with V2 config\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C20 material flow editor and attempt budget > upgrades the existing V1 blocks only explicitly and adds an editable quota sample\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C20 material flow editor and attempt budget > hydrates copied V2 config and budget from the returned draft detail\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training persistence authoring > starts both independent retention controls off\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training persistence authoring > freezes both settings after publication\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C22 Training feedback release authoring > defaults a newly bound Training questionnaire to immediate feedback after completion and generation\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C22 Training feedback release authoring > requires a valid release time before saving scheduled feedback\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C22 Training feedback release authoring > defaults to immediate feedback when a course-less draft first binds Training\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C22 Training feedback release authoring > saves the scheduled device-local time as an ISO timestamp with the current revision\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C22 Training feedback release authoring > allows returning an existing scheduled draft to immediate feedback without a stale timestamp\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C22 Training feedback release authoring > keeps published policy and timestamp read-only\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C22 Training feedback release authoring > preserves an unconfigured legacy policy while saving unrelated metadata\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C22 Training feedback release authoring > clears a configured draft policy when its author changes delivery out of Training scope\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C22 Training feedback release authoring > does not add Training feedback to a non-Training creation\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training questionnaire guided editor > selects SCALE through searchable cards while keeping the existing item API\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training questionnaire guided editor > selects COGNITIVE through searchable cards while keeping the existing item API\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training questionnaire guided editor > selects SITUATIONAL through searchable cards while keeping the existing item API\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training questionnaire guided editor > keeps the cognitive type discoverable but disabled when capability is unavailable\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training questionnaire guided editor > explains an empty cognitive catalog without inventing an available task\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training questionnaire guided editor > keeps unsaved metadata across steps and saves through the existing revision contract\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training questionnaire guided editor > reveals and focuses an invalid feedback time when saving from another step\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training questionnaire guided editor > opens the publish deep link and routes a server preflight issue back to its unit\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training questionnaire guided editor > creates with the existing request payload and opens real content authoring\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > adds library materials without opening advanced rules and persists them with the typed Form policy\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > hides manual grouping and automatically appends ordinary questions without enabling V3\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > starts a new stage only on request, then appends subsequent questions to that new stage\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > provides same-stage condition sources and clears a condition when starting another stage\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > sends a selected same-stage condition with the existing stable item key\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > starts automatically after another instrument instead of appending to an earlier section\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > keeps the special background section separate from ordinary questions\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > saves row-based legacy options with punctuation intact and preserves them on a rejected request\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > saves bulk matrix rows and options using the existing typed definition shape\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training automatic Form stages > preserves supplied background codes and requires unlinking other/exclusive roles before deleting an option\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > guided anonymous publication > explains the three steps before publishing without generating a public credential\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > guided anonymous publication > shows links directly after publication, outside the collapsed management actions\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > guided anonymous publication > opens one anonymous settings area from delivery and preserves changes through saving\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training toolkit separation > keeps the three advanced controls in toolkit with the saved course context\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training toolkit separation > hides advanced controls in course editing while retaining an unconfirmed selection guard\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > selects and submits an exact approved Training combination without collapsing versions to the physical Scale\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > distinguishes approved parameter/report versions sharing one content version and submits the selected exact combination\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > offers granted exact configurations in GENERAL while retaining authorized native Scale choices\n ↓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > uses named precise Training choices and sends the original selected binding while disabling ambiguous choices\n ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > loads the next authorized configuration page without replacing the current exact selection 813ms\n ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > keeps a failed configuration-page cursor retryable and explicitly selects the 101st authorized binding 380ms\n\n Test Files  1 passed (1)\n      Tests  2 passed | 85 skipped (87)\n   Start at  06:40:51\n   Duration  4.50s (transform 1.31s, setup 271ms, import 1.58s, tests 1.20s, environment 1.01s)\n\nJSON report written to /workspace/training-choice-pagination-20261030/evidence/ui.json\n",
+      "report": {
+        "numTotalTestSuites": 15,
+        "numPassedTestSuites": 15,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 87,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 85,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793342451640,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback hides the cognitive authoring type while disabled and preserves stored cognitive content",
+                "status": "skipped",
+                "title": "hides the cognitive authoring type while disabled and preserves stored cognitive content",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback explicitly publishes the current cognitive configuration using the saved revision without publishing delivery",
+                "status": "skipped",
+                "title": "explicitly publishes the current cognitive configuration using the saved revision without publishing delivery",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback holds an unknown cognitive publication without resending after read-only refresh",
+                "status": "skipped",
+                "title": "holds an unknown cognitive publication without resending after read-only refresh",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback restores the original actor/composite revision after remount and only archives after explicit verified-pointer review",
+                "status": "skipped",
+                "title": "restores the original actor/composite revision after remount and only archives after explicit verified-pointer review",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback blocks edits while the original publication is pending and safely ends an obsolete revision without claiming success",
+                "status": "skipped",
+                "title": "blocks edits while the original publication is pending and safely ends an obsolete revision without claiming success",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback keeps a late publication response in its original composite scope after navigation",
+                "status": "skipped",
+                "title": "keeps a late publication response in its original composite scope after navigation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback unlocks a first definitive 400 publication rejection for correction",
+                "status": "skipped",
+                "title": "unlocks a first definitive 400 publication rejection for correction",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback unlocks a first definitive 403 publication rejection for correction",
+                "status": "skipped",
+                "title": "unlocks a first definitive 403 publication rejection for correction",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback unlocks a first definitive 409 publication rejection for correction",
+                "status": "skipped",
+                "title": "unlocks a first definitive 409 publication rejection for correction",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback preserves an earlier unknown outcome when its original-revision retry gets 403",
+                "status": "skipped",
+                "title": "preserves an earlier unknown outcome when its original-revision retry gets 403",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback exposes the active composition section to keyboard and screen-reader users",
+                "status": "skipped",
+                "title": "exposes the active composition section to keyboard and screen-reader users",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback prefills only an authorized course passed by the Training course route",
+                "status": "skipped",
+                "title": "prefills only an authorized course passed by the Training course route",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback does not preselect an unlisted course from a tampered URL",
+                "status": "skipped",
+                "title": "does not preselect an unlisted course from a tampered URL",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback discards a previous questionnaire response after switching pages",
+                "status": "skipped",
+                "title": "discards a previous questionnaire response after switching pages",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback offers publication for a saved draft while preserving the revision guard",
+                "status": "skipped",
+                "title": "offers publication for a saved draft while preserving the revision guard",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback identifies and focuses an empty name without sending a request",
+                "status": "skipped",
+                "title": "identifies and focuses an empty name without sending a request",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback preserves API message objects and permits course-less drafts under the actual rule",
+                "status": "skipped",
+                "title": "preserves API message objects and permits course-less drafts under the actual rule",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback shows a field-level deadline requirement for public drafts",
+                "status": "skipped",
+                "title": "shows a field-level deadline requirement for public drafts",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback rejects a deadline earlier than the opening time before saving",
+                "status": "skipped",
+                "title": "rejects a deadline earlier than the opening time before saving",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback blocks publication and hides stale checks after editing delivery settings",
+                "status": "skipped",
+                "title": "blocks publication and hides stale checks after editing delivery settings",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback rejects incomplete and invalid calendar dates before creating a public draft",
+                "status": "skipped",
+                "title": "rejects incomplete and invalid calendar dates before creating a public draft",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "questionnaire draft feedback"
+                ],
+                "fullName": "questionnaire draft feedback authors an ordinary optional Form with the original revision and no context binding",
+                "status": "skipped",
+                "title": "authors an ordinary optional Form with the original revision and no context binding",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings explains the three base steps and keeps optional features off without writing any settings",
+                "status": "skipped",
+                "title": "explains the three base steps and keeps optional features off without writing any settings",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings keeps server retention separate from local cleanup and sends the unchanged policy shape on save",
+                "status": "skipped",
+                "title": "keeps server retention separate from local cleanup and sends the unchanged policy shape on save",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings shows editable group probabilities and explains the incompatible flow without changing saved groups",
+                "status": "skipped",
+                "title": "shows editable group probabilities and explains the incompatible flow without changing saved groups",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings opens nested flow rules and focuses invalid JSON when saving",
+                "status": "skipped",
+                "title": "opens nested flow rules and focuses invalid JSON when saving",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training guided delivery settings"
+                ],
+                "fullName": "Training guided delivery settings keeps published retention and collection read-only while disclosure permissions remain independently controlled",
+                "status": "skipped",
+                "title": "keeps published retention and collection read-only while disclosure permissions remain independently controlled",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C04 typed authoring"
+                ],
+                "fullName": "C04 typed authoring creates number using the public Form definition without a client itemKey",
+                "status": "skipped",
+                "title": "creates number using the public Form definition without a client itemKey",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C04 typed authoring"
+                ],
+                "fullName": "C04 typed authoring creates long_text using the public Form definition without a client itemKey",
+                "status": "skipped",
+                "title": "creates long_text using the public Form definition without a client itemKey",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C04 typed authoring"
+                ],
+                "fullName": "C04 typed authoring creates date using the public Form definition without a client itemKey",
+                "status": "skipped",
+                "title": "creates date using the public Form definition without a client itemKey",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C04 typed authoring"
+                ],
+                "fullName": "C04 typed authoring creates time using the public Form definition without a client itemKey",
+                "status": "skipped",
+                "title": "creates time using the public Form definition without a client itemKey",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates likert as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates likert as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates matrix as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates matrix as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates matrix_multiple as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates matrix_multiple as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates rank_order as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates rank_order as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates slider as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates slider as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 structured authoring"
+                ],
+                "fullName": "C05 structured authoring creates constant_sum as one public FormQuestion",
+                "status": "skipped",
+                "title": "creates constant_sum as one public FormQuestion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C05 incomplete single question stays editable"
+                ],
+                "fullName": "C05 incomplete single question stays editable retains title, options and matrix rows when the server rejects adding an incomplete question",
+                "status": "skipped",
+                "title": "retains title, options and matrix rows when the server rejects adding an incomplete question",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C06 stable policy authoring"
+                ],
+                "fullName": "C06 stable policy authoring adds a conditional question to the chosen existing section using its stable source key",
+                "status": "skipped",
+                "title": "adds a conditional question to the chosen existing section using its stable source key",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "shows typed export actions from the actual nested teacher form DTO",
+                "status": "skipped",
+                "title": "shows typed export actions from the actual nested teacher form DTO",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 Training conditional flow authoring"
+                ],
+                "fullName": "C19 Training conditional flow authoring saves with the latest revision after metadata and blocks publication until successful",
+                "status": "skipped",
+                "title": "saves with the latest revision after metadata and blocks publication until successful",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 Training conditional flow authoring"
+                ],
+                "fullName": "C19 Training conditional flow authoring focuses invalid flow JSON and keeps unsaved edits after server conflict",
+                "status": "skipped",
+                "title": "focuses invalid flow JSON and keeps unsaved edits after server conflict",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C20 material flow editor and attempt budget"
+                ],
+                "fullName": "C20 material flow editor and attempt budget C20 guided authoring exposes delivery and advanced JSON before saving and publishing",
+                "status": "skipped",
+                "title": "C20 guided authoring exposes delivery and advanced JSON before saving and publishing",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C20 material flow editor and attempt budget"
+                ],
+                "fullName": "C20 material flow editor and attempt budget loads the saved budget and sends budget-only changes with V2 config",
+                "status": "skipped",
+                "title": "loads the saved budget and sends budget-only changes with V2 config",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C20 material flow editor and attempt budget"
+                ],
+                "fullName": "C20 material flow editor and attempt budget upgrades the existing V1 blocks only explicitly and adds an editable quota sample",
+                "status": "skipped",
+                "title": "upgrades the existing V1 blocks only explicitly and adds an editable quota sample",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C20 material flow editor and attempt budget"
+                ],
+                "fullName": "C20 material flow editor and attempt budget hydrates copied V2 config and budget from the returned draft detail",
+                "status": "skipped",
+                "title": "hydrates copied V2 config and budget from the returned draft detail",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training persistence authoring"
+                ],
+                "fullName": "Training persistence authoring starts both independent retention controls off",
+                "status": "skipped",
+                "title": "starts both independent retention controls off",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training persistence authoring"
+                ],
+                "fullName": "Training persistence authoring freezes both settings after publication",
+                "status": "skipped",
+                "title": "freezes both settings after publication",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring defaults a newly bound Training questionnaire to immediate feedback after completion and generation",
+                "status": "skipped",
+                "title": "defaults a newly bound Training questionnaire to immediate feedback after completion and generation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring requires a valid release time before saving scheduled feedback",
+                "status": "skipped",
+                "title": "requires a valid release time before saving scheduled feedback",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring defaults to immediate feedback when a course-less draft first binds Training",
+                "status": "skipped",
+                "title": "defaults to immediate feedback when a course-less draft first binds Training",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring saves the scheduled device-local time as an ISO timestamp with the current revision",
+                "status": "skipped",
+                "title": "saves the scheduled device-local time as an ISO timestamp with the current revision",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring allows returning an existing scheduled draft to immediate feedback without a stale timestamp",
+                "status": "skipped",
+                "title": "allows returning an existing scheduled draft to immediate feedback without a stale timestamp",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring keeps published policy and timestamp read-only",
+                "status": "skipped",
+                "title": "keeps published policy and timestamp read-only",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring preserves an unconfigured legacy policy while saving unrelated metadata",
+                "status": "skipped",
+                "title": "preserves an unconfigured legacy policy while saving unrelated metadata",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring clears a configured draft policy when its author changes delivery out of Training scope",
+                "status": "skipped",
+                "title": "clears a configured draft policy when its author changes delivery out of Training scope",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C22 Training feedback release authoring"
+                ],
+                "fullName": "C22 Training feedback release authoring does not add Training feedback to a non-Training creation",
+                "status": "skipped",
+                "title": "does not add Training feedback to a non-Training creation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor selects SCALE through searchable cards while keeping the existing item API",
+                "status": "skipped",
+                "title": "selects SCALE through searchable cards while keeping the existing item API",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor selects COGNITIVE through searchable cards while keeping the existing item API",
+                "status": "skipped",
+                "title": "selects COGNITIVE through searchable cards while keeping the existing item API",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor selects SITUATIONAL through searchable cards while keeping the existing item API",
+                "status": "skipped",
+                "title": "selects SITUATIONAL through searchable cards while keeping the existing item API",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor keeps the cognitive type discoverable but disabled when capability is unavailable",
+                "status": "skipped",
+                "title": "keeps the cognitive type discoverable but disabled when capability is unavailable",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor explains an empty cognitive catalog without inventing an available task",
+                "status": "skipped",
+                "title": "explains an empty cognitive catalog without inventing an available task",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor keeps unsaved metadata across steps and saves through the existing revision contract",
+                "status": "skipped",
+                "title": "keeps unsaved metadata across steps and saves through the existing revision contract",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor reveals and focuses an invalid feedback time when saving from another step",
+                "status": "skipped",
+                "title": "reveals and focuses an invalid feedback time when saving from another step",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor opens the publish deep link and routes a server preflight issue back to its unit",
+                "status": "skipped",
+                "title": "opens the publish deep link and routes a server preflight issue back to its unit",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training questionnaire guided editor"
+                ],
+                "fullName": "Training questionnaire guided editor creates with the existing request payload and opens real content authoring",
+                "status": "skipped",
+                "title": "creates with the existing request payload and opens real content authoring",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages adds library materials without opening advanced rules and persists them with the typed Form policy",
+                "status": "skipped",
+                "title": "adds library materials without opening advanced rules and persists them with the typed Form policy",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages hides manual grouping and automatically appends ordinary questions without enabling V3",
+                "status": "skipped",
+                "title": "hides manual grouping and automatically appends ordinary questions without enabling V3",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages starts a new stage only on request, then appends subsequent questions to that new stage",
+                "status": "skipped",
+                "title": "starts a new stage only on request, then appends subsequent questions to that new stage",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages provides same-stage condition sources and clears a condition when starting another stage",
+                "status": "skipped",
+                "title": "provides same-stage condition sources and clears a condition when starting another stage",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages sends a selected same-stage condition with the existing stable item key",
+                "status": "skipped",
+                "title": "sends a selected same-stage condition with the existing stable item key",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages starts automatically after another instrument instead of appending to an earlier section",
+                "status": "skipped",
+                "title": "starts automatically after another instrument instead of appending to an earlier section",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages keeps the special background section separate from ordinary questions",
+                "status": "skipped",
+                "title": "keeps the special background section separate from ordinary questions",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages saves row-based legacy options with punctuation intact and preserves them on a rejected request",
+                "status": "skipped",
+                "title": "saves row-based legacy options with punctuation intact and preserves them on a rejected request",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages saves bulk matrix rows and options using the existing typed definition shape",
+                "status": "skipped",
+                "title": "saves bulk matrix rows and options using the existing typed definition shape",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training automatic Form stages"
+                ],
+                "fullName": "Training automatic Form stages preserves supplied background codes and requires unlinking other/exclusive roles before deleting an option",
+                "status": "skipped",
+                "title": "preserves supplied background codes and requires unlinking other/exclusive roles before deleting an option",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "guided anonymous publication"
+                ],
+                "fullName": "guided anonymous publication explains the three steps before publishing without generating a public credential",
+                "status": "skipped",
+                "title": "explains the three steps before publishing without generating a public credential",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "guided anonymous publication"
+                ],
+                "fullName": "guided anonymous publication shows links directly after publication, outside the collapsed management actions",
+                "status": "skipped",
+                "title": "shows links directly after publication, outside the collapsed management actions",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "guided anonymous publication"
+                ],
+                "fullName": "guided anonymous publication opens one anonymous settings area from delivery and preserves changes through saving",
+                "status": "skipped",
+                "title": "opens one anonymous settings area from delivery and preserves changes through saving",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training toolkit separation"
+                ],
+                "fullName": "Training toolkit separation keeps the three advanced controls in toolkit with the saved course context",
+                "status": "skipped",
+                "title": "keeps the three advanced controls in toolkit with the saved course context",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training toolkit separation"
+                ],
+                "fullName": "Training toolkit separation hides advanced controls in course editing while retaining an unconfirmed selection guard",
+                "status": "skipped",
+                "title": "hides advanced controls in course editing while retaining an unconfirmed selection guard",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "selects and submits an exact approved Training combination without collapsing versions to the physical Scale",
+                "status": "skipped",
+                "title": "selects and submits an exact approved Training combination without collapsing versions to the physical Scale",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "distinguishes approved parameter/report versions sharing one content version and submits the selected exact combination",
+                "status": "skipped",
+                "title": "distinguishes approved parameter/report versions sharing one content version and submits the selected exact combination",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "offers granted exact configurations in GENERAL while retaining authorized native Scale choices",
+                "status": "skipped",
+                "title": "offers granted exact configurations in GENERAL while retaining authorized native Scale choices",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "uses named precise Training choices and sends the original selected binding while disabling ambiguous choices",
+                "status": "skipped",
+                "title": "uses named precise Training choices and sends the original selected binding while disabling ambiguous choices",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "loads the next authorized configuration page without replacing the current exact selection",
+                "status": "passed",
+                "title": "loads the next authorized configuration page without replacing the current exact selection",
+                "duration": 813.1941339999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "keeps a failed configuration-page cursor retryable and explicitly selects the 101st authorized binding",
+                "status": "passed",
+                "title": "keeps a failed configuration-page cursor retryable and explicitly selects the 101st authorized binding",
+                "duration": 379.5520889999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793342454957,
+            "endTime": 1793342456150.552,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "id": "choice-pagination-backend-types",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "node_modules/typescript/bin/tsc",
+          "--project",
+          "/workspace/training-choice-pagination-20261030/backend-types.json"
+        ],
+        "startedAt": "2026-10-30T06:42:16.397028+00:00",
+        "finishedAt": "2026-10-30T06:42:49.951747+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "id": "choice-pagination-frontend-types",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "node_modules/typescript/bin/tsc",
+          "--project",
+          "/workspace/training-choice-pagination-20261030/frontend-types.json"
+        ],
+        "startedAt": "2026-10-30T06:42:16.387023+00:00",
+        "finishedAt": "2026-10-30T06:42:26.954792+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "id": "choice-pagination-http-pg-readback",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-dual-report-v2.py",
+          "node",
+          "node_modules/tsx/dist/cli.mjs",
+          "/workspace/training-choice-pagination-20261030/picker-http-readback.ts"
+        ],
+        "startedAt": "2026-10-30T06:42:19.947158+00:00",
+        "finishedAt": "2026-10-30T06:42:27.637353+00:00",
+        "exitCode": 0
+      },
+      "log": "PASS protected pagination GET, real PG lateral query, partial-cursor and anonymous rejection; business counts unchanged\n[2026-10-30T06:42:27.548Z] [INFO] 队列已关闭\n",
+      "readback": {
+        "passed": true,
+        "database": "precise_dual_report_test_20261030_v2",
+        "restrictedRole": "precise_task1_runtime",
+        "syntheticActorsOnly": true,
+        "requests": [
+          {
+            "actor": "standardTeacher",
+            "path": "/api/questionnaire-products/standard-combination-choices",
+            "status": 200
+          },
+          {
+            "actor": "standardTeacher",
+            "path": "/api/questionnaire-products/standard-combination-choices?afterToolKey=cfq7_zh_cn_research&afterReleaseId=2bf70753-19a4-4815-af8d-47a9786e450f&afterUseId=d1f50eee-a9c7-41cd-9173-77f415575090",
+            "status": 200
+          },
+          {
+            "actor": "standardTeacher",
+            "path": "/api/questionnaire-products/standard-combination-choices?afterToolKey=partial",
+            "status": 400
+          },
+          {
+            "actor": "funTeacher",
+            "path": "/api/questionnaire-products/standard-combination-choices",
+            "status": 200
+          },
+          {
+            "actor": "funTeacher",
+            "path": "/api/questionnaire-products/standard-combination-choices?afterToolKey=cfq7_zh_cn_research&afterReleaseId=796d8763-11cf-405e-8367-667ce5039b8f&afterUseId=22dff566-c1bb-491d-8819-c28db23a30f2",
+            "status": 200
+          },
+          {
+            "actor": "funTeacher",
+            "path": "/api/questionnaire-products/standard-combination-choices?afterToolKey=partial",
+            "status": 400
+          },
+          {
+            "actor": "anonymous",
+            "status": 401
+          }
+        ],
+        "businessCountsUnchanged": {
+          "uses": 2,
+          "events": 4,
+          "attempts": 2
+        },
+        "scope": "Actual protected GET and PostgreSQL page/probe SQL only. Existing synthetic two-R grants reused, no seed/grant/FINAL writes."
+      },
+      "script": "import {readFile,writeFile} from 'node:fs/promises'\nimport {createServer} from 'node:http'\nimport assert from 'node:assert/strict'\nimport {randomUUID} from 'node:crypto'\nimport express from '/workspace/eduK12-new-version/server-version/backend/node_modules/express/index.js'\nimport {prisma as db} from '/workspace/eduK12-new-version/server-version/backend/src/config/database'\nimport routes from '/workspace/eduK12-new-version/server-version/backend/src/modules/questionnaire-product/routes'\nimport {errorHandler} from '/workspace/eduK12-new-version/server-version/backend/src/middleware/errorHandler'\nimport {generateToken} from '/workspace/eduK12-new-version/server-version/backend/src/utils/jwt'\nimport {closeQueues} from '/workspace/eduK12-new-version/server-version/backend/src/config/queue'\nasync function main(){\n const u=new URL(process.env.DATABASE_URL!);assert.equal(u.hostname,'127.0.0.1');assert.equal(u.port,'55439');assert.equal(u.pathname,'/precise_dual_report_test_20261030_v2');assert.equal(u.username,'precise_task1_runtime')\n const state=JSON.parse(await readFile('/workspace/materials-load-20261029/dual-report-v2-private.json','utf8'))\n const app=express();app.use(express.json());app.use('/api/questionnaire-products',routes);app.use(errorHandler);const server=createServer(app);await new Promise<void>(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+(server.address() as any).port\n const count=async()=>({uses:await db.materialGrant.count(),events:await db.assessmentManagementEvent.count(),attempts:await db.compositeAssessmentAttempt.count()});const before=await count(),requests:any[]=[]\n try{\n  for(const name of ['standardTeacher','funTeacher']){\n   const user=await db.user.findUniqueOrThrow({where:{id:state[name+'Id']}}),token=generateToken({userId:user.id,username:user.username,role:user.role,accountDomain:'TRAINING',tokenVersion:user.tokenVersion})\n   const get=async(path:string,status=200)=>{const response=await fetch(base+path,{headers:{Cookie:'ptool_session='+token,Origin:'http://localhost:5173'}}),body=await response.json() as any;requests.push({actor:name,path,status:response.status});assert.equal(response.status,status,body.message);return body.data}\n   const page=await get('/api/questionnaire-products/standard-combination-choices');assert.equal(page.list.length,1);assert.equal(page.list[0].available,true);assert.equal(page.nextCursor,null)\n   const c=page.list[0];const query=new URLSearchParams({afterToolKey:c.toolKey,afterReleaseId:c.combination.releaseId,afterUseId:c.useGrantId});assert.deepEqual(await get('/api/questionnaire-products/standard-combination-choices?'+query),{list:[],nextCursor:null})\n   await get('/api/questionnaire-products/standard-combination-choices?afterToolKey=partial',400)\n  }\n  const denied=await fetch(base+'/api/questionnaire-products/standard-combination-choices');assert.equal(denied.status,401);requests.push({actor:'anonymous',status:denied.status})\n  assert.deepEqual(await count(),before);await writeFile('/workspace/training-choice-pagination-20261030/evidence/picker-http-readback.json',JSON.stringify({passed:true,database:u.pathname.slice(1),restrictedRole:u.username,syntheticActorsOnly:true,requests,businessCountsUnchanged:before,scope:'Actual protected GET and PostgreSQL page/probe SQL only. Existing synthetic two-R grants reused, no seed/grant/FINAL writes.'},null,2)+'\\n');console.log('PASS protected pagination GET, real PG lateral query, partial-cursor and anonymous rejection; business counts unchanged')\n }finally{server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));await closeQueues(true);await db.$disconnect()}\n}\nmain().catch(e=>{console.error(e);process.exitCode=1})\n"
+    },
+    {
+      "id": "choice-pagination-control-scope",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "--test",
+          "--test-reporter=tap",
+          "--test-name-pattern=Training choice pagination uses",
+          ".github/scripts/onboarding-controls.test.mjs"
+        ],
+        "startedAt": "2026-10-30T06:50:03.831624+00:00",
+        "finishedAt": "2026-10-30T06:50:04.247855+00:00",
+        "exitCode": 0
+      },
+      "log": "TAP version 13\n# Subtest: Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities\nok 1 - Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities\n  ---\n  duration_ms: 7.537811\n  type: 'test'\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 219.285314\n"
+    },
+    {
+      "id": "choice-pagination-control-actionlint",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/actionlint-task1/actionlint",
+          "-shellcheck=",
+          "-pyflakes=",
+          ".github/workflows/ci.yml"
+        ],
+        "startedAt": "2026-10-30T06:50:04.872092+00:00",
+        "finishedAt": "2026-10-30T06:50:04.963599+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "id": "choice-pagination-peer-cap",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/measurement-content/training-choice-pagination.test.ts",
+          "--testNamePattern=bounds same-name verification",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/training-choice-pagination-20261030/evidence/peer-cap.json"
+        ],
+        "startedAt": "2026-10-30T06:53:16.147263+00:00",
+        "finishedAt": "2026-10-30T06:53:21.417260+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ↓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > retains the first 100 qualified choices when there are 100 distinct authorized configurations\n ↓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > retains the first 100 qualified choices when there are 101 distinct authorized configurations\n ↓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > exposes page two without replacing page-one bindings or scanning an unbounded stale prefix\n ↓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > returns a cursor after 100 inadmissible rows so the valid 101st choice is still reachable\n ↓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > keeps distinct business names usable across pages of the same tool\n ↓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > blocks both same-name configurations even when their exact R bindings occur on different pages\n ↓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > does not treat an unchecked same-name raw candidate with withdrawn entry approval as a current peer\n ↓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > rejects partial cursors before any database query\n ✓ src/__tests__/measurement-content/training-choice-pagination.test.ts > Training exact configuration picker capacity > bounds same-name verification and limits an indeterminate result to that naming group 189ms\n\n Test Files  1 passed (1)\n      Tests  1 passed | 8 skipped (9)\n   Start at  06:53:16\n   Duration  4.83s (transform 3.29s, setup 0ms, import 4.45s, tests 193ms, environment 0ms)\n\nJSON report written to /workspace/training-choice-pagination-20261030/evidence/peer-cap.json\n",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 9,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 8,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793343196492,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+                "status": "skipped",
+                "title": "retains the first 100 qualified choices when there are 100 distinct authorized configurations",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+                "status": "skipped",
+                "title": "retains the first 100 qualified choices when there are 101 distinct authorized configurations",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity exposes page two without replacing page-one bindings or scanning an unbounded stale prefix",
+                "status": "skipped",
+                "title": "exposes page two without replacing page-one bindings or scanning an unbounded stale prefix",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity returns a cursor after 100 inadmissible rows so the valid 101st choice is still reachable",
+                "status": "skipped",
+                "title": "returns a cursor after 100 inadmissible rows so the valid 101st choice is still reachable",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity keeps distinct business names usable across pages of the same tool",
+                "status": "skipped",
+                "title": "keeps distinct business names usable across pages of the same tool",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity blocks both same-name configurations even when their exact R bindings occur on different pages",
+                "status": "skipped",
+                "title": "blocks both same-name configurations even when their exact R bindings occur on different pages",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity does not treat an unchecked same-name raw candidate with withdrawn entry approval as a current peer",
+                "status": "skipped",
+                "title": "does not treat an unchecked same-name raw candidate with withdrawn entry approval as a current peer",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity rejects partial cursors before any database query",
+                "status": "skipped",
+                "title": "rejects partial cursors before any database query",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact configuration picker capacity"
+                ],
+                "fullName": "Training exact configuration picker capacity bounds same-name verification and limits an indeterminate result to that naming group",
+                "status": "passed",
+                "title": "bounds same-name verification and limits an indeterminate result to that naming group",
+                "duration": 189.4514909999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793343201173,
+            "endTime": 1793343201362.4514,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts"
+          }
+        ]
+      }
+    }
+  ],
+  "typeConfigurations": {
+    "backend-types.json": {
+      "extends": "/workspace/eduK12-new-version/server-version/backend/tsconfig.json",
+      "compilerOptions": {
+        "noEmit": true
+      },
+      "include": [
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/questionnaire-product/routes.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/middleware/auth.ts"
+      ],
+      "exclude": []
+    },
+    "frontend-types.json": {
+      "extends": "/workspace/eduK12-new-version/server-version/frontend/tsconfig.app.json",
+      "compilerOptions": {
+        "types": [
+          "/workspace/eduK12-new-version/server-version/frontend/node_modules/vite/client.d.ts",
+          "/workspace/eduK12-new-version/server-version/frontend/node_modules/vitest/globals.d.ts",
+          "/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/jest-dom/types/index.d.ts"
+        ],
+        "tsBuildInfoFile": "/workspace/training-choice-pagination-20261030/frontend.tsbuildinfo"
+      },
+      "include": [
+        "/workspace/eduK12-new-version/server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+        "/workspace/eduK12-new-version/server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+        "/workspace/eduK12-new-version/server-version/frontend/src/components/AssessmentToolPicker.tsx",
+        "/workspace/eduK12-new-version/server-version/frontend/src/vite-env.d.ts"
+      ]
+    }
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "vitest": "4.1.11",
+    "database": "Existing isolated synthetic precise_dual_report_test_20261030_v2",
+    "role": "precise_task1_runtime",
+    "limitations": [
+      "Unsigned local WIP execution; final input digests recorded at save time, not invented historical exact Git SHA or signed execution.",
+      "Only relevant source/test paths changed from base1cc; unchanged transitive source/schema/locks are identified by base and final complete Git binding.",
+      "The 8-case fixture intercepts the base candidate query; a later shared-fixture projection repair is outside that intercepted path. Two direct old-picker adapters ran against that repaired projection. The last added peer-cap case ran alone; earlier cases were not repeated.",
+      "Types are affected transitive closures, not full app/image builds. Frontend UI is a component API mock, while separate HTTP/PG observations use actual protected GET and existing synthetic users.",
+      "NODE_ENV=test and synthetic JWT, not human login/MFA or production limiter evidence. No production, seed/grant/FINAL writes, 136 native trial replay or performance test."
+    ]
+  }
+}

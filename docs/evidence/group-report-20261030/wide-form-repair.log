@@ -1,0 +1,12 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/survey/group-report.test.ts (9 tests | 8 skipped) 7552ms
+     ✓ pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages  7550ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 8 skipped (9)
+   Start at  06:31:38
+   Duration  7.83s (transform 4.79s, setup 0ms, import 158ms, tests 7.55s, environment 0ms)
+
+JSON report written to /tmp/group-report-wide-form-repair.json

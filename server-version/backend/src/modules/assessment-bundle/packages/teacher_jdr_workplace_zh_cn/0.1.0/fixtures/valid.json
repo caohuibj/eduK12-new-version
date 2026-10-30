@@ -1,0 +1,34 @@
+{
+  "values": {
+    "demands": {
+      "state": "present",
+      "value": 2
+    },
+    "control": {
+      "state": "present",
+      "value": 4
+    },
+    "manager": {
+      "state": "present",
+      "value": 4
+    },
+    "peer": {
+      "state": "present",
+      "value": 4
+    },
+    "adult": {
+      "state": "present",
+      "value": true
+    },
+    "teaching": {
+      "state": "present",
+      "value": true
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "COMPUTED",
+  "expectedProfile": {
+    "state": "MATCHED",
+    "profileId": "J2"
+  }
+}

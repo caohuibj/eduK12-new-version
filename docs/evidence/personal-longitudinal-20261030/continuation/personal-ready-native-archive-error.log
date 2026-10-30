@@ -1,0 +1,29 @@
+2026-10-30T09:14:43.8872421Z   PG_SERVICE: 4ca706ad164c0a9048fb5b8400614361bbed4cf128d3336d31ae07cab634064c
+2026-10-30T09:14:43.8872870Z ##[endgroup]
+2026-10-30T09:14:44.2253729Z node:internal/child_process:1160
+2026-10-30T09:14:44.2254773Z     result.error = new ErrnoException(result.error, 'spawnSync ' + options.file);
+2026-10-30T09:14:44.2255580Z                    ^
+2026-10-30T09:14:44.2255989Z 
+2026-10-30T09:14:44.2256301Z <ref *1> Error: spawnSync git ENOBUFS
+2026-10-30T09:14:44.2257021Z     at Object.spawnSync (node:internal/child_process:1160:20)
+2026-10-30T09:14:44.2257768Z     at spawnSync (node:child_process:928:24)
+2026-10-30T09:14:44.2258324Z     at execFileSync (node:child_process:971:15)
+2026-10-30T09:14:44.2259228Z     at nativeDatabase (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/personal-tracking-ready.mjs:71:17)
+2026-10-30T09:14:44.2260421Z     at file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/personal-tracking-ready.mjs:106:128
+2026-10-30T09:14:44.2261255Z     at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+2026-10-30T09:14:44.2261764Z     at async node:internal/modules/esm/loader:647:26
+2026-10-30T09:14:44.2262395Z     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+2026-10-30T09:14:44.2262935Z   errno: -105,
+2026-10-30T09:14:44.2263175Z   code: 'ENOBUFS',
+2026-10-30T09:14:44.2263626Z   syscall: 'spawnSync git',
+2026-10-30T09:14:44.2264057Z   path: 'git',
+2026-10-30T09:14:44.2264413Z   spawnargs: [
+2026-10-30T09:14:44.2264837Z     'archive',
+2026-10-30T09:14:44.2265358Z     '8bd86e4059125b9ee868d4777795e513d36cba71',
+2026-10-30T09:14:44.2266185Z     'server-version/backend/prisma'
+2026-10-30T09:14:44.2266764Z   ],
+2026-10-30T09:14:44.2267204Z   error: [Circular *1],
+2026-10-30T09:14:44.2267634Z   status: null,
+2026-10-30T09:14:44.2268046Z   signal: 'SIGTERM',
+2026-10-30T09:14:44.2268454Z   output: [
+

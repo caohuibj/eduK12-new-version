@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "bat12_work_zh_hans",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "BAT12 工作短版简体中文（仅来源目录，不可施测）",
+      "abbreviation": "BAT12-WORK-ZH-HANS",
+      "instrumentFamily": "Burnout Assessment Tool WORK, zh-Hans; independently versioned source candidate"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "BAT12 工作短版简体中文；独立的12项原版候选。工作版、一般版和次级症状不混用，题号身份不推出计分/常模。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "bat12_work_zh_hans",
+        "source:BAT_Schaufeli_2020",
+        "population:adults_work_context",
+        "availability:catalog_only",
+        "locale:zh-Hans",
+        "BAT_form:WORK",
+        "rights:original_chinese_questionnaire_public_redistribution_scope_unresolved",
+        "scoring:not_installed",
+        "report:not_installed",
+        "translation_editorial:user_approved_2026_10_30",
+        "approved_private_document:JD-R_20261030_first75",
+        "BAT_WORK_ZH_ITEM9_SEMANTIC_SOURCE_CONFLICT_RETAINED"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "BAT WORK 候选，原始研究人群并非中国K12教师；18+仅为项目目录范围。英文/中文不同版本不可互换。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "必须以该语言与工作/一般原版指导语为准；当前只建立目录，不是可施测指导语",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "仅登记BAT12 工作短版简体中文、12项和精确原选题线索：1,3,4,9,11,13,14,17,18,19,20,23，不包含公开题文/锚点/可执行计分。",
+        "工作版与一般版语境不同，中文简体与英文版题意或选题存在差异，不可自动对应或替换。",
+        "作者网站提示免费使用、原工具不得改题并须引用；不自动推导当前提取包的公开再分发或中文改写权。",
+        "没有中国K12教师正式常模、阈值和经验证个人报告。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅目录来源索引。授权与版本差异核清前不提供工作/一般版可执行题本。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-Hans",
+    "targetLocale": "zh-Hans",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Official author-hosted BAT12 工作短版简体中文 source identified at burnoutassessmenttool.be; not copied into this catalog. Version-specific Chinese/English item mismatches remain pending.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Original selection 1,3,4,9,11,13,14,17,18,19,20,23; gaps OFFICIAL_ITEM9_SEMANTIC_MISMATCH,PUBLIC_REDISTRIBUTION_SCOPE_NOT_ESTABLISHED. Do not overwrite BAT23 work English, BAT12 work English, or BAT-S10 English candidates. User approved Simplified Chinese wording on 2026-10-30, editorial only. The official original Chinese BAT work item9 meaning does not align with English item9; do NOT silently reverse or remap its score. Approved private first75 SHA256 d2c931c8b2af9a4cb9aa6b1dca13cd334f559ede590f289de4ba0f00cd425fa5, not republished."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Burnout Assessment Tool — BAT12 工作短版简体中文",
+      "citation": "Schaufeli, Desart & De Witte (2020), Burnout Assessment Tool (BAT): Development, Validity, and Reliability, IJERPH 17(24), 9495; author-hosted current work/general and Chinese language forms (precise version status must be checked).",
+      "url": "https://burnoutassessmenttool.be/handleiding_vragenlijst_eng/",
+      "publicationYear": 2020
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "BAT12 工作短版简体中文"
+      ],
+      "limitations": [
+        "Only source metadata, 12 items; no executable C, scoring S, parameter P or personal report R.",
+        "Original item selection clue: 1,3,4,9,11,13,14,17,18,19,20,23.",
+        "Original work vs general and English vs Simplified Chinese variants are distinct. Unresolved item9 and general short-form crosswalk issues cannot be repaired speculatively.",
+        "The BAT author site permits free use without altering the instrument, but no new adapted editable version or third-party PDF is redistributed here. No verified China K12 norms or thresholds.",
+        "2026-10-30 user confirmed Chinese wording; source item9 meaning discrepancy and public redistribution conditions persist. No executable C/S/P/R or formula is approved. Catalog manifest revision only."
+      ],
+      "disclaimer": "目录候选；不诊断、不计分、不公开施测。"
+    },
+    "blockers": [
+      "OFFICIAL_ITEM9_SEMANTIC_MISMATCH",
+      "PUBLIC_REDISTRIBUTION_SCOPE_NOT_ESTABLISHED",
+      "USER_EDITORIAL_APPROVAL_NOT_SOURCE_OR_SCORING_CLEARANCE"
+    ]
+  }
+}

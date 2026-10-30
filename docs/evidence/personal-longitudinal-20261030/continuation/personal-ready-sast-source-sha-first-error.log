@@ -1,0 +1,23 @@
+2026-10-30T10:08:26.7945247Z node:internal/modules/run_main:107
+2026-10-30T10:08:26.7945665Z     triggerUncaughtException(
+2026-10-30T10:08:26.7945945Z     ^
+2026-10-30T10:08:26.7946063Z 
+2026-10-30T10:08:26.7946360Z AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+2026-10-30T10:08:26.7946823Z + actual - expected
+2026-10-30T10:08:26.7946966Z 
+2026-10-30T10:08:26.7947143Z + 'af8fad552f776615afaa1e91e57a012768021bca'
+2026-10-30T10:08:26.7947506Z - 'bb54da2172b7a517e7775b3f0efa72f1901e3984'
+2026-10-30T10:08:26.7947704Z 
+2026-10-30T10:08:26.7948299Z     at verifyOriginalApplicationSast (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/personal-tracking-ready.mjs:80:46)
+2026-10-30T10:08:26.7950038Z     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-10-30T10:08:26.7951288Z     at async file:///home/runner/work/eduK12-new-version/eduK12-new-version/[eval1]:3:15 {
+2026-10-30T10:08:26.7952056Z   generatedMessage: true,
+2026-10-30T10:08:26.7952308Z   code: 'ERR_ASSERTION',
+2026-10-30T10:08:26.7952622Z   actual: 'af8fad552f776615afaa1e91e57a012768021bca',
+2026-10-30T10:08:26.7953016Z   expected: 'bb54da2172b7a517e7775b3f0efa72f1901e3984',
+2026-10-30T10:08:26.7953344Z   operator: 'strictEqual',
+2026-10-30T10:08:26.7953780Z   diff: 'simple'
+2026-10-30T10:08:26.7953979Z }
+2026-10-30T10:08:26.7954078Z 
+2026-10-30T10:08:26.7954173Z Node.js v24.21.0
+2026-10-30T10:08:26.8347698Z ##[error]Process completed with exit code 1.
