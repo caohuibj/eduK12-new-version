@@ -1,5 +1,6 @@
 import {loadSurveyTrackingSource,inheritedSurveyTrackingUnit,surveyTrackingDefaultSelections} from './tracking-source'
 import {freezeSurveyTracking,surveyFormTrackingIdentity,type SurveyTrackingSelection,type SurveyTrackingBinding} from './personal-tracking'
+import {surveyProfileMeasurementInput} from './cognitive-profile.definition'
 import type {SurveyNativeBundle} from '../bundle-product/survey-native'
 import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
 import type {SituationRuntimeDefinition} from '../situational/situation-runtime-definition'
@@ -104,6 +105,7 @@ export function surveyMeasurementReleaseInput(unit:ResearchFrozenUnit,actorId:st
   const scope={kind:'PRIVATE' as const,ownerId:actorId,product:'SURVEY' as const,resourceId:projectId}
   if(unit.kind==='COGNITIVE'){
     const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition),snapshot=frozen.sessionSnapshot
+    if(frozen.schemaVersion===2)return surveyProfileMeasurementInput(frozen,{localId:unit.draftId,version:String(unit.draftRevision),scope})
     return cognitiveMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),scope,
       testType:snapshot.testType,configVersion:snapshot.configVersion,engineVersion:snapshot.engineVersion,
       scoringVersion:snapshot.scoringVersion,config:snapshot.config,

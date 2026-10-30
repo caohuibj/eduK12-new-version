@@ -52,7 +52,10 @@ export function surveyTrackingDefaultSelections(source:ResearchFrozenPublication
     // Approved combinations rebind their own exact report/parameter contract.
     // Ordinary private P/R is intentionally inherited only when omitted, and
     // re-enters the same current PUBLISHED/scope/measurement checks as a picker.
-    if(prior.contentSelection&&!unit.sourceProvenance?.surveyStandardReleaseId&&!unit.sourceProvenance?.surveyToolReleaseId)
+    const sameMeasurement=!!prior.measurementRelease&&!!unit.measurementRelease
+      &&prior.measurementRelease.releaseId===unit.measurementRelease.releaseId
+      &&prior.measurementRelease.contentHash===unit.measurementRelease.contentHash
+    if(sameMeasurement&&prior.contentSelection&&!unit.sourceProvenance?.surveyStandardReleaseId&&!unit.sourceProvenance?.surveyToolReleaseId)
       contentSelections.push({instrumentId:unit.draftId,
         ...(prior.contentSelection.reportRelease?{reportReleaseId:prior.contentSelection.reportRelease.releaseId}:{}),
         references:prior.contentSelection.referencePolicy.choices.map(({releaseId,entryKey,priority})=>({releaseId,entryKey,priority}))})

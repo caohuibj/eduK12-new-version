@@ -12,6 +12,7 @@ import * as finalSubmitService from './final-submit.service'
 import * as historyService from './history.service'
 import * as publicCognitiveService from './public.service'
 import { CognitiveServiceError } from './cognitive.errors'
+import {AdminPermissionError} from '../admin-permissions/service'
 import { rejectWrapperForStandaloneUse } from './assignment.access'
 import {
   createAssignmentSchema,
@@ -528,7 +529,7 @@ const handleError = (res: Response, err: unknown): Response => {
   if (err instanceof z.ZodError) {
     return error(res, err.issues.map((i) => i.message).join('; '), -1, 400)
   }
-  if (err instanceof CognitiveServiceError) {
+  if (err instanceof CognitiveServiceError||err instanceof AdminPermissionError) {
     return err.statusCode < 500
       ? error(res, err.message, -1, err.statusCode)
       : error(res, '服务器内部错误', -1, 500)

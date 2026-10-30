@@ -109,7 +109,7 @@ function fixture(options:Options={}){
    const prepared=query as Prisma.Sql,sql=(Array.isArray(query)?query.join('?'):prepared.sql).replace(/\s+/g,' ').trim()
    const values=Array.isArray(query)?args:[...prepared.values];reads.push({sql,values})
    if(sql.includes('clock_timestamp() AS now'))return [{now:instant}]
-   if(sql.includes('FROM content_capability_grants g WHERE g.subject_id='))return options.allowUse===false?[]:[use]
+   if(sql.includes('FROM content_capability_grants g')&&sql.includes('WHERE g.subject_id='))return options.allowUse===false?[]:[use]
    if(sql.includes('FROM scale_library_use_grants g'))return options.allowUse===false?[]:[libraryUse]
    if(sql.includes('FROM users')&&sql.includes('platform_role::text'))return [{id:id(3),platform_role:'SYSTEM_ADMIN',account_domain:'LEGACY',role:'ADMIN',teacher_approved:true,expires_at:null}]
    if(sql.includes('FROM scale_library_entries e JOIN scale_library_submissions s'))return [library]
@@ -143,7 +143,7 @@ describe('Teacher expert sources: explicit V2 declarations and independent exact
   expect(compiled.leaves.get('PRIVATE_VERSION:'+h.privateVersion.id)).toMatchObject({definition:{report:h.definition.report,scoring:h.definition.scoring}})
   expect(compiled.leaves.get('PUBLIC_FORM:'+h.publicForm.id)).toMatchObject({sourceInstruction:'Exact public observation instructions',form:{definition:form}})
   expect(compiled.publicUseExpiresAt).toEqual(expiry)
-  const grantRead=h.reads.find(row=>row.sql.includes('FROM content_capability_grants g WHERE'))!
+  const grantRead=h.reads.find(row=>row.sql.includes('FROM content_capability_grants g')&&row.sql.includes('WHERE g.subject_id='))!
   expect(grantRead.values).toEqual(expect.arrayContaining([context.principal.userId,'TEACHER',context.organizationId]))
   expect(grantRead.sql).toContain("g.capabilities=ARRAY['material.use']")
  })

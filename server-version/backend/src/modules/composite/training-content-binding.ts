@@ -1,3 +1,6 @@
+import {loadCognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-artifact'
+import {readTrainingCognitiveTaskBinding,trainingCognitiveTaskBindingSchema} from '../assessment-authorization/training-cognitive-profile-use'
+import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {assertCompositionPublicContent} from '../education-tools/private-tool.composition-content'
 import {educationNativeDescriptorSchema} from '../education-tools/native-source.contracts'
 import {educationStandardSourceSchema,educationLibrarySourceSchema} from '../education-tools/private-tool.composition-contracts'
@@ -30,7 +33,8 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),educationLibrary:educationLibrarySourceSchema.optional(),educationNative:educationNativeDescriptorSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  cognitiveProfile:trainingCognitiveTaskBindingSchema.optional(),educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),educationLibrary:educationLibrarySourceSchema.optional(),educationNative:educationNativeDescriptorSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+ if(source.cognitiveProfile&&(source.kind!=='COGNITIVE_CONFIG'||!source.assignmentId||source.educationNative||source.educationBinding||source.standardCombination||source.educationStandard||source.educationLibrary||source.privateVersionId||source.libraryEntryId))ctx.addIssue({code:'custom',message:'认知精确配置必须保留独立来源'})
  if(source.educationNative&&(source.privateVersionId||source.libraryEntryId||source.educationStandard||source.educationLibrary||source.standardCombination||source.educationBinding
   ||(source.educationNative.provider==='COGNITIVE_CONFIG'?(source.kind!=='COGNITIVE_CONFIG'||source.id!==source.educationNative.sourceId||!source.assignmentId):!['SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY'].includes(source.kind)||source.id!==source.educationNative.sourceId)))ctx.addIssue({code:'custom',message:'教育原生单元必须保留独立原源身份'})
  if(source.educationLibrary&&(source.kind!=='SCALE'||source.libraryEntryId!==source.educationLibrary.entryId||source.privateVersionId||source.standardCombination||source.educationBinding||source.educationStandard))ctx.addIssue({code:'custom',message:'Education library retains its exact approved entry identity'})
@@ -129,7 +133,7 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
     const release=await read(inherited?.measurement.releaseId??row.measurement_release_id)
     if(release.layer!=='MEASUREMENT'||release.status==='REVOKED'||purpose==='NEW_ADMINISTRATION'&&release.status!=='PUBLISHED')fail('RELEASE_NOT_PUBLISHED')
     const source:Unit['source']={kind:row.kind,id:row.id,...(row.library_entry_id?{libraryEntryId:row.library_entry_id}:{}),...(row.kind==='STATIC_SJT_REGISTRY'?{}:{ownerId:row.owner_id??item.cognitiveAssignment?.createdBy}),
-      ...(item.type==='COGNITIVE'?{assignmentId:item.cognitiveAssignment.id}:{}),
+      ...(item.type==='COGNITIVE'?{assignmentId:item.cognitiveAssignment.id,...(readTrainingCognitiveTaskBinding(item.cognitiveAssignment.courseSnapshot)?{cognitiveProfile:readTrainingCognitiveTaskBinding(item.cognitiveAssignment.courseSnapshot)!}:{})}:{}),
       ...(identity?{instrumentKey:identity.instrumentKey,instrumentVersion:identity.instrumentVersion}:{})}
     const original=trainingContentSnapshotSchema.safeParse((composite as any).trainingContentSnapshot)
     const privateId=inherited?.source.privateVersionId??(original.success?original.data.units.find(unit=>unit.itemId===item.id)?.source.privateVersionId:undefined)
@@ -138,7 +142,7 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
     const library=source.libraryEntryId?await readExactLibrarySource(db,release,source,'NEW_USE'):null
     if(!library&&!privateSource)assertScope(release,source)
     if(library&&canonicalHash(item.scale.definition)!==canonicalHash(library.definition))fail('SOURCE_MISMATCH')
-    const expected=projectActualMeasurement(item,release,resolvedSituational,Boolean(library))
+    const expected=source.cognitiveProfile?await frozenCognitiveMeasurement(db,release,source,item):projectActualMeasurement(item,release,resolvedSituational,Boolean(library))
     const projected=prepareRelease(expected)
     if(release.family!==expected.family||projected.contentHash!==release.contentHash
       ||canonicalHash(expected.content)!==canonicalHash(release.content))fail('SOURCE_MISMATCH')
@@ -147,6 +151,33 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
   }
   const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:composite.id,units})
   return {snapshot,snapshotHash:canonicalHash(snapshot),releases,recheckSourceLicenses:async()=>{for(const receipt of staticSjt.values())await recheckStaticSjtConsumerLicense(db,receipt)}}
+}
+/** Exact saved scientific identity for both START and historical reports.
+ * Current use rights are checked by NEW admission, never this reader. No live
+ * profile/report/compiler lookup is needed for an already published unit. */
+async function frozenCognitiveMeasurement(db:Prisma.TransactionClient,release:Stored,source:Unit['source'],item?:any):Promise<ReleaseInput>{
+ const pin=source.cognitiveProfile
+ if(!pin||source.kind!=='COGNITIVE_CONFIG'||!trainingMeasurementSourceScopeMatches(release,source)||release.layer!=='MEASUREMENT'||release.family!=='COGNITIVE'||release.scope.kind!=='PRIVATE')fail('COGNITIVE_PROFILE_INVALID')
+ const artifact=await loadCognitiveProfileArtifact(pin.artifactHash,undefined)
+ if(artifact.schemaVersion!==2||canonicalHash(artifact.identity)!==pin.selectedBinding.configurationHash||artifact.identity.configId!==source.id
+  ||release.sourceReleaseId!==artifact.identity.measurement.releaseId||release.provenance.profileArtifactHash!==pin.artifactHash
+  ||release.provenance.assignmentId!==source.assignmentId||release.provenance.configId!==source.id
+  ||release.provenance.profile!==artifact.identity.profile||release.provenance.resolvedConfigHash!==artifact.identity.resolvedConfigHash)fail('COGNITIVE_PROFILE_INVALID')
+ const base=await getContentRelease(db,artifact.identity.measurement.releaseId,true)
+ if(!base||base.layer!=='MEASUREMENT'||base.family!=='COGNITIVE'||base.contentHash!==artifact.identity.measurement.contentHash)fail('COGNITIVE_PROFILE_INVALID')
+ const {report:_,...config}=artifact.resolvedConfig,expected=JSON.parse(JSON.stringify(base.content.executable))
+ expected.config=config
+ // The published assignment's deterministic envelope bound is already part of
+ // its immutable M hash; it is not a profile/report selector on historical read.
+ expected.finalMaxTrials=release.content.executable.finalMaxTrials
+ if(!Number.isSafeInteger(expected.finalMaxTrials)||expected.finalMaxTrials<1||canonicalHash(expected)!==canonicalHash(release.content.executable)
+  ||canonicalHash({...base.content,measurementHash:canonicalHash(expected),executable:expected})!==canonicalHash(release.content))fail('COGNITIVE_PROFILE_INVALID')
+ if(item){
+  if(canonicalHash(readTrainingCognitiveTaskBinding(item.cognitiveAssignment.courseSnapshot))!==canonicalHash(pin))fail('COGNITIVE_PROFILE_INVALID')
+  assertCognitiveAssignmentFreeze(item.cognitiveAssignment,artifact)
+ }
+ return {layer:'MEASUREMENT',family:'COGNITIVE',key:release.key,version:release.version,scope:release.scope,
+  sourceReleaseId:release.sourceReleaseId??undefined,provenance:release.provenance,assetRefs:release.assetRefs,content:release.content}
 }
 function projectActualMeasurement(item:any,release:Stored,resolvedSituational:Map<string,ResolvedSituationalRelease>,library=false):ReleaseInput{
   let expected:ReleaseInput
@@ -233,6 +264,7 @@ export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma
   }
   return true
  }
+ if(source.cognitiveProfile){await frozenCognitiveMeasurement(db,release,source);return trainingMeasurementSourceScopeMatches(release,source)}
  if(!source.libraryEntryId)return trainingMeasurementSourceScopeMatches(release,source)
  await readExactLibrarySource(db,release,source,'FROZEN_IDENTITY')
  return true
@@ -310,6 +342,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       ||unit.source.assignmentId!==item.cognitiveAssignment?.id||unit.source.ownerId!==item.cognitiveAssignment?.createdBy))fail('SOURCE_MISMATCH')
     if(item.type==='SITUATIONAL'&&(!['SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY'].includes(unit.source.kind)||unit.source.instrumentKey!==item.situationalInstrumentKey
       ||unit.source.instrumentVersion!==item.situationalInstrumentVersion))fail('SOURCE_MISMATCH')
+    if(item.type==='COGNITIVE'&&canonicalHash(unit.source.cognitiveProfile??null)!==canonicalHash(readTrainingCognitiveTaskBinding(item.cognitiveAssignment.courseSnapshot)))fail('COGNITIVE_PROFILE_INVALID')
     if(unit.source.standardCombination){
       if(!item.standardCombinationSource||canonicalHash(item.standardCombinationSource)!==canonicalHash(unit.source.standardCombination))fail('SOURCE_MISMATCH')
       const standard=await verifyStoredTrainingStandardItem(db,input.composite,item,'COLLECTION')
@@ -336,7 +369,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     }
     if(!library&&!privateSource)assertScope(release,unit.source)
     if((library||privateSource)&&canonicalHash(item.scale.definition)!==canonicalHash((library??privateSource)!.definition))fail('SOURCE_MISMATCH')
-    const expected=projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library||privateSource))
+    const expected=unit.source.cognitiveProfile?await frozenCognitiveMeasurement(db,release,unit.source,item):projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library||privateSource))
     if(expected.family!==unit.family||prepareRelease(expected).contentHash!==unit.measurement.contentHash
       ||canonicalHash(expected.content)!==canonicalHash(release.content))fail('SOURCE_MISMATCH')
   }

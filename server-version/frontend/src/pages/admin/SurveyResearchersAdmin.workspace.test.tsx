@@ -1,7 +1,7 @@
 import {act,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {afterEach,describe,expect,it,vi} from 'vitest'
-import SurveyResearchersAdmin from './SurveyResearchersAdmin'
+import {SurveyResearchersWorkspace as SurveyResearchersAdmin} from './SurveyResearchersAdmin'
 import {SurveyCatalogGrants} from './SurveyCatalogGrants'
 
 const root='/api/platform/survey'

@@ -1,3 +1,4 @@
+import {isSurveyCognitiveProfileRef,readSurveyCognitiveProfileSource,SURVEY_PROFILE_ADAPTER} from './cognitive-profile.source'
 import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
 import {catalogDiscoveryRecords,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
 import {matchesCatalogDiscovery,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
@@ -38,7 +39,7 @@ export type CatalogSourceSnapshot={ref:CatalogSourceRef;title:string;displayDefi
   definitionDigest:string;scoringDigest:string|null;answerMapping?:SourceAnswerMapping;nativeSituational?:SurveyNativeSituationalHeader;
   /** Administration instruction of the exact source version; display metadata outside the definition digest. */
   instruction?:string;
-  adapterVersion:typeof CATALOG_ADAPTER_VERSION|typeof CANONICAL_SCALE_ADAPTER_VERSION|typeof ONLINE_SJT_ADAPTER_VERSION|typeof NATIVE_SJT_ADAPTER_VERSION;provenance:Record<string,unknown>}
+  adapterVersion:typeof CATALOG_ADAPTER_VERSION|typeof CANONICAL_SCALE_ADAPTER_VERSION|typeof ONLINE_SJT_ADAPTER_VERSION|typeof NATIVE_SJT_ADAPTER_VERSION|typeof SURVEY_PROFILE_ADAPTER;provenance:Record<string,unknown>}
 export type CatalogSourceRow={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason:string|null;definitionDigest?:string;classificationTags?:CatalogClassificationTag[]}
 const CATALOG_MAX_PAGE=40
 export type CatalogSourcePage={list:CatalogSourceRow[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null;tagFacets?:ReturnType<typeof discoveryFacets>}
@@ -254,7 +255,7 @@ export async function getCatalogSourceSnapshot(input:{actorUserId:string;ref:Cat
 }
 /** The normal legacy UPDATE retirement path conflicts with these transaction-held locks. */
 async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promise<void>{
-  const ids=(kind:SurveyKind)=>[...new Set(refs.filter(r=>r.kind===kind&&!isGovernedSource(r.sourceId)&&!(kind==='SCALE'&&isSurveyStandardSource(r.sourceId))&&!(kind==='SJT'&&r.sourceId.startsWith('registry:'))&&!(kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))).map(r=>r.sourceId))].sort()
+  const ids=(kind:SurveyKind)=>[...new Set(refs.filter(r=>r.kind===kind&&!isGovernedSource(r.sourceId)&&!isSurveyCognitiveProfileRef(r)&&!(kind==='SCALE'&&isSurveyStandardSource(r.sourceId))&&!(kind==='SJT'&&r.sourceId.startsWith('registry:'))&&!(kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))).map(r=>r.sourceId))].sort()
   // Source advisory locks must precede Scale row locks, preserving the explicit
   // converter's source -> Scale order while identities are verified.
   const scaleIds=ids('SCALE')
@@ -280,6 +281,9 @@ async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promis
 }
 async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSourceRef;pinnedSjtAuthority?:unknown},db:Database,verifiedFormScope:boolean,scaleAuthorityDb:Database=db,scaleReleases?:ReadonlyMap<string,StoredRelease>):Promise<CatalogSourceSnapshot>{
   const {ref}=input
+  if(isSurveyCognitiveProfileRef(ref)){
+   try{return await readSurveyCognitiveProfileSource(scaleAuthorityDb as Prisma.TransactionClient,ref)}catch(error){if(error&&typeof error==='object'&&'statusCode'in error)throw error;throw new CatalogSourceError(error instanceof Error?error.message:'SOURCE_PROFILE_UNAVAILABLE')}
+  }
   if(isGovernedSource(ref.sourceId))return readGovernedSource(scaleAuthorityDb,ref.sourceId,ref.sourceVersion)
   if(ref.kind==='SCALE'){
     if(isSurveyStandardSource(ref.sourceId))return readOnlineStandardSnapshot(scaleAuthorityDb,ref.sourceId,ref.sourceVersion)
@@ -350,6 +354,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   const query=input.query?.trim()??'',pattern='%'+query.replace(/[\\%_]/g,'\\$&')+'%',contains={contains:query,mode:'insensitive' as const}
   const take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
   const records=catalogDiscoveryRecords(),filters=input.discovery??{},sourceTags=new Map<string,CatalogClassificationTag[]>()
+  const profileHeaders=new Map<string,{available:boolean;reason:string|null}>()
   let cached:Database=db
   let scaleReleases:Map<string,StoredRelease>|undefined
   if(kind!=='SCALE'&&input.includeGoverned!==false){
@@ -374,6 +379,25 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.instrumentKey})
     cached={sjtAuthorRelease:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='COGNITIVE'){
+    if(input.includeGoverned!==false){
+     const [header]=await db.$queryRaw<Array<{total:number;list:Array<{id:string;name:string;profile:string;hash:string;available:boolean}>}>>(Prisma.sql`WITH profiles AS MATERIALIZED (
+      SELECT c.id,c.name,c.test_type,e.metadata#>>'{configuration,profile}' AS profile,p.fingerprint AS hash,
+       bool_or(c.status='PUBLISHED' AND m.status='PUBLISHED' AND c.test_type IN ('reaction','gonogo') AND m.content#>'{executable,presentation}'='null'::jsonb AND t.template_hash IS NOT NULL AND e.metadata#>>'{executionRequirements,hasPresentation}'='false' AND e.metadata#>>'{executionRequirements,referenceCount}'='0') AS available
+      FROM survey_tool_policies p JOIN assessment_management_events e ON e.action='COGNITIVE_PROFILE_APPROVED' AND e.metadata->>'artifactFormatVersion'='2' AND e.metadata->>'artifactHash'=p.fingerprint
+       JOIN cognitive_test_configs c ON c.id=e.resource_id
+       LEFT JOIN measurement_content_releases m ON m.id=c.measurement_release_id AND m.id=e.metadata#>>'{configuration,measurement,releaseId}' AND m.content_hash=e.metadata#>>'{configuration,measurement,contentHash}'
+       LEFT JOIN assessment_public_templates t ON t.template_hash=p.fingerprint AND t.template_kind='COGNITIVE_PROFILE_CONFIGURATION'
+       ${discoveryJoin(records,{kind:Prisma.sql`'COGNITIVE'`,key:Prisma.sql`c.test_type`,version:Prisma.sql`NULL`,engine:Prisma.sql`c.engine_version`,scoring:Prisma.sql`c.scoring_version`})}
+      WHERE p.product='SURVEY' AND p.decision='APPROVED' AND NOT p.paused AND p.resource_key='cognitive-profile:'||c.id||':'||(e.metadata#>>'{configuration,profile}')
+       AND (${query}='' OR c.name ILIKE ${pattern} OR c.test_type ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`c.name`,Prisma.sql`c.test_type`],filters)} GROUP BY c.id,c.name,c.test_type,e.metadata#>>'{configuration,profile}',p.fingerprint)
+     SELECT (SELECT count(*)::int FROM profiles) AS total,COALESCE((SELECT jsonb_agg(row) FROM (SELECT id,name,profile,hash,available FROM profiles ORDER BY id,hash LIMIT ${Math.max(0,take-refs.length)} OFFSET ${offset}) row),'[]'::jsonb) AS list`)
+     for(const row of header.list){
+      const ref:CatalogSourceRef={kind:'COGNITIVE',sourceId:'cognitive-profile:'+row.id+':'+row.profile,sourceVersion:row.hash}
+      refs.push({ref,title:row.name+' · '+(row.profile==='experience'?'体验报告':row.profile==='research'?'科研报告':'正式报告')})
+      profileHeaders.set(ref.sourceId+':'+ref.sourceVersion,{available:row.available===true,reason:row.available===true?null:'该精确配置来源或 Survey 原生/媒体/参考适配尚不可用'})
+     }
+     offset=Math.max(0,offset-header.total)
+    }
     const rows=await db.cognitiveTestConfig.findMany({where:{status:'PUBLISHED',...cognitiveDiscoveryWhere(records,filters),...(query?{OR:[{name:contains},{testType:contains}]}:{})},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.configVersion},title:row.name})
     for(const row of rows)sourceTags.set(row.id,records.find(record=>record.kind==='COGNITIVE'&&record.key===row.testType&&record.engine===row.engineVersion&&record.scoring===row.scoringVersion)?.tags??[])
@@ -390,6 +414,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   }else fail('SOURCE_KIND_UNSUPPORTED')
   const list:CatalogSourceRow[]=[]
   for(const item of refs.slice(0,limit)){try{
+    if(isSurveyCognitiveProfileRef(item.ref)){const header=profileHeaders.get(item.ref.sourceId+':'+item.ref.sourceVersion);if(!header)return fail('SOURCE_PROFILE_HEADER_MISSING');list.push({...item,available:header.available,unsupportedReason:header.reason,definitionDigest:item.ref.sourceVersion});continue}
     const result=await readCatalogSourceSnapshot({actorUserId:input.actorUserId,ref:item.ref},isGovernedSource(item.ref.sourceId)?db:cached,true,db,scaleReleases)
     list.push({...item,...(sourceTags.get(item.ref.sourceId)?.length?{classificationTags:sourceTags.get(item.ref.sourceId)}:{}),available:true,unsupportedReason:null,definitionDigest:result.definitionDigest})
   }catch(e){
@@ -410,7 +435,7 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
   const refs=entries.map(e=>e.snapshot.ref)
   await lockCatalogSourceRows(refs,db)
   const scales=refs.filter(r=>r.kind==='SCALE'&&!isGovernedSource(r.sourceId)),sjts=refs.filter(r=>r.kind==='SJT'&&!isGovernedSource(r.sourceId)&&!r.sourceId.startsWith('registry:')),
-    cognitive=refs.filter(r=>r.kind==='COGNITIVE'&&!isGovernedSource(r.sourceId)),forms=refs.filter(r=>r.kind==='FORM'&&!isGovernedSource(r.sourceId)&&!r.sourceId.startsWith('questionnaire:')),questionnaireForms=refs.filter(r=>r.kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))
+    cognitive=refs.filter(r=>r.kind==='COGNITIVE'&&!isGovernedSource(r.sourceId)&&!isSurveyCognitiveProfileRef(r)),forms=refs.filter(r=>r.kind==='FORM'&&!isGovernedSource(r.sourceId)&&!r.sourceId.startsWith('questionnaire:')),questionnaireForms=refs.filter(r=>r.kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))
   const [scaleRows,sjtRows,cognitiveRows,formRows,questionnaireRows]=await Promise.all([
     scales.length?db.scale.findMany({where:{status:'PUBLISHED',OR:scales.map(r=>({id:r.sourceId,instrumentVersion:r.sourceVersion}))},take:30}):[],
     sjts.length?db.sjtAuthorRelease.findMany({where:{status:'PUBLISHED',OR:sjts.map(r=>({id:r.sourceId,instrumentVersion:r.sourceVersion}))},take:30}):[],

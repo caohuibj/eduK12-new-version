@@ -6,7 +6,7 @@ import { AdminPermissionError, assertEntryAdmin } from '../admin-permissions/ser
 /** Independent role: STANDARD management identity with an explicit SURVEY entry.
  * A system administrator never inherits researcher-management authority. */
 export async function assertSurveyManager(db:Prisma.TransactionClient,userId:string){
-  await assertEntryAdmin(db,userId,'SURVEY')
+  return assertEntryAdmin(db,userId,'SURVEY')
   // assertEntryAdmin locks this user/grant and requires STANDARD, a valid
   // account and this exact entry. Its proof lives only in this transaction.
 }

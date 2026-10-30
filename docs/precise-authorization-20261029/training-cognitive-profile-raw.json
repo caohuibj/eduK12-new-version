@@ -1,0 +1,2233 @@
+{
+  "schemaVersion": 1,
+  "localUnsignedEvidence": true,
+  "productionAccessed": false,
+  "savedAt": "2026-10-30T01:29:05.546755+00:00",
+  "invocations": [
+    {
+      "name": "cognitive-profile-execution-unit",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/cognitive-profile-execution-unit.json"
+        ],
+        "startedAt": "2026-10-30T00:37:17.842901+00:00",
+        "finishedAt": "2026-10-30T00:37:20.390371+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts > exact cognitive profile content before recipient authorization > keeps one reaction config identity while freezing distinct existing experience/research profiles without an attempt seed 43ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts > exact cognitive profile content before recipient authorization > rejects config/report/protocol mutation and unknown envelope fields rather than accepting supplied identity hashes 9ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts > exact cognitive profile content before recipient authorization > reads an original saved artifact after the same-named registry profile changes without resolving it again 13ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts > exact cognitive profile content before recipient authorization > shares one encrypted content record between independently scoped recipients without sharing their authorization binding 49ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts > exact cognitive profile content before recipient authorization > validates each expected identity after cache hits and refuses a different storage kind or missing source 18ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts > exact cognitive profile content before recipient authorization > rejects mechanically missing report metrics and inconsistent protocol/presentation even if inner hashes are recomputed 19ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts > exact cognitive profile content before recipient authorization > does not substitute a registry implementation, a requested profile or an expected historical version 8ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts > exact cognitive profile content before recipient authorization > retains v1 content-only records without upgrading them from current definitions, and rejects forged v2 execution 18ms\n\n Test Files  1 passed (1)\n      Tests  8 passed (8)\n   Start at  00:37:18\n   Duration  2.16s (transform 1.35s, setup 0ms, import 1.84s, tests 179ms, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/cognitive-profile-execution-unit.json\n",
+      "logSha256": "b2aee625a1af9563ef0829417ae67a508a4d6400b1f6361afe3aab2d5cea3872",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793320638164,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization keeps one reaction config identity while freezing distinct existing experience/research profiles without an attempt seed",
+                "status": "passed",
+                "title": "keeps one reaction config identity while freezing distinct existing experience/research profiles without an attempt seed",
+                "duration": 43.239807000000155,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization rejects config/report/protocol mutation and unknown envelope fields rather than accepting supplied identity hashes",
+                "status": "passed",
+                "title": "rejects config/report/protocol mutation and unknown envelope fields rather than accepting supplied identity hashes",
+                "duration": 9.038786999999957,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization reads an original saved artifact after the same-named registry profile changes without resolving it again",
+                "status": "passed",
+                "title": "reads an original saved artifact after the same-named registry profile changes without resolving it again",
+                "duration": 12.673747000000049,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization shares one encrypted content record between independently scoped recipients without sharing their authorization binding",
+                "status": "passed",
+                "title": "shares one encrypted content record between independently scoped recipients without sharing their authorization binding",
+                "duration": 49.33599900000013,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization validates each expected identity after cache hits and refuses a different storage kind or missing source",
+                "status": "passed",
+                "title": "validates each expected identity after cache hits and refuses a different storage kind or missing source",
+                "duration": 17.98978100000022,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization rejects mechanically missing report metrics and inconsistent protocol/presentation even if inner hashes are recomputed",
+                "status": "passed",
+                "title": "rejects mechanically missing report metrics and inconsistent protocol/presentation even if inner hashes are recomputed",
+                "duration": 18.60440000000017,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization does not substitute a registry implementation, a requested profile or an expected historical version",
+                "status": "passed",
+                "title": "does not substitute a registry implementation, a requested profile or an expected historical version",
+                "duration": 8.11842899999965,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization retains v1 content-only records without upgrading them from current definitions, and rejects forged v2 execution",
+                "status": "passed",
+                "title": "retains v1 content-only records without upgrading them from current definitions, and rejects forged v2 execution",
+                "duration": 17.64349600000014,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793320640164,
+            "endTime": 1793320640340.6436,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cognitive-profile-execution-postgres",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_COGNITIVE_PROFILE_EXECUTION=1",
+          "PRECISE_COGNITIVE_EXECUTION_EVIDENCE=/workspace/materials-load-20261029/evidence/cognitive-profile-execution-postgres-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/cognitive-profile-execution-postgres.json"
+        ],
+        "startedAt": "2026-10-30T00:39:22.892949+00:00",
+        "finishedAt": "2026-10-30T00:39:25.705640+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts > Explicit profile execution closure with retained v1 history > reads the original v1 artifacts without hydrating current execution and explicitly approves new immutable v2 records 1782ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts > Explicit profile execution closure with retained v1 history > keeps earlier definitions/policies and all existing users/tasks/attempts intact after versioned content additions 18ms\nstdout | src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts > Explicit profile execution closure with retained v1 history\n[2026-10-30T00:39:25.652Z] [INFO] 队列已关闭\n\n\n Test Files  1 passed (1)\n      Tests  2 passed (2)\n   Start at  00:39:23\n   Duration  2.40s (transform 1.37s, setup 0ms, import 95ms, tests 2.17s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/cognitive-profile-execution-postgres.json\n",
+      "logSha256": "37971c208d703998571bce361f19e24835c39105453579909c8e2bab8bc988a0",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793320763231,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Explicit profile execution closure with retained v1 history"
+                ],
+                "fullName": "Explicit profile execution closure with retained v1 history reads the original v1 artifacts without hydrating current execution and explicitly approves new immutable v2 records",
+                "status": "passed",
+                "title": "reads the original v1 artifacts without hydrating current execution and explicitly approves new immutable v2 records",
+                "duration": 1782.13067,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Explicit profile execution closure with retained v1 history"
+                ],
+                "fullName": "Explicit profile execution closure with retained v1 history keeps earlier definitions/policies and all existing users/tasks/attempts intact after versioned content additions",
+                "status": "passed",
+                "title": "keeps earlier definitions/policies and all existing users/tasks/attempts intact after versioned content additions",
+                "duration": 17.72397799999999,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793320763722,
+            "endTime": 1793320765522.7239,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "scope": "Same registered main profile definitions; explicit v2 execution freeze and system approval only. No source install, new use grant, assignment or START.",
+        "observations": [
+          {
+            "originalV1Reads": 2,
+            "noAutomaticExecutionHydration": true,
+            "oldV1NewUseDenied": true,
+            "oldRequestStillReturnsOriginalHash": true,
+            "newV2ExplicitlyApproved": 2,
+            "configSourceNotRepublished": true
+          },
+          {
+            "oldPublicContentAndPolicyRowsUnchanged": true,
+            "sameOneNativeConfig": true,
+            "noUserGrantTaskOrAttemptChanges": true,
+            "newArtifactBodies": 2,
+            "newExplicitPolicyRows": 8,
+            "newApprovalAudits": 2
+          }
+        ],
+        "artifacts": [
+          {
+            "artifactHash": "f9df952292b9cffca2cb2ddc6ba452d1409fff53e119bdc7b3b0d8904a6f5c1e",
+            "identity": {
+              "kind": "COGNITIVE_PROFILE",
+              "testType": "reaction",
+              "configId": "76162502-e649-4e30-ba23-34856594fb9b",
+              "configVersion": "1.1.0",
+              "engineVersion": "1.0.0",
+              "scoringVersion": "1.1.0",
+              "measurement": {
+                "releaseId": "51441fa0-21d9-4b4b-93fa-7a7a99aaff12",
+                "contentHash": "1e16631aa4dac844b8bdb9c2f182eac33bd041e9245a910117443bf0ff4e9266"
+              },
+              "profile": "experience",
+              "profileDefinitionVersion": "1.1.0",
+              "resolvedConfigHash": "1e794593810e051521095e9bb8760a295452db90cdb986219c78b3fb62e96c2d",
+              "protocolSignature": "f31e756f3f91b46da4c22b51d419af99c0abb231d2048d4f28d1b08b27f1aaed",
+              "metricDefinitionVersion": "1.1.0",
+              "qualityDefinitionVersion": "1.1.0",
+              "reportDefinitionVersion": "1.1.0",
+              "reportHash": "f70b35960c0670de58df2f1e10ca19202912ffa507ec1c9259282e06225024a0",
+              "presentationVersion": "1.2.0"
+            },
+            "formatVersion": 2,
+            "compiledRuntimeHash": "940f9da1c15fe663e4836a1f46f5e8f69915a9ef0a188fc602fe28f7cb20bb73"
+          },
+          {
+            "artifactHash": "faaeea37922ce7c7da6713f6b7685bad0caa50d19d9f87854fa22099e9e2b19a",
+            "identity": {
+              "kind": "COGNITIVE_PROFILE",
+              "testType": "reaction",
+              "configId": "76162502-e649-4e30-ba23-34856594fb9b",
+              "configVersion": "1.1.0",
+              "engineVersion": "1.0.0",
+              "scoringVersion": "1.1.0",
+              "measurement": {
+                "releaseId": "51441fa0-21d9-4b4b-93fa-7a7a99aaff12",
+                "contentHash": "1e16631aa4dac844b8bdb9c2f182eac33bd041e9245a910117443bf0ff4e9266"
+              },
+              "profile": "research",
+              "profileDefinitionVersion": "1.1.0",
+              "resolvedConfigHash": "9402f8907753c52d1b7286669f9fb7f09ab8b1a687765c2574c95cc23bfa9456",
+              "protocolSignature": "f31e756f3f91b46da4c22b51d419af99c0abb231d2048d4f28d1b08b27f1aaed",
+              "metricDefinitionVersion": "1.1.0",
+              "qualityDefinitionVersion": "1.1.0",
+              "reportDefinitionVersion": "1.1.0",
+              "reportHash": "789123e7a4c53b35f39075a1971a555dc42324ea54ed60260c8c0990ba83e35e",
+              "presentationVersion": "1.2.0"
+            },
+            "formatVersion": 2,
+            "compiledRuntimeHash": "940f9da1c15fe663e4836a1f46f5e8f69915a9ef0a188fc602fe28f7cb20bb73"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cognitive-profile-execution-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/cognitive-profile-execution-types.json"
+        ],
+        "startedAt": "2026-10-30T00:40:11.016995+00:00",
+        "finishedAt": "2026-10-30T00:40:35.479635+00:00",
+        "exitCode": 0
+      },
+      "log": "",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "training-cognitive-profile-index-migrate",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_PROFILE_MIGRATION_OWNER=1",
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "npm",
+          "run",
+          "db:migrate:guarded"
+        ],
+        "startedAt": "2026-10-30T01:23:28.410816+00:00",
+        "finishedAt": "2026-10-30T01:23:29.901369+00:00",
+        "exitCode": 0
+      },
+      "log": "\n> ptool-backend@1.0.0 db:migrate:guarded\n> node scripts/pr24-migration-preflight.mjs && prisma migrate deploy && node scripts/runtime-role-contract.mjs post-migrate\n\n{\"ok\":true,\"skipped\":true,\"reason\":\"destructive_migration_already_applied\",\"migration\":\"20260827100000_scale_assessment_v2_foundation\"}\nPrisma schema loaded from prisma/schema.prisma\nDatasource \"db\": PostgreSQL database \"precise_cognitive_profile_artifact_test_20261030\", schema \"public\" at \"127.0.0.1:55439\"\n\n258 migrations found in prisma/migrations\n\nApplying migration `20261030003000_training_cognitive_profile_use_index`\n\nThe following migration(s) have been applied:\n\nmigrations/\n  └─ 20261030003000_training_cognitive_profile_use_index/\n    └─ migration.sql\n      \nAll migrations have been successfully applied.\n{\"ok\":true,\"runtimeTables\":267,\"runtimeSequences\":1,\"restrictedRuntimeRole\":true,\"migrationCount\":258,\"migrationFingerprint\":\"f2c8f65ceb24a4e5ff390f834eaaf3b57dda44a85e53c0c2c367f3fb860722df\"}\nnpm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n",
+      "logSha256": "91789e325ea36f1175ba981a1600e2a6ca7a72fcccaf34ced2f1375cb5a1ec4d"
+    },
+    {
+      "name": "training-cognitive-profile-wiring-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/training-cognitive-profile-types.json"
+        ],
+        "startedAt": "2026-10-30T01:23:04.740729+00:00",
+        "finishedAt": "2026-10-30T01:23:26.897298+00:00",
+        "exitCode": 2
+      },
+      "log": "src/modules/cognitive/assignment.service.ts(736,15): error TS2339: Property 'existing' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; existing: { status: CognitiveAssignmentStatus; id: string; createdAt: Date; ... 20 more ...; listedStandalone: boolean; }; } | { ...; }'.\n  Property 'existing' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; data: CognitiveAssignmentUncheckedCreateInput; }'.\nsrc/modules/cognitive/assignment.service.ts(736,74): error TS2339: Property 'data' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; existing: { status: CognitiveAssignmentStatus; id: string; createdAt: Date; ... 20 more ...; listedStandalone: boolean; }; } | { ...; }'.\n  Property 'data' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; existing: { status: CognitiveAssignmentStatus; id: string; createdAt: Date; ... 20 more ...; listedStandalone: boolean; }; }'.\nsrc/modules/composite/training-flow-assignment-snapshot.ts(12,16): error TS2339: Property 'existing' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; existing: { status: CognitiveAssignmentStatus; id: string; createdAt: Date; ... 20 more ...; listedStandalone: boolean; }; } | { ...; }'.\n  Property 'existing' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; data: CognitiveAssignmentUncheckedCreateInput; }'.\nsrc/modules/composite/training-flow-assignment-snapshot.ts(13,49): error TS2339: Property 'existing' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; existing: { status: CognitiveAssignmentStatus; id: string; createdAt: Date; ... 20 more ...; listedStandalone: boolean; }; } | { ...; }'.\n  Property 'existing' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; data: CognitiveAssignmentUncheckedCreateInput; }'.\nsrc/modules/composite/training-flow-assignment-snapshot.ts(17,25): error TS2339: Property 'data' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; existing: { status: CognitiveAssignmentStatus; id: string; createdAt: Date; ... 20 more ...; listedStandalone: boolean; }; } | { ...; }'.\n  Property 'data' does not exist on type '{ frozenProfile?: CognitiveProfileArtifact | undefined; existing: { status: CognitiveAssignmentStatus; id: string; createdAt: Date; ... 20 more ...; listedStandalone: boolean; }; }'.\n",
+      "logSha256": "b02250f75b7615b2004d64fcfe3c685d4687aa43b01cb7e46e59647e6f9486b1"
+    },
+    {
+      "name": "training-cognitive-profile-wiring-types-fixed",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/training-cognitive-profile-types.json"
+        ],
+        "startedAt": "2026-10-30T01:23:48.556328+00:00",
+        "finishedAt": "2026-10-30T01:24:17.552266+00:00",
+        "exitCode": 0
+      },
+      "log": "",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "training-cognitive-profile-http",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_TRAINING_COGNITIVE_PROFILE=1",
+          "PRECISE_TRAINING_COGNITIVE_EVIDENCE=/workspace/materials-load-20261029/evidence/training-cognitive-profile-http-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-cognitive-profile-http.json"
+        ],
+        "startedAt": "2026-10-30T01:24:38.030363+00:00",
+        "finishedAt": "2026-10-30T01:24:47.842325+00:00",
+        "exitCode": 1
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\nstdout | src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle\n[2026-10-30T01:24:47.754Z] [INFO] 队列已关闭\n\n × src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > shows approved execution profiles and issues one precise grant with original intent recovery 241ms\n   → own.find is not a function\n × src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > pins the admin profile at draft and publishes an exact private measurement 1ms\n   → Previous stage incomplete; dependent mutation refused\n × src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > retains admitted seed after revoke while denying new START and stale draft publish 1ms\n   → Previous stage incomplete; dependent mutation refused\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > shows approved execution profiles and issues one precise grant with original intent recovery\nTypeError: own.find is not a function\n ❯ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:60:61\n\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯\n\n FAIL  src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > pins the admin profile at draft and publishes an exact private measurement\nError: Previous stage incomplete; dependent mutation refused\n ❯ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:64:22\n     62|  },30000)\n     63|  it('pins the admin profile at draft and publishes an exact private me…\n     64|   if(ready!==1)throw Error('Previous stage incomplete; dependent mutat…\n       |                      ^\n     65|   const input={courseId:course.id,configId:config.id,title:'Exact expe…\n     66|   await call(teacher,'POST','/assignments',{...input,profile:'research…\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯\n\n FAIL  src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > retains admitted seed after revoke while denying new START and stale draft publish\nError: Previous stage incomplete; dependent mutation refused\n ❯ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:85:22\n     83|  },30000)\n     84|  it('retains admitted seed after revoke while denying new START and st…\n     85|   if(ready!==2)throw Error('Previous stage incomplete; dependent mutat…\n       |                      ^\n     86|   const stale=await call(teacher,'POST','/assignments',{courseId:cours…\n     87|   session=await call(student,'POST','/sessions',{assignmentId:draft.id…\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯\n\n\n Test Files  1 failed (1)\n      Tests  3 failed (3)\n   Start at  01:24:38\n   Duration  9.40s (transform 6.35s, setup 0ms, import 133ms, tests 9.11s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/training-cognitive-profile-http.json\n",
+      "logSha256": "8e16824637e90fcbe5c96b15213fada573c0cab8c5d6b5b31302e05a06123d74",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 3,
+        "numPassedTests": 0,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793323478348,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle shows approved execution profiles and issues one precise grant with original intent recovery",
+                "status": "failed",
+                "title": "shows approved execution profiles and issues one precise grant with original intent recovery",
+                "duration": 240.99078999999983,
+                "failureMessages": [
+                  "TypeError: own.find is not a function\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:60:61\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle pins the admin profile at draft and publishes an exact private measurement",
+                "status": "failed",
+                "title": "pins the admin profile at draft and publishes an exact private measurement",
+                "duration": 1.457774000000427,
+                "failureMessages": [
+                  "Error: Previous stage incomplete; dependent mutation refused\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:64:22\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64\n    at run (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1150:20)\n    at limiterFn (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1162:59)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:38\n    at Traces.$ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)\n    at trace (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/test.DNmyFkvJ.js:4398:21)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:13"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle retains admitted seed after revoke while denying new START and stale draft publish",
+                "status": "failed",
+                "title": "retains admitted seed after revoke while denying new START and stale draft publish",
+                "duration": 0.543852999999217,
+                "failureMessages": [
+                  "Error: Previous stage incomplete; dependent mutation refused\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:85:22\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64\n    at run (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1150:20)\n    at limiterFn (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1162:59)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:38\n    at Traces.$ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)\n    at trace (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/test.DNmyFkvJ.js:4398:21)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:13"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793323487500,
+            "endTime": 1793323487743.544,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "stage": "ready",
+        "ready": 0,
+        "ids": {
+          "first": "bebf5f1d-1956-4114-98e6-2857271ba40f"
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/profile-configurations/training/catalog",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/profile-configurations/training/catalog",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/experience/use-grants",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/experience/use-grants",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/experience/use-grants",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/experience/use-grants",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/experience/use-grants",
+            "status": 409,
+            "expectedStatus": 409
+          },
+          {
+            "method": "GET",
+            "path": "/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/use-requests/bebf5f1d-1956-4114-98e6-2857271ba40f",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/configs",
+            "status": 200,
+            "expectedStatus": 200
+          }
+        ],
+        "observations": [],
+        "scope": "Local protected HTTP with synthetic recent MFA JWT; actual runtime DB. No production or real-user authorization."
+      }
+    },
+    {
+      "name": "training-cognitive-profile-http-resume-grant",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_TRAINING_COGNITIVE_PROFILE=1",
+          "PRECISE_TRAINING_COGNITIVE_RESUME=grant",
+          "PRECISE_TRAINING_COGNITIVE_EVIDENCE=/workspace/materials-load-20261029/evidence/training-cognitive-profile-http-resume-grant-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-cognitive-profile-http-resume-grant.json"
+        ],
+        "startedAt": "2026-10-30T01:25:03.803328+00:00",
+        "finishedAt": "2026-10-30T01:25:14.691431+00:00",
+        "exitCode": 1
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > shows approved execution profiles and issues one precise grant with original intent recovery 86ms\nstdout | src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle\n[2026-10-30T01:25:14.601Z] [INFO] 队列已关闭\n\n × src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > pins the admin profile at draft and publishes an exact private measurement 198ms\n   → expected undefined to be 8 // Object.is equality\n × src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > retains admitted seed after revoke while denying new START and stale draft publish 1ms\n   → Previous stage incomplete; dependent mutation refused\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > pins the admin profile at draft and publishes an exact private measurement\nAssertionError: expected undefined to be 8 // Object.is equality\n\n- Expected:\n8\n\n+ Received:\nundefined\n\n ❯ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:87:53\n     85|   const {decryptCognitivePayload}=await import('../../modules/cognitiv…\n     86|   expect(decryptCognitivePayload(saved.resolvedConfigSnapshotEncrypted…\n     87|   expect((frozen.resolvedConfig as any).trialCount).toBe(8)\n       |                                                     ^\n     88|   observations.push({draftProfileNotChosenByUser:true,wrongPointerAndP…\n     89|  },30000)\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯\n\n FAIL  src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > retains admitted seed after revoke while denying new START and stale draft publish\nError: Previous stage incomplete; dependent mutation refused\n ❯ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:91:22\n     89|  },30000)\n     90|  it('retains admitted seed after revoke while denying new START and st…\n     91|   if(ready!==2)throw Error('Previous stage incomplete; dependent mutat…\n       |                      ^\n     92|   const stale=await call(teacher,'POST','/assignments',{courseId:cours…\n     93|   session=await call(student,'POST','/sessions',{assignmentId:draft.id…\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯\n\n\n Test Files  1 failed (1)\n      Tests  2 failed | 1 passed (3)\n   Start at  01:25:04\n   Duration  10.44s (transform 7.18s, setup 0ms, import 115ms, tests 10.18s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/training-cognitive-profile-http-resume-grant.json\n",
+      "logSha256": "ad7d87fd0f9222889842d30b06f9cb7043e3504c1e55b22a3872db5288d3e8aa",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 3,
+        "numPassedTests": 1,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793323504149,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle shows approved execution profiles and issues one precise grant with original intent recovery",
+                "status": "passed",
+                "title": "shows approved execution profiles and issues one precise grant with original intent recovery",
+                "duration": 86.20717200000036,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle pins the admin profile at draft and publishes an exact private measurement",
+                "status": "failed",
+                "title": "pins the admin profile at draft and publishes an exact private measurement",
+                "duration": 198.03340099999878,
+                "failureMessages": [
+                  "AssertionError: expected undefined to be 8 // Object.is equality\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:87:53\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle retains admitted seed after revoke while denying new START and stale draft publish",
+                "status": "failed",
+                "title": "retains admitted seed after revoke while denying new START and stale draft publish",
+                "duration": 1.1273230000006151,
+                "failureMessages": [
+                  "Error: Previous stage incomplete; dependent mutation refused\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:91:22\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64\n    at run (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1150:20)\n    at limiterFn (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1162:59)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:38\n    at Traces.$ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)\n    at trace (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/test.DNmyFkvJ.js:4398:21)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:13"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793323514307,
+            "endTime": 1793323514593.1274,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "stage": "ready",
+        "ready": 1,
+        "ids": {
+          "first": "bebf5f1d-1956-4114-98e6-2857271ba40f",
+          "draft": "8bda0ef6-fdc8-4291-a743-01078ad1044c"
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/profile-configurations/training/catalog",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/profile-configurations/training/catalog",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "GET",
+            "path": "/configs",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/assignments",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/assignments",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/assignments",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "PATCH",
+            "path": "/assignments/8bda0ef6-fdc8-4291-a743-01078ad1044c",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/assignments/8bda0ef6-fdc8-4291-a743-01078ad1044c/publish",
+            "status": 200,
+            "expectedStatus": 200
+          }
+        ],
+        "observations": [
+          {
+            "resumeFromOriginalGrant": "bebf5f1d-1956-4114-98e6-2857271ba40f",
+            "noRepeatedIssue": true
+          }
+        ],
+        "scope": "Local protected HTTP with synthetic recent MFA JWT; actual runtime DB. No production or real-user authorization."
+      }
+    },
+    {
+      "name": "training-cognitive-profile-http-resume-published",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_TRAINING_COGNITIVE_PROFILE=1",
+          "PRECISE_TRAINING_COGNITIVE_RESUME=published",
+          "PRECISE_TRAINING_COGNITIVE_EVIDENCE=/workspace/materials-load-20261029/evidence/training-cognitive-profile-http-resume-published-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-cognitive-profile-http-resume-published.json"
+        ],
+        "startedAt": "2026-10-30T01:25:35.560961+00:00",
+        "finishedAt": "2026-10-30T01:25:45.426865+00:00",
+        "exitCode": 1
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > shows approved execution profiles and issues one precise grant with original intent recovery 82ms\n ✓ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > pins the admin profile at draft and publishes an exact private measurement 4ms\nstdout | src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > retains admitted seed after revoke while denying new START and stale draft publish\nprisma:error \nInvalid `tx.contentCapabilityGrant.updateMany()` invocation in\n/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/training-cognitive-profile-use.ts:119:51\n\n  116 if(old.version!==input.replaces.expectedVersion)conflict('原使用权版本已变化')\n  117 previous={selectedBinding:selectedConfigurationPointer(meta.selectedBinding),observedVersion:old.version,reason:input.replaces.reason}\n  118 if(!old.revokedAt){\n→ 119  const changed=await tx.contentCapabilityGrant.updateMany(\nError occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: \"23514\", message: \"new row for relation \\\"content_capability_grants\\\" violates check constraint \\\"content_capability_grants_check3\\\"\", severity: \"ERROR\", detail: Some(\"Failing row contains (bebf5f1d-1956-4114-98e6-2857271ba40f, 23f0e14d-a573-48d7-a437-a7540d254806, b7df15a2-2c06-4d83-b151-0fced94f120c, null, TRAINING, PLATFORM, cognitive-profile-configurations, material, {cognitive-profile:76162502-e649-4e30-ba23-34856594fb9b:f9df9522..., {material.use}, {}, 0, 2026-10-30 01:24:46.565, 2026-10-31 01:24:47.565, {bebf5f1d-1956-4114-98e6-2857271ba40f}, 2, 2026-10-30 01:24:47.665, 2026-10-30 01:25:45.314, null, null).\"), column: None, hint: None }), transient: false })\n\nstderr | src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > retains admitted seed after revoke while denying new START and stale draft publish\n[2026-10-30T01:25:45.329Z] [ERROR] Unhandled request error {\n  requestId: undefined,\n  statusCode: 500,\n  error: {\n    name: 'PrismaClientUnknownRequestError',\n    message: '[REDACTED]',\n    stack: 'PrismaClientUnknownRequestError: [REDACTED]\\n' +\n      'Invalid `tx.contentCapabilityGrant.updateMany()` invocation in\\n' +\n      '/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/training-cognitive-profile-use.ts:119:51\\n' +\n      '\\n' +\n      \"  116 if(old.version!==input.replaces.expectedVersion)conflict('原使用权版本已变化')\\n\" +\n      '  117 previous={selectedBinding:selectedConfigurationPointer(meta.selectedBinding),observedVersion:old.version,reason:input.replaces.reason}\\n' +\n      '  118 if(!old.revokedAt){\\n' +\n      '→ 119  const changed=await tx.contentCapabilityGrant.updateMany(\\n' +\n      'Error occurred during query execution:\\n' +\n      'ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: \"23514\", message: \"new row for relation \\\\\"content_capability_grants\\\\\" violates check constraint \\\\\"content_capability_grants_check3\\\\\"\", severity: \"ERROR\", detail: Some(\"Failing row contains (bebf5f1d-1956-4114-98e6-2857271ba40f, 23f0e14d-a573-48d7-a437-a7540d254806, b7df15a2-2c06-4d83-b151-0fced94f120c, null, TRAINING, PLATFORM, cognitive-profile-configurations, material, {cognitive-profile:76162502-e649-4e30-ba23-34856594fb9b:f9df9522..., {material.use}, {}, 0, 2026-10-30 01:24:46.565, 2026-10-31 01:24:47.565, {bebf5f1d-1956-4114-98e6-2857271ba40f}, 2, 2026-10-30 01:24:47.665, 2026-10-30 01:25:45.314, null, null).\"), column: None, hint: None }), transient: false })\\n' +\n      '    at $n.handleRequestError (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:7505)\\n' +\n      '    at $n.handleAndLogRequestError (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:6623)\\n' +\n      '    at $n.request (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:6307)\\n' +\n      '    at l (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:9633)\\n' +\n      '    at /workspace/eduK12-new-version/server-version/backend/src/config/database.ts:43:14\\n' +\n      '    at /workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/training-cognitive-profile-use.ts:119:19\\n' +\n      '    at Proxy._transactionWithCallback (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:8000)\\n' +\n      '    at /workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/profile-configurations.routes.ts:13:25'\n  }\n}\n\nstdout | src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle\n[2026-10-30T01:25:45.346Z] [INFO] 队列已关闭\n\n × src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > retains admitted seed after revoke while denying new START and stale draft publish 219ms\n   → 服务器内部错误: expected 500 to be 200 // Object.is equality\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > retains admitted seed after revoke while denying new START and stale draft publish\nAssertionError: 服务器内部错误: expected 500 to be 200 // Object.is equality\n\n- Expected\n+ Received\n\n- 200\n+ 500\n\n ❯ call src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:17:70\n     15|    Cookie:'ptool_session='+token+'; ptool_csrf=training-profile','X-CS…\n     16|   const raw=await res.text();requests.push({method,path,status:res.sta…\n     17|   const value=JSON.parse(raw);expect(res.status,value.message??path).t…\n       |                                                                      ^\n     18|  }\n     19|  const grantPath=(profile:string)=>'/profile-configurations/training/'…\n ❯ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:104:15\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed (1)\n      Tests  1 failed | 2 passed (3)\n   Start at  01:25:36\n   Duration  9.21s (transform 6.08s, setup 0ms, import 126ms, tests 8.84s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/training-cognitive-profile-http-resume-published.json\n",
+      "logSha256": "05481bd42e790e53660629690905f83e3f2d21e1cd4a754e8a02c593b28edc59",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 3,
+        "numPassedTests": 2,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793323536099,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle shows approved execution profiles and issues one precise grant with original intent recovery",
+                "status": "passed",
+                "title": "shows approved execution profiles and issues one precise grant with original intent recovery",
+                "duration": 81.63781999999992,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle pins the admin profile at draft and publishes an exact private measurement",
+                "status": "passed",
+                "title": "pins the admin profile at draft and publishes an exact private measurement",
+                "duration": 3.793702000000849,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle retains admitted seed after revoke while denying new START and stale draft publish",
+                "status": "failed",
+                "title": "retains admitted seed after revoke while denying new START and stale draft publish",
+                "duration": 219.35967600000004,
+                "failureMessages": [
+                  "AssertionError: 服务器内部错误: expected 500 to be 200 // Object.is equality\n    at call (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:17:70)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts:104:15\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793323545032,
+            "endTime": 1793323545336.3596,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "stage": "ready",
+        "ready": 2,
+        "ids": {
+          "first": "bebf5f1d-1956-4114-98e6-2857271ba40f",
+          "draft": "8bda0ef6-fdc8-4291-a743-01078ad1044c",
+          "staleDraft": "d145d55b-cbdd-4fd3-adc2-dc96f1d9fc74",
+          "session": "e2b0dde9-ee62-428f-93d2-cca93772634d",
+          "replacement": "796fb128-ec6b-4cd2-9ea5-c30255310667"
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/profile-configurations/training/catalog",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/profile-configurations/training/catalog",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "GET",
+            "path": "/configs",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/assignments",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/sessions",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/research/use-grants",
+            "status": 500,
+            "expectedStatus": 200
+          }
+        ],
+        "observations": [
+          {
+            "resumeFromOriginalGrant": "bebf5f1d-1956-4114-98e6-2857271ba40f",
+            "noRepeatedIssue": true
+          },
+          {
+            "readExistingPublishedExactAssignment": "8bda0ef6-fdc8-4291-a743-01078ad1044c",
+            "noRepeatedCreateOrPublish": true
+          }
+        ],
+        "scope": "Local protected HTTP with synthetic recent MFA JWT; actual runtime DB. No production or real-user authorization."
+      }
+    },
+    {
+      "name": "training-cognitive-profile-http-resume-started",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_TRAINING_COGNITIVE_PROFILE=1",
+          "PRECISE_TRAINING_COGNITIVE_RESUME=started",
+          "PRECISE_TRAINING_COGNITIVE_EVIDENCE=/workspace/materials-load-20261029/evidence/training-cognitive-profile-http-resume-started-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-cognitive-profile-http-resume-started.json"
+        ],
+        "startedAt": "2026-10-30T01:26:10.013958+00:00",
+        "finishedAt": "2026-10-30T01:26:19.689886+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > shows approved execution profiles and issues one precise grant with original intent recovery 95ms\n ✓ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > pins the admin profile at draft and publishes an exact private measurement 4ms\n ✓ src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle > retains admitted seed after revoke while denying new START and stale draft publish 206ms\nstdout | src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts > Training exact cognitive profile actual authorization and native lifecycle\n[2026-10-30T01:26:19.607Z] [INFO] 队列已关闭\n\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Start at  01:26:10\n   Duration  9.18s (transform 6.14s, setup 0ms, import 109ms, tests 8.92s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/training-cognitive-profile-http-resume-started.json\n",
+      "logSha256": "769e2943cb94b0d8ff0827794c0041aad30262dd695c2e6ac70c4c5464ac97cc",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 3,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793323570408,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle shows approved execution profiles and issues one precise grant with original intent recovery",
+                "status": "passed",
+                "title": "shows approved execution profiles and issues one precise grant with original intent recovery",
+                "duration": 95.03404799999953,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle pins the admin profile at draft and publishes an exact private measurement",
+                "status": "passed",
+                "title": "pins the admin profile at draft and publishes an exact private measurement",
+                "duration": 3.987385999998878,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact cognitive profile actual authorization and native lifecycle"
+                ],
+                "fullName": "Training exact cognitive profile actual authorization and native lifecycle retains admitted seed after revoke while denying new START and stale draft publish",
+                "status": "passed",
+                "title": "retains admitted seed after revoke while denying new START and stale draft publish",
+                "duration": 206.12705199999982,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793323579290,
+            "endTime": 1793323579595.127,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "stage": "ready",
+        "ready": 3,
+        "ids": {
+          "first": "bebf5f1d-1956-4114-98e6-2857271ba40f",
+          "draft": "8bda0ef6-fdc8-4291-a743-01078ad1044c",
+          "staleDraft": "d145d55b-cbdd-4fd3-adc2-dc96f1d9fc74",
+          "session": "e2b0dde9-ee62-428f-93d2-cca93772634d",
+          "replacement": "f6774b4d-5dba-45e5-86d1-1ce062e3030e",
+          "researchDraft": "14c115f4-42d1-4f9a-ad51-6559a4c51305"
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/profile-configurations/training/catalog",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/profile-configurations/training/catalog",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "GET",
+            "path": "/configs",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/research/use-grants",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/assignments/d145d55b-cbdd-4fd3-adc2-dc96f1d9fc74/publish",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/sessions",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/sessions",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/assignments",
+            "status": 200,
+            "expectedStatus": 200
+          }
+        ],
+        "observations": [
+          {
+            "resumeFromOriginalGrant": "bebf5f1d-1956-4114-98e6-2857271ba40f",
+            "noRepeatedIssue": true
+          },
+          {
+            "readExistingPublishedExactAssignment": "8bda0ef6-fdc8-4291-a743-01078ad1044c",
+            "noRepeatedCreateOrPublish": true
+          },
+          {
+            "replacementDoesNotUpgradeExistingDraft": true,
+            "oldPublishedNewStartDenied": true,
+            "admittedResumeSeedUnchanged": true,
+            "legacyMaterialGrantsAndTasksUnchanged": true
+          }
+        ],
+        "scope": "Local protected HTTP with synthetic recent MFA JWT; actual runtime DB. No production or real-user authorization."
+      }
+    },
+    {
+      "name": "training-cognitive-profile-legacy-unit",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/cognitive/assignment.service.test.ts",
+          "src/__tests__/composite/training-flow-assignment-snapshot.test.ts",
+          "src/__tests__/measurement-content/assignment-measurement-release.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-cognitive-profile-legacy-unit.json"
+        ],
+        "startedAt": "2026-10-30T01:26:30.750167+00:00",
+        "finishedAt": "2026-10-30T01:26:35.538852+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\nstderr | src/__tests__/cognitive/assignment.service.test.ts > variant candidate wrapper preparation > rejects corrupt source report ciphertext before candidate selection\n[2026-10-30T01:26:33.814Z] [ERROR] 解密数据失败 {\n  name: 'Error',\n  message: '[REDACTED]',\n  stack: 'Error: [REDACTED]\\n' +\n    '    at decryptField (/workspace/eduK12-new-version/server-version/backend/src/utils/encryption.ts:88:13)\\n' +\n    '    at decryptCognitivePayload (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/cognitive.security.ts:82:20)\\n' +\n    '    at /workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/profile-freeze.ts:136:5\\n' +\n    '    at measureRequestPhaseSync (/workspace/eduK12-new-version/server-version/backend/src/services/runtimeObservability.ts:605:12)\\n' +\n    '    at readFrozenReport (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/profile-freeze.ts:135:20)\\n' +\n    '    at Module.prepareTeacherPublishedAssignment (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/assignment.service.ts:686:49)\\n' +\n    '    at processTicksAndRejections (node:internal/process/task_queues:104:5)\\n' +\n    '    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/cognitive/assignment.service.test.ts:616:5\\n' +\n    '    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20'\n}\n\n ✓ src/__tests__/cognitive/assignment.service.test.ts > listPublishedConfigs > hides GRANT configs the teacher cannot instantiate 8ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > listPublishedConfigs > does not filter GRANT configs for ADMIN 5ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > listPublishedConfigs > keeps a database-published config even when legacy v2 compatibility metadata is Draft 5ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > listPublishedConfigs > keeps a database-published config whose exact v2 definition is Published 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > creates a DRAFT for a TEACHER owning the course 4ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > forbids a TEACHER creating for another teachers course 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > allows ADMIN to create for any course 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > forbids STUDENT from creating 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > rejects a DRAFT config 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > rejects an unknown registry version 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > rejects config JSON that fails the registry schema 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > rejects a missing course 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > forbids creating an assignment from a GRANT config without a grant 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > createAssignment > allows creating an assignment from a GRANT config with a grant 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > listTeacherAssignments / listStudentAssignments > TEACHER only sees own assignments, with config metadata only 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > listTeacherAssignments / listStudentAssignments > student sees PUBLISHED assignments for ACTIVE/APPROVED memberships only 2ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > listTeacherAssignments / listStudentAssignments > student with no memberships gets empty list 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > getAssignmentForTeacher / getAssignmentForStudent > teacher can read own assignment 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > getAssignmentForTeacher / getAssignmentForStudent > marks a package-referenced wrapper as locked for the teacher UI 4ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > getAssignmentForTeacher / getAssignmentForStudent > teacher cannot read another teacher assignment 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > getAssignmentForTeacher / getAssignmentForStudent > student detail hides the run config JSON 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > getAssignmentForTeacher / getAssignmentForStudent > student detail rejects PENDING membership 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > updateDraftAssignment > updates a DRAFT assignment 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > updateDraftAssignment > rejects updating a PUBLISHED assignment 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > updateDraftAssignment > rejects PATCH opensAt beyond the existing dueAt 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > updateDraftAssignment > rejects PATCH dueAt before the existing opensAt 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > updateDraftAssignment > accepts a valid PATCH of both opensAt and dueAt 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > updateDraftAssignment > accepts an unrelated-field PATCH when existing window is valid 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > publishAssignment / archiveAssignment > publishes a DRAFT with publishedAt + courseSnapshot 3ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > publishAssignment / archiveAssignment > freezes a selected profile into resolved snapshot hash at publish 12ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > publishAssignment / archiveAssignment > rejects updating profile after publish 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > publishAssignment / archiveAssignment > rejects publishing a draft without a profile 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > publishAssignment / archiveAssignment > publishes from DB-published config even when legacy v2 compatibility metadata is Draft 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > publishAssignment / archiveAssignment > materializes a new report-package wrapper from DB-published config regardless of legacy v2 compatibility status 3ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > publishAssignment / archiveAssignment > rejects publishing a non-DRAFT 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > publishAssignment / archiveAssignment > archives DRAFT/PUBLISHED without physical delete 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > publishAssignment / archiveAssignment > rejects archive when a non-archived composite still references the assignment 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > composite wrapper assignment class > hides wrappers from the student assignment list 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > composite wrapper assignment class > returns 404 for student GET of a wrapper 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > composite wrapper assignment class > returns 404 for student GET of a library-course assignment 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > composite wrapper assignment class > allows a narrow wrapper PATCH of title and instruction 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > composite wrapper assignment class > rejects PATCH for a wrapper referenced by a report package 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > composite wrapper assignment class > rejects wrapper PATCH of maxAttempts 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > composite wrapper assignment class > rejects archive for a wrapper referenced by a report package 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > variant candidate wrapper preparation > prepares a valid wrapper without creating it until selected 0ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > variant candidate wrapper preparation > rejects partial source profile freezes before candidate selection 1ms\n ✓ src/__tests__/cognitive/assignment.service.test.ts > variant candidate wrapper preparation > rejects corrupt source report ciphertext before candidate selection 22ms\n ✓ src/__tests__/composite/training-flow-assignment-snapshot.test.ts > C19 private prepared-assignment candidate snapshot > copies an existing source freeze without transcoding, source compact=false 11ms\n ✓ src/__tests__/composite/training-flow-assignment-snapshot.test.ts > C19 private prepared-assignment candidate snapshot > copies an existing source freeze without transcoding, source compact=true 5ms\n ✓ src/__tests__/composite/training-flow-assignment-snapshot.test.ts > C19 private prepared-assignment candidate snapshot > freezes actual new-wrapper preparation and preserves deferred persistence, compact=false 3ms\n ✓ src/__tests__/composite/training-flow-assignment-snapshot.test.ts > C19 private prepared-assignment candidate snapshot > freezes actual new-wrapper preparation and preserves deferred persistence, compact=true 2ms\n ✓ src/__tests__/composite/training-flow-assignment-snapshot.test.ts > C19 private prepared-assignment candidate snapshot > freezes actual existing-wrapper preparation as identity only, compact=false 1ms\n ✓ src/__tests__/composite/training-flow-assignment-snapshot.test.ts > C19 private prepared-assignment candidate snapshot > freezes actual existing-wrapper preparation as identity only, compact=true 1ms\n ✓ src/__tests__/composite/training-flow-assignment-snapshot.test.ts > C19 private prepared-assignment candidate snapshot > keeps canonical Date rejection and does not silently omit a missing create field 1ms\n ✓ src/__tests__/composite/training-flow-assignment-snapshot.test.ts > C19 private prepared-assignment candidate snapshot > rejects an invalid publication date before encoding the deferred wrapper 0ms\n ✓ src/__tests__/measurement-content/assignment-measurement-release.test.ts > explicit owned assignment effective measurement publication > uses real registry default and private assignment scope; only CAS-fills the pointer 15ms\n ✓ src/__tests__/measurement-content/assignment-measurement-release.test.ts > explicit owned assignment effective measurement publication > uses exact frozen effective profile instead of the global default 6ms\n ✓ src/__tests__/measurement-content/assignment-measurement-release.test.ts > explicit owned assignment effective measurement publication > rejects another owner, unpublished source, broken frozen hash and partial freeze 2ms\n ✓ src/__tests__/measurement-content/assignment-measurement-release.test.ts > explicit owned assignment effective measurement publication > idempotently validates existing pointer and rejects wrong scope, changed config and retired/revoked release 13ms\n ✓ src/__tests__/measurement-content/assignment-measurement-release.test.ts > explicit owned assignment effective measurement publication > fails pointer CAS and unknown registry without modifying global config 2ms\n ✓ src/__tests__/measurement-content/assignment-measurement-release.test.ts > report-only config changes preserve scientific hash/version while provenance retains full source digest 4ms\n\n Test Files  3 passed (3)\n      Tests  61 passed (61)\n   Start at  01:26:31\n   Duration  4.38s (transform 2.07s, setup 0ms, import 3.70s, tests 166ms, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/training-cognitive-profile-legacy-unit.json\n",
+      "logSha256": "a7762d9ba1390e474311cef9c2fbe8b749a07c949a6686ad7c5c09b5eb44e85a",
+      "report": {
+        "numTotalTestSuites": 13,
+        "numPassedTestSuites": 13,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 61,
+        "numPassedTests": 61,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793323591070,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "C19 private prepared-assignment candidate snapshot"
+                ],
+                "fullName": "C19 private prepared-assignment candidate snapshot copies an existing source freeze without transcoding, source compact=false",
+                "status": "passed",
+                "title": "copies an existing source freeze without transcoding, source compact=false",
+                "duration": 11.214518999999996,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 private prepared-assignment candidate snapshot"
+                ],
+                "fullName": "C19 private prepared-assignment candidate snapshot copies an existing source freeze without transcoding, source compact=true",
+                "status": "passed",
+                "title": "copies an existing source freeze without transcoding, source compact=true",
+                "duration": 5.096875999999952,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 private prepared-assignment candidate snapshot"
+                ],
+                "fullName": "C19 private prepared-assignment candidate snapshot freezes actual new-wrapper preparation and preserves deferred persistence, compact=false",
+                "status": "passed",
+                "title": "freezes actual new-wrapper preparation and preserves deferred persistence, compact=false",
+                "duration": 3.452586999999994,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 private prepared-assignment candidate snapshot"
+                ],
+                "fullName": "C19 private prepared-assignment candidate snapshot freezes actual new-wrapper preparation and preserves deferred persistence, compact=true",
+                "status": "passed",
+                "title": "freezes actual new-wrapper preparation and preserves deferred persistence, compact=true",
+                "duration": 1.8776410000000396,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 private prepared-assignment candidate snapshot"
+                ],
+                "fullName": "C19 private prepared-assignment candidate snapshot freezes actual existing-wrapper preparation as identity only, compact=false",
+                "status": "passed",
+                "title": "freezes actual existing-wrapper preparation as identity only, compact=false",
+                "duration": 1.405711999999994,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 private prepared-assignment candidate snapshot"
+                ],
+                "fullName": "C19 private prepared-assignment candidate snapshot freezes actual existing-wrapper preparation as identity only, compact=true",
+                "status": "passed",
+                "title": "freezes actual existing-wrapper preparation as identity only, compact=true",
+                "duration": 1.4187239999999974,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 private prepared-assignment candidate snapshot"
+                ],
+                "fullName": "C19 private prepared-assignment candidate snapshot keeps canonical Date rejection and does not silently omit a missing create field",
+                "status": "passed",
+                "title": "keeps canonical Date rejection and does not silently omit a missing create field",
+                "duration": 0.668672000000015,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "C19 private prepared-assignment candidate snapshot"
+                ],
+                "fullName": "C19 private prepared-assignment candidate snapshot rejects an invalid publication date before encoding the deferred wrapper",
+                "status": "passed",
+                "title": "rejects an invalid publication date before encoding the deferred wrapper",
+                "duration": 0.3742130000000543,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793323594723,
+            "endTime": 1793323594749.3743,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/composite/training-flow-assignment-snapshot.test.ts"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "listPublishedConfigs"
+                ],
+                "fullName": "listPublishedConfigs hides GRANT configs the teacher cannot instantiate",
+                "status": "passed",
+                "title": "hides GRANT configs the teacher cannot instantiate",
+                "duration": 7.960681999999906,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "listPublishedConfigs"
+                ],
+                "fullName": "listPublishedConfigs does not filter GRANT configs for ADMIN",
+                "status": "passed",
+                "title": "does not filter GRANT configs for ADMIN",
+                "duration": 4.99708499999997,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "listPublishedConfigs"
+                ],
+                "fullName": "listPublishedConfigs keeps a database-published config even when legacy v2 compatibility metadata is Draft",
+                "status": "passed",
+                "title": "keeps a database-published config even when legacy v2 compatibility metadata is Draft",
+                "duration": 4.65652799999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "listPublishedConfigs"
+                ],
+                "fullName": "listPublishedConfigs keeps a database-published config whose exact v2 definition is Published",
+                "status": "passed",
+                "title": "keeps a database-published config whose exact v2 definition is Published",
+                "duration": 1.1493259999997463,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment creates a DRAFT for a TEACHER owning the course",
+                "status": "passed",
+                "title": "creates a DRAFT for a TEACHER owning the course",
+                "duration": 4.156046999999944,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment forbids a TEACHER creating for another teachers course",
+                "status": "passed",
+                "title": "forbids a TEACHER creating for another teachers course",
+                "duration": 1.2245339999999487,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment allows ADMIN to create for any course",
+                "status": "passed",
+                "title": "allows ADMIN to create for any course",
+                "duration": 0.4023290000000088,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment forbids STUDENT from creating",
+                "status": "passed",
+                "title": "forbids STUDENT from creating",
+                "duration": 0.29900099999986196,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment rejects a DRAFT config",
+                "status": "passed",
+                "title": "rejects a DRAFT config",
+                "duration": 0.852755999999772,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment rejects an unknown registry version",
+                "status": "passed",
+                "title": "rejects an unknown registry version",
+                "duration": 0.4524989999999889,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment rejects config JSON that fails the registry schema",
+                "status": "passed",
+                "title": "rejects config JSON that fails the registry schema",
+                "duration": 0.4434479999999894,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment rejects a missing course",
+                "status": "passed",
+                "title": "rejects a missing course",
+                "duration": 0.6365249999998923,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment forbids creating an assignment from a GRANT config without a grant",
+                "status": "passed",
+                "title": "forbids creating an assignment from a GRANT config without a grant",
+                "duration": 0.4978299999997944,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "createAssignment"
+                ],
+                "fullName": "createAssignment allows creating an assignment from a GRANT config with a grant",
+                "status": "passed",
+                "title": "allows creating an assignment from a GRANT config with a grant",
+                "duration": 0.4072339999997894,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "listTeacherAssignments / listStudentAssignments"
+                ],
+                "fullName": "listTeacherAssignments / listStudentAssignments TEACHER only sees own assignments, with config metadata only",
+                "status": "passed",
+                "title": "TEACHER only sees own assignments, with config metadata only",
+                "duration": 1.3739700000000994,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "listTeacherAssignments / listStudentAssignments"
+                ],
+                "fullName": "listTeacherAssignments / listStudentAssignments student sees PUBLISHED assignments for ACTIVE/APPROVED memberships only",
+                "status": "passed",
+                "title": "student sees PUBLISHED assignments for ACTIVE/APPROVED memberships only",
+                "duration": 2.3457909999997355,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "listTeacherAssignments / listStudentAssignments"
+                ],
+                "fullName": "listTeacherAssignments / listStudentAssignments student with no memberships gets empty list",
+                "status": "passed",
+                "title": "student with no memberships gets empty list",
+                "duration": 0.19922300000007453,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "getAssignmentForTeacher / getAssignmentForStudent"
+                ],
+                "fullName": "getAssignmentForTeacher / getAssignmentForStudent teacher can read own assignment",
+                "status": "passed",
+                "title": "teacher can read own assignment",
+                "duration": 0.33358700000007957,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "getAssignmentForTeacher / getAssignmentForStudent"
+                ],
+                "fullName": "getAssignmentForTeacher / getAssignmentForStudent marks a package-referenced wrapper as locked for the teacher UI",
+                "status": "passed",
+                "title": "marks a package-referenced wrapper as locked for the teacher UI",
+                "duration": 3.5472759999997834,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "getAssignmentForTeacher / getAssignmentForStudent"
+                ],
+                "fullName": "getAssignmentForTeacher / getAssignmentForStudent teacher cannot read another teacher assignment",
+                "status": "passed",
+                "title": "teacher cannot read another teacher assignment",
+                "duration": 0.3511479999997391,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "getAssignmentForTeacher / getAssignmentForStudent"
+                ],
+                "fullName": "getAssignmentForTeacher / getAssignmentForStudent student detail hides the run config JSON",
+                "status": "passed",
+                "title": "student detail hides the run config JSON",
+                "duration": 0.6317309999999452,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "getAssignmentForTeacher / getAssignmentForStudent"
+                ],
+                "fullName": "getAssignmentForTeacher / getAssignmentForStudent student detail rejects PENDING membership",
+                "status": "passed",
+                "title": "student detail rejects PENDING membership",
+                "duration": 0.6011350000003404,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "updateDraftAssignment"
+                ],
+                "fullName": "updateDraftAssignment updates a DRAFT assignment",
+                "status": "passed",
+                "title": "updates a DRAFT assignment",
+                "duration": 0.42238300000008167,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "updateDraftAssignment"
+                ],
+                "fullName": "updateDraftAssignment rejects updating a PUBLISHED assignment",
+                "status": "passed",
+                "title": "rejects updating a PUBLISHED assignment",
+                "duration": 0.26661799999965297,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "updateDraftAssignment"
+                ],
+                "fullName": "updateDraftAssignment rejects PATCH opensAt beyond the existing dueAt",
+                "status": "passed",
+                "title": "rejects PATCH opensAt beyond the existing dueAt",
+                "duration": 0.23661799999990762,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "updateDraftAssignment"
+                ],
+                "fullName": "updateDraftAssignment rejects PATCH dueAt before the existing opensAt",
+                "status": "passed",
+                "title": "rejects PATCH dueAt before the existing opensAt",
+                "duration": 0.5325749999997242,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "updateDraftAssignment"
+                ],
+                "fullName": "updateDraftAssignment accepts a valid PATCH of both opensAt and dueAt",
+                "status": "passed",
+                "title": "accepts a valid PATCH of both opensAt and dueAt",
+                "duration": 0.24089099999991959,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "updateDraftAssignment"
+                ],
+                "fullName": "updateDraftAssignment accepts an unrelated-field PATCH when existing window is valid",
+                "status": "passed",
+                "title": "accepts an unrelated-field PATCH when existing window is valid",
+                "duration": 0.13637599999992744,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "publishAssignment / archiveAssignment"
+                ],
+                "fullName": "publishAssignment / archiveAssignment publishes a DRAFT with publishedAt + courseSnapshot",
+                "status": "passed",
+                "title": "publishes a DRAFT with publishedAt + courseSnapshot",
+                "duration": 3.1801110000001245,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "publishAssignment / archiveAssignment"
+                ],
+                "fullName": "publishAssignment / archiveAssignment freezes a selected profile into resolved snapshot hash at publish",
+                "status": "passed",
+                "title": "freezes a selected profile into resolved snapshot hash at publish",
+                "duration": 11.614884999999958,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "publishAssignment / archiveAssignment"
+                ],
+                "fullName": "publishAssignment / archiveAssignment rejects updating profile after publish",
+                "status": "passed",
+                "title": "rejects updating profile after publish",
+                "duration": 0.6400750000002517,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "publishAssignment / archiveAssignment"
+                ],
+                "fullName": "publishAssignment / archiveAssignment rejects publishing a draft without a profile",
+                "status": "passed",
+                "title": "rejects publishing a draft without a profile",
+                "duration": 0.5631659999999101,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "publishAssignment / archiveAssignment"
+                ],
+                "fullName": "publishAssignment / archiveAssignment publishes from DB-published config even when legacy v2 compatibility metadata is Draft",
+                "status": "passed",
+                "title": "publishes from DB-published config even when legacy v2 compatibility metadata is Draft",
+                "duration": 1.4881460000001425,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "publishAssignment / archiveAssignment"
+                ],
+                "fullName": "publishAssignment / archiveAssignment materializes a new report-package wrapper from DB-published config regardless of legacy v2 compatibility status",
+                "status": "passed",
+                "title": "materializes a new report-package wrapper from DB-published config regardless of legacy v2 compatibility status",
+                "duration": 2.874703999999838,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "publishAssignment / archiveAssignment"
+                ],
+                "fullName": "publishAssignment / archiveAssignment rejects publishing a non-DRAFT",
+                "status": "passed",
+                "title": "rejects publishing a non-DRAFT",
+                "duration": 0.5898359999996501,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "publishAssignment / archiveAssignment"
+                ],
+                "fullName": "publishAssignment / archiveAssignment archives DRAFT/PUBLISHED without physical delete",
+                "status": "passed",
+                "title": "archives DRAFT/PUBLISHED without physical delete",
+                "duration": 0.8909320000002481,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "publishAssignment / archiveAssignment"
+                ],
+                "fullName": "publishAssignment / archiveAssignment rejects archive when a non-archived composite still references the assignment",
+                "status": "passed",
+                "title": "rejects archive when a non-archived composite still references the assignment",
+                "duration": 0.3910439999999653,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "composite wrapper assignment class"
+                ],
+                "fullName": "composite wrapper assignment class hides wrappers from the student assignment list",
+                "status": "passed",
+                "title": "hides wrappers from the student assignment list",
+                "duration": 0.3855389999998806,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "composite wrapper assignment class"
+                ],
+                "fullName": "composite wrapper assignment class returns 404 for student GET of a wrapper",
+                "status": "passed",
+                "title": "returns 404 for student GET of a wrapper",
+                "duration": 0.22083100000008926,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "composite wrapper assignment class"
+                ],
+                "fullName": "composite wrapper assignment class returns 404 for student GET of a library-course assignment",
+                "status": "passed",
+                "title": "returns 404 for student GET of a library-course assignment",
+                "duration": 0.3458299999997507,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "composite wrapper assignment class"
+                ],
+                "fullName": "composite wrapper assignment class allows a narrow wrapper PATCH of title and instruction",
+                "status": "passed",
+                "title": "allows a narrow wrapper PATCH of title and instruction",
+                "duration": 0.3605710000001636,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "composite wrapper assignment class"
+                ],
+                "fullName": "composite wrapper assignment class rejects PATCH for a wrapper referenced by a report package",
+                "status": "passed",
+                "title": "rejects PATCH for a wrapper referenced by a report package",
+                "duration": 0.26906800000006115,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "composite wrapper assignment class"
+                ],
+                "fullName": "composite wrapper assignment class rejects wrapper PATCH of maxAttempts",
+                "status": "passed",
+                "title": "rejects wrapper PATCH of maxAttempts",
+                "duration": 0.3542739999998048,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "composite wrapper assignment class"
+                ],
+                "fullName": "composite wrapper assignment class rejects archive for a wrapper referenced by a report package",
+                "status": "passed",
+                "title": "rejects archive for a wrapper referenced by a report package",
+                "duration": 0.22696600000017497,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "variant candidate wrapper preparation"
+                ],
+                "fullName": "variant candidate wrapper preparation prepares a valid wrapper without creating it until selected",
+                "status": "passed",
+                "title": "prepares a valid wrapper without creating it until selected",
+                "duration": 0.3530550000000403,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "variant candidate wrapper preparation"
+                ],
+                "fullName": "variant candidate wrapper preparation rejects partial source profile freezes before candidate selection",
+                "status": "passed",
+                "title": "rejects partial source profile freezes before candidate selection",
+                "duration": 1.1819860000000517,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "variant candidate wrapper preparation"
+                ],
+                "fullName": "variant candidate wrapper preparation rejects corrupt source report ciphertext before candidate selection",
+                "status": "passed",
+                "title": "rejects corrupt source report ciphertext before candidate selection",
+                "duration": 22.282034000000294,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793323593747,
+            "endTime": 1793323593836.282,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/cognitive/assignment.service.test.ts"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "explicit owned assignment effective measurement publication"
+                ],
+                "fullName": "explicit owned assignment effective measurement publication uses real registry default and private assignment scope; only CAS-fills the pointer",
+                "status": "passed",
+                "title": "uses real registry default and private assignment scope; only CAS-fills the pointer",
+                "duration": 14.566668999999933,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "explicit owned assignment effective measurement publication"
+                ],
+                "fullName": "explicit owned assignment effective measurement publication uses exact frozen effective profile instead of the global default",
+                "status": "passed",
+                "title": "uses exact frozen effective profile instead of the global default",
+                "duration": 6.373907000000031,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "explicit owned assignment effective measurement publication"
+                ],
+                "fullName": "explicit owned assignment effective measurement publication rejects another owner, unpublished source, broken frozen hash and partial freeze",
+                "status": "passed",
+                "title": "rejects another owner, unpublished source, broken frozen hash and partial freeze",
+                "duration": 2.4509010000000444,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "explicit owned assignment effective measurement publication"
+                ],
+                "fullName": "explicit owned assignment effective measurement publication idempotently validates existing pointer and rejects wrong scope, changed config and retired/revoked release",
+                "status": "passed",
+                "title": "idempotently validates existing pointer and rejects wrong scope, changed config and retired/revoked release",
+                "duration": 13.127771999999936,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "explicit owned assignment effective measurement publication"
+                ],
+                "fullName": "explicit owned assignment effective measurement publication fails pointer CAS and unknown registry without modifying global config",
+                "status": "passed",
+                "title": "fails pointer CAS and unknown registry without modifying global config",
+                "duration": 2.394100999999978,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "report-only config changes preserve scientific hash/version while provenance retains full source digest",
+                "status": "passed",
+                "title": "report-only config changes preserve scientific hash/version while provenance retains full source digest",
+                "duration": 4.287910000000011,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793323595448,
+            "endTime": 1793323595491.2878,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/assignment-measurement-release.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-cognitive-profile-composite-http",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_TRAINING_COGNITIVE_COMPOSITE=1",
+          "PRECISE_TRAINING_COGNITIVE_COMPOSITE_EVIDENCE=/workspace/materials-load-20261029/evidence/training-cognitive-profile-composite-http-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-cognitive-profile-composite-http.json"
+        ],
+        "startedAt": "2026-10-30T01:27:55.139070+00:00",
+        "finishedAt": "2026-10-30T01:28:05.808631+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts > Exact cognitive profile through the real revisioned Training questionnaire adapter > preserves profile through revisioned publish, parent START, deferred child and immutable source reader 795ms\n ✓ src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts > Exact cognitive profile through the real revisioned Training questionnaire adapter > checks both self-grant qualifications and recovers explicit revoke original intent 96ms\nstdout | src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts > Exact cognitive profile through the real revisioned Training questionnaire adapter\n[2026-10-30T01:28:05.735Z] [INFO] 队列已关闭\n\n\n Test Files  1 passed (1)\n      Tests  2 passed (2)\n   Start at  01:27:55\n   Duration  10.19s (transform 6.41s, setup 0ms, import 115ms, tests 9.93s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/training-cognitive-profile-composite-http.json\n",
+      "logSha256": "dab45faa4cf03d5c501e7ebebf3487f97375c31a4846ae50219a98fb61d89c80",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793323675516,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile through the real revisioned Training questionnaire adapter"
+                ],
+                "fullName": "Exact cognitive profile through the real revisioned Training questionnaire adapter preserves profile through revisioned publish, parent START, deferred child and immutable source reader",
+                "status": "passed",
+                "title": "preserves profile through revisioned publish, parent START, deferred child and immutable source reader",
+                "duration": 794.7917159999997,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile through the real revisioned Training questionnaire adapter"
+                ],
+                "fullName": "Exact cognitive profile through the real revisioned Training questionnaire adapter checks both self-grant qualifications and recovers explicit revoke original intent",
+                "status": "passed",
+                "title": "checks both self-grant qualifications and recovers explicit revoke original intent",
+                "duration": 95.91891599999872,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793323684833,
+            "endTime": 1793323685723.919,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "stage": "child-loaded",
+        "ids": {
+          "questionnaire": "51cd701f-db76-4ad5-8a71-c46922e91444",
+          "attempt": "b2a6eac8-c414-443b-b3b8-0dff2d1160c2",
+          "secondAttempt": "973241e4-bf0a-41c2-bc40-40276a401a0d",
+          "selfGrant": "d58e124b-5f7a-4bb5-aa9c-0845e8afc605",
+          "revokeRequest": "dea65ecd-b740-4f8f-8371-d3e2eac6a6cc"
+        },
+        "requests": [
+          {
+            "method": "POST",
+            "path": "/cognitive/assignments/14c115f4-42d1-4f9a-ad51-6559a4c51305/publish",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/questionnaire-products",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/questionnaire-products/51cd701f-db76-4ad5-8a71-c46922e91444/items",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/questionnaire-products/51cd701f-db76-4ad5-8a71-c46922e91444/publish",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/composite-assessments/51cd701f-db76-4ad5-8a71-c46922e91444/attempts",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/composite-assessments/attempts/b2a6eac8-c414-443b-b3b8-0dff2d1160c2",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/composite-assessments/51cd701f-db76-4ad5-8a71-c46922e91444/attempts",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/composite-assessments/attempts/973241e4-bf0a-41c2-bc40-40276a401a0d",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/research/use-grants",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/use-grants/d58e124b-5f7a-4bb5-aa9c-0845e8afc605/revoke",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/use-grants/d58e124b-5f7a-4bb5-aa9c-0845e8afc605/revoke",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/cognitive/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/use-requests/dea65ecd-b740-4f8f-8371-d3e2eac6a6cc",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/use-grants/d58e124b-5f7a-4bb5-aa9c-0845e8afc605/revoke",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/use-grants/d58e124b-5f7a-4bb5-aa9c-0845e8afc605/revoke",
+            "status": 409,
+            "expectedStatus": 409
+          }
+        ],
+        "observations": [
+          {
+            "realRevisionedQuestionnaire": true,
+            "originalT1PointerRetainedAtT2AndT3": true,
+            "exactResearch60Trials": true,
+            "independentParticipantSeeds": true,
+            "immutableSourceReaderAcceptsOriginalArtifact": true
+          },
+          {
+            "selfGrantIssuerAndRecipientQualified": true,
+            "crossIssuerRevokeDenied": true,
+            "revokeIntentRecoveredAndNotReapplied": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-cognitive-profile-checked-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/training-cognitive-profile-types.json"
+        ],
+        "startedAt": "2026-10-30T01:28:28.511087+00:00",
+        "finishedAt": "2026-10-30T01:28:53.487013+00:00",
+        "exitCode": 0
+      },
+      "log": "",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a"
+    },
+    {
+      "path": "server-version/backend/prisma/migrations/20261030003000_training_cognitive_profile_use_index/migration.sql",
+      "sha256": "959e197905bba90be08b6dadce97013eeec9dcce5ea19bb13334e680dcd13ef6"
+    },
+    {
+      "path": "server-version/backend/prisma/schema.prisma",
+      "sha256": "7d84ba2edeebd92509ccbb0933caf7acddaaa58ff378081e12051b820a1f476f"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts",
+      "sha256": "3fa747a3dd007093a6270107986f64ce4eb73ba94842713b9a418e68e818a76f"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts",
+      "sha256": "0480956ffc8a8a11ff2e8dd8f07ed60815c1cd125e7b7fc3e05d404f0503580c"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts",
+      "sha256": "d5b53b4f4698225fddb01541bddf5652b1e0b942165a6a808be8cdce8d4df8e3"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts",
+      "sha256": "3951fec9bc37bbab2f76844aa795d1c0ea78a4ae673968ac50df3f023e992523"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/assignment.service.test.ts",
+      "sha256": "e72670be7cf95c6308b8076c3cb53b50bec8c12c07b63cae6c415d0509138642"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/training-flow-assignment-snapshot.test.ts",
+      "sha256": "9dbd2e21c678e4f551bac8f7dd290b9ba671427c864765d4fb31e74a8858d596"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approval.ts",
+      "sha256": "e9b2dbe916a6fb6e4bf280c73313d506c6473b0aa94bbc489b137c0c1a2f09ee"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/cognitive-profile-artifact.ts",
+      "sha256": "201f096e10d61c2797971a2de478203d98f91d9665bbfb9b30091b565eb5b24d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/cognitive-profile-assignment.ts",
+      "sha256": "a1e725ff8a8b09a54214e9608828a628a73a4dc4b8cdcb63243661f772ab8ed8"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/cognitive-profile-source.ts",
+      "sha256": "6eb37b9f39875d4a32ec438ebcec5f69393f8f058b872576dc93553ffa99d133"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/training-cognitive-profile-use.ts",
+      "sha256": "a5f6b2e63c8a3d719a69dc453c1c4dc5fb081f0f173a0d221cc6c3d21839d26a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/assignment-measurement-release.ts",
+      "sha256": "afa97191acf4b653f44c60e5d8b1e6478ad647d19d96744a9c28115263223305"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/assignment.service.ts",
+      "sha256": "837d9bbbcdbb91fc5baf7d694307a4c646c56ae68c7e5e6a9b22b88660116638"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.controller.ts",
+      "sha256": "8047666a2f6dff1d7bd316ffe958697c89b24111c0810f891dd8cec1155caffb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.schema.ts",
+      "sha256": "2f36d665b0eff01a786a933aa11e5762fbbd5d8c6c21ce921828242f3c9bde25"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/profile-configurations.routes.ts",
+      "sha256": "f96c2b624908a9e01921e6582302489efb8390e7219179383c27efe658aa4cca"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/public.service.ts",
+      "sha256": "a68b7b5485193c93133965f445a72c5198c252c40d3dbbd9f29551ddd0153194"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/session.service.ts",
+      "sha256": "5f46e489cc8797b7a58792d206ce1abec36773ca099daa8424aab99f4be09941"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.service.ts",
+      "sha256": "43a8ff1604ed09360a7779d8d9e331767bca18d6f2da8fdb8b0ebef59ecfa96f"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-content-binding.ts",
+      "sha256": "4d90b6874b9cf0d42ae680f112d807e6b5c94925baf90fafc9cb484b53c13cd9"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-flow-assignment-snapshot.ts",
+      "sha256": "ac8d1bfdf5d320f9156233077da4c0fed4d6560a9e1b55b0241ff8e22fe57598"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/service.ts",
+      "sha256": "8d23c930cd807f94cd70c7a7495026879f5f5596a7d391cd2ced23a3f8bb0938"
+    },
+    {
+      "path": "server-version/backend/src/services/materialGrant.ts",
+      "sha256": "faeadcc76a3247fa9a5040d43a23e69e551f30faa1d5ed86e73550fed5907628"
+    },
+    {
+      "path": "server-version/backend/tsconfig.json",
+      "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+    }
+  ],
+  "baseCommit": "baa90448759fe134f61950c63219d8c63c20cd20"
+}

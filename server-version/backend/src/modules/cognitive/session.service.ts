@@ -36,6 +36,9 @@ import {
   ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,
   retainAssessmentAssetReferences,
 } from '../assessment-media/assessment-asset'
+import type {CognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-artifact'
+import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile,type TrainingCognitiveTaskBinding} from '../assessment-authorization/training-cognitive-profile-use'
+import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 
 /**
  * D4 — Cognitive Session / Attempt 服务。
@@ -53,6 +56,8 @@ import {
  */
 
 interface StartableContext {
+  frozenProfile?:CognitiveProfileArtifact
+  selectedProfile?:{pin:TrainingCognitiveTaskBinding;ownerId:string}
   assignment: {
     id: string
     courseId: string | null
@@ -114,16 +119,23 @@ export const prepareUnifiedCognitiveSessionConfigSnapshot = async (input: {
   engineVersion: string
   scoringVersion: string
   config: unknown
+  frozenProfile?:CognitiveProfileArtifact
   db?: ExactReferenceDb & AssetDatabase
 }) => {
   assertCognitiveProductEligible(input.testType)
-  const definition = getCognitiveV2TaskDefinition(
+  const liveDefinition = getCognitiveV2TaskDefinition(
     input.testType,
     input.engineVersion,
     input.scoringVersion,
   )
-  if (!definition) throw new Error(`No Cognitive v2 definition for ${input.testType}/${input.engineVersion}/${input.scoringVersion}`)
-  const compiledRuntime = compileCognitiveRuntime({
+  if (!liveDefinition) throw new Error(`No Cognitive v2 definition for ${input.testType}/${input.engineVersion}/${input.scoringVersion}`)
+  const frozen=input.frozenProfile
+  if(frozen&&(frozen.schemaVersion!==2||!frozen.execution||frozen.identity.testType!==input.testType||frozen.identity.configVersion!==input.configVersion
+   ||frozen.identity.engineVersion!==input.engineVersion||frozen.identity.scoringVersion!==input.scoringVersion||hashResolvedConfig(input.config)!==frozen.identity.resolvedConfigHash))
+   throw BAD_REQUEST('原精确 profile 与运行输入不一致')
+  const definition=frozen?{...liveDefinition,protocol:frozen.protocol,presentation:frozen.execution!.presentation??undefined,
+   references:frozen.execution!.referenceDefinitions,metrics:frozen.resolvedReport.v2MetricDefinitions!,quality:frozen.resolvedReport.v2QualityDefinitions!,report:frozen.resolvedReport.v2ReportDefinition!}:liveDefinition
+  const compiledRuntime = frozen?.execution!.compiledRuntime??compileCognitiveRuntime({
     definition,
     instrumentVersion: input.engineVersion,
   })
@@ -236,6 +248,12 @@ export const loadStartableAssignment = async (
   const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: assignment.configId } })
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
   assertCognitiveProductEligible(config.testType)
+  const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
+  const precise=pin?await prisma.$transaction(async tx=>{
+   if(!assignment.createdBy)throw FORBIDDEN('原配置接收者已不可用')
+   const value=await loadPinnedTrainingCognitiveProfile(tx,pin,{userId:assignment.createdBy,configId:assignment.configId},true)
+   assertCognitiveAssignmentFreeze(assignment,value.artifact);return value
+  }):null
 
   const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
   let validatedConfig: unknown
@@ -263,6 +281,7 @@ export const loadStartableAssignment = async (
   }
 
   return {
+    ...(precise?{frozenProfile:precise.artifact,selectedProfile:{pin:pin!,ownerId:assignment.createdBy!}}:{}),
     assignment: {
       id: assignment.id,
       courseId: assignment.courseId,
@@ -387,11 +406,13 @@ export const createSession = async (userId: string, assignmentId: string) => {
     engineVersion: ctx.config.engineVersion,
     scoringVersion: ctx.config.scoringVersion,
     config: ctx.validatedConfig,
+    ...(ctx.frozenProfile?{frozenProfile:ctx.frozenProfile}:{}),
   })
   const randomSeed = randomBytes(16).toString('hex')
 
   try {
     const session = await prisma.$transaction(async tx => {
+      if(ctx.selectedProfile)await loadPinnedTrainingCognitiveProfile(tx,ctx.selectedProfile.pin,{userId:ctx.selectedProfile.ownerId,configId:ctx.config.id},true)
       const source = await cognitiveQuotaSource(tx, assignmentId)
       await lockCognitiveQuota(tx, userId, source.id)
       const resumed = await tx.cognitiveSession.findFirst({
@@ -652,11 +673,13 @@ export const restartSession = async (userId: string, sessionId: string) => {
     engineVersion: ctx.config.engineVersion,
     scoringVersion: ctx.config.scoringVersion,
     config: ctx.validatedConfig,
+    ...(ctx.frozenProfile?{frozenProfile:ctx.frozenProfile}:{}),
   })
   const randomSeed = randomBytes(16).toString('hex')
 
   try {
     return await prisma.$transaction(async (tx) => {
+      if(ctx.selectedProfile)await loadPinnedTrainingCognitiveProfile(tx,ctx.selectedProfile.pin,{userId:ctx.selectedProfile.ownerId,configId:ctx.config.id},true)
       await admitCognitiveAttempt(tx, userId, session.assignmentId!)
       // D6.1 (P0)：行锁串行化 restart 与 append/complete；锁内校验仍 IN_PROGRESS。
       const locked = await lockSession(tx, sessionId)

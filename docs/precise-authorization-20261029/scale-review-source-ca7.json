@@ -1,0 +1,1796 @@
+{
+  "schemaVersion": 1,
+  "kind": "Review preparation only; not an executable CI binding or activation approval",
+  "repository": "caohuibj/eduK12-new-version",
+  "branch": "task1-scale-exact-authorization-20261029",
+  "base": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+  "sourceHead": "ca7cef4b0dbaf943eb61d925b4883bf6de2dfbdc",
+  "sourceTree": "998672314b37eb3e9dfd69441c35c4365451a0f3",
+  "backendTree": "adce6701fe6431adbe41bf4e84c009a9350056f1",
+  "frontendTree": "9045d9a83f47b3609790ef881ba364e6568bc612",
+  "rawDiffSha256": "2042d4af1454f4638dfd3d5c82db78034e869de55c28fe4fcf62ad72748804da",
+  "binaryPatchSha256": "c6aff07d85cf0fb7eaf0e8adeb7ba5e54771e71f4766b9b1289b01b3f991616f",
+  "binaryPatchBytes": 3778381,
+  "entries": [
+    {
+      "path": "docs/precise-authorization-20261029/approved-scale-axes-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fa9b56d70235a54117b58f8d0611784a2d807458"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/approved-scale-axes-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f3a79fd81bb82ac3387db0fe37633b6f61d7883f"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/approved-scale-axes-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5a3aff427415dd03e0aa2f1586103fc1f9282e2e"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/built-ui-artifacts.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "065dd3b6eebc7beca7b16b206353f6ce9df626f3"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/built-ui-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "15042ef0c880a7a0094e6ff3fa8d7b4216153456"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/built-ui-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0156b5d04d2aa5c838550db869eee182687b22eb"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/built-ui-screenshots/teacher-mobile-dark.png",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "34a133efa169a7d01693d17f5a3fa7e1d2d4140b"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/built-ui-screenshots/training-desktop-light.png",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6210558a707e780820c5994500b69dfabe426883"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/built-ui-screenshots/training-mobile-dark.png",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a7af730ff73fd6c44d0c7936b6d7adc34856b544"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/built-ui-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "680bc20a310da85bc6e1577de8025113eba0444b"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/draft-source-audit-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d88d7b82de1f93657898b1964629cb786ed838bc"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/draft-source-audit-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "53c90734342c4bf8e15bb4e0aab595f2ea5957f8"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/draft-source-audit-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "41d57fc61d08abbc2b3c7dd88eae91e4484cb388"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-admission-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "41b004a72042b06728971213e8cde729e5ec3418"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-admission-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "33dcd68c3c577e01e4d2126824c900be30de957f"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-draft-change-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3ec763aa8e666eeab2c5ffeb4152d5742333afb7"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-draft-change-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9de511b1c74af20cd95805691b4434b66754ba6a"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-draft-change-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c4af79de566842b2e9cd8189d6d64106b1732717"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-manager-services-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8aeff944038ebe5d8b710d5b56e7cdeb18b1b3cf"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-manager-services-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d12fc3f54b8a617cec0ba48a1c826a9618f8c238"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-manager-ui-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "72cb6e636a642d1e5d540a4be08cdf68ebf50d86"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-manager-ui-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b251d9528851a42e03bda0fd57dbd9c2d01db1a3"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-manager-ui-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "20957a10039a8464249b15c9f77cb5ae22f8dde8"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-replacement-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7b3bbd3398d1da9d7eefdfdf64b0ec1791da501a"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-replacement-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a77cd49c73caaae6cd26cecb7f80c2cc2ea32377"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-replacement-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a3738c8994bec27405abf0f39478ec260dc38d13"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-selected-catalog-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "69b4a17e0b6fec1d4f9a5e3928042be80d3376fb"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-selected-catalog-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "dd5d057dd9729590af6f55bd9616ebece0fae9c8"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-selected-lifecycle-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9e30817edd1c5f6e58194f88fa4018935aa66697"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-selected-source-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "68b683d07adf3cd7bfdd9f2ea4890f7b2d4efd68"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-selected-source-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "98f3e67f1662d96f110356be8bee2b9a9610495b"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-use-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "283eea56df854eeb937d53c964221a096779a046"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/education-use-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "88d66600317f04796af1fbded15a87c725f54a9f"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/exact-authorization-inventory-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0475ff454e90930100c1939cc02d049177cea74a"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/exact-authorization-inventory-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f72478bf900d9221d04bc8bbe1b8150dcaaadb19"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/exact-authorization-inventory-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4f122676a526a0f98d7fe04105a321c5ec5c4ff1"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/implementation.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c47867a5be3b9bc7c9884691b09191c5e41808c2"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/legacy-presence-inventory.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "01cab70fbd50de412ded13fd91a418b654ac44cc"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/main-dc0f-integration-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7bfb6633aa7473c244450a1459c8c3d8930daa6a"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/main-dc0f-integration-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c031126af4f1458c8aa9e371064d7caa0caeddc6"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/main-dc0f-integration-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b8b769e3780c953ede9226887a3c1ecedf150cfb"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/read-performance-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a8f4e789a2829089af69efbc1f52486c91c1b14d"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/read-performance-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b2194bd7bee496d7a4a8038db931c7c31bf3173f"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/read-performance-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fee349b0d77e8ea6a39a0c085ae7b9312d3b6fbc"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/report-parameter-compatibility-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "23c9f70fcefedce7d6563e3a6abc143c87ffbfa2"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/report-parameter-compatibility-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5de24cbe408b72d48c9b96c67e68fd70851b9542"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/report-parameter-compatibility-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a574a07a0cda4a3df910b2a7e6ae7fa9c4060978"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/runtime-role-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "951332df07346459b28bb180945a91cbcde4f710"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/runtime-role-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "af55f786c96a3d7d5f8657ed3960c2333ec4a1dd"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/runtime-role-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "84a12747eb102bddd48f4ca143c21937053843ae"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/scale-materials-readback.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "156b3347d1ac5436697d6ae66826c6757c5e9013"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/source-manifest.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7150e797a48791bc072632f90967883b4b45c468"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/specification.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "45784394509e6fb9f5eab7de4b40e1a8eaae3a10"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-exact-journey-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "01d3906299dcb3540766ca1163f245d26988b9ec"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-exact-journey-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e6b95a89e2918456822715fa787b0c04e03cf798"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-exact-journey-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8352d416d0ac2e1ea282759c117ead329854e088"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-replacement-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ab939fa627cf7ee8daaafff53d8a70056ff80904"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-replacement-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d2d63e68d05ccdfa278ca08a59453c8155eed7b4"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-replacement-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "db4acd419752dccca770c7b625c28a917708c61d"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-standard-ui-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e23fd37704a7329e9375f082b15d5858b445730e"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-standard-ui-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0c3e42c92957ddebfc0c98473e3d6a94c9b998f7"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-standard-ui-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4e5b7b12bc4b477fe0e7235fb0cf476b0d4bfbc7"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-standard-use-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ffdeeb349b8fbb913e2eb22e04961f62f2749c94"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-standard-use-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "dbbe2c06eb531a7c387fc1dd6bb5f464f027e323"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/survey-standard-use-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1ad75f1b6c5fc227e2f0bdc4541ddcea878899d8"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-binding-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8a39702d7cd94b42b261af00be7080e8c040587a"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-binding-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bf51c2a2cf3e1200699a923f5e740d6db3d1a017"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-course-journey-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "dc8a5269e0ebd6766b3aa6043facf523b9661e48"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-course-journey-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ffa2cd490907c0f034fe9adade5fd7f4c4c09856"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-course-journey-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e72351e638dacbd0bdbfb5391c2702a1a21c1cce"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-named-configuration-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "911410b5bfd3d663fe87435d7ac19a8b25ddd559"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-named-configuration-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9bdd5b7aa4284aa4e6beabeb92b54dcb718d9bed"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-named-configuration-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d0af7064ec50a7a3c61cc00ad840e24e9a888576"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5352d6a699f217ae0bf2241786df8b57df893ed3"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-replacement-contract.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f013e1ec95d831bd2af20a9ac0b8d95a332ac4d3"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-replacement-progress.md",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bbb79a32f92fabf0d9611b38c185d8e5d441f9f0"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-replacement-raw.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8c8ea6fbf7d6cfedab7dab1d25f77f2a58cd5751"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-replacement-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "412cb8ef8163cfe9326470513561ff6e42a3d13c"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/training-verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f653a8e615a5b54ff84c66f5431b5722c128ae64"
+    },
+    {
+      "path": "docs/precise-authorization-20261029/verification.json",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "74faf1a3b3fe412b45949f9205f65f3df0fa59f8"
+    },
+    {
+      "path": "server-version/backend/prisma/migrations/20261029150000_standard_combination_education_admission/migration.sql",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bc2bc593c7fb47f6bd4d45f2e5e0929d0f946eaf"
+    },
+    {
+      "path": "server-version/backend/prisma/migrations/20261029151000_standard_use_revision_evidence_index/migration.sql",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5db2d835afd120c598b8caf6fdcada32f54fbacc"
+    },
+    {
+      "path": "server-version/backend/scripts/precise-authorization-read-performance.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "31dd3b2ae015ec2338be41c5e1c1197f80bb60a6"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-draft-replacement-audit.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "33fb66966f72868d4172876dd1ea5cad3075720e"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-clock.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6f666e4801a555962e32e22b1de7a5ba5726359a"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-cross-report.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "895620436f830152ccb96a5afcc8ebba817f8147"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f9ec0d770fcfdc51b233a020ed25565cdf9b5081"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bf8513e3e3ee5847a59f4dd5dd83e1ef39343074"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fc01869b4b676a8a4ef13d976e961f4fbd999416"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-source-current.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5615250a694cb9043e2249a9a1fcce3f1874d5df"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-source.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ddbf5e84a8adf76f5d6c2b69cbacd8064fb26b60"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-management-school.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9afc4511e3338f90219f0711dc340a02f0b8c638"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "dc966fdf2b4e98ae3c8dc93137f5db51063dd123"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a90d936085fbbdaa442f8a34e8e1a1e6d11ea7d4"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "74e1d372efba89e76f4777a77abc4e0ece546e51"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "343c7935d56c664c2662e7dabeb021a8abb6b0bd"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-revoke.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "646a836b8eda850a2d3eca17317a0b5c366302a6"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-binding.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7f86fdafbb4df603bc576ee60cb1d1ace3094c24"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fd47024bca6d1c85a18ed1ffcaf08ce48ec0b031"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "87124969d7a9fdab0a25f26fcd557a48c3529763"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-use.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "41618f1d7822f76a6fa0c2fa393b9c6b4338927b"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "be05268ced0c111b88b15b767d40d2aa8c5425f9"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/exact-use-runtime-role.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5284783928d5004fe5fbab212753a7bacd76a8d1"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5b98c6ba1949be1f113246d7fa5c40aea2d7e999"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/selected-configuration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "aeda614475634b4d4d9ec09c5bc13c9ca612612c"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/selected-reference-audit.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b69ed7b5b0ff8496d8e747dabd45b9227ef60566"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/standard-configuration-binding.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2b89861c22318618b838c0c3f8515172f6e9bd5a"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ab56dc40d8d86930dbb89bfe9633605066cffdaa"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "242ab1a6783f40646c23d832a9847fcf51c3b4fb"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "af0d7e21fa6f61ca2fc5dc85d2e4f93cda759455"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bd1654b5474dc5aaf1a72ecc81dc4db2c89da89d"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e5ae15ff83e3d4da251a0bba79fe6d6ee5e0b62c"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e9fd830c7159d5b9f0cef1233db2cacd041305e7"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use-revision.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "191f430402dbb9f1276ab18fa88b9a23808983ce"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4267ab8102ae05a04f3d7d6c02ea2f11470c64db"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5b971d4e25181bf3c5d0c9b0e3bf4a95c5c6575c"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-t2-audit.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4ea49d9324d29c65d78a93aef5d82acf11b9a505"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-configuration-management.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "baf7b88ce410154aa2ef566ca356aebcbed64002"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4bcc642081e094615802de79a6446d6bc379d327"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-general-exact-journey.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9cc02d8cd8d9594b3fa82bc454bf5e820ca81367"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "27a5244b65559fe197f0483ab1f16219bc5c1887"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7d8315101c363aee10375393943708dea3052fe5"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-selected-binding.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "61607bb84c57bfc43a736163745f0cff1c26959b"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "34596947771406dc3928655ff61205aee540a5ab"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-t2-audit.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "82e2d491059ef15013383ea68a78e654021a9acc"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "123df62476860ff3ef15cb34139050c275c33e13"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/access.test.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9f7642a5f2ae480b014cb7da8266b351f0fc03c9",
+      "after": "95535923a09adc1b7efa09805df9fbba87d21e60"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/education-observer-source-read.test.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4830bbf39a7236a8e9407761556955b7117d8a96",
+      "after": "a9af2a9a9439b329f12b16024c303d6fb5fb6a7b"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/selected-source-binding.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c4fc94108318e62641adf3f8091d4df2a63b79a5"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/selected-source-catalog.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fde93ebd3f1789dad68ca20bf1c84380b6cc2e3e"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/field-expert-public-sources.test.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a24519b4b6d2f798a2e493274c01e229bdba3639",
+      "after": "dbdfe35561fdda992717da759be960777cfa9dd4"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c9efb4fa3d5e772880f3094e2cc6a0f340185778",
+      "after": "db7cd6a8b6d2fdeb02291fa7f17f78ccafe9fdd4"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/standard-report-parameters.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f298a63949d7efdff0f4b0bbacb4b8646811e5ae"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "864bee4ed8754b81e4c24db02fa2deafc4516353",
+      "after": "d846d9dc11f43cbee80630495412ca9edbd1bb3c"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9a7cd0d3c53574c79434515afb77a0db5a473cee",
+      "after": "1b70e7a466e8a75d5c26628d5bac75fab7d16ddb"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-management.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e7650701fa6480fd92783957bc32b2853f6da939"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-revoke.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6901881495cd0065e338eaaa1d2321f65b904b58"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-use-current.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "113fe988284d56db5042d7ef8c522d238c4f67be"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e42c66f0360d93761c0c62a2b6fa0cf714478bf0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/selected-configuration.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "dde1feafbad3f78e2e6c97ece844ecb2aae0e7c7"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/selected-reference-audit.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f0b35592a17b473d28ed4a7ef492d0e6f400c27c"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/standard-configuration-binding.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a8d98baf44b4a52a5d4969ec74dd6c389eb0a171"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/survey-standard-use.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "23223cb9b0db4f271d44116729cf862a4e224a3f"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "465283dc239bda699883093bca1f3f3fa39829c9",
+      "after": "07350f3c4d1cc75cd68569de78016593f3d96be5"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9dc8cb06d48d50d6cb32412bfde49c44c6ff6119",
+      "after": "9943812fbb274288962544e75add5e7577e964b3"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.schema.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "374a7627c062194b23353dce5e07f910790a3d2b",
+      "after": "0ecb3841cd4ee1a4803f8e4d97ca83da7620e8cc"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-reference-audit.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "93ceda5091b29abcfef1c712b6f57b15e1eb12c9"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-reference-selection.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "99e2c80a147dea2e4f017beec2f5a12d81d38d81",
+      "after": "777fa79d1c33c80d388059dd44c9d1e8e52da25d"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-combination.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cc9115f70de8881dea49af40e84a3a2e152d1c59",
+      "after": "db6e10d8cf02ecd068bcb6a0d8652e95f2bca4a6"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "30dfc2b8d69884548441de058d125afc9c5e08aa",
+      "after": "6d93d684212e8c401df219bdf1147d6212579ae1"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "be99ddb22302d30cfae91d6bfd0a4c3fd8869462",
+      "after": "8218d142f50be657da166f672c086ce7516289a8"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9c11cc5d703ff6e6cc8e68acd3227a610450dc8d",
+      "after": "571b03860556009cf3101dd7fc22246475abc48e"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d98861f51d2122d2661a8ef40f59ecb7f1509d45",
+      "after": "18f076d2061d58a1cd5cf0f478aaca0936463a4d"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c3f095bc16a68df6f4db64d482d167b9fa8c4c31",
+      "after": "66b43281b343ccd8e74616c800973b9b905610ae"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/selected-source-binding.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "15fed4e29ef819dfbe58630ef6c9ab5a741801b5"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/selected-source-catalog.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "589a8a82ea5cdfe7da41933fbd91e2771e1d6681"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/platform.routes.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5d8001473152516e8e8a8e7acddd7b29af30a9d2",
+      "after": "2abec54a55affe67e8d72721bede9af6abf84300"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ea129bb25baa5b1da4b06f0896616845cc2c32ba",
+      "after": "4f4f5596521403ef007f48eecdf65c74c3eff3f7"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-management.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "53349b0b670e5cd8ca895af9a3797e4a1b9c7af9"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5329c195230f365684cd40b4cec1fb82e9fe4812",
+      "after": "ba06835a6157c4bfb5f516a27b1bce5b53b9bea9"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-report-parameters.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1046bf43c35007514e1da51b8c89ad6c4a2763ee"
+    },
+    {
+      "path": "server-version/backend/src/modules/organization/educationProductAccess.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "650cdd93a876e6dc43ace4d690c83139c8d338dd",
+      "after": "f77662245be98bd1327b305b502a371f59d7f661"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/routes.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bafa43f4864293d431e4051ef382a70923aeb210",
+      "after": "a61aca5a1d7dd54ab844713b9b2ccacd7c36240f"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/service.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0ac4ac853bc99a08b57a7b21f0feb92ee9afeb62",
+      "after": "4f85933b37a577cf293409e52b309b4718fb397e"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/admin-role.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f47ab9d2a83060d797d0f41503f7669c0f7da751",
+      "after": "1bc726c6f8f87c73475a81d6e4b15fcc0e674ef1"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2daec79a26c55e5a01269028845c24bcfa00bb11",
+      "after": "08954932b55ebd8fb77f77e2ed65b777ad137238"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/platform.routes.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a83c62b96ebf1d27fede3082bcd6a3d73ed065e8",
+      "after": "df89f49bbc54a0f1d9e9705ede738e3b0a85b91e"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/selected-reference-audit.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "44369ef800cdf997da068d6abd3c04877197ca4f"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.model.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "373ddecfc1f017070dcd577a78c7a566d66f8f0a",
+      "after": "7eab28b7e3df0c20a2623ec6e6e8425da3bfbd88"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.routes.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f571ccabebcd3914c1858cee0b87c53ff8619894",
+      "after": "1fbea738e5c0d2aa83d02e7aee784b9fd3557f8b"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4f6eecd86cec9595488218f751a1d5e26cec1bb4",
+      "after": "f5fb8e84d3cd6d708e4ce7bfac094242d14db607"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/tool-policy.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ec69e08e425d7e813960c17c21f233064dfd02f1",
+      "after": "c6b5b4efd207c3375c09b7424241d89182f9e5ac"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/waves.service.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "77037a1de0b89e9d1832c13c0de291f6b2e53f96",
+      "after": "0dfdb288b70c12e3cf80415a10d1b800c92cbb65"
+    },
+    {
+      "path": "server-version/e2e/precise-authorization-built-ui.cjs",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "15dd85600055b1f43e2b2e2d1a9cf5658618f272"
+    },
+    {
+      "path": "server-version/frontend/src/admin/AdminContentPermissions.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5cd9c5bcc04355a0df1c733cade8f377301ad407",
+      "after": "88fa24a5a73e42cd07be487b6c97f99b926524fb"
+    },
+    {
+      "path": "server-version/frontend/src/admin/AdminContentPermissions.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "752711d8d17ed1c1d0231f065b4da24744bb492e",
+      "after": "3f0cb429c395926659e16d1b27bb5b19e38d8b42"
+    },
+    {
+      "path": "server-version/frontend/src/api/__tests__/educationStandardConfigurations.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "896494cde103c8abc9e7c90e0b21347209b350b1"
+    },
+    {
+      "path": "server-version/frontend/src/api/__tests__/surveyStandardConfigurations.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b2ff494b899a072a68283038a22826a7b063461e"
+    },
+    {
+      "path": "server-version/frontend/src/api/educationStandardConfigurations.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0ed7c2da0c9a43dbd53dd1492ae39374448c0b2b"
+    },
+    {
+      "path": "server-version/frontend/src/api/standardConfigurationGrants.test.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "cd18e750db84fd7e1400da71f23879a9b3d3749a"
+    },
+    {
+      "path": "server-version/frontend/src/api/standardConfigurationGrants.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7ee51e753cb364660edc56736a467a2dc82f4471"
+    },
+    {
+      "path": "server-version/frontend/src/api/surveyStandardConfigurations.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "475365ea53594f66e741a7c64ec719dc938f6e8b"
+    },
+    {
+      "path": "server-version/frontend/src/components/AssessmentToolPicker.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5f39db35af8bc8491978cd8889357439ae5c88f0",
+      "after": "93fe699826270993d8a9c328c23952188ce9f82c"
+    },
+    {
+      "path": "server-version/frontend/src/components/__tests__/AssessmentToolPicker.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c96acbbcc121352dd518f59c427bb988506aa689",
+      "after": "51f3da1379d3b9cf50f5d0962be7ce42e28d28e9"
+    },
+    {
+      "path": "server-version/frontend/src/components/assessment-tool-picker.css",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c892662604199b74beed3b670d7a8d5935eb9157",
+      "after": "383bd010bd5ee5e3ee1b72ea3e5d12a2c76a6411"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/EducationCompositionSelectedStandard.test.tsx",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "374dcb863154c02ded4e55604bd3a58ff3435279"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "66cdf06c5525f8007ba87b81e3f0cf2a9014717c",
+      "after": "00186f8047244c282fe49fc3f78d184e2b4da4ee"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bd602a59aa6539adb25f1386a29b028d09fdc70e",
+      "after": "2dd48d2b8453a201b20f27cca8935b84e68498d5"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2d9324c0d5df8a08792d346e190e3743091caca8",
+      "after": "1f3d1d5715fa6559fafb8b66757c700ad08258c5"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/educationPublicFormClient.ts",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a423c9be2acd26d56b0796a36bc71028781837d6",
+      "after": "dada9581828ac7d52e0e34323097e73ba54c90a5"
+    },
+    {
+      "path": "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.test.tsx",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "cdb2d79fc00027179681a032c549ef53cd88aa33"
+    },
+    {
+      "path": "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.tsx",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1cf32e800e12c33df8d17ffc94c38a3a1ac3d221"
+    },
+    {
+      "path": "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7d70793f94c3216a07c1a83c7305982267e591fd",
+      "after": "0e9e77b3d31e7bb80b8189b5a513b7658b27adff"
+    },
+    {
+      "path": "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "98eb14ac8a2f3d58c5d6ffd45d1400604a7d2f7d",
+      "after": "ee6472ab225b852b02ee338233f40ac524734c1c"
+    },
+    {
+      "path": "server-version/frontend/src/components/scale-governance/approved-scale-axes.css",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f612dc9ca5147ff5a3e2116b669dcbeeddb020b1"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationProductGovernance.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "784fa17b26cb1a00f71c94b7bc3a692ab5365905",
+      "after": "99d2bac34e8accc2bae8c3e442ca2b34724475eb"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e9b6754a8c0b6a104e28d65f3eee516495d93e21"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationStandardConfigurations.tsx",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a1cdb43339b2eeb6ed1155e9bbb921c25f68acdf"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b62cc09f949fdaa3bce450a8e0382a85eb018741",
+      "after": "36a18f135ac604e81d2e254c984d7598339c23d9"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5dabfd32d0b7a34a22853b76e6f4ed952f148307",
+      "after": "be4b5a5b7f075cfc609f6c555808578ec7aa6c61"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9ff8e262d095088b769bac770c462b34b897d2cd",
+      "after": "b354dc6682457d24ebb1e82b39f08932fb646585"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "67057f26ec727d2e4be721ffe24c88bb562d547f",
+      "after": "501d997da6891835b4279798a9ae4d7918ac4224"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f768155cc9a5b3c94343208235113ea38b40474b"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8526dcb0294b1cb3f26019f8bf24202db29283c7",
+      "after": "df76b4ff28dc761fe3306502bf80884965c6c3e8"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.identity.test.tsx",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "26d2c0bb4b0103f4a157ca0fa2ed7942727e3be8"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.links.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "957862c9fdaf72eb9878ae50e09134814f4c7ec5",
+      "after": "a2bb5ce391f112be1d5538887767804594141459"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e92013edf55dda148e7264d281887153aeb1bdc5",
+      "after": "cc14a6106bc6fbecfaf8be636a15f99eb99848de"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.verification.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8c3d90b85bd55af5fbd787301689d0b934a58f9a",
+      "after": "6a6f17b80de108f10b51425616930e0e84e07832"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f61afac371fe743701f933b2c7091ea14ac9dc75",
+      "after": "7ae2d727d14ca7c0f8ac23c5b06542d34346245b"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/education-products.css",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7a95dc595f6f779eb3fa61a6a166a6fe6f949541",
+      "after": "1b6163a05d3ea373966ddef48436a46b17eda3ec"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "af8e61c47ea3329107e40fd396a41132ca4080e4",
+      "after": "7d43cdec5d9fb303eede7b090e52a79c3a4ed79d"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/TrainingContentSelection.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bd27f02cb0604da25fbe1a2f3872f78d8cf37ca1",
+      "after": "0182ec65eb6b64cce88aac25d24728acd10cfafe"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a6956cde3649f62eb02db3616fa0ac464416ead1",
+      "after": "9ab805ace0d36e807519c951d656f5eb4a90a5e4"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/__tests__/TrainingContentSelection.test.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "01f4d98526d6c74c13307f3510abeacdc3be920d",
+      "after": "53ee3f109cc901929b1b5879cd31c202f9b2fa29"
+    },
+    {
+      "path": "server-version/frontend/src/survey/ResearchCatalog.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4435877e0e5d5751ddbc7ff5442a7ecf3e6b6c48",
+      "after": "73f27d5e2dd97560efa79c747532b95865562c3f"
+    },
+    {
+      "path": "server-version/frontend/src/survey/useSurveyStandardConfigurationGrant.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "001bf23f8d4cadc5a95ad45cb83c60192496c680"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingAdminResources.tsx",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ccbc559cf0ce00a168baa578d2e50241d17f6b51",
+      "after": "566f9f9e0cdc233be523d90b1d81e1c9c46181de"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c73f79acbe1281729e60a667cca2394a10674503"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7b152c7a1abec458c437c1bec0f1921ac0884f63"
+    },
+    {
+      "path": "server-version/frontend/src/training/training-admin-workspace.css",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d88b632ce515d024142247d04f3b6e0b821e795b",
+      "after": "ab1cb9221ec24ef3230edea10fb17be25ec76bbf"
+    },
+    {
+      "path": "server-version/frontend/src/training/useTrainingStandardConfigurationIssue.ts",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f395b882db2f341635c162f27ee3180d88c17f67"
+    }
+  ],
+  "newPreparationDocsExcludedFromThisHistoricalSource": true,
+  "activationRequiresRecomputeAfterAnyLaterCommit": true,
+  "protectedInputs": {
+    "AGENTS.md": "27d6849de6d3461941a2772b008a28347e933e03",
+    "docs/release/README.md": "cd7858296514a91a892fdb44e03e1715a1625414",
+    "server-version/backend/prisma/schema.prisma": "8beef2106fff0996ba42c9b9bfc3dd94a6e337d6",
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    ".github/workflows/ci.yml": "6b80b453ac51601dab0eee3392adb9d40bb47148"
+  }
+}

@@ -8,7 +8,7 @@ export { flowConditionSchema,evaluateFlowCondition } from '../assessment-core/fl
 export type { FlowField,FlowCondition,FlowScalar } from '../assessment-core/flow/definition'
 import type { FlowScalar } from '../assessment-core/flow/definition'
 import type { ResearchFrozenUnit } from './publication.service'
-import { cognitiveDraftSchema } from './cognitive.definition'
+import { cognitiveDraftSchema,surveyCognitiveFeedbackSchema } from './cognitive.definition'
 
 const key=surveyKeySchema
 export const surveyFlowDraftSchema=z.object({
@@ -118,8 +118,10 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
       error(issues,'flow.experiment.groups','所有冻结工具必须明确归入至少一个问卷子版本')
     // One participant-facing cognitive feedback policy across all variants avoids
     // revealing a hidden arm through a different report release or metric contract.
-    const feedback=units.filter(u=>u.kind==='COGNITIVE').map(u=>
-      cognitiveDraftSchema.parse(u.displayDefinition).feedback)
+    const feedback=units.filter(u=>u.kind==='COGNITIVE').map(u=>{
+      const draft=cognitiveDraftSchema.parse(u.displayDefinition)
+      return draft.schemaVersion===1?draft.feedback:surveyCognitiveFeedbackSchema.parse({})
+    })
     if(new Set(feedback.map(value=>canonicalHash(value))).size>1)
       error(issues,'flow.experiment.groups','各问卷子版本认知任务的反馈和发布策略必须一致')
     if(issues.length)throw new SurveyFlowError(issues)

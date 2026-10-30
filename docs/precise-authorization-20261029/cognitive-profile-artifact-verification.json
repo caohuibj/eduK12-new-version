@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "base": "1a95e30b2",
+  "main": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+  "recordedAt": "2026-10-30T00:13:25.066207+00:00",
+  "scope": "First nonpersonal exact cognitive profile content slice; no entry grant/API/task/START integration yet",
+  "results": {
+    "distinctUnitCasesPassed": 7,
+    "metricGuardContinuationPassed": 1,
+    "otherSixFilteredNotReplayed": true,
+    "postgresCasesPassed": 2,
+    "initialUnitAndPgBusinessFailures": 0,
+    "initialTypesExit": 2,
+    "correctedTypesExit": 0,
+    "pgTypesExit": 0,
+    "migrationAppliedExactlyOnce": true,
+    "initialGuardedPipelineExit": 1,
+    "initialPostcheckWrongOwnerUrlRetained": true,
+    "correctActualRestrictedRoleCheckExit": 0,
+    "idempotentMigrationDeployExit": 0,
+    "migrationCount": 256,
+    "runtimeTables": 267,
+    "runtimeSequences": 1,
+    "immutableMutationRejections": "55000",
+    "profileArtifacts": 2,
+    "sameConfigType": "reaction",
+    "sourceConfigVersion": "1.1.0",
+    "profiles": {
+      "experience": 8,
+      "research": 60
+    },
+    "originalUsers": 6,
+    "originalGrants": 4,
+    "originalTasks": 13,
+    "originalRowsUnchanged": true,
+    "newUserGrants": 0
+  },
+  "environment": {
+    "postgres": "16.15 localhost55439",
+    "database": "precise_cognitive_profile_artifact_test_20261030",
+    "unchangedTemplate": "precise_runtime_role_test_20261029 still255 migrations",
+    "applicationRole": "precise_task1_runtime",
+    "migrationOwner": "materials_owner",
+    "node": "24.21.0",
+    "redis": "localhost56389/7",
+    "cognitiveModuleEnabled": true,
+    "productionAccessed": false
+  },
+  "raw": {
+    "file": "cognitive-profile-artifact-raw.json",
+    "sha256": "55c77078bc130761b4499838281d8c1e3b4a1e7f68c2ec648e5382095f0f4846"
+  },
+  "sourceFilesSha256": {
+    "server-version/backend/src/modules/assessment-runtime/public-templates.ts": "bc7030b1ea71e29fa4223e680e1b7d33701a929c37366601d16ce1d96839879b",
+    "server-version/backend/src/modules/assessment-authorization/cognitive-profile-artifact.ts": "0ade19563334646527ccb5d58cdd81a3151283570d8faa339350e947570996e1",
+    "server-version/backend/prisma/migrations/20261030001000_cognitive_profile_public_template/migration.sql": "e7e465c17997e5a47b4735e84f7904cc2eb83f7849d29c2f0d80b650cffa2e1e",
+    "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts": "d16525dc2f10ec1a5638d1c417d75b402da2f73b5d8be796b23e2802ae2d9f53",
+    "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.postgres.integration.test.ts": "045188f9f542ef4b02d09d07e0f615634e64aafab6c9b6d244e08e561694e66f"
+  },
+  "reuseBoundary": "Old frontend tree and scale source are unchanged. Adding one public-template kind changes the shared backend/SQL input identity; old compiled backend cannot be relabelled current. Existing old kinds/parser/cache bodies and immutable trigger/ACL policy unchanged; no broad matrix replay. All local artifacts remain unsigned, not official CI evidence.",
+  "notExecuted": [
+    "Cognitive profile entry approval or user grant",
+    "Training/Survey/School/Teacher typed profile task adapters",
+    "Profile assignment publication/START/random seed/resume/final/report chains",
+    "Current source whole release compilation/production deployment/formal CI/PR"
+  ]
+}
