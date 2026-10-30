@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "uwes3_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "UWES-3 工作投入英文3题候选（仅目录，未准备施测）",
+      "abbreviation": "UWES3-EN",
+      "instrumentFamily": "Utrecht Work Engagement Scale ultra-short 3-item form; 2019 study (online 2017)"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "UWES-3 工作投入英文3题候选：仅记录准确版本、构念维度、已有选题/计分线索与缺件；不含题文、可执行计分或个体结果。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "uwes3_en",
+        "domain:teacher_workplace",
+        "construct:engagement",
+        "population:adult_teacher",
+        "response:self",
+        "locale:en",
+        "availability:catalog_only",
+        "rights:public_redist_unknown",
+        "project:source_identity_only",
+        "scoring:not_runtime",
+        "report:original_draft_only"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向成年教师研究资料定位；原文和既有研究不能替代中国K12教师效度或常模。18+是项目应用边界，目录不可施测。"
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "目录来源依精确原作者版本；正式指导语/回忆期和数字施测版本尚未确认",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "本目录仅标记3题版本；原17位置1/5/11＝UWES9位置1/3/8，3题只汇总整体，不建三个单题个人维度。手册家族0–6均分原则可作为未来方案，但独立3题完整操作/缺失细则与正式中文超短版均未取得。",
+        "没有公开题文、选项、指导语、可执行评分规则和用户结果。",
+        "使用、版权、译本、研究效度属真实附注，尚未获得本项目具体公开Git/商业授权。",
+        "用时为目录估计，非实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "目前只能作来源识别、版本交叉审计和受限材料追索；本独立数字执行形式尚无证据。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Schaufeli et al. three-item UWES validation, doi:10.1027/1015-5759/a000430; 2019 volume, online 2017；本目录无公开题项或新译文。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原17位置1/5/11＝UWES9位置1/3/8，3题只汇总整体，不建三个单题个人维度。手册家族0–6均分原则可作为未来方案，但独立3题完整操作/缺失细则与正式中文超短版均未取得。 当前语言/译本权利及独立计分、漏答适用条件按来源保持未知，不把报告草稿当已发布版本。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Utrecht Work Engagement Scale ultra-short 3-item form; 2019 study (online 2017)",
+      "citation": "Schaufeli et al. three-item UWES validation, doi:10.1027/1015-5759/a000430; 2019 volume, online 2017",
+      "url": "https://www.wilmarschaufeli.nl/publications/Schaufeli/516.pdf",
+      "publicationYear": 2019
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "工作投入整体"
+      ],
+      "limitations": [
+        "目录无可执行题本/计分/报告；不表示当前工具已可施测或已获授权。",
+        "原17位置1/5/11＝UWES9位置1/3/8，3题只汇总整体，不建三个单题个人维度。手册家族0–6均分原则可作为未来方案，但独立3题完整操作/缺失细则与正式中文超短版均未取得。",
+        "与UWES家族一致，非商业学术许可、可能数据共享条件和公开Git再分发未明确；没有作者许可/数据共享接受回执。",
+        "无适用于中国K12教师的常模/阈值；当前只保留原创中文教师报告的编辑方向，不生成结果、分级或图。"
+      ],
+      "disclaimer": "仅为来源目录候选：未授权装载、无独立报告版本、不可施测/计算个人分数。"
+    },
+    "blockers": [
+      "UWES3_STANDALONE_SCORING_MISSING_NOT_VERIFIED",
+      "PUBLIC_QUESTIONNAIRE_REDISTRIBUTION_NOT_ESTABLISHED",
+      "NO_AUTHORIZED_CHINESE_3ITEM_FORM",
+      "USE_AND_DATA_SHARING_TERMS_NOT_ACCEPTED"
+    ]
+  }
+}

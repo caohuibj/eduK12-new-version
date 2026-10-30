@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "c_ets14_zh_hant",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Chinese Engaged Teachers Scale 繁体中文修订14题（仅目录，未准备施测）",
+      "abbreviation": "C-ETS14-ZH-HANT",
+      "instrumentFamily": "Chinese revised Engaged Teachers Scale 14-item model, distinct from original 16"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "Chinese Engaged Teachers Scale 繁体中文修订14题：仅记录准确版本、构念维度、已有选题/计分线索与缺件；不含题文、可执行计分或个体结果。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "c_ets14_zh_hant",
+        "domain:teacher_workplace",
+        "construct:engagement",
+        "population:adult_teacher",
+        "response:self",
+        "locale:zh-Hant",
+        "availability:catalog_only",
+        "rights:public_redist_unknown",
+        "project:source_identity_only",
+        "scoring:not_runtime",
+        "report:original_draft_only"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向成年教师研究资料定位；原文和既有研究不能替代中国K12教师效度或常模。18+是项目应用边界，目录不可施测。"
+    },
+    "administration": {
+      "itemCount": 14,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "目录来源依精确原作者版本；正式指导语/回忆期和数字施测版本尚未确认",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "本目录仅标记14题版本；在原ETS16编号中删1、15得到14题；论文报告0–6七级频率端点，但未取得完整繁体问卷、中文中间锚点及明确个人分数规则。二阶潜变量模型/均值缺失替代不是个体评分。",
+        "没有公开题文、选项、指导语、可执行评分规则和用户结果。",
+        "使用、版权、译本、研究效度属真实附注，尚未获得本项目具体公开Git/商业授权。",
+        "用时为目录估计，非实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "目前只能作来源识别、版本交叉审计和受限材料追索；本独立数字执行形式尚无证据。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-Hant",
+    "targetLocale": "zh-Hant",
+    "localizationVersion": "1.0.0",
+    "translationSource": "C-ETS 2021 research; 16-item traditional Chinese adaptation with original ETS positions 1 and 15 removed for 14-item model；本目录无公开题项或新译文。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "在原ETS16编号中删1、15得到14题；论文报告0–6七级频率端点，但未取得完整繁体问卷、中文中间锚点及明确个人分数规则。二阶潜变量模型/均值缺失替代不是个体评分。 当前语言/译本权利及独立计分、漏答适用条件按来源保持未知，不把报告草稿当已发布版本。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Chinese revised Engaged Teachers Scale 14-item model, distinct from original 16",
+      "citation": "C-ETS 2021 research; 16-item traditional Chinese adaptation with original ETS positions 1 and 15 removed for 14-item model",
+      "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2021.676835/full",
+      "publicationYear": 2021
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "认知投入",
+        "情感投入",
+        "学生社会投入",
+        "同事社会投入"
+      ],
+      "limitations": [
+        "目录无可执行题本/计分/报告；不表示当前工具已可施测或已获授权。",
+        "在原ETS16编号中删1、15得到14题；论文报告0–6七级频率端点，但未取得完整繁体问卷、中文中间锚点及明确个人分数规则。二阶潜变量模型/均值缺失替代不是个体评分。",
+        "C-ETS论文为CC BY不自动授予原ETS16题或未公开中文问卷的复制/翻译/公开数字实施权；基础ETS BY-NC-ND仍需澄清。",
+        "无适用于中国K12教师的常模/阈值；当前只保留原创中文教师报告的编辑方向，不生成结果、分级或图。"
+      ],
+      "disclaimer": "仅为来源目录候选：未授权装载、无独立报告版本、不可施测/计算个人分数。"
+    },
+    "blockers": [
+      "FULL_CHINESE_ITEM_FORM_NOT_OBTAINED",
+      "INTERMEDIATE_ANCHORS_UNKNOWN",
+      "ORIGINAL_ETS_RIGHTS_UNRESOLVED",
+      "INDIVIDUAL_SCORING_NOT_VERIFIED"
+    ]
+  }
+}
