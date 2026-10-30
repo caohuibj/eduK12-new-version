@@ -1,5 +1,47 @@
 # Task1 精确候选 CI 接线（保持未激活）
 
+## 2026-10-30 双非空 R 增量，待自然节点独立复核
+
+新 base `40799e96f34d12047f31507ca2eba87e31fc08d3`，新产品
+`dd7715ede027287df109e9ae801698a3c49a6d69`。同 C/P 标准/趣味 R 已经正常登记，
+三工具六 R setup/幂等，实际两个匿名 FINAL 同分不同文本及冻结完成，详见
+[双 R 原件](registered-dual-report-raw.json)和[范围说明](registered-dual-report-progress.md)。
+旧 BLOCKED 是下文历史时点；当前 openAcceptanceItems 为空，以真实原件取代。
+新应用增量是开发者提交、待 DOT 独立审阅，不将旧 root review 冒称覆盖新增材料。
+
+继续 enabled=false，仍没有激活 Actions、正式构建/CodeQL/merge gate 或合并资格。
+完整356产品路径绑定新 base before/after blob，两个最终 component tree 锁定产品；
+控制 checkpoint 与最终 marker 分开冻结。没有再核235文件或重跑旧应用/认知链。
+最终 head/控制 checkpoint 在交接记录给出，不预写未知成功。
+
+现准备接纳26原报告/投影、67个互不重复通过 case，新增包括两个真实 R 的实际登记与
+只读报告续验；5份类型仍明确为分阶段/受影响闭包，非整个最终 component 的新编译。
+保留一个 exit1 原报告中的独立通过登记 case，同时要求其失败报告 case 有实际成功
+续验；原首次失败不转成整条命令成功。既有 verifyFailureContinuations 复用，无新框架。
+UI 原件19行中两条过滤用例同名；只有该明确格式允许重复 filtered 标题，完整原行、
+顺序/状态/数量保持。执行过的 passed/failed 标题仍拒绝重复，其他候选维持原严格默认。
+
+只新增/替换受影响的3个控制 case：真实证据接纳、双 R 事实负例、过滤标题正反边界。
+本地首轮证据读取因为上述原过滤重复失败；当时负例被前置失败遮蔽、明确不接纳。
+修正后3 PASS。旧9个选中控制中仅替换了受影响的原证据接纳 case，形成11个不重复
+通过并集。原 actionlint输入未变直接保留，当前变化 JS只补 node --check；最终实际Git
+绑定只检查冻结后的元数据，不启动应用生产者。最初非TAP原首错也完整保留。
+
+已读仓库指定 Notion CI 常见错误清单（page lastEdited 2026-10-29T20:48:25.178Z）。
+当前仅CI-001/003/006/009/013/019/020适用：独立 opt-in、原schema/锁和实际生成client、
+真实正常批准/grant/FINAL/报告、scope严格停止、unsigned证据和旧失败边界均如上标注。
+CI-002工作流语义输入未变复用原actionlint。没有新增路由不跑生成器，也不因旧条目
+开展全矩阵。正式 CI 未执行，因此没有新正式CI失败或失败回写声称。
+
+拟仍仅scope → onboarding-structure（接受已审阅原件，缺失backend tsc/frontend Vite
+各一次）→ CodeQL → merge gate。独立Situational publication的 relevant 路径不含本次
+scale文件/控制，现只读判定无关，不为其全目录重检；未改它的工作流。新R独立审核与
+精确候选自然节点复核后再激活。最后正式候选不使用skip标记，不部署、不APPROVE。
+
+---
+
+以下为上一个控制候选的历史记录。
+
 固定 main base `13884d7386987068f14b77ec5bbbcb8d431681d8`；产品来源
 `e71d5f71f7223fefdce3e4f36ee0f6e619acf361`，包括已认可三项管理修复。
 本阶段没有修改任何应用、依赖或迁移字节。最终控制 checkpoint/head、实际 Git 绑定

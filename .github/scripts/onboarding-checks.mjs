@@ -11,10 +11,11 @@ import {changedEntries} from './content-scope.mjs';
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 function safePath(path){assert(typeof path==='string'&&!path.startsWith('/')&&!path.includes('\\')&&path.split('/').every(p=>p&&p!=='.'&&p!=='..'));return path;}
-export function verifyOriginalReport(report,review){
+export function verifyOriginalReport(report,review,{allowDuplicateFiltered=false}={}){
   const cases=report.testResults.flatMap(s=>s.assertionResults.map(c=>({fullName:c.fullName,status:c.status})));
   for(const c of cases)assert(typeof c.fullName==='string'&&c.fullName&&['passed','failed','pending','skipped'].includes(c.status));
-  assert.equal(new Set(cases.map(c=>c.fullName)).size,cases.length);
+  const identities=allowDuplicateFiltered?cases.filter(c=>!['pending','skipped'].includes(c.status)):cases;
+  assert.equal(new Set(identities.map(c=>c.fullName)).size,identities.length);
   assert.deepEqual(cases,review.cases,'Original failed/filtered/case rows changed');
   const summary=Object.fromEntries(['success','numPassedTests','numFailedTests','numPendingTests'].map(key=>[key,report[key]]));
   assert.deepEqual(summary,review.summary);
@@ -176,11 +177,12 @@ export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
   const bytes=readBytes(proof.path);assert.equal(hash(bytes),proof.sha256,'Retained Task1 evidence drift');originals.set(proof.path,{sha256:proof.sha256,value:JSON.parse(bytes)});
  }assert.equal(originals.get(proof.path).sha256,proof.sha256);return originals.get(proof.path).value;};
  const admitted=review.reports.map(record=>{
-  const raw=original(record),status=task1Pointer(raw,record.statusPointer);assert.equal(status.exitCode,0);assert(Array.isArray(status.command)&&status.command.length);assert(status.startedAt&&status.finishedAt);
-  const caseNames=verifyOriginalReport(task1Report(task1Pointer(raw,record.reportPointer)),record);
+  const raw=original(record),status=task1Pointer(raw,record.statusPointer);assert.equal(status.exitCode,record.allowPartialFailure?1:0);assert(Array.isArray(status.command)&&status.command.length);assert(status.startedAt&&status.finishedAt);
+  const caseNames=verifyOriginalReport(task1Report(task1Pointer(raw,record.reportPointer)),record,{allowDuplicateFiltered:record.format==='retained-ui-report-with-duplicate-filtered-titles'});
   assert(record.sourceAssociationBasis&&record.coverage);return {id:record.id,caseNames,coverage:record.coverage,originalCommand:status.command,sourceAssociationBasis:record.sourceAssociationBasis,originalRecordSHA256:record.sha256,ciExecuted:false};
  });
  assert(admitted.length);assert.equal(new Set(admitted.map(r=>r.id)).size,admitted.length);
+ verifyFailureContinuations(review.reports,admitted);
  const names=admitted.flatMap(r=>r.caseNames);assert.equal(new Set(names).size,names.length,'Duplicate Task1 case qualification');
  const proof=review.educationNativeReadback,db=task1Pointer(original(proof),proof.pointer);
  assert.equal(db.productionAccessed,false);assert.equal(db.readOnlyTransaction,true);assert.equal(db.database,'precise_education_cognitive_runtime_test_20261030');
@@ -188,8 +190,17 @@ export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
  assert.deepEqual(db.chains.map(c=>[c.product,c.profile,c.decodedTrialCount]).sort(),[['SCHOOL','experience',8],['SCHOOL','research',60],['TEACHER','experience',8],['TEACHER','research',60]].sort());
  for(const c of db.chains){assert.equal(c.parentStatus,'COMPLETED');assert.equal(c.sessionStatus,'COMPLETED');assert.equal(c.waitingParentAttempts,0);assert.equal(c.runtimeGeneration,'UNIFIED_V1');assert.equal(c.trialCount,c.decodedTrialCount);assert.equal(c.payloadSchemaVersion,1);assert.equal(c.encodingVersion,'CANONICAL_JSON_SHA256_V1');assert.equal(c.t2PointerMatches,true);}
  const types=review.types.map(record=>{const status=task1Pointer(original(record),record.statusPointer);assert.equal(status.exitCode,0);assert(status.startedAt&&status.finishedAt&&Array.isArray(status.command));assert(record.coverage&&record.sourceAssociationBasis);return {id:record.id,component:record.component,coverage:record.coverage,originalCommand:status.command,sourceAssociationBasis:record.sourceAssociationBasis,originalRecordSHA256:record.sha256,ciExecuted:false,finalWholeTreeClaim:false};});
- assert.equal(types.length,3);assert.equal(review.openAcceptanceItems.length,1);assert.equal(review.openAcceptanceItems[0],'SAME_CP_SECOND_REGISTERED_NONEMPTY_R_BLOCKED');
- return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
+ assert.equal(types.length,5);assert.deepEqual(review.openAcceptanceItems,[]);
+ const rp=review.registeredReports,registered=task1Pointer(original(rp),rp.pointer);
+ const setup=registered.normalSetup,registration=registered.registration,consumer=registered.frozenConsumer,entry=registered.entryBoundary.entrySourceBoundary;
+ assert.equal(setup.toolCount,3);assert.equal(setup.nonemptyReportSnapshots,6);assert.equal(setup.normalSeedIdempotent,true);assert.equal(setup.defaultDefinitionsUnchanged,true);assert.equal(setup.allDraftHidden,true);
+ assert.equal(new Set(setup.snapshots.map(s=>s.reportHash)).size,6);
+ for(const key of ['registrationComplete','bothNonempty','sameMeasurementRelease','basicDraftStableAfterFunPublicationAndGrant','otherReportUseDenied','defaultReportUnchanged'])assert.equal(registration[key],true,key);
+ assert.notEqual(registration.basic.id,registration.fun.id);assert.notEqual(registration.basic.hash,registration.fun.hash);
+ for(const key of ['twoRealFinals','participantReportsDifferent','otherReportTextAbsent','reportRereadStable'])assert.equal(consumer[key],true,key);
+ assert.deepEqual(consumer.identicalCanonicalMetrics,[{key:'total',value:21,unit:'score',quality:'calculated'}]);assert.equal(consumer.admissionHashes.length,2);assert.equal(new Set(consumer.reportHashes).size,2);
+ assert.deepEqual(entry.products,['TRAINING','SURVEY','SCHOOL','TEACHER']);assert.equal(entry.exactNonemptyReportsPerProduct,2);assert.equal(entry.sourcePolicies,8);
+ return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false},{kind:'REGISTERED_SAME_CP_NONEMPTY_REPORTS',tools:3,reports:6,actualFinals:2,entryBoundary:'SOURCE_IDENTITY_POLICY_ONLY',ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
 }
 export function task1SastConfig(p,b=binding.candidates?.task1){
  assert.equal(p.pr,'task1');assert.equal(p.product,b.product);

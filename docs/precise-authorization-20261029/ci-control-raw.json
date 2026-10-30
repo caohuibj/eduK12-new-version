@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "ciExecuted": false,
   "originalExecutionSigned": false,
-  "product": "e71d5f71f7223fefdce3e4f36ee0f6e619acf361",
-  "base": "13884d7386987068f14b77ec5bbbcb8d431681d8",
-  "savedAt": "2026-10-30T04:34:17.214505+00:00",
+  "product": "dd7715ede027287df109e9ae801698a3c49a6d69",
+  "base": "40799e96f34d12047f31507ca2eba87e31fc08d3",
+  "savedAt": "2026-10-30T05:22:50.780287+00:00",
   "reports": [
     {
       "id": "task1-ci-controls-initial",
@@ -23,7 +23,6 @@
       "logSHA256": "f0d2bec3ba80076068bddcbaf044e595923a5eb0d7943b3bd2ac7267f528373c",
       "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
       "selectedCases": [
-        "Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection",
         "Task1 projections cannot invent missing cases, empty successful selections or traverse non-owned pointers"
       ],
       "allowPartialFailure": true,
@@ -45,6 +44,10 @@
         {
           "caseName": "Task1 scope refuses incomplete inventories, unknown source/control paths, modes, base and source/merge drift",
           "reason": "Negative fixture first failed before reaching its intended mutation because mocked baseline control blobs were absent. Not qualified; fixed version adds a valid nominal baseline and re-executes it."
+        },
+        {
+          "caseName": "Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection",
+          "reason": "Superseded only this source-dependent evidence-admission case after dual-R records/control changed. Raw original remains unchanged."
         }
       ]
     },
@@ -117,6 +120,31 @@
       "selectedCases": [
         "Task1 control receipt admission preserves a failed original and requires an actual successful continuation"
       ]
+    },
+    {
+      "id": "dual-report-ci-evidence-control-filtered-fix",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "--test",
+          "--test-reporter=tap",
+          "--test-name-pattern=Task1 original embedded|Task1 replaces the old|Task1 explicit filtered-title",
+          ".github/scripts/task1-onboarding-controls.test.mjs"
+        ],
+        "startedAt": "2026-10-30T05:22:22.998410+00:00",
+        "finishedAt": "2026-10-30T05:22:23.431567+00:00",
+        "exitCode": 0
+      },
+      "log": "TAP version 13\n# Subtest: Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection\nok 1 - Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection\n  ---\n  duration_ms: 24.801352\n  type: 'test'\n  ...\n# Subtest: Task1 replaces the old open R blocker only with retained real registration and frozen consumer facts\nok 2 - Task1 replaces the old open R blocker only with retained real registration and frozen consumer facts\n  ---\n  duration_ms: 145.492963\n  type: 'test'\n  ...\n# Subtest: Task1 explicit filtered-title compatibility keeps every raw row and rejects duplicate executed cases\nok 3 - Task1 explicit filtered-title compatibility keeps every raw row and rejects duplicate executed cases\n  ---\n  duration_ms: 6.179677\n  type: 'test'\n  ...\n1..3\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 360.856481\n",
+      "logSHA256": "a9980bcde73ae5088196693b31c7d45d64edd4a13bb80fca0266e17cb8611c27",
+      "sourceAssociationBasis": "New control-only invocation; unchanged app tests/builds/native chains not executed.",
+      "selectedCases": [
+        "Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection",
+        "Task1 replaces the old open R blocker only with retained real registration and frozen consumer facts",
+        "Task1 explicit filtered-title compatibility keeps every raw row and rejects duplicate executed cases"
+      ]
     }
   ],
   "auxiliaryChecks": [
@@ -139,21 +167,22 @@
       "name": "ACTIONLINT"
     },
     {
-      "id": "task1-ci-control-syntax",
+      "id": "dual-report-ci-control-syntax",
       "status": {
         "command": [
-          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
-          "--input-type=module",
-          "-e",
-          "import {execFileSync} from 'node:child_process'; for (const path of ['.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs','.github/scripts/task1-onboarding-controls.test.mjs']) execFileSync(process.execPath,['--check',path],{stdio:'inherit'});"
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "--check",
+          ".github/scripts/onboarding-checks.mjs"
         ],
-        "startedAt": "2026-10-30T04:30:10.013128+00:00",
-        "finishedAt": "2026-10-30T04:30:10.152542+00:00",
+        "startedAt": "2026-10-30T05:22:49.393227+00:00",
+        "finishedAt": "2026-10-30T05:22:49.434401+00:00",
         "exitCode": 0
       },
       "log": "",
       "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
+      "sourceAssociationBasis": "New control-only invocation; unchanged app tests/builds/native chains not executed.",
       "name": "NODE_SYNTAX"
     }
   ],
@@ -176,7 +205,7 @@
     "logSHA256": "c3c4a3141afb28781a8f56d84ce71b773b9fd6ec492df87c5f6c7e80bd509c79",
     "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate."
   },
-  "qualifiedControlCaseCount": 9,
+  "qualifiedControlCaseCount": 11,
   "actionlintTool": {
     "version": "1.7.12",
     "officialRelease": "https://github.com/rhysd/actionlint/releases/tag/v1.7.12",
@@ -185,5 +214,50 @@
     "shellcheck": "not selected",
     "pyflakes": "not selected"
   },
-  "qualification": "Initial three failed control cases remain failed; one initially passed negative case is explicitly invalidated and not admitted. Four fixture-dependent cases alone reran, then only the added control-receipt boundary after its new required-field assertions. Two independent initial evidence/pointer cases and two existing boundary cases were not repeated. Later helper additions parsed through the direct Node import in the new receipt case; original syntax receipt retains its own staged input. No original 235-file SHA256 replay, app tests, compilation, scoring, native trials or CI execution. Final Git-bound metadata check is deliberately not preclaimed here."
+  "qualification": "Initial three failed control cases remain failed; one initially passed negative case is explicitly invalidated and not admitted. Four fixture-dependent cases alone reran, then only the added control-receipt boundary after its new required-field assertions. Two independent initial evidence/pointer cases and two existing boundary cases were not repeated. Later helper additions parsed through the direct Node import in the new receipt case; original syntax receipt retains its own staged input. No original 235-file SHA256 replay, app tests, compilation, scoring, native trials or CI execution. Final Git-bound metadata check is deliberately not preclaimed here. Incremental three control cases replace only old source-dependent admission case and add actual-R negative and exact filtered-title behavior. Original first incremental failure retained, initial negative invalidated; no broad CI/application repeat.",
+  "historicalCandidate": {
+    "product": "e71d5f71f7223fefdce3e4f36ee0f6e619acf361",
+    "base": "13884d7386987068f14b77ec5bbbcb8d431681d8",
+    "savedAt": "2026-10-30T04:34:17.214505+00:00"
+  },
+  "incrementalFirstFailure": {
+    "id": "dual-report-ci-evidence-control",
+    "status": {
+      "command": [
+        "env",
+        "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+        "node",
+        "--test",
+        "--test-name-pattern=Task1 original embedded|Task1 replaces the old",
+        ".github/scripts/task1-onboarding-controls.test.mjs"
+      ],
+      "startedAt": "2026-10-30T05:21:29.603985+00:00",
+      "finishedAt": "2026-10-30T05:21:30.009646+00:00",
+      "exitCode": 1
+    },
+    "log": "✖ Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection (24.128712ms)\n✔ Task1 replaces the old open R blocker only with retained real registration and frozen consumer facts (112.455584ms)\nℹ tests 2\nℹ suites 0\nℹ pass 1\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 326.7492\n\n✖ failing tests:\n\ntest at .github/scripts/task1-onboarding-controls.test.mjs:43:1\n✖ Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection (24.128712ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  18 !== 19\n  \n      at verifyOriginalReport (file:///workspace/eduK12-new-version/.github/scripts/onboarding-checks.mjs:17:10)\n      at file:///workspace/eduK12-new-version/.github/scripts/onboarding-checks.mjs:180:19\n      at Array.map (<anonymous>)\n      at verifyTask1Evidence (file:///workspace/eduK12-new-version/.github/scripts/onboarding-checks.mjs:178:32)\n      at TestContext.<anonymous> (file:///workspace/eduK12-new-version/.github/scripts/task1-onboarding-controls.test.mjs:44:15)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.start (node:internal/test_runner/test:1262:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 18,\n    expected: 19,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+    "logSHA256": "de8f75fe20986ee73a2d8ffd38d52252dc167c12053272095125815d8e3994dc",
+    "sourceAssociationBasis": "New control-only invocation; unchanged app tests/builds/native chains not executed.",
+    "qualification": "No case admitted: new negative initially passed because positive baseline already failed. Original UI filtered duplicate exposed first; corrected only filtered identity mode, actual executed duplicates remain refused."
+  },
+  "supersededAuxiliaryChecks": [
+    {
+      "id": "task1-ci-control-syntax",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "--input-type=module",
+          "-e",
+          "import {execFileSync} from 'node:child_process'; for (const path of ['.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs','.github/scripts/task1-onboarding-controls.test.mjs']) execFileSync(process.execPath,['--check',path],{stdio:'inherit'});"
+        ],
+        "startedAt": "2026-10-30T04:30:10.013128+00:00",
+        "finishedAt": "2026-10-30T04:30:10.152542+00:00",
+        "exitCode": 0
+      },
+      "log": "",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
+      "name": "NODE_SYNTAX"
+    }
+  ]
 }

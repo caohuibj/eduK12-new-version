@@ -560,9 +560,9 @@
       "schemaVersion": 1,
       "pr": "task1",
       "enabled": false,
-      "base": "13884d7386987068f14b77ec5bbbcb8d431681d8",
-      "product": "e71d5f71f7223fefdce3e4f36ee0f6e619acf361",
-      "controlCheckpoint": "cf5da06abd1e325ea18a22fe7f1973fc126a577b",
+      "base": "40799e96f34d12047f31507ca2eba87e31fc08d3",
+      "product": "dd7715ede027287df109e9ae801698a3c49a6d69",
+      "controlCheckpoint": "dd7715ede027287df109e9ae801698a3c49a6d69",
       "source": {
         "docs/precise-authorization-20261029/approved-scale-axes-progress.md": {
           "before": null,
@@ -646,7 +646,7 @@
         },
         "docs/precise-authorization-20261029/current-status.md": {
           "before": null,
-          "after": "e83f0b0251e1fd45bb9e1acb116f49d790e810e4"
+          "after": "422bf197eccd858e241e24631177a72fecbcb6da"
         },
         "docs/precise-authorization-20261029/draft-source-audit-progress.md": {
           "before": null,
@@ -827,6 +827,14 @@
         "docs/precise-authorization-20261029/read-performance-verification.json": {
           "before": null,
           "after": "fee349b0d77e8ea6a39a0c085ae7b9312d3b6fbc"
+        },
+        "docs/precise-authorization-20261029/registered-dual-report-progress.md": {
+          "before": null,
+          "after": "09bb7757a0eb387f098ef3cb085471d1ccfa441c"
+        },
+        "docs/precise-authorization-20261029/registered-dual-report-raw.json": {
+          "before": null,
+          "after": "4dbf06daa3e97eda65806b67925a2ce3382b0dd4"
         },
         "docs/precise-authorization-20261029/report-parameter-compatibility-progress.md": {
           "before": null,
@@ -1080,6 +1088,14 @@
           "before": null,
           "after": "c110f839c304bf5a23f876de118c1b507636c5aa"
         },
+        "server-version/backend/src/__tests__/assessment-authorization/dual-report-journey.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "473f58c4d10a608e4612795f75e9e4efde60ca5b"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/dual-report-setup.http.postgres.integration.test.ts": {
+          "before": null,
+          "after": "1150df6d4bd0e0b9d088eed7b4f7261c9673ab0a"
+        },
         "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-collection-boundary.test.ts": {
           "before": null,
           "after": "1fb59dbbc5e63e746a9f23e2175daa6445d52a06"
@@ -1207,6 +1223,10 @@
         "server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts": {
           "before": null,
           "after": "5b98c6ba1949be1f113246d7fa5c40aea2d7e999"
+        },
+        "server-version/backend/src/__tests__/assessment-authorization/registered-report-variants.test.ts": {
+          "before": null,
+          "after": "58caa1e34e12adda8cc7232f5ffcb28e4a0813b9"
         },
         "server-version/backend/src/__tests__/assessment-authorization/selected-configuration.test.ts": {
           "before": null,
@@ -1604,6 +1624,30 @@
           "before": "0ac4ac853bc99a08b57a7b21f0feb92ee9afeb62",
           "after": "16e97cd311f3284bdcb1cc06a2a0060c635094de"
         },
+        "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/report-variants.json": {
+          "before": null,
+          "after": "eff14d98bcef6d81615828c70fd3e25f0085ea7a"
+        },
+        "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json": {
+          "before": null,
+          "after": "84d33c97bd23138f33d68786b459a606d38cb317"
+        },
+        "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json": {
+          "before": null,
+          "after": "b77f0aee395e7066580348804021c0942bb5b178"
+        },
+        "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts": {
+          "before": "384c3aa92bb476e1ef2a6677809657603c9fc5b9",
+          "after": "9e4603c1e626b6d35082af844405af82271703dc"
+        },
+        "server-version/backend/src/modules/scale/onboarding/report-variants.ts": {
+          "before": null,
+          "after": "3741573df0dca43d23e00b3c5eeda33df8736e88"
+        },
+        "server-version/backend/src/modules/scale/onboarding/source-snapshot.ts": {
+          "before": "2e571193fe89a8fce33130e5e1a0147bedad03bc",
+          "after": "986a57f12ce9b9db1719fbcfc544a7b7c51349e4"
+        },
         "server-version/backend/src/modules/survey/admin-role.ts": {
           "before": "f47ab9d2a83060d797d0f41503f7669c0f7da751",
           "after": "1bc726c6f8f87c73475a81d6e4b15fcc0e674ef1"
@@ -1670,7 +1714,7 @@
         },
         "server-version/backend/src/modules/survey/standard-triplet.model.ts": {
           "before": "373ddecfc1f017070dcd577a78c7a566d66f8f0a",
-          "after": "7eab28b7e3df0c20a2623ec6e6e8425da3bfbd88"
+          "after": "a99a4e8b8b6f4c2c0acb740b1b574e49aa6b5b84"
         },
         "server-version/backend/src/modules/survey/standard-triplet.routes.ts": {
           "before": "f571ccabebcd3914c1858cee0b87c53ff8619894",
@@ -1834,11 +1878,11 @@
         },
         "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx": {
           "before": "5dabfd32d0b7a34a22853b76e6f4ed952f148307",
-          "after": "be4b5a5b7f075cfc609f6c555808578ec7aa6c61"
+          "after": "ea3f18b033dd0d2e89f29723f019d3ddcb3b0b9d"
         },
         "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx": {
           "before": "9ff8e262d095088b769bac770c462b34b897d2cd",
-          "after": "b354dc6682457d24ebb1e82b39f08932fb646585"
+          "after": "f3c61739504d80dc39a48d330bfdd57cad870f9e"
         },
         "server-version/frontend/src/pages/admin/SurveyCatalogGrants.cognitive-profile.test.tsx": {
           "before": null,
@@ -1968,10 +2012,10 @@
         "docs/precise-authorization-20261029/ci-control-raw.json": null
       },
       "components": {
-        "backend": "339cc50bd88c7b2554b49276c5864865476674c4",
-        "frontend": "6fb5246339ab06b4494c2f63830971ced4caf52d"
+        "backend": "211a96d6e70078cf78e08ddaa4eb87d037eba476",
+        "frontend": "44ac407e011dd17be8636b439b440a4d152b3304"
       },
-      "activationNote": "Disabled pending independent control review; product work is not whole-task/merge qualified; no PR or Actions activation."
+      "activationNote": "Disabled pending independent review of newly completed real same-C/P dual-nonempty-R evidence and its exact control/source update; no formal CI or merge qualification."
     }
   }
 }

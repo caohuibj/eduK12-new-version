@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {binding,CONTROLS,TASK1_CONTROLS,MARKER,BRANCHES,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyTask1Evidence,verifyTask1ControlEvidence,task1Pointer,task1Report,task1SastConfig,requireOnboardingOutcomes} from './onboarding-checks.mjs';
+import {verifyTask1Evidence,verifyTask1ControlEvidence,verifyOriginalReport,task1Pointer,task1Report,task1SastConfig,requireOnboardingOutcomes} from './onboarding-checks.mjs';
 import {changedEntries} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),head=h('a'),source=h('b'),tree=h('c'),blob=h('d');
@@ -26,7 +26,7 @@ function fixture(){
 }
 test('Task1 exact candidate remains disabled, while its reviewed scope permits both components without numeric PR guessing',()=>{
  const f=fixture();assert.equal(binding.candidates.task1.enabled,false);
- const p=onboardingPlan(f.entries,f.b.base,head,f.read,f.env,f.b);assert.equal(p.pr,'task1');assert.equal(p.product,'e71d5f71f7223fefdce3e4f36ee0f6e619acf361');
+ const p=onboardingPlan(f.entries,f.b.base,head,f.read,f.env,f.b);assert.equal(p.pr,'task1');assert.equal(p.product,f.b.product);
  assert.throws(()=>onboardingPlan(f.entries,f.b.base,head,f.read,f.env,{...f.b,enabled:false}),/pending independent activation review/);
  for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_PR_NUMBER:'task1'},{CI_PR_NUMBER:'0'},{CI_HEAD_REF:'other'},{CI_PR_REPOSITORY:'other/repo'},{CI_FORCE_FULL:'true'},{CI_FULL_ACCEPTANCE:'true'}])assert.throws(()=>onboardingPlan(f.entries,f.b.base,head,f.read,{...f.env,...patch},f.b));
  const outputs=onboardingOutputs(p);assert.equal(outputs.application_route,'onboarding-structure');assert.equal(outputs.scenario,'onboarding-structure');assert.equal(outputs.codeql,true);
@@ -41,14 +41,32 @@ test('Task1 scope refuses incomplete inventories, unknown source/control paths, 
  assert.throws(()=>call(f.entries,{...f.b,controlBefore:{...f.b.controlBefore,'unreviewed-control':null}}));
 });
 test('Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection',()=>{
- const result=verifyTask1Evidence(review);assert.equal(result.admitted.length,20);assert.equal(result.admitted.flatMap(r=>r.caseNames).length,57);assert.equal(result.observations[0].trialCount,136);
- assert(result.admitted.every(r=>r.ciExecuted===false));assert(result.types.every(t=>t.finalWholeTreeClaim===false));assert.deepEqual(result.openAcceptanceItems,['SAME_CP_SECOND_REGISTERED_NONEMPTY_R_BLOCKED']);
+ const result=verifyTask1Evidence(review);assert.equal(result.admitted.length,26);assert.equal(result.admitted.flatMap(r=>r.caseNames).length,67);assert.equal(result.observations[0].trialCount,136);
+ assert(result.admitted.every(r=>r.ciExecuted===false));assert(result.types.every(t=>t.finalWholeTreeClaim===false));assert.deepEqual(result.openAcceptanceItems,[]);assert.equal(result.observations[1].actualFinals,2);
  const bad=structuredClone(review);bad.reports[0].selectedCases.push('not an original passed case');assert.throws(()=>verifyTask1Evidence(bad));
  assert.throws(()=>verifyTask1Evidence(review,path=>path===review.reports[0].path?Buffer.from('{}'):readFileSync(path)),/evidence drift/);
  const bytes=JSON.parse(readFileSync(review.reports[0].path));task1Pointer(bytes,review.reports[0].statusPointer).exitCode=1;
  const modified=Buffer.from(JSON.stringify(bytes)),badExit=structuredClone(review),digest=createHash('sha256').update(modified).digest('hex');
  for(const r of [...badExit.reports,...badExit.types])if(r.path===review.reports[0].path)r.sha256=digest;
  assert.throws(()=>verifyTask1Evidence(badExit,path=>path===review.reports[0].path?modified:readFileSync(path)));
+});
+test('Task1 replaces the old open R blocker only with retained real registration and frozen consumer facts',()=>{
+ const proof=review.registeredReports,raw=JSON.parse(readFileSync(proof.path));
+ for(const change of [v=>{v.completion.normalSetup.nonemptyReportSnapshots=5},v=>{v.completion.registration.sameMeasurementRelease=false},v=>{v.completion.frozenConsumer.otherReportTextAbsent=false},v=>{v.completion.frozenConsumer.identicalCanonicalMetrics[0].value=0},v=>{v.completion.entryBoundary.entrySourceBoundary.sourcePolicies=4}]){
+  const altered=structuredClone(raw);change(altered);const bytes=Buffer.from(JSON.stringify(altered)),sha=createHash('sha256').update(bytes).digest('hex'),bad=structuredClone(review);
+  for(const r of [...bad.reports,...bad.types,bad.registeredReports])if(r.path===proof.path)r.sha256=sha;
+  assert.throws(()=>verifyTask1Evidence(bad,path=>path===proof.path?bytes:readFileSync(path)));
+ }
+ const stale=structuredClone(review);stale.openAcceptanceItems=['SAME_CP_SECOND_REGISTERED_NONEMPTY_R_BLOCKED'];assert.throws(()=>verifyTask1Evidence(stale));
+ const noContinuation=structuredClone(review);noContinuation.reports.find(r=>r.allowPartialFailure).failureContinuations=[];assert.throws(()=>verifyTask1Evidence(noContinuation));
+});
+test('Task1 explicit filtered-title compatibility keeps every raw row and rejects duplicate executed cases',()=>{
+ const record=review.reports.find(r=>r.id==='registered-dual-report-admin-ui'),raw=JSON.parse(readFileSync(record.path)),report=task1Pointer(raw,record.reportPointer);
+ assert.throws(()=>verifyOriginalReport(report,record));
+ assert.equal(verifyOriginalReport(report,record,{allowDuplicateFiltered:true}).length,2);
+ const duplicate=structuredClone(report),cases=duplicate.testResults.flatMap(s=>s.assertionResults),passed=cases.filter(c=>c.status==='passed');passed[1].fullName=passed[0].fullName;
+ const changed={...record,cases:cases.map(c=>({fullName:c.fullName,status:c.status}))};assert.throws(()=>verifyOriginalReport(duplicate,changed,{allowDuplicateFiltered:true}));
+ const missing=structuredClone(report);missing.testResults[0].assertionResults.pop();assert.throws(()=>verifyOriginalReport(missing,record,{allowDuplicateFiltered:true}));
 });
 test('Task1 projections cannot invent missing cases, empty successful selections or traverse non-owned pointers',()=>{
  assert.throws(()=>task1Pointer({},['missing']));assert.throws(()=>task1Pointer({},['__proto__']));assert.throws(()=>task1Report({success:true,passed:1,failed:0}));
@@ -79,7 +97,7 @@ test('Task1 control receipt admission preserves a failed original and requires a
 test('Task1 final Git binding preserves disabled production state and verifies the actual fixed source/control inventory',{skip:process.env.TASK1_BINDING_FINAL_CHECK!=='1'},()=>{
  const git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim(),b=binding.candidates.task1,head=git('rev-parse','HEAD');
  assert.equal(b.enabled,false);const env={GITHUB_REPOSITORY:'caohuibj/eduK12-new-version',CI_PR_REPOSITORY:'caohuibj/eduK12-new-version',CI_EVENT:'pull_request',CI_PR_NUMBER:'9001',CI_HEAD_REF:BRANCHES.task1,CI_SOURCE_HEAD:head,CI_IS_DRAFT:'false'};
- const retained=verifyTask1ControlEvidence(JSON.parse(readFileSync('docs/precise-authorization-20261029/ci-control-raw.json')));assert.equal(retained.flatMap(r=>r.caseNames).length,9);
+ const retained=verifyTask1ControlEvidence(JSON.parse(readFileSync('docs/precise-authorization-20261029/ci-control-raw.json')));assert.equal(retained.flatMap(r=>r.caseNames).length,11);
  assert.throws(()=>onboardingPlan(changedEntries(b.base,head),b.base,head,git,env,b),/pending independent activation review/);
  const p=onboardingPlan(changedEntries(b.base,head),b.base,head,git,env,{...b,enabled:true});assert.equal(p.product,b.product);assert.equal(p.controlCheckpoint,b.controlCheckpoint);assert.equal(p.pr,'task1');
 });
