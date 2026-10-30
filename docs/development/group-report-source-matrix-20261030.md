@@ -28,7 +28,7 @@
 
 **Teacher 非 Form GROUP 合同**：库 Scale 在首批既定工具范围内。新明确审阅发布的 GROUP 版本应使用同一 C / FINAL 事实，在各受众 resultDisclosure 内保留原已批准的本人摘要上限、只向组织披露群体，不把两者做成必须二选一。现有合同字段能表示，但 registry／个人 reader 有具体硬拦截，最小修订及发布角色见 `teacher-nonform-group-contract-proposal-20261030.md`。旧 INDIVIDUAL_ONLY / NONE 版本不变；方案待 DOT 确认，未实施权限变化。
 
-**新的课程独立 Scale 投放**：优先复用 `AssessmentEpisode.courseId`，在经过现有课程投放授权的新 start / assignment 边界创建或使用与本次课程及主体绑定的 episode，并将 assessment 绑定它；恢复在途时也必须沿同一 episode 区分课程。具体触点为课程独立 Scale 启动调用与 `scale-start.controller.ts` 的新施测／恢复段、原 episode 创建服务；先核发布合同是否允许此来源，再确定是否仅需已有字段。历史缺失 episode 的结果不迁移、不猜填。当前未修改这些文件。
+**新的课程独立 Scale 投放**：#423 已在真实课程投放／成员验证后的新 start 中复用 `AssessmentEpisode.courseId`，恢复／重启／FINAL 保留该归属。本子分支只消费该标记的新 SELF 来源与正式冻结分数，接现有统计／Task Artifact；不改 #423 启动候选，不迁移或猜填旧 episode。
 
 **独立 SJT**：普通启动没有同等课程字段；如产品确需独立课程任务，先确认复用现有课程父任务投放是否足够。优先使用已经接通的普通组合／Bundle，不自行为旧历史新增来源表或批量迁移。
 
