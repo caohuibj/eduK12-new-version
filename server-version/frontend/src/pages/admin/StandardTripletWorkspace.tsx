@@ -5,7 +5,7 @@ import {useCallback,useEffect,useRef,useState,type ReactNode} from 'react'
 import {BookOpen,ChevronDown,RefreshCw,ShieldCheck,FlaskConical,Archive} from 'lucide-react'
 import ToolManagementDesign from './ToolManagementDesign'
 import AdminStepUp from '../../admin/AdminStepUp'
-import {standardRequest as api,type Axis,type Selection,type StandardItem,type StandardDetail,type StandardPreview,type StandardState} from '../../api/surveyStandard'
+import {standardRequest as api,type Axis,type Selection,type StandardItem,type StandardDetail,type StandardPreview,type StandardState,type VersionPart} from '../../api/surveyStandard'
 import {catalogQuery,EMPTY_CATALOG_FACETS,EMPTY_CATALOG_FILTERS,type CatalogDiscoveryPage,type CatalogFilters,type CatalogTagFacets} from '../../api/catalogDiscovery'
 import CatalogDiscoveryFilters from '../../components/scale-governance/CatalogDiscoveryFilters'
 import CatalogClassificationTags from '../../components/scale-governance/CatalogClassificationTags'
@@ -13,6 +13,10 @@ import LibraryPreflightPanel from '../../components/scale-governance/LibraryPref
 const labels:Record<Axis,string>={CONTENT:'量表内容',PARAMETERS:'参数',REPORT:'文字报告'}
 const states:Record<string,string>={APPROVED:'已批准 · 待试运行',TRIAL_RUNNING:'自动试运行中',TRIAL_FAILED:'试运行未通过',ONLINE:'已上线',WITHDRAWN:'已停止新增使用'}
 const axes=['CONTENT','PARAMETERS','REPORT'] as const
+const versionLabel=(part:VersionPart)=>{
+ const title=(part.reference as {metadata?:{reportVariant?:{title?:unknown}}}|undefined)?.metadata?.reportVariant?.title
+ return part.axis==='REPORT'&&part.payload!==null?`${typeof title==='string'?title:'标准版'} · ${part.version}`:part.version
+}
 export default function StandardTripletWorkspace({authored}:{authored:ReactNode}){
  const [view,setView]=useState<'standard'|'authored'|'management'|'governed'|'onboarding'>('standard'),[page,setPage]=useState(1),[more,setMore]=useState(false)
  const [rows,setRows]=useState<StandardItem[]>([]),[loading,setLoading]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
@@ -65,7 +69,7 @@ export default function StandardTripletWorkspace({authored}:{authored:ReactNode}
   return <article className="sys-record" key={k}><details onToggle={e=>{if(e.currentTarget.open&&!detail[k])void inspect(r)}}><summary><span className="sys-record-avatar"><BookOpen size={20}/></span><span className="sys-record-heading"><strong>{r.title}</strong><small>{r.versions.map(v=>labels[v.axis]+' '+v.version).join(' · ')||'当前只有目录资料'}</small><CatalogClassificationTags tags={r.classificationTags}/></span><span className="sys-record-state"><span className="sys-badge" data-status={current?.state??'PENDING'}>{current?states[current.state]:online?'已有其他上线组合':'待审核'}</span><ChevronDown size={17}/></span></summary><div className="sys-record-body">
  <LibraryPreflightPanel instrumentKey={r.toolKey} instrumentVersion={r.instrumentVersion}/>
  {r.blockers.length>0&&<div className="sys-message sys-error"><strong>当前版本需补齐</strong><ul>{r.blockers.map((b,i)=><li key={i}>{b}</li>)}</ul></div>}
- {!d?<p>展开后读取版本和 Reference…</p>:<><div className="sys-triplet-versions">{axes.map(axis=><label key={axis}>{labels[axis]}版本<select disabled={busy} value={s?.[axis]??''} onChange={e=>{setSelection(old=>({...old,[k]:{...old[k],[axis]:e.target.value}}));setPreview(old=>{const next={...old};delete next[k];return next})}}>{d.available.filter(v=>v.axis===axis).map(v=><option key={v.hash} value={v.hash}>{v.payload===null?(axis==='PARAMETERS'?'未配置（无阈值/常模）':'不反馈（无报告）'):v.version} · {v.hash.slice(0,8)}</option>)}</select></label>)}</div>
+ {!d?<p>展开后读取版本和 Reference…</p>:<><div className="sys-triplet-versions">{axes.map(axis=><label key={axis}>{labels[axis]}版本<select disabled={busy} value={s?.[axis]??''} onChange={e=>{setSelection(old=>({...old,[k]:{...old[k],[axis]:e.target.value}}));setPreview(old=>{const next={...old};delete next[k];return next})}}>{d.available.filter(v=>v.axis===axis).map(v=><option key={v.hash} value={v.hash}>{v.payload===null?(axis==='PARAMETERS'?'未配置（无阈值/常模）':'不反馈（无报告）'):versionLabel(v)} · {v.hash.slice(0,8)}</option>)}</select></label>)}</div>
  <EntryAdmissionChoices includeEducationEntries label="此批准组合的允许入口" value={entryProducts[k]??[]} disabled={busy} onChange={next=>setEntryProducts(old=>({...old,[k]:next}))}/><div className="system-actions"><button disabled={busy||d.available.length<3} onClick={()=>void check(r)}>核对三份版本</button><button disabled={busy||!p||p.blockers.length>0||!reason.trim()||!entryProducts[k]?.length||r.releases.some(x=>x.combinationHash===p.combinationHash)} onClick={()=>void approve(r)}>批准并试运行，通过后上线</button></div>
  {p&&<div className="sys-message"><strong>{p.blockers.length?'版本对应关系存在问题':'三份版本对应关系已核对'}</strong>{p.blockers.length?<ul>{p.blockers.map((b,i)=><li key={i}>{b}</li>)}</ul>:<p>批准后仍须自动试运行通过；尚未上线，也未授权任何研究者。</p>}<details className="sys-technical"><summary>查看所选内容、参数和报告</summary>{axes.map(a=><details key={a}><summary>{labels[a]} · {p.parts[a].version}</summary><pre>{JSON.stringify(p.parts[a].payload,null,2)}</pre></details>)}</details></div>}
  <details className="sys-technical"><summary>工具 Reference：作者、文献、标签及完整附加信息</summary><p>保留原始资料，不作为额外上线门槛。阈值与常模在参数版本中。</p><pre>{JSON.stringify(d.reference,null,2)}</pre></details>

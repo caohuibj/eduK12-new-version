@@ -10,6 +10,13 @@ const detail={selection:{toolKey:'fixture',...hashes},available:[...row.versions
 beforeEach(()=>{vi.clearAllMocks();sessionStorage.clear();mock.api.mockImplementation(async(path:string)=>{if(path.startsWith('/catalog'))return {list:[row],hasMore:false};if(path.startsWith('/candidate'))return detail;if(path==='/management-design')return {rules:[{action:'use.assign',label:'分配使用',training:'仅 Training',survey:'仅 Survey',system:'不代管'}],families:[{family:'COMBINATION',label:'单纯组合',content:'固定组件',parameters:'无额外参数',report:'没有组合报告',implementation:'规则已确认，运行入口尚未接通'},{family:'BUNDLE',label:'组合包',content:'固定组件',parameters:'可留空',report:'组合报告',implementation:'整包禁止拆用'}],boundaries:['不自动产生授权']};return {combinationHash:'combo',blockers:[],parts:Object.fromEntries(detail.available.slice(0,3).map(p=>[p.axis,p]))}})})
 async function open(){render(<StandardTripletWorkspace authored={<p>旧入库页面</p>}/>);const title=await screen.findByText('示例量表');const d=title.closest('details')!;d.open=true;fireEvent(d,new Event('toggle'));await screen.findByText('不反馈（无报告） · empty-re');return d}
 describe('standard workflow and unified management design UI',()=>{
+ it('identifies standard and fun nonempty reports and changes only the selected REPORT hash',async()=>{
+  const read=mock.api.getMockImplementation()!,fun={axis:'REPORT',version:'1.1.0',hash:'f'.repeat(64),sourceVersion:'1',payload:{reportVersion:'1.1.0'},reference:{metadata:{reportVariant:{title:'趣味版'}}}}
+  mock.api.mockImplementation(async(path:string,body:unknown)=>path.startsWith('/candidate')?{...detail,available:[...detail.available,fun]}:read(path,body))
+  await open();expect(screen.getByRole('option',{name:/标准版 · 1/})).toBeVisible();expect(screen.getByRole('option',{name:/趣味版 · 1.1.0/})).toBeVisible()
+  fireEvent.change(screen.getByLabelText('文字报告版本'),{target:{value:fun.hash}});fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}))
+  await waitFor(()=>expect(mock.api).toHaveBeenCalledWith('/preview',{toolKey:'fixture',...hashes,REPORT:fun.hash}));expect(mock.api.mock.calls.some(c=>String(c[0]).includes('approve'))).toBe(false)
+ })
  it('submits explicitly selected School and Teacher approval without granting recipient use',async()=>{
   const read=mock.api.getMockImplementation()!
   mock.api.mockImplementation(async(path:string,body:unknown)=>path==='/approve'?{id:'approved',state:'ONLINE'}:read(path,body))

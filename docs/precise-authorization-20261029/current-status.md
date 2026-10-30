@@ -1,5 +1,11 @@
 # 当前状态：四入口精确授权工程候选，尚未正式合格/合入 main
 
+**2026-10-30 更新：**已正常整合 main `40799e96f34d12047f31507ca2eba87e31fc08d3`。
+用户具体授权后的同 C/P 第二非空 R 正常登记已实现，三工具六 R 新库 setup/幂等回读、
+CFQ 两真实 FINAL/不同公开文本/相同 total=21/冻结及越权拒绝已有有限证据，见
+[双非空 R 更新](registered-dual-report-progress.md)。下文“fun 未登记 / 双 R BLOCKED”
+为此前时点记录，由该更新替代；尚未取得正式 CI、合并或部署资格。
+
 Task 1 分支 `task1-scale-exact-authorization-20261029` 正常整合 main
 `13884d7386987068f14b77ec5bbbcb8d431681d8`（merge `f008a76f`），保留已合入的
 Task 2 Bundle 工作；`.github` 相对该 main 无差异。逐阶段文件记录各自实际基线和执行范围，
