@@ -253,3 +253,11 @@ test('official stable manpage alias is read-only and requires exact relative tar
   assert.deepEqual(report.pathFacts, { uid: 0, gid: 0, permissionMode: 0o777, type: 'SYMLINK', expectedRelativeTargetMatches: false, targetListed: true, targetHashRecorded: true })
   assert.equal(JSON.stringify(report).includes('/private/unexpected-target'), false)
 })
+
+test('PR392 explicit user approval is package-scoped and cannot authorize another PR or branch',()=>{
+ const make=()=>{const f=packageScopeFixture();f.env.GITHUB_REF='refs/pull/392/merge';f.env.GITHUB_HEAD_REF='feat/education-package-runtime-20261029';f.env.SCHOOL_TEACHER_CHROME_TIGHTEN='confirmed-public-package-scope';return f};
+ const f=make(),result=f.run();assert.equal(result.status,'PERMISSIONS_TIGHTENED');assert.equal(result.authorizationScope,'PR392_VERIFIED_CHROME_PACKAGE_GO_WRITE');assert.equal(result.browserLaunched,false);assert.equal(result.acceptance,false);
+ for(const c of mutations(f)){assert.equal(c.args[2],'go-w');assert(c.args[4]==='/opt'||c.args[4]==='/opt/google'||c.args[4].startsWith(ROOT));}
+ assert.equal(f.items.get(ROOT+'/chrome-sandbox').mode&0o4000,0);
+ for(const alter of [x=>x.env.GITHUB_REF='refs/pull/385/merge',x=>x.env.GITHUB_HEAD_REF='other',x=>x.env.SCHOOL_TEACHER_CHROME_TIGHTEN='confirmed-observer-package-scope']){const bad=make();alter(bad);assert.equal(bad.run().status,'FAILED');assert.equal(mutations(bad).length,0)}
+});

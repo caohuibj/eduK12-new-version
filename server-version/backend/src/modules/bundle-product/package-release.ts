@@ -1,6 +1,6 @@
 import { verifyPackageFixtures } from '../assessment-bundle/onboarding/fixtures'
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient, type BundlePackageRelease } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalJsonString } from '../assessment-runtime/canonical'
 import { hashDeclarativePackage, parseDeclarativePackage } from '../assessment-bundle/onboarding/contract'
@@ -79,6 +79,9 @@ export async function assertPackageAdmission(db:Prisma.TransactionClient,raw:unk
   const p=parseDeclarativePackage(raw),d=p.manifest.definition
   await db.$queryRaw`SELECT id FROM bundle_package_releases WHERE "bundleKey"=${d.bundleKey} AND "bundleVersion"=${d.bundleVersion} FOR SHARE`
   const row=await db.bundlePackageRelease.findUnique({where:{bundleKey_bundleVersion:{bundleKey:d.bundleKey,bundleVersion:d.bundleVersion}}})
+  return validatePackageAdmission(db,p,row)
+}
+async function validatePackageAdmission(db:Prisma.TransactionClient,p:ReturnType<typeof parseDeclarativePackage>,row:BundlePackageRelease|null){
   if(!row||row.status!=='PUBLISHED'||row.contentHash!==hashDeclarativePackage(p))throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
   const review=validateReview(row.review,row.contentHash,process.env.BUNDLE_REVIEW_SIGNING_KEY)
   await admin(db,review.reviewerId)
@@ -87,4 +90,13 @@ export async function assertPackageAdmission(db:Prisma.TransactionClient,raw:unk
   const blockers = dependencyBlockers(p); if (blockers.length) throw new Error(blockers.join('; '))
   await assertPublishedDependencies(db, p)
   return row
+}
+/** Exact public-directory consumption: one locked source read, with the SAME
+ * review/dependency admission as native Training. No duplicate body lookup. */
+export async function readPackageReleaseAdmission(db:Prisma.TransactionClient,versionId:string,contentHash:string){
+  const [row]=await db.$queryRaw<BundlePackageRelease[]>`SELECT * FROM bundle_package_releases WHERE id=${versionId} AND "contentHash"=${contentHash} FOR SHARE`
+  if(!row)throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
+  const p=parseDeclarativePackage(row.content),d=p.manifest.definition
+  if(d.bundleKey!==row.bundleKey||d.bundleVersion!==row.bundleVersion)throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
+  return validatePackageAdmission(db,p,row)
 }

@@ -1,0 +1,52 @@
+// Isolated browser preparation only. No assertions/replay of FINAL or scoring.
+'use strict';
+const {randomUUID,createHmac}=require('node:crypto');
+const path=require('node:path'),backendRoot=process.env.P6_BROWSER_BACKEND_ROOT||'/app';
+const mod=p=>require(path.join(backendRoot,'dist',p+'.js'));
+module.exports=async function prepare(){
+ const url=new URL(process.env.DATABASE_URL);if(process.env.P6_BROWSER_ISOLATED_SETUP!=='true'||process.env.NODE_ENV!=='test'||url.pathname!=='/p6_browser_ci_test'||!(/^p6-browser-\d+-\d+-pg$/.test(url.hostname)||process.env.P6_BROWSER_HOST_CONTEXT==='true'&&process.env.GITHUB_ACTIONS==='true'&&url.hostname==='127.0.0.1'))throw Error('Only the isolated browser fixture database is allowed');
+ const {prisma:db}=mod('config/database'),M=p=>mod('modules/'+p);
+ const user=async(name,extra={})=>db.user.create({data:{username:name+'-'+randomUUID(),passwordHash:'synthetic-only-no-login',...extra}});
+ const system=await user('p6-system',{role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'TRAINING'}),reviewer=await user('p6-reviewer',{role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'TRAINING'});
+ const proof=()=>({tokenVersion:0,adminSessionId:'synthetic-browser-proof',adminVerifiedAt:Date.now()/1000});
+ const issue=(subject,scope,capability)=>M('measurement-content/admin-authority.service').issueAdminContentRoot(system.id,proof(),{requestId:randomUUID(),expectedVersion:0,reason:'Isolated P6 browser setup only',grant:{subjectId:subject,scope,capabilities:[capability],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60000).toISOString(),expiresAt:new Date(Date.now()+3600000).toISOString()}});
+ const identity={instrumentKey:'sjt-assertiveness-golden',instrumentVersion:'1.0.0'},staticService=M('situational/static-measurement-admin.service');
+ const mapping=await staticService.prepareAdminStaticSjtMapping(system.id,proof(),identity);
+ const root=await issue(system.id,{product:'TRAINING',scopeKind:'PLATFORM',scopeId:'situational-registry',resourceKind:'measurement',resourceKeys:[mapping.mappingId]},'measurement.publish');
+ await staticService.publishAdminStaticSjtMeasurement(system.id,proof(),{mappingId:mapping.mappingId,grantId:root.grantId,deployment:{locale:'zh-CN',territory:'CN'}});
+ const pack=M('assessment-bundle/onboarding/template').scaffoldPackage('p6_browser_'+randomUUID().replace(/-/g,''));
+ const release=await M('bundle-product/package-release').installPackage(db,system.id,pack);
+ const material={contentHash:release.contentHash,reviewerId:reviewer.id,expiresAt:new Date(Date.now()+3600000).toISOString(),claims:['independent_summary'],scientific:true,rights:true,language:true,report:true};
+ await M('bundle-product/package-release').publishPackage(db,system.id,pack.manifest.definition.bundleKey,'1.0.0',{...material,signature:createHmac('sha256',process.env.BUNDLE_REVIEW_SIGNING_KEY).update(M('assessment-runtime/canonical').canonicalJsonString(material)).digest('hex')});
+ const course=await db.course.create({data:{title:'P6 source fixture',courseCode:'P6-'+randomUUID(),creatorId:system.id,courseType:'TRAINING_COURSE',status:'PUBLISHED'}});
+ const provider=new(M('bundle-product/definition-provider').BundleDefinitionProvider)([M('assessment-bundle/onboarding/catalog').packageEntry(pack)]),service=M('bundle-product/service').createBundleProductService(provider),sourceActor={userId:system.id,role:system.role};
+ const draft=await service.create(sourceActor,{requestId:randomUUID(),bundleKey:release.bundleKey,bundleVersion:release.bundleVersion,name:'P6 original complete source',courseId:course.id,bindings:[{slotKey:'situational'}]});
+ const source=await service.publish(sourceActor,draft.id,draft.revision);
+ const managerUser=await user('p6-author',{role:'TEACHER',teacherApproved:true,accountDomain:'SCHOOL'});
+ const org=await db.organization.create({data:{id:randomUUID(),name:'P6 isolated School',productDomain:'SCHOOL',createdByUserId:system.id}}),member=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:org.id,userId:managerUser.id}});
+ await db.educationProductEntitlement.create({data:{organizationId:org.id,product:'HUISCHOOL',grantedByUserId:system.id}});
+ await db.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId:org.id,membershipId:member.id,persona:'COUNSELOR',grantedByUserId:system.id}});
+ await db.organizationCapabilityGrant.create({data:{id:randomUUID(),organizationId:org.id,membershipId:member.id,capability:'PSYCHOLOGY_STAFF',grantedByUserId:system.id}});
+ const sourceRef={provider:'NATIVE_RELEASE',versionId:release.id,contentHash:release.contentHash},scope=keys=>({product:'SCHOOL',scopeKind:'ORGANIZATION',scopeId:org.id,resourceKind:'material',resourceKeys:keys});
+ await issue(managerUser.id,scope([M('education-tools/package-reference.contracts').educationPackageKey(sourceRef)]),'material.use');
+ const original=await db.compositeAssessment.findUniqueOrThrow({where:{id:source.id}});
+ await issue(managerUser.id,scope([source.id,...original.trainingContentSnapshot.units.map(u=>u.measurement.releaseId)]),'material.distribute');
+ const principal=u=>({userId:u.id,username:u.username,role:u.role,accountDomain:u.accountDomain,platformRole:u.platformRole,tokenVersion:u.tokenVersion,mustChangePassword:false}),manager=principal(managerUser);
+ const activity=await M('campus/activity.service').createCampusActivity({actor:manager,organizationId:org.id,title:'P6 browser task',purpose:'STUDENT_WELLBEING'}),run=await M('campus/activity.runs').createCampusActivityRunDraft({actor:manager,organizationId:org.id,courseId:activity.id,name:'P6 browser draft'});
+ return {db,M,manager,reviewer:()=>({...principal(reviewer),...proof()}),scope:{product:'SCHOOL',organizationId:org.id,actorKey:manager.userId,workflowId:activity.id,runId:run.id,expectedVersion:1},sourceRef,sourceId:source.id};
+};
+if(require.main===module)(async()=>{
+ const f=await module.exports(),express=require(path.join(backendRoot,'node_modules/express')),app=express();let resourceId;
+ app.use(express.json());app.use((req,_res,next)=>{req.user=f.manager;if(req.method==='POST'&&req.path.endsWith('/preparations'))resourceId=req.body.resourceId;next()});
+ app.get('/api/fixture-config',(_req,res)=>res.json({data:{organizationId:f.scope.organizationId,actorId:f.manager.userId,scope:f.scope,sourceRef:f.sourceRef,sourceId:f.sourceId}}));
+ app.use('/api/organizations/:organizationId/private-tools',f.M('education-tools/private-tool.routes').educationPrivateToolRouter('SCHOOL'));
+ app.use('/api/organizations/:organizationId/assessment-resource-registrations',f.M('education-tools/assessment-resource.routes').educationAssessmentResourceRouter('SCHOOL',(_q,_s,next)=>next()));
+ app.post('/api/fixture-publish',async(_req,res,next)=>{try{
+  const [row]=await f.db.$queryRawUnsafe('SELECT entry_hash,entry FROM education_assessment_deliveries WHERE id=$1',resourceId);
+  if(row.entry.educationOrigin.sourceCompositeId!==f.sourceId||row.entry.educationOrigin.publicPackage.sourceRef.versionId!==f.sourceRef.versionId)throw Error('Exact original package changed');
+  const c={product:'SCHOOL',organizationId:f.scope.organizationId,principal:f.reviewer()};for(const action of ['REVIEW','PUBLISH'])await f.M('education-tools/assessment-resource.service').transitionEducationAssessment(c,resourceId,action,{expectedEntryHash:row.entry_hash,reason:'Existing independent isolated browser publication'});
+  res.json({data:{resourceId,originalParameters:row.entry.educationOrigin.units.map(u=>({references:u.references,report:u.report})),sourceRef:f.sourceRef}});
+ }catch(e){next(e)}});
+ app.get('/api/task-resources',async(_q,res,next)=>{try{res.json({data:await f.M('education-tools/assessment-resource.catalog').listEducationAssessmentResources({...f.scope,actor:f.manager})})}catch(e){next(e)}});
+ app.use(express.static(process.env.P6_BROWSER_FRONTEND_ROOT||'/frontend'));app.use((e,_q,res,_next)=>res.status(e.statusCode||500).json({code:e.code||'FIXTURE_ERROR',message:e.message}));app.listen(3000,process.env.P6_BROWSER_HOST_CONTEXT==='true'?'127.0.0.1':'0.0.0.0',()=>console.log('P6_PACKAGE_BROWSER_READY'));
+})().catch(e=>{console.error('P6_FIXTURE_FAILURE '+JSON.stringify({name:e.name,code:/^[A-Z][A-Z_0-9]{0,80}$/.test(e.code||'')?e.code:null,message:/^[A-Z][A-Z_0-9]{0,80}$/.test(e.message||'')?e.message:null}));process.exit(1)});

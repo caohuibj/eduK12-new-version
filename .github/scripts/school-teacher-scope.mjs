@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import observerReuse from './school-teacher-observer-reuse.cjs';
-import {nativeBinding,nativePlan,requireNativeQualification,NATIVE_BRANCH,NATIVE_MARKER,NATIVE_JOBS} from './school-teacher-native.mjs';
+import {nativeBinding,nativePlan,requireNativeQualification,NATIVE_BRANCH,NATIVE_MARKER,NATIVE_JOBS,PACKAGE_BRANCH,PACKAGE_MARKER,isNativeBranch} from './school-teacher-native.mjs';
 export const BRANCH='work/school-teacher-review-20261022', REPOSITORY='caohuibj/eduK12-new-version';
 export const SELF_BRANCH='release/education-observer-native-20261029';
 export const SELF_BASE='f39a00f12fed2e1b8e1d3cc45185969262925ed8';
@@ -15,9 +15,10 @@ export const sha256=x=>createHash('sha256').update(x).digest('hex');
 const sha=x=>typeof x==='string'&&/^[a-f0-9]{40}$/.test(x);
 export const binding=(env=process.env)=>{
  const branch=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
- if(branch===NATIVE_BRANCH||env.PLAN&&JSON.parse(env.PLAN).candidate==='native-bundle')return nativeBinding();
+ if(isNativeBranch(branch))return nativeBinding(branch);
+ if(env.PLAN&&JSON.parse(env.PLAN).candidate==='native-bundle')return nativeBinding(JSON.parse(env.PLAN).publicPackage?PACKAGE_BRANCH:NATIVE_BRANCH);
  const before=env.CI_BASE_SHA||(env.GITHUB_EVENT_NAME==='push'&&env.GITHUB_EVENT_PATH?JSON.parse(readFileSync(env.GITHUB_EVENT_PATH,'utf8')).before:null);
- if(branch==='main'&&before===nativeBinding().base)return nativeBinding();
+ if(branch==='main'){for(const selected of [NATIVE_BRANCH,PACKAGE_BRANCH])if(before===nativeBinding(selected).base)return nativeBinding(selected);}
  const selected=branch===SELF_BRANCH||branch==='main'&&before===SELF_BASE||env.PLAN&&JSON.parse(env.PLAN).candidate==='education-self';
  return JSON.parse(readFileSync(new URL(selected?'./school-teacher-self-bindings.json':'./school-teacher-bindings.json',import.meta.url)));
 };
@@ -112,7 +113,7 @@ export function requireSuccess(plan,needs){
 export const marker='.github/scripts/school-teacher-bindings.json';
 export function schoolTeacherPlan(entries,base,head,read=git,env=process.env,b,evidenceBytes){
  const branch=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
- if(branch===NATIVE_BRANCH||entries.some(e=>e.file===NATIVE_MARKER))return nativePlan(entries,base,head,read,env,b);
+ if(isNativeBranch(branch)||entries.some(e=>[NATIVE_MARKER,PACKAGE_MARKER].includes(e.file)))return nativePlan(entries,base,head,read,env,b);
  const self=entries.some(e=>e.file===SELF_MARKER),legacy=entries.some(e=>e.file===marker);
  assert(!(self&&legacy),'Ambiguous School candidates');
  if([BRANCH,SELF_BRANCH].includes(branch))assert.notEqual(env.CI_EVENT,'workflow_dispatch','No manual/full/probe fallback');
