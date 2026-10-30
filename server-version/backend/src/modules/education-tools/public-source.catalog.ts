@@ -4,7 +4,7 @@ import {prisma} from '../../config/database'
 import {authorizePrivateTool} from './private-tool.access'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {parseEducationPublicSourceKey} from './public-source.identity'
-import {educationStandardHeaderColumns,educationFormHeaderColumns,educationCognitiveHeaderColumns,educationSjtHeaderColumns,educationSjtHeaderSources,educationPublicRequiredContextKeys,type EducationPublicSourceHeader} from './public-source.headers'
+import {educationStandardHeaderColumns,educationFormHeaderColumns,educationCognitiveHeaderColumns,educationCognitiveProfileHeaderColumns,educationCognitiveProfileHeaderJoins,educationSjtHeaderColumns,educationSjtHeaderSources,educationPublicRequiredContextKeys,type EducationPublicSourceHeader} from './public-source.headers'
 import {assertContentGrantChain,type ContentGrant} from '../measurement-content/content-authority'
 import {educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
 import {educationCompositionResponseModeSchema,educationCompositionAdministrationForEntry} from './private-tool.composition-contracts'
@@ -21,7 +21,7 @@ import {selectedEducationCatalogChoices,type SelectedCatalogFacts} from './selec
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
 export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
 type EducationPublicCatalogCard={catalogKey:string;kind:'SCALE'|'FORM'|'COGNITIVE'|'SJT';sourceProvider:EducationPublicSourceHeader['kind'];sourceId:string;
- contentHash:string;title:string;language:string|null;versions:EducationPublicSourceHeader['versions'];requiredContextKeys:string[];referenceContextKeys:string[];
+ contentHash:string;artifactHash?:string;profile?:'experience'|'standard'|'research';title:string;language:string|null;versions:EducationPublicSourceHeader['versions'];requiredContextKeys:string[];referenceContextKeys:string[];
  sourceLabel:string;allowedActions:string[];runtimeStatus:string;canEditOriginal:false;canDistribute:false;unavailableReason?:string;
  authorizationMode?:'LEGACY';configurationName?:string;selectedBinding?:ReturnType<typeof selectedConfigurationPointer>}
 type GrantRow={id:string;subject_id:string;issuer_id:string;product:'SCHOOL'|'TEACHER';scope_id:string;resource_keys:string[];
@@ -69,7 +69,7 @@ export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:Priva
    const pins=expected.get(resourceKey),actual=evidence?selectedConfigurationPointer(evidence.binding):null
    // A new typed grant is not an implicit upgrade of a legacy draft. Existing
    // independent untyped use grants keep their original legal path.
-   if(typedPinsRequired&&resourceKey.startsWith('education-source:STANDARD_SCALE:')&&!pins&&evidence)continue
+   if(typedPinsRequired&&(resourceKey.startsWith('education-source:STANDARD_SCALE:')||resourceKey.startsWith('education-source:COGNITIVE_PROFILE:'))&&!pins&&evidence)continue
    const matches=pins?.filter(pin=>pin.authorizationId===row.id&&pin.authorizationRevision===row.version
     &&actual&&canonicalHash(pin)===canonicalHash(actual))
    if(pins&&!matches?.length)continue
@@ -119,13 +119,16 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
     WHERE c.status='PUBLISHED' AND m.layer='MEASUREMENT' AND m.family='COGNITIVE' AND m.status='PUBLISHED' AND m.scope->>'kind'='PLATFORM'
      AND (c.access_policy='OPEN' OR EXISTS(SELECT 1 FROM material_grants original WHERE original.teacher_id=${c.principal.userId} AND original.resource_type='COGNITIVE_CONFIG' AND original.resource_id=c.id))
    UNION ALL
+   SELECT ${educationCognitiveProfileHeaderColumns} FROM authorized_keys k ${educationCognitiveProfileHeaderJoins(c.entry)}
+    WHERE k.key='education-source:COGNITIVE_PROFILE:'||c.id||':'||p.fingerprint
+   UNION ALL
    SELECT ${educationSjtHeaderColumns} FROM authorized_keys k
     JOIN LATERAL ${educationSjtHeaderSources(Prisma.sql`ARRAY[split_part(k.key,':',3)]`)} ON sjt_source.id=split_part(k.key,':',3)
     JOIN measurement_content_releases m ON m.id=sjt_source.measurement_release_id AND k.key='education-source:SJT_RELEASE:'||sjt_source.id||':'||m.content_hash
     WHERE m.layer='MEASUREMENT' AND m.family='SJT' AND m.status='PUBLISHED' AND m.scope->>'kind'='PLATFORM'
   ), page AS (SELECT * FROM sources
    WHERE (${input.cursor??null}::text IS NULL OR key COLLATE "C">${input.cursor??null} COLLATE "C")
-    AND (${input.kind??null}::text IS NULL OR kind=${input.kind==='SCALE'?'STANDARD_SCALE':input.kind==='COGNITIVE'?'COGNITIVE_CONFIG':input.kind==='SJT'?'SJT_RELEASE':'FORM'})
+    AND (${input.kind??null}::text IS NULL OR (${input.kind}='COGNITIVE' AND kind IN ('COGNITIVE_CONFIG','COGNITIVE_PROFILE')) OR kind=${input.kind==='SCALE'?'STANDARD_SCALE':input.kind==='COGNITIVE'?'COGNITIVE_CONFIG':input.kind==='SJT'?'SJT_RELEASE':'FORM'})
     AND (${input.q??''}='' OR strpos(lower(title),lower(${input.q??''}))>0 OR EXISTS(SELECT 1 FROM authorized_grants named WHERE key=ANY(named.resource_keys) AND strpos(lower(named.metadata->>'configurationName'),lower(${input.q??''}))>0))
    ORDER BY key COLLATE "C" LIMIT 41), shown_page AS (SELECT * FROM page ORDER BY key COLLATE "C" LIMIT 40), typed_page_grants AS (
     SELECT g.* FROM authorized_grants g WHERE g.actor_id IS NOT NULL AND EXISTS(SELECT 1 FROM shown_page p WHERE p.key=ANY(g.resource_keys))
@@ -141,7 +144,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
   const configured=await selectedEducationCatalogChoices(tx,c,selected)
   return {list:selected.flatMap<EducationPublicCatalogCard>(header=>{
    const declaration=header.kind==='FORM'?educationApplicabilitySchema.safeParse(header.applicability):null
-   const native=['COGNITIVE_CONFIG','SJT_RELEASE'].includes(header.kind)
+   const native=['COGNITIVE_CONFIG','COGNITIVE_PROFILE','SJT_RELEASE'].includes(header.kind)
    const applicable=native?administration.responseMode==='SELF'&&['participant_self_report',c.entry==='SCHOOL'?'student_self_report':'teacher_self_report'].includes(header.nativeRespondentType??''):administration.responseMode==='EXPERT_REPORT'?supportsExpertSource(header.expertApplicability,administration)
     &&(header.kind==='FORM'||administration.targetKind==='PERSON'&&header.nativeAvailable&&isNativeExpertObserver(header.nativeRespondentType)&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes('OBSERVER')):
     header.kind==='STANDARD_SCALE'?header.nativeAvailable&&(administration.responseMode==='STUDENT_REPORT'
@@ -150,7 +153,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    const requiredContextKeys=educationPublicRequiredContextKeys(header)
    const contextUnavailable=['STUDENT_REPORT','EXPERT_REPORT'].includes(administration.responseMode)&&requiredContextKeys.length>0
    const summary:EducationPublicCatalogCard={
-   catalogKey:header.key,kind:header.kind==='STANDARD_SCALE'?'SCALE':header.kind==='COGNITIVE_CONFIG'?'COGNITIVE':header.kind==='SJT_RELEASE'?'SJT':'FORM',sourceProvider:header.kind,sourceId:header.id,contentHash:header.hash,
+   catalogKey:header.key,kind:header.kind==='STANDARD_SCALE'?'SCALE':['COGNITIVE_CONFIG','COGNITIVE_PROFILE'].includes(header.kind)?'COGNITIVE':header.kind==='SJT_RELEASE'?'SJT':'FORM',sourceProvider:header.kind==='COGNITIVE_PROFILE'?'COGNITIVE_CONFIG':header.kind,sourceId:header.id,contentHash:header.kind==='COGNITIVE_PROFILE'?header.versions.measurementHash!:header.hash,...(header.kind==='COGNITIVE_PROFILE'?{artifactHash:header.hash,profile:header.versions.profile}:{}),
    title:header.title,language:header.language,versions:header.versions,requiredContextKeys,referenceContextKeys:header.referenceContextKeys,sourceLabel:'获授权公共固定版本',
    allowedActions:applicable&&!contextUnavailable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:native?'CHECK_EXACT_NATIVE_AT_FREEZE':header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':header.nativeAvailable?'CHECK_EXACT_STANDARD_AT_FREEZE':'NATIVE_UNAVAILABLE',canEditOriginal:false,canDistribute:false,
    ...(native&&!applicable?{unavailableReason:'认知与 SJT 仅支持原生本人作答，不能用于他评。'}:{}),
@@ -163,7 +166,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    const exact=choices.filter(choice=>titleMatches||choice.configurationName?.toLowerCase().includes(input.q!.toLowerCase())).map(choice=>({...summary,catalogKey:header.key+':use:'+choice.selectedBinding.authorizationId,
     configurationName:choice.configurationName??header.title,selectedBinding:choice.selectedBinding,
     ...(choice.ambiguous?{allowedActions:[],unavailableReason:'存在多条同名或未命名配置，请管理员明确使用配置名称。'}:{})}))
-   if(header.legacyUseAvailable&&titleMatches)return [{...summary,authorizationMode:'LEGACY' as const},...exact]
+   if(header.kind!=='COGNITIVE_PROFILE'&&header.legacyUseAvailable&&titleMatches)return [{...summary,authorizationMode:'LEGACY' as const},...exact]
    if(exact.length)return exact
    return [{...summary,allowedActions:[],unavailableReason:summary.unavailableReason??(configured.overflow?'当前精确授权较多，请缩小搜索范围或请管理员整理配置。':'原授权的管理资格、分发依据或入口批准已变化，请管理员重新配置。')}]
   }),nextCursor:candidates.length>40?selected.at(-1)!.key:null}

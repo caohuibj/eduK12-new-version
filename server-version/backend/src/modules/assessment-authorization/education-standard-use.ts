@@ -25,7 +25,7 @@ export const educationStandardUseInput=z.object({requestId:id,userId:id,combinat
  expectedAuthorityVersion:z.number().int().positive(),validFrom:z.string().datetime(),expiresAt:z.string().datetime(),configurationName:z.string().trim().min(1).max(120).optional(),
  replaces:z.object({grantId:id,expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(500)}).strict().optional()}).strict()
 export const educationStandardUseMetadata=z.object({schemaVersion:z.literal(1),selectedBinding:z.unknown(),requestIntentHash:hash,selfGrant:z.boolean(),
- configurationName:z.string().trim().min(1).max(120).optional(),
+ configurationName:z.string().trim().min(1).max(120).optional(),artifactHash:hash.optional(),
  supersedes:z.object({selectedBinding:selectedConfigurationPointerSchema,reason:z.string().trim().min(1).max(500)}).strict().optional()}).strict()
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000}
 const deny:(message:string)=>never=(message)=>{throw new AdminPermissionError(403,message)}
@@ -146,10 +146,11 @@ export function readEducationStandardUseBinding(metadata:unknown,expected:{id:st
  const sealed=readSelectedConfigurationBinding(value.selectedBinding,{product:expected.scope.product,recipientId:expected.recipientId,organizationId:expected.scope.organizationId,
   authorizationId:expected.id,authorizationRevision:1})
  if(!sealed||sealed.binding.authorization.kind!=='EDUCATION_SOURCE_USE'||sealed.binding.authorization.issuerId!==expected.issuerId
-  ||sealed.binding.configuration.kind!=='STANDARD_COMBINATION'||sealed.binding.authorization.authority.length!==2
+  ||sealed.binding.authorization.authority.length!==2
   ||sealed.binding.authorization.authority[0].kind!=='ENTRY_ADMIN'||sealed.binding.authorization.authority[1].kind!=='CONTENT_DELEGATION'
   ||value.selfGrant!==(expected.issuerId===expected.recipientId))conflict('教育精确使用配置证据不完整')
  const c=sealed.binding.configuration
- if(educationPublicSourceKey({kind:'STANDARD_SCALE',id:c.combinationId,hash:c.combinationHash})!==expected.resourceKey)conflict('教育精确配置来源不一致')
+ const source=c.kind==='STANDARD_COMBINATION'?{kind:'STANDARD_SCALE' as const,id:c.combinationId,hash:c.combinationHash}:{kind:'COGNITIVE_PROFILE' as const,id:c.configId,hash:value.artifactHash??''}
+ if(c.kind==='STANDARD_COMBINATION'&&value.artifactHash!==undefined||c.kind==='COGNITIVE_PROFILE'&&!value.artifactHash||educationPublicSourceKey(source)!==expected.resourceKey)conflict('教育精确配置来源不一致')
  return sealed
 }

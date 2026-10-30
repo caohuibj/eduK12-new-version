@@ -19,7 +19,7 @@ export async function assertEducationConfigurationManager(tx:Prisma.TransactionC
  if(actor.systemAdmin||!['TRAINING','LEGACY'].includes(actor.account_domain))throw new AdminPermissionError(403,'需要独立的教育入口管理身份')
  await assertEntryAdmin(tx,actorId,scope.product==='SCHOOL'?'HUISCHOOL':'HUITEACHER')
 }
-const roots=(actorId:string,scope:EducationConfigurationScope,measurement:Prisma.Sql)=>Prisma.sql`
+export const educationConfigurationDistributionRoots=(actorId:string,scope:EducationConfigurationScope,measurement:Prisma.Sql)=>Prisma.sql`
  SELECT g.id,g.version,g.valid_from,g.expires_at FROM content_capability_grants g
  WHERE g.subject_id=${actorId} AND g.product=${scope.product} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${scope.organizationId}
   AND g.resource_kind='material' AND g.resource_keys@>ARRAY[${measurement}]::text[] AND g.capabilities=ARRAY['material.distribute']::text[]
@@ -42,11 +42,11 @@ export async function educationStandardManagementCatalog(actorId:string,scope:Ed
     EXISTS(SELECT 1 FROM organizations o JOIN education_product_entitlements ent ON ent.organization_id=o.id
      AND ent.product=${scope.product==='SCHOOL'?'HUISCHOOL':'HUITEACHER'} AND ent.status='ACTIVE' WHERE o.id=${scope.organizationId} AND o.product_domain='SCHOOL' AND o.status='ACTIVE') AS "organizationAvailable",
     COALESCE((SELECT jsonb_agg(jsonb_build_object('id',r.id,'version',r.version,'validFrom',r.valid_from AT TIME ZONE 'UTC','expiresAt',r.expires_at AT TIME ZONE 'UTC'))
-     FROM (${roots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`)} ORDER BY g.id LIMIT 129) r),'[]'::jsonb) AS authorities
+     FROM (${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`)} ORDER BY g.id LIMIT 129) r),'[]'::jsonb) AS authorities
    FROM survey_standard_releases s LEFT JOIN survey_tool_policies p ON p.product=${scope.product} AND p.resource_key='standard-release:'||s.id AND p.fingerprint=s.combination_hash
    LEFT JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
    LEFT JOIN scales native ON native.code=s.tool_key AND native.instrument_version=s.snapshot->>'instrumentVersion' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
-   WHERE (EXISTS(${roots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`)}) OR EXISTS(
+   WHERE (EXISTS(${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`)}) OR EXISTS(
     SELECT 1 FROM content_capability_grants own JOIN assessment_management_events e ON e.id=own.id AND e.action=${EDUCATION_STANDARD_USE_ACTION}
     WHERE own.issuer_id=${actorId} AND own.product=${scope.product} AND own.scope_kind='ORGANIZATION' AND own.scope_id=${scope.organizationId} AND e.resource_id=s.id))
     AND (${input.q}='' OR strpos(lower(s.snapshot->>'title'),lower(${input.q}))>0 OR strpos(lower(s.tool_key),lower(${input.q}))>0)
@@ -65,7 +65,7 @@ async function assertSelectable(tx:Prisma.TransactionClient,actorId:string,scope
  await assertEducationConfigurationManager(tx,actorId,scope)
  const source=await readCurrentStandardCombination(tx,{releaseId:id.parse(combinationId),combinationHash})
  await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+combinationId,fingerprint:combinationHash},scope.product)
- const found=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`${roots(actorId,scope,Prisma.sql`${source.measurement.releaseId}`)} LIMIT 1`)
+ const found=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`${source.measurement.releaseId}`)} LIMIT 1`)
  if(!found.length)throw new AdminPermissionError(403,'缺少本校、本来源的精确分发委托')
  return source
 }
@@ -91,8 +91,8 @@ export async function educationStandardManagementGrants(actorId:string,scope:Edu
    ORDER BY g.created_at,g.id LIMIT ${size+1} OFFSET ${(input.page-1)*size}`)
   return {page:input.page,hasMore:rows.length>size,list:rows.slice(0,size).map(row=>{
    const metadata=educationStandardUseMetadata.parse(row.metadata),stored=readSelectedConfigurationBinding(metadata.selectedBinding)
-   if(!stored||stored.binding.configuration.kind!=='STANDARD_COMBINATION')throw new AdminPermissionError(409,'精确配置审计身份不完整')
-   const resourceKey=`education-source:STANDARD_SCALE:${combinationId}:${stored.binding.configuration.combinationHash}`
+   if(!stored)throw new AdminPermissionError(409,'精确配置审计身份不完整')
+   const configuration=stored.binding.configuration,resourceKey=configuration.kind==='STANDARD_COMBINATION'?`education-source:STANDARD_SCALE:${combinationId}:${configuration.combinationHash}`:`education-source:COGNITIVE_PROFILE:${combinationId}:${metadata.artifactHash}`
    const selected=readEducationStandardUseBinding(row.metadata,{id:row.id,issuerId:actorId,recipientId:row.userId,scope,resourceKey})
    return {id:row.id,userId:row.userId,username:row.username,version:row.version,revokedAt:row.revokedAt,validFrom:row.validFrom,expiresAt:row.expiresAt,
     configurationName:metadata.configurationName??null,selectedBinding:selectedConfigurationPointer(selected),configuration:selected.binding.configuration,authority:selected.binding.authorization.authority,
@@ -131,10 +131,10 @@ export async function educationStandardManagementOperation(actorId:string,scope:
   const original=educationStandardUseMetadata.parse(row.originalMetadata),selected=readEducationStandardUseBinding(row.originalMetadata,
    {id:row.grantId,issuerId:actorId,recipientId:row.userId,scope,resourceKey:row.resourceKeys[0]})
   const {configuration,authorization}=selected.binding
-  if(configuration.kind!=='STANDARD_COMBINATION'||configuration.combinationId!==combinationId)throw new AdminPermissionError(409,'原配置与请求来源不一致')
+  if((configuration.kind==='STANDARD_COMBINATION'?configuration.combinationId:configuration.configId)!==combinationId)throw new AdminPermissionError(409,'原配置与请求来源不一致')
   const grant={id:row.grantId,version:row.version,revokedAt:row.revokedAt}
   if(row.action===EDUCATION_STANDARD_USE_ACTION)return {kind:'ISSUE' as const,grant,request:{requestId:row.grantId,userId:row.userId,
-   combinationHash:configuration.combinationHash,authorityGrantId:authorization.authority[1].id,expectedAuthorityVersion:authorization.authority[1].revision,
+   ...(configuration.kind==='STANDARD_COMBINATION'?{combinationHash:configuration.combinationHash}:{artifactHash:original.artifactHash!,profile:configuration.profile}),authorityGrantId:authorization.authority[1].id,expectedAuthorityVersion:authorization.authority[1].revision,
    validFrom:row.validFrom.toISOString(),expiresAt:row.expiresAt.toISOString(),...(original.configurationName?{configurationName:original.configurationName}:{}),
    ...(original.supersedes?{replaces:{grantId:original.supersedes.selectedBinding.authorizationId,expectedVersion:original.supersedes.selectedBinding.authorizationRevision,reason:original.supersedes.reason}}:{})}}
   const revoked=z.object({schemaVersion:z.literal(1),grantId:id,requestIntentHash:z.string().regex(/^[a-f0-9]{64}$/),previousVersion:z.number().int().positive(),

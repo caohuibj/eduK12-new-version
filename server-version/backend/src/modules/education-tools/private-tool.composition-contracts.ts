@@ -70,7 +70,7 @@ export function matchesEducationCompositionRespondent(origin:Pick<z.infer<typeof
 }
 export const educationCompositionBindingSchema=z.object({schemaVersion:z.literal(1),origin:educationCompositionOriginSchema,
  sealed:z.literal(true),context:z.object({sectionId:id,itemIds:z.array(id).min(1).max(5)}).strict().optional(),manifest:z.array(z.object({blockId:id,instruction:z.string().max(16000),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']),versionId:id,contentHash:hash,
-  sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE','COGNITIVE_CONFIG','SJT_RELEASE']),sourceInstruction:z.string().max(16000).optional(),
+  sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE','COGNITIVE_CONFIG','SJT_RELEASE']),sourceInstruction:z.string().max(16000).optional(),profileArtifactHash:hash.optional(),
   toolId:id,itemIds:z.array(id).min(1).max(1000),sectionIds:z.array(id).max(500)}).strict()).min(1).max(50),
 }).strict().superRefine((binding,ctx)=>{
  const {manifest}=binding

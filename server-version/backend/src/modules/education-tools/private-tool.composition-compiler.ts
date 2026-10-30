@@ -32,7 +32,7 @@ export type CompositionLeaf={provider:'LIBRARY_SCALE';kind:'SCALE';version:Pick<
   sourceInstruction?:string;form:ReturnType<typeof compilePrivateFormRuntime>}|
  {provider:'COGNITIVE_CONFIG';kind:'COGNITIVE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;native:EducationCognitiveLeaf}|
  {provider:'SJT_RELEASE';kind:'SJT';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;native:EducationSjtLeaf}
-export const compositionLeafKey=(source:{provider:string;versionId:string;profile?:string})=>source.provider+':'+source.versionId+(source.profile?':'+source.profile:'')
+export const compositionLeafKey=(source:{provider:string;versionId:string;profile?:string;artifactHash?:string})=>source.provider+':'+source.versionId+(source.profile?':'+source.profile:'')+(source.artifactHash?':'+source.artifactHash:'')
 export type CompiledPrivateComposition={definition:PrivateCompositionDefinition;leaves:Map<string,CompositionLeaf>;publicUseExpiresAt?:Date}
 
 /** Already-authorized request only. One bounded source read, one optional media

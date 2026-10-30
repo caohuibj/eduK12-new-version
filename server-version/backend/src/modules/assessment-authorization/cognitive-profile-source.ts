@@ -63,7 +63,7 @@ export async function assertPublishedCognitiveArtifactSource(tx:Tx,artifact:Cogn
 /** Existing per-assignment M projection, from the frozen global scientific M
  * and fixed resolved config. Only the versioned native kernel computes its
  * deterministic FINAL envelope bound; no live profile/report/presentation merge. */
-export async function cognitiveProfileAssignmentMeasurement(tx:Tx,artifact:CognitiveProfileArtifact,actorId:string,assignmentId:string):Promise<ReleaseInput>{
+export async function cognitiveProfileAssignmentMeasurement(tx:Tx,artifact:CognitiveProfileArtifact,actorId:string,assignmentId:string,product:'TRAINING'|'SCHOOL'|'TEACHER'='TRAINING'):Promise<ReleaseInput>{
  const {measurement}=await assertPublishedCognitiveArtifactSource(tx,artifact)
  if(measurement.layer!=='MEASUREMENT')unavailable()
  const identity=artifact.identity,definition=getCognitiveV2TaskDefinition(identity.testType,identity.engineVersion,identity.scoringVersion)
@@ -71,7 +71,7 @@ export async function cognitiveProfileAssignmentMeasurement(tx:Tx,artifact:Cogni
  const executable=JSON.parse(JSON.stringify(measurement.content.executable)) as Record<string,unknown>
  executable.config=withoutReport(artifact.resolvedConfig)
  executable.finalMaxTrials=resolveCognitiveFinalMaxTrials(definition,artifact.resolvedConfig)
- const scope={kind:'PRIVATE' as const,product:'TRAINING' as const,ownerId:actorId,resourceId:assignmentId}
+ const scope={kind:'PRIVATE' as const,product,ownerId:actorId,resourceId:assignmentId}
  return {layer:'MEASUREMENT',family:'COGNITIVE',key:`cognitive:${canonicalHash(scope)}:${identity.testType}`,version:'assignment-v1',scope,
   sourceReleaseId:measurement.releaseId,provenance:{testType:identity.testType},assetRefs:measurement.assetRefs,
   content:{...measurement.content,measurementHash:canonicalHash(executable),executable}}

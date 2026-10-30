@@ -1,5 +1,5 @@
 import {Prisma} from '@prisma/client'
-import {EDUCATION_STANDARD_USE_ACTION,readEducationStandardUseBinding,type EducationConfigurationScope} from './education-standard-use'
+import {EDUCATION_STANDARD_USE_ACTION,educationStandardUseMetadata,readEducationStandardUseBinding,type EducationConfigurationScope} from './education-standard-use'
 import type {PrivateToolContext} from '../education-tools/private-tool.contracts'
 import {EducationAssessmentSourceError} from '../education-tools/assessment-resource.repository'
 import {lockEducationAssessmentUsers} from '../education-tools/assessment-resource.locks'
@@ -42,16 +42,16 @@ export async function readEducationStandardCurrentEvidence(tx:Prisma.Transaction
    throw new EducationAssessmentSourceError('EDUCATION_CONFIGURATION_USE_IDENTITY')
   const binding=readEducationStandardUseBinding(audit.metadata,{id:use.id,issuerId:use.issuer_id,recipientId:use.subject_id,scope,resourceKey:use.resource_keys[0]})
   const a=binding.binding.authorization,config=binding.binding.configuration
-  if(config.kind!=='STANDARD_COMBINATION')throw new EducationAssessmentSourceError('EDUCATION_CONFIGURATION_KIND')
+  const meta=educationStandardUseMetadata.parse(audit.metadata)
   result.set(use.id,{binding,authority:null})
   return {useId:use.id,issuerId:use.issuer_id,entryId:a.authority[0].id,entryRevision:a.authority[0].revision,
-   rootId:a.authority[1].id,rootRevision:a.authority[1].revision,measurementId:config.measurement.releaseId,combinationId:config.combinationId,combinationHash:config.combinationHash}
+   rootId:a.authority[1].id,rootRevision:a.authority[1].revision,measurementId:config.measurement.releaseId,policyKey:config.kind==='STANDARD_COMBINATION'?'standard-release:'+config.combinationId:'cognitive-profile:'+config.configId+':'+config.profile,policyHash:config.kind==='STANDARD_COMBINATION'?config.combinationHash:meta.artifactHash!}
  })
  if(lock&&suppliedAudits)await lockEducationAssessmentUsers(tx,wanted.map(value=>value.issuerId))
- const tuples=wanted.map(w=>Prisma.sql`(${w.useId},${w.issuerId},${w.entryId},${w.entryRevision}::int,${w.rootId},${w.rootRevision}::int,${w.measurementId},${w.combinationId},${w.combinationHash})`)
+ const tuples=wanted.map(w=>Prisma.sql`(${w.useId},${w.issuerId},${w.entryId},${w.entryRevision}::int,${w.rootId},${w.rootRevision}::int,${w.measurementId},${w.policyKey},${w.policyHash})`)
  const facts=await tx.$queryRaw<Array<{useId:string;validFrom:Date;expiresAt:Date;issuerExpiresAt:Date|null;readAt:Date}>>(Prisma.sql`
   SELECT w.use_id AS "useId",root.valid_from AS "validFrom",root.expires_at AS "expiresAt",u.expires_at AS "issuerExpiresAt",clock_timestamp() AS "readAt"
-  FROM (VALUES ${Prisma.join(tuples)}) w(use_id,issuer_id,entry_id,entry_revision,root_id,root_revision,measurement_id,combination_id,combination_hash)
+  FROM (VALUES ${Prisma.join(tuples)}) w(use_id,issuer_id,entry_id,entry_revision,root_id,root_revision,measurement_id,policy_key,policy_hash)
   JOIN content_capability_grants root ON root.id=w.root_id AND root.subject_id=w.issuer_id AND root.version=w.root_revision
    AND root.product=${c.entry} AND root.scope_kind='ORGANIZATION' AND root.scope_id=${c.organizationId} AND root.resource_kind='material'
    AND root.resource_keys@>ARRAY[w.measurement_id]::text[] AND root.capabilities=ARRAY['material.distribute']::text[]
@@ -61,8 +61,8 @@ export async function readEducationStandardCurrentEvidence(tx:Prisma.Transaction
    AND u.is_active AND NOT u.is_frozen AND NOT u.must_change_password
   JOIN admin_entry_grants e ON e.id=w.entry_id AND e.user_id=w.issuer_id AND e.version=w.entry_revision
    AND e.entry=${c.entry==='SCHOOL'?'HUISCHOOL':'HUITEACHER'} AND e.revoked_at IS NULL
-  JOIN survey_tool_policies p ON p.product=${c.entry} AND p.resource_key='standard-release:'||w.combination_id
-   AND p.fingerprint=w.combination_hash AND p.decision='APPROVED' AND NOT p.paused
+  JOIN survey_tool_policies p ON p.product=${c.entry} AND p.resource_key=w.policy_key
+   AND p.fingerprint=w.policy_hash AND p.decision='APPROVED' AND NOT p.paused
   ORDER BY root.id,e.id,w.use_id ${lock?Prisma.sql`FOR SHARE OF root,u,e,p`:Prisma.empty}`)
  for(const fact of facts){const item=result.get(fact.useId);if(item)item.authority=fact}
  return result

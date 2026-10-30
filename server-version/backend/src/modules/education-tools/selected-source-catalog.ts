@@ -15,21 +15,17 @@ export async function selectedEducationCatalogChoices(tx:Prisma.TransactionClien
  let overflow=rows.some(row=>row.typedOverflow)||uses.length>128
  if(!overflow&&uses.length){
   const ids=rows.flatMap(row=>{const source=parseEducationPublicSourceKey(row.key);return source?.kind==='STANDARD_SCALE'?[source.id]:[]})
-  // Peer configurations can be on another source page or use another R. Read
-  // them as one bounded batch, then use the SAME original-authority validator.
-  // No per-card query or default/latest choice is introduced.
+  const configs=rows.flatMap(row=>{const source=parseEducationPublicSourceKey(row.key);return source?.kind==='COGNITIVE_PROFILE'?[source.id]:[]})
   uses=await tx.$queryRaw<TypedCatalogUse[]>(Prisma.sql`SELECT g.id,g.subject_id,g.issuer_id,g.resource_keys,g.version,g.valid_from,g.expires_at,e.actor_id,e.metadata
    FROM content_capability_grants g JOIN assessment_management_events e ON e.id=g.id AND e.action=${EDUCATION_STANDARD_USE_ACTION}
-   JOIN survey_standard_releases s ON g.resource_keys=ARRAY['education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash]::text[]
-   JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId' AND m.layer='MEASUREMENT' AND m.family='SCALE'
-    AND m.status='PUBLISHED' AND m.content_hash=s.measurement_release->>'contentHash'
-   JOIN scales native ON native.code=s.tool_key AND native.instrument_version=s.snapshot->>'instrumentVersion'
-    AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
    WHERE g.subject_id=${c.principal.userId} AND g.product=${c.entry} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${c.organizationId}
     AND g.resource_kind='material' AND g.capabilities=ARRAY['material.use']::text[] AND g.parent_grant_id IS NULL AND g.ancestry=ARRAY[g.id]::text[]
     AND g.remaining_delegation_depth=0 AND g.delegable_capabilities=ARRAY[]::text[] AND g.revoked_at IS NULL
-    AND g.valid_from<=clock_timestamp() AT TIME ZONE 'UTC' AND g.expires_at>clock_timestamp() AT TIME ZONE 'UTC' AND s.state='ONLINE'
-    AND s.tool_key IN (SELECT tool_key FROM survey_standard_releases WHERE id=ANY(${ids}::text[]))
+    AND g.valid_from<=clock_timestamp() AT TIME ZONE 'UTC' AND g.expires_at>clock_timestamp() AT TIME ZONE 'UTC'
+    AND (e.metadata#>>'{selectedBinding,binding,configuration,configId}'=ANY(${configs}::text[]) OR EXISTS(
+     SELECT 1 FROM survey_standard_releases s JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId' AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED' AND m.content_hash=s.measurement_release->>'contentHash'
+     JOIN scales native ON native.code=s.tool_key AND native.instrument_version=s.snapshot->>'instrumentVersion' AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
+     WHERE s.state='ONLINE' AND g.resource_keys=ARRAY['education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash]::text[] AND s.tool_key IN (SELECT tool_key FROM survey_standard_releases WHERE id=ANY(${ids}::text[]))))
    ORDER BY g.id LIMIT 129`)
   overflow=uses.length>128
  }
@@ -43,8 +39,7 @@ export async function selectedEducationCatalogChoices(tx:Prisma.TransactionClien
    const validFrom=use.valid_from instanceof Date?use.valid_from:new Date(use.valid_from),expiresAt=use.expires_at instanceof Date?use.expires_at:new Date(use.expires_at)
    if(!educationStandardEvidenceCurrent(current,now)||validFrom>now||expiresAt<=now)return []
    const configuration=current.binding.binding.configuration
-   if(configuration.kind!=='STANDARD_COMBINATION')return []
-   return [{key:use.resource_keys[0],toolKey:configuration.toolKey,configurationName:educationStandardUseMetadata.parse(use.metadata).configurationName??null,
+   return [{key:use.resource_keys[0],toolKey:configuration.kind==='STANDARD_COMBINATION'?configuration.toolKey:'cognitive:'+configuration.configId,configurationName:educationStandardUseMetadata.parse(use.metadata).configurationName??null,
     selectedBinding:selectedConfigurationPointer(current.binding),ambiguous:false}]
   })
  for(const item of all){

@@ -1,3 +1,4 @@
+import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -2478,7 +2479,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   const anonymous = !userId
   const sessionConfig = prepared ? prepared.snapshot.config : resolvedCompositeCognitiveConfig(assignment)
   const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
-  const fixed=!prepared&&pin?await loadPinnedTrainingCognitiveProfile(db as Prisma.TransactionClient,pin,{userId:assignment.createdBy,configId:config.id},false):null
+  const fixed=!prepared?(pin?await loadPinnedTrainingCognitiveProfile(db as Prisma.TransactionClient,pin,{userId:assignment.createdBy,configId:config.id},false):await readEducationCognitiveAssignmentArtifact(assignment)):null
   if(fixed)assertCognitiveAssignmentFreeze(assignment,fixed.artifact)
   const unifiedSnapshot = runtimeReference && prepared ? {encrypted:runtimeReference,compiledRuntime:prepared.compiledRuntime} : prepared
     ? await cognitiveSessionService.persistPreparedUnifiedCognitiveSessionConfigSnapshot(prepared, db)
@@ -2882,7 +2883,7 @@ const createAttempt = async (
   }
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
   const hasStandardCombinations=composite.items.some((item:any)=>item.standardCombinationSource!=null)
-  const hasPreciseCognitiveProfiles=composite.items.some((item:any)=>item.type==='COGNITIVE'&&readTrainingCognitiveTaskBinding(item.cognitiveAssignment?.courseSnapshot)!==null)
+  const hasPreciseCognitiveProfiles=composite.items.some((item:any)=>item.type==='COGNITIVE'&&(readTrainingCognitiveTaskBinding(item.cognitiveAssignment?.courseSnapshot)!==null||readEducationCognitiveProfilePin(item.cognitiveAssignment?.courseSnapshot)!==null))
   const educationStandardUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationStandard):[]
   const educationLibraryUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationLibrary):[]
   const educationStandards=await readEducationStandardStartSources(db as Prisma.TransactionClient,educationStandardUnits,composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scale))
@@ -2956,7 +2957,7 @@ const createAttempt = async (
         const assignment=item.cognitiveAssignment
         const config=assignment.config
         const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
-        const fixed=pin?await loadPinnedTrainingCognitiveProfile(db as Prisma.TransactionClient,pin,{userId:assignment.createdBy,configId:config.id},true):null
+        const fixed=pin?await loadPinnedTrainingCognitiveProfile(db as Prisma.TransactionClient,pin,{userId:assignment.createdBy,configId:config.id},true):await readEducationCognitiveAssignmentArtifact(assignment)
         if(fixed)assertCognitiveAssignmentFreeze(assignment,fixed.artifact)
         if (composite.deliveryCourseId) prepared.assignments.set(item.id, await prepareTeacherPublishedAssignment(db, {
           userId:assignment.createdBy,courseId:composite.deliveryCourseId,configId:assignment.configId,

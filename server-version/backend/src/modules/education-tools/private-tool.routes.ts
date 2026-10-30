@@ -56,7 +56,7 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
  }))
  router.get('/public-sources',handle(req=>listEducationPublicSources(context(req),educationPublicCatalogQuery.parse(req.query))))
  router.get('/public-sources/native/:provider/:versionId',handle(req=>{
-  const input=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),profile:educationCognitiveProfileSchema.optional(),responseMode:educationCompositionResponseModeSchema.optional()}).strict().parse(req.query)
+  const input=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),profile:educationCognitiveProfileSchema.optional(),artifactHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),responseMode:educationCompositionResponseModeSchema.optional()}).strict().parse(req.query)
   return readEducationNativePreview(context(req),{...input,provider:z.enum(['COGNITIVE_CONFIG','SJT_RELEASE']).parse(req.params.provider),versionId:privateToolId.parse(req.params.versionId)})
  }))
  router.get('/public-sources/form/:versionId',handle(req=>{

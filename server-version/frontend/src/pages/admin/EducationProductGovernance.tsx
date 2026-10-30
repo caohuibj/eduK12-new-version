@@ -5,6 +5,7 @@ import {sessionFetch} from '../../api/client'
 import {entryPaths,hasAdminEntry} from '../../admin/authority'
 import AdminStepUp from '../../admin/AdminStepUp'
 import './education-products.css'
+const EducationCognitiveConfigurations=lazy(()=>import('./EducationCognitiveConfigurations'))
 const EducationStandardConfigurations=lazy(()=>import('./EducationStandardConfigurations'))
 
 type Product='HUISCHOOL'|'HUITEACHER'
@@ -97,7 +98,7 @@ export default function EducationProductGovernance({product}:{product?:Product})
         查询学校产品授权</button>
     </div>
     {loaded&&<>
-      <Suspense fallback={<p role="status">正在加载固定配置授权…</p>}><EducationStandardConfigurations actorId={user!.id} organizationId={loaded} product={selectedProduct}/></Suspense>
+      <Suspense fallback={<p role="status">正在加载固定配置授权…</p>}><EducationStandardConfigurations actorId={user!.id} organizationId={loaded} product={selectedProduct}/><EducationCognitiveConfigurations actorId={user!.id} organizationId={loaded} product={selectedProduct}/></Suspense>
       <div className="epg-panel">
         <h2>独立产品开通</h2>
         <p>组织 ID：<code>{loaded}</code></p>

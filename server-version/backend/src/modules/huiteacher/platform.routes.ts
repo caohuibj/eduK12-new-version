@@ -1,3 +1,5 @@
+import {grantEducationCognitiveProfileUse,educationCognitiveProfileUseInput} from '../assessment-authorization/education-cognitive-profile-use'
+import {educationCognitiveProfileManagementCatalog,educationCognitiveProfileManagementRecipients,educationCognitiveProfileManagementPreview} from '../assessment-authorization/education-cognitive-profile-management'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
@@ -108,6 +110,29 @@ router.post(configurationBase+'/:combinationId/use-grants/:grantId/revoke',handl
  const {currentPassword,...input}=educationStandardRevokeInput.extend({currentPassword:password}).parse(req.body)
  await adminStepUp(req,currentPassword)
  return revokeEducationStandardConfigurationUse(req.user!.userId,configurationScope(req),configurationId(req),uuid.parse(req.params.grantId),input)
+}))
+const cognitiveConfigurationBase='/organizations/:organizationId/products/:product/cognitive-profile-configurations'
+router.use(cognitiveConfigurationBase,(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
+const cognitiveConfigId=(req:Request)=>uuid.parse(req.params.configId)
+const cognitiveProfile=(req:Request)=>z.enum(['experience','standard','research']).parse(req.params.profile)
+const artifactHash=z.string().regex(/^[a-f0-9]{64}$/)
+router.get(cognitiveConfigurationBase,handle(req=>educationCognitiveProfileManagementCatalog(req.user!.userId,configurationScope(req),req.query)))
+router.get(cognitiveConfigurationBase+'/:configId/:profile/preview',handle(req=>educationCognitiveProfileManagementPreview(req.user!.userId,configurationScope(req),cognitiveConfigId(req),cognitiveProfile(req),z.object({artifactHash}).strict().parse(req.query).artifactHash)))
+router.get(cognitiveConfigurationBase+'/:configId/:profile/recipients',handle(req=>{
+ const {artifactHash:hash,...query}=z.object({artifactHash,page:z.coerce.number().int().min(1).max(10000).default(1),q:z.string().trim().max(120).default('')}).strict().parse(req.query)
+ return educationCognitiveProfileManagementRecipients(req.user!.userId,configurationScope(req),cognitiveConfigId(req),cognitiveProfile(req),hash,query)
+}))
+router.get(cognitiveConfigurationBase+'/:configId/use-grants',handle(req=>educationStandardManagementGrants(req.user!.userId,configurationScope(req),cognitiveConfigId(req),req.query)))
+router.get(cognitiveConfigurationBase+'/:configId/operations/:requestId',handle(req=>educationStandardManagementOperation(req.user!.userId,configurationScope(req),cognitiveConfigId(req),uuid.parse(req.params.requestId))))
+router.post(cognitiveConfigurationBase+'/:configId/:profile/use-grants',handle(async req=>{
+ const {currentPassword,...input}=educationCognitiveProfileUseInput.extend({currentPassword:password}).strict().parse(req.body)
+ await adminStepUp(req,currentPassword)
+ return grantEducationCognitiveProfileUse(req.user!.userId,configurationScope(req),cognitiveConfigId(req),cognitiveProfile(req),input)
+}))
+router.post(cognitiveConfigurationBase+'/:configId/use-grants/:grantId/revoke',handle(async req=>{
+ const {currentPassword,...input}=educationStandardRevokeInput.extend({currentPassword:password}).strict().parse(req.body)
+ await adminStepUp(req,currentPassword)
+ return revokeEducationStandardConfigurationUse(req.user!.userId,configurationScope(req),cognitiveConfigId(req),uuid.parse(req.params.grantId),input)
 }))
 router.get('/organizations/:organizationId/products',handle(req=>
   readEducationProductEntitlements(req.user!.userId,uuid.parse(req.params.organizationId))))

@@ -21,6 +21,7 @@ const wireGrant=z.object({ ...contentGrantInputSchema.shape,
     ctx.addIssue({code:'custom',message:'Only supported exact project, course, governance, entry-distribution or education public-source use grants are allowed'})
   if(platformSjtDistribution(grant)&&(grant.remainingDelegationDepth!==0||grant.delegableCapabilities.length!==0))
     ctx.addIssue({code:'custom',message:'Situational entry distribution does not support delegation'})
+  if(educationMaterialUse(grant)&&grant.scope.resourceKeys.some(key=>parseEducationPublicSourceKey(key)?.kind==='COGNITIVE_PROFILE'))ctx.addIssue({code:'custom',message:'Exact cognitive profile use must be issued by its authorized education entry manager'})
   if(educationMaterialUse(grant)&&(grant.remainingDelegationDepth!==0||grant.delegableCapabilities.length!==0))
     ctx.addIssue({code:'custom',message:'Education exact public-source use does not support delegation'})
 })

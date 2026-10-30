@@ -183,7 +183,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
       if(value.kind==='COGNITIVE'&&!value.profile){setError('请选择明确的认知任务版本。');return}
       const provider=value.sourceProvider==='FORM'?'PUBLIC_FORM' as const:value.sourceProvider
       const common={versionId:value.sourceId,contentHash:value.contentHash}
-      const source:CompositionSource=provider==='COGNITIVE_CONFIG'?{...common,provider,kind:'COGNITIVE',profile:value.profile!}:provider==='SJT_RELEASE'?{...common,provider,kind:'SJT'}:provider==='LIBRARY_SCALE'?{...common,provider,kind:'SCALE'}:provider==='STANDARD_SCALE'?{...common,provider,kind:'SCALE',...(value.selectedBinding?{selectedBinding:value.selectedBinding}:{})}:{...common,provider:'PUBLIC_FORM',kind:'FORM'}
+      const source:CompositionSource=provider==='COGNITIVE_CONFIG'?{...common,provider,kind:'COGNITIVE',profile:value.profile!,...(value.artifactHash&&value.selectedBinding?{artifactHash:value.artifactHash,selectedBinding:value.selectedBinding}:{})}:provider==='SJT_RELEASE'?{...common,provider,kind:'SJT'}:provider==='LIBRARY_SCALE'?{...common,provider,kind:'SCALE'}:provider==='STANDARD_SCALE'?{...common,provider,kind:'SCALE',...(value.selectedBinding?{selectedBinding:value.selectedBinding}:{})}:{...common,provider:'PUBLIC_FORM',kind:'FORM'}
       setReferences(old=>mergeReferences(old,[{id:value.sourceId,sourceProvider:provider,kind:value.kind,title:value.title,contentHash:value.contentHash,version:value.versions.content,versions:value.versions,requiredContextKeys:value.requiredContextKeys}]))
       change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source}]}})
      }}/>}</div>

@@ -29,7 +29,7 @@ export async function revokeEducationStandardConfigurationUse(actorId:string,sco
   if(!row||row.resource_keys.length!==1||!original||original.actorId!==actorId||original.action!==EDUCATION_STANDARD_USE_ACTION||original.resourceId!==combinationId)
    throw new AdminPermissionError(409,'原精确配置授权身份不完整')
   const selected=readEducationStandardUseBinding(original.metadata,{id:grantId,issuerId:actorId,recipientId:row.subject_id,scope,resourceKey:row.resource_keys[0]})
-  if(selected.binding.configuration.kind!=='STANDARD_COMBINATION'||selected.binding.configuration.combinationId!==combinationId)
+  if((selected.binding.configuration.kind==='STANDARD_COMBINATION'?selected.binding.configuration.combinationId:selected.binding.configuration.configId)!==combinationId)
    throw new AdminPermissionError(409,'原配置来源与撤销目标不一致')
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'education-standard-revoke:'+input.requestId}))`
   const previous=await tx.assessmentManagementEvent.findUnique({where:{id:input.requestId}})
