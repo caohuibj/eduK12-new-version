@@ -1,0 +1,12 @@
+{
+  "observedAt": "2026-10-30T11:44:27.742326+00:00",
+  "head": "26d1268ce2146fe3005a36582ace16c0bcbda09a",
+  "main": "28c5d75f73b3569e1f799e3f8daaf3ab71f67fee",
+  "unmergedStages": [
+    "100644 021cf3022aa87bf8206c380f7aa8929024c8a7c8 1\t.github/workflows/ci.yml",
+    "100644 e99aa03232d6db28c275c49558b76c9bfac17e2b 2\t.github/workflows/ci.yml",
+    "100644 916cf9095181455e713017f408a9fbf1a7dce60b 3\t.github/workflows/ci.yml"
+  ],
+  "conflict": "ci.yml CodeQL config/ram/threads block",
+  "resolution": "Preserve personal-codeql-config prefix from candidate; preserve PR417 native-bundle conditional ram/threads and comments. No analysis paths removed or thresholds weakened."
+}
