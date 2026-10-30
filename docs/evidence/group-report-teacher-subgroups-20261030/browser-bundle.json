@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "name": "teacher-group-fixture.js",
+      "bytes": 21687734,
+      "sha256": "05d08953ad0686ea35fe9ddbe60271577d284d51855016f2cac6cb4a69d6eaa7"
+    },
+    {
+      "name": "teacher-group-fixture.css",
+      "bytes": 759059,
+      "sha256": "6788deadf9c58aac8c5bb94cf118bdaa53bf7a686f4e5eefcae0156a710283c4"
+    }
+  ],
+  "redundantFixtureRebuild": "Locator-only browser repair recompiled unchanged esbuild fixture once; not a production build. Retained transparently; no further replay."
+}

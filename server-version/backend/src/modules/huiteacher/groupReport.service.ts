@@ -1,3 +1,7 @@
+import {randomUUID} from 'node:crypto'
+import {freezeRunTrackCohort} from '../reporting/cohort'
+import {educationGroupSelector,educationGroupPresentation,listEducationGroupSelections,type EducationGroupSelection} from '../reporting/education-group-selection'
+import type {ReportingCohortSnapshotRecord} from '../reporting/types'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -166,26 +170,9 @@ function isDeferredTeacherReport(value: unknown): value is { deferredCompute: ()
   return value !== null && typeof value === 'object' && 'deferredCompute' in value && typeof value.deferredCompute === 'function'
 }
 
-export async function readTeacherFormGroupReport(input:{
-  organizationId:string;eventId:string;formId:string;actorUserId:string;
-  publishV2?:boolean;releasedOnly?:boolean
-}) {
-  const first = await readTeacherFormGroupReportStage(input)
-  if (!isDeferredTeacherReport(first)) return first
-  const prepared = await first.deferredCompute()
-  // Reacquire current authorization/source/disclosure locks; nothing from the
-  // calculation phase is a reusable grant or a released privacy projection.
-  const second = await readTeacherFormGroupReportStage(input, prepared)
-  if (isDeferredTeacherReport(second)) throw new Error('Unexpected report stage')
-  return second
-}
-
-async function readTeacherFormGroupReportStage(input:{
-  organizationId:string;eventId:string;formId:string;actorUserId:string;
-  publishV2?:boolean;releasedOnly?:boolean
-}, prepared?: PreparedTeacherReport) {
-  return prisma.$transaction(async tx=>{
-    if(input.publishV2)await lockTeacherDisclosure(tx,input.organizationId)
+type FormReportKey={organizationId:string;eventId:string;formId:string;actorUserId:string}
+type SelectedPopulation={cohort:ReportingCohortSnapshotRecord;selection:EducationGroupSelection;populationLabel:string;sourceLabel:string;versionKey:string;policySnapshotId:string}
+async function teacherFormReportingScope(tx:Prisma.TransactionClient,input:FormReportKey){
     // Serialize product suspension: a valid School ORG_ADMIN is not enough.
     const scope=await resolveEducationProductMemberScope({
       organizationId:input.organizationId,actorUserId:input.actorUserId,
@@ -204,13 +191,13 @@ async function readTeacherFormGroupReportStage(input:{
     `
     if(!entitled.length)reject('HUITEACHER_GROUP_PRODUCT_INACTIVE',403)
     const linkage=await tx.$queryRaw<Array<{
-      runId:string;eventStatus:string;runStatus:string;definitionDigest:string;
+      runId:string;eventStatus:string;runStatus:string;definitionDigest:string;trackId:string;
       eventClosedAt:Date|null;runClosedAt:Date|null
     }>>`
       SELECT link."run_id" AS "runId",event."status" AS "eventStatus",
         run."status" AS "runStatus",event."closed_at" AS "eventClosedAt",
         run."closed_at" AS "runClosedAt",
-        form."definition_digest" AS "definitionDigest"
+        form."definition_digest" AS "definitionDigest",track.id AS "trackId"
       FROM "huiteacher_evaluation_run_links" link
       JOIN "huiteacher_evaluation_events" event
         ON event."organization_id"=link."organization_id"
@@ -242,7 +229,33 @@ async function readTeacherFormGroupReportStage(input:{
     const frozen=await teacherFrozenPolicy(tx,{
       organizationId:input.organizationId,runId:source.runId,
       scenario:'TEACHER_ADULT_FORM_GROUP'})
-    const scopeKey=frozen?teacherScopeKey({
+  return {source,form,frozen}
+}
+
+export async function readTeacherFormGroupReport(input:{
+  organizationId:string;eventId:string;formId:string;actorUserId:string;
+  publishV2?:boolean;releasedOnly?:boolean;population?:SelectedPopulation
+}) {
+  const first = await readTeacherFormGroupReportStage(input)
+  if (!isDeferredTeacherReport(first)) return first
+  const prepared = await first.deferredCompute()
+  // Reacquire current authorization/source/disclosure locks; nothing from the
+  // calculation phase is a reusable grant or a released privacy projection.
+  const second = await readTeacherFormGroupReportStage(input, prepared)
+  if (isDeferredTeacherReport(second)) throw new Error('Unexpected report stage')
+  return second
+}
+
+async function readTeacherFormGroupReportStage(input:{
+  organizationId:string;eventId:string;formId:string;actorUserId:string;
+  publishV2?:boolean;releasedOnly?:boolean;population?:SelectedPopulation
+}, prepared?: PreparedTeacherReport) {
+  return prisma.$transaction(async tx=>{
+    if(input.publishV2)await lockTeacherDisclosure(tx,input.organizationId)
+    const {source,form,frozen}=await teacherFormReportingScope(tx,input)
+    if(input.population&&(input.population.cohort.organizationId!==input.organizationId||input.population.cohort.sourceRunId!==source.runId||input.population.cohort.sourceTrackId!==source.trackId||input.population.policySnapshotId!==frozen?.policySnapshotId))reject('HUITEACHER_REPORT_SOURCE_UNAVAILABLE',404)
+    const executionIds=input.population?.cohort.members.map(member=>member.executionId)??null
+    const scopeKey=input.population?canonicalHash({kind:'TEACHER_GROUP_VERSION',organizationId:input.organizationId,versionId:input.population.versionKey}):frozen?teacherScopeKey({
       organizationId:input.organizationId,runId:source.runId,eventId:input.eventId,
       formId:input.formId,scenario:'TEACHER_ADULT_FORM_GROUP'}):null
     if(frozen&&scopeKey){
@@ -274,6 +287,7 @@ async function readTeacherFormGroupReportStage(input:{
         AND track."resource_version"=${source.definitionDigest}
       WHERE execution."organization_id"=${input.organizationId}
         AND execution."run_id"=${source.runId}
+        AND (${executionIds}::text[] IS NULL OR execution.id=ANY(${executionIds}::text[]))
         AND execution."status" IN ('ASSIGNED','STARTED')
     `
     if((pending[0]?.count??0)>0
@@ -300,6 +314,7 @@ async function readTeacherFormGroupReportStage(input:{
         AND track."id"=execution."track_id"
       WHERE execution."organization_id"=${input.organizationId}
         AND execution."run_id"=${source.runId}
+        AND (${executionIds}::text[] IS NULL OR execution.id=ANY(${executionIds}::text[]))
         AND track."resource_family"='FORM'
         AND track."resource_key"='huiteacher-form:'||${input.formId}
         AND track."resource_version"=${source.definitionDigest}
@@ -328,6 +343,7 @@ async function readTeacherFormGroupReportStage(input:{
         AND execution."organization_id"=attempt."organization_id"
         AND execution."run_id"=attempt."run_id"
         AND execution."status"='COMPLETED'
+        AND (${executionIds}::text[] IS NULL OR execution.id=ANY(${executionIds}::text[]))
         AND execution."runtime_binding_kind"='HUITEACHER_FORM_V2'
         AND execution."runtime_binding_ref"=attempt."id"
       WHERE final."organization_id"=${input.organizationId}
@@ -352,6 +368,7 @@ async function readTeacherFormGroupReportStage(input:{
       JOIN huiteacher_form_attempts attempt ON attempt.id=final.attempt_id AND attempt.organization_id=final.organization_id
       JOIN assessment_run_executions execution ON execution.id=attempt.run_execution_id
         AND execution.organization_id=attempt.organization_id AND execution.run_id=attempt.run_id
+        AND (${executionIds}::text[] IS NULL OR execution.id=ANY(${executionIds}::text[]))
         AND execution.status='COMPLETED' AND execution.runtime_binding_kind='HUITEACHER_FORM_V2'
         AND execution.runtime_binding_ref=attempt.id
       WHERE final.organization_id=${input.organizationId} AND attempt.run_id=${source.runId}
@@ -362,7 +379,7 @@ async function readTeacherFormGroupReportStage(input:{
     const rows: PreparedTeacherReport['rows'] = []
     let cipherBytes = 0
     const binding = canonicalHash(JSON.parse(JSON.stringify({ runId: source.runId, definitionDigest: source.definitionDigest,
-      n, count, requiredN, frozen, formDefinition: form.definition })))
+      n, count, requiredN, frozen, cohortHash:input.population?.cohort.snapshotHash??null, formDefinition: form.definition })))
     let cursor=''
     let seen=0
     for(;;){
@@ -386,6 +403,7 @@ async function readTeacherFormGroupReportStage(input:{
           AND execution."organization_id"=attempt."organization_id"
           AND execution."run_id"=attempt."run_id"
           AND execution."status"='COMPLETED'
+        AND (${executionIds}::text[] IS NULL OR execution.id=ANY(${executionIds}::text[]))
           AND execution."runtime_binding_kind"='HUITEACHER_FORM_V2'
           AND execution."runtime_binding_ref"=attempt."id"
         WHERE final."organization_id"=${input.organizationId}
@@ -431,8 +449,8 @@ async function readTeacherFormGroupReportStage(input:{
     // Form definition, all released waves must use EXACTLY the same frozen
     // respondent population, preventing 10-of-11 / 11-of-12 differencing.
     // A mismatch refuses the entire next report. IDs remain internal.
-    const contributors=await tx.$queryRaw<Array<{userId:string}>>`
-      SELECT DISTINCT respondent."user_id" AS "userId"
+    const contributors=await tx.$queryRaw<Array<{userId:string;executionId:string}>>`
+      SELECT DISTINCT respondent."user_id" AS "userId",execution.id AS "executionId"
       FROM "assessment_run_executions" execution
       JOIN "assessment_run_tracks" track
         ON track."organization_id"=execution."organization_id"
@@ -448,6 +466,7 @@ async function readTeacherFormGroupReportStage(input:{
         AND respondent."actor_role"='TEACHER'
       WHERE execution."organization_id"=${input.organizationId}
         AND execution."run_id"=${source.runId}
+        AND (${executionIds}::text[] IS NULL OR execution.id=ANY(${executionIds}::text[]))
         AND execution."status"='COMPLETED'
       ORDER BY respondent."user_id"
     `
@@ -514,6 +533,7 @@ async function readTeacherFormGroupReportStage(input:{
       distributions,withheldFreeText:true,
       releasedAt:new Date().toISOString(),
       privacyPolicy:'FROZEN_TEACHER_V2' as const,
+      ...(input.population?{populationLabel:input.population.populationLabel,sourceLabel:input.population.sourceLabel,selection:input.population.selection,versionId:input.population.versionKey}:{}),
       note:'正式发布的群体统计快照，不包含个人原始作答、响应时间或开放文本。不构成教师个人绩效或因果结论。',
     }
     return recordTeacherReportRelease(tx,{
@@ -521,6 +541,7 @@ async function readTeacherFormGroupReportStage(input:{
       scopeKey:scopeKey!,policySnapshotId:frozen.policySnapshotId,
       scenario:'TEACHER_ADULT_FORM_GROUP',actorUserId:input.actorUserId,
       populationDigest,projection,
+      ...(input.population?{releaseId:input.population.versionKey,privatePopulation:{cohortSnapshotId:input.population.cohort.id,contributingExecutionIds:contributors.map(row=>row.executionId)}}:{}),
     })
   },{
     // Legacy first reads acquire the disclosure lock after source resolution.
@@ -528,4 +549,40 @@ async function readTeacherFormGroupReportStage(input:{
     isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,
     maxWait:2000,timeout:30000,
   })
+}
+
+
+/** Picker and old-version reads never freeze a cohort or revisit FINAL data. */
+export async function listTeacherFormGroupVersions(input:FormReportKey){
+  const scoped=await prisma.$transaction(tx=>teacherFormReportingScope(tx,input))
+  const {source,frozen}=scoped
+  const versions=await prisma.$queryRaw<Array<{versionId:string;releasedAt:Date;populationLabel:string}>>`
+    SELECT id AS "versionId",released_at AS "releasedAt",COALESCE(report_projection->>'populationLabel','全部合格参与教师') AS "populationLabel"
+    FROM education_report_release_records WHERE organization_id=${input.organizationId} AND source_run_id=${source.runId}
+      AND report_kind='TEACHER_ADULT_FORM_GROUP' AND policy_snapshot_id=${frozen?.policySnapshotId??''}
+      AND report_projection->>'eventId'=${input.eventId} AND report_projection->>'formId'=${input.formId}
+      AND report_projection->>'definitionDigest'=${source.definitionDigest}
+    ORDER BY released_at DESC,id DESC LIMIT 101
+  `
+  const groups=frozen?await listEducationGroupSelections({organizationId:input.organizationId,runId:source.runId,trackId:source.trackId,product:'TEACHER'}):{options:[],limitations:['该历史任务没有冻结的 Teacher V2 隐私策略；沿用原历史报告，不新增子群快照。']}
+  return {versioned:!!frozen,groups,versions:versions.slice(0,100).map(row=>({...row,releasedAt:row.releasedAt.toISOString()})),truncated:versions.length>100}
+}
+export async function readTeacherFormGroupVersion(input:FormReportKey&{versionId:string}){
+ return prisma.$transaction(async tx=>{
+  const {source,frozen}=await teacherFormReportingScope(tx,input)
+  if(!frozen)reject('HUITEACHER_REPORT_SOURCE_UNAVAILABLE',404)
+  const row=await tx.educationReportReleaseRecord.findFirst({where:{id:input.versionId,organizationId:input.organizationId,sourceRunId:source.runId,reportKind:'TEACHER_ADULT_FORM_GROUP'}})
+  const p=row?.reportProjection as Record<string,unknown>|null
+  if(!row||p?.eventId!==input.eventId||p?.formId!==input.formId||p?.definitionDigest!==source.definitionDigest)reject('HUITEACHER_REPORT_SOURCE_UNAVAILABLE',404)
+  const report=await readReleasedTeacherReport(tx,{organizationId:input.organizationId,runId:source.runId,scopeKey:row!.reportScopeKey,policySnapshotId:frozen!.policySnapshotId,reportKind:'TEACHER_ADULT_FORM_GROUP'})
+  return {...report as object,versionId:row!.id}
+ })
+}
+export async function generateTeacherFormGroupVersion(input:FormReportKey&{selection:EducationGroupSelection}){
+ const {source,frozen}=await prisma.$transaction(tx=>teacherFormReportingScope(tx,input))
+ if(!frozen)reject('HUITEACHER_REPORT_V2_RUN_REQUIRED',409)
+ const selector=await educationGroupSelector(input.organizationId,'TEACHER',input.selection)
+ const cohort=await freezeRunTrackCohort({organizationId:input.organizationId,runId:source.runId,trackId:source.trackId,generatedByUserId:input.actorUserId,cohortSelector:selector,nativeTeacherForm:true})
+ const presentation=await educationGroupPresentation({organizationId:input.organizationId,runId:source.runId,selection:input.selection})
+ return readTeacherFormGroupReport({...input,publishV2:true,population:{cohort,selection:input.selection,...presentation,populationLabel:input.selection.kind==='CLASSES'?presentation.populationLabel.replace(/^班级：/,'任教班级：'):presentation.populationLabel,versionKey:randomUUID(),policySnapshotId:frozen!.policySnapshotId}})
 }
