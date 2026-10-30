@@ -1,0 +1,44 @@
+{
+  "recordedAt": "2026-10-30T13:45:39.175219+00:00",
+  "pr": 409,
+  "main": "43d119c9bfbc7949baab2edea29d96044b04607c",
+  "anchor": "a539228a131f6bda6ee825a4a36ef16f7e799c03",
+  "previousCandidate": "1170ac40728191631be07330bc8d58712339de34",
+  "originalQualifiedRun": 41061117266,
+  "applicationBlobsUnchanged": 14,
+  "actualMergeConflict": false,
+  "sharedIntersection": "reporting/types.ts adds only group types/fields; Teacher reportingFail and direct personal projection/leaf readers unchanged",
+  "prismaAndLocks": "exact old/current base Prisma trees, candidate Prisma and backend/frontend package/locks",
+  "nativeProgramUnchanged": true,
+  "nativeQualification": {
+    "mode": "authenticate official previous native-only success",
+    "job": 124080976872,
+    "run": 41061117266,
+    "scope": "same full baseline/candidate Prisma, locked backend tools, native program and job commands; <=24h official successful native steps",
+    "willExecuteAgain": false,
+    "frontendAdmitted": false
+  },
+  "newControls": {
+    "passed": 3,
+    "log": "teacher-main43-controls.log",
+    "actionlintExit": 0,
+    "why": "native-only admission must validate its actual native producer, without requiring old combined frontend install/audit step"
+  },
+  "currentFormal": {
+    "workflow": ".github/workflows/ci.yml",
+    "jobs": [
+      "scope",
+      "personal-tracking (original/native admission and current frontend consumers)",
+      "docker (changed complete production tree and HIGH/CRITICAL scans)",
+      "codeql (selected Teacher sources/current control context)",
+      "merge-gate"
+    ],
+    "budgetMinutes": "10-15; investigate actual waiting at5",
+    "applicationsNotReplayed": true,
+    "databaseNotReplayed": true,
+    "fullRegressionNotRequested": true
+  },
+  "notion": "Hui spec/review targets only; old CI mapping remains nonblocking",
+  "school416": "held at28a5ffe; no School feature copied into409",
+  "mergeAndDeploy": "not performed; DOT executes specifically approved merge after final evidence"
+}
