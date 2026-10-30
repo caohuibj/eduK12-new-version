@@ -2,9 +2,16 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata} from './onboarding-checks.mjs';
+import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
+test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/measurement-content/standard-combination-use.ts',frontend='server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx';
+ f.b.pr='choice-page';f.b.source=Object.fromEntries([backend,frontend].map(path=>[path,{before:null,after:blob}]));f.entries=[backend,frontend,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'9002',CI_HEAD_REF:BRANCHES['choice-page']};
+ const call=(b=f.b,entries=f.entries,env=f.env)=>onboardingPlan(entries,base,head,f.read,env,b),p=call();assert.equal(p.pr,'choice-page');assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert(task1SastConfig(p,f.b).paths.includes(frontend));
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'choice-page'},{CI_PR_NUMBER:'0'},{CI_FORCE_FULL:'true'}])assert.throws(()=>call(f.b,f.entries,{...f.env,...patch}));
+ assert.throws(()=>call({...f.b,enabled:false}));const unknown='server-version/backend/src/unrelated.ts';assert.throws(()=>call({...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}},[...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}]));
+});
 function fixture(){
  const file='server-version/backend/src/modules/cognitive/onboarding/install.ts';
  const b={pr:366,enabled:true,base,product:h('f'),controlCheckpoint:h('1'),source:{[file]:{before:null,after:blob}},controlBefore:Object.fromEntries(CONTROLS.map(path=>[path,null])),components:{backend:h('2'),frontend:h('3')}};

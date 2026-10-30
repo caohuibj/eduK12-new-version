@@ -288,15 +288,16 @@ it('projects only validated frozen version labels into teacher summaries without
  expect(f.h.calls).toEqual([])
 })
 
-it('continues past 100 stale grants using the last scanned cursor, retaining current use checks',async()=>{
+it('continues past 100 stale grants through an explicit page cursor, retaining current use checks',async()=>{
  const f=trainingSourceHarness(),original=f.db.$queryRaw.getMockImplementation()!
+ f.h.use!.id=tid(1100)
  const {prisma}=await import('../../config/database'),client=prisma as any,previous=client.$transaction
  client.$transaction=async(fn:any)=>fn(f.db)
  let pages=0
  f.db.$queryRaw.mockImplementation(async(query:any,...args:any[])=>{
   if(query.sql.includes('FROM material_grants g JOIN survey_standard_releases')){
    const [valid]=await original(query,...args)
-   if(++pages===1)return Array.from({length:100},(_,i)=>({...valid,use_id:tid(1000+i)}))
+   if(++pages===1)return [...Array.from({length:100},(_,i)=>({...valid,use_id:tid(1000+i)})),valid]
    expect(query.sql).toContain('(r.tool_key,r.id,g.id)>')
    expect(query.values.slice(-3)).toEqual([valid.tool_key,valid.id,tid(1099)])
    return [valid]
@@ -304,8 +305,10 @@ it('continues past 100 stale grants using the last scanned cursor, retaining cur
   return original(query,...args)
  })
  try{
-  const {listTrainingStandardCombinationChoices}=await import('../../modules/measurement-content/standard-combination-use')
-  const choices=await listTrainingStandardCombinationChoices(ids.owner)
-  expect(pages).toBe(2);expect(choices).toHaveLength(1);expect(choices[0].useGrantId).toBe(ids.leaf)
+  const {listTrainingStandardCombinationChoicePage}=await import('../../modules/measurement-content/standard-combination-use')
+  const first=await listTrainingStandardCombinationChoicePage(ids.owner)
+  expect(first.list).toEqual([]);expect(first.nextCursor).not.toBeNull()
+  const second=await listTrainingStandardCombinationChoicePage(ids.owner,first.nextCursor!)
+  expect(pages).toBe(2);expect(second.list).toHaveLength(1);expect(second.list[0].useGrantId).toBe(tid(1100))
  }finally{client.$transaction=previous}
 })

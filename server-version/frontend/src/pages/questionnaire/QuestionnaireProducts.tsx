@@ -234,6 +234,25 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     situational: [],
     courses: [],
   })
+  const choicePageEpoch=useRef(0)
+  const [choicePageLoading,setChoicePageLoading]=useState(false)
+  const [choicePageError,setChoicePageError]=useState('')
+  const loadMoreStandardChoices=async()=>{
+    const cursor=catalog.standardCombinationsNextCursor
+    if(!cursor||choicePageLoading)return
+    const epoch=choicePageEpoch.current
+    setChoicePageLoading(true);setChoicePageError('')
+    try{
+      const page=await request('/standard-combination-choices?'+new URLSearchParams(cursor).toString())
+      if(choicePageEpoch.current!==epoch)return
+      setCatalog((current:any)=>{
+        if(JSON.stringify(current.standardCombinationsNextCursor)!==JSON.stringify(cursor))return current
+        const seen=new Set((current.standardCombinations??[]).map((c:any)=>c.useGrantId??c.combination.releaseId))
+        return {...current,standardCombinations:[...(current.standardCombinations??[]),...page.list.filter((c:any)=>!seen.has(c.useGrantId??c.combination.releaseId))],standardCombinationsNextCursor:page.nextCursor}
+      })
+    }catch(e){if(choicePageEpoch.current===epoch)setChoicePageError(message(e))}
+    finally{if(choicePageEpoch.current===epoch)setChoicePageLoading(false)}
+  }
   const [name, setName] = useState('')
   const [instruction, setInstruction] = useState('')
   const [description, setDescription] = useState('')
@@ -409,6 +428,8 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   }
   useEffect(() => {
     let active = true
+    choicePageEpoch.current++;setChoicePageLoading(false);setChoicePageError('')
+    setCatalog((current:any)=>({...current,standardCombinations:[],standardCombinationsNextCursor:null}))
     setDetail(null)
     setError('')
     const resourcesRequest = formTemplate ? Promise.resolve({scales:[],cognitive:[],situational:[],courses:[]}) : request('/resources')
@@ -441,7 +462,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
       if (!formTemplate && row.productKind === 'FORM_TEMPLATE') { navigate('/toolkit/forms/' + id, { replace: true }); return }
       hydrate(row)
     }).catch(e => { if (active) setError(message(e)) })
-    return () => { active = false }
+    return () => { active = false;choicePageEpoch.current++ }
   }, [id, preselectedScaleId, preselectedCourseId, user?.id, formTemplate, navigate])
   const action = async (fn: () => Promise<void>, measurementRecovery = false) => {
     if(externalToolPending){setError('请先在工具中核对未确认的参数／报告请求，再修改组合测评。');return}
@@ -1055,7 +1076,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                     </select>
                   </label>
                   {type !== 'FORM' ? (
-                    trainingDesign ? <><Suspense fallback={<p role="status">正在加载工具…</p>}><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} /></Suspense>{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
+                    trainingDesign ? <><Suspense fallback={<p role="status">正在加载工具…</p>}><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} more={type==='SCALE'&&catalog.standardCombinationsNextCursor?<div><ProductButton disabled={choicePageLoading} onClick={()=>void loadMoreStandardChoices()}>{choicePageLoading?'正在读取更多配置…':'载入更多已授权配置'}</ProductButton>{choicePageError&&<p role="alert">{choicePageError}</p>}</div>:undefined}/></Suspense>{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
                       选择测评
                       <select
                         aria-label="选择测评"
