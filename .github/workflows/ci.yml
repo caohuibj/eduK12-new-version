@@ -3542,8 +3542,11 @@ jobs:
         run: node .github/scripts/personal-tracking-ready.mjs admit
       - name: install locked native migration tools and audit backend
         working-directory: server-version/backend
+        env:
+          PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
         run: |
           npm ci
+          npx prisma generate
           npm audit --audit-level=high
       - name: real nonempty main upgrade and native dump restore
         env:

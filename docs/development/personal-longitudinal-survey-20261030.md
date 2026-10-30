@@ -432,3 +432,28 @@ producer fixtures are refused. Actual new Actions metadata verification and
 native migration still must run. There is no retained deployable image archive
 and no deployment qualification. Current SAST is selected again because the
 qualification control code changed; application31/32/5 are not replayed.
+
+### Freeze final catalog main8bd; historical images no longer match its input
+
+Main advanced again to8bd86e4059125b9ee868d4777795e513d36cba71 (PR410 approved
+Chinese catalog). It changes backend instrument/registry bytes. That exact main
+was merged once without conflict and is the final frozen qualification base;
+no repeated application or catalog formula tests are selected. All24 Survey
+product/test/schema pins and locked dependencies still match the reviewed inputs.
+
+The image-success receipt from source171f is retained as historicalImageSuccess,
+not active admission: the backend image input tree changed. The existing combined
+production-image workflow has no supported frontend/backend partial receipt, so
+its necessary compound check must execute for the new input tree. No old image
+run is called current qualification. The optional whole-input reuse code still
+refuses differing trees; the required current jobs are again scope, personal-
+tracking, docker and current CodeQL. No new per-PR workflow is added.
+
+Static SQL review also caught the old-schema owner FK to survey_accounts.
+The schema fixture now creates its synthetic SURVEY user and alias before the
+project, using the candidate Prisma client whose User/Alias fields are unchanged
+from main. This is fixture setup, not a new real account or grant. The native
+job explicitly generates that client once after install (postinstall generation
+skipped). Original app31/32/5 are not replayed. Only changed gate/image-refusal
+contracts, the actual child entry and workflow syntax were checked locally;
+actual native upgrade/restore is still first execution in the next selected CI.

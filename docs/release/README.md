@@ -2015,3 +2015,9 @@ changed inputs refuse. The original failed overall run stays failed. This is
 qualification evidence, not a deployable image archive or production permission.
 The existing image workflow is not changed; current SAST still runs for changed
 qualification controls.
+
+After final catalog PR410, PR399 freezes base8bd86e4059125b9ee868d4777795e513d36cba71.
+The source171f image success is historical only: backend production inputs now
+differ, so it cannot qualify the new tree. Existing compound image checks remain
+required for those changed inputs; current native/audit/types/SAST still execute.
+The optional old-image receipt must not bypass its exact-tree refusal.

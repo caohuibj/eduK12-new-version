@@ -5,6 +5,7 @@ import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {createRequire} from 'node:module';
 import {participantAccessOutputs} from './participant-access-scope.mjs';
 import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
 export const binding=JSON.parse(readFileSync(new URL('./personal-tracking-ready.json',import.meta.url)));
@@ -44,8 +45,8 @@ export function admitOriginalReportsInChild(){
  const code="const {admitOriginalReports}=await import('./.github/scripts/personal-tracking-ready.mjs');process.stdout.write(JSON.stringify(await admitOriginalReports()));";
  return JSON.parse(execFileSync(process.execPath,['--input-type=module','-e',code],{encoding:'utf8'}));
 }
-export async function verifyOriginalImages(plan,fetcher=fetch,now=Date.now()){
- const proof=plan.imageReuse;assert(proof&&JSON.stringify(proof)===JSON.stringify(binding.imageReuse));
+export async function verifyOriginalImages(plan,fetcher=fetch,now=Date.now(),expectedProof=binding.imageReuse){
+ const proof=plan.imageReuse;assert(proof&&JSON.stringify(proof)===JSON.stringify(expectedProof));
  const token=process.env.GH_TOKEN;assert(token,'Existing Actions read token required');
  const get=async path=>{const response=await fetcher('https://api.github.com/repos/'+binding.repository+path,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'}});assert(response.ok,'Official image metadata inaccessible: '+response.status);return response.json()};
  const run=await get('/actions/runs/'+proof.runId),job=await get('/actions/jobs/'+proof.jobId);
@@ -69,10 +70,12 @@ async function nativeDatabase(){
   for(const name of names)sql('postgres','CREATE DATABASE '+name+';');
   const archive=execFileSync('git',['archive',binding.base,'server-version/backend/prisma']);execFileSync('tar',['-xf','-','-C',temporary],{input:archive});
   deploy(resolve(temporary,'server-version/backend/prisma/schema.prisma'),database(names[0]));
-  const id=randomUUID(),participant=randomUUID(),wave=randomUUID(),publication=randomUUID(),attempt=randomUUID(),final=randomUUID(),digest='a'.repeat(64);
+  const owner=randomUUID(),id=randomUUID(),participant=randomUUID(),wave=randomUUID(),publication=randomUUID(),attempt=randomUUID(),final=randomUUID(),digest='a'.repeat(64);
+  const {PrismaClient}=createRequire(resolve(backend,'package.json'))('@prisma/client'),db=new PrismaClient({datasources:{db:{url:database(names[0])}}}),login='native-'+owner.replaceAll('-','').slice(0,20);
+  try{await db.user.create({data:{id:owner,username:login,passwordHash:'synthetic-schema-fixture-not-a-login',role:'TEACHER',accountDomain:'SURVEY'}});await db.surveyAccount.create({data:{userId:owner,loginName:login,normalizedLogin:login}});}finally{await db.$disconnect()}
   // Nonempty old-schema SQL fixture, not a repeated application journey or a
   // claim of a newly accepted scientific FINAL. Opaque original bytes survive.
-  sql(names[0],`INSERT INTO survey_projects(id,owner_user_id,title,collection_mode,status) VALUES ('${id}','synthetic-owner','native upgrade sentinel','LINKED_WAVES','ACTIVE');
+  sql(names[0],`INSERT INTO survey_projects(id,owner_user_id,title,collection_mode,status) VALUES ('${id}','${owner}','native upgrade sentinel','LINKED_WAVES','ACTIVE');
    INSERT INTO survey_publications(id,project_id,definition_digest,compiled_snapshot,consent_version,version) VALUES ('${publication}','${id}','${digest}','{"schemaVersion":1,"synthetic":true}',1,1);
    INSERT INTO survey_waves(id,project_id,publication_id,ordinal,title,status,consent_text) VALUES ('${wave}','${id}','${publication}',1,'T1','CLOSED','Synthetic isolated schema preservation fixture');
    INSERT INTO survey_participants(id,project_id,research_code,credential_hash) VALUES ('${participant}','${id}','synthetic','${digest}');

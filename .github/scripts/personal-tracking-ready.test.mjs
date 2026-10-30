@@ -22,9 +22,9 @@ test('exact app pins reject unknown inputs, changed main and full fallback',()=>
 });
 test('Ready requires actual native/image/SAST success; Draft never qualifies',()=>{
  const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),outputs=Object.fromEntries(Object.entries(personalTrackingReadyOutputs(plan)).map(([k,v])=>[k,String(v)]));
- const needs={scope:{result:'success',outputs},'personal-tracking':{result:'success'},docker:{result:'success'},codeql:{result:'success'}};
- assert.deepEqual(requiredChecks(needs,false),['scope','personal-tracking','codeql']);assert.deepEqual(failedChecks(needs,false),[]);
- for(const key of ['personal-tracking','codeql'])assert(failedChecks({...needs,[key]:{result:'skipped'}},false).includes(key));
+ const needs={scope:{result:'success',outputs},'personal-tracking':{result:'success'},docker:{result:'success'},codeql:{result:'success'},docker:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','personal-tracking',...(plan.imageReuse?[]:['docker']),'codeql']);assert.deepEqual(failedChecks(needs,false),[]);
+ for(const key of ['personal-tracking',...(plan.imageReuse?[]:['docker']),'codeql'])assert(failedChecks({...needs,[key]:{result:'skipped'}},false).includes(key));
  assert(failedChecks(needs,true).includes('scope'));
 });
 
@@ -33,9 +33,10 @@ test('actual entrypoint child resolves original admission without a top-level-aw
 });
 test('image reuse refuses failed, skipped or expired original producer steps',async()=>{
  const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),old=process.env.GH_TOKEN;process.env.GH_TOKEN='synthetic-unit-read-token';
+ const proof=binding.imageReuse??binding.historicalImageSuccess,imagePlan={...plan,imageReuse:proof};
  const now=Date.now(),steps=['validate compose','assert prelaunch resource and HTTPS contract','assert API/worker isolation topology','validate monitoring compose','build production images','verify production Nginx static asset MIME and security headers','scan backend image (high and critical)','scan frontend image (high and critical)'].map(name=>({name,conclusion:'success'}));
- const job={id:binding.imageReuse.jobId,run_id:binding.imageReuse.runId,head_sha:binding.imageReuse.executionHead,name:'docker (compose config + production builds) / production image build and scan',status:'completed',conclusion:'success',completed_at:new Date(now).toISOString(),steps};
- const run={id:job.run_id,head_sha:binding.imageReuse.sourceHead,event:'pull_request',path:'.github/workflows/ci.yml',conclusion:'failure'};
+ const job={id:proof.jobId,run_id:proof.runId,head_sha:proof.executionHead,name:'docker (compose config + production builds) / production image build and scan',status:'completed',conclusion:'success',completed_at:new Date(now).toISOString(),steps};
+ const run={id:job.run_id,head_sha:proof.sourceHead,event:'pull_request',path:'.github/workflows/ci.yml',conclusion:'failure'};
  const fake=value=>async url=>({ok:true,status:200,json:async()=>url.includes('/jobs/')?value:run});
- try{assert.equal((await verifyOriginalImages(plan,fake(job),now)).reexecuted,false);await assert.rejects(verifyOriginalImages(plan,fake({...job,conclusion:'failure'}),now));await assert.rejects(verifyOriginalImages(plan,fake({...job,steps:steps.map(s=>({...s,conclusion:s.name.startsWith('scan')?'skipped':s.conclusion}))}),now));await assert.rejects(verifyOriginalImages(plan,fake({...job,completed_at:new Date(now-25*3600000).toISOString()}),now));}finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
+ try{assert.equal((await verifyOriginalImages(imagePlan,fake(job),now,proof)).reexecuted,false);await assert.rejects(verifyOriginalImages(imagePlan,fake({...job,conclusion:'failure'}),now,proof));await assert.rejects(verifyOriginalImages(imagePlan,fake({...job,steps:steps.map(s=>({...s,conclusion:s.name.startsWith('scan')?'skipped':s.conclusion}))}),now,proof));await assert.rejects(verifyOriginalImages(imagePlan,fake({...job,completed_at:new Date(now-25*3600000).toISOString()}),now,proof));}finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
 });
