@@ -24,7 +24,7 @@ export async function readEducationAssessmentDeliveryIdentity(tx:Tx,input:{
  resourceKey:string;version:string;purpose:'NEW_USE'|'HISTORY'
 }){
  const match=/^education-assessment:(SCHOOL|TEACHER):([a-f0-9-]{36}):([a-f0-9-]{36})$/.exec(input.resourceKey)
- if(!match||input.version!=='1.0.0')fail('EDUCATION_ASSESSMENT_RESOURCE_IDENTITY')
+ if(!match||!['1.0.0','2.0.0'].includes(input.version))fail('EDUCATION_ASSESSMENT_RESOURCE_IDENTITY')
  const [row]=await tx.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM education_assessment_deliveries
   WHERE id=${match![3]} AND product=${match![1]} AND organization_id=${match![2]} FOR SHARE`)
  if(!row||!['PUBLISHED',...(input.purpose==='HISTORY'?['RETIRED']:[])].includes(row.status)
@@ -34,7 +34,7 @@ export async function readEducationAssessmentDeliveryIdentity(tx:Tx,input:{
  const authority=[row.created_authority,row.reviewed_authority,row.published_authority].map(proof=>educationDeliveryAuthoritySchema.parse(proof))
  if(authority.some((proof,index)=>proof.actorId!==[row.created_by_user_id,row.reviewed_by_user_id,row.published_by_user_id][index]))fail('EDUCATION_ASSESSMENT_AUTHORITY_IDENTITY')
  const origin=educationAssessmentOriginSchema.parse(row.entry.educationOrigin)
- if(educationAssessmentResourceKey(origin)!==input.resourceKey||origin.resourceId!==row.id||origin.family!==row.family
+ if(origin.adapterVersion!==input.version||educationAssessmentResourceKey(origin)!==input.resourceKey||origin.resourceId!==row.id||origin.family!==row.family
   ||origin.product!==row.product||origin.organizationId!==row.organization_id||origin.sourceCompositeId!==row.source_composite_id
   ||origin.runtimeCompositeId!==row.runtime_composite_id)fail('EDUCATION_ASSESSMENT_RESOURCE_IDENTITY')
  const draft=draftEducationAssessmentEntry({origin,title:row.entry.title as string,disclosure:row.entry.resultDisclosure})

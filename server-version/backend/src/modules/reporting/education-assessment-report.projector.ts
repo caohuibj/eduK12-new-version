@@ -24,6 +24,7 @@ export function projectEducationAssessmentReports(input:{
   binding:TrainingContentSnapshot;receipt:TrainingFinalReceipt
   references:TrainingReferenceBinding|null;releases:ReadonlyMap<string,StoredRelease>
   facts:ReadonlyMap<string,CanonicalUnitResultEnvelopeV1>;metricKeys:ReadonlySet<string>
+  metricKeysByItem?:ReadonlyMap<string,ReadonlySet<string>>
 }):EducationAssessmentUnitReport[]{
   const {origin}=input
   if(origin.product!==input.product||input.binding.compositeId!==origin.runtimeCompositeId
@@ -65,7 +66,7 @@ export function projectEducationDeclaredUnitReports(input:Omit<Parameters<typeof
     if(interpretation.report.status!=='READY'||interpretation.report.generatorVersion!==DECLARATIVE_REPORT_GENERATOR)return {...base,status:'UNAVAILABLE'}
     const core=envelope.core
     if(core.unitType!==(unit.family==='SJT'?'SITUATIONAL':unit.family))hidden()
-    if(report.content.metricKeys.some(key=>!input.metricKeys.has(key)))return {...base,status:'WITHHELD'}
+    if(report.content.metricKeys.some(key=>!input.metricKeys.has(key)||input.metricKeysByItem&&!input.metricKeysByItem.get(unit.itemId)?.has(key)))return {...base,status:'WITHHELD'}
     const allowed=new Set(report.content.metricKeys)
     const metrics:ReportMetricFact[]=core.metrics.filter(metric=>allowed.has(metric.key)).map(metric=>({
       metricKey:metric.key,value:typeof metric.value==='number'&&Number.isFinite(metric.value)?metric.value:null,

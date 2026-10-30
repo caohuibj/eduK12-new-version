@@ -32,7 +32,8 @@ export async function assertEducationNativeBundle(instance:Instance|null|undefin
 /** Called only after the existing execution-scoped personal report authority.
  * Single-report availability and metric policy can further withhold the Bundle. */
 export async function readEducationNativeBundleFeedback(input:{attemptId:string;instance:Instance;identity:EducationNativeBundle;
-  availableItemIds:ReadonlySet<string>;metricKeys:ReadonlySet<string>;db?:Prisma.TransactionClient}){
+  availableItemIds:ReadonlySet<string>;metricKeys:ReadonlySet<string>;
+  metricKeysByItem?:ReadonlyMap<string,ReadonlySet<string>>;db?:Prisma.TransactionClient}){
   await assertEducationNativeBundle(input.instance,input.identity)
   const {frozen,bindings}=readInstance(input.instance),pack=frozen.declarativePackage
   const hidden={schemaVersion:1 as const,kind:'NATIVE_BUNDLE_FEEDBACK' as const,status:'WITHHELD',title:frozen.reportDefinition.title,profileView:null}
@@ -41,6 +42,7 @@ export async function readEducationNativeBundleFeedback(input:{attemptId:string;
   if(required.some(evidence=>{
     const binding=bindings.slots.find(slot=>slot.slotKey===evidence.slotKey)
     return !binding||!input.availableItemIds.has(binding.itemId)||!input.metricKeys.has(evidence.selector)
+      ||input.metricKeysByItem!==undefined&&!input.metricKeysByItem.get(binding.itemId)?.has(evidence.selector)
   }))return hidden
   const {readReport}=await import('./analysis')
   // "student" is the existing participant projection, never staff/admin access
