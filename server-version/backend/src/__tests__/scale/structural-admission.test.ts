@@ -27,7 +27,7 @@ describe('three-part structural admission', () => {
 
   it('retains report language, respondent, metric coverage and duplicate-band structural failures', () => {
     const definition = source().executable!.definition
-    definition.report.audienceContract!.locale = 'en'
+    definition.report.audienceContract!.locale = 'not a locale'
     definition.report.interpretations[0].bands.push({ key: 'repeated', label: '区间', summary: '说明', guidance: [] }, { key: 'repeated', label: '区间', summary: '说明', guidance: [] })
     const messages = validateAudienceReport(definition).map(issue => issue.message)
     expect(messages).toEqual(expect.arrayContaining(['AUDIENCE_LANGUAGE_QC_REQUIRED', 'REPORT_BAND_KEYS_DUPLICATE']))
