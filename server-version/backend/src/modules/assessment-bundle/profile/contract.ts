@@ -20,6 +20,9 @@ export const profileSchema = z.object({
     constructKey: key, evidenceKey: key, label: text, contributionGroup: key, weight: z.number().finite().positive().max(1000),
     source: z.object({
       instrumentKey: key, instrumentVersion: version, scoringVersion: version, localizationVersion: version,
+      // A cross-tool model may span distinct measurement subjects. Absence keeps
+      // the historical same-domain contract; the runtime hash is still exact.
+      subjectKey: key.optional(),
       measurementHash: hash, runtimeDefinitionHash: hash.optional(), definitionSourceHash: z.string().regex(/^[a-f0-9]{40}$/),
       expectedItems: z.number().int().positive().max(1000), timeframeKey: key,
     }).strict(),

@@ -109,3 +109,13 @@ HSE 指令为过去六个月；CBI 为当前工作感受，未指定相同固定
 - 原始 reporter、日志、退出码及命令/源码/锁文件/运行环境清单保留在本节点 `/workspace/bundle-inputs/jdr-bundle-20261030/`。这是本地结果，尚未正式 CI 接纳。没有安装、计分、DB 旅程或浏览器执行。
 
 还确认既有 `dependencyBlockers` 将每个核心来源的 `versionAxes.subjectKey` 与整个模型 domain 相等比较。这只适合原 EVC 同学科映射，四个 HSE 各自有真实 subjectKey，不能伪改源身份。后续最小兼容修复是在每个 binding 的 source 中可选冻结自己的 subjectKey；未声明的旧包仍按原 domain 校验。不改 C/P/R 或授权服务。
+
+## 逐来源身份与独立工具预览切片实际记录
+
+上述逐来源 `source.subjectKey` 已接通，仍逐项检查原 runtime/measurement/scoring/localization/item 身份；旧包不新增字段，缺省沿原 domain。另修复 `verifyPackageFixtures` 对每个 SCALE 都解引用核心 binding 的假设：固定独立工具没有核心 binding 时不生成虚假的核心身份，既有核心分支输出不变。独立 CBI 在未来包中只占固定必做 slot，不映射进 Profile evidence。
+
+- 新 `profile-subject-identity.test.ts` 首轮 2 FAIL：夹具从原 Value 工具继承了 1–7 转换范围，HSE control 实际为 1–5，原身份检查正确拒绝。只修该夹具范围；相同两例复验 2 PASS。未放松范围或身份断言。
+- 新 `profile-independent-tool.test.ts` 1 PASS：原合成核心附加固定 CBI 独立 slot 后可预览，核心 missing/invalid 仍弃权，CBI 不进入画像文本。没有运行 CBI 计分或注册这个合成夹具。
+- 前一成人切片的六个未变断言继续复用；新增可选 subjectKey 无默认值，旧 JSON 不增加字段；fixture 的核心分支仍选择原身份对象。前一后端类型成功只对应成人切片，**最终组合后端类型尚待正式检查**，不冒称新的组合已通过。
+
+当前完整差异没有前端、数据库 schema/迁移、公共授权或 CI 修改。现有 `onboarding-structure` 在 `onboarding-scope.mjs` 明确硬绑定旧分支和候选（含 PR393），本分支不匹配；不能只沿用旧 PR393 资格。待两项内容决定及最终包冻结后，给出现有路线所需的最小绑定与缺失 backend 编译/产物安全/CodeQL/stable gate 计划，保持 Draft，当前不触发 Ready 的通用平台回归。不为本次独立分支新建 workflow，也不修改旧合并候选原件。
