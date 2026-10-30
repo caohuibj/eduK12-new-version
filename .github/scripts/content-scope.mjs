@@ -4,6 +4,7 @@ import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
 import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
 import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
 import {reportPlanningPlan,reportPlanningOutputs} from './report-planning-scope.mjs';
+import {groupReportDraftPlan,groupReportDraftOutputs} from './group-report-draft.mjs';
 import {pr357Plan,pr357Outputs} from './pr357-scope.mjs';
 import {post356Plan,post356Outputs} from './post356-scope.mjs';
 import {refuseUnplannedPR356} from './pr356-entry.mjs';
@@ -331,6 +332,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const event = process.env.CI_EVENT;
   refuseUnplannedPR356();
   const base = process.env.CI_BASE_SHA;
+  const groupDraft=groupReportDraftPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(groupDraft){const output=groupReportDraftOutputs(groupDraft);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const onboarding=onboardingPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(onboarding){const output=onboardingOutputs(onboarding);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const pr364=pr364Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

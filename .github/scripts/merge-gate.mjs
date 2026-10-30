@@ -1,4 +1,5 @@
 import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
+import {groupReportDraftPlan,groupReportDraftOutputs} from './group-report-draft.mjs';
 export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd()}={}) {
   const actual=readCognitiveIntakeDiff(base,head,{cwd});
   const scope=needs.scope?.outputs||{};
@@ -82,6 +83,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='group-report-draft')return draft?['scope']:['scope','group-report-ready-qualification-required'];
   if(scope.application_route==='onboarding-structure')return ['scope','onboarding-structure','codeql'];
   if(scope.application_route==='pr364')return ['scope','pr364','codeql'];
   if(scope.application_route==='pr363')return ['scope','pr363','codeql'];
@@ -173,6 +175,10 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='group-report-draft'){
+    try{const p=JSON.parse(scope.group_report_plan);if(!draft||p.preflightOnly!==true||p.route!=='group-report-draft'||Object.entries(groupReportDraftOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='onboarding-structure'){
     try{const p=JSON.parse(scope.onboarding_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='onboarding-structure'||Object.entries(onboardingOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -507,6 +513,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='group-report-draft'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();const p=JSON.parse(needs.scope.outputs.group_report_plan);if(p.base!==process.env.CI_BASE_SHA||JSON.stringify(groupReportDraftPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-group-report-draft');}catch{failed.push('recomputed-group-report-draft');}
+  }
   if(needs.scope?.outputs?.application_route==='onboarding-structure'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.onboarding_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(onboardingPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-onboarding-plan');}catch{failed.push('recomputed-onboarding-plan');}
   }

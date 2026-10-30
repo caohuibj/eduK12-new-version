@@ -15,6 +15,7 @@ import { generateToken } from '../../utils/jwt'
 import { SURVEY_AUTH_COOKIE_NAME } from '../../utils/authCookies'
 import * as security from '../../modules/assessment-runtime/security'
 import type { FormDraft } from '../../modules/survey/builder.definition'
+import { runtimeMetricLines } from '../../services/runtimeObservability'
 
 const url = integrationDatabaseUrl('GROUP_REPORT_DATABASE_URL')
 const suite = url ? describe : describe.skip
@@ -110,5 +111,19 @@ suite('Survey generated group snapshot / real HTTP and PostgreSQL', () => {
     await prisma.surveyWaveAttempt.update({ where: { id: attempt.id }, data: { excludedAt: new Date() } })
     expect((await call('/' + firstArtifact)).status).toBe(409)
     await expect(prisma.$executeRaw`UPDATE reporting_task_artifacts SET payload_hash='changed' WHERE id=${firstArtifact}`).rejects.toThrow()
+  })
+  it('counts SQL for one generated report and its snapshot read without repeating the application assertions', async () => {
+    const count = () => Number(runtimeMetricLines().find(line => line.startsWith('ptool_prisma_sql_events_total '))?.split(' ')[1])
+    if (!Number.isFinite(count())) throw new Error('Explicit isolated count-only SQL instrumentation required')
+    const before = count(), start = performance.now()
+    const generated = await call('', 'POST', { instrumentKey: 'learning' })
+    const middle = count(), generationMs = performance.now() - start
+    const readStart = performance.now()
+    const read = await call('/' + generated.data.data.artifactId)
+    const after = count()
+    evidence.sqlComparison = { generation: { sqlEvents: middle - before, ms: generationMs }, read: { sqlEvents: after - middle, ms: performance.now() - readStart },
+      unit: 'SQL events including transaction statements; not network round trips', syntheticN: 2 }
+    expect(generated.status).toBe(200); expect(read.status).toBe(200)
+    expect(after - middle).toBeGreaterThan(0); expect(after - middle).toBeLessThan(middle - before)
   })
 })

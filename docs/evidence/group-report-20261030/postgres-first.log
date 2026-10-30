@@ -1,0 +1,55 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL > creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries
+prisma:error 
+Invalid `prisma.surveyResearcherGrant.create()` invocation in
+/workspace/eduK12-new-version/server-version/backend/src/__tests__/survey/group-report.postgres.integration.test.ts:101:40
+
+   98 const count = await prisma.$queryRaw<Array<{ n: number }>>`SELECT COUNT(*)::int AS n FROM reporting_task_artifacts WHERE container_id=${projectId}`
+   99 expect(count[0].n).toBe(2)
+  100 const stranger = await prisma.user.create({ data: { username: `group-stranger-${suffix}`, passwordHash: 'synthetic-test', role: 'STUDENT', accountDomain: 'SURVEY' } })
+→ 101 await prisma.surveyResearcherGrant.create(
+Foreign key constraint violated: `survey_researcher_grants_user_id_fkey (index)`
+
+stdout | src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL
+GROUP_REPORT_COMPARISON {"generation":{"ms":59.50721800000065,"transactions":5,"decryptions":2},"read":{"ms":11.086706999999478,"transactions":1,"decryptions":1}}
+
+ ❯ src/__tests__/survey/group-report.postgres.integration.test.ts (2 tests | 1 failed) 384ms
+     ✓ generates the real Form report, then reopens without FINAL decryption or regeneration 140ms
+     × creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries 57ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL > creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries
+PrismaClientKnownRequestError: 
+Invalid `prisma.surveyResearcherGrant.create()` invocation in
+/workspace/eduK12-new-version/server-version/backend/src/__tests__/survey/group-report.postgres.integration.test.ts:101:40
+
+   98 const count = await prisma.$queryRaw<Array<{ n: number }>>`SELECT COUNT(*)::int AS n FROM reporting_task_artifacts WHERE container_id=${projectId}`
+   99 expect(count[0].n).toBe(2)
+  100 const stranger = await prisma.user.create({ data: { username: `group-stranger-${suffix}`, passwordHash: 'synthetic-test', role: 'STUDENT', accountDomain: 'SURVEY' } })
+→ 101 await prisma.surveyResearcherGrant.create(
+Foreign key constraint violated: `survey_researcher_grants_user_id_fkey (index)`
+ ❯ $n.handleRequestError node_modules/@prisma/client/runtime/library.js:121:7315
+ ❯ $n.handleAndLogRequestError node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ src/config/database.ts:43:14
+     41|     const startedAt = process.hrtime.bigint()
+     42|     try {
+     43|       return await next(params)
+       |              ^
+     44|     } catch (error: any) {
+     45|       recordPrismaError(error?.code)
+ ❯ src/__tests__/survey/group-report.postgres.integration.test.ts:101:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  05:55:10
+   Duration  7.04s (transform 4.72s, setup 0ms, import 6.52s, tests 384ms, environment 0ms)
+
+JSON report written to /tmp/group-report-postgres-ready.json

@@ -1,0 +1,14 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL
+GROUP_REPORT_COMPARISON {"sqlComparison":{"generation":{"sqlEvents":46,"ms":102.56736799999999},"read":{"sqlEvents":8,"ms":18.91089699999975},"unit":"SQL events including transaction statements; not network round trips","syntheticN":2}}
+
+ ✓ src/__tests__/survey/group-report.postgres.integration.test.ts (3 tests | 2 skipped) 326ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 2 skipped (3)
+   Start at  06:03:16
+   Duration  8.00s (transform 5.41s, setup 0ms, import 7.54s, tests 326ms, environment 0ms)
+
+JSON report written to /tmp/group-report-postgres-query-count.json
