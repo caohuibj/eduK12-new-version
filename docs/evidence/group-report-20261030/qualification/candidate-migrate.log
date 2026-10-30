@@ -1,0 +1,14 @@
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "eduk12_group_qual_upgrade_test_20261030", schema "public" at "127.0.0.1:55432"
+
+261 migrations found in prisma/migrations
+
+Applying migration `20261030160000_reporting_task_artifacts`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20261030160000_reporting_task_artifacts/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
