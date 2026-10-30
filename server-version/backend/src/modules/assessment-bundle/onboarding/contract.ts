@@ -71,6 +71,16 @@ const packageV1Schema = z.object({
 }).strict()
 const packageV2Schema = packageV1Schema.extend({
   schemaVersion:z.literal(2),
+  report:packageV1Schema.shape.report.extend({
+    // This declaration is covered by the existing content-hash-bound rights/report review.
+    // It never grants access to educational materials owned by a source instrument.
+    profileActionContent:z.literal('BUNDLE_OWNED').optional(),
+    // Optional frozen template text: historical packages keep their original output.
+    profileStateExplanations:z.object({
+      INSUFFICIENT:text, INVALID:text, NOT_APPLICABLE:text,
+      UNCLASSIFIED:text, MIXED:text, BOUNDARY:text,
+    }).strict().optional(),
+  }),
   manifest:packageV1Schema.shape.manifest.extend({
     packageSchemaVersion:z.literal(2),
     definition:declaration.extend({engine:z.object({key:z.literal('declarative-evidence-v1'),version:z.literal('1.1.0')}).strict()}),

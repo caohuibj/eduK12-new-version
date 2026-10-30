@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
-import {execFileSync} from 'node:child_process';
+import {execFileSync,spawnSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {onboardingPlan,binding} from './onboarding-scope.mjs';
@@ -153,8 +153,31 @@ function plan(){
   return value;
 }
 function readOriginal(proof){const bytes=readFileSync(safePath(proof.path));assert.equal(hash(bytes),proof.sha256,'Original evidence bytes drift');return JSON.parse(bytes);}
+
+// PR393 reuses reviewed tests, but its combined main backend has no exact-tree
+// compiler result. Execute only that missing check here, never npm run build
+// (which invokes unrelated onboarding/scoring suites). Failure logs survive.
+function qualifyPr393BackendTypes(p,review){
+  assert.deepEqual(review.types,[],'Do not relabel historical types as this combined tree');
+  assert.equal(review.missingCheck,'CURRENT_COMBINED_BACKEND_TYPES');
+  mkdirSync('onboarding-evidence',{recursive:true});
+  const argv=['node_modules/typescript/bin/tsc','--noEmit'];
+  const execution=spawnSync(process.execPath,argv,{cwd:'server-version/backend',encoding:'utf8'});
+  const log=(execution.stdout??'')+(execution.stderr??'')+(execution.error?String(execution.error):'');
+  writeFileSync('onboarding-evidence/backend-types.log',log);
+  const receipt={component:'backend',currentComponentTree:p.components.backend,source:p.sourceHead,
+    mergePreview:p.head,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,
+    argv:['node',...argv],node:process.version,exitCode:execution.status,signal:execution.signal,
+    logSHA256:hash(Buffer.from(log)),ciExecuted:true};
+  writeFileSync('onboarding-evidence/backend-types.json',JSON.stringify(receipt,null,2)+'\n');
+  assert.equal(execution.status,0,'Current combined backend types failed; see backend-types.log');
+  return [receipt];
+}
+
 function admit(){
-  const p=plan(),review=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
+  const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
+  const review=p.pr===393?allReviews.candidates?.['393']:allReviews;
+  assert(review,'Missing exact reviewed evidence');
   assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
@@ -181,7 +204,7 @@ function admit(){
     assert.deepEqual(review.types,[],'PR381 does not fabricate an argv-style original receipt');
     originalTaskChecks=verifyPr381CommandRecords(readOriginal(record.commands),readOriginal(record.inputs),readOriginal(record.firstInputs),p.components.frontend,path=>readFileSync(path));
   }else assert(!review.pr381LocalChecks);
-  const types=originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
+  const types=p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
   if([372,374].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   const observations=[];

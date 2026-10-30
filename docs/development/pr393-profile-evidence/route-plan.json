@@ -1,0 +1,511 @@
+{
+  "status": "CONTROL_DRAFT_PENDING_INDEPENDENT_REVIEW_NOT_READY",
+  "source": "990d3a5271284e40b137183e1524bb0842614960",
+  "sourceTree": "93ae2cc17356b23106684f1e140ad40f8f7b8800",
+  "observedMain": "f9b776930edc22841f572d92c3c2b711754bf3b4",
+  "originalBase": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+  "mergePreviewTree": "d89a43a49381aecc947056c2afb799b6dc7d9abd",
+  "sourceChangeCount": 19,
+  "inventory": [
+    {
+      "path": "docs/development/bundle-evc-profile-implementation-20261029.md",
+      "before": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "095b77dabc16a624d1d2a4a09922b50b7bc4ebe7"
+      },
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "2c763050695833ac911f96104c53f12ba21efba0"
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/bundle-onboarding/profile-actions.test.ts",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "3a073a7748015947574295681cb4cd51e61e7490"
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/bundle-onboarding/profile-feedback.test.ts",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "ff65b69657aa31523d05b56fc328c0adfcba12b6"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/ci-fixtures/learning_motivation_math_support/0.1.2.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "a8c6efa27ecdace17070a736e35c591b12038aa5"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+      "before": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "26a9433ffe025af051ec760025774a854a4cbfd8"
+      },
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "6ccb0569149b7ab60dd19562a7da77b055020623"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+      "before": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "6aaf8419e89699e427d72efbdd1c469f9659bf92"
+      },
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "88d54cd45a800b84c95df4e339ce8e4a47f19d50"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/context.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "dddde39899e9f394b8fe3f9f062b8cfc7551cdb9"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/evidence-map.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "46a6d34cde58cfc0b119c89d2aaa0bc51c9a3d9d"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/fixtures/invalid.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "c9986f07107b14ac67bfde686283315e2f40cb5a"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/fixtures/missing.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "fc316e2819084bb09956cd47abec7ae2e82198eb"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/fixtures/not-applicable.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "638560f6c77d005e99fb79354912a116ed74e68a"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/fixtures/valid.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "7606daeda4b96e3a6ec726bc6b81608816dfa974"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/manifest.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "a991ef72c6d12a45ebb40c4710110856bf35a9cc"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/profile.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "9c51d41ece714aa0194b419491a1aa79ee7349dd"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/publication.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "80d6b9ebbd1fdec46fd252888cfb5f1ef2aecf9c"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/report.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "0295c1fbfc4ff8c13b4bdd14d650ed8204b1cbff"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/rules.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "27b7b88ac60133772499bb25a8c795992ff10d01"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.2/scientific.json",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "46804debdf96af35ff5090c542d91ec3fc7b72ae"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+      "before": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "1f304835921957b9fc4f42b3a102c6b62076dece"
+      },
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "blob": "dac3746688abe3ef09d20c631d19aab8a712bd0b"
+      }
+    }
+  ],
+  "reports": [
+    {
+      "name": "profile-feedback-unit",
+      "bytes": 3961,
+      "sha256": "74d788b5881dec3e2500a97a46441f64bf8f9954affbeb14414a5ba7e5d3c652",
+      "summary": {
+        "success": true,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "allOriginalCases": [
+        {
+          "suite": 0,
+          "index": 0,
+          "fullName": "frozen profile status feedback explains INSUFFICIENT using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 1,
+          "fullName": "frozen profile status feedback explains INVALID using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 2,
+          "fullName": "frozen profile status feedback explains NOT_APPLICABLE using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 3,
+          "fullName": "frozen profile status feedback explains UNCLASSIFIED using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 4,
+          "fullName": "frozen profile status feedback explains MIXED using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 5,
+          "fullName": "frozen profile status feedback explains BOUNDARY using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 6,
+          "fullName": "frozen profile status feedback withholds explanation for denied audiences and either missing interpretation capability",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 7,
+          "fullName": "frozen profile status feedback keeps matched summaries and source-limited actions unchanged",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 8,
+          "fullName": "frozen profile status feedback reopens the old frozen definition without importing the new template",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 9,
+          "fullName": "frozen profile status feedback freezes feedback in the package hash and requires a complete bounded state template",
+          "status": "passed"
+        }
+      ],
+      "selectedPassedCases": [
+        {
+          "suite": 0,
+          "index": 0,
+          "fullName": "frozen profile status feedback explains INSUFFICIENT using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 1,
+          "fullName": "frozen profile status feedback explains INVALID using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 2,
+          "fullName": "frozen profile status feedback explains NOT_APPLICABLE using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 3,
+          "fullName": "frozen profile status feedback explains UNCLASSIFIED using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 4,
+          "fullName": "frozen profile status feedback explains MIXED using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 5,
+          "fullName": "frozen profile status feedback explains BOUNDARY using only frozen reader-facing text",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 6,
+          "fullName": "frozen profile status feedback withholds explanation for denied audiences and either missing interpretation capability",
+          "status": "passed"
+        }
+      ],
+      "originalShellExit": 0,
+      "sourceAssociation": "Original F02 working tree, retrospectively associated with 1369d661db44f7c5d7ff29affe26db857c533546; no exact precommit execution-tree attestation"
+    },
+    {
+      "name": "profile-actions-unit",
+      "bytes": 5513,
+      "sha256": "8970e69cc59e5b6e735119fc9986b2f8601e01b2618ae2fac84525ac22d83289",
+      "summary": {
+        "success": true,
+        "numPassedTests": 7,
+        "numFailedTests": 0,
+        "numPendingTests": 7
+      },
+      "allOriginalCases": [
+        {
+          "suite": 0,
+          "index": 0,
+          "fullName": "Bundle-owned profile actions selects only frozen Bundle action text without raising source educational permissions",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 1,
+          "fullName": "Bundle-owned profile actions still withholds actions for restricted audiences, missing core permissions and an unclassified result",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 2,
+          "fullName": "Bundle-owned profile actions keeps old report content and its hash unchanged and rejects source-material declarations",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 3,
+          "fullName": "Bundle-owned profile actions uses existing content-bound rights/report review; ordinary allocation is not content approval",
+          "status": "passed"
+        },
+        {
+          "suite": 1,
+          "index": 0,
+          "fullName": "frozen profile status feedback explains INSUFFICIENT using only frozen reader-facing text",
+          "status": "skipped"
+        },
+        {
+          "suite": 1,
+          "index": 1,
+          "fullName": "frozen profile status feedback explains INVALID using only frozen reader-facing text",
+          "status": "skipped"
+        },
+        {
+          "suite": 1,
+          "index": 2,
+          "fullName": "frozen profile status feedback explains NOT_APPLICABLE using only frozen reader-facing text",
+          "status": "skipped"
+        },
+        {
+          "suite": 1,
+          "index": 3,
+          "fullName": "frozen profile status feedback explains UNCLASSIFIED using only frozen reader-facing text",
+          "status": "skipped"
+        },
+        {
+          "suite": 1,
+          "index": 4,
+          "fullName": "frozen profile status feedback explains MIXED using only frozen reader-facing text",
+          "status": "skipped"
+        },
+        {
+          "suite": 1,
+          "index": 5,
+          "fullName": "frozen profile status feedback explains BOUNDARY using only frozen reader-facing text",
+          "status": "skipped"
+        },
+        {
+          "suite": 1,
+          "index": 6,
+          "fullName": "frozen profile status feedback withholds explanation for denied audiences and either missing interpretation capability",
+          "status": "skipped"
+        },
+        {
+          "suite": 1,
+          "index": 7,
+          "fullName": "frozen profile status feedback keeps legacy matched summaries and source-limited actions unchanged",
+          "status": "passed"
+        },
+        {
+          "suite": 1,
+          "index": 8,
+          "fullName": "frozen profile status feedback reopens the old frozen definition without importing the new template",
+          "status": "passed"
+        },
+        {
+          "suite": 1,
+          "index": 9,
+          "fullName": "frozen profile status feedback freezes feedback in the package hash and requires a complete bounded state template",
+          "status": "passed"
+        }
+      ],
+      "selectedPassedCases": [
+        {
+          "suite": 0,
+          "index": 0,
+          "fullName": "Bundle-owned profile actions selects only frozen Bundle action text without raising source educational permissions",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 1,
+          "fullName": "Bundle-owned profile actions still withholds actions for restricted audiences, missing core permissions and an unclassified result",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 2,
+          "fullName": "Bundle-owned profile actions keeps old report content and its hash unchanged and rejects source-material declarations",
+          "status": "passed"
+        },
+        {
+          "suite": 0,
+          "index": 3,
+          "fullName": "Bundle-owned profile actions uses existing content-bound rights/report review; ordinary allocation is not content approval",
+          "status": "passed"
+        },
+        {
+          "suite": 1,
+          "index": 7,
+          "fullName": "frozen profile status feedback keeps legacy matched summaries and source-limited actions unchanged",
+          "status": "passed"
+        },
+        {
+          "suite": 1,
+          "index": 8,
+          "fullName": "frozen profile status feedback reopens the old frozen definition without importing the new template",
+          "status": "passed"
+        },
+        {
+          "suite": 1,
+          "index": 9,
+          "fullName": "frozen profile status feedback freezes feedback in the package hash and requires a complete bounded state template",
+          "status": "passed"
+        }
+      ],
+      "originalShellExit": 0,
+      "sourceAssociation": "990d3a5271284e40b137183e1524bb0842614960 task source; unsigned local execution"
+    }
+  ],
+  "selectedUniquePassedCases": 14,
+  "knownMainClosureChanges": {
+    "bundle-product/package-release.ts": "Type-only BundlePackageRelease import and factoring/addition under assertPackageAdmission/readPackageReleaseAdmission. Tests invoke unchanged validateReview and publishPackage, with both mocked publisher attempts rejecting before the changed admission functions; no affected selected execution branch.",
+    "bundle-product/education-adapter.ts": "Not imported or executed by these report projection and package review tests.",
+    "scale/onboarding/instruments.generated.ts": "PR394 adds ten new source registrations; same EVC exact identity lookups and disclosure/source bytes remain unchanged. No selected case reads or scores CBI/HSE. Compiler consumes current registry once in formal CI."
+  },
+  "route": "onboarding-structure",
+  "requiredExistingJobs": [
+    "scope",
+    "onboarding-structure",
+    "codeql",
+    "merge gate / ready PR"
+  ],
+  "missingExecution": [
+    {
+      "job": "onboarding-structure",
+      "check": "Locked backend dependencies, Prisma generation without DB, actual integrated backend tsc --noEmit on final combined tree; original local types are not relabelled to new main."
+    },
+    {
+      "job": "codeql",
+      "check": "Real JS/TS analysis of assessment-bundle directory and changed onboarding controls, with unchanged query/finding policy."
+    }
+  ],
+  "proposedExistingControlFiles": [
+    ".github/scripts/onboarding-scope.mjs",
+    ".github/scripts/onboarding-bindings.json",
+    ".github/scripts/onboarding-checks.mjs",
+    ".github/scripts/onboarding-evidence.json",
+    ".github/scripts/onboarding-controls.test.mjs",
+    ".github/workflows/ci.yml"
+  ],
+  "noChangeRequired": [
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs"
+  ],
+  "evidenceTransport": "Only the two already-reviewed synthetic raw Vitest JSON reports under docs/development/pr393-profile-evidence/. Do not publish Library delivery metadata, private source material or test environment files.",
+  "newControlExecution": "One local bounded control-contract validation for the added PR393 branch/schema/evidence selection; no application test replay.",
+  "finalization": "Read main/PR394 once before final binding; merge actual main into this branch and pin base/product/component trees + complete path/mode/blob + control checkpoint. Draft until independent control review/activation.",
+  "budget": "Scope/admission about 5 minutes; CodeQL retain existing 30-minute maximum and report >5 minute stage, no short runtime guarantee.",
+  "notPerformed": [
+    "No application test replay",
+    "No Ready transition",
+    "No formal CI activation",
+    "No production deployment"
+  ],
+  "alignedMain": "4a3aaa2ebbae712002a2d349c5e83368085c437e",
+  "alignedProduct": "b00712d2887cccf3117a9095184f6afd301f0e6f",
+  "alignedProductTree": "ad0a1fd24ded93070fb308b0fbbb8b1f9c4236fe",
+  "alignment": "One normal merge of actual main including PR392 and PR394; original source identity and reports retained above."
+}

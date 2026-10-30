@@ -974,5 +974,812 @@
         "NOT_APPLICABLE": "不在本版本适用范围"
       }
     }
+  },
+  {
+    "schemaVersion": 2,
+    "manifest": {
+      "definition": {
+        "schemaVersion": 1,
+        "bundleKey": "learning_motivation_math_support",
+        "bundleVersion": "0.1.2",
+        "status": "DRAFT",
+        "category": "scale_self",
+        "name": "数学学习动机支持画像｜理论试验版",
+        "description": "用数学学业自我效能、重要性/用途价值、时间/取舍成本生成有证据路径的暂定组合解释；非诊断、非自然类别。",
+        "respondentTypes": [
+          "SELF"
+        ],
+        "initiationModes": [
+          "TEACHER_ASSIGNMENT",
+          "STUDENT_COURSE"
+        ],
+        "population": {
+          "subjectPopulation": "youth"
+        },
+        "slots": [
+          {
+            "slotKey": "ase",
+            "unitType": "SCALE",
+            "position": 0,
+            "required": true,
+            "instrumentKey": "academic_self_efficacy_mathematics_zh_cn",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "academic_self_efficacy"
+            ]
+          },
+          {
+            "slotKey": "vc",
+            "unitType": "SCALE",
+            "position": 1,
+            "required": true,
+            "instrumentKey": "value_cost_mathematics_zh_cn",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "value",
+              "cost"
+            ]
+          },
+          {
+            "slotKey": "context",
+            "unitType": "FORM",
+            "position": 2,
+            "required": true,
+            "instrumentKey": "learning_motivation_math_context",
+            "instrumentVersion": "0.1.0",
+            "respondentType": "SELF"
+          }
+        ],
+        "engine": {
+          "key": "declarative-evidence-v1",
+          "version": "1.1.0"
+        },
+        "contextDefinitionKey": "learning_motivation_math_context",
+        "contextDefinitionVersion": "0.1.0",
+        "reportDefinitionKey": "learning_motivation_math_support_report",
+        "reportDefinitionVersion": "0.1.2",
+        "publicationRequirements": {
+          "scientificGate": true,
+          "rightsGate": true,
+          "languageGate": true,
+          "reportGate": true,
+          "safetyGate": false,
+          "nonCommercialOnly": false
+        },
+        "rightsRequirements": {
+          "required": true,
+          "instrumentKeys": [
+            "academic_self_efficacy_mathematics_zh_cn",
+            "value_cost_mathematics_zh_cn"
+          ]
+        },
+        "safetyCapability": {
+          "safetyCapable": false,
+          "productionTriggerEnabled": false
+        },
+        "limitations": [
+          "仅限获准适用的7—12年级数学学生自评；具体适用性由单项冻结admission及Bundle审核共同决定。",
+          "数学ASE-5为PILOT学科替换版本，未建立exact-version本地经验验证。",
+          "V不等于纯兴趣；C不覆盖完整情绪成本；禁止Value-Cost抵消或构造动机总分。",
+          "规则、阈值、原型和名称为专家理论候选，未验证自然类别或个体干预效应。",
+          "教师/研究者个体解释受现有源披露策略限制，不得越权。"
+        ]
+      },
+      "files": {
+        "evidence": "evidence-map.json",
+        "rules": "rules.json",
+        "report": "report.json",
+        "scientific": "scientific.json",
+        "publication": "publication.json",
+        "context": "context.json",
+        "profile": "profile.json"
+      },
+      "cognitiveDependencies": [],
+      "packageSchemaVersion": 2
+    },
+    "evidence": [
+      {
+        "evidenceKey": "e",
+        "slotKey": "ase",
+        "selector": "academic_self_efficacy",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "math.academic_self_efficacy",
+        "role": "PRIMARY",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "v",
+        "slotKey": "vc",
+        "selector": "value",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "math.importance_utility_value",
+        "role": "PRIMARY",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "c",
+        "slotKey": "vc",
+        "selector": "cost",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "math.time_opportunity_cost",
+        "role": "PRIMARY",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "grade",
+        "slotKey": "context",
+        "selector": "grade_level",
+        "valueType": "number",
+        "unit": "context",
+        "construct": "context.grade",
+        "role": "CONTEXT",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      }
+    ],
+    "rules": {
+      "version": "0.1.0",
+      "items": []
+    },
+    "report": {
+      "key": "learning_motivation_math_support_report",
+      "version": "0.1.2",
+      "locale": "zh-CN",
+      "blocks": [
+        {
+          "blockId": "core",
+          "kind": "conclusions",
+          "title": "当前学习动机的暂定组合",
+          "audience": [
+            "student",
+            "parent",
+            "teacher",
+            "admin"
+          ],
+          "ruleIds": []
+        },
+        {
+          "blockId": "evidence",
+          "kind": "evidence",
+          "title": "三个不同含义的核心指标",
+          "audience": [
+            "student",
+            "parent",
+            "teacher",
+            "admin"
+          ],
+          "ruleIds": []
+        },
+        {
+          "blockId": "scope",
+          "kind": "limitations",
+          "title": "解释边界",
+          "audience": [
+            "student",
+            "parent",
+            "teacher",
+            "admin"
+          ],
+          "ruleIds": []
+        }
+      ],
+      "states": {
+        "missing": "核心证据不完整，暂不分型。",
+        "limited": "作答或测量证据有限，仅阅读可支持的单项信息。",
+        "unavailable": "当前证据或权限不足以形成综合画像。"
+      },
+      "profileActionContent": "BUNDLE_OWNED",
+      "profileStateExplanations": {
+        "INSUFFICIENT": "本次用于组合分析的信息还不完整，暂不形成综合画像。你仍可查看已获准展示的单项结果。",
+        "INVALID": "本次部分结果未满足组合分析所需的计算或质量条件，暂不形成综合画像。你仍可查看已获准展示的单项结果。",
+        "NOT_APPLICABLE": "当前测评版本不适用于此次填写的年级或对象，因此暂不形成综合画像。你仍可查看已获准展示的单项结果。",
+        "UNCLASSIFIED": "现有理论组合还不足以充分概括这次结果。学习体验可以有不同组合，可先结合已获准展示的单项结果理解本次情况。",
+        "MIXED": "本次结果与两种理论组合较为接近，暂不选定单一画像。可以结合已获准展示的单项结果，看看哪些描述更贴近近期的学习体验。",
+        "BOUNDARY": "本次结果处在现有理论组合的边界附近，暂不足以清楚归入其中一种。可以先结合已获准展示的单项结果理解本次的学习体验。"
+      }
+    },
+    "scientific": {
+      "maturity": "EXPERIMENTAL",
+      "scope": "理论驱动的支持对话原型，不是已验证的心理类型；精确版本、年级、语言、负担与报告需科学审核。",
+      "references": [
+        {
+          "id": "r01",
+          "citation": "Eccles & Wigfield (2020). Situated Expectancy-Value Theory. https://doi.org/10.1016/j.cedpsych.2020.101859",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "r02",
+          "citation": "Bandura (1977). Self-efficacy. https://doi.org/10.1037/0033-295X.84.2.191",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "r03",
+          "citation": "Flake et al. (2015). Measuring cost. https://doi.org/10.1016/j.cedpsych.2015.03.002",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "r08",
+          "citation": "Jiang & Zhang (2023). https://doi.org/10.1016/j.lindif.2022.102252",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "r09",
+          "citation": "Hulleman & Harackiewicz (2009). https://doi.org/10.1126/science.1177067",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "r12",
+          "citation": "Pekrun (2006). Control-value theory. https://doi.org/10.1007/s10648-006-9029-9",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "r23",
+          "citation": "Dignath & Büttner (2008). https://doi.org/10.1007/s11409-008-9029-x",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "r24",
+          "citation": "Panadero et al. (2017). https://doi.org/10.1016/j.edurev.2017.08.004",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "r25",
+          "citation": "Ryan & Deci (2020). https://doi.org/10.1016/j.cedpsych.2020.101860",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "expert_design",
+          "citation": "独立候选B；中心、阈值、原型为专家理论假设/工程选择，非实证类型；仍待既有独立科学/技术发布审核。",
+          "allowedClaims": [
+            "cross_source_condition"
+          ]
+        }
+      ]
+    },
+    "fixtures": {
+      "valid": {
+        "values": {
+          "e": {
+            "state": "present",
+            "value": 2.2
+          },
+          "v": {
+            "state": "present",
+            "value": 5
+          },
+          "c": {
+            "state": "present",
+            "value": 5
+          },
+          "grade": {
+            "state": "present",
+            "value": 9
+          }
+        },
+        "expectedRuleIds": [],
+        "expectedKind": "COMPUTED",
+        "expectedProfile": {
+          "state": "MATCHED",
+          "profileId": "P4"
+        }
+      },
+      "missing": {
+        "values": {
+          "e": {
+            "state": "missing"
+          },
+          "v": {
+            "state": "present",
+            "value": 5
+          },
+          "c": {
+            "state": "present",
+            "value": 5
+          },
+          "grade": {
+            "state": "present",
+            "value": 9
+          }
+        },
+        "expectedRuleIds": [],
+        "expectedKind": "COMPUTED",
+        "expectedProfile": {
+          "state": "INSUFFICIENT",
+          "profileId": null
+        }
+      },
+      "invalid": {
+        "values": {
+          "e": {
+            "state": "present",
+            "value": 2.2
+          },
+          "v": {
+            "state": "present",
+            "value": 5
+          },
+          "c": {
+            "state": "invalid"
+          },
+          "grade": {
+            "state": "present",
+            "value": 9
+          }
+        },
+        "expectedRuleIds": [],
+        "expectedKind": "COMPUTED",
+        "expectedProfile": {
+          "state": "INVALID",
+          "profileId": null
+        }
+      },
+      "not-applicable": {
+        "values": {
+          "e": {
+            "state": "not_applicable"
+          },
+          "v": {
+            "state": "present",
+            "value": 5
+          },
+          "c": {
+            "state": "present",
+            "value": 5
+          },
+          "grade": {
+            "state": "present",
+            "value": 6
+          }
+        },
+        "expectedRuleIds": [],
+        "expectedKind": "COMPUTED",
+        "expectedProfile": {
+          "state": "NOT_APPLICABLE",
+          "profileId": null
+        }
+      }
+    },
+    "publication": {
+      "requestedStatus": "DRAFT"
+    },
+    "context": {
+      "schemaVersion": 1,
+      "contextDefinitionKey": "learning_motivation_math_context",
+      "contextDefinitionVersion": "0.1.0",
+      "fields": [
+        {
+          "contextKey": "grade_level",
+          "required": true,
+          "valueType": "number"
+        }
+      ]
+    },
+    "profile": {
+      "schemaVersion": 1,
+      "key": "learning_motivation_math_support",
+      "version": "0.1.0",
+      "mappingVersion": "0.1.1",
+      "templateVersion": "0.1.2",
+      "algorithm": "weighted-l1-guarded-v1",
+      "maturity": "EXPERIMENTAL",
+      "sourceArchiveHash": "d6583c15ae4e6de3e88a42d51c09f4aa588aced07dd38c6e064b723f7c1c01e0",
+      "applicability": {
+        "domain": "mathematics",
+        "gradeEvidenceKey": "grade",
+        "minGrade": 7,
+        "maxGrade": 12
+      },
+      "bindings": [
+        {
+          "constructKey": "math.academic_self_efficacy",
+          "evidenceKey": "e",
+          "label": "数学学习把握感",
+          "contributionGroup": "competence_beliefs",
+          "weight": 1,
+          "source": {
+            "instrumentKey": "academic_self_efficacy_mathematics_zh_cn",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "measurementHash": "ea8cd4535b0c80c64bf6c93e538f2d33b282860136bcb153ac053b06d9f9da2d",
+            "runtimeDefinitionHash": "8b4eb7b667ede55476fdb5f1c8be3d42627b9677f6a9dcd5379f23f7cfe83a73",
+            "definitionSourceHash": "a5f02168ad4135d3c13a2740d391d2043770cb8b",
+            "expectedItems": 5,
+            "timeframeKey": "current_beliefs_with_next_semester_item_v1"
+          },
+          "transformation": {
+            "version": "1.0.0",
+            "kind": "WITHIN_INSTRUMENT_RANGE",
+            "referenceKind": "THEORETICAL_RANGE_NOT_NORM",
+            "min": 1,
+            "max": 5,
+            "orientation": "DIRECT"
+          }
+        },
+        {
+          "constructKey": "math.importance_utility_value",
+          "evidenceKey": "v",
+          "label": "数学重要性与用途价值",
+          "contributionGroup": "math.importance_utility_value",
+          "weight": 1,
+          "source": {
+            "instrumentKey": "value_cost_mathematics_zh_cn",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "measurementHash": "931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3",
+            "runtimeDefinitionHash": "53e935260ed7c4e54e7dbfdc67a8b1f68c4fcc64ec4aa4ebacc6371e90c1c89d",
+            "definitionSourceHash": "8db7d7822006b919e03b33d0543e37f81b79f426",
+            "expectedItems": 3,
+            "timeframeKey": "current_subject_beliefs_no_fixed_recall_v1"
+          },
+          "transformation": {
+            "version": "1.0.0",
+            "kind": "WITHIN_INSTRUMENT_RANGE",
+            "referenceKind": "THEORETICAL_RANGE_NOT_NORM",
+            "min": 1,
+            "max": 6,
+            "orientation": "DIRECT"
+          }
+        },
+        {
+          "constructKey": "math.time_opportunity_cost",
+          "evidenceKey": "c",
+          "label": "数学时间与取舍成本",
+          "contributionGroup": "math.time_opportunity_cost",
+          "weight": 1,
+          "source": {
+            "instrumentKey": "value_cost_mathematics_zh_cn",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "measurementHash": "931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3",
+            "runtimeDefinitionHash": "53e935260ed7c4e54e7dbfdc67a8b1f68c4fcc64ec4aa4ebacc6371e90c1c89d",
+            "definitionSourceHash": "8db7d7822006b919e03b33d0543e37f81b79f426",
+            "expectedItems": 4,
+            "timeframeKey": "current_subject_beliefs_no_fixed_recall_v1"
+          },
+          "transformation": {
+            "version": "1.0.0",
+            "kind": "WITHIN_INSTRUMENT_RANGE",
+            "referenceKind": "THEORETICAL_RANGE_NOT_NORM",
+            "min": 1,
+            "max": 6,
+            "orientation": "DIRECT"
+          }
+        }
+      ],
+      "profiles": [
+        {
+          "id": "P1",
+          "name": "把握与价值较清晰，当前负担较轻",
+          "centers": {
+            "math.academic_self_efficacy": 0.8,
+            "math.importance_utility_value": 0.8,
+            "math.time_opportunity_cost": 0.2
+          },
+          "pattern": {
+            "math.academic_self_efficacy": "HIGH",
+            "math.importance_utility_value": "HIGH",
+            "math.time_opportunity_cost": "LOW"
+          },
+          "supportRefs": [
+            "r01",
+            "r03",
+            "r08",
+            "expert_design"
+          ],
+          "summary": "在三个核心维度上接近“有把握、认为值得、较少报告时间与取舍负担”的理论参照。",
+          "actions": [
+            {
+              "text": "保留一个已经有效的学习习惯，写清它在哪类题上有效。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "每周选一道略有挑战的题，先独立尝试，再核对具体错误。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "一周后核对完成情况与负担，负担上升时调整计划。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P2",
+          "name": "有把握，也觉得负担重",
+          "centers": {
+            "math.academic_self_efficacy": 0.8,
+            "math.importance_utility_value": 0.8,
+            "math.time_opportunity_cost": 0.8
+          },
+          "pattern": {
+            "math.academic_self_efficacy": "HIGH",
+            "math.importance_utility_value": "HIGH",
+            "math.time_opportunity_cost": "HIGH"
+          },
+          "supportRefs": [
+            "r01",
+            "r03",
+            "r08",
+            "expert_design"
+          ],
+          "summary": "学习把握与价值较强，同时报告较高时间与取舍成本。",
+          "actions": [
+            {
+              "text": "把一周数学任务分为必须完成、可以延后、需要求助三类。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "和老师讨论一项可调整的重复任务，保留关键练习。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "记录三次学习的开始时间、结束时间和实际完成内容。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P3",
+          "name": "看重学习，正在建立把握",
+          "centers": {
+            "math.academic_self_efficacy": 0.2,
+            "math.importance_utility_value": 0.8,
+            "math.time_opportunity_cost": 0.2
+          },
+          "pattern": {
+            "math.academic_self_efficacy": "LOW",
+            "math.importance_utility_value": "HIGH",
+            "math.time_opportunity_cost": "LOW"
+          },
+          "supportRefs": [
+            "r01",
+            "r03",
+            "r08",
+            "r02",
+            "r12",
+            "expert_design"
+          ],
+          "summary": "重视数学，但成功把握偏弱；当前时间与取舍负担并不突出。",
+          "actions": [
+            {
+              "text": "选择一个已学过、难度适中的小目标，而不是一次补完全部内容。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "做完后标出一个确实做对的步骤和一个还需帮助的步骤。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "把“我不行”改写成“这一步我还没有掌握”，并向老师提出具体问题。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P4",
+          "name": "看重学习，但把握与负担形成拉扯",
+          "centers": {
+            "math.academic_self_efficacy": 0.2,
+            "math.importance_utility_value": 0.8,
+            "math.time_opportunity_cost": 0.8
+          },
+          "pattern": {
+            "math.academic_self_efficacy": "LOW",
+            "math.importance_utility_value": "HIGH",
+            "math.time_opportunity_cost": "HIGH"
+          },
+          "supportRefs": [
+            "r01",
+            "r03",
+            "r08",
+            "r02",
+            "r12",
+            "expert_design"
+          ],
+          "summary": "认为数学重要、有用，但把握偏弱，且报告较多时间与取舍成本。",
+          "actions": [
+            {
+              "text": "选一个十至十五分钟可开始的小任务，把目标限定到一种题型或一个步骤。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "列出最耗时的一处，带着具体问题求助，必要时与老师调整重复任务。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "连续一周记录“做到了什么、哪里卡住、是否更可承受”，不只记录分数。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P5",
+          "name": "有把握，意义连接仍可探索",
+          "centers": {
+            "math.academic_self_efficacy": 0.8,
+            "math.importance_utility_value": 0.2,
+            "math.time_opportunity_cost": 0.2
+          },
+          "pattern": {
+            "math.academic_self_efficacy": "HIGH",
+            "math.importance_utility_value": "LOW",
+            "math.time_opportunity_cost": "LOW"
+          },
+          "supportRefs": [
+            "r01",
+            "r03",
+            "r08",
+            "r09",
+            "r25",
+            "expert_design"
+          ],
+          "summary": "对学好数学有一定把握，但重要性与用途价值较弱，成本暂不突出。",
+          "actions": [
+            {
+              "text": "从你关心的一件事情出发，找一个数学能解释的小问题。",
+              "supportRefs": [
+                "r09"
+              ]
+            },
+            {
+              "text": "与老师约定一个可选择的应用任务，而不是接受统一的励志理由。",
+              "supportRefs": [
+                "r09"
+              ]
+            },
+            {
+              "text": "一周后问自己：哪一部分确实有用，哪一部分还需要解释？",
+              "supportRefs": [
+                "r09"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P6",
+          "name": "连接与把握都需要支持，负担先被看见",
+          "centers": {
+            "math.academic_self_efficacy": 0.2,
+            "math.importance_utility_value": 0.2,
+            "math.time_opportunity_cost": 0.8
+          },
+          "pattern": {
+            "math.academic_self_efficacy": "LOW",
+            "math.importance_utility_value": "LOW",
+            "math.time_opportunity_cost": "HIGH"
+          },
+          "supportRefs": [
+            "r01",
+            "r03",
+            "r08",
+            "expert_design"
+          ],
+          "summary": "重要性/用途价值与把握均偏弱，同时报告较高时间与取舍成本。",
+          "actions": [
+            {
+              "text": "与一位可信任的老师把最难承受的一项要求具体说清。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "只选择一个现实可行的小目标，并约定可获得的帮助。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            },
+            {
+              "text": "在体验到可做到之后，再探索一个由你认可的学习理由。",
+              "supportRefs": [
+                "r02",
+                "r23",
+                "r24"
+              ]
+            }
+          ]
+        }
+      ],
+      "matching": {
+        "lowMax": 0.35,
+        "highMin": 0.65,
+        "minimumMatchingScore": 75,
+        "minimumMargin": 8,
+        "fuzzyLowPlateauEnd": 0.25,
+        "fuzzyMidpoint": 0.5,
+        "fuzzyHighPlateauStart": 0.75,
+        "coreMissingPolicy": "ABSTAIN",
+        "qualityPolicy": "COMPLETE_INTERPRETABLE_ONLY"
+      },
+      "modifierRuleIds": [],
+      "states": {
+        "MATCHED": "接近一个暂定组合",
+        "MIXED": "接近多个组合，暂不贴单一标签",
+        "BOUNDARY": "处于暂定边界，保留维度解释",
+        "UNCLASSIFIED": "现有原型不能充分概括，暂不分型",
+        "INSUFFICIENT": "核心证据不足，暂不分型",
+        "INVALID": "输入版本或质量不满足解释前提",
+        "NOT_APPLICABLE": "不在本版本适用范围"
+      }
+    }
   }
 ]

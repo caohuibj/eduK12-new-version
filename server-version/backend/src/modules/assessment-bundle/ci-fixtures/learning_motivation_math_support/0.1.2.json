@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "context": {
+    "grade_level": 9
+  },
+  "slots": {
+    "ase": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "LM-01",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "LM-02",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "LM-03",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "LM-04",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "LM-05",
+          "responseValue": "3"
+        }
+      ]
+    },
+    "vc": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "LM-01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "LM-02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "LM-03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "LM-04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "LM-05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "LM-06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "LM-07",
+          "responseValue": "5"
+        }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": []
+}
