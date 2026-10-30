@@ -283,7 +283,7 @@ export async function projectCampusLeafGroupWithPolicy(input:Parameters<typeof p
     product:'HUISCHOOL',scenario:['SCHOOL_GENERAL_EDUCATION_GROUP','SCHOOL_SENSITIVE_WELLBEING_GROUP']})
   let options=ENHANCED
   if(frozen.mode==='FROZEN_V1'){
-    if(frozen.scenario!=='SCHOOL_GENERAL_EDUCATION_GROUP'&&frozen.scenario!=='SCHOOL_SENSITIVE_WELLBEING_GROUP')hidden()
+    if(frozen.scenario!=='SCHOOL_GENERAL_EDUCATION_GROUP'&&frozen.scenario!=='SCHOOL_SENSITIVE_WELLBEING_GROUP')return hidden()
     options=parseFrozenSchoolOptions(frozen.effective,frozen.scenario)
   }
   const report=projectCampusLeafGroupReport(input,leaf)
