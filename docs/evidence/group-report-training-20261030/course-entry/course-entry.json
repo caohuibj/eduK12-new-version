@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "syntheticBackendAndOwner": true,
+  "actualCoursePageRouterTabsAndFlags": true,
+  "url": "http://127.0.0.1:33827/courses/course/detail?section=analysis",
+  "calls": [
+    {
+      "method": "GET",
+      "path": "/api/courses/course"
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/course/training-assessments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/course"
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/course/training-group-reports"
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/course/training-group-reports/task/old"
+    }
+  ],
+  "checks": [
+    "actual course assessment tab to group report",
+    "direct analysis URL after reload",
+    "snapshot read",
+    "old multi-wave entry remains closed",
+    "no page errors"
+  ]
+}

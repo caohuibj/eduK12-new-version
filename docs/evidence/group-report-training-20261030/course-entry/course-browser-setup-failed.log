@@ -1,0 +1,30 @@
+/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:2127
+    if (plugins && plugins.length > 0) throw fakeBuildError(`Cannot use plugins in synchronous API calls`);
+                                       ^
+
+Error: Build failed with 1 error:
+error: Cannot use plugins in synchronous API calls
+    at fakeBuildError (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:2117:17)
+    at validateBuildSyncOptions (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:2127:46)
+    at Object.buildSync (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:2153:7)
+    at Object.buildSync (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:1884:32)
+    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/e2e/training-group-report-browser.cjs:8:9)
+    at Module._compile (node:internal/modules/cjs/loader:1929:14)
+    at Object..js (node:internal/modules/cjs/loader:2060:10)
+    at Module.load (node:internal/modules/cjs/loader:1651:32)
+    at Module._load (node:internal/modules/cjs/loader:1443:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19) {
+  errors: [
+    {
+      id: '',
+      pluginName: '',
+      text: 'Cannot use plugins in synchronous API calls',
+      location: null,
+      notes: [],
+      detail: undefined
+    }
+  ],
+  warnings: []
+}
+
+Node.js v24.21.0

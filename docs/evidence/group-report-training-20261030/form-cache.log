@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/training-analysis/source.test.ts (88 tests | 84 skipped) 63ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed | 84 skipped (88)
+   Start at  07:12:54
+   Duration  4.49s (transform 3.14s, setup 0ms, import 4.31s, tests 63ms, environment 0ms)
+
+JSON report written to /tmp/training-group-form-cache.json
