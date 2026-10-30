@@ -35,3 +35,8 @@ test('shallow product fetch covers both native PR branches and their exact main 
  assert(!selected({event_name:'pull_request',event:{pull_request:{head:{ref:'unrelated'}}}}));
  assert(block.includes("'--depth=1','origin',b.productHead"));
 });
+test('package Chrome diagnostics run in existing admission before producers and survive a preflight rejection',()=>{
+ const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8'),admission=workflow.split('  frontend:')[0],browser=readFileSync(new URL('../../server-version/e2e/school-teacher-package-browser.cjs',import.meta.url),'utf8');
+ assert(admission.includes('node server-version/e2e/school-teacher-chrome.cjs preflight'));assert(admission.includes('if: fromJSON(inputs.plan).publicPackage == true'));assert(admission.includes('if: always()'));
+ assert(browser.indexOf("report.error='CHROME_PREFLIGHT_REJECTED'")<browser.indexOf('assert(preflight.ok'));assert(browser.indexOf("report.preflight=preflight")<browser.indexOf('assert(preflight.ok'));
+});

@@ -32,6 +32,11 @@ jobs:
           node-version: '24.21.0'
       - name: authenticate frozen scope and all configured source inputs
         run: node .github/scripts/school-teacher-checks.mjs admission
+      - name: inspect existing Chrome before any package producer or runtime scan
+        if: fromJSON(inputs.plan).publicPackage == true
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node server-version/e2e/school-teacher-chrome.cjs preflight
       - name: verify legacy candidate control contracts
         if: fromJSON(inputs.plan).candidate != 'education-self' && fromJSON(inputs.plan).candidate != 'native-bundle'
         run: |

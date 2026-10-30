@@ -8,7 +8,9 @@ const pause=ms=>new Promise(r=>setTimeout(r,ms));
  assert.equal(process.env.GITHUB_ACTIONS,'true');const plan=JSON.parse(process.env.PLAN);assert.equal(plan.publicPackage,true);
  const {chromium}=require(path.join(root,'.github/release-tools/node_modules/playwright-core'));
  const {preflightChrome,verifyChromeSandbox,CHROME_LAUNCH_OPTIONS}=require('./school-teacher-chrome.cjs');
- const preflight=preflightChrome({repo:root,diagnostics:true});assert(preflight.ok,'Existing official Chrome sandbox preflight failed; no security changes permitted');
+ const preflight=preflightChrome({repo:root,diagnostics:true});report.preflight=preflight;
+ if(!preflight.ok){report.status='FAILED';report.error='CHROME_PREFLIGHT_REJECTED';fs.writeFileSync(path.join(out,'package-browser.json'),JSON.stringify(report,null,2));}
+ assert(preflight.ok,'Existing official Chrome sandbox preflight failed; no security changes permitted');
  const runtime=JSON.parse(fs.readFileSync(path.join(out,'native-runtime.json')));assert.equal(runtime.head,process.env.GITHUB_SHA);assert.equal(runtime.runId,process.env.GITHUB_RUN_ID);
  const backend=runtime.results.find(r=>r.component==='backend');assert(backend);assert.equal(backend.context.tree,plan.components.backend);
  const suffix=process.env.GITHUB_RUN_ID+'-'+process.env.GITHUB_RUN_ATTEMPT,network='p6-browser-'+suffix,pg=network+'-pg',app=network+'-app';let browser,networkCreated=false,pgCreated=false,appCreated=false;

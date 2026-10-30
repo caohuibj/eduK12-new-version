@@ -198,7 +198,7 @@
     },
     ".github/scripts/school-teacher-package.test.mjs": {
       "before": null,
-      "after": "4da44e270c29374fdccbb57275e4c56709b180ca"
+      "after": "9428d35dd145cf1e22026c4d93054d8abd48be1f"
     },
     ".github/scripts/school-teacher-scope.mjs": {
       "before": "0f553bba6766571834830ea8af05371e54fb4d90",
@@ -206,7 +206,7 @@
     },
     ".github/workflows/ci-school-teacher.yml": {
       "before": "d778bf7cbbe8e922d3ea03bc7a5a87e40f7b09c4",
-      "after": "1f4051244efb6b61cd6085d85593dbc52303382c"
+      "after": "4d19f01a83979c9de4e593154448704ecddb9bd0"
     },
     ".github/workflows/ci.yml": {
       "before": "6b80b453ac51601dab0eee3392adb9d40bb47148",
@@ -214,7 +214,7 @@
     },
     "server-version/e2e/school-teacher-package-browser.cjs": {
       "before": null,
-      "after": "2769491add3220deab1565dea972c9ff93ae0a66"
+      "after": "6df0ea6714de2f5574b0d3cccee501e30b8577e0"
     },
     "server-version/e2e/school-teacher-package-fixture.cjs": {
       "before": null,
