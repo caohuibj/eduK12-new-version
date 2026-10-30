@@ -22,7 +22,7 @@ type RunPreview={runId:string;version:number;tracks:Array<{trackId:string;execut
 type PreviewSnapshot={data:RunPreview;base:string;api:Api;actorKey:string;eventVersion:number;eventStatus:string}
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
 type TeacherScale={id:string;key:string;version:string;title:string;hash:string;
-  visibilityPolicyKey?:string;personalReportAvailable?:boolean}
+  visibilityPolicyKey?:string;personalReportAvailable?:boolean;analysisMode?:string;minimumRespondents?:number|null}
 type Progress={runId:string;total:number;counts:Record<string,number>}
 const targetLabels:Record<string,string>={
   PERSON:'教师或学校人员',TEAM:'教研组／管理团队',ORGANIZATION:'学校',
@@ -212,7 +212,8 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     if(!selected)throw new Error('请选择拥有学校授权的正式教师自评 Scale')
     const library=selected.key.startsWith('library-scale:')
     const visibilityPolicyKey=selected.visibilityPolicyKey??(library?null:'HUITEACHER_ADULT_SELF_PILOT_V1')
-    if(visibilityPolicyKey!==(library?'EDUCATION_LIBRARY_APPROVED_CONTENT_V1':'HUITEACHER_ADULT_SELF_PILOT_V1'))
+    const group=selected.analysisMode==='COHORT_AGGREGATE'&&visibilityPolicyKey==='EDUCATION_SELF_GROUP_V2'
+    if(!group&&visibilityPolicyKey!==(library?'EDUCATION_LIBRARY_APPROVED_CONTENT_V1':'HUITEACHER_ADULT_SELF_PILOT_V1'))
       throw new Error('量表报告策略缺失或不受支持，请重新读取授权目录。')
     const run=runMap[event.id]??await fetchRun(event)
     if(run.status!=='DRAFT')throw new Error('只允许对草稿任务增配 Scale')
@@ -223,9 +224,9 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
       requestedPolicy:{
         subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],
         relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
-        analysisMode:'INDIVIDUAL_ONLY',
+        analysisMode:group?'COHORT_AGGREGATE':'INDIVIDUAL_ONLY',
         visibilityPolicyKey,
-        minimumRespondents:null,
+        minimumRespondents:group?selected.minimumRespondents:null,
       },
     })
     await fetchRun(event)

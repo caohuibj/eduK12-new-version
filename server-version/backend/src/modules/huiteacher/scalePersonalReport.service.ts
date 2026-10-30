@@ -5,6 +5,8 @@ import { resolveEducationProductMemberScope } from '../organization/educationPro
 import { hashScaleDefinition,validateScaleDefinition } from '../scale/scale-definition'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
 import { teacherPilotContentIssues } from './teacherPilotContent'
+import {resolveAuthoritativeTrackObservations} from '../reporting/resultSource'
+import {canonicalHash} from '../assessment-runtime/canonical'
 
 export class TeacherScaleReportError extends Error{
   constructor(public readonly code:string,public readonly statusCode=404){
@@ -23,13 +25,14 @@ export async function readTeacherPersonalScaleReport(input:{
   const libraryReport = await readEducationRespondentScaleReport({ ...input, product: 'TEACHER' })
   if (libraryReport) return libraryReport
   const records=await prisma.$queryRaw<Array<{
-    organizationId:string;resourceKey:string;resourceVersion:string;
+    organizationId:string;resourceKey:string;resourceVersion:string;runId:string;trackId:string;
     definitionHash:string;scaleDefinition:unknown;title:string;
     sourceStatus:string;scaleStatus:string
   }>>`
     SELECT execution."organization_id" AS "organizationId",
       track."resource_key" AS "resourceKey",
       track."resource_version" AS "resourceVersion",
+      track."run_id" AS "runId",track."id" AS "trackId",
       resource."definition_hash" AS "definitionHash",
       scale."definition" AS "scaleDefinition",scale."name" AS "title",
       resource."status" AS "sourceStatus",scale."status" AS "scaleStatus"
@@ -43,7 +46,7 @@ export async function readTeacherPersonalScaleReport(input:{
       AND track."run_id"=execution."run_id"
       AND track."id"=execution."track_id"
       AND track."resource_family"='SCALE'
-      AND track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+      AND (track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL' OR track."resource_key" LIKE 'teacher-scale:%:GROUP')
     JOIN "registered_assessment_resources" resource
       ON resource."resource_key"=track."resource_key"
       AND resource."resource_version"=track."resource_version"
@@ -92,12 +95,28 @@ export async function readTeacherPersonalScaleReport(input:{
     denied()
   // This calls current population & respondent authority again and refuses
   // School data, unrecognized sources, and organization-facing projections.
-  const current=await readRespondentRunSummary(input.actorUserId,input.executionId)
+  const group=record.resourceKey.endsWith(':GROUP')
+  const current=group?await readRespondentRunSummary(input.actorUserId,input.executionId,{disclosureOnly:true})
+    :await readRespondentRunSummary(input.actorUserId,input.executionId)
   if(current.mode!=='INDIVIDUAL_SUMMARY'||current.state!=='READY')
     return {kind:'HUITEACHER_PERSONAL_DESCRIPTION' as const,
       state:'WITHHELD' as const,mode:current.mode}
-  const projection=('metrics' in current && current.metrics
+  let projection:Record<string,unknown>=('metrics' in current && current.metrics
     &&typeof current.metrics==='object')?current.metrics:{}
+  if(group){
+    // This existing dedicated reader has verified one original Teacher Scale,
+    // its frozen definition and the actual same-person completed execution.
+    // Original descriptive Scale feedback is immediate; native C/P/R and
+    // scheduled education reports retain their separate dedicated reader.
+    const allowed='metricKeys' in current?new Set(current.metricKeys):new Set<string>()
+    const batch=await resolveAuthoritativeTrackObservations({organizationId:record.organizationId,runId:record.runId,trackId:record.trackId,
+      selection:{subjectUserId:input.actorUserId,relationshipKind:'SELF',perspective:'SELF_REPORT'}})
+    const own=batch.resolved.find(row=>row.executionId===input.executionId&&row.respondent.userId===input.actorUserId)
+    if(!own)denied()
+    projection=Object.fromEntries(own.metrics.filter(metric=>allowed.has(metric.key)&&metric.resultQuality!=='invalid').map(metric=>[metric.key,metric.value]))
+    const latest=await readRespondentRunSummary(input.actorUserId,input.executionId,{disclosureOnly:true})
+    if(canonicalHash(latest)!==canonicalHash(current))denied()
+  }
   const metrics=Object.entries(projection).map(([key,value])=>{
     const score=def.scoring.scores.find(s=>s.key===key)
     if(!score)denied()

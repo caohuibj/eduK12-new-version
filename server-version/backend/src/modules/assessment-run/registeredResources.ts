@@ -1,3 +1,5 @@
+import {SELF_GROUP_POLICY_KEY,buildSelfGroupCohortAnalysisPolicy,assertSelfGroupOwnSummaryCeiling} from '../assessment-policy/self-group-contract'
+import {teacherResourceMinimum} from '../huiteacher/privacyV2'
 import {readEducationRunLibraryContext,assertEducationRunLibraryResources} from './educationLibraryContext'
 import {readEducationLibraryRegisteredSource} from '../scale-library-governance/education-runtime-resources'
 import {educationLibraryResourceProduct} from '../scale-library-governance/education-runtime-entry'
@@ -34,10 +36,10 @@ export function validateDescriptiveResourceScale(scale: { status: string; instru
   return definition
 }
 
-export function descriptiveResourceEntry(input: { scaleId: string; name: string; definition: ScaleDefinitionV2; definitionHash: string; compositeId: string; version: string; mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' }): RelationalProductEntryV1 {
-  const isTeacher = input.mode === 'TEACHER_INDIVIDUAL'
-  const isIndividual = input.mode !== 'GROUP'
-  const key = isTeacher ? `teacher-scale:${input.scaleId}:INDIVIDUAL` : `custom-scale:${input.scaleId}:${input.mode}`
+export function descriptiveResourceEntry(input: { scaleId: string; name: string; definition: ScaleDefinitionV2; definitionHash: string; compositeId: string; version: string; mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' | 'TEACHER_GROUP' }): RelationalProductEntryV1 {
+  const isTeacher = input.mode === 'TEACHER_INDIVIDUAL' || input.mode === 'TEACHER_GROUP'
+  const isIndividual = input.mode !== 'GROUP' && input.mode !== 'TEACHER_GROUP'
+  const key = isTeacher ? `teacher-scale:${input.scaleId}:${isIndividual?'INDIVIDUAL':'GROUP'}` : `custom-scale:${input.scaleId}:${input.mode}`
   const metricKeys = input.definition.scoring.scores.map(score => score.key)
   const individual = { mode: 'INDIVIDUAL_SUMMARY' as const, metricKeys, longitudinalMetricKeys: input.definition.report.audienceContract?.longitudinalMetricKeys ?? metricKeys }
   const none = { mode: 'NONE' as const, metricKeys: [], longitudinalMetricKeys: [] }
@@ -54,6 +56,17 @@ export function descriptiveResourceEntry(input: { scaleId: string; name: string;
         RESPONDENT: { mode: 'AGGREGATE_ONLY', metricKeys, longitudinalMetricKeys: [] }, SUBJECT: { mode: 'AGGREGATE_ONLY', metricKeys, longitudinalMetricKeys: [] },
         TEACHER: { mode: 'CLASS_AGGREGATE', metricKeys, longitudinalMetricKeys: [] }, PROFESSIONAL: { mode: 'ORGANIZATION_AGGREGATE', metricKeys, longitudinalMetricKeys: [] },
         ORGANIZATION: { mode: 'ORGANIZATION_AGGREGATE', metricKeys, longitudinalMetricKeys: [] }, PARENT: none, RESEARCH: none } },
+  }
+  if(input.mode==='TEACHER_GROUP'){
+    const minimumRespondents=teacherResourceMinimum()
+    const approved=descriptiveResourceEntry({...input,mode:'TEACHER_INDIVIDUAL'}).resultDisclosure!
+    entry.title=`${input.name}（教师群体汇总与本人自评）`
+    entry.subjectReportMode='INDIVIDUAL_SUMMARY'
+    entry.resultDisclosure={...approved,policyKey:SELF_GROUP_POLICY_KEY,minimumRespondents,
+      audiences:{...approved.audiences,ORGANIZATION:{mode:'AGGREGATE_ONLY',metricKeys,longitudinalMetricKeys:[]}}}
+    entry.applicability={...entry.applicability,visibilityPolicyKey:SELF_GROUP_POLICY_KEY,minimumRespondents}
+    entry.cohortAnalysisPolicy=buildSelfGroupCohortAnalysisPolicy(entry.resultDisclosure)
+    assertSelfGroupOwnSummaryCeiling({approved,proposed:entry.resultDisclosure})
   }
   // Reuse the production applicability/disclosure validator; no client policy JSON.
   createRelationalProductRegistry([entry])
@@ -74,7 +87,7 @@ const checkedEntry = (row: Row): RelationalProductEntryV1 => {
   return row.entry
 }
 
-export async function registerDescriptiveResource(actor: Actor, scaleId: string, mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' = 'INDIVIDUAL') {
+export async function registerDescriptiveResource(actor: Actor, scaleId: string, mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' | 'TEACHER_GROUP' = 'INDIVIDUAL') {
   admin(actor)
   return prisma.$transaction(async tx => {
     await tx.$queryRaw`SELECT id FROM scales WHERE id=${scaleId} FOR UPDATE`
@@ -82,13 +95,13 @@ export async function registerDescriptiveResource(actor: Actor, scaleId: string,
     if (!scale) return reportingFail('RESOURCE_NOT_FOUND', '量表不存在', 404)
     if (scale.code?.startsWith('education-private-scale:')) return reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED', '作者私有量表不能转为旧注册资源', 409)
     if (scale.libraryEntryId) return reportingFail('RESOURCE_LIBRARY_LANE_REQUIRED', '共用库量表须使用其固定版本入口，不能转为旧注册资源', 409)
-    const isTeacher=mode==='TEACHER_INDIVIDUAL'
+    const isTeacher=mode==='TEACHER_INDIVIDUAL'||mode==='TEACHER_GROUP'
     const definition=validateDescriptiveResourceScale(scale,
       isTeacher?'teacher_self_report':'participant_self_report')
     if(isTeacher && definition.items.some(x=>Boolean(x.images)||Boolean(x.video)))
       reportingFail('RESOURCE_MEDIA_BRIDGE_NOT_RELEASED','教师版量表暂不支持没有独立跨域授权的图片或视频',409)
     const hash = hashScaleDefinition(definition)
-    const key = isTeacher?`teacher-scale:${scale.id}:INDIVIDUAL`:`custom-scale:${scale.id}:${mode}`
+    const key = isTeacher?`teacher-scale:${scale.id}:${mode==='TEACHER_GROUP'?'GROUP':'INDIVIDUAL'}`:`custom-scale:${scale.id}:${mode}`
     const existing = await tx.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE resource_key=${key} AND definition_hash=${hash} ORDER BY created_at DESC,id DESC`
     if (existing[0]) {
       const prior = existing[0]; checkedEntry(prior)
