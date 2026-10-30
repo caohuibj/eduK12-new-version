@@ -151,6 +151,7 @@ export interface ReportingCohortSnapshotPayloadV1 {
 
 export type ReportingCohortClauseV2 =
   | { kind: 'CLASS_UNITS'; classUnitIds: string[] }
+  | { kind: 'STAFF_CLASS_UNITS'; classUnitIds: string[] }
   | { kind: 'LABELS'; labelIds: string[]; match: 'ANY' | 'ALL' }
   | { kind: 'MEMBERSHIP_IDS'; membershipIds: string[] }
 
@@ -201,6 +202,7 @@ export interface ReportingSeriesRecordV1 {
 }
 
 export interface ReportingResolvedMetricV1 {
+  unit?: string
   scaleReference?: ScaleReferenceIdentityV1
   key: string
   value: unknown
@@ -461,8 +463,26 @@ export interface ReportingProtectedArtifactPayloadV1 {
   fixedPopulationDisclosure?: { schemaVersion: 1; complete: boolean }
 }
 
+/** A leaf is selected before metric extraction; equal keys in other slots are unrelated. */
+export interface ReportingLeafSourceV2 {
+  slotKey: string
+  unitType: 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'
+  instrumentKey: string
+  instrumentVersion: string
+  compiledRuntimeHash: string
+}
+export interface ReportingGroupArtifactPayloadV2 extends Omit<ReportingGroupArtifactPayloadV1, 'schemaVersion' | 'source'> {
+  schemaVersion: 2
+  source: ReportingGroupArtifactPayloadV1['source'] & { leaf: ReportingLeafSourceV2 }
+  metricMetadata: Record<string, { unit: string | null; minimumN: number }>
+  descriptionVersion: 'group-descriptive-v1'
+  presentation?: { sourceLabel: string; populationLabel: string }
+}
+export type ReportingGroupArtifactPayload = ReportingGroupArtifactPayloadV1 | ReportingGroupArtifactPayloadV2
+
 export type ReportingArtifactPayloadV1 =
   | ReportingGroupArtifactPayloadV1
+  | ReportingGroupArtifactPayloadV2
   | ReportingLongitudinalArtifactPayloadV1
   | ReportingProtectedArtifactPayloadV1
   | ReportingIndividualArtifactPayloadV1
@@ -486,7 +506,7 @@ export interface ReportingGroupArtifactRecord extends ReportingArtifactRecordBas
   subjectActorSnapshotId: null
   relationshipKind: null
   perspective: null
-  artifactPayload: ReportingGroupArtifactPayloadV1
+  artifactPayload: ReportingGroupArtifactPayload
 }
 export interface ReportingLongitudinalArtifactRecord extends ReportingArtifactRecordBase {
   analysisKind: 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'

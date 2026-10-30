@@ -11,6 +11,7 @@ export const cohortSelectorSchema = z.object({
   schemaVersion: z.literal(2),
   clauses: z.array(z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('CLASS_UNITS'), classUnitIds: ids }).strict(),
+    z.object({ kind: z.literal('STAFF_CLASS_UNITS'), classUnitIds: ids }).strict(),
     z.object({ kind: z.literal('LABELS'), labelIds: ids, match: z.enum(['ANY', 'ALL']) }).strict(),
     z.object({ kind: z.literal('MEMBERSHIP_IDS'), membershipIds: ids }).strict(),
   ])).max(30),
@@ -18,7 +19,7 @@ export const cohortSelectorSchema = z.object({
 }).strict().superRefine((value, ctx) => {
   const references = value.clauses.reduce((total, clause) => total + (
     clause.kind === 'LABELS' ? clause.labelIds.length
-      : clause.kind === 'CLASS_UNITS' ? clause.classUnitIds.length
+      : clause.kind === 'CLASS_UNITS' || clause.kind === 'STAFF_CLASS_UNITS' ? clause.classUnitIds.length
         : clause.membershipIds.length
   ), 0)
   if (references > MAX_COHORT_SELECTOR_REFERENCES) {
@@ -36,7 +37,7 @@ export function normalizeCohortSelector(value: unknown): ReportingCohortSelector
   const unique = (values: string[]) => [...new Set(values)].sort()
   const clauses = parsed.data.clauses.map(c => c.kind === 'LABELS'
     ? { ...c, labelIds: unique(c.labelIds) }
-    : c.kind === 'CLASS_UNITS' ? { ...c, classUnitIds: unique(c.classUnitIds) }
+    : c.kind === 'CLASS_UNITS' || c.kind === 'STAFF_CLASS_UNITS' ? { ...c, classUnitIds: unique(c.classUnitIds) }
       : { ...c, membershipIds: unique(c.membershipIds) })
   return {
     schemaVersion: 2,
@@ -49,7 +50,7 @@ export function normalizeCohortSelector(value: unknown): ReportingCohortSelector
 
 const selectorReferences = (selector: ReportingCohortSelectorInputV2) => ({
   labelIds: [...new Set(selector.clauses.flatMap(c => c.kind === 'LABELS' ? c.labelIds : []))],
-  classIds: [...new Set(selector.clauses.flatMap(c => c.kind === 'CLASS_UNITS' ? c.classUnitIds : []))],
+  classIds: [...new Set(selector.clauses.flatMap(c => c.kind === 'CLASS_UNITS' || c.kind === 'STAFF_CLASS_UNITS' ? c.classUnitIds : []))],
   memberIds: [...new Set(selector.clauses.flatMap(c => c.kind === 'MEMBERSHIP_IDS' ? c.membershipIds : []))],
 })
 
@@ -83,6 +84,16 @@ export async function historicalCohortMembershipPredicate(input: {
   const predicates = input.selector.clauses.map((clause) => {
     if (clause.kind === 'MEMBERSHIP_IDS') {
       return Prisma.sql`${input.membershipIdSql} = ANY(${clause.membershipIds}::text[])`
+    }
+    if (clause.kind === 'STAFF_CLASS_UNITS') {
+      return Prisma.sql`EXISTS (
+        SELECT 1 FROM organization_staff_class_assignments staff_assignment
+        WHERE staff_assignment.organization_id=${input.organizationId}
+          AND staff_assignment.membership_id=${input.membershipIdSql}
+          AND staff_assignment.class_unit_id = ANY(${clause.classUnitIds}::text[])
+          AND staff_assignment.valid_from <= ${input.at}
+          AND (staff_assignment.valid_until IS NULL OR staff_assignment.valid_until > ${input.at})
+      )`
     }
     if (clause.kind === 'CLASS_UNITS') {
       return Prisma.sql`EXISTS (

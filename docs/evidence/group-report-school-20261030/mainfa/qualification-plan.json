@@ -1,0 +1,52 @@
+{
+  "status": "PREPARED_NOT_ACTIVATED",
+  "pr": 414,
+  "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+  "productCheckpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+  "branch": "feat/group-report-school-teacher-20261030",
+  "components": {
+    "backend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+    "frontend": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8"
+  },
+  "completeProductDiff": {
+    "path": "docs/evidence/group-report-school-20261030/mainfa/source-diff.raw",
+    "format": "git diff --raw --no-abbrev --no-renames -z base productCheckpoint; final metadata/control inventory separately bound by existing candidate config",
+    "sha256": "f91bfc34aa4ca246555f804bc2c9a41ddd5ccedda5d071809274cca151469d44"
+  },
+  "scope": "Existing School single selected Scale/Cognitive/SJT leaf and one-dimension subgroup, V2 snapshot/read/print; existing authorization, enrollment histories, floor and differencing retained",
+  "schemaTree": {
+    "base": "ba21974eef50397589e9fec671eab73d188dffba",
+    "candidate": "ba21974eef50397589e9fec671eab73d188dffba"
+  },
+  "intendedExistingRoute": "onboarding-structure reviewed original local receipts + exact source/control CodeQL + existing merge gate; no new workflow or local application replay",
+  "selectedJobs": [
+    "scope",
+    "reviewed onboarding evidence admission",
+    "CodeQL (javascript-typescript)",
+    "merge gate / ready PR"
+  ],
+  "activationWorkStillRequired": [
+    "Finish exact final candidate configuration verification on mainfa; candidate stays disabled until reviewed.",
+    "Read designated CI checklist and verify actual live PR base/source/merge identity before activation. No new workflow or platform fallback."
+  ],
+  "checksNotToReplay": [
+    "39 distinct unit/mockHTTP +2 retained PG; original37 not replayed, only2 new source-discovery cases executed.",
+    "Actual School browser/navigation/print outputs; synthetic authentication/API attribution stays visible.",
+    "No schema delta: no new migration, dump/restore or platform scientific regression.",
+    "Original Training175 and Survey81 remain outside the new candidate test scope."
+  ],
+  "budget": {
+    "scopeAndAdmissionMinutes": 5,
+    "codeqlMaximumMinutes": 30,
+    "applicationReexecution": false
+  },
+  "constraints": [
+    "Old no-leaf V1 has no frozen leaf identity; retain documented limitation without unrelated migration.",
+    "School Form and broader source adapters are not claimed.",
+    "No Ready transition, formalCI, merge or deployment in this preparation."
+  ],
+  "ciExecuted": false,
+  "deployed": false,
+  "productionAccessed": false,
+  "previousProductCheckpoint": "199d2807fd634e6fa54fd09163233d4722fd9778"
+}
