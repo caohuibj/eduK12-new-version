@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "key": "teacher_jdr_workplace_zh_cn",
+  "version": "0.1.0",
+  "mappingVersion": "0.1.0",
+  "templateVersion": "0.1.0",
+  "algorithm": "weighted-l1-guarded-v1",
+  "maturity": "EXPERIMENTAL",
+  "sourceArchiveHash": "7b19ab153a6a6c056c72c5c94c205caf8e7e1168d42f4cc2d0628cf0d07f6b54",
+  "applicability": {
+    "domain": "teacher_workplace",
+    "kind": "ADULT_TEACHER",
+    "adultEvidenceKey": "adult",
+    "teacherEvidenceKey": "teaching"
+  },
+  "bindings": [
+    {
+      "constructKey": "workplace.demands",
+      "evidenceKey": "demands",
+      "label": "工作要求条件（原工具高分较有利）",
+      "contributionGroup": "workplace.demands",
+      "weight": 3,
+      "source": {
+        "instrumentKey": "hse_demands_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "subjectKey": "hse_msit_demands",
+        "measurementHash": "22aad4a1147e3e039efe127926439dec4cf2995e4270e0451beaf8e4397f6105",
+        "runtimeDefinitionHash": "e8c90664af81c36b2779e95b1f42a45a8d7bb189dd526f2688968bcb75a657e9",
+        "definitionSourceHash": "2631ff43fcb434efff589b70d5c3a3a5a73aac8d",
+        "expectedItems": 8,
+        "timeframeKey": "previous_six_months"
+      },
+      "transformation": {
+        "version": "0.1.0",
+        "kind": "WITHIN_INSTRUMENT_RANGE",
+        "referenceKind": "THEORETICAL_RANGE_NOT_NORM",
+        "min": 1,
+        "max": 5,
+        "orientation": "REFLECT"
+      }
+    },
+    {
+      "constructKey": "workplace.control",
+      "evidenceKey": "control",
+      "label": "工作自主性（高分资源较多）",
+      "contributionGroup": "workplace.control",
+      "weight": 1,
+      "source": {
+        "instrumentKey": "hse_control_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "subjectKey": "hse_msit_control",
+        "measurementHash": "6931227d68658b47e7c46c17c93f3d650dd4bbd3b99b0ec2cdf9802b4c8e29c5",
+        "runtimeDefinitionHash": "ef896acc5727b6d6a98802bc4b1b8917d8b3010ac74cae78d05a2b2e0c71c6ed",
+        "definitionSourceHash": "60ecd37d7c36b8f414bc94bde990c0465d95e205",
+        "expectedItems": 6,
+        "timeframeKey": "previous_six_months"
+      },
+      "transformation": {
+        "version": "0.1.0",
+        "kind": "WITHIN_INSTRUMENT_RANGE",
+        "referenceKind": "THEORETICAL_RANGE_NOT_NORM",
+        "min": 1,
+        "max": 5,
+        "orientation": "DIRECT"
+      }
+    },
+    {
+      "constructKey": "workplace.managerial_support",
+      "evidenceKey": "manager",
+      "label": "管理支持（高分资源较多）",
+      "contributionGroup": "workplace.managerial_support",
+      "weight": 1,
+      "source": {
+        "instrumentKey": "hse_managerial_support_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "subjectKey": "hse_msit_managerial_support",
+        "measurementHash": "8fdd163d9418ad18b093ff4be98409f52f62d16b034422a9d88b20b6f6589418",
+        "runtimeDefinitionHash": "b8ba40ed07cbd6b022b8f7639ddb09fa7b157a09f603cfa1f24ac55e95d29d65",
+        "definitionSourceHash": "a1f5d00643a4fa2404966a216fcb2ea82b840af1",
+        "expectedItems": 5,
+        "timeframeKey": "previous_six_months"
+      },
+      "transformation": {
+        "version": "0.1.0",
+        "kind": "WITHIN_INSTRUMENT_RANGE",
+        "referenceKind": "THEORETICAL_RANGE_NOT_NORM",
+        "min": 1,
+        "max": 5,
+        "orientation": "DIRECT"
+      }
+    },
+    {
+      "constructKey": "workplace.peer_support",
+      "evidenceKey": "peer",
+      "label": "同事支持（高分资源较多）",
+      "contributionGroup": "workplace.peer_support",
+      "weight": 1,
+      "source": {
+        "instrumentKey": "hse_peer_support_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "subjectKey": "hse_msit_peer_support",
+        "measurementHash": "fe14b3a4beb2c7a7bc710e1e916b128f2aed945833dd7ad6399eebb96cdc2ad3",
+        "runtimeDefinitionHash": "11ab137e5a2851a777237206f403f760dea239f471896670bc71ef36e9b8755b",
+        "definitionSourceHash": "dd38ac7c0c9ea3f5bb661309b6ec6288f855e79a",
+        "expectedItems": 4,
+        "timeframeKey": "previous_six_months"
+      },
+      "transformation": {
+        "version": "0.1.0",
+        "kind": "WITHIN_INSTRUMENT_RANGE",
+        "referenceKind": "THEORETICAL_RANGE_NOT_NORM",
+        "min": 1,
+        "max": 5,
+        "orientation": "DIRECT"
+      }
+    }
+  ],
+  "profiles": [
+    {
+      "id": "J1",
+      "name": "要求较少、资源较多",
+      "centers": {
+        "workplace.demands": 0.25,
+        "workplace.control": 0.75,
+        "workplace.managerial_support": 0.75,
+        "workplace.peer_support": 0.75
+      },
+      "pattern": {
+        "workplace.demands": "LOW",
+        "workplace.control": "HIGH",
+        "workplace.managerial_support": "HIGH",
+        "workplace.peer_support": "HIGH"
+      },
+      "supportRefs": [
+        "jdr_theory",
+        "project_design"
+      ],
+      "summary": "从这次回答看，您近六个月的工作量和节奏带来较少要求，同时感受到的工作自主性、管理支持和同事支持整体较多。这是对本次工作条件的理论描述，不是对教学能力或个人价值的评价。",
+      "actions": [
+        {
+          "text": "个人层面：保留一项目前有效的工作安排，并留意它是否仍为您留下休息与恢复的空间。",
+          "supportRefs": [
+            "jdr_theory",
+            "project_design"
+          ]
+        },
+        {
+          "text": "组织层面：可与负责人讨论如何保留已有的自主安排和协作方式，并共同检查分工是否可持续。",
+          "supportRefs": [
+            "jdr_theory",
+            "project_design"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "J2",
+      "name": "要求较多、资源较多",
+      "centers": {
+        "workplace.demands": 0.75,
+        "workplace.control": 0.75,
+        "workplace.managerial_support": 0.75,
+        "workplace.peer_support": 0.75
+      },
+      "pattern": {
+        "workplace.demands": "HIGH",
+        "workplace.control": "HIGH",
+        "workplace.managerial_support": "HIGH",
+        "workplace.peer_support": "HIGH"
+      },
+      "supportRefs": [
+        "jdr_theory",
+        "project_design"
+      ],
+      "summary": "从这次回答看，您近六个月的工作量和节奏带来较多要求，同时感受到的工作自主性、管理支持和同事支持整体较多。资源值得保留，但它们不意味着繁重的任务会自动消失。这是对本次工作条件的理论描述，不是对教学能力或个人价值的评价。",
+      "actions": [
+        {
+          "text": "个人层面：挑一项近期最耗时的重复任务，记录可协调或合并的环节，向合适的同事或负责人提出具体需要。",
+          "supportRefs": [
+            "jdr_theory",
+            "project_design"
+          ]
+        },
+        {
+          "text": "组织层面：可与负责人讨论一项可调整的期限、流程或分工；已有支持不意味着繁重任务会自动消失。",
+          "supportRefs": [
+            "jdr_theory",
+            "project_design"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "J3",
+      "name": "要求较少、资源较少",
+      "centers": {
+        "workplace.demands": 0.25,
+        "workplace.control": 0.25,
+        "workplace.managerial_support": 0.25,
+        "workplace.peer_support": 0.25
+      },
+      "pattern": {
+        "workplace.demands": "LOW",
+        "workplace.control": "LOW",
+        "workplace.managerial_support": "LOW",
+        "workplace.peer_support": "LOW"
+      },
+      "supportRefs": [
+        "jdr_theory",
+        "project_design"
+      ],
+      "summary": "从这次回答看，您近六个月的工作量和节奏带来较少要求，同时感受到的工作自主性、管理支持和同事支持整体较少。这是对本次工作条件的理论描述，不是对教学能力或个人价值的评价。",
+      "actions": [
+        {
+          "text": "个人层面：选择一个最希望改善的工作环节，写下您需要的具体支持；资源较少并不说明您做得不够好。",
+          "supportRefs": [
+            "jdr_theory",
+            "project_design"
+          ]
+        },
+        {
+          "text": "组织层面：可与负责人讨论怎样让一项求助渠道、决策空间或协作时间变得更明确、更易获得。",
+          "supportRefs": [
+            "jdr_theory",
+            "project_design"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "J4",
+      "name": "要求较多、资源较少",
+      "centers": {
+        "workplace.demands": 0.75,
+        "workplace.control": 0.25,
+        "workplace.managerial_support": 0.25,
+        "workplace.peer_support": 0.25
+      },
+      "pattern": {
+        "workplace.demands": "HIGH",
+        "workplace.control": "LOW",
+        "workplace.managerial_support": "LOW",
+        "workplace.peer_support": "LOW"
+      },
+      "supportRefs": [
+        "jdr_theory",
+        "project_design"
+      ],
+      "summary": "从这次回答看，您近六个月的工作量和节奏带来较多要求，同时感受到的工作自主性、管理支持和同事支持整体较少。这是对本次工作条件的理论描述，不是对教学能力或个人价值的评价。",
+      "actions": [
+        {
+          "text": "个人层面：优先找一个可信赖、愿意一起协调的人，讨论当前最迫切的一项工作需要；无需独自承担所有调整。",
+          "supportRefs": [
+            "jdr_theory",
+            "project_design"
+          ]
+        },
+        {
+          "text": "组织层面：可与负责人讨论先减少一项重复性任务，或明确一项支持责任；改善工作条件需要组织共同参与。",
+          "supportRefs": [
+            "jdr_theory",
+            "project_design"
+          ]
+        }
+      ]
+    }
+  ],
+  "matching": {
+    "lowMax": 0.25,
+    "highMin": 0.75,
+    "minimumMatchingScore": 75,
+    "minimumMargin": 10,
+    "fuzzyLowPlateauEnd": 0.25,
+    "fuzzyMidpoint": 0.5,
+    "fuzzyHighPlateauStart": 0.75,
+    "coreMissingPolicy": "ABSTAIN",
+    "qualityPolicy": "COMPLETE_INTERPRETABLE_ONLY"
+  },
+  "modifierRuleIds": [],
+  "states": {
+    "MATCHED": "本次工作要求与资源的理论参照",
+    "MIXED": "本次结果接近不止一种理论参照",
+    "BOUNDARY": "本次结果处在理论参照的边界附近",
+    "UNCLASSIFIED": "现有理论参照尚不能概括本次结果",
+    "INSUFFICIENT": "用于画像的核心信息尚不完整",
+    "INVALID": "部分核心信息未满足画像条件",
+    "NOT_APPLICABLE": "本版本不适用于本次填写的对象"
+  }
+}

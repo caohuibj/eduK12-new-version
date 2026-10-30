@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "key": "teacher_jdr_workplace_zh_cn",
+  "modelVersion": "0.1.0",
+  "mappingVersion": "0.1.0",
+  "templateVersion": "0.1.0",
+  "approval": {
+    "date": "2026-10-30",
+    "sourceMessage": "Sentinel_3463f35a75fc8191b757c8c1110fceb4",
+    "decision": "fixed 30 items; HSE four core; CBI independent-only; four theoretical patterns and documented geometric parameters; reviewed Bundle-owned interpretation for participant self only"
+  },
+  "scope": "Adults 18+ currently teaching in K–12; theoretical experiment, not empirical LPA classes, norms or probabilities",
+  "sources": [
+    {
+      "slot": "demands",
+      "instrumentKey": "hse_demands_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourceFile": "server-version/backend/src/modules/scale/instruments/hse_demands_zh_cn/1.0.0/source.json",
+      "sha256": "fa9805389127970a82db57efdb8dc99581693ad1e158cf258caff488e3ea0851",
+      "gitBlob": "2631ff43fcb434efff589b70d5c3a3a5a73aac8d",
+      "scoreKey": "demands",
+      "scoringVersion": "1.0.0",
+      "localizationVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "profileCore": true
+    },
+    {
+      "slot": "control",
+      "instrumentKey": "hse_control_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourceFile": "server-version/backend/src/modules/scale/instruments/hse_control_zh_cn/1.0.0/source.json",
+      "sha256": "8fcf12c2c622c76ad20628b691a888d44aa68947907081a3702d39163ef5cf57",
+      "gitBlob": "60ecd37d7c36b8f414bc94bde990c0465d95e205",
+      "scoreKey": "control",
+      "scoringVersion": "1.0.0",
+      "localizationVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "profileCore": true
+    },
+    {
+      "slot": "manager",
+      "instrumentKey": "hse_managerial_support_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourceFile": "server-version/backend/src/modules/scale/instruments/hse_managerial_support_zh_cn/1.0.0/source.json",
+      "sha256": "a5ee5548a228a8d7192a9f30cec33fd598c9197d3ef8b52886cb7b2b93cac9f0",
+      "gitBlob": "a1f5d00643a4fa2404966a216fcb2ea82b840af1",
+      "scoreKey": "managerial_support",
+      "scoringVersion": "1.0.0",
+      "localizationVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "profileCore": true
+    },
+    {
+      "slot": "peer",
+      "instrumentKey": "hse_peer_support_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourceFile": "server-version/backend/src/modules/scale/instruments/hse_peer_support_zh_cn/1.0.0/source.json",
+      "sha256": "44ffd13212577e820a4681df566a73ed8f60c3ae379caf908691b899f35e65d3",
+      "gitBlob": "dd38ac7c0c9ea3f5bb661309b6ec6288f855e79a",
+      "scoreKey": "peer_support",
+      "scoringVersion": "1.0.0",
+      "localizationVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "profileCore": true
+    },
+    {
+      "slot": "burnout",
+      "instrumentKey": "cbi_work_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourceFile": "server-version/backend/src/modules/scale/instruments/cbi_work_zh_cn/1.0.0/source.json",
+      "sha256": "bfef914b74e74fde7758fb79c11827c4627d86c309925eba01157ed2765eb260",
+      "gitBlob": "985b118baa5d4bb68713324c25429c58b79572ff",
+      "scoreKey": "work_related_burnout",
+      "scoringVersion": "1.0.0",
+      "localizationVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "profileCore": false
+    }
+  ],
+  "parameters": {
+    "centers": [
+      0.25,
+      0.75
+    ],
+    "lowMax": 0.25,
+    "highMin": 0.75,
+    "demandWeight": 3,
+    "resourceWeights": [
+      1,
+      1,
+      1
+    ],
+    "minimumMatchingScore": 75,
+    "minimumMargin": 10,
+    "fuzzyPlateaus": [
+      0.25,
+      0.5,
+      0.75
+    ]
+  },
+  "provenance": "Project-defined geometry, not literature-derived clinical cutoffs or fitted class parameters. HSE demand scores reflected only in Bundle coordinates. Source archive identity below means this canonical design/source record, not a downloaded ZIP."
+}

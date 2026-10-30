@@ -36,7 +36,7 @@ export function dependencyBlockers(raw: unknown): string[] {
     const d=pkg?.definition,score=d?.scoring.scores.find(s=>s.key===e.selector)
     const range=d?calculateScoreRanges(d).get(e.selector):undefined
     if(!d || canonicalHash(d)!==b.source.runtimeDefinitionHash || range?.min!==b.transformation.min || range?.max!==b.transformation.max || hashScaleDefinition(d)!==b.source.measurementHash || d.scoring.scoringVersion!==b.source.scoringVersion ||
-      d.versionAxes?.localizationVersion!==b.source.localizationVersion || d.versionAxes?.subjectKey!==p.profile.applicability.domain ||
+      d.versionAxes?.localizationVersion!==b.source.localizationVersion || d.versionAxes?.subjectKey!==(b.source.subjectKey??p.profile.applicability.domain) ||
       d.scoring.scorerKey || score?.source.type!=='items' || score.source.items.length!==b.source.expectedItems || score.source.aggregation!=='mean')
       errors.push(b.evidenceKey+': PROFILE frozen measurement/scoring/locale/item identity mismatch')
   }
