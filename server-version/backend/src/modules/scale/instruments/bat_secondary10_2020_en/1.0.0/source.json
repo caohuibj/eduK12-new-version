@@ -1,0 +1,754 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "bat_secondary10_2020_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "BAT 次级症状10题（英文题本／中文教师反馈）",
+      "abbreviation": "BAT-S-10-EN",
+      "instrumentFamily": "Burnout Assessment Tool secondary symptoms (BAT-S), ten psychological and psychosomatic complaint items"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "BAT-S次级症状原题组：心理不适5题及身心不适5题，合并为10题整体均分。不能分成两个已验证的独立个人量表；不代表BAT-C核心分、医学诊断或工作因果推断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:occupational_well_being",
+        "domain:teacher_workplace",
+        "construct:bat_secondary_symptoms",
+        "construct:psychological_and_psychosomatic_complaints",
+        "population:working_adults",
+        "population:adult_18_plus_project_boundary",
+        "population:not_teacher_specific_validation",
+        "response:self",
+        "response:10_items",
+        "response:five_point_frequency",
+        "response:no_reverse_items",
+        "response:fixed_order",
+        "scoring:10_item_mean_total",
+        "scoring:complete_required_project_rule",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_employee_ranking",
+        "use:no_foreign_cutoffs_transferred",
+        "license:cc_by_4_0_paper_appendix",
+        "language_validation:original_english_items",
+        "language_validation:chinese_feedback_not_questionnaire_translation"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "供有实际工作经历、能理解英文的成人教师自评候选。18+只是项目范围，不是原作者给定年龄界线。原研究不构成中国教师常模或电子施测验证；身体症状也可能来自工作以外因素。"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般工作情况；原指导语不限定固定回顾天数",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "使用2020论文Appendix B Table A3原次级症状1–10题，原英文题文与顺序不变，选项为1 Never至5 Always。",
+        "心理不适1–5和身心不适6–10只标示条目内容分组；计分为10题整体均分，不独立拆为两个5题工具，不合并BAT核心总分。",
+        "完整作答才计算得分是项目保守缺失政策，未核得原作者的漏答/插补操作规则。",
+        "中文仅为原创教师反馈；不是中文施测题本、健康诊断或已验证中国教师工具；不使用欧洲临床界值或百分位。",
+        "3分钟为项目估计，非实测时长。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原量表有研究基础，但此独立数字呈现及中国教师应用尚未测量验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "只反映本次自述的非特异性身心不适频率，不提供病因或诊断。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Schaufeli, Desart & De Witte (2020) Appendix B Table A3原始英文；无题文新译，中文仅为原创教师反馈。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "英文选项与题文保留原词句；中文教师报告不是作者认可的中文施测译本或中国教师效度研究。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "bat_secondary10_2020_en-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "bat_secondary10_2020_en-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "bat_secondary10_2020_en-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "英文10题原文取自 Schaufeli, Desart & De Witte (2020), Burnout Assessment Tool—Development, Validity, and Reliability, IJERPH 17(24):9495, Appendix B Table A3, doi:10.3390/ijerph17249495，©2020作者／MDPI，CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ 。本项目仅规范表格断行及数字编排，未修改题文；中文教师反馈为原创。论文许可不替代作者手册、官方PDF版式、标志及第三方内容的公开再分发许可。",
+      "作者官网 https://burnoutassessmenttool.be/start_eng/ 提示使用须引用原作且不要擅改题文；本项目原题不改。科学手册 v2.0 p102与用户手册 v2.0 p11的10题整体均分1–5仅供计分核查，未把手册PDF或官方版式公开转存。",
+      "完成作答才计分为项目规则；本电子版本、中国教师适用性与中文反馈未获作者认可或测量验证。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "Burnout Assessment Tool — Secondary Symptoms (BAT-S), English 10-item form",
+        "citation": "Schaufeli, W. B., Desart, S. & De Witte, H. (2020). Burnout Assessment Tool (BAT)—Development, Validity, and Reliability. IJERPH 17(24), 9495, Appendix B Table A3. doi:10.3390/ijerph17249495.",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7766078/",
+        "publicationYear": 2020
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "英文10题原文取自 Schaufeli, Desart & De Witte (2020), Burnout Assessment Tool—Development, Validity, and Reliability, IJERPH 17(24):9495, Appendix B Table A3, doi:10.3390/ijerph17249495，©2020作者／MDPI，CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ 。本项目仅规范表格断行及数字编排，未修改题文；中文教师反馈为原创。论文许可不替代作者手册、官方PDF版式、标志及第三方内容的公开再分发许可。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "bat_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "Never",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "Rarely",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "Sometimes",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "Often",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "Always",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "BATS_01",
+          "content": "I have trouble falling or staying asleep",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BATS_02",
+          "content": "I tend to worry",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BATS_03",
+          "content": "I feel tense and stressed",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BATS_04",
+          "content": "I feel anxious and/or suffer from panic attacks",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BATS_05",
+          "content": "Noise and crowds disturb me",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BATS_06",
+          "content": "I suffer from palpitations or chest pain",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BATS_07",
+          "content": "I suffer from stomach and/or intestinal complaints",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BATS_08",
+          "content": "I suffer from headaches",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BATS_09",
+          "content": "I suffer from muscle pain, for example in the neck, shoulder or back",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BATS_10",
+          "content": "I often get sick",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "BATS_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BATS_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BATS_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BATS_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BATS_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BATS_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BATS_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BATS_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BATS_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BATS_10",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "secondary_symptoms_total",
+            "type": "total",
+            "label": "次级身心不适体验（整体均分）",
+            "description": "10题频率均分1–5；较高值表示不适体验自述更频繁，不等于BAT核心症状分、医学诊断或临床分级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BATS_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BATS_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BATS_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BATS_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BATS_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BATS_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BATS_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BATS_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BATS_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BATS_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "secondary_symptoms_total"
+        ],
+        "scoreOrder": [
+          "secondary_symptoms_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "secondary_symptoms_total",
+            "headline": "身心感受：看见信号，而不是给自己下结论",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这些题目涉及睡眠困难、担忧、紧张、惊恐感受、对噪声或拥挤的敏感，以及胸部、胃肠、头部和肌肉不适、容易生病等体验。完成全部十题后会得到1–5的整体频率均分；数值越大，表示本次自述这类情况出现得越频繁。这不是BAT核心得分、健康诊断，也无法确定原因或具体健康状况。\n\n回想一个真实的教学工作日：某些不适是忙碌时才出现，还是休息日也会有？这只是帮助反思的例子，并不表示系统知道你的生活细节。工作安排、休息、既有健康状况和其他生活因素都值得同时考虑，不能由一次答卷推断工作造成了不适。\n\n前五题和后五题属于原题组中的不同主题，但本工具只呈现10题合并整体分数，不对心理或身体方面分别贴标签。没有适用于中国教师的常模或临床界值，因此不划分轻、中、重或同业排名。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "只选择一两种你愿意留意的感受，记录它在什么情境、时间出现，也看看休息时是否有所变化；不必每天再做一份完整复盘。"
+              },
+              {
+                "category": "environment",
+                "text": "如果工作安排确实带来困扰，可与合适的人讨论一个实际调整，如明确非紧急消息的处理时间、协调噪声环境或安排合理休息。"
+              },
+              {
+                "category": "support",
+                "text": "持续、加重或影响生活的身心不适值得向医生或相关专业人员了解。明显急性身体症状不要仅归因为压力；这份问卷不能代替医疗评估。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "英文原文题本与原创中文教师反馈分别管理；不是已验证的中文BAT-S题本或中国教师诊断工具。",
+          "本工具只解释10题完整作答的描述性均分1–5；缺答不算分是项目规则。没有适用于中国教师的常模、百分位或分级线。",
+          "身心不适可由多种工作内外因素造成；本结果不能判断具体病因、健康状态或职业适任性。"
+        ],
+        "disclaimer": "供能理解英文的工作成年人自我反思，不用于医学诊断、人事筛选、教师考核或学校排名。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "bat_secondary10_2020_work",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "BATS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "secondary_symptoms_total": 1
+          },
+          "totalScoreKeys": [
+            "secondary_symptoms_total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "BATS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "secondary_symptoms_total": 5
+          },
+          "totalScoreKeys": [
+            "secondary_symptoms_total"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "BATS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BATS_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BATS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BATS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BATS_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BATS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BATS_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "secondary_symptoms_total": 3
+          },
+          "totalScoreKeys": [
+            "secondary_symptoms_total"
+          ]
+        }
+      },
+      {
+        "name": "missing_one",
+        "answers": [
+          {
+            "itemCode": "BATS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BATS_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "secondary_symptoms_total": null
+          },
+          "totalScoreKeys": [
+            "secondary_symptoms_total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "secondary_symptoms_total": null
+          },
+          "totalScoreKeys": [
+            "secondary_symptoms_total"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "The following statements are related to your work situation and how you experience this situation. Please state how often each statement applies to you.",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "Schaufeli, Desart & De Witte (2020), Appendix B Table A3; original work-related instructions, with no fixed day recall period."
+  }
+}
