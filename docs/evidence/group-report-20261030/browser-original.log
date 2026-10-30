@@ -1,0 +1,12 @@
+locator.isVisible: Error: strict mode violation: getByRole('heading', { name: '本周自习小时', exact: true }) resolved to 2 elements:
+    1) <h2 class="report-section__title">本周自习小时</h2> aka getByRole('region', { name: '本周自习小时' }).locator('h2')
+    2) <h4>本周自习小时</h4> aka locator('h4')
+
+Call log:
+[2m    - checking visibility of getByRole('heading', { name: '本周自习小时', exact: true })[22m
+
+    at /workspace/eduK12-new-version/server-version/e2e/group-report-browser.cjs:41:83 {
+  log: [
+    "    - checking visibility of getByRole('heading', { name: '本周自习小时', exact: true })"
+  ]
+}

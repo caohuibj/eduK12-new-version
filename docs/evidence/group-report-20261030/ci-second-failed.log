@@ -1,0 +1,44 @@
+classify changed content	select dependency-free documentation or tooling classification	﻿2026-10-30T06:16:08.8389957Z ##[group]Run node --input-type=module <<'JS'
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8390374Z [36;1mnode --input-type=module <<'JS'[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8390690Z [36;1mimport {appendFileSync} from 'node:fs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8391198Z [36;1mimport {changedEntries,classifyChanges} from './.github/scripts/content-scope.mjs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8391837Z [36;1mimport {trainingFollowupPlan} from './.github/scripts/training-followup-scope.mjs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8392461Z [36;1mimport {groupReportDraftPlan} from './.github/scripts/group-report-draft.mjs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8392956Z [36;1mimport {execFileSync} from 'node:child_process';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8393414Z [36;1mimport {toolingOnly} from './server-version/scripts/release/policy.mjs';[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8394034Z [36;1mconst entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(process.env.CI_BASE_SHA);[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8394705Z [36;1mconst docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8395681Z [36;1mconst followup=process.env.CI_EVENT==='pull_request' && trainingFollowupPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8397128Z [36;1mconst groupDraft=groupReportDraftPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8401319Z [36;1mconst lightweight=process.env.CI_FORCE_FULL!=='true' && (Boolean(groupDraft)||docs||toolingOnly(entries)||Boolean(followup)||entries.some(e=>['.github/scripts/survey-governance-bindings.json','.github/scripts/training-polish-bindings.json','.github/scripts/survey-review-bindings.json','.github/scripts/training-admin-integration-bindings.json','.github/scripts/training-entry-bindings.json','.github/scripts/participant-capacity-bindings.json','.github/scripts/survey-assessment-bindings.json','.github/scripts/training-assessment-bindings.json','.github/scripts/school-teacher-visual-bindings.json','.github/scripts/participant-access-bindings.json','.github/scripts/training-manual-ui-bindings.json','.github/scripts/training-appearance-bindings.json','.github/scripts/shared-authoring-bindings.json','.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-self-bindings.json','.github/scripts/school-teacher-native-bindings.json','.github/scripts/school-teacher-package-bindings.json'].includes(e.file)));[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8405579Z [36;1mappendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8406069Z [36;1mJS[0m
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8427390Z shell: /usr/bin/bash -e {0}
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8427654Z env:
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8427906Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8428241Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8428567Z   CI_HEAD_REF: feat/group-report-snapshots-20261030
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8428867Z   CI_IS_DRAFT: true
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8429081Z   CI_PR_NUMBER: 404
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8429319Z   CI_BASE_SHA: dfd506347cfa2c684a75812936f32d48bdce34d4
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8429618Z   CI_EVENT: pull_request
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8429834Z   CI_FORCE_FULL: 
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.8430026Z ##[endgroup]
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9474679Z node:internal/modules/run_main:107
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9475157Z     triggerUncaughtException(
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9475431Z     ^
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9475547Z 
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9476010Z AssertionError [ERR_ASSERTION]: Unknown group-report path: .github/scripts/onboarding-bindings.json
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9477818Z     at groupReportDraftPlan (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/group-report-draft.mjs:34:27)
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9479147Z     at file:///home/runner/work/eduK12-new-version/eduK12-new-version/[eval1]:10:18
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9479839Z     at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9480297Z   generatedMessage: false,
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9480798Z   code: 'ERR_ASSERTION',
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9481033Z   actual: false,
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9481251Z   expected: true,
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9481456Z   operator: '==',
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9481659Z   diff: 'simple'
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9481858Z }
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9481963Z 
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9482052Z Node.js v24.21.0
+classify changed content	select dependency-free documentation or tooling classification	2026-10-30T06:16:08.9521978Z ##[error]Process completed with exit code 1.

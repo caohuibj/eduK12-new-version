@@ -1,0 +1,10 @@
+{
+  "kind": "local repair diagnostic on immutable original failed GitHub merge; not CI success",
+  "eventBase": "dfd506347cfa2c684a75812936f32d48bdce34d4",
+  "actualBase": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+  "head": "62046f52f6a0acd3710a935f2f6230ba60b7051d",
+  "source": "f84424dacf7907a84a089a50f01ccd97efd9b15e",
+  "paths": 52,
+  "containsUpstreamOnboarding": false,
+  "route": "group-report-draft"
+}

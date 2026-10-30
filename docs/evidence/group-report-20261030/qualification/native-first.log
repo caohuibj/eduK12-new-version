@@ -1,0 +1,70 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts > exact main task artifact migration and native backup > upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows
+prisma:query SELECT migration_name AS name FROM _prisma_migrations WHERE finished_at IS NOT NULL ORDER BY migration_name
+
+stdout | src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts > exact main task artifact migration and native backup > upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows
+prisma:query SELECT to_regclass('reporting_task_artifacts')::text AS name
+
+node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+
+Error: Cannot find module '/workspace/eduK12-new-version/node_modules/prisma/build/index.js'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v24.21.0
+ ❯ src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts (1 test | 1 failed) 86ms
+     × upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows 76ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts > exact main task artifact migration and native backup > upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows
+Error: Command failed: /workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/prisma/build/index.js migrate deploy --schema prisma/schema.prisma
+node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+
+Error: Cannot find module '/workspace/eduK12-new-version/node_modules/prisma/build/index.js'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v24.21.0
+
+ ❯ src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts:27:26
+     25|     expect(applied.map(row => row.name)).toEqual(expected)
+     26|     expect((await prisma.$queryRaw<Array<{name: string | null}>>`SELEC…
+     27|     const migrationLog = execFileSync(process.execPath, ['node_modules…
+       |                          ^
+     28|     writeFileSync('/tmp/group-report-candidate-migrate.log', migration…
+     29|     const added = await prisma.$queryRaw<Array<{name: string}>>`SELECT…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  07:36:25
+   Duration  528ms (transform 219ms, setup 0ms, import 311ms, tests 86ms, environment 0ms)
+
+JSON report written to /tmp/group-report-native-test.json

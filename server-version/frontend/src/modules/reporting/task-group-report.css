@@ -1,0 +1,27 @@
+.task-group-report { padding: clamp(1rem, 3vw, 2.5rem); border-radius: 1.4rem; background: var(--surface, #fff); color: var(--text-primary, #173042); max-width: 1400px; margin: 1rem auto; }
+.task-group-report__header { display: flex; justify-content: space-between; gap: 1.5rem; align-items: start; border-bottom: 1px solid #cbd5e1; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.task-group-report__header h2 { font-size: clamp(1.5rem, 3vw, 2.5rem); line-height: 1.25; margin: .4rem 0; }
+.task-group-report__actions { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: 1rem; }
+.task-group-report button, .task-group-report select { border: 1px solid #94a3b8; border-radius: .5rem; padding: .5rem .75rem; background: inherit; color: inherit; }
+.task-group-report table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+.task-group-report th, .task-group-report td { padding: .7rem; border-bottom: 1px solid #cbd5e1; text-align: left; overflow-wrap: anywhere; }
+.task-group-report td:last-child { position: relative; min-width: 6rem; }
+.task-group-report__bar { display: block; background: #94c8bc; height: .35rem; max-width: 100%; margin-bottom: .3rem; }
+.task-group-report footer { margin-top: 2rem; font-size: .75rem; overflow-wrap: anywhere; }
+.task-group-report__metric--print { display: none; }
+.task-group-report:fullscreen { overflow: auto; width: 100%; max-width: none; border-radius: 0; }
+@media (max-width: 640px) { .task-group-report__header { flex-direction: column; } }
+@media print {
+  @page { size: A4; margin: 14mm; }
+  body:has(.task-group-report) { background: white !important; }
+  body:has(.task-group-report) *:not(.task-group-report):not(.task-group-report *):not(:has(.task-group-report)) { display: none !important; }
+  body:has(.task-group-report) *:has(.task-group-report) { display: block !important; margin: 0 !important; padding: 0 !important; border: 0 !important; height: auto !important; overflow: visible !important; }
+  .task-group-report { margin: 0; padding: 0; width: 100%; max-width: none; border: 0; background: white; color: #111827; }
+  .task-group-report__actions { display: none !important; }
+  .task-group-report__metric--print { display: block; }
+  .task-group-report__metric, .task-group-report .report-metric, .task-group-report tr { break-inside: avoid; }
+  .task-group-report .report-section { box-shadow: none; border-color: #cbd5e1; }
+  .task-group-report h2, .task-group-report h3 { break-after: avoid; }
+  .task-group-report table { font-size: 10pt; }
+  .task-group-report__bar { print-color-adjust: exact; }
+}
