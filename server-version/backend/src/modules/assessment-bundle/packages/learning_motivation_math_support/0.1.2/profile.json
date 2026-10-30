@@ -1,0 +1,401 @@
+{
+  "schemaVersion": 1,
+  "key": "learning_motivation_math_support",
+  "version": "0.1.0",
+  "mappingVersion": "0.1.1",
+  "templateVersion": "0.1.2",
+  "algorithm": "weighted-l1-guarded-v1",
+  "maturity": "EXPERIMENTAL",
+  "sourceArchiveHash": "d6583c15ae4e6de3e88a42d51c09f4aa588aced07dd38c6e064b723f7c1c01e0",
+  "applicability": {
+    "domain": "mathematics",
+    "minGrade": 7,
+    "maxGrade": 12,
+    "gradeEvidenceKey": "grade"
+  },
+  "bindings": [
+    {
+      "constructKey": "math.academic_self_efficacy",
+      "label": "数学学习把握感",
+      "contributionGroup": "competence_beliefs",
+      "weight": 1,
+      "transformation": {
+        "kind": "WITHIN_INSTRUMENT_RANGE",
+        "version": "1.0.0",
+        "min": 1,
+        "max": 5,
+        "orientation": "DIRECT",
+        "referenceKind": "THEORETICAL_RANGE_NOT_NORM"
+      },
+      "evidenceKey": "e",
+      "source": {
+        "instrumentKey": "academic_self_efficacy_mathematics_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "definitionSourceHash": "a5f02168ad4135d3c13a2740d391d2043770cb8b",
+        "timeframeKey": "current_beliefs_with_next_semester_item_v1",
+        "expectedItems": 5,
+        "measurementHash": "ea8cd4535b0c80c64bf6c93e538f2d33b282860136bcb153ac053b06d9f9da2d",
+        "runtimeDefinitionHash": "8b4eb7b667ede55476fdb5f1c8be3d42627b9677f6a9dcd5379f23f7cfe83a73"
+      }
+    },
+    {
+      "constructKey": "math.importance_utility_value",
+      "label": "数学重要性与用途价值",
+      "contributionGroup": "math.importance_utility_value",
+      "weight": 1,
+      "transformation": {
+        "kind": "WITHIN_INSTRUMENT_RANGE",
+        "version": "1.0.0",
+        "min": 1,
+        "max": 6,
+        "orientation": "DIRECT",
+        "referenceKind": "THEORETICAL_RANGE_NOT_NORM"
+      },
+      "evidenceKey": "v",
+      "source": {
+        "instrumentKey": "value_cost_mathematics_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "definitionSourceHash": "8db7d7822006b919e03b33d0543e37f81b79f426",
+        "timeframeKey": "current_subject_beliefs_no_fixed_recall_v1",
+        "expectedItems": 3,
+        "measurementHash": "931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3",
+        "runtimeDefinitionHash": "53e935260ed7c4e54e7dbfdc67a8b1f68c4fcc64ec4aa4ebacc6371e90c1c89d"
+      }
+    },
+    {
+      "constructKey": "math.time_opportunity_cost",
+      "label": "数学时间与取舍成本",
+      "contributionGroup": "math.time_opportunity_cost",
+      "weight": 1,
+      "transformation": {
+        "kind": "WITHIN_INSTRUMENT_RANGE",
+        "version": "1.0.0",
+        "min": 1,
+        "max": 6,
+        "orientation": "DIRECT",
+        "referenceKind": "THEORETICAL_RANGE_NOT_NORM"
+      },
+      "evidenceKey": "c",
+      "source": {
+        "instrumentKey": "value_cost_mathematics_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "definitionSourceHash": "8db7d7822006b919e03b33d0543e37f81b79f426",
+        "timeframeKey": "current_subject_beliefs_no_fixed_recall_v1",
+        "expectedItems": 4,
+        "measurementHash": "931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3",
+        "runtimeDefinitionHash": "53e935260ed7c4e54e7dbfdc67a8b1f68c4fcc64ec4aa4ebacc6371e90c1c89d"
+      }
+    }
+  ],
+  "profiles": [
+    {
+      "id": "P1",
+      "name": "把握与价值较清晰，当前负担较轻",
+      "centers": {
+        "math.academic_self_efficacy": 0.8,
+        "math.importance_utility_value": 0.8,
+        "math.time_opportunity_cost": 0.2
+      },
+      "pattern": {
+        "math.academic_self_efficacy": "HIGH",
+        "math.importance_utility_value": "HIGH",
+        "math.time_opportunity_cost": "LOW"
+      },
+      "supportRefs": [
+        "r01",
+        "r03",
+        "r08",
+        "expert_design"
+      ],
+      "summary": "在三个核心维度上接近“有把握、认为值得、较少报告时间与取舍负担”的理论参照。",
+      "actions": [
+        {
+          "text": "保留一个已经有效的学习习惯，写清它在哪类题上有效。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "每周选一道略有挑战的题，先独立尝试，再核对具体错误。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "一周后核对完成情况与负担，负担上升时调整计划。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "有把握，也觉得负担重",
+      "centers": {
+        "math.academic_self_efficacy": 0.8,
+        "math.importance_utility_value": 0.8,
+        "math.time_opportunity_cost": 0.8
+      },
+      "pattern": {
+        "math.academic_self_efficacy": "HIGH",
+        "math.importance_utility_value": "HIGH",
+        "math.time_opportunity_cost": "HIGH"
+      },
+      "supportRefs": [
+        "r01",
+        "r03",
+        "r08",
+        "expert_design"
+      ],
+      "summary": "学习把握与价值较强，同时报告较高时间与取舍成本。",
+      "actions": [
+        {
+          "text": "把一周数学任务分为必须完成、可以延后、需要求助三类。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "和老师讨论一项可调整的重复任务，保留关键练习。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "记录三次学习的开始时间、结束时间和实际完成内容。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "看重学习，正在建立把握",
+      "centers": {
+        "math.academic_self_efficacy": 0.2,
+        "math.importance_utility_value": 0.8,
+        "math.time_opportunity_cost": 0.2
+      },
+      "pattern": {
+        "math.academic_self_efficacy": "LOW",
+        "math.importance_utility_value": "HIGH",
+        "math.time_opportunity_cost": "LOW"
+      },
+      "supportRefs": [
+        "r01",
+        "r03",
+        "r08",
+        "r02",
+        "r12",
+        "expert_design"
+      ],
+      "summary": "重视数学，但成功把握偏弱；当前时间与取舍负担并不突出。",
+      "actions": [
+        {
+          "text": "选择一个已学过、难度适中的小目标，而不是一次补完全部内容。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "做完后标出一个确实做对的步骤和一个还需帮助的步骤。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "把“我不行”改写成“这一步我还没有掌握”，并向老师提出具体问题。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "看重学习，但把握与负担形成拉扯",
+      "centers": {
+        "math.academic_self_efficacy": 0.2,
+        "math.importance_utility_value": 0.8,
+        "math.time_opportunity_cost": 0.8
+      },
+      "pattern": {
+        "math.academic_self_efficacy": "LOW",
+        "math.importance_utility_value": "HIGH",
+        "math.time_opportunity_cost": "HIGH"
+      },
+      "supportRefs": [
+        "r01",
+        "r03",
+        "r08",
+        "r02",
+        "r12",
+        "expert_design"
+      ],
+      "summary": "认为数学重要、有用，但把握偏弱，且报告较多时间与取舍成本。",
+      "actions": [
+        {
+          "text": "选一个十至十五分钟可开始的小任务，把目标限定到一种题型或一个步骤。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "列出最耗时的一处，带着具体问题求助，必要时与老师调整重复任务。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "连续一周记录“做到了什么、哪里卡住、是否更可承受”，不只记录分数。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P5",
+      "name": "有把握，意义连接仍可探索",
+      "centers": {
+        "math.academic_self_efficacy": 0.8,
+        "math.importance_utility_value": 0.2,
+        "math.time_opportunity_cost": 0.2
+      },
+      "pattern": {
+        "math.academic_self_efficacy": "HIGH",
+        "math.importance_utility_value": "LOW",
+        "math.time_opportunity_cost": "LOW"
+      },
+      "supportRefs": [
+        "r01",
+        "r03",
+        "r08",
+        "r09",
+        "r25",
+        "expert_design"
+      ],
+      "summary": "对学好数学有一定把握，但重要性与用途价值较弱，成本暂不突出。",
+      "actions": [
+        {
+          "text": "从你关心的一件事情出发，找一个数学能解释的小问题。",
+          "supportRefs": [
+            "r09"
+          ]
+        },
+        {
+          "text": "与老师约定一个可选择的应用任务，而不是接受统一的励志理由。",
+          "supportRefs": [
+            "r09"
+          ]
+        },
+        {
+          "text": "一周后问自己：哪一部分确实有用，哪一部分还需要解释？",
+          "supportRefs": [
+            "r09"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "name": "连接与把握都需要支持，负担先被看见",
+      "centers": {
+        "math.academic_self_efficacy": 0.2,
+        "math.importance_utility_value": 0.2,
+        "math.time_opportunity_cost": 0.8
+      },
+      "pattern": {
+        "math.academic_self_efficacy": "LOW",
+        "math.importance_utility_value": "LOW",
+        "math.time_opportunity_cost": "HIGH"
+      },
+      "supportRefs": [
+        "r01",
+        "r03",
+        "r08",
+        "expert_design"
+      ],
+      "summary": "重要性/用途价值与把握均偏弱，同时报告较高时间与取舍成本。",
+      "actions": [
+        {
+          "text": "与一位可信任的老师把最难承受的一项要求具体说清。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "只选择一个现实可行的小目标，并约定可获得的帮助。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        },
+        {
+          "text": "在体验到可做到之后，再探索一个由你认可的学习理由。",
+          "supportRefs": [
+            "r02",
+            "r23",
+            "r24"
+          ]
+        }
+      ]
+    }
+  ],
+  "matching": {
+    "lowMax": 0.35,
+    "highMin": 0.65,
+    "minimumMatchingScore": 75,
+    "minimumMargin": 8,
+    "fuzzyLowPlateauEnd": 0.25,
+    "fuzzyMidpoint": 0.5,
+    "fuzzyHighPlateauStart": 0.75,
+    "coreMissingPolicy": "ABSTAIN",
+    "qualityPolicy": "COMPLETE_INTERPRETABLE_ONLY"
+  },
+  "modifierRuleIds": [],
+  "states": {
+    "MATCHED": "接近一个暂定组合",
+    "MIXED": "接近多个组合，暂不贴单一标签",
+    "BOUNDARY": "处于暂定边界，保留维度解释",
+    "UNCLASSIFIED": "现有原型不能充分概括，暂不分型",
+    "INSUFFICIENT": "核心证据不足，暂不分型",
+    "INVALID": "输入版本或质量不满足解释前提",
+    "NOT_APPLICABLE": "不在本版本适用范围"
+  }
+}

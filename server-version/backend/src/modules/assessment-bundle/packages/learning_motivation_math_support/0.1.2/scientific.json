@@ -1,0 +1,76 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "理论驱动的支持对话原型，不是已验证的心理类型；精确版本、年级、语言、负担与报告需科学审核。",
+  "references": [
+    {
+      "id": "r01",
+      "citation": "Eccles & Wigfield (2020). Situated Expectancy-Value Theory. https://doi.org/10.1016/j.cedpsych.2020.101859",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "r02",
+      "citation": "Bandura (1977). Self-efficacy. https://doi.org/10.1037/0033-295X.84.2.191",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "r03",
+      "citation": "Flake et al. (2015). Measuring cost. https://doi.org/10.1016/j.cedpsych.2015.03.002",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "r08",
+      "citation": "Jiang & Zhang (2023). https://doi.org/10.1016/j.lindif.2022.102252",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "r09",
+      "citation": "Hulleman & Harackiewicz (2009). https://doi.org/10.1126/science.1177067",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "r12",
+      "citation": "Pekrun (2006). Control-value theory. https://doi.org/10.1007/s10648-006-9029-9",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "r23",
+      "citation": "Dignath & Büttner (2008). https://doi.org/10.1007/s11409-008-9029-x",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "r24",
+      "citation": "Panadero et al. (2017). https://doi.org/10.1016/j.edurev.2017.08.004",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "r25",
+      "citation": "Ryan & Deci (2020). https://doi.org/10.1016/j.cedpsych.2020.101860",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "expert_design",
+      "citation": "独立候选B；中心、阈值、原型为专家理论假设/工程选择，非实证类型；仍待既有独立科学/技术发布审核。",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    }
+  ]
+}

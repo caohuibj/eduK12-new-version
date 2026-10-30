@@ -1,4 +1,5 @@
 import {prepareAdminStaticSjtMapping,publishAdminStaticSjtMeasurement} from '../situational/static-measurement-admin.service'
+import {listAdminEducationPackageSources} from '../education-tools/package-reference.catalog'
 import {ContentReleaseError} from '../measurement-content/release'
 import {educationAssessmentResourceRouter} from '../education-tools/assessment-resource.routes'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
@@ -123,6 +124,8 @@ adminPermissionsRouter.get('/audit', handle(req => {
 // origin and rate boundaries; the transaction rechecks strong authentication.
 adminPermissionsRouter.post('/content-grants',requireRecentAdminKey,handle(req=>
   issueAdminContentRoot(req.user!.userId,req.user!,req.body)))
+adminPermissionsRouter.get('/education-package-sources',requireRecentAdminKey,handle(req=>
+  listAdminEducationPackageSources(req.user!.userId,req.user!,req.query)))
 adminPermissionsRouter.post('/content-grants/:id/revoke',requireRecentAdminKey,handle(req=>
   revokeAdminContentGrant(req.user!.userId,req.user!,z.string().guid().parse(req.params.id),req.body)))
 

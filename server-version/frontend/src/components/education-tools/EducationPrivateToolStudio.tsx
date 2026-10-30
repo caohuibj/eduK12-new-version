@@ -16,6 +16,7 @@ import type {ProfessionalAnswer} from '../../modules/assessment-core/form/types'
 import {sanitizeFormAnswers} from '../../modules/assessment-core/form/form-visibility'
 import {PrivateToolPreview} from './PrivateToolPreview'
 import {EducationCompositionStudio} from './EducationCompositionStudio'
+import {EducationPackageLibrary} from './EducationPackageLibrary'
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateTool,type PrivateToolSummary,type PrivateToolKind,type PrivateToolValidation,type PrivateToolVersion,type PrivateDraftState,type PrivateToolIssue} from './privateToolClient'
 import './education-private-tools.css'
 
@@ -25,7 +26,7 @@ const mergeById=<T extends {id:string}>(current:T[],next:T[]):T[]=>Array.from(ne
 const fingerprint=(tool:PrivateTool)=>JSON.stringify({title:tool.title,definition:tool.definition})
 /** A keyed session prevents responses from one school from entering another editor. */
 export function EducationPrivateToolStudio(props:Props){
- const [mode,setMode]=useState<'TOOLS'|'COMPOSITIONS'>('TOOLS'),draft=useRef<PrivateDraftState>({dirty:false,writing:false})
+ const [mode,setMode]=useState<'TOOLS'|'COMPOSITIONS'|'PACKAGES'>('TOOLS'),draft=useRef<PrivateDraftState>({dirty:false,writing:false})
  const onDraftStateChange=useCallback((value:PrivateDraftState)=>{draft.current=value;props.onDraftStateChange?.(value)},[props.onDraftStateChange])
  const switchMode=(next:typeof mode)=>{
   if(next===mode||draft.current.writing||draft.current.dirty&&!window.confirm('当前草稿尚未保存，确定放弃修改并切换吗？'))return
@@ -34,8 +35,10 @@ export function EducationPrivateToolStudio(props:Props){
  return <><nav className={'education-private-studio-modes education-private-studio-modes--'+props.entry.toLowerCase()} aria-label="工具编制类型">
   <button type="button" aria-pressed={mode==='TOOLS'} onClick={()=>switchMode('TOOLS')}>量表与表单</button>
   <button type="button" aria-pressed={mode==='COMPOSITIONS'} onClick={()=>switchMode('COMPOSITIONS')}>普通问卷</button>
+  <button type="button" aria-pressed={mode==='PACKAGES'} onClick={()=>switchMode('PACKAGES')}>正式整包 · 整体引用</button>
  </nav>{mode==='TOOLS'?<PrivateToolSession key={`${props.entry}:${props.actorId??'session'}:${props.organizationId}`} {...props} onDraftStateChange={onDraftStateChange}/>
-  :<EducationCompositionStudio api={props.api} entry={props.entry} organizationId={props.organizationId} actorId={props.actorId??'session'} onDraftStateChange={onDraftStateChange}/>}</>
+  :mode==='COMPOSITIONS'?<EducationCompositionStudio api={props.api} entry={props.entry} organizationId={props.organizationId} actorId={props.actorId??'session'} onDraftStateChange={onDraftStateChange}/>
+  :<EducationPackageLibrary api={props.api} entry={props.entry} organizationId={props.organizationId} actorId={props.actorId??'session'} onDraftStateChange={onDraftStateChange}/>}</>
 }
 function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftStateChange}:Props){
  const {hasPending:bulkPending,onPendingChange,clear:clearPending}=useFormPendingBuffers()

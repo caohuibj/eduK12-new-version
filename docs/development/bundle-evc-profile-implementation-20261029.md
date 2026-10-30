@@ -539,3 +539,45 @@ DOT已逐项读取77份原件并决定：接纳School原失败调用中实际到
 恢复的Training HTTP原件、本次新审计及其关联观察仍待DOT最终候选核对：reader能验证原件，但requireNativeEvidence保持拒绝这部分pending；既有enabled=false、control review PENDING未变。后续只在已有最终候选review/激活流程中收口，不另造签名、证据提供者或审批层。只改状态而没有原字节、选择摘要、分支映射和输入一致性，无法通过reader。缺失退出仍null；旧School失败整次仍false；浏览器始终声明开发环境范围。
 
 新增reader控制两例覆盖原件漂移、filtered行、伪造exit、篡改声明source/只读状态、漏行为及未知观察拒绝。逐行分支元数据加入后，负例夹具在构造非法选择时先遇undefined的自校验错误；只修夹具的非法行分支说明，失败原件保留，仅重验该负例PASS。未重复旧模型/三入口用例。本切片不Ready、不运行正式build/audit/runtime/CodeQL、不合main或部署，PR正文拒绝动作未重试。
+
+## 23. F02：冻结的未分型说明；F01保持原边界
+
+本切片基于main dc0f46ba506d51d42c5bb379059df82f18860b72，只补报告已有状态的中文解释。V2报告模板可选`profileStateExplanations`，完整列出INSUFFICIENT、INVALID、NOT_APPLICABLE、UNCLASSIFIED、MIXED、BOUNDARY六类静态说明；不把`reasons[]`、内部身份/版本错误或来源详情直接送出。投影继续要求所有核心源的individualInterpretations和scoreDerivedLabels，WITHHELD的explanation仍null；MATCHED沿用原summary。原前端段落已消费explanation，无需改UI、受众权限或读取路径。没有新增检测、SQL、单项计分、事实存储或后台任务。
+
+新增learning_motivation_math_support@0.1.2（DRAFT），报告/模板0.1.1；模型0.1.0、映射0.1.1、原L1参数/工具/适用年级不变。0.1.1原目录不改，原内容hash仍34625844b7014e409a423e99ee2f31fdf28f3d41f629d6432a928e9a2214a941。旧包无新字段，旧冻结定义重开仍返回原null说明，已存Survey视图不重写。新包经既有bundle:manifest:generate登记；新任务需按原bundle:package:install及独立签审发布流程选择0.1.2，代码登记不是发布。没有自动替换旧任务、旧包或补写旧报告。
+
+必要共享文件只有onboarding/contract.ts（兼容可选模板字段）、profile/report.ts、generated/packages.json（新DRAFT版本）、新0.1.2内容目录及直接报告测试；不改公共目录/授权服务、School任务路由或P6接线。验证只覆盖六状态、真实学生/教师/研究者策略、两项解释能力的交集、内部原因不泄漏、匹配summary和教育内容限制保持、旧冻结定义/哈希及新模板身份。未重跑原模型43+2、PG矩阵、入口计分或浏览器。报告文字与计算结果同用冻结定义；不查最新模板。
+
+F01核对：源DisclosureCapabilitiesV1只有educationalContent布尔能力；静态EducationalFeedbackDefinition禁止分数条件。Bundle validateReview批准contentHash及scientific/rights/language/report与cross_source_condition等声明，未定义可覆盖源educationalContent=false的独立受众能力；当前Profile投影明确取核心交集。因缺乏明确覆盖依据，本切片保留actions隐藏，不把既有report=true解释为越权许可。
+
+交回的唯一产品决定：是否允许经独立Bundle权利/报告签审的自有教育建议，在核心解释与标签权限均已获准时，不再受源educationalContent=false限制？若明确允许，最小建议是在现有Bundle signed review中明确批准这类自有文案并冻结批准范围，由既有投影消费；不改源策略或grant、不另建权限系统。本轮没有实施该语义变更。
+
+CI计划：本地仅做上述新报告边界及受影响后端类型检查；生成器不调用计分或数据库。现有正式路由先以最终完整差异回读，普通Draft只作已有预检，不把Draft成功当正式资格；若Ready仍选平台C广泛矩阵则交DOT集中收敛，未自行新建workflow、门禁或重跑原件。生产构建/扫描/SAST按最终受影响组件选择，未授权部署或GitHub APPROVE。Notion和旧PR详细资料披露拒绝继续停止。
+
+本地原始结果：profile-feedback.test.ts首轮10 PASS/exit0；随后仅把历史夹具的model元数据明确绑定旧模板，对应历史case单项1 PASS/exit0（另9项filtered，不计作重跑成功）。后端tsc --noEmit --incremental false实际exit0、0诊断。普通生成器成功登记3包；新0.1.2相对0.1.1只有manifest/profile/report三份内容变化，其他9份原件逐字相同。新包contentHash=ef95136e38c6c2c05956c6ea602644b8ffd39eb36bc63de1fa10fdd0ecc697e9。未安装或发布新包，未访问生产数据库。
+
+Draft首轮run40972703596/source1369d661d在backend job123793241307的Bundle content and immutable history步骤失败；前端类型、mini-program等结果保留，未执行下游backend build。官方日志下载403、未取得字节，不能声称读到官方具体异常；同一标准内容检查在隔离环境实际复现0.1.2缺少ci-fixtures同版本文件的ENOENT（exit1，原结果保留）。这是新增包遗漏正常登记fixture的工程错误。补0.1.2 smoke JSON，输入与0.1.1逐字相同；只readSmoke定向解析新文件实际PASS/exit0，没有重跑类型、报告10例、单项计分或旧完整旅程。未取消断言或修改检查器。原Ready仍是platform，未激活。Notion错误回写因既有同类披露拒绝保持pending，本对话保留原run/job/诊断/修复及下轮只核新fixture登记的清单。
+
+## 24. F01：经既有内容签审的Bundle自有建议
+
+用户已明确批准：具备Bundle内容审核能力的管理员可以批准Bundle自有行动建议；核心画像解释及受众权限仍须允许，不授予读取原量表教育材料的权利。工具继续固定必做，非核心变量只在各自单项报告反馈；不接入Modifier/可选工具/补做或成人模型。本轮没有改授权服务、审核服务、公共目录、School/Survey任务路由或PR392控制。
+
+最小实现是在V2 report中增加可选profileActionContent='BUNDLE_OWNED'声明。既有发布流程本来就要求独立ADMIN、精确contentHash的rights/report等签审，普通分配使用权不能替代这项签审；该新声明及所有建议正文均在原内容哈希内，不增加审核步骤、签名类型或逐被试检查。声明仅指profile.actions的Bundle自有文字，投影不读取源EducationalFeedbackDefinition。profile仍须通过该受众所有核心individualInterpretations与scoreDerivedLabels；不匹配/权限不足时没有建议。未声明该字段的旧包继续原educationalContent交集，不静默改变旧输出。源策略对象及源教育内容保持不变。
+
+只更新本PR尚未安装或发布的0.1.2 DRAFT候选，报告/模板版本升至0.1.2，模型0.1.0和映射0.1.1保持；旧0.1.1目录/哈希及报告不变。新DRAFT内容哈希e89a182bd7a499bbd1d0a23e1b76d28c0d7719145da2f0c50dceb696c7a14e4c；正常安装及独立内容审核发布后，新任务才可消费。没有生成真实审批记录或自动发布。
+
+实际投影样例采用已计算P4的合成呈现输入，不重新运行匹配：学生看到“看重学习，但把握与负担形成拉扯”和既有3条建议（十至十五分钟小任务；定位耗时点求助；连续一周记录进展与承受程度）。实际教师源策略仍WITHHELD且actions=[]；旧0.1.1学生视图仍actions=[]。原前端已显示actions并附教育支持限制说明，未修改前端。
+
+本轮最小验证：4项F01建议/限制/旧版本/内容签审边界，加3项受模板版本影响的既有报告断言，实际7 PASS/exit0；其余7项F02状态断言filtered，保留前轮成功，不冒充本轮执行。合成签审仅用于内存验证，分配者TEACHER和没有有效签审的普通ADMIN均被原发布函数拒绝；无真实DB发布。后端类型检查exit0、0诊断。原模型、入口计分、PG、浏览器及PR388/391观察未重跑。本次只提交推送普通Draft，等待PR392收口，不markReady/激活重型CI；旧Notion披露拒绝继续停止。
+
+## 25. PR393 最小正式路线草稿（2026-10-30）
+
+PR392/394 已进入 main `4a3aaa2ebbae712002a2d349c5e83368085c437e`；本分支通过一次正常 merge 对齐，产品提交 `b00712d2887cccf3117a9095184f6afd301f0e6f`。F01/F02 业务组件保持原报告改动；没有加入 JD-R 工具、语言机制或新的模型。原始19文件清单及两份报告的选例见 `pr393-profile-evidence/route-plan.json`。
+
+复用已有 `onboarding-structure`：只修改 scope/bindings/checks/evidence/controls.test 和原 ci.yml；不新增 workflow、稳定门禁或签名机制。历史根绑定/证据保持原值，393追加独立记录，实际 source/base、两组件tree、完整 path/mode/blob、控制 checkpoint 和合并预览均须吻合。候选先保持 `enabled:false`、Draft；此时分类明确拒绝，不降级全平台。独立复核后才更新 activation binding 和 Ready。
+
+选例为原F02未变7例（六状态及受限能力）与F01实际7 PASS的并集，共14个不同用例；两份原JSON逐字保存，F01七个过滤项仍为 skipped。原F02提交前执行树未完整记录，source关联为回顾性索引，不伪造签名或旧环境。后续新建议声明只改变存在匹配profile的分支，不改变原六个无匹配状态的断言；F01报告接替早期匹配、历史冻结、hash/schema三例。main的 package-release 变化位于测试未调用的 admission 路径，实际 validateReview/publishPackage早退分支不变；PR394新增CBI/HSE注册不改变两个EVC工具的精确来源/披露权限，选例不执行新增量表计分。
+
+唯一缺失应用检查放在正式 admission 作业：官方源锁定安装后端依赖、Prisma generate（不连接DB）、当前组合后端 `tsc --noEmit`，保留真实 source/merge/run/attempt/tree/退出/日志hash。历史类型通过不冒充新主干结果，不用 npm run build 重放量表/Bundle验收。真实CodeQL只扫描受影响 assessment-bundle 和直接控制/测试源码；原 stable gate 仍要求 scope、admission、CodeQL 全部成功。前端、镜像、模型、PG和浏览器不重跑。main push只观察精确merge身份，不执行这些应用作业。本路线仅用于合并，不用于部署。
+
+控制验证首条命令 `node --test .github/scripts/onboarding-controls.test.mjs` 意外包括旧任务用例，实际20 PASS/1 FAIL：新增393三例均通过；旧PR381命令记录用例读取当前 Prisma schema，与其历史固定hash不同而失败。该历史验证函数及该用例未改，保留首错，不改旧证据或重复已经通过项，也不以本次结果声称历史PR381全组当前通过。actionlint基线/候选各exit0，新增诊断0；三个直接控制脚本语法exit0。正式当前后端类型、CodeQL、Ready和合并尚未执行；必要检查预计约5分钟，CodeQL保留原30分钟预算，超过5分钟报告具体阶段。

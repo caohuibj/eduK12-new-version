@@ -8,7 +8,7 @@ import {execFileSync} from 'node:child_process';
 export const hash=x=>createHash('sha256').update(x).digest('hex');
 export const canonical=x=>JSON.stringify(x&&typeof x==='object'?Array.isArray(x)?x.map(v=>JSON.parse(canonical(v))):Object.fromEntries(Object.keys(x).sort().map(k=>[k,JSON.parse(canonical(x[k]))])):x);
 export const selection=data=>data.reports.map(r=>({group:r.group,sha256:r.report.sha256,selected:r.selected.map(index=>({index,...r.report.cases[index],branchReview:r.caseBranches[index]}))}));
-export const readNativeEvidenceBytes=()=>readFileSync(new URL('./school-teacher-native-evidence.json',import.meta.url));
+export const readNativeEvidenceBytes=b=>readFileSync(new URL(b?.branch==='feat/education-package-runtime-20261029'?'./school-teacher-package-evidence.json':'./school-teacher-native-evidence.json',import.meta.url));
 export function verifyNativeEvidence(bytes,b,helpers,git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim()){
  assert(helpers?.inspectHistoricalCase&&helpers?.requireReviewedCase,'Native application assertions not admitted without original byte readers');
  assert.equal(hash(bytes),b.evidence.manifestSha256,'Reviewed original manifest changed');
@@ -48,6 +48,13 @@ export function verifyNativeEvidence(bytes,b,helpers,git=(...args)=>execFileSync
  const observations=[];
  for(const o of data.observations){
   assert(o.id&&!covered.has(o.id));covered.add(o.id);assert(o.scope.length>40);
+  if(o.kind==='reached-package-start'){
+   const report=JSON.parse(raw(o.file)),cases=report.testResults.flatMap(s=>s.assertionResults??[]);
+   assert.equal(report.success,false);assert.equal(cases.length,2);
+   for(const product of ['SCHOOL','TEACHER'])assert(cases.some(c=>c.status==='failed'&&c.fullName.includes(product)&&c.failureMessages.some(m=>m.includes('getAttemptState'))));
+   const records=JSON.parse(raw(o.checkpoints));assert.deepEqual(records.map(r=>r.product).sort(),['SCHOOL','TEACHER']);
+   observations.push({id:o.id,scope:o.scope,wholeInvocationSuccess:false,reachedStageOnly:true});continue;
+  }
   if(o.kind==='reached-school-publication'){
    const text=raw(o.file).toString().split('\n'),segment=text.slice(o.publicationLine,o.publicationLine+9).join('\n');
    assert(segment.includes('UPDATE education_assessment_deliveries')&&segment.includes('published_by_user_id')&&segment.includes('published_at'));

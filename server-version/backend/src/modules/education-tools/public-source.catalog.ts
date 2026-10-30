@@ -17,8 +17,10 @@ import {selectedConfigurationPointer} from '../assessment-authorization/standard
 import {canonicalHash} from '../assessment-runtime/canonical'
 import type {SelectedSourceBindings} from './selected-source-binding'
 import {selectedEducationCatalogChoices,type SelectedCatalogFacts} from './selected-source-catalog'
+import {parseEducationPackageKey} from './package-reference.contracts'
 
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
+const useKey=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null||parseEducationPackageKey(value)!==null)
 export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
 type EducationPublicCatalogCard={catalogKey:string;kind:'SCALE'|'FORM'|'COGNITIVE'|'SJT';sourceProvider:EducationPublicSourceHeader['kind'];sourceId:string;
  contentHash:string;artifactHash?:string;profile?:'experience'|'standard'|'research';title:string;language:string|null;versions:EducationPublicSourceHeader['versions'];requiredContextKeys:string[];referenceContextKeys:string[];
@@ -38,7 +40,7 @@ const grantFromRow=(row:GrantRow):ContentGrant=>({id:row.id,subjectId:row.subjec
  * One grant batch + one post-lock clock covers all referenced public leaves;
  * no per-card ancestry reads or persistent authorization cache. */
 export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:PrivateToolContext,keys:readonly string[],lock=false,expected:SelectedSourceBindings=new Map(),typedPinsRequired=false){
- const exact=[...new Set(keys)];if(exact.length>128||exact.some(value=>!key.safeParse(value).success))privateToolFail('PUBLIC_SOURCE_INPUT_INVALID',400)
+ const exact=[...new Set(keys)];if(exact.length>128||exact.some(value=>!useKey.safeParse(value).success))privateToolFail('PUBLIC_SOURCE_INPUT_INVALID',400)
  if([...expected.keys()].some(value=>!exact.includes(value)))privateToolFail('SELECTED_CONFIGURATION_SOURCE_MISMATCH',400)
  if(!exact.length)return new Map<string,{grantId:string;grantVersion:number;expiresAt:Date;selectedBinding?:SelectedConfigurationBinding}>()
  const rows=await tx.$queryRaw<GrantRow[]>(Prisma.sql`SELECT g.id,g.subject_id,g.issuer_id,g.product,g.scope_id,g.resource_keys,
