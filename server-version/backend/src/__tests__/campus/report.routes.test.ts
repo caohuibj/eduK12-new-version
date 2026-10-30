@@ -16,7 +16,7 @@ const state = vi.hoisted(() => ({
   participant: { list: vi.fn(), read: vi.fn() },
   professional: { list: vi.fn(), read: vi.fn() },
   respondentSummary: vi.fn(),
-  group: {catalog:vi.fn(),generate:vi.fn(),read:vi.fn()},
+  group: {catalog:vi.fn(),tools:vi.fn(),generate:vi.fn(),read:vi.fn()},
   protectedStudio: {catalog:vi.fn(),generate:vi.fn()},
   longitudinal: {catalog:vi.fn(),sources:vi.fn(),generate:vi.fn()},
   groupLongitudinal: {catalog:vi.fn(),generate:vi.fn()},
@@ -33,6 +33,7 @@ vi.mock('../../modules/reporting/respondentSummary', () => ({ readRespondentRunS
 vi.mock('../../modules/campus/student-feedback', () => ({ readCampusStudentFeedback: state.respondentSummary }))
 vi.mock('../../modules/campus/group-reports',()=>({
   listCampusGroupReportCatalog:state.group.catalog,
+  listCampusGroupReportTools:state.group.tools,
   generateCampusGroupReport:state.group.generate,
   readCampusGroupReport:state.group.read,
 }))
@@ -318,6 +319,15 @@ describe('Huischool governed report HTTP surface', () => {
       ...body,
     })
     expect(response.headers.get('cache-control')).toBe('no-store')
+  })
+  it('accepts a selected leaf with single-dimension class OR selection',async()=>{
+    const leaf={slotKey:'scale:a',unitType:'SCALE',instrumentKey:'a',instrumentVersion:'1',compiledRuntimeHash:'a'.repeat(64)}
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,specId:LINK,leaf,selection:{kind:'CLASSES',ids:[CHILD]}}
+    const response=await request('/reports/groups','POST',body,{'x-school-role':'ADMIN','x-recent-school-mfa':'true'})
+    expect(response.status).toBe(200)
+    expect(state.group.generate).toHaveBeenCalledWith({actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),...body})
+    const invalid=await request('/reports/groups','POST',{...body,selection:{kind:'MEMBERSHIP_IDS',ids:[CHILD]}},{'x-school-role':'ADMIN','x-recent-school-mfa':'true'})
+    expect(invalid.status).toBe(400)
   })
   it('reads an old group artifact only through fresh current school authorization',async()=>{
     const response=await request('/reports/groups/'+CHILD+'/'+ARTIFACT,'GET',

@@ -72,6 +72,17 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
     const keys = artifact.analysisKind === 'INDIVIDUAL_LONGITUDINAL' ? rule.longitudinalMetricKeys : rule.metricKeys
     allowed = allowed.filter(id => spec.definition.metricRules.some(r => r.metricId === id && keys.includes(r.sourceMetricKey)))
   }
+  if (artifact.analysisKind === 'GROUP' && artifact.artifactPayload.schemaVersion === 2) {
+    const leaf = artifact.artifactPayload.source.leaf
+    const entry = await resolveHistoricalRelationalEntry({ resourceKind: leaf.unitType,
+      resourceKey: leaf.instrumentKey, resourceVersion: leaf.instrumentVersion })
+    if (!entry || entry.releaseStatus !== 'PUBLISHED' || !entry.resultDisclosure) return hidden()
+    const rule = validateResultDisclosureContract(entry.resultDisclosure).audiences[audience]
+    if (!rule.mode.includes('AGGREGATE')) return hidden()
+    if (rule.mode === 'DELAYED_AGGREGATE' && tracks.some(track => !track.closedAt
+      || Date.now() < track.closedAt.getTime() + rule.delaySeconds! * 1000)) return hidden()
+    allowed = allowed.filter(id => spec.definition.metricRules.some(r => r.metricId === id && rule.metricKeys.includes(r.sourceMetricKey)))
+  }
   if (!allowed.length) return hidden()
   return allowed
 }

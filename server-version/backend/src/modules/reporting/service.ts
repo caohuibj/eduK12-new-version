@@ -12,7 +12,7 @@ import { assertFixedPopulationArtifactDisclosure } from './fixedPopulationPrivac
 import { resolveAuthoritativeRunResults } from './resultSource'
 import { getPublishedReportingSpec } from './spec'
 import { assertReportingSubgroupsPrivacy } from './subgroupPrivacy'
-import { reportingFail, type ReportingArtifactRecord, type ReportingCohortSelectorInputV2, type ReportingGroupArtifactRecord } from './types'
+import { reportingFail, type ReportingArtifactRecord, type ReportingCohortSelectorInputV2, type ReportingGroupArtifactRecord, type ReportingLeafSourceV2, type ReportingCohortSnapshotRecord } from './types'
 
 const publicArtifact = async (artifact: ReportingArtifactRecord, principal: ReportingPrincipal) => {
   await assertFixedPopulationArtifactDisclosure({ principal, artifact })
@@ -30,6 +30,9 @@ export const generateOrganizationGroupAnalysis = async (input: {
   trackId: string
   specId: string
   cohortSelector?: ReportingCohortSelectorInputV2
+  leaf?: ReportingLeafSourceV2
+  presentation?: { sourceLabel: string; populationLabel: string }
+  beforeCompute?: (cohort: ReportingCohortSnapshotRecord) => Promise<void>
 }): Promise<Awaited<ReturnType<typeof publicArtifact>>> => {
   await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
@@ -51,7 +54,8 @@ export const generateOrganizationGroupAnalysis = async (input: {
     specId: spec.id,
     entries: [{ cohort, minimumN: 3 }],
   })
-  const batch = await resolveAuthoritativeRunResults(cohort)
+  await input.beforeCompute?.(cohort)
+  const batch = await resolveAuthoritativeRunResults(cohort, input.leaf)
   const generatedAt = new Date()
   const built = buildReportingArtifact({
     artifactId: randomUUID(),
@@ -61,6 +65,8 @@ export const generateOrganizationGroupAnalysis = async (input: {
     cohort,
     batch,
     options: {},
+    leaf: input.leaf,
+    presentation: input.presentation,
   })
   await assertFixedPopulationArtifactDisclosure({
     principal: input.principal,

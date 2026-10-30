@@ -30,8 +30,13 @@ export function unsafeComparableGeneralOverlap(
   const other=new Set(prior)
   let common=0
   for(const userId of current)if(other.has(userId))common++
-  const currentOnly=current.length-common
-  const priorOnly=prior.length-common
+  return unsafeComparableGeneralOverlapCounts(current.length,prior.length,common,minDelta)
+}
+
+/** SQL callers can retain identities in PostgreSQL and return three counts. */
+export function unsafeComparableGeneralOverlapCounts(currentN:number,priorN:number,common:number,minDelta=5):boolean{
+  const currentOnly=currentN-common
+  const priorOnly=priorN-common
   return common>0&&((currentOnly>0&&currentOnly<minDelta)
     ||(priorOnly>0&&priorOnly<minDelta))
 }

@@ -7,6 +7,7 @@ import {
   ReportingError,
   reportingFail,
   type ReportingCohortSnapshotRecord,
+  type ReportingLeafSourceV2,
   type ReportingProvenanceState,
   type ReportingResolvedExecutionV1,
   type ReportingResolvedMetricV1,
@@ -184,10 +185,12 @@ type AttemptRow = {
 }
 
 type SnapshotRow = {
+  id: string
   compositeAttemptId: string | null
   attemptEpoch: number
   slotKey: string
   canonicalResultEncrypted: string | null
+  compiledRuntimeHash: string | null
 }
 
 type PreparedTrack = {
@@ -202,6 +205,7 @@ type PreparedTrack = {
   unresolved: ReportingUnresolvedObservationV1[]
   completed: Array<{ row: ExecutionRow; attempt: AttemptRow }>
   snapshots: SnapshotRow[]
+  leaf?: ReportingLeafSourceV2
 }
 
 const selectedBy = (row: ExecutionRow, selection?: TrackSelection): boolean => {
@@ -216,6 +220,8 @@ const prepareTrackInTransaction = async (
   tx: Tx,
   input: { organizationId: string; runId: string; trackId: string },
   selection?: TrackSelection,
+  leaf?: ReportingLeafSourceV2,
+  catalog = false,
 ): Promise<PreparedTrack> => {
   const executions = await queryTrackRows(tx, input)
   const first = executions[0]
@@ -291,16 +297,22 @@ const prepareTrackInTransaction = async (
   }
 
   const selectedCompleted = completed.filter((row) => selectedBy(row, selection))
+  if ((leaf || catalog) && executions.length > 6000) reportingFail('REPORT_SOURCE_LIMIT', 'select a task with at most 6000 observations', 413)
   const selectedAttemptIds = selectedCompleted.map((row) => row.runtimeBindingRef!)
   const snapshots = selectedAttemptIds.length === 0 ? [] : await tx.assessmentUnitSnapshot.findMany({
     where: {
       compositeAttemptId: { in: selectedAttemptIds },
       terminalState: 'COMPLETED',
       payloadKind: 'UNIT_RESULT',
+      ...(leaf ? { slotKey: leaf.slotKey } : {}),
+      ...(leaf || catalog ? { OR: selectedCompleted.map(row => ({ compositeAttemptId: row.runtimeBindingRef!,
+        attemptEpoch: attemptById.get(row.runtimeBindingRef!)!.attemptEpoch })) } : {}),
     },
     orderBy: [{ compositeAttemptId: 'asc' }, { slotKey: 'asc' }],
-    select: { compositeAttemptId: true, attemptEpoch: true, slotKey: true, canonicalResultEncrypted: true },
+    ...(catalog ? { take: 25001 } : {}),
+    select: { id: true, compositeAttemptId: true, attemptEpoch: true, slotKey: true, compiledRuntimeHash: true, canonicalResultEncrypted: !catalog },
   }) as SnapshotRow[]
+  if (catalog && snapshots.length > 25000) reportingFail('REPORT_SOURCE_LIMIT', 'too many frozen leaf snapshots', 413)
 
   return {
     organizationId: input.organizationId,
@@ -317,6 +329,7 @@ const prepareTrackInTransaction = async (
       attempt: attemptById.get(row.runtimeBindingRef!)!,
     })),
     snapshots,
+    ...(leaf ? { leaf } : {}),
   }
 }
 
@@ -335,7 +348,9 @@ const materializePreparedTrack = async (prepared: PreparedTrack): Promise<Report
   const resolved: ReportingResolvedObservationV1[] = prepared.completed.map(({ row, attempt }) => {
     const unitRows = (snapshotsByAttempt.get(attempt.id) ?? [])
       .filter((snapshot) => snapshot.attemptEpoch === attempt.attemptEpoch)
-    if (unitRows.length === 0) reportingFail('REPORT_RESULT_INTEGRITY', 'completed runtime has no canonical UNIT_RESULT snapshots', 500)
+    // A latest completed parent with a missing selected leaf remains missing;
+    // it never borrows a prior epoch or another slot's equal metric key.
+    if (unitRows.length === 0 && !prepared.leaf) reportingFail('REPORT_RESULT_INTEGRITY', 'completed runtime has no canonical UNIT_RESULT snapshots', 500)
     const seen = new Set<string>()
     const metrics: ReportingResolvedMetricV1[] = []
     const hashes: Array<{ slotKey: string; resultHash: string }> = []
@@ -346,12 +361,18 @@ const materializePreparedTrack = async (prepared: PreparedTrack): Promise<Report
       payloadMaterializationObserver?.()
       try { envelope = canonicalByCipher.get(encrypted); if (!envelope) throw new Error('Missing canonical view') }
       catch { return reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is invalid', 500) }
+      if (prepared.leaf && (envelope.core.unitType !== prepared.leaf.unitType
+        || envelope.core.instrumentKey !== prepared.leaf.instrumentKey
+        || envelope.core.instrumentVersion !== prepared.leaf.instrumentVersion
+        || envelope.core.compiledRuntimeHash !== prepared.leaf.compiledRuntimeHash)) {
+        reportingFail('REPORT_MEASUREMENT_MISMATCH', 'selected leaf has a different frozen measurement definition', 409)
+      }
       hashes.push({ slotKey: snapshot.slotKey, resultHash: envelope.resultHash })
       const resultQuality = asQuality(envelope.core.quality.status)
       for (const metric of envelope.core.metrics) {
         if (seen.has(metric.key)) reportingFail('AMBIGUOUS_OBSERVATION', `metric ${metric.key} appears in more than one canonical unit`, 409)
         seen.add(metric.key)
-        metrics.push({ key: metric.key, value: metric.scaleReference && typeof metric.value==='number' ? Number(metric.value.toFixed(8)) : metric.value, resultQuality, metricQuality: metric.quality ?? null, ...(metric.scaleReference ? {scaleReference:metric.scaleReference} : {}) })
+        metrics.push({ key: metric.key, value: metric.scaleReference && typeof metric.value==='number' ? Number(metric.value.toFixed(8)) : metric.value, resultQuality, metricQuality: metric.quality ?? null, ...(metric.scaleReference ? {scaleReference:metric.scaleReference} : {}), ...(prepared.leaf && metric.unit ? {unit:metric.unit} : {}) })
       }
     }
     return {
@@ -368,6 +389,7 @@ const materializePreparedTrack = async (prepared: PreparedTrack): Promise<Report
         executionId: row.executionId,
         attemptId: attempt.id,
         unitResults: hashes,
+        ...(prepared.leaf ? { leaf: prepared.leaf, attemptEpoch: attempt.attemptEpoch } : {}),
       }),
       metrics,
       scientificMaturity: row.scientificMaturity,
@@ -380,9 +402,9 @@ const materializePreparedTrack = async (prepared: PreparedTrack): Promise<Report
     organizationId: prepared.organizationId,
     runId: prepared.runId,
     trackId: prepared.trackId,
-    resourceFamily: prepared.resourceFamily,
-    resourceKey: prepared.resourceKey,
-    resourceVersion: prepared.resourceVersion,
+    resourceFamily: prepared.leaf?.unitType ?? prepared.resourceFamily,
+    resourceKey: prepared.leaf?.instrumentKey ?? prepared.resourceKey,
+    resourceVersion: prepared.leaf?.instrumentVersion ?? prepared.resourceVersion,
     resourceMinimumN: prepared.resourceMinimumN,
     resolved,
     unresolved: prepared.unresolved,
@@ -410,6 +432,7 @@ export const resolveAuthoritativeTrackObservations = async (input: {
 
 export const resolveAuthoritativeRunResults = async (
   cohort: ReportingCohortSnapshotRecord,
+  leaf?: ReportingLeafSourceV2,
 ): Promise<ReportingResultBatchV1> => {
   const selectedExecutionIds = new Set(cohort.members.map((member) => member.executionId))
   const prepared = await prisma.$transaction(
@@ -417,7 +440,7 @@ export const resolveAuthoritativeRunResults = async (
       organizationId: cohort.organizationId,
       runId: cohort.sourceRunId,
       trackId: cohort.sourceTrackId,
-    }, { kind: 'EXECUTION_IDS', executionIds: selectedExecutionIds }),
+    }, { kind: 'EXECUTION_IDS', executionIds: selectedExecutionIds }, leaf),
     { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
   )
   if (cohort.selector.kind === 'RUN_TRACK_SUBJECTS' && prepared.totalObservationCount !== cohort.members.length) {
@@ -476,4 +499,36 @@ export const resolveAuthoritativeRunResults = async (
       reason: observation.reason,
     })),
   }
+}
+
+/** Internal discovery after product authorization. Read one accepted current-epoch
+ * canonical result per slot/definition, never expose participant values. */
+export const listAuthoritativeRunLeafSources = async (input: {
+  organizationId: string; runId: string; trackId: string
+}): Promise<Array<{ leaf: ReportingLeafSourceV2; metrics: Array<{ key: string; unit?: string }> }>> => {
+  const samples = await prisma.$transaction(async tx => {
+    const prepared = await prepareTrackInTransaction(tx, input, undefined, undefined, true)
+    const epochs = new Map(prepared.completed.map(({ attempt }) => [attempt.id, attempt.attemptEpoch]))
+    const unique = new Map<string, string>()
+    for (const row of prepared.snapshots) {
+      if (!row.compositeAttemptId || epochs.get(row.compositeAttemptId) !== row.attemptEpoch) continue
+      unique.set(JSON.stringify([row.slotKey, row.compiledRuntimeHash]), row.id)
+    }
+    if (unique.size > 500) reportingFail('REPORT_SOURCE_LIMIT', 'too many frozen leaf definitions', 413)
+    return tx.assessmentUnitSnapshot.findMany({
+      where: { id: { in: [...unique.values()] } },
+      select: { slotKey: true, canonicalResultEncrypted: true },
+      orderBy: [{ slotKey: 'asc' }, { id: 'asc' }],
+    })
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead })
+  const ciphers = samples.map(row => row.canonicalResultEncrypted
+    ?? reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500))
+  const views = await loadStoredCanonicalUnitResults(ciphers)
+  return samples.map((sample, i) => {
+    const { core } = views[i]
+    return { leaf: { slotKey: sample.slotKey, unitType: core.unitType,
+      instrumentKey: core.instrumentKey, instrumentVersion: core.instrumentVersion,
+      compiledRuntimeHash: core.compiledRuntimeHash },
+    metrics: core.metrics.map(metric => ({ key: metric.key, ...(metric.unit ? { unit: metric.unit } : {}) })) }
+  })
 }

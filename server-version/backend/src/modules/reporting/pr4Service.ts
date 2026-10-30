@@ -69,6 +69,9 @@ const publicArtifact = async (artifact: ReportingArtifactRecord, principal: Repo
     artifactId: artifact.id,
     generatedAt: artifact.generatedAt.toISOString(),
     projection: narrowGovernedProjection(artifact.artifactPayload.projection, allowedMetrics),
+    ...(artifact.analysisKind === 'GROUP' && artifact.artifactPayload.schemaVersion === 2
+      ? { presentation: artifact.artifactPayload.presentation, metricMetadata: Object.fromEntries(Object.entries(artifact.artifactPayload.metricMetadata)
+        .filter(([key]) => allowedMetrics === null || allowedMetrics.includes(key))) } : {}),
   }
 }
 

@@ -8,7 +8,7 @@ import {
   type ReportingIndividualArtifactRecord,
   type ReportingArtifactPayloadV1,
   type ReportingArtifactRecord,
-  type ReportingGroupArtifactPayloadV1,
+  type ReportingGroupArtifactPayload,
   type ReportingGroupArtifactRecord,
   type ReportingLongitudinalArtifactPayloadV1,
   type ReportingLongitudinalArtifactRecord,
@@ -109,7 +109,7 @@ const verifyStored = async (tx: Tx, row: ArtifactRow): Promise<ReportingArtifact
       || 'analysisKind' in payload
       || payload.cohortSnapshotId !== row.cohortSnapshotId
     ) reportingFail('REPORT_ARTIFACT_INTEGRITY', 'GROUP artifact row shape is invalid', 500)
-    return { ...row, analysisKind: 'GROUP', policyDomain: 'ORG_GROUP_REPORT_V1', artifactPayload: payload as ReportingGroupArtifactPayloadV1 } as ReportingGroupArtifactRecord
+    return { ...row, analysisKind: 'GROUP', policyDomain: 'ORG_GROUP_REPORT_V1', artifactPayload: payload as ReportingGroupArtifactPayload } as ReportingGroupArtifactRecord
   }
 
   if (row.analysisKind === 'REPEATED_COHORT' || row.analysisKind === 'MATCHED_LONGITUDINAL') {
@@ -202,7 +202,7 @@ export const createOrReuseReportingArtifact = async (input: {
   cohortSnapshotId: string
   specId: string
   analysisIdentityHash: string
-  artifactPayload: ReportingGroupArtifactPayloadV1
+  artifactPayload: ReportingGroupArtifactPayload
   snapshotHash: string
   generatedByUserId: string
   generatedAt: Date
