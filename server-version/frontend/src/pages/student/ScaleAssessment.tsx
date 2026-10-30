@@ -4,7 +4,7 @@ import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { isTrainingHost } from '../../training/context'
 import { useScaleAutoAdvance } from '../../hooks/useScaleAutoAdvance'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import apiClient, { sessionFetch } from '../../api/client'
 import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { AssessmentShell } from '../../components/assessment-shell'
@@ -133,6 +133,8 @@ const isFinalAttemptConflict = (error: unknown) => {
 
 const ScaleAssessment: React.FC = () => {
   const { scaleId } = useParams<{ scaleId: string }>()
+  const location = useLocation()
+  const courseId = isTrainingHost() ? new URLSearchParams(location.search).get('courseId') ?? undefined : undefined
   const learner = useTrainingLearnerNavigation()
   const navigate = learner.navigate
   const [loading, setLoading] = useState(true)
@@ -226,7 +228,8 @@ const ScaleAssessment: React.FC = () => {
     let cancelled = false
     const startAssessment = async () => {
       try {
-        const response = await apiClient.post<{ assessment: Assessment; scale: Scale & { definitionHash?: string }; preflight?: { requiredContextKeys: ScaleContextKey[] } }>(`/scales/${scaleId}/assessments`, contextInput ? { context: contextInput } : undefined)
+        const startInput = {...(contextInput ? {context: contextInput} : {}), ...(courseId ? {courseId} : {})}
+        const response = await apiClient.post<{ assessment: Assessment; scale: Scale & { definitionHash?: string }; preflight?: { requiredContextKeys: ScaleContextKey[] } }>(`/scales/${scaleId}/assessments`, Object.keys(startInput).length ? startInput : undefined)
         if (cancelled || response.code !== 0 || !response.data) return
         if (response.data.preflight) {
           setRequiredContextKeys(response.data.preflight.requiredContextKeys)
@@ -320,7 +323,7 @@ const ScaleAssessment: React.FC = () => {
     }
     void startAssessment()
     return () => { cancelled = true }
-  }, [navigate, registerScalePersistence, scaleId, contextInput])
+  }, [navigate, registerScalePersistence, scaleId, contextInput, courseId])
 
   const handleSelectAnswer = async (value: ResponseValue, itemCode?: string) => {
     if (!scale || !assessment || savingAnswerRef.current || submitting || submissionLocked) return false
