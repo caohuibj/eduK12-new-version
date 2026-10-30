@@ -17,3 +17,9 @@
 ## mainfa / PR414 资格等待期间的独立收口
 
 只在本Reader分支合入School已冻结候选77e276724，检查点68f047824a940595a9a9346298235c3f4cddaa56；不修改PR414候选。当前backend tree2342ff04dd851b9c82383fd5835f35935ecb67fa与School实际已验tree完全相同，复用原类型收据，不运行后端检查。当前Reader frontend treeb6e7cfb9d6bd52c9f67fcb3b744f3d9b8936f31f实际仅补一次app类型检查，exit0。原导航/浏览器/PDF不重播。PR415保持Draft，尚无自己的正式CI资格。
+
+## PR414旧基线正式原件归档（不改其已验候选）
+
+正式41057783824在candidate77e276724/basefa038041上四作业成功，41个观察实际接纳而非重播；完整126作业列表、原件接纳JSON、两个ZIP的真实下载哈希及原SARIF lossless gzip已在本后续分支归档。SARIF保留一条主线既有测试断言告警，不声称零告警，不改旧源码/阈值。School已验77候选不变。
+
+用户批准406/414依次合并后，新mainfb3a0cab6f3f28e737a38550167ff6b2affcae56尚未在此节点对齐：Git fetch认证失败，新对象本地不存在。GitHub API仍可读，Hui新审阅页已成功追加正式原件与准确阻碍，未重复两项修复结论。停止Git凭据重试，不用旧run代替新基线资格；这些归档先本地保存，恢复Git传输后再推送。没有合并或部署。
