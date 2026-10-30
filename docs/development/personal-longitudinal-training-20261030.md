@@ -132,3 +132,15 @@ static SJT metadata; an author-only SJT source without that metadata is a specif
 picker gap, not a new runner to be built. Tool-specific longitudinal narrative is
 phase two. Cross-version equating, observer reports and categorical Form trends
 are outside this personal phase.
+
+## Reviewed-base continuation
+
+After the first Draft push `6da24a5c4`, Survey's ordinary untracked-C/P-R fix and
+reviewed main PR401 were merged normally at `633af9b2905cc4fef17c665377911adcfc175a1f`.
+All Training files merged without conflict. The personal tracking services,
+leaf adapter, shared disclosure consumer and own-view component are unchanged
+from the original 32-case input. Upstream changes to existing cognitive-profile
+authorization and authoring callers are retained. Current backend and frontend
+TypeScript checks exit 0; original application cases were not replayed for this
+already-reviewed base alignment. The source/evidence identities remain those
+of their original executions, not relabeled as tests of a new build.
