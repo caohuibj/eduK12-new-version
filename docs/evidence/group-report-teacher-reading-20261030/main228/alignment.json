@@ -1,0 +1,24 @@
+{
+  "base": "228f953e31dd768e7a8481e813f5fd90fdaeb321",
+  "product": "0367785f19fadc20b9e9368d8e435377f298bcca",
+  "backendTree": "acd54f1e946bfae679e4fd5fecfa90b70a6a984f",
+  "frontendTree": "3227cd02582e5322a765d4483c4ad2b1ea8a7b77",
+  "mergeConflicts": false,
+  "backendEqualsCurrentMain": true,
+  "unchangedOwnSources": {
+    "server-version/frontend/src/huiteacher/TeacherFormGroupReport.tsx": true,
+    "server-version/frontend/src/huiteacher/HuiteacherGroupReportReading.test.tsx": true,
+    "server-version/e2e/teacher-group-report-browser.cjs": true,
+    "server-version/e2e/teacher-group-report-fixture.tsx": true
+  },
+  "sharedReview": {
+    "Studio": "Draft-only onRemove callback added;CLOSED Form report path unchanged.",
+    "TeacherTrackingNext": "Re-exported EducationTrackingNext keeps same GET tracking,Boolean(baselineId),default Teacher caption and no button for null.",
+    "SelectedToolOutline": "New optional remove/disabled props;CLOSED report remains read-only.",
+    "ci.yml": "Adds School personal longitudinal branch to its fetch selector;415 existing selector retained."
+  },
+  "oldApplicationPgBrowserReplayed": false,
+  "frontendTypes": "Only actual changed frontend compiler tree compiled once;main228/frontend-types.json",
+  "formal": "Existing scope/admission/CodeQL/gate;no new workflow,no merge/deploy",
+  "notion": "Hui review retained;CI map migration stays nonblocking per DOT;no old Qiang page access"
+}
