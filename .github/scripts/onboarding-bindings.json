@@ -198,12 +198,12 @@
       "schemaVersion": 1,
       "pr": 414,
       "enabled": true,
-      "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
-      "product": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
-      "controlCheckpoint": "880223ffdd8092731438b0b25ec27dd8f03ab3d3",
+      "base": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+      "product": "f736217fc2426cbcee35b602eafbed43a5a16164",
+      "controlCheckpoint": "cde473ae5c357df11f1275fc3053e73cd71bd471",
       "components": {
-        "backend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
-        "frontend": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8"
+        "backend": "dc9a331f08901238236ec3664e3173aba3f15030",
+        "frontend": "cba77e36ec1ba531a20f7775ea00a34c91699fe5"
       },
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
@@ -222,12 +222,12 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "574f24bb2eee4b7528cdb38ea506dc1472429c1b"
+        ".github/workflows/ci.yml": "58fdeb56092a75d95fbc832b2e9aee8a714c5113"
       },
       "source": {
         "docs/development/group-report-school-20261030.md": {
           "before": null,
-          "after": "128f9b070513f836fceca053a56678b8fd2c7eeb"
+          "after": "17f485a90dda547eb84fc0fd8d57366e971043e2"
         },
         "docs/evidence/group-report-school-20261030/backend-delta.json": {
           "before": null,
@@ -465,9 +465,33 @@
           "before": null,
           "after": "a267e9779f8b3ecd8323b6c893e4ca1d54fbd30c"
         },
+        "docs/evidence/group-report-school-20261030/mainfb/backend-types.json": {
+          "before": null,
+          "after": "1dfdad38c49a4d1a02aedc60b1c6ca49c1a39909"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/frontend-types.json": {
+          "before": null,
+          "after": "575130332829db3b87583cea84efade5b821b2ef"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/prisma-generate.log.gz": {
+          "before": null,
+          "after": "a6cece008b17e698fda89fb4f500f64cade5259d"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/qualification-plan.json": {
+          "before": null,
+          "after": "2a641caef571f5af15c3ecd5af8695af15822f64"
+        },
         "docs/evidence/group-report-school-20261030/manifest.json": {
           "before": null,
-          "after": "29c1103b185939d7a85ffa211fc854dbb94cb8bd"
+          "after": "4663636cc3983731e3a3271a8cb80a4cb627c58b"
         },
         "docs/evidence/group-report-school-20261030/postgres-continuation.json": {
           "before": null,
@@ -670,7 +694,7 @@
           "after": "24f7d521a70de4e058f382a62623cd1039045d49"
         }
       },
-      "activationNote": "Specific PR414 base/main, Ready and scoped formal-CI confirmation received. Actual mainfa/source10b merge preview matched its source tree before final metadata binding. Existing exact route only;41 original observations and unchanged current component receipts admitted without business/PG replay. Hui checklist remapping uses Git/local record per latest instruction and adds no new gate. No merge or deployment authorization."
+      "activationNote": "Final main406 alignment under specific user approval for PR414 qualification and subsequent DOT merge. Current combined component compilers passed once; original41 business/PG observations reused. Existing exact source/admission/affected SAST/gate only, no new workflow, no local merge/deployment. Original formal41057783824 remains old-base evidence with preserved baseline test advisory."
     },
     "393": {
       "schemaVersion": 1,

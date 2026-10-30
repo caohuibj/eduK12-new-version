@@ -1274,6 +1274,9 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  personalTrackingBaselineId String? @map("personal_tracking_baseline_id")
+  personalTrackingOrdinal Int? @map("personal_tracking_ordinal")
+  personalTracking Json? @map("personal_tracking")
   tags String[] @default([])
   trainingReportSelectionDraft Json? @map("training_report_selection_draft")
   trainingReferenceSelectionDraft Json? @map("training_reference_selection_draft")
@@ -1341,6 +1344,7 @@ model CompositeAssessment {
   @@index([createdBy, status])
   @@index([copyable, status])
   @@index([reportPackageKey, reportPackageVersion], map: "composite_assessments_report_package_key_version_idx")
+  @@unique([personalTrackingBaselineId,personalTrackingOrdinal], map: "composite_personal_tracking_wave")
   @@map("composite_assessments")
   @@index([createdBy, createdAt(sort: Desc), id(sort: Desc)])
   @@index([tags], type: Gin)
@@ -1436,6 +1440,7 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  personalChangesSnapshots Json @default("{}") @map("personal_changes_snapshots")
   trainingContentInterpretationEncrypted String? @map("training_content_interpretation_encrypted")
   trainingContentInterpretationHash String? @map("training_content_interpretation_hash")
   trainingContentBinding Json? @map("training_content_binding")

@@ -402,8 +402,14 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: fetch the immutable reviewed personal tracking source
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'feat/personal-longitudinal-survey-20261030'
-        run: git fetch --no-tags --depth=1 origin a62c9a5763da69aa13b4f70d062b0bf55d6db65f 571a14b73ef81148913f5ff1666e7e461f2f4b92 af8fad552f776615afaa1e91e57a012768021bca e6585ebed49e5cd92e858c19fd930230c791adbb
+        if: github.event_name == 'pull_request' && contains(fromJSON('["feat/personal-longitudinal-survey-20261030","feat/personal-longitudinal-training-20261030"]'), github.event.pull_request.head.ref)
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';import {execFileSync} from 'node:child_process';
+          const b=JSON.parse(readFileSync('.github/scripts/personal-tracking-ready.json'));
+          const refs=[b.reviewedCandidate,b.originalSource,b.backendAuditReuse?.sourceHead,b.frontendAuditReuse?.sourceHead,b.qualificationReuse?.sourceHead,...Object.values(b.files).map(v=>v.originalBase)].filter(Boolean);
+          execFileSync('git',['fetch','--no-tags','--depth=1','origin',...new Set(refs)],{stdio:'inherit'});
+          JS
       - name: fetch the exact diff base without full history
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -1473,7 +1479,7 @@ jobs:
           import {execFileSync} from 'node:child_process';
           import {verifyOriginalApplicationSast} from './.github/scripts/personal-tracking-ready.mjs';
           const plan=JSON.parse(process.env.PERSONAL_TRACKING_PLAN);
-          let paths=['server-version/backend/src/modules/survey','server-version/backend/src/modules/reporting/personal-tracking.ts','server-version/frontend/src/survey','server-version/frontend/src/modules/reporting','.github/scripts/personal-tracking-ready.mjs'];
+          let paths=plan.sastPaths??['server-version/backend/src/modules/survey','server-version/backend/src/modules/reporting/personal-tracking.ts','server-version/frontend/src/survey','server-version/frontend/src/modules/reporting','.github/scripts/personal-tracking-ready.mjs'];
           if(plan.applicationSastReuse){
             execFileSync('git',['fetch','--no-tags','--depth=1','origin',plan.applicationSastReuse.sourceHead]);
             console.log(JSON.stringify(await verifyOriginalApplicationSast(plan)));
@@ -3606,18 +3612,24 @@ jobs:
         env:
           PG_SERVICE: ${{ job.services.postgres.id }}
         run: node .github/scripts/personal-tracking-ready.mjs native
-      - name: install frontend tools and audit locked inputs
+      - name: install frontend tools
         if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse || fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse.nativeOnly }}
         working-directory: server-version/frontend
-        run: |
-          npm ci
-          npm audit --audit-level=high
+        run: npm ci
+      - name: audit frontend when no admitted exact-input success
+        if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').frontendAuditReuse }}
+        working-directory: server-version/frontend
+        run: npm audit --audit-level=high
       - name: actual frontend app types and affected source lint
         if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse || fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse.nativeOnly }}
         working-directory: server-version/frontend
         run: |
           npx tsc -p tsconfig.app.json --noEmit
-          npx eslint src/modules/reporting/PersonalChangesReport.tsx src/modules/reporting/longitudinalVisualization.ts src/survey/SurveyPersonalChanges.tsx src/survey/SurveyPublicApp.tsx src/survey/SurveyWaveStudio.tsx
+          node --input-type=module <<'JS'
+          import {execFileSync} from 'node:child_process';
+          const p=JSON.parse(process.env.PERSONAL_TRACKING_PLAN);
+          execFileSync('node_modules/.bin/eslint',p.frontendLintPaths??['src/modules/reporting/PersonalChangesReport.tsx','src/modules/reporting/longitudinalVisualization.ts','src/survey/SurveyPersonalChanges.tsx','src/survey/SurveyPublicApp.tsx','src/survey/SurveyWaveStudio.tsx'],{stdio:'inherit'});
+          JS
       - uses: actions/upload-artifact@v4
         if: always()
         with:
