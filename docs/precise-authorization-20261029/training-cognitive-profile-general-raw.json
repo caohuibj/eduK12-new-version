@@ -1,0 +1,424 @@
+{
+  "schemaVersion": 1,
+  "localUnsignedEvidence": true,
+  "productionAccessed": false,
+  "invocations": [
+    {
+      "name": "training-cognitive-profile-general-http",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_TRAINING_COGNITIVE_GENERAL=1",
+          "PRECISE_TRAINING_COGNITIVE_GENERAL_EVIDENCE=/workspace/materials-load-20261029/evidence/training-cognitive-profile-general-http-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-cognitive-profile-general-http.json"
+        ],
+        "startedAt": "2026-10-30T01:39:28.213545+00:00",
+        "finishedAt": "2026-10-30T01:39:42.919155+00:00",
+        "exitCode": 1
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\nstdout | src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts > Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke\n[2026-10-30T01:39:42.833Z] [INFO] 队列已关闭\n\n × src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts > Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke > preserves the exact scientific/report source through anonymous admission, revoke, FINAL and historical read 672ms\n   → 匿名综合测评已开始，请保存恢复凭证: expected 200 to be 403 // Object.is equality\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts > Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke > preserves the exact scientific/report source through anonymous admission, revoke, FINAL and historical read\nAssertionError: 匿名综合测评已开始，请保存恢复凭证: expected 200 to be 403 // Object.is equality\n\n- Expected\n+ Received\n\n- 403\n+ 200\n\n ❯ call src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts:16:50\n\n ❯ src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts:55:3\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed (1)\n      Tests  1 failed (1)\n   Start at  01:39:28\n   Duration  14.24s (transform 9.80s, setup 0ms, import 170ms, tests 13.90s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/training-cognitive-profile-general-http.json\n",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793324368564,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke"
+                ],
+                "fullName": "Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke preserves the exact scientific/report source through anonymous admission, revoke, FINAL and historical read",
+                "status": "failed",
+                "title": "preserves the exact scientific/report source through anonymous admission, revoke, FINAL and historical read",
+                "duration": 672.2184339999985,
+                "failureMessages": [
+                  "AssertionError: 匿名综合测评已开始，请保存恢复凭证: expected 200 to be 403 // Object.is equality\n    at call (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts:16:50)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts:55:3\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793324382150,
+            "endTime": 1793324382822.2185,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "stage": "revoked",
+        "ids": {
+          "questionnaire": "62581365-b972-4354-ada6-62904649c67a",
+          "attempt": "457e67a2-fef2-47da-974d-ee551ba8254d",
+          "session": "9badbef0-a699-4b84-b4ea-6e678a215ef4"
+        },
+        "requests": [
+          {
+            "method": "POST",
+            "path": "/questionnaire-products",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/questionnaire-products/62581365-b972-4354-ada6-62904649c67a/items",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/questionnaire-products/62581365-b972-4354-ada6-62904649c67a/publish",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/composite-assessments/62581365-b972-4354-ada6-62904649c67a/public-tokens",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/public/composite-assessments/:token/start",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/public/composite-assessments/attempts/457e67a2-fef2-47da-974d-ee551ba8254d",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/public/cognitive/sessions/9badbef0-a699-4b84-b4ea-6e678a215ef4",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/use-grants/f6774b4d-5dba-45e5-86d1-1ce062e3030e/revoke",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/public/composite-assessments/:token/start",
+            "status": 200,
+            "expectedStatus": 403
+          }
+        ],
+        "observations": [],
+        "scope": "Real anonymous GENERAL parent and native cognitive FINAL. Access/recovery credentials, answers, seeds and report body omitted from evidence."
+      }
+    },
+    {
+      "name": "training-cognitive-profile-general-fixed-http",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_TRAINING_COGNITIVE_GENERAL=1",
+          "PRECISE_TRAINING_COGNITIVE_GENERAL_CHECKPOINT=/workspace/materials-load-20261029/cognitive-general-fixed-private.json",
+          "PRECISE_TRAINING_COGNITIVE_GENERAL_EVIDENCE=/workspace/materials-load-20261029/evidence/training-cognitive-profile-general-fixed-http-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-cognitive-profile-general-fixed-http.json"
+        ],
+        "startedAt": "2026-10-30T01:40:56.528241+00:00",
+        "finishedAt": "2026-10-30T01:41:16.514839+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts > Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke > preserves the exact scientific/report source through anonymous admission, revoke, FINAL and historical read 2148ms\nstdout | src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts > Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke\n[2026-10-30T01:41:16.349Z] [INFO] 队列已关闭\n\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  01:40:57\n   Duration  19.10s (transform 12.23s, setup 0ms, import 217ms, tests 18.59s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/training-cognitive-profile-general-fixed-http.json\n",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793324457217,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke"
+                ],
+                "fullName": "Training GENERAL exact profile anonymous FINAL and frozen report after ordinary revoke preserves the exact scientific/report source through anonymous admission, revoke, FINAL and historical read",
+                "status": "passed",
+                "title": "preserves the exact scientific/report source through anonymous admission, revoke, FINAL and historical read",
+                "duration": 2148.0390000000007,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793324474189,
+            "endTime": 1793324476337.039,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "stage": "complete",
+        "ids": {
+          "newUse": "9e27ad79-b8f2-4421-8a3e-40153057bb29",
+          "newAssignment": "f1fad277-39fb-45ab-96a0-ff2ddad1627d",
+          "questionnaire": "6e3107f3-1c3f-45b9-a73c-5027c7c2302a",
+          "attempt": "79817e13-36e9-417a-8ff5-a840a850c7c4",
+          "session": "c1c50cd5-9f1c-4f9c-aceb-733c1cbdc739"
+        },
+        "requests": [
+          {
+            "method": "POST",
+            "path": "/cognitive/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/research/use-grants",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/assignments",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/assignments/f1fad277-39fb-45ab-96a0-ff2ddad1627d/publish",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/questionnaire-products",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/questionnaire-products/6e3107f3-1c3f-45b9-a73c-5027c7c2302a/items",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/questionnaire-products/6e3107f3-1c3f-45b9-a73c-5027c7c2302a/publish",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/composite-assessments/6e3107f3-1c3f-45b9-a73c-5027c7c2302a/public-tokens",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/public/composite-assessments/:token/start",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/public/composite-assessments/attempts/79817e13-36e9-417a-8ff5-a840a850c7c4",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/public/cognitive/sessions/c1c50cd5-9f1c-4f9c-aceb-733c1cbdc739",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/profile-configurations/training/76162502-e649-4e30-ba23-34856594fb9b/use-grants/9e27ad79-b8f2-4421-8a3e-40153057bb29/revoke",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/public/composite-assessments/:token/start",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/public/composite-assessments/:token/start",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/public/cognitive/sessions/c1c50cd5-9f1c-4f9c-aceb-733c1cbdc739",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/public/cognitive/sessions/c1c50cd5-9f1c-4f9c-aceb-733c1cbdc739/submit",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/public/cognitive/sessions/c1c50cd5-9f1c-4f9c-aceb-733c1cbdc739/submit",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/public/composite-assessments/attempts/79817e13-36e9-417a-8ff5-a840a850c7c4",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/composite-assessments/6e3107f3-1c3f-45b9-a73c-5027c7c2302a/attempts/79817e13-36e9-417a-8ff5-a840a850c7c4/report",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/composite-assessments/6e3107f3-1c3f-45b9-a73c-5027c7c2302a/attempts/79817e13-36e9-417a-8ff5-a840a850c7c4/report",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/composite-assessments/6e3107f3-1c3f-45b9-a73c-5027c7c2302a/attempts/79817e13-36e9-417a-8ff5-a840a850c7c4/report",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "GET",
+            "path": "/public/cognitive/sessions/c1c50cd5-9f1c-4f9c-aceb-733c1cbdc739",
+            "status": 200,
+            "expectedStatus": 200
+          }
+        ],
+        "observations": [
+          {
+            "ordinaryRevokeStopsNewAnonymousStart": true,
+            "admittedRecoverySeedRetained": true,
+            "exactResearch60TrialsFinal": true,
+            "idempotentFinal": true,
+            "parentCompleted": true,
+            "historicalReportReadableAfterRevoke": true,
+            "reportProfileFixed": "research",
+            "otherTeacherCannotReadReport": true,
+            "originalT3BindingUnchanged": true
+          }
+        ],
+        "scope": "Real anonymous GENERAL parent and native cognitive FINAL. Access/recovery credentials, answers, seeds and report body omitted from evidence."
+      }
+    },
+    {
+      "name": "training-cognitive-profile-general-fixed-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/training-cognitive-profile-types.json"
+        ],
+        "startedAt": "2026-10-30T01:41:52.265815+00:00",
+        "finishedAt": "2026-10-30T01:42:18.858232+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "name": "training-cognitive-profile-general-retained-counts",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "node",
+          "--import",
+          "tsx",
+          "/workspace/materials-load-20261029/read-cognitive-final-counts.ts"
+        ],
+        "startedAt": "2026-10-30T01:42:55.128079+00:00",
+        "finishedAt": "2026-10-30T01:42:55.818345+00:00",
+        "exitCode": 0
+      },
+      "log": "{\n  \"scope\": \"retained synthetic local fixture only\",\n  \"uses\": 5,\n  \"cognitiveAssignments\": 8,\n  \"cognitiveSessions\": 6,\n  \"general\": [\n    {\n      \"id\": \"62581365-b972-4354-ada6-62904649c67a\",\n      \"name\": \"Synthetic cognitive exact GENERAL report\",\n      \"attempts\": [\n        {\n          \"id\": \"457e67a2-fef2-47da-974d-ee551ba8254d\",\n          \"status\": \"IN_PROGRESS\"\n        },\n        {\n          \"id\": \"12ef472b-98c0-453f-8a2f-807bf301cee0\",\n          \"status\": \"IN_PROGRESS\"\n        }\n      ]\n    },\n    {\n      \"id\": \"6e3107f3-1c3f-45b9-a73c-5027c7c2302a\",\n      \"name\": \"Synthetic cognitive precise GENERAL fixed admission\",\n      \"attempts\": [\n        {\n          \"id\": \"79817e13-36e9-417a-8ff5-a840a850c7c4\",\n          \"status\": \"COMPLETED\"\n        }\n      ]\n    }\n  ]\n}\n[2026-10-30T01:42:55.788Z] [INFO] 队列已关闭\n"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/composite/composite.service.ts",
+      "sha256": "aac1291fc0ffb60e6da31e51640a186c862166ba131a58ff36f85f5d353a1871"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts",
+      "sha256": "1064660d2d465ba1f8b9c54ade1d6f690a320240d1e8f74769d9bbe37f1bdf18"
+    }
+  ]
+}

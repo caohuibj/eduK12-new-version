@@ -2882,11 +2882,12 @@ const createAttempt = async (
   }
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
   const hasStandardCombinations=composite.items.some((item:any)=>item.standardCombinationSource!=null)
+  const hasPreciseCognitiveProfiles=composite.items.some((item:any)=>item.type==='COGNITIVE'&&readTrainingCognitiveTaskBinding(item.cognitiveAssignment?.courseSnapshot)!==null)
   const educationStandardUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationStandard):[]
   const educationLibraryUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationLibrary):[]
   const educationStandards=await readEducationStandardStartSources(db as Prisma.TransactionClient,educationStandardUnits,composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scale))
   const educationFrozenScales=new Map<string,Awaited<ReturnType<typeof freezeExactStandardScaleDefinition>>>()
-  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations||educationStandardUnits.length>0||educationLibraryUnits.length>0) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
+  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations||hasPreciseCognitiveProfiles||educationStandardUnits.length>0||educationLibraryUnits.length>0) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
   if (variantEnabled || flowEnabled) {
     if(variantEnabled)await assertTrainingVariantAuthoringScope(db as any, composite)
