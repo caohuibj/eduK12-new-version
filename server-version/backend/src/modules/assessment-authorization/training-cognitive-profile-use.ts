@@ -1,3 +1,4 @@
+import {readApprovedCognitiveProfileArtifact} from './cognitive-profile-approved-source'
 import {Prisma} from '@prisma/client'
 import {randomUUID} from 'node:crypto'
 import {z} from 'zod'
@@ -62,18 +63,8 @@ async function original(tx:Tx,grantId:string,configId:string){
  if(event.actorId!==meta.selectedBinding.binding.authorization.issuerId)conflict('认知配置发行者与原审计不一致')
  return meta
 }
-export async function readApprovedTrainingCognitiveArtifact(tx:Tx,configId:string,rawProfile:unknown,artifactHash:string){
- const selected=profile.parse(rawProfile);id.parse(configId);hash.parse(artifactHash)
- const rows=await tx.$queryRaw<Array<{configuration:unknown;format:string}>>`SELECT DISTINCT metadata->'configuration' AS configuration,
-  COALESCE(metadata->>'artifactFormatVersion','1') AS format FROM assessment_management_events
-  WHERE action='COGNITIVE_PROFILE_APPROVED' AND resource_id=${configId} AND metadata->>'artifactHash'=${artifactHash} LIMIT 2`
- if(rows.length!==1||rows[0].format!=='2')conflict('该精确 profile 尚未完成执行闭包的系统审批')
- const configuration=cognitiveProfileApprovalReceipt.shape.configuration.parse(rows[0].configuration)
- if(configuration.configId!==configId||configuration.profile!==selected)conflict('所选 profile 与批准来源不一致')
- const artifact=await loadCognitiveProfileArtifact(artifactHash,configuration)
- await assertPublishedCognitiveArtifactSource(tx,artifact)
- const policy=await assertToolEntryPolicy(tx,cognitiveProfilePolicyIdentity(configId,selected,artifactHash),'TRAINING')
- return {artifact,policy}
+export function readApprovedTrainingCognitiveArtifact(tx:Tx,configId:string,rawProfile:unknown,artifactHash:string){
+ return readApprovedCognitiveProfileArtifact(tx,configId,rawProfile,artifactHash,'TRAINING')
 }
 
 /** Reuses the existing immutable/versioned capability grant store. No mirrored

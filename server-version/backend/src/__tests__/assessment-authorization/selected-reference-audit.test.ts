@@ -13,6 +13,10 @@ describe('T2 exact reference audit',()=>{
   expect(a.removed).toEqual([one]);expect(a.added).toEqual([two]);expect(a.changeHash).toMatch(/^[a-f0-9]{64}$/)
   expect(selectedReferenceChanges([two,one],[])?.changeHash).toBe(selectedReferenceChanges([one,two],[])?.changeHash)
  })
+ it('retains cognitive profile kind and exact artifact identity in the same audit contract',()=>{
+  const cognitive={...one,kind:'COGNITIVE_PROFILE' as const};const delta=selectedReferenceChanges([one],[cognitive])!
+  expect(delta.removed).toEqual([one]);expect(delta.added).toEqual([cognitive]);expect(delta.changeHash).not.toBe(selectedReferenceChanges([one],[])?.changeHash)
+ })
  it('fails closed on duplicated slots, malformed provided pointers and undeclared body fields',()=>{
   expect(()=>selectedReferenceChanges([one,one],[])).toThrow('DUPLICATE_SELECTED_REFERENCE_SLOT')
   expect(()=>selectedReferenceChanges([{...one,selectedBinding:null} as any],[])).toThrow()

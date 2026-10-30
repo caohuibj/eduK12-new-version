@@ -1,3 +1,4 @@
+import {isSurveyCognitiveProfileRef,surveyCognitiveProfilePolicy,assertSurveyCognitiveProfileSourceCurrent} from './cognitive-profile.source'
 import {assertGovernedEntryAllowed} from './governed-tool.service'
 import {assertFrozenPackageAdmissions} from './governed-package.service'
 import {Prisma} from '@prisma/client'
@@ -18,6 +19,7 @@ export const standardPolicyIdentity=(key:string,version:string):PolicyIdentity=>
  return source?scaleSourcePolicyIdentity(source):{resourceKey:`standard:${key}:${version}`,fingerprint:canonicalHash({key,version,missing:true})}
 }
 export async function snapshotPolicyIdentity(tx:Prisma.TransactionClient,snapshot:CatalogSourceSnapshot):Promise<PolicyIdentity>{
+ if(isSurveyCognitiveProfileRef(snapshot.ref))return surveyCognitiveProfilePolicy(snapshot)
  const governed=snapshot.provenance.surveyToolReleaseId
  if(typeof governed==='string')return {resourceKey:'governed-release:'+governed,fingerprint:snapshot.ref.sourceVersion}
  const approved=snapshot.provenance.surveyStandardReleaseId
@@ -85,6 +87,9 @@ export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClie
    // The strict governed check already locked the identical policy/hash and
    // required APPROVED. Keep the source grant check above in this transaction.
    continue
+  }
+  if(isSurveyCognitiveProfileRef(ref)){
+   try{await assertSurveyCognitiveProfileSourceCurrent(tx,{ref,provenance:p})}catch(error){if(error instanceof AdminPermissionError)throw error;throw new AdminPermissionError(409,error instanceof Error?error.message:'原精确认知来源不可用')}
   }
   if(typeof p.surveyStandardReleaseId==='string'){
    const [release]=await tx.$queryRaw<Array<{state:string;combination_hash:string}>>`SELECT state,combination_hash FROM survey_standard_releases WHERE id=${p.surveyStandardReleaseId} FOR SHARE`

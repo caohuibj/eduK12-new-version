@@ -51,7 +51,7 @@ export function useSurveyStandardConfigurationGrant(actorId:string|null,api:Cata
  async function issue(recipientId:string,source:CatalogSourceRef,title:string,configurationName:string,password:string,replaces?:SurveyStandardReplacement){
   if(pending||blocked)throw Error('请先核对原配置请求。')
   const value={requestId:crypto.randomUUID(),recipientId,source:{kind:source.kind,sourceId:source.sourceId,sourceVersion:source.sourceVersion},title,configurationName:configurationName.trim(),...(replaces?{replaces}:{})}
-  if(!isSurveyStandardPending(value))throw Error('请填写业务配置名称，并选择已批准的精确标准量表组合。')
+  if(!isSurveyStandardPending(value))throw Error('请填写业务配置名称，并选择已批准的精确量表或认知配置。')
   return send(value,password)
  }
  async function recover(){

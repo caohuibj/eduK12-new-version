@@ -64,6 +64,7 @@ const page=(raw:unknown)=>z.coerce.number().int().min(1).max(1000).default(1).pa
 surveyPlatformRouter.get('/source-catalog',handler(req=>catalog.sourceCatalog(req.user!.userId,{
   discovery:z.object(catalogDiscoveryQueryFields).parse(req.query),page:page(req.query.page),kind:sourceRef.shape.kind.optional().parse(req.query.kind),
   organizationId:sourceRef.shape.organizationId.parse(req.query.organizationId)})))
+surveyPlatformRouter.get('/cognitive-profile-preview',handler(req=>catalog.previewSurveyCognitiveProfileSource(req.user!.userId,sourceRef.parse({kind:'COGNITIVE',sourceId:req.query.sourceId,sourceVersion:req.query.sourceVersion}))))
 surveyPlatformRouter.get('/researchers/:id/tool-grants',handler(req=>catalog.listToolGrants(req.user!.userId,inviteId.parse(req.params.id),page(req.query.page))))
 surveyPlatformRouter.use('/researchers/:id/tool-grant-requests',(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 surveyPlatformRouter.get('/researchers/:id/tool-grant-requests/:requestId',handler(async req=>{

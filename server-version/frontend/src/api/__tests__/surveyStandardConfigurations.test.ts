@@ -45,3 +45,16 @@ describe('Survey original replacement intent',()=>{
   for(const malformed of [{},{selectedBinding:null}])expect(sameSurveyStandardOperation(p,{...op,grant:{...op.grant,supersedes:malformed}} as unknown as SurveyStandardOperation)).toBe(false)
  })
 })
+
+
+describe('Survey exact cognitive profile original intent',()=>{
+ const source={kind:'COGNITIVE' as const,sourceId:'cognitive-profile:'+id(3)+':experience',sourceVersion:'f'.repeat(64)}
+ const p={...pending,source},op={...operation,request:{...operation.request,source},grant:{...operation.grant,kind:'COGNITIVE' as const,sourceRef:source}}
+ it('retains the exact profile artifact without accepting another profile, guessed latest, organization or arbitrary binding',()=>{
+  expect(isSurveyStandardPending(p)).toBe(true);expect(sameSurveyStandardOperation(p,op)).toBe(true)
+  for(const change of [{...source,sourceVersion:'latest'},{...source,sourceId:'cognitive-profile:'+id(3)+':unknown'},
+   {...source,sourceId:source.sourceId+':extra'},{...source,organizationId:id(4)},{...source,kind:'SCALE'}, {...source,sourceId:null}])expect(isSurveyStandardPending({...p,source:change})).toBe(false)
+  for(const change of [{...source,sourceId:'cognitive-profile:'+id(3)+':research'},{...source,sourceVersion:'e'.repeat(64)}])
+   expect(sameSurveyStandardOperation(p,{...op,request:{...op.request,source:change}})).toBe(false)
+ })
+})

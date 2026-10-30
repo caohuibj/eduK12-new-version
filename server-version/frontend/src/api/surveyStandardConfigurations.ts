@@ -4,13 +4,19 @@ export type SurveyStandardPending={requestId:string;recipientId:string;source:Ca
 export type SurveyStandardOperation={grant:CatalogGrant;request:{requestId:string;userId:string;configurationName:string;source:CatalogSourceRef;replaces?:SurveyStandardReplacement}}
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i,hash=/^[a-f0-9]{64}$/
 const keys=(value:object,names:string[])=>Object.keys(value).sort().join('|')===names.sort().join('|')
-export const isSurveyStandardSource=(source:CatalogSourceRef)=>source.kind==='SCALE'&&source.sourceId.startsWith('survey-standard:')
+export const isSurveyStandardSource=(source:CatalogSourceRef)=>source?.kind==='SCALE'&&typeof source.sourceId==='string'&&source.sourceId.startsWith('survey-standard:')
+export const isSurveyCognitiveProfileSource=(source:CatalogSourceRef)=>{
+ if(!source||typeof source.sourceId!=='string'||typeof source.sourceVersion!=='string')return false
+ const [prefix,id,profile,...extra]=source.sourceId.split(':')
+ return source.kind==='COGNITIVE'&&prefix==='cognitive-profile'&&!extra.length&&uuid.test(id)&&['experience','standard','research'].includes(profile)&&hash.test(String(source.sourceVersion))&&!source.organizationId
+}
+export const isSurveyExactConfigurationSource=(source:CatalogSourceRef)=>isSurveyStandardSource(source)||isSurveyCognitiveProfileSource(source)
 export function isSurveyStandardPending(raw:unknown):raw is SurveyStandardPending{
  if(!raw||typeof raw!=='object')return false
  const v=raw as SurveyStandardPending,s=v.source
  const r=v.replaces
  return keys(v,['requestId','recipientId','source','configurationName','title',...(r===undefined?[]:['replaces'])])&&uuid.test(v.requestId)&&uuid.test(v.recipientId)
-  &&Boolean(s)&&keys(s,['kind','sourceId','sourceVersion'])&&isSurveyStandardSource(s)&&uuid.test(s.sourceId.slice(16))&&hash.test(String(s.sourceVersion))
+  &&Boolean(s)&&keys(s,['kind','sourceId','sourceVersion'])&&isSurveyExactConfigurationSource(s)&&(!isSurveyStandardSource(s)||uuid.test(s.sourceId.slice(16)))&&typeof s.sourceVersion==='string'&&hash.test(s.sourceVersion)
   &&typeof v.configurationName==='string'&&v.configurationName.trim().length>0&&v.configurationName.length<=120
   &&typeof v.title==='string'&&v.title.length>0&&v.title.length<=1000
   &&(r===undefined||Boolean(r)&&keys(r,['grantId','expectedVersion','reason'])&&uuid.test(r.grantId)&&r.grantId!==v.requestId&&r.expectedVersion===1

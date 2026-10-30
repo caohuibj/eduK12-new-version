@@ -1,3 +1,4 @@
+import {isSurveyCognitiveProfileRef,parseSurveyCognitiveProfileRef,readSurveyCognitiveProfileSource,hydrateSurveyCognitiveProfileSource} from './cognitive-profile.source'
 import type {CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {packageBoundCatalogSnapshots,assertNotTechnicalPackageGrant} from './governed-package.service'
 import {isGovernedSource} from './governed-tool.model'
@@ -30,6 +31,7 @@ export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourc
   const result=await listCatalogSources({actorUserId,...input},prisma)
   const list=[]
   for(const row of result.list){
+    if(isSurveyCognitiveProfileRef(row.ref)){list.push(row);continue}
     if(row.ref.kind!=='SCALE'||!row.available){
       if(isGovernedSource(row.ref.sourceId)&&row.available){try{await assertGovernedEntryAllowed(prisma,row.ref.sourceId.slice(12),row.ref.sourceVersion);list.push(row)}catch(e){list.push({...row,available:false,unsupportedReason:e instanceof Error?e.message:'尚未准入 Survey'})}}
       else list.push(row.ref.kind!=='SCALE'&&row.available?{...row,available:false,unsupportedReason:'此原来源尚未经过系统三版本审批；请先在工具库审批中提交精确版本'}:row)
@@ -67,6 +69,7 @@ async function target(tx:Tx,id:string){
 }
 export async function grantCatalogSource(actorUserId:string,userId:string,ref:CatalogSourceRef,exact?:unknown){
   const precise=exact===undefined?null:surveyStandardUseInput.parse(exact)
+  if(isSurveyCognitiveProfileRef(ref)){if(!precise)fail(400,'精确 profile 分配必须带原请求编号及业务配置名称');return grantSurveyCognitiveProfileSource(actorUserId,userId,ref,precise!)}
   if(precise&&(ref.kind!=='SCALE'||!/^survey-standard:[a-f0-9-]{36}$/.test(ref.sourceId)||ref.organizationId))fail(409,'固定配置授权须选择已批准的精确标准量表组合')
   return prisma.$transaction(async tx=>{
     const manager=await assertSurveyManager(tx,actorUserId);await target(tx,userId)
@@ -144,7 +147,7 @@ export async function grantCatalogSource(actorUserId:string,userId:string,ref:Ca
 }
 export async function listToolGrants(actorUserId:string,userId:string,page=1){
   await assertSurveyManager(prisma,actorUserId)
-  const rows=await prisma.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,jsonb_build_object('title',snapshot->'title','ref',snapshot->'ref','provenance',jsonb_build_object('license',snapshot#>'{provenance,license}','reuseAuthority',snapshot#>'{provenance,reuseAuthority}','selectedBinding',snapshot#>'{provenance,selectedBinding}','configurationName',snapshot#>'{provenance,configurationName}','triplet',snapshot#>'{provenance,triplet}','sourceMeasurementRelease',snapshot#>'{provenance,sourceMeasurementRelease}','surveyStandardReleaseId',snapshot#>'{provenance,surveyStandardReleaseId}','code',snapshot#>'{provenance,code}','standardInstrumentVersion',snapshot#>'{provenance,standardInstrumentVersion}'),
+  const rows=await prisma.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,jsonb_build_object('title',snapshot->'title','ref',snapshot->'ref','provenance',jsonb_build_object('license',snapshot#>'{provenance,license}','reuseAuthority',snapshot#>'{provenance,reuseAuthority}','cognitiveProfile',snapshot#>'{provenance,cognitiveProfile}','selectedBinding',snapshot#>'{provenance,selectedBinding}','configurationName',snapshot#>'{provenance,configurationName}','triplet',snapshot#>'{provenance,triplet}','sourceMeasurementRelease',snapshot#>'{provenance,sourceMeasurementRelease}','surveyStandardReleaseId',snapshot#>'{provenance,surveyStandardReleaseId}','code',snapshot#>'{provenance,code}','standardInstrumentVersion',snapshot#>'{provenance,standardInstrumentVersion}'),
       'definitionDigest',snapshot->'definitionDigest','adapterVersion',snapshot->'adapterVersion') AS snapshot,snapshot_digest AS "snapshotDigest",
     created_at AS "createdAt",revoked_at AS "revokedAt" FROM survey_tool_grants WHERE user_id=${userId} AND NOT EXISTS(SELECT 1 FROM survey_package_members pm WHERE pm.technical_grant_id=survey_tool_grants.id)
     ORDER BY created_at DESC,id LIMIT 25 OFFSET ${(page-1)*25}`
@@ -210,7 +213,9 @@ export async function catalogSnapshotsForDrafts(tx:Tx,userId:string,ids:readonly
       ||active&&row.status!=='ACTIVE')fail(409,'工具来源授权已变化，请重新载入')
   }
   if(active)await assertSurveyStandardUseAuthority(tx,rows)
-  return packageBoundCatalogSnapshots(tx,userId,map,active)
+  const resolved=await packageBoundCatalogSnapshots(tx,userId,map,active)
+  for(const [key,snapshot] of resolved)if(isSurveyCognitiveProfileRef(snapshot.ref))resolved.set(key,await hydrateSurveyCognitiveProfileSource(tx,snapshot))
+  return resolved
 }
 export function compileCatalogUnit(draft:{id:string;instrumentKey:string;kind:string;title:string;revision:number;definition:unknown;catalogGrantId?:string|null},snapshot:CatalogSnapshot):ResearchFrozenUnit{
   const packageBinding=snapshot.provenance.surveyPackage as {draftId:string}|undefined
@@ -227,9 +232,75 @@ export function compileCatalogUnit(draft:{id:string;instrumentKey:string;kind:st
       adapterVersion:snapshot.adapterVersion},...(snapshot.answerMapping?{sourceAnswerMapping:snapshot.answerMapping}:{})}
 }
 export async function researcherCatalog(tx:Tx,userId:string,page:number){
-  const rows=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,jsonb_build_object('title',snapshot->'title','ref',snapshot->'ref','provenance',jsonb_build_object('license',snapshot#>'{provenance,license}','reuseAuthority',snapshot#>'{provenance,reuseAuthority}','selectedBinding',snapshot#>'{provenance,selectedBinding}','configurationName',snapshot#>'{provenance,configurationName}','triplet',snapshot#>'{provenance,triplet}','sourceMeasurementRelease',snapshot#>'{provenance,sourceMeasurementRelease}','surveyStandardReleaseId',snapshot#>'{provenance,surveyStandardReleaseId}','code',snapshot#>'{provenance,code}','standardInstrumentVersion',snapshot#>'{provenance,standardInstrumentVersion}'),
+  const rows=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,jsonb_build_object('title',snapshot->'title','ref',snapshot->'ref','provenance',jsonb_build_object('license',snapshot#>'{provenance,license}','reuseAuthority',snapshot#>'{provenance,reuseAuthority}','cognitiveProfile',snapshot#>'{provenance,cognitiveProfile}','selectedBinding',snapshot#>'{provenance,selectedBinding}','configurationName',snapshot#>'{provenance,configurationName}','triplet',snapshot#>'{provenance,triplet}','sourceMeasurementRelease',snapshot#>'{provenance,sourceMeasurementRelease}','surveyStandardReleaseId',snapshot#>'{provenance,surveyStandardReleaseId}','code',snapshot#>'{provenance,code}','standardInstrumentVersion',snapshot#>'{provenance,standardInstrumentVersion}'),
       'definitionDigest',snapshot->'definitionDigest','adapterVersion',snapshot->'adapterVersion') AS snapshot,snapshot_digest AS "snapshotDigest",
     created_at AS "createdAt",revoked_at AS "revokedAt" FROM survey_tool_grants
     WHERE user_id=${userId} AND status='ACTIVE' AND NOT EXISTS(SELECT 1 FROM survey_package_members pm WHERE pm.technical_grant_id=survey_tool_grants.id) ORDER BY created_at DESC,id LIMIT 25 OFFSET ${(page-1)*25}`
   return {page,pageSize:25,list:rows.map(view)}
+}
+
+/** Same immutable SurveyToolGrant path, explicit native profile identity. No
+ * Training permission, new ledger or technical choice by the researcher. */
+async function grantSurveyCognitiveProfileSource(actorUserId:string,userId:string,ref:CatalogSourceRef,input:ReturnType<typeof surveyStandardUseInput.parse>){
+ const source=parseSurveyCognitiveProfileRef(ref),intent=canonicalHash({schemaVersion:1,actorUserId,userId,ref,...input})
+ if(input.replaces?.grantId===input.requestId)fail(409,'新修订不能替换自身请求编号')
+ return prisma.$transaction(async tx=>{
+  const manager=await assertSurveyManager(tx,actorUserId)
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-profile-request:'+input.requestId}))`
+  const [prior]=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,snapshot,snapshot_digest AS "snapshotDigest",created_at AS "createdAt",revoked_at AS "revokedAt"
+   FROM survey_tool_grants WHERE id=${input.requestId} FOR SHARE`
+  if(prior){
+   if(prior.createdBy!==actorUserId||prior.userId!==userId||canonicalHash(prior.snapshot)!==prior.snapshotDigest||!readSurveyStandardUse(prior)
+    ||prior.snapshot.provenance.configurationRequestIntentHash!==intent)fail(409,'原请求编号已用于其他 profile、接收者或完整意图')
+   return {...view(prior),replayed:true}
+  }
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-profile-recipient:'+userId+':'+source.configId}))`
+  await target(tx,userId)
+  const snapshot=await readSurveyCognitiveProfileSource(tx,ref)
+  const active=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,snapshot,snapshot_digest AS "snapshotDigest",created_at AS "createdAt",revoked_at AS "revokedAt"
+   FROM survey_tool_grants WHERE user_id=${userId} AND status='ACTIVE'
+    AND (snapshot#>>'{provenance,selectedBinding,binding,configuration,configId}'=${source.configId} OR snapshot#>>'{ref,sourceId}'=${source.configId}) ORDER BY id LIMIT 2 FOR UPDATE`
+  if(active.length>1)fail(409,'同工具存在多个原使用配置，请管理员先明确处理')
+  if(active.some(row=>row.createdBy!==actorUserId))fail(403,'不能接管另一发行者的认知使用配置')
+  if(active.length&&input.replaces?.grantId!==active[0].id)fail(409,'请明确原授权修订和替换原因；旧来源不静默升级')
+  let supersedes:ReturnType<typeof readSurveyStandardSupersedes>=null
+  if(input.replaces){
+   const [previous]=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,snapshot,snapshot_digest AS "snapshotDigest",created_at AS "createdAt",revoked_at AS "revokedAt"
+    FROM survey_tool_grants WHERE id=${input.replaces.grantId} FOR UPDATE`
+   if(!previous||previous.userId!==userId||previous.createdBy!==actorUserId||previous.status!=='ACTIVE'||canonicalHash(previous.snapshot)!==previous.snapshotDigest)fail(409,'原配置已经失效或不属于本次替换身份')
+   const selected=readSurveyStandardUse(previous),c=selected?.binding.configuration
+   if(!selected||c?.kind!=='COGNITIVE_PROFILE'||c.configId!==source.configId)fail(409,'旧来源不具备同工具的精确 profile 证据，请明确撤销后再分配')
+   supersedes={selectedBinding:selectedConfigurationPointer(selected!),reason:input.replaces.reason}
+  }
+  const configuration=(snapshot.provenance.cognitiveProfile as {configuration:unknown}).configuration as Parameters<typeof sealSelectedConfigurationBinding>[0]['configuration']
+  const selected=sealSelectedConfigurationBinding({product:'SURVEY',configuration,authorization:{kind:'COGNITIVE_PROFILE_USE',id:input.requestId,revision:1,issuerId:actorUserId,recipientId:userId,organizationId:null,
+   authority:[{kind:'ENTRY_ADMIN',id:manager.grantId,revision:manager.grantVersion}]}})
+  snapshot.provenance={...snapshot.provenance,selectedBinding:selected,configurationName:input.configurationName,configurationRequestIntentHash:intent,...(supersedes?{configurationSupersedes:supersedes}:{})}
+  const digest=canonicalHash(snapshot)
+  const [row]=await tx.$queryRaw<Grant[]>`INSERT INTO survey_tool_grants(id,user_id,status,snapshot,snapshot_digest,created_by)
+   VALUES(${input.requestId},${userId},'ACTIVE',${JSON.stringify(snapshot)}::jsonb,${digest},${actorUserId})
+   RETURNING id,user_id AS "userId",created_by AS "createdBy",status,snapshot,snapshot_digest AS "snapshotDigest",created_at AS "createdAt",revoked_at AS "revokedAt"`
+  await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:userId,action:'CATALOG_TOOL_GRANTED',metadata:{grantId:input.requestId,source:ref,snapshotDigest:digest,selectedBinding:selected,
+   configurationName:input.configurationName,requestIntentHash:intent,selfGrant:actorUserId===userId,...(supersedes?{supersedes}:{})}}})
+  if(supersedes){
+   const changed=await tx.$executeRaw`UPDATE survey_tool_grants SET status='REVOKED',revoked_at=clock_timestamp() WHERE id=${supersedes.selectedBinding.authorizationId} AND status='ACTIVE'`
+   if(changed!==1)fail(409,'原配置已变化，本次替换没有保存')
+   await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:userId,action:'CATALOG_TOOL_CONFIGURATION_REPLACED',metadata:{previous:supersedes.selectedBinding,next:selectedConfigurationPointer(selected),reason:supersedes.reason,policy:'STOP_NEW_ADMISSION_AND_COLLECTION_KEEP_SAVED_DATA'}}})
+  }
+  return {...view(row),replayed:false}
+ },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000})
+}
+/** Selected configuration preview only; no grant, trial or participant data. */
+export async function previewSurveyCognitiveProfileSource(actorUserId:string,ref:CatalogSourceRef){
+ return prisma.$transaction(async tx=>{
+  await assertSurveyManager(tx,actorUserId)
+  const source=await readSurveyCognitiveProfileSource(tx,ref),snapshot=await hydrateSurveyCognitiveProfileSource(tx,source)
+  const frozen=(await import('./cognitive.definition')).parseFrozenSurveyCognitive(snapshot.compiledDefinition)
+  if(frozen.schemaVersion!==2)return fail(409,'所选来源不是精确 profile')
+  const report=frozen.artifact.resolvedReport
+  return {source:ref,artifactHash:frozen.artifactHash,profile:frozen.artifact.identity.profile,reportStyle:{title:report.reportDefinition.title,
+   caveats:report.reportCaveats,disclaimer:report.reportDefinition.disclaimer,
+   headline:report.reportDefinition.primaryMetrics.map(key=>({key,label:report.metricDefinitions[key]?.label??key})),
+   detail:report.reportDefinition.secondaryMetrics.map(key=>({key,label:report.metricDefinitions[key]?.label??key}))}}
+ },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000})
 }

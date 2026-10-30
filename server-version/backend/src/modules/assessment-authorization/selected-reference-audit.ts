@@ -3,7 +3,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {selectedConfigurationPointerSchema} from './standard-configuration-binding'
 
 const hash=z.string().regex(/^[a-f0-9]{64}$/)
-const reference=z.object({slotId:z.string().min(1).max(240),kind:z.literal('STANDARD_COMBINATION'),
+const reference=z.object({slotId:z.string().min(1).max(240),kind:z.enum(['STANDARD_COMBINATION','COGNITIVE_PROFILE']),
  sourceId:z.string().guid(),sourceHash:hash,referenceHash:hash,selectedBinding:selectedConfigurationPointerSchema}).strict()
 export type SelectedReferenceAudit=z.infer<typeof reference>
 

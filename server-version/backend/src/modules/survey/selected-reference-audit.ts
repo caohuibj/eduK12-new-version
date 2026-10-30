@@ -17,7 +17,7 @@ export async function surveyWaveReferenceChanges(tx:Prisma.TransactionClient,own
  const rows=await tx.$queryRaw<Array<{draftId:string;catalogGrantId:string|null;id:string|null;createdBy:string;userId:string;snapshot:Parameters<typeof readSurveyStandardUse>[0]['snapshot'];snapshotDigest:string}>>(Prisma.sql`
   SELECT d.id AS "draftId",d.catalog_grant_id AS "catalogGrantId",g.id,g.created_by AS "createdBy",g.user_id AS "userId",
    jsonb_build_object('ref',g.snapshot->'ref','provenance',jsonb_build_object(
-    'selectedBinding',g.snapshot#>'{provenance,selectedBinding}','configurationName',g.snapshot#>'{provenance,configurationName}',
+    'cognitiveProfile',g.snapshot#>'{provenance,cognitiveProfile}','selectedBinding',g.snapshot#>'{provenance,selectedBinding}','configurationName',g.snapshot#>'{provenance,configurationName}',
     'configurationSupersedes',g.snapshot#>'{provenance,configurationSupersedes}',
     'surveyStandardReleaseId',g.snapshot#>'{provenance,surveyStandardReleaseId}','code',g.snapshot#>'{provenance,code}',
     'standardInstrumentVersion',g.snapshot#>'{provenance,standardInstrumentVersion}','triplet',g.snapshot#>'{provenance,triplet}',
@@ -32,8 +32,8 @@ export async function surveyWaveReferenceChanges(tx:Prisma.TransactionClient,own
   const sealed=readSurveyStandardUse({...row,id:row.id})
   if(!sealed)continue
   const c=sealed.binding.configuration
-  if(c.kind!=='STANDARD_COMBINATION'||!z.string().regex(/^[a-f0-9]{64}$/).safeParse(row.snapshotDigest).success)return fail('原研究固定配置身份不完整')
-  selected.set(row.draftId,{slotId:row.draftId,kind:'STANDARD_COMBINATION',sourceId:c.combinationId,sourceHash:c.combinationHash,
+  if(!z.string().regex(/^[a-f0-9]{64}$/).safeParse(row.snapshotDigest).success)return fail('原研究固定配置身份不完整')
+  selected.set(row.draftId,{slotId:row.draftId,kind:c.kind,sourceId:c.kind==='STANDARD_COMBINATION'?c.combinationId:c.configId,sourceHash:c.kind==='STANDARD_COMBINATION'?c.combinationHash:row.snapshot.ref.sourceVersion,
    referenceHash:row.snapshotDigest,selectedBinding:selectedConfigurationPointer(sealed)})
  }
  const project=(values:string[])=>values.flatMap(id=>selected.has(id)?[selected.get(id)!]:[])

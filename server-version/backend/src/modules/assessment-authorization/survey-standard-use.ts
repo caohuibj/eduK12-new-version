@@ -1,3 +1,4 @@
+import {isSurveyCognitiveProfileRef,parseSurveyCognitiveProfileRef} from '../survey/cognitive-profile.source'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import type {CatalogSourceSnapshot} from '../survey/catalog.sources'
@@ -24,6 +25,14 @@ export function readSurveyStandardUse(row:SurveyUseRow):SelectedConfigurationBin
  const {configuration:c,authorization:a}=selected.binding,p=row.snapshot.provenance
  const supersedes=readSurveyStandardSupersedes(p.configurationSupersedes)
  if(supersedes&&(supersedes.selectedBinding.authorizationId===row.id||supersedes.selectedBinding.authorizationRevision!==1))return fail('研究前一授权修订身份不完整')
+ if(isSurveyCognitiveProfileRef(row.snapshot.ref)){
+  const ref=parseSurveyCognitiveProfileRef(row.snapshot.ref),profile=p.cognitiveProfile as {artifactHash?:string;configuration?:unknown}|undefined
+  if(a.kind!=='COGNITIVE_PROFILE_USE'||a.issuerId!==row.createdBy||a.authority.length!==1||a.authority[0].kind!=='ENTRY_ADMIN'
+   ||c.kind!=='COGNITIVE_PROFILE'||c.configId!==ref.configId||c.profile!==ref.profile||profile?.artifactHash!==ref.artifactHash
+   ||!profile?.configuration||canonicalHash(profile.configuration)!==canonicalHash(c)||canonicalHash(p.sourceMeasurementRelease)!==canonicalHash(c.measurement)
+   ||typeof p.configurationName!=='string'||!p.configurationName.trim()||p.configurationName.length>120)fail('研究精确 profile 与原授权来源不一致')
+  return selected
+ }
  if(a.kind!=='SURVEY_TOOL_USE'||a.issuerId!==row.createdBy||a.authority.length!==1||a.authority[0].kind!=='ENTRY_ADMIN'
   ||c.kind!=='STANDARD_COMBINATION'||row.snapshot.ref.kind!=='SCALE'||row.snapshot.ref.sourceId!=='survey-standard:'+c.combinationId
   ||row.snapshot.ref.sourceVersion!==c.combinationHash||p.surveyStandardReleaseId!==c.combinationId||p.code!==c.toolKey
