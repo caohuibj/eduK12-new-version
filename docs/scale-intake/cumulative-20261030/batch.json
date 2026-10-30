@@ -12,6 +12,24 @@
       "source": "PhenX Toolkit protocol 180901",
       "provenance": "University of Maryland public domain",
       "status": "DRAFT_EXECUTABLE_PENDING_CI"
+    },
+    {
+      "batch": "B002",
+      "instrumentKey": "fs8_en",
+      "source": "https://eddiener.com/flourishing-scale-fs/",
+      "status": "CATALOG_ONLY_RIGHTS_RESTRICTED"
+    },
+    {
+      "batch": "B002",
+      "instrumentKey": "swls5_en",
+      "source": "https://eddiener.com/satisfaction-with-life-scale-swls/",
+      "status": "CATALOG_ONLY_RIGHTS_RESTRICTED"
+    },
+    {
+      "batch": "B002",
+      "instrumentKey": "spane12_en",
+      "source": "https://eddiener.com/scale-of-positive-and-negative-experience-spane/",
+      "status": "CATALOG_ONLY_RIGHTS_RESTRICTED"
     }
   ],
   "authorization": {
@@ -37,7 +55,10 @@
     ]
   },
   "instrumentRecords": [
-    "rses10_en@1.0.0"
+    "rses10_en@1.0.0",
+    "fs8_en@1.0.0",
+    "swls5_en@1.0.0",
+    "spane12_en@1.0.0"
   ],
   "sharedEvidence": [
     {
@@ -56,6 +77,21 @@
     {
       "kind": "official_scoring_source",
       "url": "https://www.phenxtoolkit.org/protocols/view/180901"
+    },
+    {
+      "kind": "author_source",
+      "key": "fs8_en",
+      "url": "https://eddiener.com/flourishing-scale-fs/"
+    },
+    {
+      "kind": "author_source",
+      "key": "swls5_en",
+      "url": "https://eddiener.com/satisfaction-with-life-scale-swls/"
+    },
+    {
+      "kind": "author_source",
+      "key": "spane12_en",
+      "url": "https://eddiener.com/scale-of-positive-and-negative-experience-spane/"
     }
   ],
   "lastUpdatedAt": "2026-10-30"

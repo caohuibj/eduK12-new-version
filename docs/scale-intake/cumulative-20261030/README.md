@@ -18,3 +18,7 @@ Existing TSES24/12, UWES9 and BAT-S10 Chinese source-only catalog entries remain
 ## Operational boundary
 
 No production DB installation, PUBLIC, task launch, user/organization allocation, schema migration, deployment or new permissions. CI success is source qualification, not scientific evidence, rights clearance for unrelated translations, real usage or deployment.
+
+## B002 — copyright-restricted author wellbeing sources
+
+Original English FS-8, SWLS-5 and SPANE-12 source catalogs were added as CATALOG_ONLY. The author permits credited non-commercial research use (https://eddiener.com/scales/); unrestricted public question copying or commercial digital usage is not established. Original item text is not in Git; only source-specific scoring clues and report plans are recorded, not executable C/S/P/R. Candidate registry 245→248. No database install, PUBLIC, allocation or deployment. All content remains in the same unmerged #413.

@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "spane12_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Scale of Positive and Negative Experience original English 12-item",
+      "abbreviation": "SPANE12_EN",
+      "instrumentFamily": "Scale of Positive and Negative Experience original English 12-item"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "Wellbeing self-report source only; not a diagnostic or K12-equivalent instrument.",
+      "constructOverlapTags": [
+        "spane12_en",
+        "source:eddiener",
+        "locale:en",
+        "population:adult_candidate",
+        "response:self",
+        "availability:catalog_only",
+        "rights:noncommercial_only",
+        "scoring:uninstalled",
+        "P:none",
+        "R:not_runtime"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Conservative adult project scope only; China K12 psychometric validity and language equivalence not established."
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Previous four weeks",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Catalog only: original copyrighted question wording and response anchors not distributed in public Git.",
+        "Twelve 1–5 frequency items: positive positions 1,3,5,7,10,12 and negative 2,4,6,8,9,11; sums 6–30 each, possible balance −24..24. Do not invent reversed total or missing rule.",
+        "Author only permits attributed non-commercial research use; unrestricted commercial deployment/public item reproduction not established.",
+        "No electronic administration or missing-data handling executed; time is an estimate."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Non-commercial research candidate source, not validated local executable."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Original English source metadata: https://eddiener.com/scale-of-positive-and-negative-experience-spane/; no original questionnaire copied into Git.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Translations require their own rights/validity records. No China K12 evidence."
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Scale of Positive and Negative Experience original English 12-item",
+      "citation": "Ed Diener and colleagues: https://eddiener.com/scale-of-positive-and-negative-experience-spane/",
+      "url": "https://eddiener.com/scale-of-positive-and-negative-experience-spane/",
+      "publicationYear": 2010
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "Positive experience",
+        "Negative experience",
+        "Balance (non-executable)"
+      ],
+      "limitations": [
+        "Twelve 1–5 frequency items: positive positions 1,3,5,7,10,12 and negative 2,4,6,8,9,11; sums 6–30 each, possible balance −24..24. Do not invent reversed total or missing rule.",
+        "No executable C, score plugin, parameters P or runtime report R; no original item body in Git.",
+        "Non-commercial academic research use only with credit; public full-text redistribution and commercial scope unconfirmed.",
+        "No target Chinese teacher/student norms, missing policy or validation; not diagnostic."
+      ],
+      "disclaimer": "CATALOG_ONLY bibliographic source, not administered, scored, or published."
+    },
+    "blockers": [
+      "NONCOMMERCIAL_AUTHOR_RIGHTS",
+      "PUBLIC_QUESTION_ITEMS_REDISTRIBUTION_NOT_CLEARED",
+      "TARGET_K12_VALIDITY_MISSING",
+      "EXECUTABLE_C_S_P_R_NOT_INSTALLED"
+    ]
+  }
+}
