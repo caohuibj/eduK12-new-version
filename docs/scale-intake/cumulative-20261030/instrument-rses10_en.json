@@ -1,0 +1,128 @@
+{
+  "recordType": "scale-intake-instrument",
+  "key": "rses10_en",
+  "name": "Rosenberg Self-Esteem Scale, English 10-item (PhenX order)",
+  "locale": "en",
+  "sources": [
+    {
+      "url": "https://www.phenxtoolkit.org/protocols/view/180901",
+      "type": "official_item_scoring_source"
+    },
+    {
+      "url": "https://socy.umd.edu/about-us/rosenberg-self-esteem-scale",
+      "type": "official_rights_steward"
+    },
+    {
+      "url": "https://socy.umd.edu/about-us/rosenberg-scale-faq",
+      "type": "official_no_cutoff_guidance"
+    }
+  ],
+  "inputHash": null,
+  "deduplication": {
+    "status": "VERIFIED_NEW_LANGUAGE_IDENTITY",
+    "existingIdentity": "rses10_zh_cn_research@1.0.0",
+    "conflict": "Distinct English original and Chinese research translation; no overwriting"
+  },
+  "versions": {
+    "measurement": {
+      "version": "1.0.0",
+      "hash": null,
+      "scoringVersion": "1.0.0"
+    },
+    "parameters": {
+      "policy": "none",
+      "version": null,
+      "hash": null,
+      "basis": "UMD no universal cutoff; local population norms absent",
+      "references": []
+    },
+    "report": {
+      "version": "1.0.0",
+      "hash": null
+    },
+    "localizationVersion": "1.0.0",
+    "instructionVersion": "1.0.0",
+    "catalogVersion": 1
+  },
+  "audit": {
+    "measurementAndScoring": "DECLARED_PENDING_REAL_SCORER",
+    "parameters": "NONE_NO_REFERENCES",
+    "report": "DECLARED_PENDING_CONSUMER",
+    "issues": [
+      "Conservative complete_required is project rule, not author missing policy",
+      "Adult 18+ is local scope only",
+      "No new clinical cutoff or population percentile"
+    ],
+    "changes": [
+      "Original English 10-item source with 0–30 reverse keyed scoring",
+      "Five declared golden cases including missing item",
+      "English descriptive R report, no bands",
+      "New stable English identity and index 244→245"
+    ],
+    "evidence": [
+      "https://www.phenxtoolkit.org/protocols/view/180901",
+      "https://socy.umd.edu/about-us/rosenberg-self-esteem-scale"
+    ]
+  },
+  "tags": {
+    "primaryDomain": "PERSONALITY",
+    "construct": "global_self_esteem",
+    "population": "ADULT_SELF",
+    "ageMin": 18,
+    "language": "en",
+    "uses": [
+      "RESEARCH",
+      "INDIVIDUAL_REFLECTION"
+    ],
+    "administrable": "DRAFT_ONLY"
+  },
+  "notes": {
+    "commercialUse": "PUBLIC_DOMAIN_ENGLISH_SOURCE",
+    "authorizationNeeded": "NOT_FOR_SOURCE_COPY;PRODUCT_RELEASE_NOT_AUTHORIZED",
+    "rightsEvidence": [
+      "UMD original public-domain notice"
+    ],
+    "translationRelationship": "Original English; rses10_zh_cn_research independent AI working Chinese",
+    "researchStatus": "SOURCE_RESEARCH_MEASURE_LOCAL_VALIDITY_PENDING",
+    "contactNeeded": "NO_FOR_ORIGINAL_PUBLIC_DOMAIN_SOURCE"
+  },
+  "delivery": {
+    "git": {
+      "branch": "feat/scale-intake-cumulative-20261030",
+      "commit": null,
+      "pushReadback": "PENDING",
+      "mergeStatus": "OPEN_KEEP_UNMERGED"
+    },
+    "environment": null,
+    "loadedCodeSha": null,
+    "installStatus": "NOT_RUN",
+    "scaleId": null,
+    "measurementReleaseId": null,
+    "deploymentRevision": null,
+    "runtimePolicyHash": null,
+    "publicationProofHash": null,
+    "publicationStatus": "NOT_RUN",
+    "visibility": "UNKNOWN",
+    "productScope": [],
+    "actualVersionReadback": null,
+    "allocationStatus": "NOT_RUN",
+    "readbackAt": null
+  },
+  "notion": {
+    "pageId": "400d2763-5a38-8151-9396-d8f4efb1d118",
+    "status": "PENDING",
+    "readbackAt": null
+  },
+  "blockedBy": [
+    "REAL_SCORER_AND_REPORT_CONSUMER_NOT_YET_RUN",
+    "FORMAL_CI_NOT_YET_COMPLETED",
+    "NO_ENVIRONMENT_INSTALL_OR_RELEASE_AUTHORIZATION"
+  ],
+  "nextAction": "Verify real selected scorer/report and formal CI on exact cumulative head; append next batch to same PR",
+  "artifact": {
+    "instrumentVersion": "1.0.0",
+    "sourcePath": "server-version/backend/src/modules/scale/instruments/rses10_en/1.0.0/source.json",
+    "sourceHash": null
+  },
+  "operationReceipts": []
+}

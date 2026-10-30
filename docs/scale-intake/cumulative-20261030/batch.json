@@ -1,0 +1,62 @@
+{
+  "recordType": "scale-intake-batch",
+  "workflowVersion": "1.0.0",
+  "workflowCommit": null,
+  "batchId": "SCALE-CUMULATIVE-20261030",
+  "repository": "caohuibj/eduK12-new-version",
+  "sourceBaseSha": "b85e3466819266ffb8cd844b39d87aa566fb90e6",
+  "inputs": [
+    {
+      "batch": "B001",
+      "instrumentKey": "rses10_en",
+      "source": "PhenX Toolkit protocol 180901",
+      "provenance": "University of Maryland public domain",
+      "status": "DRAFT_EXECUTABLE_PENDING_CI"
+    }
+  ],
+  "authorization": {
+    "instructionReference": "2026-10-30 cumulative-PR user instruction: do not merge",
+    "permittedActions": [
+      "audit",
+      "create_pure_content_branch",
+      "append_content_commits",
+      "open_single_cumulative_pr",
+      "formal_CI_checks",
+      "update_existing_notion_index"
+    ],
+    "targetEnvironment": null,
+    "visibility": "NOT_PUBLIC",
+    "productScope": [],
+    "deploymentAuthorized": false
+  },
+  "notion": {
+    "parentPageId": "400d2763-5a38-811f-a070-c1724a0c2adc",
+    "status": "PENDING",
+    "recordPageIds": [
+      "400d2763-5a38-8151-9396-d8f4efb1d118"
+    ]
+  },
+  "instrumentRecords": [
+    "rses10_en@1.0.0"
+  ],
+  "sharedEvidence": [
+    {
+      "kind": "main_registry_before",
+      "sha": "a7a233371fb7b895998471d9aba2f6d5753a1b40",
+      "count": 244
+    },
+    {
+      "kind": "original_chinese_source_not_modified",
+      "sha": "3fc83c84e41fe1475d7131684942cd0c89c03109"
+    },
+    {
+      "kind": "official_rights_source",
+      "url": "https://socy.umd.edu/about-us/rosenberg-self-esteem-scale"
+    },
+    {
+      "kind": "official_scoring_source",
+      "url": "https://www.phenxtoolkit.org/protocols/view/180901"
+    }
+  ],
+  "lastUpdatedAt": "2026-10-30"
+}
