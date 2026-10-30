@@ -336,6 +336,98 @@
     ]
   },
   "candidates": {
+    "415": {
+      "schemaVersion": 1,
+      "product": "91487d27e12e60cd30895d5e5327016552f9a45a",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "One original local navigation case and browser observation are unsigned; historical failures and original raw reports remain untouched. No original execution signature is reconstructed.",
+          "Browser uses actual TeacherApp/admin/evaluation navigation and released-projection GET with synthetic API/auth. It covers hidden counts, rounded0,multi denominator,item/fullscreen/responsive/print, not production authorization or real backend FINAL.",
+          "Reader has no backend/schema/statistics/policy/store changes. Exact backenddc9 type receipt comes from qualified School mainfb; exact current frontendb672 type receipt passed once. Main414 merge changed neither component tree.",
+          "The original five Reader source blobs are unchanged; full upstream frontend delta is listed explicitly, not dismissed as globally unrelated.",
+          "PR418 holds subgroup/version behavior and its directory-refresh correction separately. Personal INDIVIDUAL_ONLY sources, student evaluation and expert consensus do not acquire generic GROUP authority.",
+          "PR409 is aligning current main. Candidate415 remains disabled and Draft; no Ready, formalCI, merge queue or deployment is started by this preparation."
+        ]
+      },
+      "reports": [
+        {
+          "id": "teacher-reading-navigation",
+          "path": "docs/evidence/group-report-teacher-reading-20261030/navigation-projection-continuation.json",
+          "sha256": "1afb5de7b87704f64780535b89ed092349b693878b9078508806b232dff2de34",
+          "originalSourceAssociation": "380b90cd700d2180015f60b44aad4fbd2131029c",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/api/anonymousStudy.ts",
+            "server-version/frontend/src/modules/composite/CompositeReportPage.tsx",
+            "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx",
+            "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx",
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.test.tsx",
+            "server-version/frontend/src/modules/reporting/longitudinalVisualization.ts",
+            "server-version/frontend/src/pages/bundle/BundleProducts.tsx",
+            "server-version/frontend/src/pages/bundle/BundleProfileSummary.tsx",
+            "server-version/frontend/src/pages/bundle/__tests__/BundleProfileSummary.jdr.test.tsx",
+            "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx",
+            "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+            "server-version/frontend/src/survey/SurveyPersonalChanges.tsx",
+            "server-version/frontend/src/survey/SurveyPublicApp.tsx",
+            "server-version/frontend/src/survey/SurveyWaveStudio.tracking.test.tsx",
+            "server-version/frontend/src/survey/SurveyWaveStudio.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned original local WIP execution associated retrospectively with retained product380b90cd7. This is not an execution signature or exact historical dependency attestation.",
+          "deltaRationale": "All five own Reader application/browser-fixture blobs are identical from380b90cd7 to current product91487d27. Upstream School/Survey/Training/Bundle changes retain their independent qualifications. Current exact frontend b672 and unchanged backend dc9 receipts are reused; original Teacher navigation/browser/PDF and old business/PG are not replayed. No claim that the complete original browser bundle or every upstream byte is unchanged.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "opens an existing Teacher Form release through the real product navigation and prints only its authorized rounded projection",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-school-20261030/mainfb/backend-types.json",
+          "sha256": "5c58f97910b464ebf6899f5b4fc99d43ab03822082c5f557ff5a47ec8991d4e9",
+          "component": "backend",
+          "componentTree": "dc9a331f08901238236ec3664e3173aba3f15030",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-school-20261030/mainfb/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/group-report-teacher-reading-20261030/mainfb/frontend-types.json",
+          "sha256": "fc4cd9fc51b83b2d96f1081b7a471726606ce2ee69741f9be7be067664f97de0",
+          "component": "frontend",
+          "componentTree": "b672a3fcf90f535079675048a7a013fbbbf660fb",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-teacher-reading-20261030/mainfb/frontend-types.log"
+        }
+      ],
+      "groupReportObservations": [
+        {
+          "kind": "browser",
+          "path": "docs/evidence/group-report-teacher-reading-20261030/browser.json",
+          "sha256": "7484e30d26f2c7781d485159ccdd04b64a3035e794db000f27f600dd82880f87",
+          "sourceAssociationBasis": "Original actual TeacherApp navigation/rendering/fullscreen/printing with synthetic API/auth; own source blobs retained, current compiler tree proof separate.",
+          "limitations": [
+            "Unsigned original browser observation.",
+            "No real backend or production authority claim; no browser replay."
+          ]
+        }
+      ]
+    },
     "414": {
       "schemaVersion": 1,
       "product": "f736217fc2426cbcee35b602eafbed43a5a16164",
