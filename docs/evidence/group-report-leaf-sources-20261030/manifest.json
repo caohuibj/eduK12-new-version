@@ -111,5 +111,30 @@
     "formalCiActivated": false,
     "draftCreation": "Specific branch/base authorization received from user; retry only once at this natural checkpoint.",
     "notion": "Progress kept in Git/local during Hui migration; no Qiang writes."
+  },
+  "mainf674DisclosedContract": {
+    "main": "f6740969b31f1154e3ffc1a23dd2406bd06a3634",
+    "sourceCheckpoint": "54d4344f0",
+    "retainedOriginalCompleted": 1,
+    "newSyntheticCompleted": 4,
+    "oneContract": "mainf674/disclosed-five-person-continuation.json:1PASS,3filtered",
+    "proof": "mainf674/disclosed-five-person-proof.json",
+    "disclosedScale": {
+      "N": 5,
+      "mean": 0.4,
+      "sdSample": 0.5477225575051662,
+      "snapshotReadCanonicalMaterializations": 0
+    },
+    "actualCoverage": "Scale disclosed multi-person generation/read now proved;Cognitive/SJT retain original single-parent metric/continuation evidence,not separately disclosed multi-person cases. Context still mandatory/no aggregation;Profile not aggregated. Independent legacy Assessment not connected.",
+    "firstFailure": "mainf674/disclosed-five-person.json:missing already-merged Training personal tracking column before new parent creation;original completed response not replayed",
+    "databaseRepair": "Existing isolated test DB applied four pending main migrations (Survey100000/100500,Training110000,Education120000);no new migration file,no reset,no production access. One unused synthetic enrollment from first fixture failure remains excluded from completed population;assignedN not invented.",
+    "types": {
+      "backendReceipt": "mainf674/backend-types.json",
+      "backendTree": "b1c57bf9195379ba0e45e59f9320a7411eb8b068",
+      "frontend": "unchanged c444887 main418 tree;no recompile"
+    },
+    "draftRoute": "Reuse existing group-report-draft scope-only route for exact leaf branch;one targeted control PASS;no Ready qualification,new workflow,PG/browser/shared-statistics replay.",
+    "newDraftAuthorization": "User specifically allowed existing leaf branch update and Draft to main;verify no duplicate before single authorized retry",
+    "mergeDeploy": false
   }
 }

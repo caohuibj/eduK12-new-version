@@ -1,0 +1,23 @@
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "eduk12_group_report_test_20261030", schema "public" at "127.0.0.1:55432"
+
+265 migrations found in prisma/migrations
+
+Applying migration `20261030100000_survey_personal_tracking`
+Applying migration `20261030100500_survey_personal_tracking_guards`
+Applying migration `20261030110000_training_personal_tracking`
+Applying migration `20261030120000_education_personal_tracking`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20261030100000_survey_personal_tracking/
+    └─ migration.sql
+  └─ 20261030100500_survey_personal_tracking_guards/
+    └─ migration.sql
+  └─ 20261030110000_training_personal_tracking/
+    └─ migration.sql
+  └─ 20261030120000_education_personal_tracking/
+    └─ migration.sql
+      
+All migrations have been successfully applied.

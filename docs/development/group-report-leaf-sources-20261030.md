@@ -19,3 +19,11 @@
 已无冲突沿 School10bdaac26 → Teacher da00b2af9 → 子群 ef2554926 对齐个人纵向main fa038041c47b275d30ccb8b8b01ab019615906e0，并继承两项必要修复：Teacher POST成功先交付报告、目录GET失败只读重试；School仅列真实受众GROUP父/叶合同可用来源，私有组合当前INDIVIDUAL_ONLY不升格为群体授权。未复制个人/纵向权限或新增私有GROUP接口。
 
 本批Bundle消费者代码未改，原PG/绑定/认知-SJT补验不重跑。新合并leaf组件整树的类型结果尚未执行；旧60e3/6fbb结果只代表原tree，不称为当前正式资格。School自己的最新类型与固定候选准备位于上游PR414，仍禁用、未正式CI。新leaf Draft的具体head/base已获用户明确授权，仅创建审阅，不Ready/合并/部署。Notion迁移期间记录保留Git，不写旧Qiang目标。
+
+## mainf674 对齐与足量公开合同
+
+原分支无冲突合入已冻结418及真实merge mainf674；三个生产文件边界保持不变，未混入群体纵向。原1人证明仅覆盖小N抑制，不能当作可披露多人聚合。保留原发布／完成场景，新增4份合成正式完成，仅选一条新合同：Scale N=5、mean0.4、SD_SAMPLE0.5477225575，公开state present；回读与生成相同且canonical物化0。原三项用例筛除，没有重做原发布／原答卷／浏览器。Cognitive/SJT仍仅按原单人投影和部分／续行原件披露，不称另有多人公开验证；独立旧Assessment仍待接入。
+
+首错为保留隔离库缺少main已合入的personal_tracking列，发生在新parent创建前。原件保留；仅补齐四个已存在主线迁移后续验该一条通过，不新造迁移、不reset数据。首错产生一名未完成合成成员，不纳入完成群体，不据此补assignedN。当前新backend树只编译一次通过；frontend与main418相同，未复编。
+
+新Draft在明确授权后向main创建；此前拒绝保持历史，先查重。为防止Draft开立机械重跑旧业务，沿现有group-report-draft明确该来源分支的3生产／2测试与原件目录边界，只做scope和稳定gate，不新增workflow或Ready／合并资格；单条新控制已通过。正式资格留独立授权／冻结点，当前无合并或部署。
