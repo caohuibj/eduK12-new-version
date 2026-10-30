@@ -2,7 +2,7 @@ import { beforeEach,describe,expect,it,vi } from 'vitest'
 
 const mock=vi.hoisted(()=>({
   context:vi.fn(),query:vi.fn(),spec:vi.fn(),listSpecs:vi.fn(),listSources:vi.fn(),
-  generate:vi.fn(),read:vi.fn(),cohort:vi.fn(),lock:vi.fn(),
+  generate:vi.fn(),read:vi.fn(),cohort:vi.fn(),lock:vi.fn(),artifact:vi.fn(),
 }))
 vi.mock('../../config/database',()=>({prisma:{$queryRaw:mock.query}}))
 vi.mock('../../modules/campus/report-release-lock',()=>({
@@ -19,11 +19,12 @@ vi.mock('../../modules/reporting/discovery',()=>({
 }))
 vi.mock('../../modules/reporting/spec',()=>({getPublishedReportingSpec:mock.spec}))
 vi.mock('../../modules/reporting/cohort',()=>({readReportingCohort:mock.cohort}))
+vi.mock('../../modules/reporting/artifact',()=>({readReportingArtifactRecord:mock.artifact}))
 vi.mock('../../modules/reporting/service',()=>({generateOrganizationGroupAnalysis:mock.generate}))
 vi.mock('../../modules/reporting/pr4Service',()=>({readOrganizationReportingArtifact:mock.read}))
 
 import {
-  CAMPUS_GROUP_MIN_N,assertReviewedCampusGroupSpec,projectCampusGroupReport,
+  CAMPUS_GROUP_MIN_N,assertReviewedCampusGroupSpec,projectCampusGroupReport,projectCampusLeafGroupReport,assertCampusLeafGroupDifferencing,
   assertCampusNoGroupDifferencing,
   listCampusGroupReportCatalog,generateCampusGroupReport,readCampusGroupReport,
 } from '../../modules/campus/group-reports'
@@ -57,6 +58,7 @@ describe('Huischool internal group reporting privacy boundary',()=>{
     mock.spec.mockResolvedValue({definition})
     mock.generate.mockResolvedValue({artifactId:artifact})
     mock.read.mockResolvedValue(content)
+    mock.artifact.mockResolvedValue({analysisKind:'GROUP',artifactPayload:{schemaVersion:1}})
     mock.cohort.mockResolvedValue({organizationId:org,sourceRunId:run,sourceTrackId:track,
       selector:{kind:'RUN_TRACK_SUBJECTS'},eligibleN:10,
       members:Array.from({length:10},(_,i)=>({userId:'campus-user-'+i}))})
@@ -248,5 +250,36 @@ describe('Huischool internal group reporting privacy boundary',()=>{
     expect(out.specs.map(s=>s.specId)).toEqual([spec])
     expect(out.sources).toHaveLength(1)
     expect(JSON.stringify(out)).not.toMatch(/studentUserId|memberId|participantCount|username/)
+  })
+})
+
+const leaf={slotKey:'scale:a',unitType:'SCALE' as const,instrumentKey:'a',instrumentVersion:'1',compiledRuntimeHash:'a'.repeat(64)}
+describe('School selected leaf and subgroup disclosure',()=>{
+  beforeEach(()=>vi.clearAllMocks())
+  it('permits an adequately separated subgroup, withholding a small difference across parent containers',async()=>{
+    const members=Array.from({length:20},(_,i)=>({userId:`u${i}`}))
+    const cohort={sourceRunId:run,sourceTrackId:track,members:members.slice(0,10)} as any
+    mock.query.mockResolvedValueOnce([{priorN:20,shared:10,minimumN:10}])
+    await expect(assertCampusLeafGroupDifferencing({organizationId:org,cohort,leaf})).resolves.toBeUndefined()
+    mock.query.mockResolvedValueOnce([{priorN:11,shared:10,minimumN:10}])
+    await expect(assertCampusLeafGroupDifferencing({organizationId:org,cohort,leaf})).rejects.toMatchObject({code:'CAMPUS_GROUP_DIFFERENCING_WITHHELD'})
+    const sql=mock.query.mock.calls[0][0].strings.join('')
+    expect(sql).toContain("->>'instrumentKey'")
+    expect(sql).not.toContain("->>'slotKey'")
+    expect(sql).not.toContain("->>'instrumentVersion'")
+  })
+  it('shows only existing numeric aggregates and preserves zero, units and independent effective N',()=>{
+    const result=projectCampusLeafGroupReport({...content,presentation:{sourceLabel:'已冻结活动',populationLabel:'班级：历史一班'},metricMetadata:{wellbeing:{unit:'ms'}},projection:{...content.projection,eligibleN:20,resultContributorN:20,
+      metrics:{wellbeing:{state:'present',validN:10,missingN:10,aggregations:{mean:0,sdSample:2}}}}},leaf)
+    expect(result.projection.metrics[0]).toMatchObject({mean:0,sdSample:2,validN:10,missingN:10,unit:'ms'})
+    expect(result.projection.metrics[0].range).toBeNull()
+    expect(result.projection.populationLabel).toBe('班级：历史一班')
+  })
+  it('withholds a tiny missing complement rather than disclosing one excluded student',()=>{
+    const result=projectCampusLeafGroupReport({...content,projection:{...content.projection,eligibleN:11,resultContributorN:11,
+      metrics:{wellbeing:{state:'present',validN:10,missingN:1,aggregations:{mean:4,sdSample:1}}}}},leaf)
+    expect(result.projection.metrics[0]).toMatchObject({state:'suppressed',validN:null,missingN:null,mean:null,sdSample:null})
+    const stricter=projectCampusLeafGroupReport({...content,metricMetadata:{wellbeing:{unit:'score',minimumN:20}},projection:{...content.projection,eligibleN:30,resultContributorN:30,metrics:{wellbeing:{state:'present',validN:20,missingN:10,aggregations:{mean:4}}}}},leaf)
+    expect(stricter.projection.metrics[0].state).toBe('suppressed')
   })
 })

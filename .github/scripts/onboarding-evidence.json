@@ -336,6 +336,1663 @@
     ]
   },
   "candidates": {
+    "414": {
+      "schemaVersion": 1,
+      "product": "f736217fc2426cbcee35b602eafbed43a5a16164",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "database": "Existing isolated synthetic loopback eduk12_group_report_test_20261030; no production.",
+        "limitations": [
+          "Original School WIP reports are unsigned. Commit references are retrospective source associations; no reconstructed execution signature or historical dependency fingerprint.",
+          "41 distinct selected successful names =39 unit/mockHTTP plus2 retained PG. Duplicate reports, failed setup, filtered cases and repaired failures remain in the repository; only successful case ownership is admitted once.",
+          "Full School service used synthetic content registry while actual authority, independent spec review, canonical statistics, artifact persistence, renamed historical range, versions and revocation were real. First generation and already completed fixture stages were not replayed.",
+          "Browser uses actual School navigation/React/printing with synthetic auth/backend; not full live backend browser or fresh production login.",
+          "Current backend95198 and frontend7db compile receipts bind exact component trees. No schema change, new migrations, dump/restore, platform scientific regression or old Survey/Training replay.",
+          "Legacy no-leaf V1 limitation remains documented. Private composition parent currently INDIVIDUAL_ONLY, so no fabricated GROUP entitlement or full-source-completion claim.",
+          "This is scoped merge qualification only; no runtime images, deployment, all-source completion or group longitudinal claim.",
+          "After mainfa038041 integration, current backend2342ff04/frontend3346bc7d receipts passed once on checkpoint7cc7edb0. Only Prisma client generation occurred; no DB migration, native publication, PG or application cases were rerun. Mainfa itself carries the personal longitudinal schema, so this PR has no schema delta.",
+          "Final main406 alignment: source f736217f includes mainfb3a0cab, current backenddc9a331f/frontendcba77e36 passed once after client generation only. No database migration or School business/PG replay. Original formal41057783824/basefa remains historical. This PR changes no schema relative to its new base."
+        ]
+      },
+      "reports": [
+        {
+          "id": "backend-unit",
+          "path": "docs/evidence/group-report-school-20261030/backend-unit.json",
+          "sha256": "dc9929e6495d8c761eef42dd37c61560fa74852ed06672b6b2f8a0965d329e9d",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/admission.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/match.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/analysis.ts",
+            "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/bundle-product/survey-native.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 21,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Huischool internal group reporting privacy boundary requires a separately reviewed group floor and independent metric coverage floor",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects students, generic teachers and training accounts before looking up any report",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects a denied or cross-domain school organization",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary does not launch calculation when whole-source or delay checks fail",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary uses canonical generation and a second governed read, with no arbitrary cohort selector",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary blocks overlapping non-identical school cohorts, including old exposed artifacts",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary withholds cross-kind historical longitudinal partial-overlap aggregates",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary allows disjoint or exactly identical populations only, never a narrow override",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary suppresses incomplete contributors, missing values and insufficient published mean",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects wrong audience for existing artifact and re-checks historical source",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects a historic filtered 10-person cohort from a larger Run despite adequate metric N",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary refuses an old partial cohort even if its selector is spelled as whole-Run",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary catalog is bounded, exposes no student identities, and omits unreviewed low-floor plans",
+              "status": "passed"
+            },
+            {
+              "fullName": "School selected leaf and subgroup disclosure permits an adequately separated subgroup, withholding a small difference across parent containers",
+              "status": "passed"
+            },
+            {
+              "fullName": "School selected leaf and subgroup disclosure shows only existing numeric aggregates and preserves zero, units and independent effective N",
+              "status": "passed"
+            },
+            {
+              "fullName": "School selected leaf and subgroup disclosure withholds a tiny missing complement rather than disclosing one excluded student",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations isolates equal metric names in different tools and uses only the current completed epoch",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations keeps a missing latest leaf missing instead of borrowing its prior high score",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations rejects another measurement definition at the selected slot",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations does not turn a new unfinished execution into a completed contribution",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations discovers current leaf definitions without returning participant values or decrypting every parent",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Huischool internal group reporting privacy boundary requires a separately reviewed group floor and independent metric coverage floor",
+            "Huischool internal group reporting privacy boundary rejects students, generic teachers and training accounts before looking up any report",
+            "Huischool internal group reporting privacy boundary rejects a denied or cross-domain school organization",
+            "Huischool internal group reporting privacy boundary does not launch calculation when whole-source or delay checks fail",
+            "Huischool internal group reporting privacy boundary uses canonical generation and a second governed read, with no arbitrary cohort selector",
+            "Huischool internal group reporting privacy boundary blocks overlapping non-identical school cohorts, including old exposed artifacts",
+            "Huischool internal group reporting privacy boundary withholds cross-kind historical longitudinal partial-overlap aggregates",
+            "Huischool internal group reporting privacy boundary allows disjoint or exactly identical populations only, never a narrow override",
+            "Huischool internal group reporting privacy boundary suppresses incomplete contributors, missing values and insufficient published mean",
+            "Huischool internal group reporting privacy boundary rejects wrong audience for existing artifact and re-checks historical source",
+            "Huischool internal group reporting privacy boundary rejects a historic filtered 10-person cohort from a larger Run despite adequate metric N",
+            "Huischool internal group reporting privacy boundary refuses an old partial cohort even if its selector is spelled as whole-Run",
+            "Huischool internal group reporting privacy boundary catalog is bounded, exposes no student identities, and omits unreviewed low-floor plans"
+          ]
+        },
+        {
+          "id": "backend-final-delta",
+          "path": "docs/evidence/group-report-school-20261030/backend-final-delta.json",
+          "sha256": "25acc300726464e0c0f40781288da36a3708a340ad4898260f56306dd82dd11c",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/admission.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/match.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/analysis.ts",
+            "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/bundle-product/survey-native.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 9,
+            "numFailedTests": 0,
+            "numPendingTests": 13
+          },
+          "cases": [
+            {
+              "fullName": "Huischool internal group reporting privacy boundary requires a separately reviewed group floor and independent metric coverage floor",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects students, generic teachers and training accounts before looking up any report",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects a denied or cross-domain school organization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary does not launch calculation when whole-source or delay checks fail",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary uses canonical generation and a second governed read, with no arbitrary cohort selector",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary blocks overlapping non-identical school cohorts, including old exposed artifacts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary withholds cross-kind historical longitudinal partial-overlap aggregates",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary allows disjoint or exactly identical populations only, never a narrow override",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary suppresses incomplete contributors, missing values and insufficient published mean",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects wrong audience for existing artifact and re-checks historical source",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects a historic filtered 10-person cohort from a larger Run despite adequate metric N",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary refuses an old partial cohort even if its selector is spelled as whole-Run",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary catalog is bounded, exposes no student identities, and omits unreviewed low-floor plans",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School selected leaf and subgroup disclosure permits an adequately separated subgroup, withholding a small difference across parent containers",
+              "status": "passed"
+            },
+            {
+              "fullName": "School selected leaf and subgroup disclosure shows only existing numeric aggregates and preserves zero, units and independent effective N",
+              "status": "passed"
+            },
+            {
+              "fullName": "School selected leaf and subgroup disclosure withholds a tiny missing complement rather than disclosing one excluded student",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations isolates equal metric names in different tools and uses only the current completed epoch",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations keeps a missing latest leaf missing instead of borrowing its prior high score",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations rejects another measurement definition at the selected slot",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations does not turn a new unfinished execution into a completed contribution",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations discovers current leaf definitions without returning participant values or decrypting every parent",
+              "status": "passed"
+            },
+            {
+              "fullName": "leaf artifact identity and measurement metadata retains the V1 payload shape and binds V2 identity to the selected leaf, unit and source floor",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School selected leaf and subgroup disclosure permits an adequately separated subgroup, withholding a small difference across parent containers"
+          ]
+        },
+        {
+          "id": "presentation-delta",
+          "path": "docs/evidence/group-report-school-20261030/presentation-delta.json",
+          "sha256": "4dd4fb5464ff20de9258ba45805194e6a657948f3a565eca17c539b7c0a1b57e",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/admission.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/match.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/analysis.ts",
+            "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/bundle-product/survey-native.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 19
+          },
+          "cases": [
+            {
+              "fullName": "Huischool internal group reporting privacy boundary requires a separately reviewed group floor and independent metric coverage floor",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects students, generic teachers and training accounts before looking up any report",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects a denied or cross-domain school organization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary does not launch calculation when whole-source or delay checks fail",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary uses canonical generation and a second governed read, with no arbitrary cohort selector",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary blocks overlapping non-identical school cohorts, including old exposed artifacts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary withholds cross-kind historical longitudinal partial-overlap aggregates",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary allows disjoint or exactly identical populations only, never a narrow override",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary suppresses incomplete contributors, missing values and insufficient published mean",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects wrong audience for existing artifact and re-checks historical source",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary rejects a historic filtered 10-person cohort from a larger Run despite adequate metric N",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary refuses an old partial cohort even if its selector is spelled as whole-Run",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool internal group reporting privacy boundary catalog is bounded, exposes no student identities, and omits unreviewed low-floor plans",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School selected leaf and subgroup disclosure permits an adequately separated subgroup, withholding a small difference across parent containers",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School selected leaf and subgroup disclosure shows only existing numeric aggregates and preserves zero, units and independent effective N",
+              "status": "passed"
+            },
+            {
+              "fullName": "School selected leaf and subgroup disclosure withholds a tiny missing complement rather than disclosing one excluded student",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations isolates equal metric names in different tools and uses only the current completed epoch",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations keeps a missing latest leaf missing instead of borrowing its prior high score",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations rejects another measurement definition at the selected slot",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations does not turn a new unfinished execution into a completed contribution",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations discovers current leaf definitions without returning participant values or decrypting every parent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "leaf artifact identity and measurement metadata retains the V1 payload shape and binds V2 identity to the selected leaf, unit and source floor",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School selected leaf and subgroup disclosure shows only existing numeric aggregates and preserves zero, units and independent effective N",
+            "School selected leaf and subgroup disclosure withholds a tiny missing complement rather than disclosing one excluded student"
+          ]
+        },
+        {
+          "id": "leaf-current-epoch",
+          "path": "docs/evidence/group-report-school-20261030/leaf-current-epoch.json",
+          "sha256": "eeae411c7413e1a7d8a5d0c0efbd91008402c7bcf20096911a669b66a5cd85e5",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/admission.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/match.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/analysis.ts",
+            "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/bundle-product/survey-native.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 6,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "selected Organization Run leaf observations isolates equal metric names in different tools and uses only the current completed epoch",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations keeps a missing latest leaf missing instead of borrowing its prior high score",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations rejects another measurement definition at the selected slot",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations does not turn a new unfinished execution into a completed contribution",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations discovers current leaf definitions without returning participant values or decrypting every parent",
+              "status": "passed"
+            },
+            {
+              "fullName": "leaf artifact identity and measurement metadata retains the V1 payload shape and binds V2 identity to the selected leaf, unit and source floor",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "selected Organization Run leaf observations isolates equal metric names in different tools and uses only the current completed epoch",
+            "selected Organization Run leaf observations keeps a missing latest leaf missing instead of borrowing its prior high score",
+            "selected Organization Run leaf observations rejects another measurement definition at the selected slot",
+            "selected Organization Run leaf observations does not turn a new unfinished execution into a completed contribution",
+            "selected Organization Run leaf observations discovers current leaf definitions without returning participant values or decrypting every parent",
+            "leaf artifact identity and measurement metadata retains the V1 payload shape and binds V2 identity to the selected leaf, unit and source floor"
+          ]
+        },
+        {
+          "id": "routes",
+          "path": "docs/evidence/group-report-school-20261030/routes.json",
+          "sha256": "e2cada086cd988e05da342cd15dece86c150b6e7b398d020058bbb924748a04e",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/admission.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/match.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/analysis.ts",
+            "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/bundle-product/survey-native.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 6,
+            "numFailedTests": 0,
+            "numPendingTests": 28
+          },
+          "cases": [
+            {
+              "fullName": "Huischool governed report HTTP surface reports feature availability without leaking a parent report when disabled",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface never accepts a legacy/training credential as a campus session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface remains closed while the reviewed parent portal feature is disabled",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface never exposes a child internal account alias in the SCHOOL parent DTO",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface passes authenticated SCHOOL parent identity to the existing per-grant read policy",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface denies revoked or absent grants without returning report content",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface withholds unreviewed campus student longitudinal numbers on list and deep links",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface does not show student feedback before class approval",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface allows an approved campus student to read only their own contracted FINAL summary",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface does not invoke a FINAL respondent result for a pending student",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface preserves an authority revocation when the source result is no longer readable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface refuses consent mutation without matching SCHOOL CSRF",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface rejects caller-supplied parent identity and accepts only the fixed report binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface requires the live counselor relationship on every professional detail read",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface rejects officer disclosure grants without a recent CAMPUS TOTP step-up",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface rejects report publication without a recent CAMPUS TOTP step-up",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface preserves an officer source/permission denial on the school reporting endpoint",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface does not permit TRAINING or unauthenticated group reporting",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface denies school group generation without recent TOTP or matching CSRF",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface disallows arbitrary membership selection and subject-targeted filters in school aggregate POST",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface accepts only whole-source arguments in the authorized school report path",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface accepts a selected leaf with single-dimension class OR selection",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface reads an old group artifact only through fresh current school authorization",
+              "status": "passed"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface does not expose protected case discovery to an unauthenticated/training identity",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface requires SCHOOL step-up and exact CSRF for pseudonymous professional generation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface rejects exact student IDs, arbitrary metrics or unauthorized audience in request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface passes only a school-scoped subject reference to the authoritative professional generator",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface protects clinical longitudinal generation with school MFA and CSRF",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface rejects extraneous subjectUserId, age claims or browser-supplied scoring data",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface passes valid pseudonym-only longitudinal request to server-authoritative scope",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface requires recent SCHOOL MFA and CSRF for fixed-group longitudinal generation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface prohibits direct subgroup selectors, memberIds and unvalidated longitudinal modes",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface routes longitudinal group catalog before the generic two-segment historical read",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Huischool governed report HTTP surface accepts only whole-group source IDs on controlled longitudinal POST",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "Huischool governed report HTTP surface does not permit TRAINING or unauthenticated group reporting",
+            "Huischool governed report HTTP surface denies school group generation without recent TOTP or matching CSRF",
+            "Huischool governed report HTTP surface disallows arbitrary membership selection and subject-targeted filters in school aggregate POST",
+            "Huischool governed report HTTP surface accepts only whole-source arguments in the authorized school report path",
+            "Huischool governed report HTTP surface accepts a selected leaf with single-dimension class OR selection",
+            "Huischool governed report HTTP surface reads an old group artifact only through fresh current school authorization"
+          ]
+        },
+        {
+          "id": "frontend-renderer-delta",
+          "path": "docs/evidence/group-report-school-20261030/frontend-renderer-delta.json",
+          "sha256": "437a3d269d34e12fb83b1c04312c3e85a091baf94c9a1e0de070bb529b406603",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/api/anonymousStudy.ts",
+            "server-version/frontend/src/modules/composite/CompositeReportPage.tsx",
+            "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx",
+            "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx",
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.test.tsx",
+            "server-version/frontend/src/modules/reporting/longitudinalVisualization.ts",
+            "server-version/frontend/src/pages/bundle/BundleProducts.tsx",
+            "server-version/frontend/src/pages/bundle/BundleProfileSummary.tsx",
+            "server-version/frontend/src/pages/bundle/__tests__/BundleProfileSummary.jdr.test.tsx",
+            "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx",
+            "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+            "server-version/frontend/src/survey/SurveyPersonalChanges.tsx",
+            "server-version/frontend/src/survey/SurveyPublicApp.tsx",
+            "server-version/frontend/src/survey/SurveyWaveStudio.tracking.test.tsx",
+            "server-version/frontend/src/survey/SurveyWaveStudio.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "School group workbench generates a selected leaf subgroup and prints the same authorized snapshot",
+              "status": "passed"
+            },
+            {
+              "fullName": "School group workbench reopens the latest artifact without discovering sources or recalculating",
+              "status": "passed"
+            },
+            {
+              "fullName": "School group workbench recovers a failed catalogue request with a GET only",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School group workbench does not restore a previous school from a late response",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School group workbench generates a selected leaf subgroup and prints the same authorized snapshot",
+            "School group workbench reopens the latest artifact without discovering sources or recalculating"
+          ]
+        },
+        {
+          "id": "frontend-unit",
+          "path": "docs/evidence/group-report-school-20261030/frontend-unit.json",
+          "sha256": "3e6dcaefa9273816f5885a871b65696d2b6ab04f0a700571563e57f62daebcee",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/api/anonymousStudy.ts",
+            "server-version/frontend/src/modules/composite/CompositeReportPage.tsx",
+            "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx",
+            "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx",
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.test.tsx",
+            "server-version/frontend/src/modules/reporting/longitudinalVisualization.ts",
+            "server-version/frontend/src/pages/bundle/BundleProducts.tsx",
+            "server-version/frontend/src/pages/bundle/BundleProfileSummary.tsx",
+            "server-version/frontend/src/pages/bundle/__tests__/BundleProfileSummary.jdr.test.tsx",
+            "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx",
+            "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+            "server-version/frontend/src/survey/SurveyPersonalChanges.tsx",
+            "server-version/frontend/src/survey/SurveyPublicApp.tsx",
+            "server-version/frontend/src/survey/SurveyWaveStudio.tracking.test.tsx",
+            "server-version/frontend/src/survey/SurveyWaveStudio.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 4,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School group workbench generates a selected leaf subgroup and prints the same authorized snapshot",
+              "status": "passed"
+            },
+            {
+              "fullName": "School group workbench reopens the latest artifact without discovering sources or recalculating",
+              "status": "passed"
+            },
+            {
+              "fullName": "School group workbench recovers a failed catalogue request with a GET only",
+              "status": "passed"
+            },
+            {
+              "fullName": "School group workbench does not restore a previous school from a late response",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School group workbench recovers a failed catalogue request with a GET only",
+            "School group workbench does not restore a previous school from a late response"
+          ]
+        },
+        {
+          "id": "frozen-privacy",
+          "path": "docs/evidence/group-report-school-20261030/frozen-privacy.json",
+          "sha256": "c1e77020cf51e3f5913a55f3c6e7d96692606cc54cf230f954708609a15dece9",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/admission.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/match.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/analysis.ts",
+            "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/bundle-product/survey-native.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 4,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School selected leaf preserves the existing frozen privacy projection keeps a legacy Run strict instead of exposing counts, SD or cells through the new path",
+              "status": "passed"
+            },
+            {
+              "fullName": "School selected leaf preserves the existing frozen privacy projection uses the general frozen policy precision and numeric fields without adding item cells",
+              "status": "passed"
+            },
+            {
+              "fullName": "School selected leaf preserves the existing frozen privacy projection honors sensitive and require-all-completed options for subgroups",
+              "status": "passed"
+            },
+            {
+              "fullName": "School selected leaf preserves the existing frozen privacy projection retains exact single-scenario, product and frozen-hash rejection in the shared reader",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School selected leaf preserves the existing frozen privacy projection keeps a legacy Run strict instead of exposing counts, SD or cells through the new path",
+            "School selected leaf preserves the existing frozen privacy projection uses the general frozen policy precision and numeric fields without adding item cells",
+            "School selected leaf preserves the existing frozen privacy projection honors sensitive and require-all-completed options for subgroups",
+            "School selected leaf preserves the existing frozen privacy projection retains exact single-scenario, product and frozen-hash rejection in the shared reader"
+          ]
+        },
+        {
+          "id": "leaf-floor-review-fix",
+          "path": "docs/evidence/group-report-school-20261030/leaf-floor-review-fix.json",
+          "sha256": "c53655e4267b1e05f503806e5b781eea5035584aeea9d3507cb7182c5e21907b",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/admission.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/match.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/analysis.ts",
+            "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/bundle-product/survey-native.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 6
+          },
+          "cases": [
+            {
+              "fullName": "selected Organization Run leaf observations isolates equal metric names in different tools and uses only the current completed epoch",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations keeps a missing latest leaf missing instead of borrowing its prior high score",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations rejects another measurement definition at the selected slot",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations does not turn a new unfinished execution into a completed contribution",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations discovers current leaf definitions without returning participant values or decrypting every parent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "leaf artifact identity and measurement metadata retains the V1 payload shape and binds V2 identity to the selected leaf, unit and source floor",
+              "status": "skipped"
+            },
+            {
+              "fullName": "content-owned leaf minimum enforces parent10 leaf20 spec10 cohort12 for generation and retained snapshot reads",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "content-owned leaf minimum enforces parent10 leaf20 spec10 cohort12 for generation and retained snapshot reads"
+          ]
+        },
+        {
+          "id": "postgres-continuation",
+          "path": "docs/evidence/group-report-school-20261030/postgres-continuation.json",
+          "sha256": "b9f0441d384e03089ff70df3f3f7f91376714c66f51bd70ff7653475471a1653",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/admission.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/match.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/analysis.ts",
+            "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/bundle-product/survey-native.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "School leaf source and historical subgroup in PostgreSQL uses actual historical class/tag members, deduplicates staff assignments, and keeps a frozen cohort after tag changes",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School leaf source and historical subgroup in PostgreSQL continues only the retained staff-class deduplication step after the fixture enum repair",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School leaf source and historical subgroup in PostgreSQL continues only the retained staff-class deduplication step after the fixture enum repair"
+          ]
+        },
+        {
+          "id": "service-postgres-read-continuation",
+          "path": "docs/evidence/group-report-school-20261030/service-postgres-read-continuation.json",
+          "sha256": "2869d7a74016c34ea3364b8ebb360ed33bab5ef906b5a8fa995eb6c2527732db",
+          "originalSourceAssociation": "a7969866f2f1106f82e810b550675badce0f1656",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json",
+            "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+            "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json",
+            "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json",
+            "server-version/backend/src/modules/assessment-bundle/profile/admission.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/contract.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/match.ts",
+            "server-version/backend/src/modules/assessment-bundle/profile/report.ts",
+            "server-version/backend/src/modules/bundle-product/analysis.ts",
+            "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/bundle-product/survey-native.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School actual reporting service with isolated PostgreSQL generates and persists a selected class V2, reads it without canonical reprocessing, and retains the old version after rename",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School actual reporting service with isolated PostgreSQL generates and persists a selected class V2, reads it without canonical reprocessing, and retains the old version after rename"
+          ]
+        },
+        {
+          "id": "group-discovery-contract",
+          "path": "docs/evidence/group-report-school-20261030/group-discovery-contract.json",
+          "sha256": "9e64c85b2921b6454c87fbd724bcb09c4afc6566d31cfb407eb18a9d9bd61799",
+          "originalSourceAssociation": "a2b20a6e66ac68fd38ca8c37b9128613c2a725f4",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local execution retrospectively associated with its retained reviewed School source lineage; this is not an original signed execution or exact dependency attestation.",
+          "deltaRationale": "Original selected School math, cohort/epoch/floor, frontend recovery and retained PG cases are not replayed. The opt-in GROUP discovery change is covered by its two new cases; generic discovery/default leaf semantics remain unchanged. Main native Bundle/JD-R changes retain their own qualification; both current School component type receipts bind the exact product trees. Synthetic registry/browser limits stay explicit. Mainfa adds the independently qualified personal longitudinal/Survey contract and shared visualization; it does not replace School assertions. Current combined compilers consume the actual new Prisma schema/client. No old business replay. Mainfb adds qualified Training personal longitudinal/source binding and a new Prisma relation/migration; no School/Teacher/reporting production module changed. Current combined compilers are fresh; original41 observations are not replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 9
+          },
+          "cases": [
+            {
+              "fullName": "SCHOOL protected source discovery is not an all-student directory GROUP discovery excludes personal-only compositions and uses the actual professional audience without changing generic discovery",
+              "status": "passed"
+            },
+            {
+              "fullName": "SCHOOL protected source discovery is not an all-student directory requires CLIENT relation even for dual-role school administrator+psychology staff",
+              "status": "skipped"
+            },
+            {
+              "fullName": "SCHOOL protected source discovery is not an all-student directory keeps existing LEGACY manager discovery semantics unchanged",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations GROUP discovery rejects a personal-only parent and does not advertise an unresolved private leaf as a registered measurement",
+              "status": "passed"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations isolates equal metric names in different tools and uses only the current completed epoch",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations keeps a missing latest leaf missing instead of borrowing its prior high score",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations rejects another measurement definition at the selected slot",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations does not turn a new unfinished execution into a completed contribution",
+              "status": "skipped"
+            },
+            {
+              "fullName": "selected Organization Run leaf observations discovers current leaf definitions without returning participant values or decrypting every parent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "leaf artifact identity and measurement metadata retains the V1 payload shape and binds V2 identity to the selected leaf, unit and source floor",
+              "status": "skipped"
+            },
+            {
+              "fullName": "content-owned leaf minimum enforces parent10 leaf20 spec10 cohort12 for generation and retained snapshot reads",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "SCHOOL protected source discovery is not an all-student directory GROUP discovery excludes personal-only compositions and uses the actual professional audience without changing generic discovery",
+            "selected Organization Run leaf observations GROUP discovery rejects a personal-only parent and does not advertise an unresolved private leaf as a registered measurement"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-school-20261030/mainfb/backend-types.json",
+          "sha256": "5c58f97910b464ebf6899f5b4fc99d43ab03822082c5f557ff5a47ec8991d4e9",
+          "component": "backend",
+          "componentTree": "dc9a331f08901238236ec3664e3173aba3f15030",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-school-20261030/mainfb/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/group-report-school-20261030/mainfb/frontend-types.json",
+          "sha256": "6311a7169e2a703e1b27b614364f99fb6bead0e931a9f9902f58a9d94c8e3773",
+          "component": "frontend",
+          "componentTree": "cba77e36ec1ba531a20f7775ea00a34c91699fe5",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-school-20261030/mainfb/frontend-types.log"
+        }
+      ],
+      "groupReportObservations": [
+        {
+          "kind": "browser",
+          "path": "docs/evidence/group-report-school-20261030/browser.json",
+          "sha256": "7791ffd1feecb7227a8ef682bfe013eef5d0b28e15ee3b73054837cc8e1b6daa",
+          "sourceAssociationBasis": "Original retained School observation; generation/read/rename/version/revocation are stage continuations, not replayed full lifecycle. Browser uses actual School navigation/components with synthetic API/auth.",
+          "limitations": [
+            "Unsigned local original; no production/capacity claim.",
+            "Private composition GROUP permission is not inferred; current unsupported leaves are filtered."
+          ]
+        },
+        {
+          "kind": "school-service",
+          "path": "docs/evidence/group-report-school-20261030/service-postgres-proof.json",
+          "sha256": "b1c07e34d3eecd7de7b33b208b523f128c0b260506e4781536fcce84837d0db5",
+          "sourceAssociationBasis": "Original retained School observation; generation/read/rename/version/revocation are stage continuations, not replayed full lifecycle. Browser uses actual School navigation/components with synthetic API/auth.",
+          "limitations": [
+            "Unsigned local original; no production/capacity claim.",
+            "Private composition GROUP permission is not inferred; current unsupported leaves are filtered."
+          ]
+        }
+      ]
+    },
     "393": {
       "schemaVersion": 1,
       "product": "b00712d2887cccf3117a9095184f6afd301f0e6f",

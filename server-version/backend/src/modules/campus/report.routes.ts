@@ -12,7 +12,8 @@ import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
 import { readCampusStudentFeedback } from './student-feedback'
-import { listCampusGroupReportCatalog, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
+import { listCampusGroupReportCatalog, listCampusGroupReportTools, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
+import {educationGroupSelectionSchema,reportingLeafSourceSchema} from '../reporting/education-group-selection'
 import {listCampusGeneralGroupV2Catalog,publishCampusGeneralGroupV2,
   readCampusGeneralGroupV2} from './generalGroupV2.service'
 import { listCampusProtectedReportCatalog, generateCampusProtectedReport } from './protected-report-studio'
@@ -91,9 +92,14 @@ router.get('/reports/groups/catalog', guarded(req => {
   const q=z.object({organizationId:id}).strict().parse(req.query)
   return listCampusGroupReportCatalog(req.user!,q.organizationId)
 }))
+router.get('/reports/groups/tools',guarded(req=>{
+  const input=z.object({organizationId:id,runId:id,trackId:id}).strict().parse(req.query)
+  return listCampusGroupReportTools({actor:req.user!,...input})
+}))
 router.post('/reports/groups', requireRecentSchoolMfa, mutationBudget, guarded(req => {
   const body=z.object({
     organizationId:id,runId:id,trackId:id,specId:id,
+    leaf:reportingLeafSourceSchema.optional(),selection:educationGroupSelectionSchema.optional(),
   }).strict().parse(req.body)
   return generateCampusGroupReport({actor:req.user!,...body})
 }))

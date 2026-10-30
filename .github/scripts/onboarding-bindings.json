@@ -194,6 +194,508 @@
     }
   },
   "candidates": {
+    "414": {
+      "schemaVersion": 1,
+      "pr": 414,
+      "enabled": true,
+      "base": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+      "product": "f736217fc2426cbcee35b602eafbed43a5a16164",
+      "controlCheckpoint": "cde473ae5c357df11f1275fc3053e73cd71bd471",
+      "components": {
+        "backend": "dc9a331f08901238236ec3664e3173aba3f15030",
+        "frontend": "cba77e36ec1ba531a20f7775ea00a34c91699fe5"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "1737eb2322da2046b11ab546a8d6620a20f38d66",
+        ".github/scripts/onboarding-checks.mjs": "923e0eb5a317e587b5eed0f0c7416be5822f758a",
+        ".github/scripts/onboarding-controls.test.mjs": "8e47a7f0d5a2a80a349a13c69ecaa044be43589f",
+        ".github/scripts/onboarding-evidence.json": "5050938915a9f1238d4ee22915a25c35d8968b72",
+        ".github/scripts/onboarding-scope.mjs": "d121e465306e6bf41d753526b9921b283c540bf3",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "58fdeb56092a75d95fbc832b2e9aee8a714c5113"
+      },
+      "source": {
+        "docs/development/group-report-school-20261030.md": {
+          "before": null,
+          "after": "17f485a90dda547eb84fc0fd8d57366e971043e2"
+        },
+        "docs/evidence/group-report-school-20261030/backend-delta.json": {
+          "before": null,
+          "after": "7ee9df1221d907b9222c81202240571c35870a80"
+        },
+        "docs/evidence/group-report-school-20261030/backend-delta.log": {
+          "before": null,
+          "after": "c55283d1a055f97e3c22c06a6a59a82ef16b5829"
+        },
+        "docs/evidence/group-report-school-20261030/backend-final-delta.json": {
+          "before": null,
+          "after": "f53f44d7fee2874fa4a4586c2001df5e076b0c97"
+        },
+        "docs/evidence/group-report-school-20261030/backend-final-delta.log": {
+          "before": null,
+          "after": "e61ce6f7438e56d2f88c137f47bd04d87625c380"
+        },
+        "docs/evidence/group-report-school-20261030/backend-final-types.log": {
+          "before": null,
+          "after": "cef37cf4c1675221a7010d40926c3a257390f324"
+        },
+        "docs/evidence/group-report-school-20261030/backend-leaf-floor-types.json": {
+          "before": null,
+          "after": "49c21b8f3087bb701dc1bf4f7f3f21327e3a5160"
+        },
+        "docs/evidence/group-report-school-20261030/backend-leaf-floor-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/backend-presentation-types.log": {
+          "before": null,
+          "after": "cef37cf4c1675221a7010d40926c3a257390f324"
+        },
+        "docs/evidence/group-report-school-20261030/backend-types.log": {
+          "before": null,
+          "after": "cef37cf4c1675221a7010d40926c3a257390f324"
+        },
+        "docs/evidence/group-report-school-20261030/backend-unit.json": {
+          "before": null,
+          "after": "1c2dfd069bb8492a003e43f60a1aeb5aaac93567"
+        },
+        "docs/evidence/group-report-school-20261030/backend-unit.log": {
+          "before": null,
+          "after": "0c8c8f26548f52dc0a54323907a643c5f496aa4c"
+        },
+        "docs/evidence/group-report-school-20261030/browser-assets-repair.log": {
+          "before": null,
+          "after": "646ad2d3f79b16f78e3e7dd1c992e7aff4bbe2d4"
+        },
+        "docs/evidence/group-report-school-20261030/browser.json": {
+          "before": null,
+          "after": "91cc2e93125ca09c1ab5fdf5563e373dff9ef7dc"
+        },
+        "docs/evidence/group-report-school-20261030/browser.log": {
+          "before": null,
+          "after": "f1fa85ceeeb9d7c56c5364147970308fd1e1d489"
+        },
+        "docs/evidence/group-report-school-20261030/current-backend-types.json": {
+          "before": null,
+          "after": "c78603fa29df78928838224026596d2064fd5ce3"
+        },
+        "docs/evidence/group-report-school-20261030/current-backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/current-frontend-types.json": {
+          "before": null,
+          "after": "0242682474fa55bce686f97b76fed69e248e0db5"
+        },
+        "docs/evidence/group-report-school-20261030/current-frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/frontend-app-types.log": {
+          "before": null,
+          "after": "cef37cf4c1675221a7010d40926c3a257390f324"
+        },
+        "docs/evidence/group-report-school-20261030/frontend-final-types.log": {
+          "before": null,
+          "after": "cef37cf4c1675221a7010d40926c3a257390f324"
+        },
+        "docs/evidence/group-report-school-20261030/frontend-lint.log": {
+          "before": null,
+          "after": "b92c014fbb5f0f5a7298842e8d47175d334c8ce2"
+        },
+        "docs/evidence/group-report-school-20261030/frontend-renderer-delta.json": {
+          "before": null,
+          "after": "a9405da52228ba461f9a2269b6552681345e08d8"
+        },
+        "docs/evidence/group-report-school-20261030/frontend-renderer-delta.log": {
+          "before": null,
+          "after": "3d6be1d18dfd3afdbfaa8709b8692cec2808c277"
+        },
+        "docs/evidence/group-report-school-20261030/frontend-types.log": {
+          "before": null,
+          "after": "cef37cf4c1675221a7010d40926c3a257390f324"
+        },
+        "docs/evidence/group-report-school-20261030/frontend-unit.json": {
+          "before": null,
+          "after": "b295c098aa35b45da7f3cc383882acdd211b18ec"
+        },
+        "docs/evidence/group-report-school-20261030/frontend-unit.log": {
+          "before": null,
+          "after": "fceacde7c9027daa62ace92ed96e102bf6a374b4"
+        },
+        "docs/evidence/group-report-school-20261030/frozen-privacy-types-repair.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-school-20261030/frozen-privacy-types-repair.json": {
+          "before": null,
+          "after": "278f94faaf5383a2abfdf3c573991a736e724b64"
+        },
+        "docs/evidence/group-report-school-20261030/frozen-privacy-types-repair.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/frozen-privacy-types.exit": {
+          "before": null,
+          "after": "0cfbf08886fca9a91cb753ec8734c84fcbe52c9f"
+        },
+        "docs/evidence/group-report-school-20261030/frozen-privacy-types.json": {
+          "before": null,
+          "after": "4721d5a7e04ffe9fefa1f508a873f3ff844f502f"
+        },
+        "docs/evidence/group-report-school-20261030/frozen-privacy-types.log": {
+          "before": null,
+          "after": "fc4d3d136732fa005f4fb74658098885ffbc8081"
+        },
+        "docs/evidence/group-report-school-20261030/frozen-privacy.json": {
+          "before": null,
+          "after": "f6f98f4040622ab3b75605b9e3e53522a5c5d54d"
+        },
+        "docs/evidence/group-report-school-20261030/frozen-privacy.log": {
+          "before": null,
+          "after": "b3ad9afe455cce196c80a72c45b878cf1711f3a2"
+        },
+        "docs/evidence/group-report-school-20261030/group-discovery-backend-types.json": {
+          "before": null,
+          "after": "7ff51ea4e5099a179c9383a4bc8fb88c308ad86b"
+        },
+        "docs/evidence/group-report-school-20261030/group-discovery-backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/group-discovery-contract.json": {
+          "before": null,
+          "after": "80041fbb66a528109300bc4340dc0c883830ecea"
+        },
+        "docs/evidence/group-report-school-20261030/group-discovery-contract.log": {
+          "before": null,
+          "after": "518bc0468d0247510387cc4d1f0dee531098b869"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-current-epoch.json": {
+          "before": null,
+          "after": "453da05d3586ab93496dca232f92278d0b710564"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-current-epoch.log": {
+          "before": null,
+          "after": "dfaecbfe55f431740dbf57869605d9cfaa294435"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-floor-before.json": {
+          "before": null,
+          "after": "720ec5e3ea190316aaede28f7f2374b7d3f31085"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-floor-before.log": {
+          "before": null,
+          "after": "e672192fe0b68b3132a5f169063dc52b472de717"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-floor-fix.json": {
+          "before": null,
+          "after": "5d99f64daac25f129f95f488f5edd44894f3696c"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-floor-fix.log": {
+          "before": null,
+          "after": "ca84b07f5b3b5364701bac7f38a9e108387be0d5"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-floor-reproduction.json": {
+          "before": null,
+          "after": "18b91db0648f5865a09ed2f1a7510d8c6b683986"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-floor-reproduction.log": {
+          "before": null,
+          "after": "f738357da5fbd5ec85db937ef353b0f171bd6530"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-floor-review-fix.json": {
+          "before": null,
+          "after": "e332530a5b9b52a9f933da2bbc04ceda7489cf39"
+        },
+        "docs/evidence/group-report-school-20261030/leaf-floor-review-fix.log": {
+          "before": null,
+          "after": "2790c3b177617894cfecd68c9bc14be80f7876a9"
+        },
+        "docs/evidence/group-report-school-20261030/main55-qualification-plan.json": {
+          "before": null,
+          "after": "6b4d44ee6e7f6d6f3e59ac42729039477247c49b"
+        },
+        "docs/evidence/group-report-school-20261030/main55-source-diff.raw": {
+          "before": null,
+          "after": "5965fe51febf73c42f0b40c68ad97e8b160cc450"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/activation-preparation.json": {
+          "before": null,
+          "after": "d4ad21ceed034a2e50a5162215b316fd35220448"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/backend-types.json": {
+          "before": null,
+          "after": "403a1393eec936bf2a45c1161b09198274386c3f"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/frontend-types.json": {
+          "before": null,
+          "after": "772ef35d831729006a0850582569da92ca77cf1c"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/prisma-generate.log.gz": {
+          "before": null,
+          "after": "125942b82a0e115a7932d5bc5fb1259127d602f3"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/qualification-plan.json": {
+          "before": null,
+          "after": "9421e08379e8ed21880447a3f135d3830a7414c2"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/receipt-review.json": {
+          "before": null,
+          "after": "1799f86e018d7b84202c385d5834028c21bb666a"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/source-diff.raw": {
+          "before": null,
+          "after": "a267e9779f8b3ecd8323b6c893e4ca1d54fbd30c"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/backend-types.json": {
+          "before": null,
+          "after": "1dfdad38c49a4d1a02aedc60b1c6ca49c1a39909"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/frontend-types.json": {
+          "before": null,
+          "after": "575130332829db3b87583cea84efade5b821b2ef"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/prisma-generate.log.gz": {
+          "before": null,
+          "after": "a6cece008b17e698fda89fb4f500f64cade5259d"
+        },
+        "docs/evidence/group-report-school-20261030/mainfb/qualification-plan.json": {
+          "before": null,
+          "after": "2a641caef571f5af15c3ecd5af8695af15822f64"
+        },
+        "docs/evidence/group-report-school-20261030/manifest.json": {
+          "before": null,
+          "after": "4663636cc3983731e3a3271a8cb80a4cb627c58b"
+        },
+        "docs/evidence/group-report-school-20261030/postgres-continuation.json": {
+          "before": null,
+          "after": "31b9b4a5f85cac7972d6b6b0124b095fcb5c6f62"
+        },
+        "docs/evidence/group-report-school-20261030/postgres-continuation.log": {
+          "before": null,
+          "after": "115e85bcbc41b5df59e76547b02521bcfd906893"
+        },
+        "docs/evidence/group-report-school-20261030/postgres.json": {
+          "before": null,
+          "after": "e28ebc49c4c4a1316f008d251ab52cc58bf43f38"
+        },
+        "docs/evidence/group-report-school-20261030/postgres.log": {
+          "before": null,
+          "after": "4802a6c93a9bd7c6b29eb19e90db4a91db062307"
+        },
+        "docs/evidence/group-report-school-20261030/presentation-delta.json": {
+          "before": null,
+          "after": "347d79a294b15c1f340606d3b687244063c23093"
+        },
+        "docs/evidence/group-report-school-20261030/presentation-delta.log": {
+          "before": null,
+          "after": "cbffda826fbfa86e0f2877b239fea93bf636d961"
+        },
+        "docs/evidence/group-report-school-20261030/qualification-case-inventory.json": {
+          "before": null,
+          "after": "6b1169efab31381d969bdde83b60dfa34eebc7f2"
+        },
+        "docs/evidence/group-report-school-20261030/qualification-controls.log": {
+          "before": null,
+          "after": "1964c4372c93eb1ee8d1a608558471acfe99410b"
+        },
+        "docs/evidence/group-report-school-20261030/routes.json": {
+          "before": null,
+          "after": "64abd6aad6194ae1d7aee38f8cd5338999c0d518"
+        },
+        "docs/evidence/group-report-school-20261030/routes.log": {
+          "before": null,
+          "after": "2d49d079d809c382f30370090d8d2b2a68b15675"
+        },
+        "docs/evidence/group-report-school-20261030/school-group-1440.png": {
+          "before": null,
+          "after": "a3f7220f440b29cbc8161e4d7fdb22ccf188550e"
+        },
+        "docs/evidence/group-report-school-20261030/school-group-390.png": {
+          "before": null,
+          "after": "48b8c28755c7326f7cff7ff8fd2b0030a85731d4"
+        },
+        "docs/evidence/group-report-school-20261030/school-group-report.pdf": {
+          "before": null,
+          "after": "a17861fb9286f0227fcd729f4ad3aaf73d17b682"
+        },
+        "docs/evidence/group-report-school-20261030/service-postgres-domain-continuation.json": {
+          "before": null,
+          "after": "2f0efbb95b9201b5f15451d8dea450863f4bc156"
+        },
+        "docs/evidence/group-report-school-20261030/service-postgres-domain-continuation.log": {
+          "before": null,
+          "after": "17ab949c7ff22f06787f771e71aeb4beeeea6041"
+        },
+        "docs/evidence/group-report-school-20261030/service-postgres-first.json": {
+          "before": null,
+          "after": "00e6b65f6ec073dc2842c41d1898eaf26fe9b097"
+        },
+        "docs/evidence/group-report-school-20261030/service-postgres-first.log": {
+          "before": null,
+          "after": "503d0ccc7a069a8855f54f180e9503b0227c9bbf"
+        },
+        "docs/evidence/group-report-school-20261030/service-postgres-proof.json": {
+          "before": null,
+          "after": "dfefa26cd7341a013999c4ec21b4685030a5f2b7"
+        },
+        "docs/evidence/group-report-school-20261030/service-postgres-read-continuation.json": {
+          "before": null,
+          "after": "6f9d1d3ebec1a1f2da86ff995d2c979a934eb668"
+        },
+        "docs/evidence/group-report-school-20261030/service-postgres-read-continuation.log": {
+          "before": null,
+          "after": "a90c5f8fc7fa943a9dd03e9ce33acdda5c326fbf"
+        },
+        "docs/evidence/group-report-school-20261030/service-postgres-users-continuation.json": {
+          "before": null,
+          "after": "e048c19d9ddc4af149e32097cbceaf3265c678a4"
+        },
+        "docs/evidence/group-report-school-20261030/service-postgres-users-continuation.log": {
+          "before": null,
+          "after": "0d839c263691ddeb183502772c6e722c41bf8fea"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/formal-result.json": {
+          "before": null,
+          "after": "2a6d726333a09415133a485a526ab05b9048a5d7"
+        },
+        "server-version/backend/src/__tests__/campus/group-leaf-privacy.test.ts": {
+          "before": null,
+          "after": "01402cf7f67f3118c63f46dd27f6b165338c3845"
+        },
+        "server-version/backend/src/__tests__/campus/group-reports.test.ts": {
+          "before": "defff66103042a403d10c5e01ee9d3fa03518d88",
+          "after": "52674552b5aa0d2f07242f57202f9f38d30af289"
+        },
+        "server-version/backend/src/__tests__/campus/report.routes.test.ts": {
+          "before": "ee82a66d6777bf397cd2180834300a3a130ababb",
+          "after": "3e06a4bd205d900866cbc6a4a3c9bee5bd1fbe5f"
+        },
+        "server-version/backend/src/__tests__/integration/groupReportSchoolLeaves.postgres.integration.test.ts": {
+          "before": null,
+          "after": "b5afe58c115c458524f8ad7d4f3db72b15969cb8"
+        },
+        "server-version/backend/src/__tests__/integration/groupReportSchoolService.postgres.integration.test.ts": {
+          "before": null,
+          "after": "403131df67586a6467dc2108b46e0ccc9a4634d9"
+        },
+        "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts": {
+          "before": "093f53427bcb83ea2f9d08bd125b29ff77336cdf",
+          "after": "b9f55ed01abd573828c84a6bdfc5706b11a7150d"
+        },
+        "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts": {
+          "before": null,
+          "after": "c845124d83ef4ec6fa83266d3edfb2ba75033db9"
+        },
+        "server-version/backend/src/modules/campus/generalGroupV2.differencing.ts": {
+          "before": "9afb80838e24b2276694f8100130a911e2cc6b48",
+          "after": "b2ccf4f6f7a8eff8e692c35b822ce3e6be367f85"
+        },
+        "server-version/backend/src/modules/campus/group-reports.ts": {
+          "before": "1d4a37ccfd4b2cedcb5caea2c5e5b474382564c8",
+          "after": "713ae7473aa117370fd58c81f379caacc4d86f81"
+        },
+        "server-version/backend/src/modules/campus/privacyV2.ts": {
+          "before": "94d6c4c633977be6e864939da863cddcb9f1c722",
+          "after": "0fc4762a47e616df39f282794450cca6b39d5104"
+        },
+        "server-version/backend/src/modules/campus/report.routes.ts": {
+          "before": "18cee67f75742711e1642b612f65250986165206",
+          "after": "4c9042098c9c4db63322dfb5b1e99b380b0de0cd"
+        },
+        "server-version/backend/src/modules/report-privacy/snapshot.service.ts": {
+          "before": "67159ace7ab9ca92c206f847feeb2be5146f0886",
+          "after": "82bf5b2ba6da4a4931810fbc0a0b14c4bc3608ac"
+        },
+        "server-version/backend/src/modules/reporting/artifact.ts": {
+          "before": "bb652ba665f22714da9ed8924e60e116a4b5000a",
+          "after": "244795010b5a7e94b5882d8a86f40c82e602a122"
+        },
+        "server-version/backend/src/modules/reporting/cohort-selector.ts": {
+          "before": "6c69776c58dae63273a5bd24d6d0f87d1258c514",
+          "after": "1bc04971bd726cd6173740af04bdc32b2f760177"
+        },
+        "server-version/backend/src/modules/reporting/discovery.ts": {
+          "before": "4be8b9084c68a21ca718006080fe08f467176c6e",
+          "after": "9ebacd7d5706ba89438e6f9d4459373237d18bc0"
+        },
+        "server-version/backend/src/modules/reporting/education-group-selection.ts": {
+          "before": null,
+          "after": "5fcdd364630ce7051d4a4a955f90d83fee31f48b"
+        },
+        "server-version/backend/src/modules/reporting/engine.ts": {
+          "before": "2c29ccf3d92dd3ed0a620da02bdac1de6fb1bc50",
+          "after": "6aabd0db80380e607994ca81802b4db3c2eaa139"
+        },
+        "server-version/backend/src/modules/reporting/governedDisclosure.ts": {
+          "before": "d7f5378f36006b2b2bfeb38d84acb9a861f17805",
+          "after": "caca09d42ced85f2590e2b31e377455c8c46472f"
+        },
+        "server-version/backend/src/modules/reporting/pr4Service.ts": {
+          "before": "526dbea4399a04c5ca647527d61b913d128954ec",
+          "after": "cbbf65d147f30876d38ca4ee6ca5aba03622c62c"
+        },
+        "server-version/backend/src/modules/reporting/resultSource.ts": {
+          "before": "1e190fcbdb392b79b7481eb11de046827137451f",
+          "after": "1de430ddf8fa8e5d732346f9c8184ae2f6a087ca"
+        },
+        "server-version/backend/src/modules/reporting/service.ts": {
+          "before": "29843a56d208a28d694651b58c0accf070cb494a",
+          "after": "5ee9418f96a6c1c094af537a6027cc3f6ef8137c"
+        },
+        "server-version/backend/src/modules/reporting/types.ts": {
+          "before": "ebfcf7106a5deb4f199a64e2437cf75ea3ed3a2f",
+          "after": "22a008a4cb09b5807ee3e35bdfd0609eaa1eb73b"
+        },
+        "server-version/e2e/school-group-report-browser.cjs": {
+          "before": null,
+          "after": "910479f295b0847f2d1da27955aa4b1b068e8a65"
+        },
+        "server-version/e2e/school-group-report-fixture.tsx": {
+          "before": null,
+          "after": "1436c90a6e5ee93c26be0dbf0c10bb3614bd3ec9"
+        },
+        "server-version/frontend/src/modules/reporting/TaskGroupReport.tsx": {
+          "before": "e4e57a5b592b073c1e9ca86b18aeb1ed4ff5f89f",
+          "after": "7a951571a3494b8a77f7c6857bc8cb07d5af19e3"
+        },
+        "server-version/frontend/src/school/SchoolGroupReports.test.tsx": {
+          "before": "b55466f3c1e5591af566f99017e29d210f94a04b",
+          "after": "4d9fbd65ff0f49c87e9271dd8ffee26975c88d63"
+        },
+        "server-version/frontend/src/school/SchoolGroupReports.tsx": {
+          "before": "662aba141d6e30e2f513a9dd30065769d5687b41",
+          "after": "24f7d521a70de4e058f382a62623cd1039045d49"
+        }
+      },
+      "activationNote": "Final main406 alignment under specific user approval for PR414 qualification and subsequent DOT merge. Current combined component compilers passed once; original41 business/PG observations reused. Existing exact source/admission/affected SAST/gate only, no new workflow, no local merge/deployment. Original formal41057783824 remains old-base evidence with preserved baseline test advisory."
+    },
     "393": {
       "schemaVersion": 1,
       "pr": 393,
