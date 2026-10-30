@@ -1449,7 +1449,7 @@ jobs:
           JS
       - name: select exact Task1 changed application and control SAST inputs
         id: task1-codeql-config
-        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404,408,414,415,418,419]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
+        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404,408,414,415,418,419,420]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
         env:
           CI: 'true'
           PLAN: ${{ needs.scope.outputs.onboarding_plan }}
@@ -2561,6 +2561,8 @@ jobs:
     # the native-base reuse fixture runs locally once. Admission below verifies
     # the actual new base/source inputs without replaying those fixtures.
     - name: admit reviewed results and qualify only missing compiler inputs
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: node .github/scripts/onboarding-checks.mjs admit
     - name: compile each missing Task1 component once and retain those exact artifacts
       if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 'task1' && steps.task1-build-reuse.outputs.backend-reused != 'true'

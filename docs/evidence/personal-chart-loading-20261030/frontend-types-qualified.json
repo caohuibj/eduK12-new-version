@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.app.json",
+    "--noEmit"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-30T22:21:14.660406+00:00",
+  "finishedAt": "2026-10-30T22:21:54.687240+00:00",
+  "node": "v24.22.1",
+  "componentTree": "8d7f9214106aa965d1379b75464136d7cc5b90e5",
+  "source": "f4fa39bdb98d3d6984538b45de5797a46b52bda5",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "continuationOf": "frontend-types.json",
+  "correction": "Install existing locked backend dependencies and generate Prisma client required by imported shared type contracts; no backend build/test/DB."
+}
