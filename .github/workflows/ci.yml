@@ -403,7 +403,7 @@ jobs:
           node-version: '24.21.0'
       - name: fetch the immutable reviewed personal tracking source
         if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'feat/personal-longitudinal-survey-20261030'
-        run: git fetch --no-tags --depth=1 origin a62c9a5763da69aa13b4f70d062b0bf55d6db65f 571a14b73ef81148913f5ff1666e7e461f2f4b92 af8fad552f776615afaa1e91e57a012768021bca
+        run: git fetch --no-tags --depth=1 origin a62c9a5763da69aa13b4f70d062b0bf55d6db65f 571a14b73ef81148913f5ff1666e7e461f2f4b92 af8fad552f776615afaa1e91e57a012768021bca e6585ebed49e5cd92e858c19fd930230c791adbb
       - name: fetch the exact diff base without full history
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -3581,6 +3581,7 @@ jobs:
       - name: admit exact original local reporters without application replay
         run: node .github/scripts/personal-tracking-ready.mjs admit
       - name: install locked native migration tools
+        if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse }}
         working-directory: server-version/backend
         env:
           PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
@@ -3592,15 +3593,18 @@ jobs:
         working-directory: server-version/backend
         run: npm audit --audit-level=high
       - name: real nonempty main upgrade and native dump restore
+        if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse }}
         env:
           PG_SERVICE: ${{ job.services.postgres.id }}
         run: node .github/scripts/personal-tracking-ready.mjs native
       - name: install frontend tools and audit locked inputs
+        if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse }}
         working-directory: server-version/frontend
         run: |
           npm ci
           npm audit --audit-level=high
       - name: actual frontend app types and affected source lint
+        if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse }}
         working-directory: server-version/frontend
         run: |
           npx tsc -p tsconfig.app.json --noEmit

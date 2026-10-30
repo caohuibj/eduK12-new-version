@@ -521,3 +521,25 @@ application SAST findings/disposition are not changed. Existing audit success
 remains retained. Main31845 is unchanged. Only missing native/frontend checks
 remain; no CI activation until required Notion failure/checking-list append
 and exact-target writes succeed under the newly supplied authorization.
+
+### Official native/frontend qualification success and SAST metadata repair
+
+Run41038456712/sourcee658/executiona4019 job124005165894 SUCCESS:
+exact-main upgrade, full native dump/restore, affected DDL, old opaque bytes,
+immutable guards, frontend locked audit/types/lint and retained original checks.
+Artifact12969576293/ZIPsha2563d59e25890432fb8b3dc6e7fd34792a516a93deebb441df9cce18db93acf2d71
+retains the official qualification receipt. The overall run remains failed:
+SAST job124005164672 refused original af8 source SHA because the verifier
+incorrectly required checkout merge-preview SHA in GitHub job.head_sha. Official
+job metadata returns PR sourceSHA; both are fixed original identities, as in
+the existing image verifier. No scan had begun in this failed continuation.
+
+The exact official saved job metadata now exercises the corrected verifier.
+Complete original native/frontend job reuse requires successful whole original
+job and every selected step, age24h, unchanged complete server tree and base,
+byte-equal native function section and tool/job inputs (only explicit receipt
+reuse conditions excluded). Failed/missing/changed proof refuses. The first
+local parser assertion caught its own marker literal; anchored newline markers
+fix that without changing original qualification input. All raw failures remain.
+Only original receipt acceptance plus changed control SAST execute next; no
+repeated migration, frontend compile/audit, production build or application test.

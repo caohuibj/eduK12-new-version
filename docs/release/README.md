@@ -2047,3 +2047,12 @@ findings are retained without disposition changes. Native old-row fixture
 explicitly confirms linkage and uses a valid synthetic research code, honoring
 existing database guards. Local rollback-only fixture validation is not claimed
 as official migration/restore qualification.
+
+PR399 official qualification job124005165894/run41038456712 succeeded for e658
+main31845 inputs. Later control-only continuation authenticates that whole
+successful native/frontend producer with its required steps,24h metadata,
+unchanged full production tree/base/native function bytes and original job/tool
+inputs. Its failed sibling SAST adapter remains failed and is repaired separately.
+GitHub job.head_sha may carry the pinned PR source rather than checkout preview;
+only those two exact original identities are accepted. Current changed controls
+still receive actual SAST. No skipped producer is treated as a new execution.

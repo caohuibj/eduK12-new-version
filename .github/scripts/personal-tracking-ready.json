@@ -946,5 +946,13 @@
       "server-version/frontend/src/survey",
       "server-version/frontend/src/modules/reporting"
     ]
+  },
+  "qualificationReuse": {
+    "runId": 41038456712,
+    "jobId": 124005165894,
+    "sourceHead": "e6585ebed49e5cd92e858c19fd930230c791adbb",
+    "executionHead": "a4019d0a8b51783f8ae3dac869456c81557f5bd5",
+    "serverVersionTree": "04c7d744e4835dabd055a5595ad8578a792d8b72",
+    "maximumAgeHours": 24
   }
 }

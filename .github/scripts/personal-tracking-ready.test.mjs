@@ -4,7 +4,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,mkdtempSync,statSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
-import {binding,personalTrackingReadyPlan,personalTrackingReadyOutputs,admitOriginalReports,admitOriginalReportsInChild,verifyOriginalImages,prepareMainSchema,verifyOriginalBackendAudit,verifyOriginalApplicationSast} from './personal-tracking-ready.mjs';
+import {binding,personalTrackingReadyPlan,personalTrackingReadyOutputs,admitOriginalReports,admitOriginalReportsInChild,verifyOriginalImages,prepareMainSchema,verifyOriginalBackendAudit,verifyOriginalApplicationSast,verifyOriginalQualification} from './personal-tracking-ready.mjs';
 import {changedEntries} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
@@ -59,4 +59,18 @@ test('retained application SAST requires exact official successful extraction an
  const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),proof=binding.applicationSastReuse,now=Date.now(),old=process.env.GH_TOKEN;process.env.GH_TOKEN='synthetic-read-only-metadata';
  const job={id:proof.jobId,run_id:proof.runId,head_sha:proof.executionHead,name:'codeql (javascript/typescript SAST)',status:'completed',conclusion:'success',completed_at:new Date(now).toISOString(),steps:['bound personal tracking SAST without extending the inline expression','initialize CodeQL','analyze with CodeQL'].map(name=>({name,conclusion:'success'}))};const fake=value=>async()=>({ok:true,json:async()=>value});
  try{assert.equal((await verifyOriginalApplicationSast(plan,fake(job),now)).reexecuted,false);await assert.rejects(verifyOriginalApplicationSast(plan,fake({...job,conclusion:'failure'}),now));await assert.rejects(verifyOriginalApplicationSast(plan,fake({...job,steps:[]}),now));await assert.rejects(verifyOriginalApplicationSast(plan,fake({...job,head_sha:'0'.repeat(40)}),now));await assert.rejects(verifyOriginalApplicationSast(plan,fake({...job,completed_at:new Date(now-25*3600000).toISOString()}),now));}finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
+});
+
+
+test('actual original source-SHA job metadata admits unchanged complete native and application SAST only',async()=>{
+ const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),old=process.env.GH_TOKEN;process.env.GH_TOKEN='synthetic-offline-metadata-reader';
+ const prefix='docs/evidence/personal-longitudinal-20261030/continuation/',sast=JSON.parse(readFileSync(prefix+'personal-ready-af8-codeql-success.json')),native=JSON.parse(readFileSync(prefix+'personal-ready-e658-native-success.json'));
+ const read=job=>async()=>({ok:true,json:async()=>job});
+ try{
+  assert.equal(sast.head_sha,binding.applicationSastReuse.sourceHead);assert.equal((await verifyOriginalApplicationSast(plan,read(sast))).reexecuted,false);
+  assert.equal((await verifyOriginalQualification(plan,read(native))).reexecuted,false);
+  await assert.rejects(verifyOriginalQualification(plan,read({...native,conclusion:'failure'})));
+  await assert.rejects(verifyOriginalQualification(plan,read({...native,steps:[]})));
+  await assert.rejects(verifyOriginalQualification({...plan,qualificationReuse:{...plan.qualificationReuse,serverVersionTree:'0'.repeat(40)}},read(native)));
+ }finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
 });
