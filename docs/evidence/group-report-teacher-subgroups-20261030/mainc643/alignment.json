@@ -1,0 +1,29 @@
+{
+  "base": "c64329c40d49d7df215a123dec0ec434e83e5c65",
+  "product": "b4dd0f7be5d9e064534ad02d7a73b942d68efe23",
+  "ownTenOtherSourceBlobsUnchangedFrom": "478670cef348ce0c686bb889708fa4ddfbe12c14",
+  "same": {
+    "server-version/backend/src/__tests__/integration/teacherFormGroupSubgroups.postgres.integration.test.ts": true,
+    "server-version/backend/src/modules/huiteacher/disclosureOverlap.service.ts": true,
+    "server-version/backend/src/modules/huiteacher/groupReport.routes.ts": true,
+    "server-version/backend/src/modules/huiteacher/groupReport.service.ts": true,
+    "server-version/backend/src/modules/huiteacher/privacyReleaseV2.service.ts": true,
+    "server-version/backend/src/modules/reporting/cohort.ts": true,
+    "server-version/e2e/teacher-group-report-browser.cjs": true,
+    "server-version/frontend/src/huiteacher/HuiteacherGroupReportReading.test.tsx": true,
+    "server-version/frontend/src/huiteacher/TeacherFormGroupReport.tsx": true,
+    "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx": true
+  },
+  "sharedStudio": "Only upstream draft removal callback added;retained versions wrapper and personal tracking imports;CLOSED Form behavior unchanged.",
+  "nativeConsumer": "Own groupReport/privacyRelease/disclosureOverlap/cohort blobs unchanged;upstream personal tracking does not alter native Form consumer. No schema/package/lock changes introduced by418.",
+  "componentTrees": {
+    "backend": "2ea6fd8d6e44388995a9d8ca9d0ba6b51a68ea05",
+    "frontend": "c444887f09c20c27d7ffbdd9a115786b65554a68"
+  },
+  "originalCasesRetained": 3,
+  "oldPgBrowserOrSharedStatisticsReplayed": false,
+  "newControlCase": "qualification-controls.log:1PASS",
+  "qualification": "Existing four-job fixed route,no new workflow",
+  "leafFeatureIncluded": false,
+  "mergeDeploy": false
+}

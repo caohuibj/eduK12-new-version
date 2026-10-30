@@ -2058,6 +2058,340 @@
       },
       "activationNote": "Exact main228 after416 merge;no418 mixed in. Actual shared boundary reviewed;original app/PG/browser retained and only changed whole frontend compiler input checked once. Existing four-job route only;no merge/deploy."
     },
+    "418": {
+      "schemaVersion": 1,
+      "pr": 418,
+      "enabled": true,
+      "base": "c64329c40d49d7df215a123dec0ec434e83e5c65",
+      "product": "b4dd0f7be5d9e064534ad02d7a73b942d68efe23",
+      "controlCheckpoint": "504b46b52a8875f45ed7f758036a449e02a60edc",
+      "components": {
+        "backend": "2ea6fd8d6e44388995a9d8ca9d0ba6b51a68ea05",
+        "frontend": "c444887f09c20c27d7ffbdd9a115786b65554a68"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "fdd99d34bab5e5812e2889a93be7e0461b1be471",
+        ".github/scripts/onboarding-checks.mjs": "f2e5d4226fb2a0b101dbcbc3b586823924d898af",
+        ".github/scripts/onboarding-controls.test.mjs": "5f6800fb0ac6aa437693e899aa786cbaeb39c82a",
+        ".github/scripts/onboarding-evidence.json": "351304e05a45b937a7635373bc7a0b5b2a7e2939",
+        ".github/scripts/onboarding-scope.mjs": "bbb5e3f940e98771f43416cea2fe538431340c4f",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "4a64efec2ed8e522db4f6702acb83a7ca575adc6"
+      },
+      "source": {
+        "docs/development/group-report-teacher-subgroups-20261030.md": {
+          "before": null,
+          "after": "6d96c31ff4e7b1ab047b75d2c08d1f4872836593"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/admission-inspection.json": {
+          "before": null,
+          "after": "a12fc2dd87335c880a863e1bdb988f4dec44c2a1"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/admission.json": {
+          "before": null,
+          "after": "43e3a9858f15b4e45181ea239252fc0d8bc2e10f"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/formal-result.json": {
+          "before": null,
+          "after": "250fdfa4f70e374e8379e6b57982190fb7c83ca3"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/javascript.sarif.gz": {
+          "before": null,
+          "after": "ebe2d4f4630a8dae8e4494a87d3896357cb7f071"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/job-results.json": {
+          "before": null,
+          "after": "ae08a7e6337e9833d177ca64982a8c96ca04dc8e"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/run.json": {
+          "before": null,
+          "after": "6b4fb30f333cfc39d88a5ef1bd0d4fafad91030a"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/sast-inspection.json": {
+          "before": null,
+          "after": "2dcafc94e4ebbc9491478c0d68bde4b0c1cb5a84"
+        },
+        "docs/evidence/group-report-teacher-reading-20261030/main8bc/formal/sast-review.json": {
+          "before": null,
+          "after": "021ab3ef7f82f99ef272bf316336105fed0f9217"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/backend-types.json": {
+          "before": null,
+          "after": "ee33af9c73355e62ed6edd3aed95f131f0aac7f9"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/browser-bundle.json": {
+          "before": null,
+          "after": "86c255a7580a0281d458eb69456a7594f5b5c65f"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/browser-selector-continuation.log": {
+          "before": null,
+          "after": "6082fa44ebc90a256617c78d7083b0abaf96d250"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/browser-selector-failure.log": {
+          "before": null,
+          "after": "0d7e6133cce2bfc3d5213c11a14d4bee1b8874da"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/browser.json": {
+          "before": null,
+          "after": "2687c32bb0bf27f6155a7f2c90b086175ef5e78e"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/browser.log": {
+          "before": null,
+          "after": "0d7e6133cce2bfc3d5213c11a14d4bee1b8874da"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/directory-failure.json": {
+          "before": null,
+          "after": "9527dbe333a0cbe225ea6f112fafd26aba2d619e"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/directory-failure.log": {
+          "before": null,
+          "after": "e7f226fa4c719d8bb6227a3f5c68f26a3fc842a3"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/frontend-lint.json": {
+          "before": null,
+          "after": "a752db67138458071d2aa338f943f5709242fa47"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/frontend-lint.log.gz": {
+          "before": null,
+          "after": "c19399b9c357b11081f909296cefe67a741880f7"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/frontend-types.json": {
+          "before": null,
+          "after": "b74fad1bdca9484675cb0d8c5c09f1df0cea2d6f"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/backend-types.json": {
+          "before": null,
+          "after": "1de2e1040d9042434d08b172c6bcdaa10200420c"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/frontend-types-continuation.json": {
+          "before": null,
+          "after": "edfae6df6a6e4123e0820e33f0dfae49cf317142"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/frontend-types-continuation.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/frontend-types.json": {
+          "before": null,
+          "after": "3c816e637389b03d5752097d092676abf8644436"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/frontend-types.log": {
+          "before": null,
+          "after": "5857102a75007974eaa601dbbe47d64c982293d4"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation-continuation.json": {
+          "before": null,
+          "after": "33bc00d7215a2442337a2e41acfd5f5de5e3610c"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation-continuation.log": {
+          "before": null,
+          "after": "269427542a225211388319cd564e5fcb181c62ee"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation.json": {
+          "before": null,
+          "after": "f08e9520dd4cdd48daaa3f2b96f3eb232bb1ee89"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation.log": {
+          "before": null,
+          "after": "569d6469d3b5b165ca1651b7e7ff438324cdc19c"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/preparation.json": {
+          "before": null,
+          "after": "fe09a11509baab4c5fc2ed9891290dc8b745ae80"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/alignment.json": {
+          "before": null,
+          "after": "f77a9aec0709eb51a638360393c7c2c808b71a52"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/backend-types.json": {
+          "before": null,
+          "after": "d0a899e667aaa9b6170164bc3f5367c0f28c9b2a"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/frontend-types.json": {
+          "before": null,
+          "after": "8d9f50dd4fd6f5cdcd60ca80b0e744a83272e850"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/qualification-controls.log": {
+          "before": null,
+          "after": "c972518f5478de271fcef39eaff4b79406e89811"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/manifest.json": {
+          "before": null,
+          "after": "c5a538f29ebda94edab101287cf004dcedf319e0"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/navigation.json": {
+          "before": null,
+          "after": "10d3a2d34af8a2a64697b7a181135f144590d833"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/navigation.log": {
+          "before": null,
+          "after": "853b65d058e80299aa3e7a0857fbcaa3060a4362"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/postgres-first.json": {
+          "before": null,
+          "after": "87efc06bb5c243ba2dab1bc0c61ac8afa3a599a1"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/postgres-first.log": {
+          "before": null,
+          "after": "0befa74198741c43281c278fbb8ab1a8da84b120"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/postgres-grade-continuation.json": {
+          "before": null,
+          "after": "00aadbed1a8f467bd82c0c6003ea4fc15541c809"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/postgres-grade-continuation.log": {
+          "before": null,
+          "after": "0d253a647bb02a737dcee4290ce388867ccef93f"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/postgres-proof.json": {
+          "before": null,
+          "after": "5655230aca72f4801b14dc277f8c4228055d3c2d"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/postgres-revocation-continuation.json": {
+          "before": null,
+          "after": "80e25f30803d4eb62593346e2e232c0e5dffdbd2"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/postgres-revocation-continuation.log": {
+          "before": null,
+          "after": "726dbeef3a46192a56021fb34c331fe450f20096"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/postgres-scope-continuation.json": {
+          "before": null,
+          "after": "2604467d04d626fe869dd236c04fd42e817790eb"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/postgres-scope-continuation.log": {
+          "before": null,
+          "after": "92ff4139e94988f9503a7660cde5cf61589231f5"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/teacher-group-1440.png": {
+          "before": null,
+          "after": "fdd002e55be564ecdc858bf26ce509c2aa446a61"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/teacher-group-390.png": {
+          "before": null,
+          "after": "e29a0a930eb4ecfa27f8c21a0f26de5ab9d97d7c"
+        },
+        "docs/evidence/group-report-teacher-subgroups-20261030/teacher-group-report.pdf": {
+          "before": null,
+          "after": "b187d86de3886fcf9ee219338909140eae93ba8c"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/README.md": {
+          "before": "ae74fc32ed1c03a23302db68e9775d15669f8b46",
+          "after": "a24bebd449991d3f250cac1e47016832c922664f"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/downstream-sync.json": {
+          "before": null,
+          "after": "5712632a6c00e598f25aa431bcdb05332286976f"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/draft-failed.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/draft-gate.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/draft-jobs-complete.json": {
+          "before": null,
+          "after": "01e941a19a5e1d74c2fac8ff92ea17e681e29833"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/draft-run.json": {
+          "before": null,
+          "after": "477f5d24fc47b8b06b072482af1b37228c46b9fc"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/formal-result.json": {
+          "before": null,
+          "after": "81a530fa3b4825977320910ce788a59bed83f121"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/ready-jobs-1.json": {
+          "before": null,
+          "after": "b413929db930f7a1dd9aeb85ffa14a68d557afd8"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/ready-jobs-2.json": {
+          "before": null,
+          "after": "32233d33e98ab99a529fcdccc50ba15db808a846"
+        },
+        "docs/evidence/group-report-training-20261030/main-2fc-alignment/ready-run.json": {
+          "before": null,
+          "after": "24c27dbfb94562e28fa5c076b332fdbe738e9ceb"
+        },
+        "server-version/backend/src/__tests__/integration/teacherFormGroupSubgroups.postgres.integration.test.ts": {
+          "before": null,
+          "after": "89eee1a909b50b35f243dbb535f5c467e1cb14e8"
+        },
+        "server-version/backend/src/modules/huiteacher/disclosureOverlap.service.ts": {
+          "before": "056bb14ce482045550b1b8e4e9414036b856e27b",
+          "after": "112cb914882924f0db8a3f7114a0b2461d9632cb"
+        },
+        "server-version/backend/src/modules/huiteacher/groupReport.routes.ts": {
+          "before": "1f803ef942c672536c2b5eca2f2e10a2f4d9d126",
+          "after": "211fe0646fef1aa1887131a6fa17be4757aece5d"
+        },
+        "server-version/backend/src/modules/huiteacher/groupReport.service.ts": {
+          "before": "a39603dfe98e58b828ede3a661b3cd1cbd2d3fe9",
+          "after": "692abcd005cf2fc7be3e1056f2505a9d38c91ed8"
+        },
+        "server-version/backend/src/modules/huiteacher/privacyReleaseV2.service.ts": {
+          "before": "9e50397f28c7f06a8e5d5eeaa7fc37cad5179e83",
+          "after": "3e37ef69db470a841e8de82768821dbe66d9d62e"
+        },
+        "server-version/backend/src/modules/reporting/cohort.ts": {
+          "before": "adff37e6109b798d48a2333f8446707875ef3bce",
+          "after": "6061589a23d0ac937d0fb864df5867a0333ccc4b"
+        },
+        "server-version/e2e/teacher-group-report-browser.cjs": {
+          "before": "1a30ff892f14b67a466ea0410db4aa13ade24355",
+          "after": "caf6ad7934575f6598aff8d55723a2bb898f132e"
+        },
+        "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
+          "before": "7aa7c3e6e32c3857615cb32fb425d9139fc4e4ad",
+          "after": "b68c9bd3de329decef4ed8c2f55c9d0b2090aaa1"
+        },
+        "server-version/frontend/src/huiteacher/HuiteacherGroupReportReading.test.tsx": {
+          "before": "7fd75ca7a3b30b3e5a6cdeafabafa2c0a4f7b715",
+          "after": "41a4f034bc834da5bccf679232fdb18717685c22"
+        },
+        "server-version/frontend/src/huiteacher/TeacherFormGroupReport.tsx": {
+          "before": "7d759c77aaf90613f7e64981bb7f766591e6c6ef",
+          "after": "fa5c27c079ff638bce4e4138e3383cea82819034"
+        },
+        "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx": {
+          "before": null,
+          "after": "56e938b28c4f163b71c9c4e86cfb013e622837fa"
+        }
+      },
+      "activationNote": "Teacher native Form subgroup/version only on actual merged mainc643;no leaf-source feature. Original retained-stage native scene and browser,plus2-case navigation/directory continuation admitted unsigned;only current component types/new fixed-route control check executed locally. Existing scope/admission/CodeQL/gate,no new workflow,no merge/deploy."
+    },
     "task1": {
       "schemaVersion": 1,
       "pr": "task1",
