@@ -12,11 +12,12 @@ it('keeps a successfully generated Teacher report when the directory refresh fai
  const report={versionId:'saved',eventId:'event',formId:'form',definitionDigest:'a'.repeat(64),releasedAt:'2026-10-30T12:00:00Z',populationLabel:'全部合格参与教师',independentRespondents:10,minimumRespondents:10,distributions:[]}
  const index={versioned:true,truncated:false,versions:[] as Array<{versionId:string;releasedAt:string;populationLabel:string}>,groups:{options:[],limitations:[]}}
  let reads=0
- const api=vi.fn(async<T,>(_path:string,method?:string):Promise<T>=>{
-  if(method==='POST')return report as T
+ const requests=vi.fn(async(_path:string,method?:string):Promise<unknown>=>{
+  if(method==='POST')return report
   if(++reads===2)throw new Error('目录暂不可用')
-  return {...index,versions:reads>2?[report]:[]} as T
+  return {...index,versions:reads>2?[report]:[]}
  })
+ const api=async<T,>(path:string,method?:string):Promise<T>=>await requests(path,method) as T
  const deliver=vi.fn()
  render(<TeacherFormGroupVersions api={api} endpoint="/group-report" onReport={deliver}/> )
  fireEvent.click(await screen.findByRole('button',{name:'生成更新版报告'}))
@@ -27,7 +28,7 @@ it('keeps a successfully generated Teacher report when the directory refresh fai
  await waitFor(()=>expect(screen.queryByText(/版本目录刷新失败/)).not.toBeInTheDocument())
  expect(deliver).toHaveBeenLastCalledWith(report)
  expect(screen.getByLabelText('已生成版本')).toHaveValue('saved')
- expect(api.mock.calls.filter(([,method])=>method==='POST')).toHaveLength(1)
+ expect(requests.mock.calls.filter(([,method])=>method==='POST')).toHaveLength(1)
  expect(reads).toBe(3)
 })
 it('opens existing Teacher Form versions, explicitly generates one class report, and prints only its authorized rounded projection',async()=>{
@@ -61,7 +62,10 @@ it('opens existing Teacher Form versions, explicitly generates one class report,
  const schoolButton=within(await screen.findByRole('navigation',{name:'Teacher 工作台'})).getByRole('button',{name:'学校改进'})
  fireEvent.click(schoolButton);await waitFor(()=>expect(schoolButton).toHaveAttribute('aria-pressed','true'))
  fireEvent.click(await screen.findByRole('link',{name:'评价活动'}))
- fireEvent.click(await screen.findByRole('button',{name:'查看任务配置'}))
+ const configure=await screen.findByRole('button',{name:'查看任务配置'},{timeout:3000}).catch(error=>{
+  throw new Error(String(error)+'\nRequests: '+JSON.stringify(fetch.mock.calls.map(([url,options])=>({url,method:options?.method??'GET'}))))
+ })
+ fireEvent.click(configure)
  fireEvent.change(await screen.findByLabelText('报告对应 Form'),{target:{value:'form'}})
  await screen.findByRole('article',{name:'教师群体报告阅读'})
  expect(generated).toBe(false)
