@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "parentCommit": "17d19b36eca2e0b15a94709c5b5eb805d8729a04",
+  "recordedAt": "2026-10-29T15:38:33.571897+00:00",
+  "environment": "isolated cloud, Node24.21, local PostgreSQL55439/precise_general_test_20261029, Redis56389; no production",
+  "inputs": [
+    {
+      "path": "server-version/backend/prisma/migrations/20261029150000_standard_combination_education_admission/migration.sql",
+      "sha256": "862f27626e110280f05fa476258bea29cbef5821c67b467af08fdf4b727d6545"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.postgres.integration.test.ts",
+      "sha256": "707b4c6f32f4634e227156ce52734d45de74602ef95b209017dc21eb9ff28872"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.test.ts",
+      "sha256": "2b854f42ddf34de90b3eee9377f05bf0556bcdd75ac616f0bf54caaf607caf38"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts",
+      "sha256": "d8a4d2b5dae0990d4deaee964f51d57e1cc20d0267454d19b1cf4d65f5c1bdcd"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.routes.ts",
+      "sha256": "8bdd1719d35cd6c820a00fe86b1d0525268909c47b5cd92eb6444d5092450ba7"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+      "sha256": "7f9c84172ad4b1680581d7b8acac5264675010e2d47c2a5211e3df2da269845e"
+    },
+    {
+      "path": "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.test.tsx",
+      "sha256": "d9da6fb990dfd8b8afdc2dc69c90744804dae01dea2201181b9466a79e69df2b"
+    },
+    {
+      "path": "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.tsx",
+      "sha256": "fd8b8f61db6710a193528e250b3f8903702e97ec774eb4c35d32488e26850dbe"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "sha256": "a356adcfb129467c7c565f37f77510f386287d01cf27abb23382efda91793cf8"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx",
+      "sha256": "730f36fc900ad01dd9997978aa02236e982e01872f2e1375780c733d0c6c544f"
+    }
+  ],
+  "reports": [
+    {
+      "file": "education-admission-backend-initial.json",
+      "sha256": "971a5594dbe008b7551c944d50aaaade19a05bfeb743464ba7962c47bf4cc90b",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0,
+      "success": true
+    },
+    {
+      "file": "education-admission-ui-initial.json",
+      "sha256": "3a64df1dc11722157d2a7ecebb5f03cfdc1bb3bfc14946362915cef9b214467d",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0,
+      "success": true
+    }
+  ],
+  "evidence": [
+    {
+      "file": "education-admission-backend-types.log",
+      "sha256": "0c5e2568b4c79c13debcc497cf347b98e7a01e636ae2bed42cf3faa742048c94",
+      "exitCode": 0
+    },
+    {
+      "file": "education-admission-frontend-types-fixed-scope.log",
+      "sha256": "0c5e2568b4c79c13debcc497cf347b98e7a01e636ae2bed42cf3faa742048c94",
+      "exitCode": 0
+    },
+    {
+      "file": "education-admission-lint.log",
+      "sha256": "0c5e2568b4c79c13debcc497cf347b98e7a01e636ae2bed42cf3faa742048c94",
+      "exitCode": 0
+    },
+    {
+      "file": "education-admission-migration.log",
+      "sha256": "98d2184ac7c344e296219ce554d96303435ff4e4f3b838657b823c3f86154cb9",
+      "exitCode": 0
+    },
+    {
+      "file": "education-admission-http-initial.json",
+      "sha256": "c5fafc5ae36292ca39cea5b4b5bc4dc212a9e47242d84263f19d5cb4a6554880",
+      "exitCode": 0
+    }
+  ],
+  "notExecuted": [
+    "browser end-to-end",
+    "education manager distribution",
+    "four-entry acceptance",
+    "performance comparison",
+    "formal GitHub CI"
+  ],
+  "contentWrites": "One normal approved no-report combination from existing registered source; no new use grants"
+}

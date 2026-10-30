@@ -17,6 +17,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     courseStudent: { findMany: vi.fn(), findUnique: vi.fn() },
     compositeAssessmentItem: { findFirst: vi.fn() },
     cognitiveSession: { count: vi.fn(), findFirst: vi.fn() },
+    $queryRaw:vi.fn(),
     $transaction: vi.fn(),
   },
 }))
@@ -109,6 +110,7 @@ const baseInput = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$queryRaw.mockResolvedValue([])
   appConfig.cognitiveModuleEnabled = true
   mockPrisma.$transaction.mockImplementation((run: any) => run(mockPrisma))
   mockPrisma.cognitiveSession.count.mockResolvedValue(0)

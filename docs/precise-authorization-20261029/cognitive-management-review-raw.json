@@ -1,0 +1,641 @@
+{
+  "schemaVersion": 1,
+  "localUnsignedEvidence": true,
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "savedAt": "2026-10-30T04:11:03.650025+00:00",
+  "integratedMain": "13884d7386987068f14b77ec5bbbcb8d431681d8",
+  "mergeCommit": "f008a76fde60c3334a344f80f289b5865bbfd82f",
+  "previousQualifiedCandidate": "cac1775f0c9892396f78264a1c6fee6284b77a04",
+  "qualification": "No repeated native/scoring/loading or 235-file verification. UI test ran before the main merge; PR395 changes no direct test/component/API inputs. History/type checks ran after the merge. Current hashes bind only this direct fix, not retroactive original executions. Original 8 component assertions and full app types precede the final restored-initial-state hunk; that isolated branch has 1 new PASS/8 filtered and a final component/test type closure PASS. No historical whole-file exact-input execution is invented. First local incremental type config failed before checking application inputs because package-name type directives resolved relative to the outside config; final config uses exact installed declaration paths, no dependency change.",
+  "invocations": [
+    {
+      "name": "education-cognitive-management-review-clone",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/clone-education-cognitive-management-review.py"
+        ],
+        "startedAt": "2026-10-30T04:07:26.997886+00:00",
+        "finishedAt": "2026-10-30T04:07:27.635233+00:00",
+        "exitCode": 0
+      },
+      "log": "{\"target\": \"precise_education_cognitive_management_test_20261030\", \"sourceSyntheticFixture\": \"precise_education_cognitive_profile_test_20261030\", \"exitCode\": 0, \"output\": \"CREATE DATABASE\\n\", \"error\": \"\"}\n",
+      "logSha256": "8aa6bdda809a9b8636fea353a952381bf94576750d0b3e70664121d769400378"
+    },
+    {
+      "name": "education-cognitive-management-review-ui",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/admin/EducationCognitiveConfigurations.test.tsx",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/education-cognitive-management-review-ui.json"
+        ],
+        "startedAt": "2026-10-30T04:06:33.955058+00:00",
+        "finishedAt": "2026-10-30T04:06:37.723210+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend\n\n ✓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: manages recipient 26 and grant 101 and pins the replacement recipient outside the returned page 1638ms\n ✓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: a definite fresh POST rejection unlocks correction with a new request 80ms\n ✓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: accepted POST followed by a rejected readback keeps the original pending request 58ms\n ✓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: an unknown write and its rejected retry retain the original intent after an absent readback 91ms\n ✓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: historical unavailable sources stay selectable for grant inspection and revocation, not issuance 36ms\n ✓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > HUISCHOOL previews without writing and confirms one exact named profile operation 69ms\n ✓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > HUITEACHER previews without writing and confirms one exact named profile operation 86ms\n ✓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > retains an unknown original request without password and resolves it by readback without another POST 58ms\n\n Test Files  1 passed (1)\n      Tests  8 passed (8)\n   Start at  04:06:34\n   Duration  3.31s (transform 257ms, setup 298ms, import 277ms, tests 2.12s, environment 439ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/education-cognitive-management-review-ui.json\n",
+      "logSha256": "3ecc58883e56a98ce468a8500eadc547c2055e2da96f661487b9a9db2a41d5f0",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793333194343,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: manages recipient 26 and grant 101 and pins the replacement recipient outside the returned page",
+                "status": "passed",
+                "title": "review: manages recipient 26 and grant 101 and pins the replacement recipient outside the returned page",
+                "duration": 1637.6264799999997,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: a definite fresh POST rejection unlocks correction with a new request",
+                "status": "passed",
+                "title": "review: a definite fresh POST rejection unlocks correction with a new request",
+                "duration": 80.2144330000001,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: accepted POST followed by a rejected readback keeps the original pending request",
+                "status": "passed",
+                "title": "review: accepted POST followed by a rejected readback keeps the original pending request",
+                "duration": 57.98696400000017,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: an unknown write and its rejected retry retain the original intent after an absent readback",
+                "status": "passed",
+                "title": "review: an unknown write and its rejected retry retain the original intent after an absent readback",
+                "duration": 91.27415499999961,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: historical unavailable sources stay selectable for grant inspection and revocation, not issuance",
+                "status": "passed",
+                "title": "review: historical unavailable sources stay selectable for grant inspection and revocation, not issuance",
+                "duration": 36.15170599999965,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only HUISCHOOL previews without writing and confirms one exact named profile operation",
+                "status": "passed",
+                "title": "HUISCHOOL previews without writing and confirms one exact named profile operation",
+                "duration": 68.93407400000024,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only HUITEACHER previews without writing and confirms one exact named profile operation",
+                "status": "passed",
+                "title": "HUITEACHER previews without writing and confirms one exact named profile operation",
+                "duration": 85.90301499999987,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only retains an unknown original request without password and resolves it by readback without another POST",
+                "status": "passed",
+                "title": "retains an unknown original request without password and resolves it by readback without another POST",
+                "duration": 58.374287000000095,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793333195568,
+            "endTime": 1793333197685.3743,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.test.tsx"
+          }
+        ]
+      },
+      "reportSha256": "c7d1dfb01c9bfa193b584bd58d10de28815ba63af876f861770b46ebab45893b"
+    },
+    {
+      "name": "education-cognitive-management-review-history",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education-cognitive-management-review.py",
+          "env",
+          "PRECISE_EDUCATION_COGNITIVE_MANAGEMENT_REVIEW=1",
+          "PRECISE_EDUCATION_COGNITIVE_CHECKPOINT=/workspace/materials-load-20261029/education-cognitive-profile-private.json",
+          "PRECISE_EDUCATION_COGNITIVE_EVIDENCE=/workspace/materials-load-20261029/evidence/education-cognitive-management-review-history-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/education-cognitive-management-review-history.json"
+        ],
+        "startedAt": "2026-10-30T04:08:03.229848+00:00",
+        "finishedAt": "2026-10-30T04:08:12.963376+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts > Education cognitive own-issuance management after authority/source withdrawal > SCHOOL keeps own history inspectable and revocable without permitting new distribution 349ms\n ✓ src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts > Education cognitive own-issuance management after authority/source withdrawal > TEACHER keeps own history inspectable and revocable without permitting new distribution 240ms\nstdout | src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts > Education cognitive own-issuance management after authority/source withdrawal\n[2026-10-30T04:08:12.876Z] [INFO] 队列已关闭\n\n\n Test Files  1 passed (1)\n      Tests  2 passed (2)\n   Start at  04:08:03\n   Duration  9.26s (transform 5.87s, setup 0ms, import 86ms, tests 9.03s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/education-cognitive-management-review-history.json\n",
+      "logSha256": "44b46b21456fd5f896c4a8126b824ea6e15613034671acf1d371846cc7310ba1",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793333283600,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Education cognitive own-issuance management after authority/source withdrawal"
+                ],
+                "fullName": "Education cognitive own-issuance management after authority/source withdrawal SCHOOL keeps own history inspectable and revocable without permitting new distribution",
+                "status": "passed",
+                "title": "SCHOOL keeps own history inspectable and revocable without permitting new distribution",
+                "duration": 349.04686200000106,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive own-issuance management after authority/source withdrawal"
+                ],
+                "fullName": "Education cognitive own-issuance management after authority/source withdrawal TEACHER keeps own history inspectable and revocable without permitting new distribution",
+                "status": "passed",
+                "title": "TEACHER keeps own history inspectable and revocable without permitting new distribution",
+                "duration": 240.3928190000006,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793333292168,
+            "endTime": 1793333292758.3928,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "reportSha256": "bb7e3d6716689f300c1e97ff5f25f9618198cdada49574f4f4153631566ff036",
+      "readback": {
+        "productionAccessed": false,
+        "database": "precise_education_cognitive_management_test_20261030",
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUISCHOOL/cognitive-profile-configurations",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/admin/permissions/content-grants/d0026d9c-4017-4cb0-a270-ec6b1b1bd085/revoke",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUISCHOOL/cognitive-profile-configurations",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUISCHOOL/cognitive-profile-configurations/fdc65a61-68e1-4087-9218-059286d7b9ef/use-grants?page=1",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUISCHOOL/cognitive-profile-configurations/fdc65a61-68e1-4087-9218-059286d7b9ef/research/preview?artifactHash=9029e5cbac5a6b16541954bf92df1fe81b2149accca9c6b758f7416357890027",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUISCHOOL/cognitive-profile-configurations/fdc65a61-68e1-4087-9218-059286d7b9ef/use-grants/83ca9ed7-e5c1-4b6d-bed3-6d13383d9123/revoke",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUISCHOOL/cognitive-profile-configurations",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUITEACHER/cognitive-profile-configurations",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/cognitive/profile-configurations/system/fdc65a61-68e1-4087-9218-059286d7b9ef/experience/approve",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUITEACHER/cognitive-profile-configurations",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUITEACHER/cognitive-profile-configurations/fdc65a61-68e1-4087-9218-059286d7b9ef/use-grants?page=1",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUITEACHER/cognitive-profile-configurations/fdc65a61-68e1-4087-9218-059286d7b9ef/experience/preview?artifactHash=8ac36a4ea708c73367c55c0cba298a2ae21c1063f651fd6afe248bc7bd1ba4fa",
+            "status": 409,
+            "expectedStatus": 409
+          },
+          {
+            "method": "POST",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUITEACHER/cognitive-profile-configurations/fdc65a61-68e1-4087-9218-059286d7b9ef/use-grants/0b7c1b8b-6d33-4580-804b-059e75a63873/revoke",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/platform/education/organizations/432a909b-e156-4795-af4d-a01bcfd87e09/products/HUITEACHER/cognitive-profile-configurations",
+            "status": 200,
+            "expectedStatus": 200
+          }
+        ],
+        "observations": [
+          {
+            "product": "SCHOOL",
+            "profile": "research",
+            "artifactHash": "9029e5cbac5a6b16541954bf92df1fe81b2149accca9c6b758f7416357890027",
+            "grantId": "83ca9ed7-e5c1-4b6d-bed3-6d13383d9123",
+            "historyRetained": true,
+            "assignable": false,
+            "ownRevokeVersion": 2,
+            "originalT1Unchanged": true,
+            "noNativeAttemptsOrNewUse": true
+          },
+          {
+            "product": "TEACHER",
+            "profile": "experience",
+            "artifactHash": "8ac36a4ea708c73367c55c0cba298a2ae21c1063f651fd6afe248bc7bd1ba4fa",
+            "grantId": "0b7c1b8b-6d33-4580-804b-059e75a63873",
+            "historyRetained": true,
+            "assignable": false,
+            "ownRevokeVersion": 2,
+            "originalT1Unchanged": true,
+            "noNativeAttemptsOrNewUse": true
+          }
+        ],
+        "scope": "Existing synthetic source/identities/uses cloned unchanged. Actual restricted role and protected HTTP; normal root revoke, exact profile entry-scope update and own-use revoke. No new users/use grants/native attempts/scoring, production or human-MFA/rate-limit qualification."
+      },
+      "readbackSha256": "6a2241fada796a79bb7238e3f7362abc032104e77ee9f642d34032e8a53c466b"
+    },
+    {
+      "name": "education-cognitive-management-review-types",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education-cognitive-management-review.py",
+          "node",
+          "node_modules/typescript/bin/tsc",
+          "--project",
+          "/workspace/materials-load-20261029/education-cognitive-profile-types.json"
+        ],
+        "startedAt": "2026-10-30T04:08:36.012159+00:00",
+        "finishedAt": "2026-10-30T04:09:08.187325+00:00",
+        "exitCode": 0
+      },
+      "log": "",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "education-cognitive-management-review-ui-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "startedAt": "2026-10-30T04:08:37.725931+00:00",
+        "finishedAt": "2026-10-30T04:09:37.702399+00:00",
+        "exitCode": 0
+      },
+      "log": "",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "education-cognitive-management-review-restored-ui",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/admin/EducationCognitiveConfigurations.test.tsx",
+          "--testNamePattern",
+          "review: a restored request",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/education-cognitive-management-review-restored-ui.json"
+        ],
+        "startedAt": "2026-10-30T04:11:38.057637+00:00",
+        "finishedAt": "2026-10-30T04:11:39.382335+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend\n\n ↓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: manages recipient 26 and grant 101 and pins the replacement recipient outside the returned page\n ↓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: a definite fresh POST rejection unlocks correction with a new request\n ↓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: accepted POST followed by a rejected readback keeps the original pending request\n ↓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: an unknown write and its rejected retry retain the original intent after an absent readback\n ↓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: historical unavailable sources stay selectable for grant inspection and revocation, not issuance\n ✓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > review: a restored request is uncertain even if its last saved flag preceded the POST 159ms\n ↓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > HUISCHOOL previews without writing and confirms one exact named profile operation\n ↓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > HUITEACHER previews without writing and confirms one exact named profile operation\n ↓ src/pages/admin/EducationCognitiveConfigurations.test.tsx > Education cognitive management UI contracts, mocked transport only > retains an unknown original request without password and resolves it by readback without another POST\n\n Test Files  1 passed (1)\n      Tests  1 passed | 8 skipped (9)\n   Start at  04:11:38\n   Duration  966ms (transform 161ms, setup 124ms, import 192ms, tests 161ms, environment 323ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/education-cognitive-management-review-restored-ui.json\n",
+      "logSha256": "d96963f9015de7bd84275ea23e68275be4c04ff7602f0ea53a4a8e0b1f3a1da2",
+      "report": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 9,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 8,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793333498363,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: manages recipient 26 and grant 101 and pins the replacement recipient outside the returned page",
+                "status": "skipped",
+                "title": "review: manages recipient 26 and grant 101 and pins the replacement recipient outside the returned page",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: a definite fresh POST rejection unlocks correction with a new request",
+                "status": "skipped",
+                "title": "review: a definite fresh POST rejection unlocks correction with a new request",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: accepted POST followed by a rejected readback keeps the original pending request",
+                "status": "skipped",
+                "title": "review: accepted POST followed by a rejected readback keeps the original pending request",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: an unknown write and its rejected retry retain the original intent after an absent readback",
+                "status": "skipped",
+                "title": "review: an unknown write and its rejected retry retain the original intent after an absent readback",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: historical unavailable sources stay selectable for grant inspection and revocation, not issuance",
+                "status": "skipped",
+                "title": "review: historical unavailable sources stay selectable for grant inspection and revocation, not issuance",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only review: a restored request is uncertain even if its last saved flag preceded the POST",
+                "status": "passed",
+                "title": "review: a restored request is uncertain even if its last saved flag preceded the POST",
+                "duration": 159.04118699999992,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only HUISCHOOL previews without writing and confirms one exact named profile operation",
+                "status": "skipped",
+                "title": "HUISCHOOL previews without writing and confirms one exact named profile operation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only HUITEACHER previews without writing and confirms one exact named profile operation",
+                "status": "skipped",
+                "title": "HUITEACHER previews without writing and confirms one exact named profile operation",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Education cognitive management UI contracts, mocked transport only"
+                ],
+                "fullName": "Education cognitive management UI contracts, mocked transport only retains an unknown original request without password and resolves it by readback without another POST",
+                "status": "skipped",
+                "title": "retains an unknown original request without password and resolves it by readback without another POST",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793333499192,
+            "endTime": 1793333499351.0413,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.test.tsx"
+          }
+        ]
+      },
+      "reportSha256": "0578dc1ff7481ae31328338991e8b6ff00639062ffa1823532ed466657a11be3"
+    },
+    {
+      "name": "education-cognitive-management-review-restored-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/education-cognitive-management-ui-delta-types.json",
+          "--noEmit"
+        ],
+        "startedAt": "2026-10-30T04:11:57.429115+00:00",
+        "finishedAt": "2026-10-30T04:11:58.263315+00:00",
+        "exitCode": 2
+      },
+      "log": "error TS2688: Cannot find type definition file for '@testing-library/jest-dom'.\n  The file is in the program because:\n    Entry point of type library '@testing-library/jest-dom' specified in compilerOptions\nerror TS2688: Cannot find type definition file for 'vite/client'.\n  The file is in the program because:\n    Entry point of type library 'vite/client' specified in compilerOptions\nerror TS2688: Cannot find type definition file for 'vitest/globals'.\n  The file is in the program because:\n    Entry point of type library 'vitest/globals' specified in compilerOptions\n",
+      "logSha256": "12fcc1724baa54ca0f8242d808850cf0af862bfaa51827064f551cc48a240f1a"
+    },
+    {
+      "name": "education-cognitive-management-review-restored-types-fixed",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/education-cognitive-management-ui-delta-types.json",
+          "--noEmit"
+        ],
+        "startedAt": "2026-10-30T04:12:10.923764+00:00",
+        "finishedAt": "2026-10-30T04:12:12.514784+00:00",
+        "exitCode": 0
+      },
+      "log": "",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "directFiles": [
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-management.ts",
+      "sha256": "3d7bf51474a729aa4b113e3c6afb0ce5924add005d769a5f70e6530c743998dd"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts",
+      "sha256": "1a3f5b344712351efa25f7bde6fff76cd37e7bedd7663848e51b709e4ad3f44d"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.tsx",
+      "sha256": "fdf68d81e202604a83a35514c47eb1f8263a7b8615f7e54ccb600adda998f732"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.test.tsx",
+      "sha256": "b3a32445969a1213844ddea1aeca68acb55a39ddcc68fd45e90dd33b76d79ad8"
+    }
+  ]
+}

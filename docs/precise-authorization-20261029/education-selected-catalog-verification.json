@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "0df59bc6f680d83d2d3d70870e32865f16fd6318",
+  "sourceTree": "a81811e157bc786c833a77784060f2e056fb680f",
+  "base": "dbe56f9a8f12c5d7185c4c70ba3e1863d6263afe",
+  "main": "6142ddc74db9787f6606746610df58c73de256f5",
+  "reports": {
+    "education-selected-catalog-unit.json": {
+      "numPassedTests": 13,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "education-selected-catalog-bounds.json": {
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "education-selected-catalog.json": {
+      "numPassedTests": 5,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "education-selected-catalog-clock.json": {
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "education-selected-catalog-legacy.json": {
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "education-selected-catalog-ui.json": {
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    }
+  },
+  "scope": "Named exact education use catalogue/consumer UI; issuance manager route still unmounted",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 local owner role",
+    "productionAccessed": false,
+    "runtimeRoleQualified": false,
+    "clockSupplementTimezone": "Asia/Shanghai"
+  },
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-clock.postgres.integration.test.ts",
+      "sha256": "fdef2c1166b69a3edddb1133554e7c0702ab3048d930084ae8b99d417383a777"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog.postgres.integration.test.ts",
+      "sha256": "737cc4dc348e61c0dbec70201d84db5d4a2726fffd826dd49950462e0cf63879"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/education-observer-source-read.test.ts",
+      "sha256": "32fde8350f77252962b7fdc2a1c84a8e82fdcae9be764469005447cb0c36dace"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/selected-source-catalog.test.ts",
+      "sha256": "d8144e48080d1a1c8da09d405db3207de35793c71dd159bd25bdc43fb5424864"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+      "sha256": "204f2ecb6198b1c759d035f5a51e27e9497790ee758c2ba0ceb050174346b639"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+      "sha256": "ac9e20877f2746604a3be616eb0f3df1a313c33e35ad1c0bac38323d165deb63"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/selected-source-catalog.ts",
+      "sha256": "49e81228cd87550017c9425faf4a63ebed1a31ca30337212fc144890ef827f01"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/EducationCompositionSelectedStandard.test.tsx",
+      "sha256": "381900698410d547375a6327e4e08682ce8b12b6996929729b549e88c2ea819c"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+      "sha256": "03e209f9c4fe2daf796fc0a04b74c61db45dbd892b9eb5e17985136406cfa7ad"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.tsx",
+      "sha256": "27c5385b6772feb77cd155e91bb501a06deeb22383fd13db4c724735bb16100d"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+      "sha256": "6ea338fc05b059b604cccc877fcd1e8a5c84ab8110f0146222b52ac3fea004cb"
+    },
+    {
+      "path": "server-version/frontend/src/components/education-tools/educationPublicFormClient.ts",
+      "sha256": "dea43f81c183eee91c403f17921486955108ee8451f66827c0e4a724d1a8a564"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "education-selected-catalog-unit.json",
+      "sha256": "73d38a13d14db686fd59b8702da4457ad5acba88520b81849f05f17789aac191"
+    },
+    {
+      "file": "education-selected-catalog-bounds.json",
+      "sha256": "d3290a618a53988da85467132dc9ea9fcdea481fdb87b1824858719c712ff8f1"
+    },
+    {
+      "file": "education-selected-catalog.json",
+      "sha256": "d0be5d447e5d687d7b7e64be9597d6895b1c0b24f5934b264c991475f6ef800d"
+    },
+    {
+      "file": "education-selected-catalog-clock.json",
+      "sha256": "cdfecd38924b0024442aa42c5f9190e40778df23937d4558f110d388b0594684"
+    },
+    {
+      "file": "education-selected-catalog-legacy.json",
+      "sha256": "38b11123659bcea839a18b995fc512dafa992975942e27dc8071aa69c70b57ca"
+    },
+    {
+      "file": "education-selected-catalog-ui.json",
+      "sha256": "395b7a716cde1119bb806099196424c7537d2a18896745f12b851b34a1377ed9"
+    },
+    {
+      "file": "education-selected-catalog-status.json",
+      "sha256": "4bbb2348dd6ec34dcec1c5b8b0d4d9fe1ae6d542742f30c9d2a94fae7a13be94"
+    },
+    {
+      "file": "education-selected-catalog-clock-status.json",
+      "sha256": "f4b7d3a5900bbd37d234d12981ad039db411204baa0ac9c44e176b954e455964"
+    },
+    {
+      "file": "education-selected-catalog-legacy-status.json",
+      "sha256": "54053b89e1de342019b3fc94b8772f71e3ba327cb0d27ab06318eeebb154e0ad"
+    },
+    {
+      "file": "education-selected-catalog-types-status.json",
+      "sha256": "7b7c3fad848eab58d588d80f20cd72a9d23745f6a96a2ed19b69f8779c311d28"
+    },
+    {
+      "file": "education-selected-catalog-types-v2-status.json",
+      "sha256": "e0bb36b67f15210e340cf072e260807def3181cd16c1540f73df7a7b37d8f7ea"
+    },
+    {
+      "file": "education-selected-catalog-types-final-status.json",
+      "sha256": "07289297d04d4b6cfc8f41ff6f6720cd415e30678cb177d2d3facc64e7f0aa73"
+    },
+    {
+      "file": "education-selected-catalog-clock-types-status.json",
+      "sha256": "19e0915795fbbd9aeadf5bfe9b680d147e731e82bf313686db929427494728e0"
+    },
+    {
+      "file": "education-selected-catalog-frontend-types.log",
+      "sha256": "0c5e2568b4c79c13debcc497cf347b98e7a01e636ae2bed42cf3faa742048c94"
+    },
+    {
+      "file": "education-selected-catalog-frontend-lint.log",
+      "sha256": "e3245eb39520858186e641d29d9d1f4c83208beff22895b8989ad7afaa87fc40"
+    },
+    {
+      "file": "education-selected-catalog-final-readback.json",
+      "sha256": "5380e36bf3b7005299258f24c224b60fd15eb4588cdcf5e89e3b328fce81fb19"
+    }
+  ],
+  "reuseBoundary": "Five main catalogue PG cases and legacy two executed before the final shown-page-only overflow selection and explicit UTC JSON conversion. Final non-UTC ten-minute grant PG case executed final SQL and positive name/pointer selection. Source/metadata/authorization inputs to earlier task lifecycles did not change; no START or FINAL replayed. Four frontend cases execute final frontend files.",
+  "lint": {
+    "exitCode": 0,
+    "warnings": 2,
+    "errors": 0,
+    "existingWarnings": "EducationCompositionStudio.tsx lines45/130; unchanged effect/memo code from source parent; no lint threshold changed"
+  },
+  "failuresRetained": [
+    "Initial scoped backend tsc could not infer optional flatMap union branches; explicit card DTO fixed it without changing runtime authorization.",
+    "First evidence-packaging script stopped because it required an empty lint log, which actually contained two pre-existing nonblocking warnings. Code commit/push succeeded; evidence docs are a separate corrective commit."
+  ],
+  "notExecuted": [
+    "Administrator issuance/revoke UI",
+    "Scope-wide migration/dry-run",
+    "p50/p95 and payload baseline",
+    "Formal CI",
+    "Four-entry scale completion",
+    "Cognitive profile authorizations",
+    "Production"
+  ]
+}

@@ -41,7 +41,7 @@ export function trainingSourceHarness(){
     createdAt:new Date('2020-01-01'),activatedAt:new Date('2020-01-01'),retiredAt:null}
   const h={row,release,scale,composite,principal,grants,use,auth,policy,deployment,rows:new Map([[row.id,row]]),now:new Date('2026-10-25T06:00:00Z'),
     trainingDecision:'APPROVED' as 'APPROVED'|'RETURNED'|'PENDING',trainingPaused:false,materialActive:true,entryActive:true,entryProduct:'TRAINING',entryRole:'STANDARD',entryGrantId:tid(90),entryGrantVersion:1,owned:true,courseOwner:ids.owner,courseType:'TRAINING_COURSE',courseLibrary:false,
-    emergency:false,scaleStop:false,missingMeasurement:false,expireDuringStop:false,expireLicenseDuringStop:false,sourceChanged:false,writes:[] as string[],calls:[] as string[]}
+    emergency:false,scaleStop:false,missingMeasurement:false,expireDuringStop:false,expireLicenseDuringStop:false,sourceChanged:false,t1Records:[] as Array<{selected:unknown;actor_id:string}>,writes:[] as string[],calls:[] as string[]}
   const db:any={
     compositeAssessment:{findUnique:vi.fn(async()=>({...structuredClone(h.composite),...(!h.owned?{createdBy:'foreign'}:{})}))},
     scale:{findUnique:vi.fn(async()=>({...structuredClone(h.scale),...(h.sourceChanged?{code:'changed'}:{})}))},
@@ -70,6 +70,7 @@ export function trainingSourceHarness(){
         content_version:h.row.snapshot.parts.CONTENT.version,parameters_version:h.row.snapshot.parts.PARAMETERS.version,report_version:h.row.snapshot.parts.REPORT.version,
         scale_id:h.scale.id,measurement_release:structuredClone(h.row.measurement_release),use_id:h.use.id,use_version:h.use.version,
       }]:[]
+      if(sql.includes('FROM assessment_management_events'))return structuredClone(h.t1Records)
       if(sql.includes('FROM material_grants WHERE teacher_id='))return h.use&&h.use.teacher_id===values[0]&&h.use.resource_id===values[1]&&(!values[2]||h.use.id===values[2])?[structuredClone(h.use)]:[]
       if(sql.includes('FROM material_grants WHERE id='))return h.use?.id===values[0]?[structuredClone(h.use)]:[]
       if(sql.includes('FROM content_capability_grants leaf'))return values[0]===ids.root?structuredClone(h.grants):[]

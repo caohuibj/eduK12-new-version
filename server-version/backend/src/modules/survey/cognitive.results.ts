@@ -16,8 +16,9 @@ export const cognitiveFail=(status:number,message:string):never=>{throw new Surv
 export interface SurveyCognitiveStoredResult {
   schemaVersion:1;sessionId:string;projectId:string;waveId:string;attemptId:string;publicationId:string;
   slotKey:string;epoch:number;measurementDigest:string;configHash:string;protocolSignature:string;
-  testType:'gonogo';configVersion:'1.1.0';engineVersion:'1.0.0';scoringVersion:'1.0.0';
-  timingPolicy:'software-frame-v1';maturity:'PILOT';referenceMode:'none';
+  testType:string;configVersion:string;engineVersion:string;scoringVersion:string;
+  profileArtifactHash?:string;profile?:'experience'|'standard'|'research';maxTrials?:number;
+  timingPolicy:'software-frame-v1'|'NATIVE_PROFILE_V1';maturity:'PILOT';referenceMode:'none'|'frozen-profile';
   metrics:Record<string,unknown>;quality:CognitiveScoreResult['quality'];audit:CognitiveScoreResult['audit'];
   administrationProvenance:AdministrationProvenanceV1;restartCount:number;rawHash:string;completedAt:string;
 }
@@ -87,7 +88,7 @@ function decodeResults(input:Scope&{includeRaw?:boolean},references:SurveyCognit
         ||result.waveId!==input.waveId||result.attemptId!==input.attemptId||result.publicationId!==input.publicationId
         ||result.slotKey!==reference.slotKey||result.epoch!==reference.epoch
         ||result.measurementDigest!==reference.measurementDigest||result.rawHash!==row!.rawHash
-        ||result.audit.trialCount!==row!.trialCount||row!.trialCount!==120)
+        ||result.audit.trialCount!==row!.trialCount||(result.profileArtifactHash?(!/^[a-f0-9]{64}$/.test(result.profileArtifactHash)||!Number.isSafeInteger(result.maxTrials)||result.maxTrials!<1||result.maxTrials!>1000||row!.trialCount<1||row!.trialCount>result.maxTrials!):row!.trialCount!==120))
         cognitiveFail(409,'认知权威结果密文或来源摘要校验失败')
       const base:LoadedSurveyCognitiveResult={reference,sessionId:row!.sessionId,completedAt:row!.completedAt,result}
       if(input.includeRaw){

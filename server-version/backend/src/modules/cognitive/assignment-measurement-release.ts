@@ -6,6 +6,8 @@ import {getContentRelease,publishContentRelease} from '../measurement-content/re
 import {requireCognitiveRegistryEntry} from './cognitive.registry'
 import {decryptCognitivePayload} from './cognitive.security'
 import {hashResolvedConfig} from './profile-freeze'
+import type {CognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-artifact'
+import {cognitiveProfileAssignmentMeasurement} from '../assessment-authorization/cognitive-profile-source'
 
 type Assignment={id:string;config_id:string;created_by:string|null;status:string;profile:string|null;profile_definition_version:string|null;
  resolved_config_snapshot_encrypted:string|null;resolved_config_hash:string|null;measurement_release_id:string|null}
@@ -19,7 +21,7 @@ function fail(code:string):never{throw new AssignmentMeasurementError('CONTENT_A
  * supply the real owned PUBLISHED wrapper. No caller-supplied config or owner.
  * Lock order: owned assignment UPDATE -> actual config SHARE -> release SHARE.
  */
-export async function publishAssignmentMeasurementRelease(tx:Prisma.TransactionClient,actorId:string,assignmentId:string){
+export async function publishAssignmentMeasurementRelease(tx:Prisma.TransactionClient,actorId:string,assignmentId:string,frozenProfile?:CognitiveProfileArtifact){
  if(!actorId.trim()||!assignmentId.trim())fail('IDENTITY_REQUIRED')
  const [assignment]=await tx.$queryRaw<Assignment[]>(Prisma.sql`SELECT id,config_id,created_by,status::text,profile::text,
   profile_definition_version,resolved_config_snapshot_encrypted,resolved_config_hash,measurement_release_id
@@ -39,12 +41,15 @@ export async function publishAssignmentMeasurementRelease(tx:Prisma.TransactionC
   if(assignment.resolved_config_snapshot_encrypted&&hashResolvedConfig(effective)!==assignment.resolved_config_hash)fail('PROFILE_INVALID')
  }catch(error){if(error instanceof AssignmentMeasurementError)throw error;fail('PROFILE_INVALID')}
  const effectiveHash=canonicalHash(effective)
- const input=cognitiveMeasurementRelease({localId:config.test_type,version:'assignment-v1',
+ if(frozenProfile&&(frozenProfile.identity.configId!==config.id||frozenProfile.identity.profile!==assignment.profile
+  ||frozenProfile.identity.profileDefinitionVersion!==assignment.profile_definition_version||frozenProfile.identity.resolvedConfigHash!==assignment.resolved_config_hash))fail('PROFILE_INVALID')
+ const input=frozenProfile?await cognitiveProfileAssignmentMeasurement(tx,frozenProfile,actorId,assignment.id):cognitiveMeasurementRelease({localId:config.test_type,version:'assignment-v1',
   testType:config.test_type,configVersion:config.config_version,engineVersion:config.engine_version,scoringVersion:config.scoring_version,
   config:effective,scope:{kind:'PRIVATE',product:'TRAINING',ownerId:actorId,resourceId:assignment.id}})
  if(input.layer!=='MEASUREMENT')fail('RELEASE_MISMATCH')
  input.version='assignment-v1:'+input.content.measurementHash
  input.provenance={...input.provenance,configId:config.id,configVersion:config.config_version,assignmentId:assignment.id,
+  ...(frozenProfile?{profileArtifactHash:canonicalHash({storageVersion:1,kind:'COGNITIVE_PROFILE_CONFIGURATION',value:frozenProfile})}:{}),
   profile:assignment.profile,profileDefinitionVersion:assignment.profile_definition_version,resolvedConfigHash:assignment.resolved_config_hash,effectiveConfigHash:effectiveHash}
  const expected=prepareRelease(input)
  const validate=(release:NonNullable<Awaited<ReturnType<typeof getContentRelease>>>)=>{

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "ipip_neo_c1_self_efficacy10"
+        ],
+        "scoreOrder": [
+          "ipip_neo_c1_self_efficacy10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_neo_c1_self_efficacy10",
+            "headline": "信心不靠喊口号，先攒一个小证据",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：先完成一小步，给“我可以”留一条具体证据。\n\n先读懂上方的数字\n\n这十题整理的是你通常怎样看待自己完成任务、判断情况和寻找办法的把握。统一计分方向后，总分范围10–50，数值越大，表示这次整体更认可“我能处理好”的描述。这不是现场能力考试；也没有可用的中文分档线，所以不会凭这个数字告诉你“信心不足”或“天生很强”。\n\n把“我行不行”拆成一件具体的事\n\n假设有人很熟悉日常报表，能很快做完；换成第一次接触的软件，却不知道从哪里开始。前一件事顺利，不代表后一件也该立刻上手；后一件暂时卡住，也不能把前面积累的经验一笔勾销。\n\n如果你拿不准，不妨把“我是不是不行”换成：“我现在缺的是要求说明、一个示例、练习机会，还是有人搭把手？”如果你已经很有把握，也可以保留核对与听反馈的习惯。有信心和愿意检查并不冲突。这里列的是供你核对的可能性，不是系统已经从总分查明了原因。\n\n下面的小尝试不是“让自己立刻自信”的作业。如果你已在使用其中某种办法，可以继续保留；如果某一步不适合眼前任务，也可以换掉。\n\n这些是固定的生活解释和可选行动，不是系统已从分数判断出你的具体能力或困难。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "留一张“做成记录”：选一件最近完成的小事，写下三行：要做什么、我实际做了什么、什么信息或支持帮了忙。比起一句“我真棒”或“只是运气好”，具体做法更方便下次拿来用。"
+              },
+              {
+                "category": "strategy",
+                "text": "留一个能开始的入口：把“做好整份材料”缩成“先列三个问题”或“先找一个可参考的示例”。顺手写下一个需要问清的要求，或一个可以求助的人。不用先保证全程顺利，才允许自己开始。"
+              },
+              {
+                "category": "reflection",
+                "text": "留一次校准的机会：完成一个小阶段后，对照预期看看：哪一步有效，哪一步要改，下一次提前准备什么？如果发现任务确实超出当前资源，可以调整范围或求助，不必把所有困难都归成自己不够努力。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文研究译稿尚待专家审校与适用人群验证，没有可用的中文分档或人群排名；任务信心不等于客观能力。十题需完整作答，漏答不算零分。"
+        ],
+        "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T13:41:59Z",
+            "basis": "本次AI内容自审对应ipip_neo_c1_self_efficacy10_zh_cn_research趣味R1.1.0：读取当前source及既有趣味草稿，核对得分范围与方向、固定解释与条件式例子、三条可选行动及简短限制；不继承基本R的历史审核结论，不声称人工专家、作者或本地验证批准。未运行计分器、报告生成、schema validator或测试。"
+          }
+        }
+      }
+    }
+  ]
+}

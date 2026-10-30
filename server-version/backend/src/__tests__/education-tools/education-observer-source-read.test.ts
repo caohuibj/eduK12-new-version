@@ -12,7 +12,7 @@ import {readEducationLibraryScalePreview} from '../../modules/education-tools/li
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,hash='a'.repeat(64)
 const c={entry:'SCHOOL' as const,organizationId:id(1),principal:{userId:id(2),accountDomain:'SCHOOL' as const}}
 const applicability=(responseMode:string)=>({schemaVersion:1,administrations:[{population:'STUDENT',responseMode}]})
-const header=(n:number,mode:string)=>({key:`education-source:FORM:${id(n)}:${hash}`,id:id(n),kind:'FORM',hash,title:mode,language:'zh-CN',versions:{content:'1',parameters:null,report:null},applicability:applicability(mode),referenceContextKeys:[]})
+const header=(n:number,mode:string)=>({key:`education-source:FORM:${id(n)}:${hash}`,id:id(n),kind:'FORM',hash,title:mode,language:'zh-CN',versions:{content:'1',parameters:null,report:null},applicability:applicability(mode),referenceContextKeys:[],typedUses:[],legacyUseAvailable:true,typedOverflow:false,catalogReadAt:new Date()})
 beforeEach(()=>{
  vi.clearAllMocks();m.authorize.mockResolvedValue(undefined);m.authority.mockResolvedValue(undefined)
  m.publicUse.mockImplementation(async(_tx,_c,keys:string[])=>new Map(keys.map(key=>[key,{}])))

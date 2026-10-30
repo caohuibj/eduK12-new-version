@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "base": "12d205c9a38683ebb4d45cc8d57ad8313006e705",
+  "main": "6142ddc74db9787f6606746610df58c73de256f5",
+  "scope": "Isolated exact typed School/Teacher task lifecycles over already approved original source, no production or admin browser",
+  "database": "precise_education_lifecycle_test_20261029",
+  "newProductionCode": false,
+  "evidence": [
+    {
+      "file": "education-selected-lifecycle.json",
+      "sha256": "b45ae065d2d6472edee9c9bae4d565d5cdc0d072be0d3cccf02d65057ea97bf0"
+    },
+    {
+      "file": "education-selected-lifecycle-status.json",
+      "sha256": "87f24410540c67bef1900db84c5431d8c2e35bb6c9d87ad5329d1b32f8a10f4f"
+    },
+    {
+      "file": "education-selected-lifecycle-http.json",
+      "sha256": "39c5de4e65096edb41f9ed362795c8cb73b3a91c08bf6e6f4cfa1f4d09db1636"
+    },
+    {
+      "file": "education-selected-lifecycle-readback.json",
+      "sha256": "cbda6412aba4ad9a4f7593f53681575882e3aaee34295ea1156263e8eae02f85"
+    },
+    {
+      "file": "education-selected-lifecycle-readback-status.json",
+      "sha256": "7bfcf836abe7131b5e773aefd0a48dbd35e8f3200bc0175cc92507fcd96801b5"
+    },
+    {
+      "file": "education-selected-lifecycle-readback-v2.json",
+      "sha256": "3ef8325de025d7c5aec1a094639020b3763dbf7dd09958dc35b5c73b534f1b67"
+    },
+    {
+      "file": "education-selected-lifecycle-readback-v2-status.json",
+      "sha256": "7a96207cea7d30137df253932f2f68e8355fbde1c888f84f8aef17a365c3eca6"
+    },
+    {
+      "file": "education-selected-lifecycle-types-status.json",
+      "sha256": "3a206681fe09377b9a6d9f4426eb78fb6f752e89524f1436a82eb597eb642c11"
+    },
+    {
+      "file": "education-selected-lifecycle-types-v2-status.json",
+      "sha256": "909252da31471ac7a5794924a8a0604b09cd121ba3362567962ea4767c1b56ba"
+    },
+    {
+      "file": "education-lifecycle-fixture-emission.json",
+      "sha256": "57e7627dfb19c0e5d2f3dbd4779313112bf12bea40b3c3ebb4ceb9d45826eeab"
+    }
+  ],
+  "outcome": {
+    "originalInvocation": "1 PASS School / 1 FAIL Teacher final report-state expectation",
+    "retainedTeacherReadback": "1 PASS; actual completed attempt, immutable exact binding, revoked use, no waiting attempt; COMPLETION_ONLY/WITHHELD per original student audience",
+    "completedRealAttempts": 2,
+    "waitingVersionsWithoutAttempts": 2,
+    "newStartAfterUseRevoke": "403 in both entries",
+    "enteredReplayAfterUseRevoke": "200 same attempt in both entries",
+    "actualHttpRequestCount": 19,
+    "typesExitCode": 0
+  },
+  "reuseBoundary": "Do not call the original invocation fully green. School case is retained at its original source; final file has a corrected Teacher report-state expectation and completes the typed School service principal fields. No START/FINAL is replayed. Teacher completion/report/binding is independently checked read-only. Shared fixture only gets literal type annotations, emitted JS identical. Scoped test lib ES2021 matches Node 24.21 replaceAll support; no production tsconfig change.",
+  "remaining": [
+    "Manager directory/preview/issuance/revoke UI",
+    "Education old-data dry-run and performance baseline",
+    "Teacher report with an approved adult audience source",
+    "Four-entry scale completion",
+    "Cognition precise profiles",
+    "Bounded formal CI and independent review"
+  ]
+}

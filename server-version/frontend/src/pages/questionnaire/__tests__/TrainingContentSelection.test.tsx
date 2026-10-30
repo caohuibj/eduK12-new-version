@@ -229,3 +229,8 @@ describe('Training content selection real component', () => {
     await screen.findByText('storage blocked'); expect(posts()).toHaveLength(0)
   })
 })
+
+it('shows a fixed administrator configuration without offering that unit any P or R control and preserves other units',async()=>{
+ http.send.mockResolvedValue(response({schemaVersion:1,units:[{itemId:'fixed',family:'SCALE',measurementReleaseId:'fixed-m',fixedConfiguration:{name:'基础教学反馈'},choices:[],reports:[]},...catalog.units]}));mount();await open()
+ expect(screen.getByRole('heading',{name:'基础教学反馈'})).toBeVisible();expect(screen.getByText(/内容、参数和报告已由管理员固定/)).toBeVisible();expect(screen.queryByLabelText('报告 fixed')).not.toBeInTheDocument();expect(screen.queryByLabelText(/优先级 fixed/)).not.toBeInTheDocument();expect(screen.getByLabelText('报告 item-1')).toBeEnabled();expect(posts()).toHaveLength(0)
+})

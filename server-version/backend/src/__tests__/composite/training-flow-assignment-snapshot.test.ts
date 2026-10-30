@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const db = vi.hoisted(() => ({
   course: { findUnique: vi.fn() },
   cognitiveTestConfig: { findUnique: vi.fn() },
-  cognitiveAssignment: { findMany: vi.fn(), create: vi.fn() },
+  cognitiveAssignment: { findMany: vi.fn(), create: vi.fn(),findUnique:vi.fn() },
 }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 
@@ -47,6 +47,7 @@ beforeEach(() => {
   appConfig.cognitiveModuleEnabled = true
   db.cognitiveTestConfig.findUnique.mockResolvedValue(publishedConfig)
   db.course.findUnique.mockResolvedValue({ id: input.courseId, title: 'Flow course', courseCode: 'FLOW-COURSE' })
+  db.cognitiveAssignment.findUnique.mockResolvedValue(null)
   db.cognitiveAssignment.findMany.mockResolvedValue([])
   db.cognitiveAssignment.create.mockImplementation(async ({ data }) => ({ id: 'created-wrapper', ...data }))
 })

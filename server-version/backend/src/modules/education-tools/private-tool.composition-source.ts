@@ -13,6 +13,7 @@ import {readEducationPublicSourceHeaders} from './public-source.headers'
 import {assertEducationLibraryHeaders} from './library-source.catalog'
 import {assertEducationCognitiveOriginalUse} from './native-source.cognitive'
 import {assertEducationLibraryUses,type LockedEducationLibraryUses} from './library-source.use'
+import {readSelectedSourceBindings} from './selected-source-binding'
 import {educationCompositionKey,educationCompositionOriginSchema,educationCompositionResourceKeySchema,educationCompositionVariant,
  educationCompositionPolicyBindingSchema,type EducationCompositionOrigin} from './private-tool.composition-contracts'
 
@@ -23,7 +24,7 @@ const leafSummarySchema=z.array(z.object({blockId:z.string().guid(),versionId:z.
  reportRespondent:z.string().nullable().optional(),subjectNumeric:z.boolean().nullable().optional(),reportScoreKeys:z.array(z.string()).nullable().optional()}).strict()).min(1).max(50)
 type Row={id:string;key:string;creationHash:string;createdBy:string;status:string;publishedAt:Date|null;productKind:string;
  publicEnabled:boolean;copyable:boolean;manifestHash:string;versionId:string;toolId:string;entry:string;organizationId:string;
- ownerUserId:string;contentHash:string;variantKey:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[];librarySources:Array<{versionId:string;contentHash:string}>}
+ ownerUserId:string;contentHash:string;variantKey:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[];publicBindings?:unknown;librarySources:Array<{versionId:string;contentHash:string}>}
 export type PrivateCompositionRunSource={origin:EducationCompositionOrigin;compositeId:string;manifestHash:string;
  resourceEntry:RelationalProductEntryV1|null;policy:RunResourcePolicy;identityOnly:true;canPublish:false}
 
@@ -47,6 +48,8 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   c.training_content_snapshot_hash AS "manifestHash",v.id AS "versionId",v.tool_id AS "toolId",v.entry,
   v.organization_id AS "organizationId",v.owner_user_id AS "ownerUserId",v.content_hash AS "contentHash",v.title,
   (v.definition#>>'{administration,population}')||':'||(v.definition#>>'{administration,responseMode}') AS "variantKey",
+  (SELECT COALESCE(jsonb_agg((b->'source')-ARRAY['kind','profile']),'[]'::jsonb) FROM jsonb_array_elements(v.definition->'blocks') b
+   WHERE b#>>'{source,provider}' IN ('STANDARD_SCALE','COGNITIVE_CONFIG') AND b->'source'?'selectedBinding') AS "publicBindings",
   (SELECT COALESCE(jsonb_agg(jsonb_build_object('versionId',b->>'versionId','contentHash',b->>'contentHash')),'[]'::jsonb)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider'='LIBRARY_SCALE') AS "librarySources",
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','versionId',b->>'versionId','contentHash',b->>'contentHash','kind',b->>'kind',
@@ -71,7 +74,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
      WHERE stop.target_kind='RELEASE' AND stop.target_id=r.id OR stop.target_kind='TRAINING_SCALE' AND stop.target_id=s.id)) AS available,
   ARRAY(SELECT u#>>'{measurement,releaseId}' FROM jsonb_array_elements(c.training_content_snapshot->'units') u UNION SELECT u#>>'{source,educationNative,sourceMeasurementReleaseId}' FROM jsonb_array_elements(c.training_content_snapshot->'units') u WHERE u#>>'{source,educationNative,provider}'='COGNITIVE_CONFIG') AS "releaseIds",
   ARRAY(SELECT u#>>'{source,id}' FROM jsonb_array_elements(c.training_content_snapshot->'units') u WHERE u->>'family'='SCALE') AS "scaleIds",
-  ARRAY(SELECT 'education-source:'||CASE b->>'sourceProvider' WHEN 'PUBLIC_FORM' THEN 'FORM' ELSE b->>'sourceProvider' END||':'||(b->>'versionId')||':'||(b->>'contentHash')
+  ARRAY(SELECT 'education-source:'||CASE b->>'sourceProvider' WHEN 'PUBLIC_FORM' THEN 'FORM' WHEN 'COGNITIVE_CONFIG' THEN CASE WHEN b?'profileArtifactHash' THEN 'COGNITIVE_PROFILE' ELSE 'COGNITIVE_CONFIG' END ELSE b->>'sourceProvider' END||':'||(b->>'versionId')||':'||COALESCE(b->>'profileArtifactHash',b->>'contentHash')
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider' IN ('PUBLIC_FORM','STANDARD_SCALE','COGNITIVE_CONFIG','SJT_RELEASE')) AS "publicKeys"
   FROM composite_assessments c JOIN education_private_tool_versions v ON c.creation_key=
    'education-composition:'||v.entry||':'||v.id||':'||(v.definition#>>'{administration,population}')||':'||(v.definition#>>'{administration,responseMode}')||':1.0.0'
@@ -95,7 +98,8 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   if(unavailable.length)privateToolFail('PRIVATE_COMPOSITION_SOURCE_UNAVAILABLE')
  }
  if(publicKeys.length){
-  const headers=await readEducationPublicSourceHeaders(tx,publicKeys.map(key=>parseEducationPublicSourceKey(key)!),options.lockForUse),allowed=await readEducationPublicUse(tx,c,publicKeys,options.lockForUse)
+  const pins=readSelectedSourceBindings(rows.flatMap(row=>(row.publicBindings??[]) as unknown[]),true)
+  const headers=await readEducationPublicSourceHeaders(tx,publicKeys.map(key=>parseEducationPublicSourceKey(key)!),options.lockForUse,c.entry),allowed=await readEducationPublicUse(tx,c,publicKeys,options.lockForUse,pins,true)
   if(allowed.size!==publicKeys.length||headers.size!==publicKeys.length)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
  }
  const sources=new Map<string,PrivateCompositionRunSource>()

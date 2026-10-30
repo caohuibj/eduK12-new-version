@@ -5,6 +5,7 @@ import {readEducationPublicSourceHeaders,educationPublicRequiredContextKeys} fro
 import {compilePrivateFormRuntime} from './private-tool.form-runtime-adapter'
 import {EducationPrivateToolError} from './private-tool.contracts'
 import {randomUUID} from 'node:crypto'
+import {canonicalHash} from '../assessment-runtime/canonical'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -26,6 +27,7 @@ import {educationPublicSourceKey} from './public-source.identity'
 import {educationBlockPublicSource} from './public-source.identity'
 import {compositionLeafKey} from './private-tool.composition-compiler'
 import {lockOwnedDraftNativeSources} from './native-source.locks'
+import {assertSelectedSourceBindingsUnchanged,selectedSourceBindingsFromBlocks,selectedSourceBindingChanges} from './selected-source-binding'
 
 type Tx=Prisma.TransactionClient
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const
@@ -92,7 +94,7 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   // A mutable draft may contain an as-yet unverified reference. It cannot be
   // used as an oracle for another public source's title/version without U.
   // Keep the owner's draft intact; resolve only currently authorized summaries.
-  const allowed=await readEducationPublicUse(tx,c,publicSources.map(publicKey))
+  const allowed=await readEducationPublicUse(tx,c,publicSources.map(publicKey),false,selectedSourceBindingsFromBlocks(definition.blocks))
   const visibleSources=publicSources.filter(source=>allowed.has(publicKey(source)))
   const publicHeaders=await readEducationPublicSourceHeaders(tx,visibleSources)
   const libraryHeaders=await readEducationLibrarySourceSummaries(tx,c,definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source),definition.administration.responseMode,definition.administration.responseMode==='EXPERT_REPORT'?definition.administration.targetKind:undefined)
@@ -109,12 +111,29 @@ export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unkno
   const row=await readOwned(tx,c,id,true)
   if(row.revision!==input.expectedRevision)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
   const definition=privateToolDefinition(row.kind as PrivateToolKind,input.definition)
+  let sourceChanges:ReturnType<typeof selectedSourceBindingChanges>=null
+  if(row.kind==='COMPOSITION'){
+   const previous=row.definition as unknown as PrivateCompositionDefinition,next=definition as PrivateCompositionDefinition
+   assertSelectedSourceBindingsUnchanged(previous.blocks,next.blocks)
+   sourceChanges=selectedSourceBindingChanges(previous.blocks,next.blocks)
+   const pins=selectedSourceBindingsFromBlocks(next.blocks)
+   if(pins.size){
+    const allowed=await readEducationPublicUse(tx,c,[...pins.keys()],true,pins)
+    if(allowed.size!==pins.size)privateToolFail('SELECTED_CONFIGURATION_USE_REQUIRED',403)
+   }
+  }
   const media=await assertPrivateToolImages(tx,c,id,row.kind as PrivateToolKind,definition)
   const contentHash=privateToolContentHash(row.kind as PrivateToolKind,input.title,definition)
   const result=await tx.educationPrivateTool.updateMany({where:{id,...scope(c),revision:input.expectedRevision},
    data:{title:input.title,definition:definition as Prisma.InputJsonValue,contentHash,revision:{increment:1}}})
   if(result.count!==1)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
   await syncPrivateToolDraftImages(tx,id,media)
+  if(sourceChanges){
+   const change={schemaVersion:1,entry:c.entry,organizationId:c.organizationId,previousRevision:row.revision,revision:row.revision+1,
+    previousContentHash:row.contentHash,contentHash,...sourceChanges}
+   await tx.assessmentManagementEvent.create({data:{id:randomUUID(),actorId:c.principal.userId,resourceId:id,
+    action:'EDUCATION_PRIVATE_SOURCE_BINDINGS_CHANGED',metadata:{...change,changeHash:canonicalHash(change)}}})
+  }
   return {id,revision:row.revision+1,contentHash,...boundary}
  },false,true)
 }

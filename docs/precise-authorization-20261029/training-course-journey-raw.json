@@ -1,0 +1,387 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "name": "training-course-exact-journey",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_TRAINING_COURSE_JOURNEY=1",
+          "PRECISE_TRAINING_COURSE_EVIDENCE=/workspace/materials-load-20261029/evidence/training-course-exact-journey-requests.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-training-course-journey.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-course-exact-journey.json"
+        ],
+        "startedAt": "2026-10-29T22:19:42.505349+00:00",
+        "finishedAt": "2026-10-29T22:19:57.300593+00:00",
+        "exitCode": 1
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/training-course-exact-journey.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 1,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793312382884,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training COURSE exact configuration through actual enrolled participant HTTP"
+                ],
+                "fullName": "Training COURSE exact configuration through actual enrolled participant HTTP freezes the administrator-selected configuration and requires normal course enrollment before START",
+                "status": "passed",
+                "title": "freezes the administrator-selected configuration and requires normal course enrollment before START",
+                "duration": 1128.2048219999997,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training COURSE exact configuration through actual enrolled participant HTTP"
+                ],
+                "fullName": "Training COURSE exact configuration through actual enrolled participant HTTP denies a new enrolled participant after revoke but completes the old frozen attempt and rereads its exact report",
+                "status": "failed",
+                "title": "denies a new enrolled participant after revoke but completes the old frozen attempt and rereads its exact report",
+                "duration": 503.3714540000001,
+                "failureMessages": [
+                  "AssertionError: 本次未启用计时，不能提交计时数据: expected 400 to be 200 // Object.is equality\n    at call (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts:17:77)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts:79:17\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793312395587,
+            "endTime": 1793312397218.3713,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-course-exact-journey-final",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_TRAINING_COURSE_JOURNEY=1",
+          "PRECISE_TRAINING_COURSE_CONTINUE_FINAL=1",
+          "PRECISE_TRAINING_COURSE_EVIDENCE=/workspace/materials-load-20261029/evidence/training-course-exact-journey-requests-final.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-training-course-journey.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts",
+          "-t",
+          "denies a new enrolled",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/training-course-exact-journey-final.json"
+        ],
+        "startedAt": "2026-10-29T22:22:26.951132+00:00",
+        "finishedAt": "2026-10-29T22:22:44.465312+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/training-course-exact-journey-final.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 1,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793312547910,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training COURSE exact configuration through actual enrolled participant HTTP"
+                ],
+                "fullName": "Training COURSE exact configuration through actual enrolled participant HTTP freezes the administrator-selected configuration and requires normal course enrollment before START",
+                "status": "skipped",
+                "title": "freezes the administrator-selected configuration and requires normal course enrollment before START",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training COURSE exact configuration through actual enrolled participant HTTP"
+                ],
+                "fullName": "Training COURSE exact configuration through actual enrolled participant HTTP denies a new enrolled participant after revoke but completes the old frozen attempt and rereads its exact report",
+                "status": "passed",
+                "title": "denies a new enrolled participant after revoke but completes the old frozen attempt and rereads its exact report",
+                "duration": 1082.2604140000003,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793312563266,
+            "endTime": 1793312564348.2605,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-course-exact-journey-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/training-course-journey-types.json"
+        ],
+        "startedAt": "2026-10-29T22:19:42.491878+00:00",
+        "finishedAt": "2026-10-29T22:20:08.435285+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "name": "training-course-exact-journey-types-final",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/training-course-journey-types.json"
+        ],
+        "startedAt": "2026-10-29T22:22:26.976313+00:00",
+        "finishedAt": "2026-10-29T22:22:54.296947+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    }
+  ],
+  "observations": {
+    "training-course-exact-journey-requests": {
+      "productionAccessed": false,
+      "scope": "Existing protected author/course enrollment and authenticated participant HTTP. Synthetic users/JWT proof only; actual native SCALE FINAL/report, not browser or human timing.",
+      "requests": [
+        {
+          "method": "POST",
+          "route": "/questionnaire-products",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/questionnaire-products/d82f9039-74c2-48c1-b812-1f702b3abf52/items",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/questionnaire-products/d82f9039-74c2-48c1-b812-1f702b3abf52/items",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/questionnaire-products/d82f9039-74c2-48c1-b812-1f702b3abf52/publish",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/composite-assessments/d82f9039-74c2-48c1-b812-1f702b3abf52/attempts",
+          "status": 403
+        },
+        {
+          "method": "POST",
+          "route": "/courses/join",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/courses/join",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/composite-assessments/d82f9039-74c2-48c1-b812-1f702b3abf52/attempts",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "route": "/composite-assessments/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/questionnaire-products/standard-combination-use-grants/3556d111-ec36-4dde-8f2e-de5ef4ae9f6b/revoke",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/composite-assessments/d82f9039-74c2-48c1-b812-1f702b3abf52/attempts",
+          "status": 403
+        },
+        {
+          "method": "POST",
+          "route": "/composite-assessments/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1/form-sections/261a5938-9aeb-4877-a890-97aea16ae816/submit",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "route": "/composite-assessments/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/composite-assessments/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1/items/58227a97-b4e9-48be-937c-0a850762ad6a/scale/submit?response=receipt",
+          "status": 400
+        }
+      ],
+      "observations": [
+        {
+          "taskId": "d82f9039-74c2-48c1-b812-1f702b3abf52",
+          "attemptId": "08e53f6e-bd5d-4685-96db-f1b60554bff1",
+          "sourceUseRevision": 7,
+          "selectedBinding": {
+            "bindingHash": "51b206f14146fbf5db4dd386989492e00c8582e31f40118ec851aed29dd01806",
+            "configurationHash": "9a30d47cccc1feb416f6cd8cfebb0dda6e60388f0c4e0f068ac894958dbc4405",
+            "authorizationId": "3556d111-ec36-4dde-8f2e-de5ef4ae9f6b",
+            "authorizationRevision": 7
+          },
+          "nonMemberStartDenied": true,
+          "actualEnrollmentRows": 2,
+          "coursePublishedAndFrozen": true
+        }
+      ]
+    },
+    "training-course-exact-journey-requests-final": {
+      "productionAccessed": false,
+      "scope": "Existing protected author/course enrollment and authenticated participant HTTP. Synthetic users/JWT proof only; actual native SCALE FINAL/report, not browser or human timing.",
+      "requests": [
+        {
+          "method": "GET",
+          "route": "/composite-assessments/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/composite-assessments/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1/items/58227a97-b4e9-48be-937c-0a850762ad6a/scale/submit?response=receipt",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "route": "/composite-assessments/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1/items/58227a97-b4e9-48be-937c-0a850762ad6a/scale/submit?response=receipt",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "route": "/composite-assessments/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "route": "/composite-assessments/d82f9039-74c2-48c1-b812-1f702b3abf52/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1/report",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "route": "/composite-assessments/d82f9039-74c2-48c1-b812-1f702b3abf52/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1/report",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "route": "/composite-assessments/attempts/08e53f6e-bd5d-4685-96db-f1b60554bff1/report",
+          "status": 403
+        }
+      ],
+      "observations": [
+        {
+          "resumeOriginalAttempt": true,
+          "originalUntimedPolicy": true,
+          "noRepeatedCreateJoinStartRevokeOrFormSubmit": true
+        },
+        {
+          "newEnrolledStartDenied": true,
+          "oldAdmittedCompletesAfterRevoke": true,
+          "oneAttemptOnly": true,
+          "originalT3BindingRetained": true,
+          "fullFrozenTeacherReportReread": true,
+          "otherStudentReportDenied": true,
+          "oldTwelveTasksAndOriginalUsersUnchanged": true,
+          "answeredItems": 4
+        }
+      ]
+    }
+  },
+  "readbacks": [
+    {
+      "after": "untimed policy rejected timing-bearing FINAL with 400",
+      "users": 6,
+      "tasks": 13,
+      "materialGrants": 4,
+      "attemptId": "08e53f6e-bd5d-4685-96db-f1b60554bff1",
+      "attemptStatus": "IN_PROGRESS",
+      "attemptEpoch": 1,
+      "currentUseRevision": 8,
+      "currentUseRevoked": true
+    },
+    {
+      "after": "affected FINAL continuation success",
+      "users": 6,
+      "tasks": 13,
+      "materialGrants": 4,
+      "courses": 1,
+      "attemptStatus": "COMPLETED",
+      "attemptEpoch": 1,
+      "timingSnapshotAbsent": true,
+      "attemptsForTask": 1
+    }
+  ]
+}

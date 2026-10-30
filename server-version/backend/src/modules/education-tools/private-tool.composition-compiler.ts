@@ -24,6 +24,7 @@ import {readEducationLibrarySources,type EducationLibraryLeaf} from './library-s
 import {readEducationLibrarySourceUses} from './library-source.catalog'
 import {readLockedEducationLibraryUses,type LockedEducationLibraryUses} from './library-source.use'
 import {assertAssessmentAssetReferencesReady} from '../assessment-media/assessment-asset'
+import {selectedSourceBindingsFromBlocks} from './selected-source-binding'
 
 export type CompositionLeaf={provider:'LIBRARY_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;library:EducationLibraryLeaf}|{provider:'STANDARD_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;standard:EducationStandardLeaf}|({provider:'PRIVATE_VERSION';version:EducationPrivateToolVersion}&(
  {kind:'SCALE';definition:ScaleDefinitionV2}|{kind:'FORM';form:ReturnType<typeof compilePrivateFormRuntime>}))|
@@ -31,7 +32,7 @@ export type CompositionLeaf={provider:'LIBRARY_SCALE';kind:'SCALE';version:Pick<
   sourceInstruction?:string;form:ReturnType<typeof compilePrivateFormRuntime>}|
  {provider:'COGNITIVE_CONFIG';kind:'COGNITIVE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;native:EducationCognitiveLeaf}|
  {provider:'SJT_RELEASE';kind:'SJT';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;native:EducationSjtLeaf}
-export const compositionLeafKey=(source:{provider:string;versionId:string;profile?:string})=>source.provider+':'+source.versionId+(source.profile?':'+source.profile:'')
+export const compositionLeafKey=(source:{provider:string;versionId:string;profile?:string;artifactHash?:string})=>source.provider+':'+source.versionId+(source.profile?':'+source.profile:'')+(source.artifactHash?':'+source.artifactHash:'')
 export type CompiledPrivateComposition={definition:PrivateCompositionDefinition;leaves:Map<string,CompositionLeaf>;publicUseExpiresAt?:Date}
 
 /** Already-authorized request only. One bounded source read, one optional media
@@ -55,7 +56,7 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
  if(libraryIds.some(id=>!libraryUses.has(id)))privateToolFail('LIBRARY_SOURCE_USE_REQUIRED',403)
  const publicSources=definition.blocks.map(block=>block.source).filter(source=>educationBlockPublicSource(source)!==null)
  const publicKeys=publicSources.map(source=>educationPublicSourceKey(educationBlockPublicSource(source)!))
- const publicUse=await readEducationPublicUse(tx,c,publicKeys,true)
+ const publicUse=await readEducationPublicUse(tx,c,publicKeys,true,selectedSourceBindingsFromBlocks(definition.blocks),true)
  if(publicUse.size!==new Set(publicKeys).size)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
  const ids=[...new Set(definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION').map(block=>block.source.versionId))]
  const rows=ids.length?await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...privateToolScope(c),kind:{in:['SCALE','FORM']}}}):[]

@@ -14,6 +14,8 @@ export interface AssessmentToolOption {
   instrumentKey?: string | null
   testType?: string | null
   profile?: string | null
+  disabled?: boolean
+  unavailableReason?: string | null
 }
 
 /** Choices are supplied by an already-authorized catalog. Selecting a card
@@ -56,9 +58,10 @@ function ToolDialog({ options, value, label, titleId, onClose, onSelect }: {
       <p className="assessment-tool-count" role="status">{query ? `找到 ${filtered.length} 项` : `共 ${filtered.length} 项可用工具`}</p>
       <div className="assessment-tool-grid">{filtered.slice((currentPage - 1) * 12, currentPage * 12).map(option => {
         const version = option.version || option.instrumentVersion || option.configVersion
-        return <button type="button" key={option.id} className={'assessment-tool-card' + (option.id === value ? ' is-selected' : '')} aria-label={`选择 ${option.name}${version ? `，版本 ${version}` : ''}`} onClick={() => onSelect(option.id)}>
+        return <button type="button" key={option.id} disabled={option.disabled} className={'assessment-tool-card' + (option.id === value ? ' is-selected' : '')} aria-label={`选择 ${option.name}${version ? `，版本 ${version}` : ''}${option.disabled?'，暂不可用':''}`} onClick={() => onSelect(option.id)}>
           <span className="assessment-tool-card-kind">{label}{option.id === value && <span><Check size={14} aria-hidden="true" />已选择</span>}</span>
           <strong>{option.name}</strong>{option.description && <p>{option.description}</p>}
+          {option.unavailableReason&&<p>{option.unavailableReason}</p>}
           <span className="assessment-tool-card-meta">{[version ? `版本 ${version}` : null, option.code || option.instrumentKey || option.testType, option.profile].filter(Boolean).join(' · ') || '已列入可用目录'}</span>
         </button>
       })}</div>

@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "base": "9b8731e8a89450f0fa04c83d5005ac7bfcbe5e73",
+  "verifiedMain": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "scope": "Training explicit exact-use replacement, independent old/target revisions, immutable lineage, bounded original identity headers, administrator UI and original-intent recovery. No schema/engine/seed changes.",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost55439 owner role",
+    "database": "precise_training_replacement_test_20261029",
+    "template": "precise_training_named_configuration_test_20261029 unchanged",
+    "productionAccessed": false
+  },
+  "results": {
+    "postgresHttpDistinctPassed": 5,
+    "coreContinuation": {
+      "passed": 4,
+      "originalFailed": 4,
+      "readExistingSetup": true,
+      "actualHttpRequests": 24
+    },
+    "headerAndQualificationContinuation": {
+      "passed": 1,
+      "filteredCore": 4,
+      "actualHttpRequests": 12,
+      "recipientHeaderQueries": 2,
+      "observedTotalHeaderSqlQueries": 16,
+      "sourceBodyQueries": 0
+    },
+    "frontendPassed": 28,
+    "frontendBreakdown": {
+      "apiOriginal": 4,
+      "apiNew": 3,
+      "uiOriginal": 17,
+      "uiNew": 4
+    },
+    "finalBackendClosureTypesExit": 0,
+    "frontendTypesExit": 0,
+    "changedFrontendLintExit": 0,
+    "retainedGrantRows": 4,
+    "retainedUsers": 4,
+    "retainedTasks": 12,
+    "retainedEntryManagers": 2,
+    "finalOriginalOwnerUseVersions": {
+      "full": 7,
+      "none": 7
+    },
+    "finalOtherTeacherUseVersions": {
+      "full": 3,
+      "none": 3
+    }
+  },
+  "raw": {
+    "file": "training-replacement-raw.json",
+    "sha256": "f8897167c2db8a2e1a82fab2ed39c82f0cb5223da0dee1337127d0a6f662a613"
+  },
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts",
+      "sha256": "923f00733b842adca223db28ad838103a624fbe016613030f2276f72a661b64d"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-management.ts",
+      "sha256": "bbd59b8eb61bfeb1dc5d546050ba2ce3f3fe35692d7ed33115b735e74f1ba34f"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+      "sha256": "44cf0ecbc4af554547acbd4f5caa1e1ad78271090bc71e294a0d70e5218f0344"
+    },
+    {
+      "path": "server-version/frontend/src/api/standardConfigurationGrants.test.ts",
+      "sha256": "68f997c1c29ee8728b432c0c93cdd08899c1faaf703ed91082348097be9bad68"
+    },
+    {
+      "path": "server-version/frontend/src/api/standardConfigurationGrants.ts",
+      "sha256": "5a653a21cf65fbfe5e058de83d801aa2f093c750cedca02caf19f6d540ecc529"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx",
+      "sha256": "3637f78988c7c6e211a6db54690e7315819ef5d6b3417bf25e568980dff971a8"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx",
+      "sha256": "49d377dbd4c3a7ce68e18e871d32e62b113d114b6c1b20fbe632c3325e097617"
+    },
+    {
+      "path": "server-version/frontend/src/training/useTrainingStandardConfigurationIssue.ts",
+      "sha256": "525d4912c010bf42e9e8e3aeefb0b02601b06b9a620e2d6438c6c804b48be9c3"
+    }
+  ],
+  "captureAt": "2026-10-29T21:29:15.143062+00:00",
+  "inputCapture": "Post-execution direct inventory, not contemporaneous dependency/flag manifest or signed CI. First four core cases passed before append-only header/qualification stage and display-header SQL were added; their service writer and runtime inputs were unchanged. New header stage tested actual changed reader and issuer/self-use branches.",
+  "failurePreserved": "Initial test0PASS/4FAIL (one real fixture error plus three dependency stops): public link now+1h was milliseconds later than parent deadline. Server400 protected validity; read-only DB readback proved target revoked4, three created tasks, zero replacement events. Corrected link to stored parent expiresAt and explicit guarded setup-resume reused those exact tasks rather than recreating them. All four then passed.",
+  "reuseBoundary": "No repeated scale installation/approval, scoring/FINAL/report content, DOT20 basic/fun pairs, seed or old broad lifecycle. Core actual public START/form/SCALE admission/resume only; retained original report evidence remains separate. New qualification fixture is an explicit normal system-admin service action before positive self-use, never role repair inside issuance.",
+  "limits": [
+    "Headers validate original identity and context only, not new-source availability or full new compatibility; writer rechecks both actual sources",
+    "Business-view report denial does not redefine existing management-view report policy",
+    "Real MFA ceremony not performed; synthetic proof only",
+    "No actual active legacy-without-T1 replacement fixture inserted; writer rejects missing original typed evidence",
+    "No actual different-tool replacement fixture",
+    "No compiled browser, representative p50/p95/batch budget, runtime-role DB or complete COURSE participant/FINAL journey",
+    "Training/Survey explicit T2 draft-change audit and arbitrary new C/P/R approval remain independent work",
+    "Cognitive four-entry precise profile, formal CI, Draft PR, merge and production remain unexecuted"
+  ]
+}

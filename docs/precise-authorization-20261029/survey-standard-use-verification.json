@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "base": "69ba08ac461476885422f2c86e3bc007eff66dde",
+  "main": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "scope": "Survey optional exact standard grants, original authority, immutable draft/wave lineage and new admission guard; no UI/HTTP/browser or participant execution",
+  "database": "precise_survey_standard_use_test_20261029",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost55439 owner role",
+    "redis": "localhost56389 db0",
+    "productionAccessed": false
+  },
+  "results": {
+    "originalBusiness": 5,
+    "newAuthorityRevisionContinuation": 2,
+    "finalBackendTypesExit": 0
+  },
+  "retainedFailures": [
+    {
+      "name": "survey-standard-use",
+      "exit": 1,
+      "casesPassed": 0,
+      "casesFailed": 0,
+      "casesSkipped": 5,
+      "cause": "Fixture used unmapped surveyToolGrant Prisma property before any write; readback8users/0grants/0projects"
+    },
+    {
+      "name": "survey-standard-use-v2",
+      "exit": 1,
+      "casesPassed": 0,
+      "casesFailed": 0,
+      "casesSkipped": 5,
+      "cause": "Fixture project UUID missing after 1manager and1researcher; explicit readback10users/0grants/0projects/1account/1entry before same-fixture continuation"
+    }
+  ],
+  "raw": {
+    "file": "survey-standard-use-raw.json",
+    "sha256": "6c34054e03c24a3112b7b0c1e9bc69457756554f4e5524259338866ee102cf3c"
+  },
+  "directInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use-revision.postgres.integration.test.ts",
+      "sha256": "a7a4d48482ce42f1a535b0ab884514a2dfa12f4a61a38ef9bd19a51994de52f8"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.postgres.integration.test.ts",
+      "sha256": "434d70e8dc1d34115d32b22f7330d06488887451b9da9e8eb3cbbec847697ac3"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/survey-standard-use.ts",
+      "sha256": "66b80bf5d240cd57d89619a4bb5706a55882a3c9e664ddd70a0eca22dfac848f"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/admin-role.ts",
+      "sha256": "f246062b7c042a3a1afcf9824d788e9746bbd34581cbbf55f5b83760ac1b9316"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "sha256": "f2e6c491fd89a90421e9f4f5a66ad0699158975455ca0bd65438df4ddc8f3eac"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/platform.routes.ts",
+      "sha256": "26c81fffe69df07c2ef987d62ac297401f8438ec21d1609ed386347f19910c0e"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/tool-policy.ts",
+      "sha256": "61a8160c9caec0a6510103bc397fc2e2a5fb416339c7af16ee4dc6cb8498e439"
+    }
+  ],
+  "inputCapture": "Post-execution source inventory; no contemporaneous complete dependency manifest or signed CI admission claimed",
+  "reuseBoundary": "Original5 before final authority timing move preserved; final2 executed changed call paths with new explicit entry revision and use. No content/scoring or earlier education/Training replay. Only original supported full/none R, no fun registration.",
+  "notExecuted": [
+    "Real HTTP route and browser",
+    "Participant attempt/submit/report UI",
+    "Exact axis composition UI and consumer business options",
+    "Concurrency/expiry waiting scenarios",
+    "Legacy dry-run and representative performance",
+    "Formal CI/merge gate",
+    "Production runtime role and deployment"
+  ]
+}

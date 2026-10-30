@@ -10,6 +10,7 @@ import type { FrozenUnitResult } from './final.compute'
 export function cognitiveParentUnit(unit:ResearchFrozenUnit,loaded:LoadedSurveyCognitiveResult):FrozenUnitResult{
   const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)
   const stored=loaded.result
+  if(frozen.schemaVersion===2&&(stored.profileArtifactHash!==frozen.artifactHash||stored.profile!==frozen.artifact.identity.profile||stored.configHash!==frozen.sessionSnapshot.configHash||stored.protocolSignature!==frozen.sessionSnapshot.protocolSignature))throw new Error('原认知结果与冻结 profile 不一致')
   const definitions=parseCompiledInstrumentRuntime(frozen.sessionSnapshot.compiledRuntime).metricDefinitions
   const measurement=projectStoredMeasurement({identity:{schemaVersion:1,kind:'COGNITIVE',
     sourceDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,

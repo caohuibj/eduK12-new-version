@@ -1,3 +1,4 @@
+import {surveyCognitiveProfileDraftSchema,parseFrozenSurveyCognitiveProfile,surveyProfileTaskDefinition,type FrozenSurveyCognitiveProfile} from './cognitive-profile.definition'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { compileCognitiveRuntime } from '../assessment-runtime/compiler'
@@ -19,15 +20,17 @@ export const surveyCognitiveFeedbackSchema=z.object({
   if(value.mode==='DESCRIPTIVE'&&!value.metricKeys.length)
     ctx.addIssue({code:'custom',path:['metricKeys'],message:'描述性反馈至少选择一个获准指标'})
 })
-export const cognitiveDraftSchema=z.object({
+const legacyCognitiveDraftSchema=z.object({
   schemaVersion:z.literal(1),
   templateKey:z.literal(SURVEY_COGNITIVE_TEMPLATE),
   feedback:surveyCognitiveFeedbackSchema.default({policyVersion:'SURVEY_DESCRIPTIVE_V1',mode:'GENERAL',metricKeys:[],release:'AFTER_FINAL'}),
 }).strict()
-export type CognitiveDraft=z.infer<typeof cognitiveDraftSchema>
+export type CognitiveDraft=z.infer<typeof legacyCognitiveDraftSchema>|z.infer<typeof surveyCognitiveProfileDraftSchema>
+export const cognitiveDraftSchema:z.ZodType<CognitiveDraft>=z.discriminatedUnion('schemaVersion',[legacyCognitiveDraftSchema,surveyCognitiveProfileDraftSchema])
 export const initialCognitiveDefinition=():CognitiveDraft=>cognitiveDraftSchema.parse({schemaVersion:1,templateKey:SURVEY_COGNITIVE_TEMPLATE})
 export const validateCognitiveDraft=(_definition:CognitiveDraft,_forPreview:boolean):Array<{path:string;message:string;severity:'error'|'warning'}>=>[]
-export interface FrozenSurveyCognitive {
+export type FrozenSurveyCognitive=FrozenSurveyLegacyCognitive|FrozenSurveyCognitiveProfile
+export interface FrozenSurveyLegacyCognitive {
   schemaVersion:1
   templateKey:typeof SURVEY_COGNITIVE_TEMPLATE
   sessionSnapshot:SessionConfigSnapshot
@@ -38,20 +41,21 @@ export interface FrozenSurveyCognitive {
   maturity:'PILOT'
   referenceMode:'none'
   partialRetentionDays:30
-  feedback:CognitiveDraft['feedback']
+  feedback:z.infer<typeof surveyCognitiveFeedbackSchema>
 }
 // This is a fixed, versioned Survey template, not an editable task configuration.
 // Its existing runner selects software-frame-v1 only for this exact config identity.
 export const SURVEY_GONOGO_CONFIG={totalTrials:120,nogoRatio:0.25,stimulusMs:800,isiMs:500,
   validRtFloorMs:100,report:{reportVersion:'1.0.0',referenceMode:'none' as const}}
-export const surveyCognitiveTaskDefinition=()=>{
+export const surveyCognitiveTaskDefinition=(frozen?:FrozenSurveyCognitive)=>{
+  if(frozen?.schemaVersion===2)return surveyProfileTaskDefinition(frozen.artifact)
   const definition=getCognitiveV2TaskDefinition('gonogo','1.0.0','1.0.0')
   if(!definition)throw new Error('Survey Go/No-Go runtime is unavailable')
   // No catalog norms are admitted into this expressly non-normative pilot.
   return {...definition,references:[]}
 }
-export function compileResearchCognitive(input:unknown):FrozenSurveyCognitive{
-  const draft=cognitiveDraftSchema.parse(input)
+export function compileResearchCognitive(input:unknown):FrozenSurveyLegacyCognitive{
+  const draft=legacyCognitiveDraftSchema.parse(input)
   const definition=surveyCognitiveTaskDefinition()
   const compiledRuntime=compileCognitiveRuntime({definition,instrumentVersion:'1.0.0'})
   const sessionSnapshot=createSessionConfigSnapshot({definition,configVersion:'1.1.0',
@@ -66,8 +70,9 @@ export function compileResearchCognitive(input:unknown):FrozenSurveyCognitive{
   return {...measurement,measurementDigest:canonicalHash(measurement),feedback:draft.feedback}
 }
 export function parseFrozenSurveyCognitive(value:unknown):FrozenSurveyCognitive{
+  if(value&&typeof value==='object'&&(value as {schemaVersion?:number}).schemaVersion===2)return parseFrozenSurveyCognitiveProfile(value)
   if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Invalid frozen cognitive template')
-  const frozen=value as FrozenSurveyCognitive
+  const frozen=value as FrozenSurveyLegacyCognitive
   const {measurementDigest,feedback,...measurement}=frozen
   cognitiveDraftSchema.parse({schemaVersion:frozen.schemaVersion,templateKey:frozen.templateKey,feedback})
   const snapshot=parseSessionConfigSnapshot(frozen.sessionSnapshot)

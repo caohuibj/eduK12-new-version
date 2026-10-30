@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "base": "ec0ff495c",
+  "main": "6142ddc74db9787f6606746610df58c73de256f5",
+  "qualification": "local affected path only; not Actions or four-entry completion",
+  "reports": {
+    "education-binding-unit-final.json": {
+      "numTotalTests": 65,
+      "numPassedTests": 65,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "education-selected-source-v2.json": {
+      "numTotalTests": 4,
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "education-selected-source-current.json": {
+      "numTotalTests": 3,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "education-selected-source-legacy-start-v2.json": {
+      "numTotalTests": 1,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    }
+  },
+  "evidence": [
+    {
+      "file": "education-binding-unit-final.json",
+      "sha256": "d1119a909b096bd3f82657cba2f1b8a356cde10c629795d9a371732e99b37c01"
+    },
+    {
+      "file": "education-binding-unit-final-status.json",
+      "sha256": "71b89650f7129ad6cb065f1fde7eeb7a418ca5ae2642112e4658b2d3d0fe1c20"
+    },
+    {
+      "file": "education-selected-source-initial.json",
+      "sha256": "95c2fd09a071d141790363e92e0b0d2a53e3a58cf4ff8ac24facdbdb8d6ad77a"
+    },
+    {
+      "file": "education-selected-source-failure-readback.json",
+      "sha256": "e0a44eb3f72dbca3ebad7c721417ea085de07d6d852b6142d60beeb820bc7ca1"
+    },
+    {
+      "file": "education-selected-source-v2.json",
+      "sha256": "9fffbdcf48f62194771858cb239b12723fb650221c855c7e5592d323096e8c58"
+    },
+    {
+      "file": "education-selected-source-v2-status.json",
+      "sha256": "1a4a56780dc3443a9458e33d49295b2fcba91c6b256067dcc3039eced59970c0"
+    },
+    {
+      "file": "education-selected-source-http-v2.json",
+      "sha256": "f69df2ffe8af3a3faba39e972a3d67ef381083e8ec995430f0a8894b8ea475c5"
+    },
+    {
+      "file": "education-selected-source-current.json",
+      "sha256": "9f03ee29646a61a15530435ce5221cb13192fe774d7fe89f3563156972927966"
+    },
+    {
+      "file": "education-selected-source-current-status.json",
+      "sha256": "92fc27e165a1000a233c1d4f779ecaa98e07c6b67ed6e89bd3327bffad1c8750"
+    },
+    {
+      "file": "education-binding-types.log",
+      "sha256": "233efec4afcf8e293f5ae144ad49cde0332e0a145dbfd65d31f1dbf1caf128ed"
+    },
+    {
+      "file": "education-binding-types-final-status.json",
+      "sha256": "709f92f9004c9d9c291edb1ce38fe9ff9597cef6410d021f2a0ad6c031222485"
+    },
+    {
+      "file": "education-selected-source-legacy-start.json",
+      "sha256": "b5dbda06e391d83e93c83dd921b1e9dd147e336c5a4bd56e313aa5eb09430837"
+    },
+    {
+      "file": "education-selected-source-legacy-start-failure-readback.json",
+      "sha256": "1d730145e037781349a9587c43fcd1f3cdc831fe614cf521674823a94f4a0211"
+    },
+    {
+      "file": "education-selected-source-legacy-start-v2.json",
+      "sha256": "de1268c49e23d8caf2c31cca680b687019f95fd90f45cf71d5afc804b9f8869d"
+    },
+    {
+      "file": "education-selected-source-legacy-start-v2-status.json",
+      "sha256": "4acb2cfdd0c99b0ea41377e10315502aa80fa7d4f8241af9b0d9ee0dfbd27110"
+    }
+  ],
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+      "sha256": "697d52ef6ea4135ec60d1f853931d87b2cbdb37d09a880aa2e9e98ab301a4054"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+      "sha256": "a7e75a29ef8ef2391925ed395b0322522d7f7d4d6b0c0941cfcf9dda5ba604e1"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+      "sha256": "40bc4def5f954b0e46032e3d23e0b1d867dd1cb129131b78852ca27b28c0fe3c"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+      "sha256": "046e182c603737fe40902f00c5ba0481c7c2e6cdc6737fa3880503764554d126"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+      "sha256": "e6e4fc600854147877d3a692d456b20caca1ecc08d2ad75712cf7b2528c52960"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+      "sha256": "77f620a8f6bbbc9e7946dc1e0b8e67450a07659e5a7a29094bc2d4909664df35"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-source-current.postgres.integration.test.ts",
+      "sha256": "6e34fb9286bb971f37a3001d3450ebdf09a5fe32aa4a1ef78d809cedc4c96e67"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-selected-source.postgres.integration.test.ts",
+      "sha256": "4e8f127b25a9edbe63ab49f60dc550d2dbf73ef7421dacb06eeede369ee1634a"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/selected-source-binding.test.ts",
+      "sha256": "5d39b6c40c9c1095b50355527cfcf98f0fc31fc0f18dfe7098d895b47db4a164"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/selected-source-binding.ts",
+      "sha256": "fd95406ee70d7b8685587f9639d9fd980a70e273d3260d6a79522b2d87e76e94"
+    }
+  ],
+  "node": "24.21.0",
+  "postgres": "16.15 local owner role; runtime role not qualified",
+  "databases": [
+    "precise_education_binding_test_20261029_v2",
+    "precise_education_start_test_20261029_v2"
+  ],
+  "reuseBoundary": "Initial four PG cases executed before typedPinsRequired was added: all consuming calls already supply a valid pin, so the new pinless-only rejection cannot change those selected cases. Three fresh retained-state cases qualify that changed branch. Final 65 unit cases and legacy School lifecycle executed after it. No duplicate participant submission or initial grant request was replayed.",
+  "notExecuted": [
+    "New typed School/Teacher participant lifecycles",
+    "Manager directory/issuance UI",
+    "Survey selected binding",
+    "Cognitive grants",
+    "Formal CI",
+    "Latency baseline/p95",
+    "Production"
+  ],
+  "failuresRetained": [
+    "Initial HTTP fixture incorrectly used bearer transport; subsequent dependent case wrote a second grant/version. Clone retained and read before corrected v2.",
+    "Initial scoped tsc omitted Express augmentation root; also caught test excess property. Both corrected without production type relaxation.",
+    "Legacy School lifecycle lacked synthetic CAMPUS_ELIGIBILITY_HMAC_KEY before private draft; original database retained, separate v2 has required synthetic key."
+  ]
+}

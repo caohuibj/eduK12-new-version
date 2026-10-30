@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-29T15:53:38.213375+00:00",
+  "environment": "isolated cloud Node24.21, localhost55439/precise_general_test_20261029, Redis56389; no production",
+  "inputs": [
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/standard-configuration-binding.ts",
+      "sha256": "88d2febe5cbe7b7002a051cccc88612f878d024f9dd7a083ab487d84c77c1695"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+      "sha256": "77e3c6f4aae54d0d8be5d897369237c02b8bf66f71fb4d81dc605cd4c71259ee"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-combination.ts",
+      "sha256": "68a45a22f99f1c580f0f19d4472014640584e951ae9ae46039275efbb43ed04f"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts",
+      "sha256": "e23f9b4f23a3e710d6e32c6589dae5cdb69af5236b8b6dd823eb6fb9da08dc89"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/standard-configuration-binding.test.ts",
+      "sha256": "6920777b6b98cde847e84f0d2996a25de173cf2c11679af0470840709597fe36"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/training-selected-binding.postgres.integration.test.ts",
+      "sha256": "fb8ebd92efb83b0b6ba1a07031d477133dcf4cf1653e0994ef21985be4a62057"
+    },
+    {
+      "path": "server-version/backend/prisma/migrations/20261029151000_standard_use_revision_evidence_index/migration.sql",
+      "sha256": "b1c2fc877414c2f005ace85d09cfbd7310ba508ccb4413ac826995eb2ac8eb20"
+    }
+  ],
+  "results": {
+    "currentUnitPassed": 86,
+    "currentTypeExitCode": 0,
+    "postgresHTTPPassedBeforePureDecoderExtension": 2,
+    "latestReadOnlyFrozenSources": {
+      "typed": 2,
+      "legacy": 3
+    },
+    "initialJSONHookRun": {
+      "success": false,
+      "passedTests": 0,
+      "pendingTests": 2,
+      "outcomeBeforeRetry": "Read back old DB counts, no new grant/attempt, HTTP empty",
+      "reason": "Not captured by JSON reporter; not inferred"
+    }
+  },
+  "evidence": [
+    {
+      "file": "training-t1-binding-unit-final.json",
+      "sha256": "51425ec2e7f67a255a35a77015c89ebbd48eb8e09eab9188d1d272ae9646f91a"
+    },
+    {
+      "file": "training-t1-binding-types-final.log",
+      "sha256": "0c5e2568b4c79c13debcc497cf347b98e7a01e636ae2bed42cf3faa742048c94"
+    },
+    {
+      "file": "training-t1-binding-migration.log",
+      "sha256": "19c5fe78fe8ac267298355969f056eb9c861de595c0b838dc672e3d28fe63835"
+    },
+    {
+      "file": "training-t1-binding-postgres-initial.json",
+      "sha256": "bc3e6cb3dae32b140de405d3a8ef4837a10c68dca935cafc5062c86aa7d30e96"
+    },
+    {
+      "file": "training-t1-binding-http-initial.json",
+      "sha256": "a0b57a5fb708cbd68a7d022270c376f5b3a1d59b1d9669606ef6c6a9a7d252d8"
+    },
+    {
+      "file": "training-t1-binding-postgres-diagnostic.log",
+      "sha256": "a24d8261bd2ea01c20936b030e9f16c1fe0188297ac7e8edac6b32a14ff89d5d"
+    },
+    {
+      "file": "training-t1-binding-http-diagnostic.json",
+      "sha256": "3e5b977ab152a903d2b3e7b1bd480083716353a7bd8f0a8af39ce16f1621dcda"
+    },
+    {
+      "file": "training-t1-binding-frozen-readback.json",
+      "sha256": "eb05f036b7f2b53372bf27ff8975e2ddea4e2fd76d641e778e7271866991cb4a"
+    }
+  ],
+  "notExecuted": [
+    "formal CI",
+    "full HTTP replay after pure decoder extension",
+    "browser end-to-end",
+    "performance comparison",
+    "other entry consumers"
+  ]
+}
