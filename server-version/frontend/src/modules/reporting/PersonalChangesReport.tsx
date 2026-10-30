@@ -1,6 +1,10 @@
 import {useMemo} from 'react'
-import {ReportTrendChart} from './ReportTrendChart'
+import {deferredPage} from '../../components/page-loading/deferredPage'
 import {toPersonalChangesTrend,type PersonalChangesMetric} from './longitudinalVisualization'
+
+// The four entry adapters can show their action without downloading chart code.
+// Keep the numeric report readable while the existing retryable loader loads it.
+const ReportTrendChart=deferredPage(async()=>({default:(await import('./ReportTrendChart')).ReportTrendChart}))
 
 export type PersonalChangesResponse={status:'NOT_CONFIGURED'|'WAITING'|'AVAILABLE';reportId?:string;generatedAt?:string;
   metrics?:PersonalChangesMetric[];note?:string}
