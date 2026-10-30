@@ -3,15 +3,35 @@
   "candidate": "native-bundle",
   "repository": "caohuibj/eduK12-new-version",
   "branch": "feat/teacher-jdr-bundle-20261030",
-  "enabled": false,
+  "enabled": true,
   "base": "8bd86e4059125b9ee868d4777795e513d36cba71",
   "productHead": "47a00dabda5767d01b9c1eb0f27e1beafeed27ca",
   "productTree": "3f758aa1d3646622df45fbc02a093a7134e92daf",
   "frontendTree": "f9be4ad6cd12a0fa39b88ba4c10ca637b72a4fae",
   "backendTree": "89c27fa1b5fcc660debdb75a146e23c6732f7f6d",
   "review": {
-    "status": "PENDING",
-    "recordSha256": null
+    "status": "INDEPENDENTLY_REVIEWED",
+    "recordSha256": "1d9e2fb4ae69ea79b96142c5984cd9367f435fc3c2363d4672ed9d0969864fa4",
+    "record": {
+      "kind": "project-review-and-activation-record",
+      "date": "2026-10-30",
+      "reviewer": "DOT parent thread",
+      "instructionSource": "01a17318-5715-7735-9afe-7834c577902b",
+      "independentlyReviewedImplementation": "c14496dd42ff2ad4034eaaacc917cf1f83a9148a",
+      "finalAlignedCandidate": "fceeb55aef75e317c37c150ff94f387e1dffec72",
+      "decision": "Proceed with the existing bounded formal qualification; no per-commit approval pause. Return actual qualification for user merge confirmation.",
+      "reviewScope": "Parent reports independent review of core implementation, actual package and test originals: fixed 30 items and parameters, CBI independent, participant-self-only approved Bundle interpretation intersected with source numeric/interpretation rights.",
+      "finalDeltaVerification": "Cloud node checked main alignment and control-only changes since the reviewed implementation: all 41 current source entries and 32 protected inputs unchanged, all 66 prior originals and 23 selections identical; 9 added originals only describe catalog identity/alignment. Control logic unchanged; main-before literal and exact base/product/component pins updated.",
+      "evidenceLimits": [
+        "Unsigned original executions; historical environment incompletely recorded.",
+        "Actual full journey is Training participant account with adult-teacher declarations, not system Teacher role or all four entrypoints.",
+        "Ordinary collection publication separation only; ordinary scoring not rerun.",
+        "First FINAL reached in failed lifecycle-r1 invocation; saved-read-r2 never rescores.",
+        "Browser is developer-environment report observation, not final image qualification."
+      ],
+      "notASignature": true,
+      "notGitHubApproval": true
+    }
   },
   "requiredJobs": [
     "admission",
@@ -289,7 +309,7 @@
     }
   },
   "evidence": {
-    "status": "ORIGINALS_PREPARED_PENDING_INDEPENDENT_REVIEW",
+    "status": "REVIEWED_LOCAL_EVIDENCE_BOUNDED_ORIGINALS",
     "obligations": [
       "adult-context-source-and-independent-binding",
       "approved-jdr-mapping-states-and-self-projection",
