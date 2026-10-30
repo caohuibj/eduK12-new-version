@@ -560,9 +560,9 @@
       "schemaVersion": 1,
       "pr": "task1",
       "enabled": true,
-      "base": "0e8f1de8e7d68d7c8cc76230315abbbbbf47cf4d",
-      "product": "66ace3dc6fc90a9a7f8600c0f7b357a1ffa714ed",
-      "controlCheckpoint": "d793f328b4f5ce192e56571d84b62c7f277a0833",
+      "base": "dfd506347cfa2c684a75812936f32d48bdce34d4",
+      "product": "7403128fed365351cacbaa59c75cbe57a7cf810e",
+      "controlCheckpoint": "7403128fed365351cacbaa59c75cbe57a7cf810e",
       "source": {
         "docs/precise-authorization-20261029/approved-scale-axes-progress.md": {
           "before": null,
@@ -2012,10 +2012,10 @@
         "docs/precise-authorization-20261029/ci-control-raw.json": null
       },
       "components": {
-        "backend": "59ed20ba45e87c41a55829e5064aa176cfcf5bad",
+        "backend": "05dbc95723e5e4587f4932a3e89302c80c9f73b9",
         "frontend": "44ac407e011dd17be8636b439b440a4d152b3304"
       },
-      "activationNote": "Specific Notion append authorized/completed. Align newly merged main PR400; reuse the unchanged frontend official artifact and compile only the genuinely changed backend once, then finish scoped SAST/gate."
+      "activationNote": "Align latest main PR402 catalog-only sources. Old base0e8 success remains its original qualification; retain identical frontend and application evidence, compile changed backend once using the existing bounded formal route. No new CI system or merge authority."
     }
   }
 }

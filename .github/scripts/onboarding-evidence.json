@@ -876,7 +876,7 @@
     },
     "task1": {
       "schemaVersion": 1,
-      "product": "66ace3dc6fc90a9a7f8600c0f7b357a1ffa714ed",
+      "product": "7403128fed365351cacbaa59c75cbe57a7cf810e",
       "reviewer": "root dot",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -891,7 +891,8 @@
           "NODE_ENV=test bypasses the existing limiter and MFA is a synthetic recent proof. No human MFA/rate-limit or all-tool/performance claim.",
           "New dual-nonempty-R evidence is developer-submitted unsigned staged execution, accepted by DOT at exact54da/47ef; original execution remains unsigned/staged. Original failed stages retained.",
           "Final main5a39 alignment adds only three non-executable COPSOQ catalog sources/index; previous dual-R execution remains at main407 stage. No changed interface/scorer/runtime or this fixture material input; no app replay. Current component trees are bound separately.",
-          "PR400 main0e8 adds seven scale source/instrument files plus generated registry and docs. Existing three dual-R source/scorer/parameters/consumer code unchanged; no application replay. Frontend production imports/aliases do not consume the changed backend catalog; its exact component/build is reused. Backend source tree changes and needs one new formal compile; no old backend qualification is relabelled."
+          "PR400 main0e8 adds seven scale source/instrument files plus generated registry and docs. Existing three dual-R source/scorer/parameters/consumer code unchanged; no application replay. Frontend production imports/aliases do not consume the changed backend catalog; its exact component/build is reused. Backend source tree changes and needs one new formal compile; no old backend qualification is relabelled.",
+          "Final baseline PR402/main dfd506 adds only seven CATALOG_ONLY source/instrument modules plus generated registry/docs (16 paths); no authorization interface or existing dual-R definition changed. Old official success40c07/base0e8 is not renamed to the new merge tree. Frontend exact tree unchanged and reused; changed backend source compiled once in the existing formal route. No application/scoring/native evidence replay."
         ]
       },
       "reports": [
