@@ -3,7 +3,7 @@
   "base": "296c941419d76b360405c2c487d10514cd5c530e",
   "productHead": "95baa41c600b1f6e8ac930a83da04578c3614894",
   "componentTrees": {
-    "backend": "303a4a4ca919da1ec9d0e7e8c858f5a8fe89aa60",
+    "backend": "315616d1b8fead0cbbd340822ef8828498007cb9",
     "frontend": "83917ae150cafbbe825a269d4c56a0e08a98e0a8"
   },
   "localTypes": [
@@ -19,13 +19,40 @@
       "componentTree": "83917ae150cafbbe825a269d4c56a0e08a98e0a8",
       "exitCode": 0,
       "reusedUnchangedFrontend": true
+    },
+    {
+      "component": "backend",
+      "report": "backend-leaf-floor-types.json",
+      "componentTree": "315616d1b8fead0cbbd340822ef8828498007cb9",
+      "exitCode": 0,
+      "replaysPriorCases": false
     }
   ],
-  "distinctUnitAndMockHttpCases": 36,
+  "distinctUnitAndMockHttpCases": 37,
   "postgres": {
     "initial": "failed after historical class/tag/source assertions, invalid staff-role fixture enum",
     "continuation": "one retained staff-class step passed; no fixture reset or replay",
-    "isFullSchoolServiceJourney": false
+    "isFullSchoolServiceJourney": false,
+    "schoolService": {
+      "original": "service-postgres-first.json",
+      "usersContinuation": "service-postgres-users-continuation.json",
+      "domainContinuation": "service-postgres-domain-continuation.json",
+      "readContinuation": "service-postgres-read-continuation.json",
+      "proof": "service-postgres-proof.json",
+      "status": "PASSED_BY_RETAINED_STAGE_CONTINUATION",
+      "failures": [
+        "Fixture missing explicit required IDs; reused created users",
+        "Fixture lacked ORGANIZATION_RUN DB-only assignment provenance; repaired only synthetic retained assignments",
+        "Actual first artifact saved then read failed: SQL GREATEST returned bigint; cast to int and resumed existing artifact read"
+      ],
+      "noResetOrFirstGenerationReplay": true,
+      "registryStubOnly": true,
+      "generationCanonical": 10,
+      "readCanonical": 0,
+      "operationsAre": "Prisma/Raw calls, not SQL events or production CPU",
+      "generationMs": 188,
+      "readMs": 26
+    }
   },
   "browser": {
     "report": "browser.json",
@@ -39,10 +66,11 @@
     "backend types before later source edits retained as earlier checkpoints only"
   ],
   "remaining": [
-    "Actual School generation/read service journey with persisted V2 artifact remains to complete before merge-ready",
+    "V2 School PG service completed; old no-leaf V1 whole-Run floor scope remains unresolved before full disclosure finding closure",
     "Teacher actual product entry and product-admin adaptation",
     "School Form choices and unsupported standalone/Bundle runtime adapters",
-    "group longitudinal awaits stable personal contract"
+    "group longitudinal awaits stable personal contract",
+    "Notion 409 review-page append denied by automatic review: explicit target authorization pending; no write performed, no reroute"
   ],
   "reports": {
     "backend-delta.json": {
@@ -121,6 +149,61 @@
     "frozen-privacy-types-repair.json": {
       "sha256": "1fa8b543cbbe0172901d7d8e4d6fad98ac101835a6f5cca40f0f30b7f39bac89",
       "exitCode": 0
+    },
+    "backend-leaf-floor-types.json": {
+      "sha256": "f11e7e993985150cd5a58d7f9e2eae066420b14af27af38f69430c5d619ef46e",
+      "exitCode": 0
+    },
+    "leaf-floor-before.json": {
+      "sha256": "68a47f61885fc7d5199a5cbdba7f7235fe7d71a8b9b939aaea8f4477763c3a1d",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 6
+    },
+    "leaf-floor-fix.json": {
+      "sha256": "2705ad058580ade96d0309b29bad6e96becbf5315b5b2c79dc102aeee59a0957",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 6
+    },
+    "leaf-floor-reproduction.json": {
+      "sha256": "4e12922c904a6dcad49c8f19ee0d9cfcadabe54cd0755d27eb24c4323e75ba69",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 6
+    },
+    "leaf-floor-review-fix.json": {
+      "sha256": "c53655e4267b1e05f503806e5b781eea5035584aeea9d3507cb7182c5e21907b",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 6
+    },
+    "service-postgres-domain-continuation.json": {
+      "sha256": "87eef3b6401608869e1317dc2e5285d8524b784432ac550694855ef6fe43d1c9",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "service-postgres-first.json": {
+      "sha256": "23d5ec6cfba880b57f710732986c19a7df74a0c4ce55c826300024dbb3030ec6",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "service-postgres-proof.json": {
+      "sha256": "b1c07e34d3eecd7de7b33b208b523f128c0b260506e4781536fcce84837d0db5"
+    },
+    "service-postgres-read-continuation.json": {
+      "sha256": "2869d7a74016c34ea3364b8ebb360ed33bab5ef906b5a8fa995eb6c2527732db",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "service-postgres-users-continuation.json": {
+      "sha256": "c6de98132500c2159f4c732e786893481d7d5f644d2d2c874f8b8f48fc8b9d39",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
     }
   },
   "ciExecuted": false,
@@ -142,5 +225,14 @@
     "frontendTree": "83917ae150cafbbe825a269d4c56a0e08a98e0a8",
     "currentBackendTypes": "PENDING_NEXT_PRODUCT_FREEZE",
     "frontendEvidenceReused": true
+  },
+  "leafFloor": {
+    "status": "V2_FIXED_V1_SCOPE_OPEN",
+    "test": "parent10 leaf20 spec10 cohort12",
+    "before": "leaf-floor-reproduction.json",
+    "after": "leaf-floor-review-fix.json",
+    "cases": 1,
+    "invariant": "max leaf/parent/request/spec; same floor for V2 generation, old snapshot metric/cell reads, and School differencing",
+    "v1Risk": "Old unselected whole-Run V1 lacks leaf identity. Existing parent-only path can flatten a child metric without its stronger contract. Do not claim all GROUP paths fixed; migration/legacy read compatibility scope pending. School subgroup without leaf is still rejected."
   }
 }

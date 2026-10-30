@@ -6,9 +6,16 @@ import { resolveHistoricalRelationalEntry } from '../assessment-run/registeredRe
 import { resolveOrganizationAccessContext, type OrganizationAccessContext } from '../organization/access'
 import type { ReportingPrincipal } from './authorization'
 import { getPublishedReportingSpec } from './spec'
-import { reportingFail, type ReportingArtifactRecord } from './types'
+import { reportingFail, type ReportingArtifactRecord, type ReportingLeafSourceV2 } from './types'
 
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
+
+export async function reportingLeafDisclosureContract(leaf:ReportingLeafSourceV2){
+  const entry=await resolveHistoricalRelationalEntry({resourceKind:leaf.unitType,
+    resourceKey:leaf.instrumentKey,resourceVersion:leaf.instrumentVersion})
+  if(!entry||entry.releaseStatus!=='PUBLISHED'||!entry.resultDisclosure)return hidden()
+  return validateResultDisclosureContract(entry.resultDisclosure)
+}
 
 
 /** SCHOOL professional disclosure needs both a live counseling persona and
@@ -47,20 +54,24 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
       ))
   `
   if (!tracks.length) return hidden()
-  if (!tracks.some(t => t.policy?.resultDisclosure)) {
+  const legacyParent=!tracks.some(t => t.policy?.resultDisclosure)
+  if (legacyParent) {
     // Legacy projections may use their historic reporting policy, but SCHOOL
     // can never interpret a missing content-owned disclosure contract as full access.
     if (tracks.some(t => t.productDomain === 'SCHOOL')) return hidden()
-    return null
+    if(!(artifact.analysisKind==='GROUP'&&artifact.artifactPayload.schemaVersion===2))return null
   }
   // A mixed legacy/governed series cannot use the legacy path to widen disclosure.
-  if (tracks.some(t => !t.policy?.resultDisclosure)) return hidden()
+  else if (tracks.some(t => !t.policy?.resultDisclosure)) return hidden()
   const context = await resolveOrganizationAccessContext({ organizationId: artifact.organizationId, principal },input.tx)
-  if (!context?.membershipId || context.organizationStatus !== 'ACTIVE' || context.explicitDenies.some(d => ['*', 'REPORT_READ'].includes(d))) return hidden()
+  const legacyHistoricalAdmin=legacyParent&&principal.platformRole==='SYSTEM_ADMIN'
+  if (!context?.membershipId || (context.organizationStatus !== 'ACTIVE'&&!legacyHistoricalAdmin)
+    || context.explicitDenies.some(d => ['*', 'REPORT_READ'].includes(d))) return hidden()
   const audience = reportingAudienceForContext(context)
   const spec = await getPublishedReportingSpec(artifact.specId,input.tx)
   let allowed = spec.definition.metricRules.map(r => r.metricId)
   for (const track of tracks) {
+    if(!track.policy?.resultDisclosure)continue
     if (canonicalHash(track.policy) !== track.hash) return hidden()
     const entry = await resolveHistoricalRelationalEntry({ resourceKind: track.family as any, resourceKey: track.key, resourceVersion: track.version })
     if (!entry || entry.releaseStatus !== 'PUBLISHED' || !entry.resultDisclosure || canonicalHash(entry.resultDisclosure) !== canonicalHash(track.policy.resultDisclosure)) return hidden()
@@ -74,14 +85,28 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
   }
   if (artifact.analysisKind === 'GROUP' && artifact.artifactPayload.schemaVersion === 2) {
     const leaf = artifact.artifactPayload.source.leaf
-    const entry = await resolveHistoricalRelationalEntry({ resourceKind: leaf.unitType,
-      resourceKey: leaf.instrumentKey, resourceVersion: leaf.instrumentVersion })
-    if (!entry || entry.releaseStatus !== 'PUBLISHED' || !entry.resultDisclosure) return hidden()
-    const rule = validateResultDisclosureContract(entry.resultDisclosure).audiences[audience]
+    const contract=await reportingLeafDisclosureContract(leaf)
+    const rule = contract.audiences[audience]
     if (!rule.mode.includes('AGGREGATE')) return hidden()
     if (rule.mode === 'DELAYED_AGGREGATE' && tracks.some(track => !track.closedAt
       || Date.now() < track.closedAt.getTime() + rule.delaySeconds! * 1000)) return hidden()
     allowed = allowed.filter(id => spec.definition.metricRules.some(r => r.metricId === id && rule.metricKeys.includes(r.sourceMetricKey)))
+    const projection=artifact.artifactPayload.projection
+    if(projection.state==='present'){
+      const minimum=contract.minimumRespondents??0
+      if((projection.eligibleN??0)<minimum||(projection.resultContributorN??0)<minimum)return hidden()
+      allowed=allowed.filter(id=>{
+        const metric=projection.metrics?.[id]
+        if(!metric||metric.state!=='present')return true
+        const floor=Math.max(minimum,artifact.artifactPayload.schemaVersion===2?artifact.artifactPayload.metricMetadata?.[id]?.minimumN??0:0)
+        if((metric.validN??0)<floor)return false
+        const distribution=metric.aggregations?.distribution as {state?:string;cells?:Array<{count:number}>}|undefined
+        // Old snapshots may have emitted cells under the former lower floor.
+        // Withhold that metric through the existing projection filter; never
+        // rewrite historical bytes or expose its unsafe distribution elsewhere.
+        return distribution?.state!=='present'||(Array.isArray(distribution.cells)&&distribution.cells.every(cell=>cell.count>=floor))
+      })
+    }
   }
   if (!allowed.length) return hidden()
   return allowed

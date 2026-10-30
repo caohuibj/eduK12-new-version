@@ -9,6 +9,7 @@ import { readReportingArtifactRecord } from '../reporting/artifact'
 import { listAuthoritativeRunLeafSources } from '../reporting/resultSource'
 import { educationGroupSelector, educationGroupPresentation, listEducationGroupSelections, type EducationGroupSelection } from '../reporting/education-group-selection'
 import { generateOrganizationGroupAnalysis } from '../reporting/service'
+import { reportingLeafDisclosureContract } from '../reporting/governedDisclosure'
 import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail, type ReportingCohortSnapshotRecord, type ReportingLeafSourceV2 } from '../reporting/types'
 import { withCampusReportReleaseLock } from './report-release-lock'
@@ -169,6 +170,8 @@ export async function assertCampusLeafGroupDifferencing(input:{
   organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN?:number
 }):Promise<void>{
   const current=input.cohort.members.map(member=>member.userId)
+  const leafContract=await reportingLeafDisclosureContract(input.leaf)
+  const minimumN=Math.max(input.minimumN??CAMPUS_GROUP_MIN_N,leafContract.minimumRespondents??0)
   const rows=await prisma.$queryRaw<Array<{priorN:number;shared:number;minimumN:number}>>(Prisma.sql`
     WITH current_members AS (SELECT value AS user_id FROM jsonb_array_elements_text(${JSON.stringify(current)}::jsonb)),
     historical AS (
@@ -187,9 +190,9 @@ export async function assertCampusLeafGroupDifferencing(input:{
     SELECT jsonb_array_length(cohort.members) AS "priorN",
       (SELECT COUNT(*)::int FROM jsonb_array_elements(cohort.members) member
         JOIN current_members ON current_members.user_id=member->>'userId') AS shared,
-      GREATEST(${input.minimumN??CAMPUS_GROUP_MIN_N},
+      GREATEST(${minimumN},
       COALESCE((track.frozen_resource_policy->>'minimumRespondents')::int,0),
-      COALESCE((track.requested_policy->>'minimumRespondents')::int,0)) AS "minimumN" FROM historical
+      COALESCE((track.requested_policy->>'minimumRespondents')::int,0))::int AS "minimumN" FROM historical
     JOIN reporting_cohort_snapshots cohort ON cohort.id=historical.cohort_id AND cohort.organization_id=${input.organizationId}
     JOIN assessment_run_tracks track ON track.organization_id=${input.organizationId}
       AND track.run_id=${input.cohort.sourceRunId} AND track.id=${input.cohort.sourceTrackId}

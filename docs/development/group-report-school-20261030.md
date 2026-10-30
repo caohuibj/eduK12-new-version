@@ -27,3 +27,15 @@
 main318与 Training候选20de08b63 已在 `42e2a40d908cef7e3e0c4a52eeb1975c7079301a` 无冲突合入。没有修改PR408冻结候选。当前backend树 `d11a452cf25da1465fbb745a6a7c5f86aab8fe29` 因依赖素材索引发生变化，尚未补当前完整树编译；保留旧95baa隐私修订源码的真实exit0，不把旧树说成新树。frontend83917ae未变，复用原types/browser。待实际School服务生成/持久化/读取旅程与产品修订完成后，再冻结当前必要检查，不为每次依赖合入机械重跑。Teacher真实入口、Form及其他runtime仍待后续。
 
 Draft审阅：https://github.com/caohuibj/eduK12-new-version/pull/414 。Training依赖PR408的正式41035994222四作业成功记录放在本后续分支 main-alignment/formal-result.json，不为补记录改动已资格通过的20de08b63。School实际PG服务旅程及当前最终编译仍在后续收口范围，未交合并。
+
+## 叶工具下限与实际 School 服务续验（当前修订）
+
+V2 已按 max(父冻结/任务请求、叶内容合同、科学方案) 传播现有引擎下限。当前叶合同 minimumRespondents 也在快照读取和 School 差分比较保留；历史不足人数或含小分布单元的指标通过既有投影过滤收窄，不改写旧 Artifact。直接生成返回同样经过 governed 投影；Legacy 父任务的 V2 不能跳过叶合同。保留当前成员 SYSTEM_ADMIN 对暂停 Legacy 组织的既有历史读取边界，平台身份不扩大成员范围。新增一个 parent10 / leaf20 / spec10 / cohort12 case，先实际复现失败，再定向通过；原36项未重跑。
+
+实际 PostgreSQL 服务旅程已完成：20名合成参与者中选10人班级，真正 School 管理授权、独立科学方案创建/审阅/发布、冻结隐私、canonical 结果与统计、V2持久化/读取均真实调用，仅预批准合成工具登记项替换。首次 fixture 缺必填ID，续行缺DB-only assignment policy_domain；保留原失败与已建用户/任务，修夹具后续行。首份报告成功保存，首次读取暴露 SQL GREATEST bigint / Math.max TypeError；将有界下限查询明确 ::int，直接从已保存 artifact 续读，没有重建或重复首份生成。续验验证班级改名不漂移旧版、主动生成新版、旧hash不变，以及撤销当前成员授权后拒绝读取。
+
+同一合成样本的显式新版生成/随即读取：canonical物化10/0，Prisma/Raw调用38/17，188/26ms。不是SQL事件数、生产CPU或大规模压测结论。当前backend树315616d1b8fead0cbbd340822ef8828498007cb9真实types exit0；frontend83917ae未变，沿用原证据。37个不同单元/模拟HTTPcase，加实际PG旅程的分阶段续验，不把续行计为多份独立旅程。
+
+仍不能声称整个披露问题全局关闭：旧 no-leaf V1 整组生成/读取在 reporting.controller.ts 和 resultSource 的历史路径中只绑定父合同；若唯一子指标属于更高人数下限工具，可能仍被扁平化。历史V1未记录叶身份，不能凭新增V2字段证明其下限；需要明确旧整组路径迁移/读取兼容范围。当前 School 子群不传leaf仍400。未擅自停用旧纵向/整组体系，也未覆盖旧快照。PR414仍Draft、不合并、不激活正式CI。
+
+向既有Notion409审阅页追加修复范围/旧V1风险的动作被自动审批拒绝：明确授权被认定只覆盖404 CI页。动作已知未执行，409目标授权问题pending，不换页/接口绕过。代码、脱敏仓库证据和独立开发继续。

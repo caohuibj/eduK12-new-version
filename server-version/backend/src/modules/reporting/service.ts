@@ -12,14 +12,17 @@ import { assertFixedPopulationArtifactDisclosure } from './fixedPopulationPrivac
 import { resolveAuthoritativeRunResults } from './resultSource'
 import { getPublishedReportingSpec } from './spec'
 import { assertReportingSubgroupsPrivacy } from './subgroupPrivacy'
+import {governedArtifactMetrics,narrowGovernedProjection} from './governedDisclosure'
 import { reportingFail, type ReportingArtifactRecord, type ReportingCohortSelectorInputV2, type ReportingGroupArtifactRecord, type ReportingLeafSourceV2, type ReportingCohortSnapshotRecord } from './types'
 
 const publicArtifact = async (artifact: ReportingArtifactRecord, principal: ReportingPrincipal) => {
   await assertFixedPopulationArtifactDisclosure({ principal, artifact })
+  const allowed=artifact.analysisKind==='GROUP'&&artifact.artifactPayload.schemaVersion===2
+    ?await governedArtifactMetrics({principal,artifact}):null
   return {
     artifactId: artifact.id,
     generatedAt: artifact.generatedAt.toISOString(),
-    projection: artifact.artifactPayload.projection,
+    projection: narrowGovernedProjection(artifact.artifactPayload.projection,allowed),
   }
 }
 

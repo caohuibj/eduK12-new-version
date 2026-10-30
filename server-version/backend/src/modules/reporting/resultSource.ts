@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { parseStoredCanonicalUnitResult } from '../assessment-runtime/persistence'
+import { reportingLeafDisclosureContract } from './governedDisclosure'
 import {
   ReportingError,
   reportingFail,
@@ -434,6 +435,7 @@ export const resolveAuthoritativeRunResults = async (
   cohort: ReportingCohortSnapshotRecord,
   leaf?: ReportingLeafSourceV2,
 ): Promise<ReportingResultBatchV1> => {
+  const leafContract=leaf?await reportingLeafDisclosureContract(leaf):null
   const selectedExecutionIds = new Set(cohort.members.map((member) => member.executionId))
   const prepared = await prisma.$transaction(
     (tx) => prepareTrackInTransaction(tx, {
@@ -443,6 +445,7 @@ export const resolveAuthoritativeRunResults = async (
     }, { kind: 'EXECUTION_IDS', executionIds: selectedExecutionIds }, leaf),
     { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
   )
+  prepared.resourceMinimumN=Math.max(prepared.resourceMinimumN??0,leafContract?.minimumRespondents??0)||null
   if (cohort.selector.kind === 'RUN_TRACK_SUBJECTS' && prepared.totalObservationCount !== cohort.members.length) {
     reportingFail('REPORT_RESULT_INTEGRITY', 'Run execution population no longer matches frozen cohort', 500)
   }
