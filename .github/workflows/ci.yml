@@ -330,6 +330,7 @@ jobs:
       pr364_plan: ${{ steps.scope.outputs.pr364_plan }}
       pr363_plan: ${{ steps.scope.outputs.pr363_plan }}
       report_planning_plan: ${{ steps.scope.outputs.report_planning_plan }}
+      group_report_plan: ${{ steps.scope.outputs.group_report_plan }}
       pr357_plan: ${{ steps.scope.outputs.pr357_plan }}
       post356_plan: ${{ steps.scope.outputs.post356_plan }}
       training_polish_plan: ${{ steps.scope.outputs.training_polish_plan }}
@@ -404,6 +405,20 @@ jobs:
         run: |
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
+      - name: fetch the actual group report merge base
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'feat/group-report-snapshots-20261030'
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node --input-type=module <<'JS'
+          import {execFileSync} from 'node:child_process';
+          import {groupReportDiffBase} from './.github/scripts/group-report-draft.mjs';
+          const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          const base=groupReportDiffBase(process.env.CI_BASE_SHA,head);
+          execFileSync('git',['fetch','--no-tags','--depth=1','origin',base],{stdio:'inherit'});
+          JS
       - name: fetch exact PR363 source without application execution
         if: github.event_name == 'pull_request' && github.event.pull_request.number == 363
         env:
@@ -579,6 +594,11 @@ jobs:
         if: steps.pr356-entry.outputs.candidate != 'true'
         name: select dependency-free documentation or tooling classification
         env:
+          CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+          CI_HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          CI_IS_DRAFT: ${{ github.event.pull_request.draft }}
+          CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+          CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           CI_EVENT: ${{ github.event_name }}
           CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
@@ -587,12 +607,17 @@ jobs:
           import {appendFileSync} from 'node:fs';
           import {changedEntries,classifyChanges} from './.github/scripts/content-scope.mjs';
           import {trainingFollowupPlan} from './.github/scripts/training-followup-scope.mjs';
+          import {onboardingPlan} from './.github/scripts/onboarding-scope.mjs';
+          import {groupReportDraftPlan,groupReportDiffBase} from './.github/scripts/group-report-draft.mjs';
           import {execFileSync} from 'node:child_process';
           import {toolingOnly} from './server-version/scripts/release/policy.mjs';
-          const entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(process.env.CI_BASE_SHA);
+          const actualBase=groupReportDiffBase(process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+          const entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(actualBase);
           const docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;
           const followup=process.env.CI_EVENT==='pull_request' && trainingFollowupPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-          const lightweight=process.env.CI_FORCE_FULL!=='true' && (docs||toolingOnly(entries)||Boolean(followup)||entries.some(e=>['.github/scripts/survey-governance-bindings.json','.github/scripts/training-polish-bindings.json','.github/scripts/survey-review-bindings.json','.github/scripts/training-admin-integration-bindings.json','.github/scripts/training-entry-bindings.json','.github/scripts/participant-capacity-bindings.json','.github/scripts/survey-assessment-bindings.json','.github/scripts/training-assessment-bindings.json','.github/scripts/school-teacher-visual-bindings.json','.github/scripts/participant-access-bindings.json','.github/scripts/training-manual-ui-bindings.json','.github/scripts/training-appearance-bindings.json','.github/scripts/shared-authoring-bindings.json','.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-self-bindings.json','.github/scripts/school-teacher-native-bindings.json','.github/scripts/school-teacher-package-bindings.json'].includes(e.file)));
+          const onboarding=onboardingPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+          const groupDraft=onboarding?null:groupReportDraftPlan(entries,actualBase,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+          const lightweight=process.env.CI_FORCE_FULL!=='true' && (Boolean(onboarding)||Boolean(groupDraft)||docs||toolingOnly(entries)||Boolean(followup)||entries.some(e=>['.github/scripts/survey-governance-bindings.json','.github/scripts/training-polish-bindings.json','.github/scripts/survey-review-bindings.json','.github/scripts/training-admin-integration-bindings.json','.github/scripts/training-entry-bindings.json','.github/scripts/participant-capacity-bindings.json','.github/scripts/survey-assessment-bindings.json','.github/scripts/training-assessment-bindings.json','.github/scripts/school-teacher-visual-bindings.json','.github/scripts/participant-access-bindings.json','.github/scripts/training-manual-ui-bindings.json','.github/scripts/training-appearance-bindings.json','.github/scripts/shared-authoring-bindings.json','.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-self-bindings.json','.github/scripts/school-teacher-native-bindings.json','.github/scripts/school-teacher-package-bindings.json'].includes(e.file)));
           appendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);
           JS
       - name: install pinned release classification tools
@@ -743,6 +768,10 @@ jobs:
         run: |
           node --test .github/scripts/exact-candidate.test.mjs
           python3 -B .github/scripts/scale-authoring-admission.test.py
+
+      - name: group report Draft boundary contracts
+        if: steps.scope.outputs.application_route == 'group-report-draft'
+        run: node --test .github/scripts/group-report-draft.test.mjs
 
   maintenance:
     needs: scope
@@ -1396,7 +1425,7 @@ jobs:
           JS
       - name: select exact Task1 changed application and control SAST inputs
         id: task1-codeql-config
-        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page"]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
+        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
         env:
           CI: 'true'
           PLAN: ${{ needs.scope.outputs.onboarding_plan }}
@@ -2481,6 +2510,9 @@ jobs:
       run: |
         npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
         node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
+    # PR404's unchanged binding fixtures retain their successful run evidence;
+    # the native-base reuse fixture runs locally once. Admission below verifies
+    # the actual new base/source inputs without replaying those fixtures.
     - name: admit reviewed results and qualify only missing compiler inputs
       run: node .github/scripts/onboarding-checks.mjs admit
     - name: compile each missing Task1 component once and retain those exact artifacts

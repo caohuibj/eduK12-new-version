@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "synthetic": true,
+  "productionAccessed": false,
+  "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
+  "baseMigrations": 260,
+  "addedMigrations": [
+    "20261030160000_reporting_task_artifacts"
+  ],
+  "pgVersion": "pg_dump (PostgreSQL) 16.15 (Debian 16.15-1.pgdg12+2)",
+  "nativeArchiveSHA256": "4330d68cb8689cfb9bb84d756376abbadbd70854c844643850e42b94588b4040",
+  "nativeArchiveBytes": 1466094,
+  "sourceSchema": "6afd208035c0ec40f9e268ed3611ff60e81dd69ef3d3b48485c72ff162d6d591",
+  "restoreSchema": "6afd208035c0ec40f9e268ed3611ff60e81dd69ef3d3b48485c72ff162d6d591",
+  "schemaScope": "new reporting_task_artifacts table, indexes, foreign key and immutable trigger",
+  "nativeRestorePerformedThisInvocation": false,
+  "retainedNativeRestoreContinued": true,
+  "encryptedArtifactRead": true,
+  "immutableTriggerVerified": true,
+  "dumpUploaded": false
+}
