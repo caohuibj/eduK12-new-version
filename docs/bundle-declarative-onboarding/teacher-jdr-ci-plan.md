@@ -1,6 +1,6 @@
 # PR405：固定 JD-R 实例的最小正式资格
 
-业务与 Project 完整候选 `b40e7514217712a40905ba4592c879b3546397c2`，base `8cf07bfd35702222e279cbfeee2f64d73a938b55`。PR407 合入差异只改变标准配置选择分页；本例没有调用 resources/standardCombinationChoices。其 create/addItem/publish、Profile、计分和保存读取分支未改，不重放已完成旅程。完整文件/mode/blob、两组件树、依赖/schema/运行配置和控制闭包由 `school-teacher-jdr-bindings.json` 绑定，未知/混合/错误输入拒绝。
+业务与 Project 完整检查点 `47a00dabda5767d01b9c1eb0f27e1beafeed27ca`，base `8bd86e4059125b9ee868d4777795e513d36cba71`。PR407 合入差异只改变标准配置选择分页；本例没有调用 resources/standardCombinationChoices。随后 PR403/410 新增或更新51项 BAT/COPSOQ/TSES/UWES 仅目录素材及生成索引，本次只读导入当前registry并核对五个来源SHA/版本、四个核心runtime/measurement/subject/item身份，全部与冻结模型相同，51项没有executable，不运行它们或本例的计分。其 create/addItem/publish、Profile和保存读取分支未改，不重放已完成旅程。完整文件/mode/blob、两组件树、依赖/schema/运行配置和控制闭包由 `school-teacher-jdr-bindings.json` 绑定，未知/混合/错误输入拒绝。
 
 复用已有 native-bundle 场景与 `ci-school-teacher.yml`，不新建 workflow。新增的是明确 JD-R 分支/PR身份和证据数据，原 PR388/392 的 binding、原件与历史结论不变。
 
@@ -19,3 +19,5 @@ main push 只读回精确PR405已成功的最新正式run和所有原门禁，�
 原始命令、退出状态、reporter、结果、失败及输入限制在本轮附件；私有checkpoint（合成登录/签审密钥）从不进入Git或附件。原执行没有签名、没有完整历史环境证明；当前消费闭包不冒充当时执行环境。正式接纳失败时明确阻断，不偷偷重跑应用。
 
 控制契约首轮4例：2 PASS / 2 FAIL。失败均在新测试夹具：真实 Vitest 过滤状态是 skipped，不能断言成 pending；GitHub job mock 缺 run_id/head_sha/run_attempt，原观察器正确拒绝。仅修这两个夹具并选中复验，2 PASS，先前两例不重复；actionlint与变化JS模块语法 exit0。原失败日志和执行退出码保留，不把整条首轮命令改成通过。没有执行应用构建、审计、扫描或Ready。
+
+Draft run `41025902888`（c14496dd4）只有闭合范围/admission/stable gate成功，未取得正式应用资格。后续 `41028004727` attempt1（ea451a8a2）在scope job `123970656362` 失败：事件base仍是8cf，而main在运行时推进到1d95，GitHub合并预览树与分支树不同，校验正确拒绝。gate失败是下游结果，全部应用、构建、审计、扫描未执行。首错完整日志保留；只合入实际main并更新base/product/component身份，不放宽树一致性、不复演23项应用断言。该首错及下轮范围已增量写回原Notion CI清单CI-020；修复待新的Draft范围检查验证，不声称原run已修复。

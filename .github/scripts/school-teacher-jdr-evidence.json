@@ -12,15 +12,15 @@
       "First real FINAL reached COMPLETED and J2 in the failed lifecycle-r1 case. That invocation remains failure; lifecycle-r2 is saved-read only and does not prove a second FINAL.",
       "Workflow initial and r1 failures are preserved DTO fixture errors; r2 reads the already published ordinary source and saved Bundle only.",
       "Browser ran a developer Vite/API tree before source commit, with sandbox true. No original sourceCommit was captured or backfilled; it is not final image qualification.",
-      "Current source trees include upstream PR407 pagination, which these cases never call. Current locks/trees bind consumers, not the original execution environment.",
+      "Current source trees include upstream PR407 pagination, which these cases never call, and PR403/410 catalog-only descriptors. A new read-only registry/source identity probe confirms the five exact executable sources and four core runtime/measurement identities remain unchanged; 51 added or updated descriptors have no executable. This does not qualify their scientific content. Current locks/trees bind consumers, not the original execution environment.",
       "First FINAL performance values were not saved. The saved-read result submitted=[] and its finalMs cannot be called first-FINAL latency."
     ]
   },
-  "reviewSha256": "effb7525c56b88b701ca89dc499cb54f9492d8a664f2544ff82806ead8d4616b",
+  "reviewSha256": "e98575d938a7f75b8b70e8daaf88027fba44353cc452dc7d3a5eba70b5d83552",
   "inputClosure": {
     "trees": {
       "frontend": "f9be4ad6cd12a0fa39b88ba4c10ca637b72a4fae",
-      "backend": "ff1c7d6abaae7c5add4b667c1c1912c4437eedbf"
+      "backend": "89c27fa1b5fcc660debdb75a146e23c6732f7f6d"
     },
     "files": {
       "server-version/backend/Dockerfile": "8dfd85f6e843d964eb192cfdf52addffdc3c4132",
@@ -40,7 +40,7 @@
       "server-version/scripts/ci-install-canvas-deps.sh": "75e8b7f5ce24a53e1c040d105b8b757e3686f102"
     }
   },
-  "inputClosureSha256": "dc3373edf9c1165b06733680cae1440df2b57b78e87c655daa3be64509463de0",
+  "inputClosureSha256": "0c7c4b69a86a295d252b43252c8707729f0b42babf62a89db57212940114cf04",
   "files": {
     "adult-applicability.json": {
       "bytes": 3178,
@@ -357,6 +357,51 @@
       "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
       "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
     },
+    "check-main-catalog-identity.mts": {
+      "bytes": 3303,
+      "sha256": "e1fa68c128ec64b5945959a9dfda018305c11d3bfc1f6af1b0a3ebaa2a85cb40",
+      "gzipBase64": "H4sIAAAAAAACA61WbW/bNhD+nl+hfZIESJTjxI2jQhnSpUPSAmvRDOuHrggo8WQzkUmNpNK4hv/7jnq1FWcv2AIkAcm75+6ee3gUX5VSGSfXTq7kynGFZBDn2j3izUFJzXL3yK77Q6o1WOfhuNmJtFE8M73dJlNADVxTvdzuWmdqXRo5mMETZD/zAm7XIts3XPKC3ZVKZqCH3DYLMG/RpTI0RaeMFvCRZg90AZ1z9E2qB13SDCJg1fvjaXjPVJhWghUQYaaPoEL81VyKKEVXECzSKotWklUF6EhbzEiKVFLFuFhE0IcLFSw41rkmZiejjAopOHrt1vpfs7Ckar0CYUJVCcNXEPVx9qIvMWhNwxXkXHCDgP8vE/XfkPXodfRMCm0cJaVJ/jJMZ7ngJvEIITS2MhGLL1/95GK39Z6LJm5Ag032jcUWOACRSduA2K1MPne3PkHXlee3kPdaisQrW0CEe3f74RdSUqXByzVB9bEe3CqY3EsuvBq59IMG0+/AFOSgMCAkFtZzmcx01JSApWcFVdTwRwh3ZGGAZktk0BbLQPOFCHsUYlHcDhz5hKIF/netb3tVNgrXXcw7jHlnWS8LZP3u+/IuE9GEHJNJhPclx6r3E9CyUniLkiG/doesaOl5OqZijQRujpzGPl0btP4bEnULYs+Rx3YwEPijooU3XH4seUmns1euT6qS4aZXo/uEcazIeO4SnlzfotVmYyBUBZogTijTe8D5sh8XV2jxppCp3yVfPiySF4eEpwlHI1VZet/DOthd/9Y0xX/dZOAhUo/KElyR4RYEaVK3laRcWDlogifM89KWy7TNcj9ckiSjBMb1MqIzaQXd/W+TsmXvbTx3bDV1+QT6R1JIrJp/pzbXAeLA7nMcBXaytP8G37117zVKGGx3VuA9JRdP5KEtuD6wtaIXz7EFrUh/wm0fRddBpR3znYh2B6vH/KAntR2Jw8izFn6P1PofGI17KCugulJgO3HQf0SprmoFWtX0EMOe9W5vmy03ecZLrY/DvPwwjlyfdDHMuoTA5QZW2rVRLIXjc8TrLDYvI9UWpACxMMuhBngqsQRgN/Z01II9d7pY4ANYiydwkTwcMNsjZwuFhv300wDnluUcGCaswFRKOBssO352/epLH3e3P+goiQd2gh21xHvaCQ7KIH4mm1Gf48O62B5tu3lZlZgj0FVSTx/G89wN3DAUdGVfgGKNq3mWT87SnJ3MziZT/IHp2XmW5gAwzV+dsrMTen4yT2czQo7Z+SzNZ+w8O56csiw7Z5M8pyenp/PZPEtPzikCHE9ThgNSl4UN+PswuTNqaCEXOulSQhkVBpRXJhclwZdDf+YGZ2zUtqgZ+34918udid4cN29QOe5xJ4NuYO51b38avzxXW4UxJJmb9bjNL5528+SQYkZetj+j+dCQ0yn6dN7QJvH9w32v/iBoPg94vvY22lBT6dj9eHl76wYPeB9j175wdU/DJlpIBes/88IutNtWcI3WcS0KBY9h/a2BWrh+e3mFT1jXojdUQ+z+47a30Dpoy/mAyVwyBiwe19eldVN/+qEBcghBO2ZuxCMOd6tlHU8CfGhpinl8woR3158VzgC7UfAVN635F/emrdOxdDiWjteOkA4tUZANaKsDa+9I5SwxEQyLCnBAPHIlhW2mYz9nUKAFQVZ+XYJzOu/vUi9lhyocF6m29vV36iA8R0OBowiDvHbMErjCWcptZjnPrJCN9eGYQGU0tgZtcPHuKvyEeT9y+Ebcr9tAVEURTPGt+ROpbBSl5wwAAA=="
+    },
+    "jdr-main-catalog-identity.json": {
+      "bytes": 2511,
+      "sha256": "ea1e658c213b7cf7521b13bb549f1e004cc8c68f1fe64c9fff6c0314a224b1c7",
+      "gzipBase64": "H4sIAAAAAAACA6VWTY8URwy98ytac2ZRfZcrnEg4QHJIBJFyiNDKZbt2WvR0j7p7IBvEf497dheQYJdIXHqmu8ou+71nlz886rrdsuJ6WnY/dbs/nr1+vXu8fXvbj7x9mQX5YhqH64tlOs0kFzjyxSxX/bLO1xc9y7j26/WNzc2OF2qxWdZcoCXWH+OqramZnFPjFJy0lIsF0I+U243t6agOBQ8/4yKbteUSa4tcyJrARIVNa+hDgAhUfcFsnHWVvzx5S+Fvfe26D+fnloZcb972i1yyHDT25fLf/SWNZ7PzjmWPLqZtU8MCJnoo1uWSDYLjGrM0rsBUSgSbike2YjWE5vSBrQUA8YIGov3CJ02z/HZz9O2xnxeP89T6QX7RLbq+zif5tDSfFM2DPJfWj/3aT+MLXPabEwEqJqWADSz5VF3ORRQg24LDEBE412qhMEeXmksAJUGlmiMmTaF8Pv0guJxmOShvd86dQ+SA1oasqRhfpMkGgUvBFxYKmqymL8FlIyZEW0XjEF3MLVkTd2ffHx/fizxN4zpPw/3IQ6NmHTlKzlFOyM4kBzUViwDAISAmKEGVlA1Y9Mo9+2KTlxapxfxt5G+P/UHkm0KJRDG7XBMn1QionimopFUpmaF6Yw1SDoSSgU1EV50YypaS8IPIq56sc5kTpAhV4c8UEtlMxTfPKRrmUCv7Wko1ovhwK9vpgUBcoe8jr9LDK5l7HC6X0/E4zev9JGAUiTEAOgeboGxxWJo3JOR941hUg7ZkVtChRgeQVF/V1eIJqTTzbRK+juDH+KhQMRhhk6lyqsa5Ci0nFSpXUxrmamNG/ZeMp4a2uYAUoxYLu6KQPsgHNGZVFZdgQQsd1KPXEq9SIKjL6FpyuqEa7UNaNYUBqjPa2pS+zea7fBxF5u8zEUJrbL32t5izgDMYElhuMSXMXljbqiGP4nPRFlQMaKGoGJWsKCmy/zYTX579YxxYi9X6LKp0bXuYc3Y+a8m2YLxyYVjQ+dJC1o6UUjZVa0GaT1Iq5Bjrgxxo7wnVo4JetRcon2psxIqWe7UOmkNRfiJ4z5yRlfkiUmtJxORQk3+IA6r95ftpfns/9rVJKxpBDpJDY8k5QtM7jKwFt5Wnlqsq35tSXJSKxqrehF1O+ubSPVVwPnOWAVfhy3qax+l0LwcNh+V/kMAllSxBCyESJCBthc5kR3pVJrbZBimq0cZmw0bEB0pqkDwwp6YN5kES2FGJFnLRlPRSAE/RV+3/2m21D+kN5JXKom3QWG1RRaskVW2N2gAthcjhlgR9vjnfz4QrDtPV7zpHPGOWbT4IcF65GyVeHjZdnlfuRHhGsB+vXo7vJnWguW8XvDkvsTqsOiq80mHj669/zf0qnz8P/aFfPzm4mRB2L29Hl26bcLptwnnajVOHx+PQ35zW4bLIfDbrprnba5waD+HQyfiun6dxQ6yrSG+VveHJLaC7P/eiyXV3A013m/vS4Swd1mUzavN06OQfoZMGPEi3yCC0nfS0W/fSz91C/RZe66nbrrHNptcoTuuiI5fu0Zdfn1+80uDf9fL+yYb3m0cfH/0HtoV7hs8JAAA="
+    },
+    "jdr-main-catalog-identity.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "jdr-main-catalog-identity-execution.json": {
+      "bytes": 422,
+      "sha256": "783f333a3edc5847af1f8924b628e1026c12fa9ac10e243d6b6708432102e74b",
+      "gzipBase64": "H4sIAAAAAAACA32QzU7EMAyE730KK2ey6RaJA5w57StwSRNrm21qV3GyP0K8O2npCpAQhxxszTcZz3sDoBxPkyWvnkEJl+QQzIXTKLN1aNCXcd9pF7l4Y10OZ5txJ8MbEXsErcM0c8qQ5foT6wv5iDrQXLKYk09623Rt97RvH1vjBnSjnmwg7Wy2kY86eKQc8m03ZVEPa7TLGut3nkPN8+1oBNMZk65PApPprRuxXrPyMmCMr9eQq0v7tcmeyzKqxeLv70/CpO5qTOl/dR02seMZF21C6zVTvMGE2foKwNZSrRnuIKwNyAsQQ0VToCNwgkXeW0GwzqGIaj6aT44riaSmAQAA"
+    },
+    "jdr-draft-failure-ea451.log": {
+      "bytes": 8040,
+      "sha256": "221965564b8b9965210ad38998b116d35d467fba335a443b431a40052d107348",
+      "gzipBase64": "H4sIAAAAAAACA81Yy27bRhRdN7+QzcAp4DStRHKGHHIYdCFLlE3EplRKchEbLjEcXkl0KVLhw44R5Mu66Cf1FzqUbNmpWzRBO24NeCOAc859n3tFxqsqnd8gseT5AhIkiryGvP4qbHKUztE52vt6HBKLRl4wDd/uoe/RXl02sIcuXqN6CflXv/3yK9Yx7Rh6h+hT3XFN3SW4Sw0T25Z1hl68OF+URbO++NwXn4l/zOkvCBGD6Wfo+Tmhr43V5zz0/FxfKaRjWXhHB6G8SAB1F2m9bGKtEmW6rittXcqHO5Uo1tBdXVao0ymaet3UlWJqDrV31CCrQC2caRjs7zxxi3XvC8WUTP0+OPNUKRg1TVtWSrWELHOR1lSlFqe5FvNqiTqAPugfFULbRNoJ+ZWrEIM55hlCKBifRP1RMPQPo9A79CfyERct63pduZpWwiKt6vKmm69lcLtFuVBHyCKEPCI0Pu71vR2x6Gg0mbqIZ9f8plLHxHYsu2VyeBRNR2+8wEWvXr1SB+fo20g8+NhFcy4LXCEmZvY95vioN/FcpBDOZMY93GTqjaNxODpQi2nrDzCHs+PjqNfve+NpL+irBWbkQTz7o5PxsTf1omnY8wM/OFQJzTB2HqTSqT/wpLHRwA9lC1sWK9DKJs+h1K6L8mctqmG13k4zrSqaUihMOEa3Tun70ZHXG8iSHsokB15rNXCxhLJzmZSduMmTDDrtG4ZOdIV0brufpDMZzULpo5aVi4CblsEdjrkgJmFAdU5E4hgkTixigYhjC3MuHGXMbB0zesvMn0SDsDeUHa/9UiGkZdh3zpiFp97baOIde/2pPwpknH6Y+aE3UN2RbJ0xdktiGI6CqRcMorEXDkfhSVuwT0fEwM5dAHqDEz+QrSPY+KJ3/IQkNjJ0Q+Kub/w3PBxsfJoaJ73+08Fja6sJPoX/n1Us0Y1NrB4wnPnSR6e+96M3uKUpFy+dUyK4lcQiiQkFII6DKdAkBpsDxw4mlJkKaVrmXcvbcev3goE/6E2fsLwIM+4yO5wFgRe2SmDoH8uRvCyqGhJ10OZm1dxAj8NWXI4m/nTUqi3Bi2WTxpcaJM0bA3dyuO5cQVmlRa6QjungezrB7OTAk2Pa1C2FkHQ3XLxT+a2L1k2WRSW8a6CqFeIysmvuTybEbMvYNVE5RmTHaLGVApLdDDuQijqaHPVc5Ii5bsfzhFhytss/wDYT8RwA8JyaiU04I05sKYy6BCabmw/kyfbsowSLdC1qU8uSCrQ9FripfLHMeaatiqTJoGq1Z7Tiae4auq2OgS07bRsEJFVTulhAOcsFbxbL2nsvYF3Lkn6pENzR6Rb8J3Ugjvz5DCl832o92KsqKFt3eWVZlOjcC8OoN5l4YatBLly5Y6Dt0oB4nqAVlAvorEu4SuFaeh6gQkk6n0Opjqfcs6wz9C3iom54hjoI3q9BqBohW0irvcwofF8OqdakfSdmieEwIeYGM0WcUEFo4sQYhJBNRhY0k5KHcX1fGRdHN6hMgw7aT7DDsJ3AnHA6T2IsVRXVKQYn0RMBnDjMZIkl5iq5EKYy5R2d0dumwWt0xbM04TUEvE6v4KCQSykvb9DLeZqBq2mPF+nHquHPfvrj8bQSy6LIOnf7b75Ba4+orum4xPpGnbVYasGdtVvcccbzJ7SQGS5TaCAxt3eQjYFbFtMtiaewc3cNdw2Dyn+s0FKTWGxn6b9s1qPrvkts6mKCPii0x9keJhcgycsaTE6gqvgCbveS79QhS7W4QRatdkH7n4y7fZW4pr2RDNsp5n5B61dJynE2/fBuorpfMAUU0qJY32S7zEeZHEUpaVVS5Ynaeyd9pxTZ3Dqk1TQtarpaZ6Bw4FHKpND4qBBAyieVE7U9g5+hQBZT97JCV9jsYqOrq8KziWG2yqxdclq5ejEuCyE7h3y+DZTMYHQtm5vM57TeVDgyus9+B9sRJNJoHwAA"
+    },
+    "check-main-catalog-identity-r1.mts": {
+      "bytes": 3303,
+      "sha256": "393bba1508a131b4c34b9dfeb266b3ed3299369c4c3efdfca48de457d7299400",
+      "gzipBase64": "H4sIAAAAAAACA61WbW/bNhD+nl+hfZIESFTs1ImjQhnSpUPSAmvRDOuHrggo8WQzkUmNpNK4hv/7jnq1FWcv2AIkAcm75+6ee3gUX5VSGSfXTq7kynGFZBDn2j3izUFJzXL3yK77Q6o1WOfhuNmJtFE8M73dJlNADVxTvdzuWmdqXRo5mMETZD/zAm7XIts3XPKC3ZVKZqCH3DYLMG/RpTI0RaeMFvCRZg90AZ1z9E2qB13SDCJg1fvJNLxnKkwrwQqIMNNHUCH+ai5FlKIrCBZplUUryaoCdKQtZiRFKqliXCwi6MOFChYc61wTs5NRRoUUHL12a/2vWVhStV6BMKGqhOEriPo4e9GXGLSm4QpyLrhBwP+XifpvyHr0OnomhTaOktIkfxmms1xwk3iEEBpbmYjFl69+crHbes9FEzegwSb7xmILHIDIpG1A7FYmn7tbn6DryvNbyHstReKVLSDCvbv98AspqdLg5Zqg+lgPbhVM7iUXXo1c+kGD6XdgCnJQGBASC+u5TGY6akrA0rOCKmr4I4Q7sjBAsyUyaItloPlChD0KsShuB458QtEC/7vWt70qG4XrLuYdxryzrJcFsn73fXmXieiYTMhxhPclx6r3E9CyUniLkiG/doesaOl5OqZijQRujpzGPl0btP4bEnULYs+Rx3YwEPijooU3XH4seUmns1PXJ1XJcNOr0X3COFZkPHcJT65v0WqzMRCqAk0QJ5TpPeB82Y+LK7R4U8jU75IvHxbJi0PC04Sjkaosve9hHeyuf2ua4r9uMvAQqUdlCa7IcAuCNKnbSlIurBw0wRPmeWnLZdpmuR8uSZJRAuN6GdGZtILu/rdJ2bL3Np47tpq6fAL9IykkVs2/U5vrAHFg9zmOAjtZ2n+D79669xolDLY7K/Cekosn8tAWXB/YWtGL59iCVqQ/4baPouug0o75TkS7g9VjftCT2o7EYeRZC79Hav0PjMY9lBVQXSmwnTjoP6JUV7UCrWp6iGHPere3zZabPOOl1sdhXn4YR65PuhhmXULgcgMr7doolsLxOeJ1FpuXkWoLUoBYmOVQAzyVWAKwG3s6asGeO10s8AGsxRO4SB4OmO2Rs4VCw376aYBzy3IODBNWYColnA2WHT+7fvWlj7vbH3SUxAM7wY5a4j3tBAdlED+TzajP8WFdbI+23bysSswR6Cqppw/jee4GbhgKurIvQLHG1TzLj8/SnJ3Mzo6n+APTs/MszQFgmp++Ymcn9Pxkns5mhMxTNj+FV8ez88l0lp4DzE/n7NUZ/pzPYDY5YSenWUrPJjggdVnYgL8PkzujhhZyoZMuJZRRYUB5ZXJREnw59GducMZGbYuase/Xc73cmejNcfMGleMedzLoBuZe9/an8ctztVUYQ5K5WY/b/OJpN08OKWbkZfszmg8NOZ2iZ5OGNonvH+579QdB83nA87W30YaaSsfux8vbWzd4wPsYu/aFq3saNtFCKlj/mRd2od22gmu0jmtRKHgM628N1ML128srfMK6Fr2hGmL3H7e9hdZBW84HTOaSMWDxuL4urZv60w8NkEMI2jFzIx5xuFst6/g4wIeWppjHJ0x4d/1Z4QywGwVfcdOaf3Fv2jodS4dj6XjtCOnQEgXZgLY6sPaOVM4SE8GwqAAHxCNXUthmOvZzBgVaEGTl1yU4s0l/l3opO1ThuEi1ta+/UwfhORoKHEUY5LVjlsAVzlJuM8t5ZoVsrA/HBCqjsTVog4t3V+EnzPuRwzfift0GoiqKYIpvzZ9oQQiG5wwAAA=="
+    },
+    "jdr-main-catalog-identity-r1.json": {
+      "bytes": 2511,
+      "sha256": "e127dad9bed90abcafc5570dbf1e736e25445239a6929bf110cbfde2a1f369de",
+      "gzipBase64": "H4sIAAAAAAACA6VWS4/URhC+8yusObOo310dTiQcIDkkgkg5RGhV1VW9YzEzHtkeyAbx31M9uwtIsEskfLBkd9fr++r14dEwbJYV19Oy+WnY/PHs9evN4/7v7Xjg/mcW5IvpsLu+WKbTXOUCD3wxy9W4rPP1xchyWMf1+kbm5sYLleiSIaMxjMQYc8psLJVqhUxzWSwJNhF2ueKN7OmoCgX3P+MiXRqIIUkwsVgXqYhAAg5ZnxIlWs8+VcJsv7TcQ/hbP4fhw/ndw5Drrm27yCXLXn1fLv/dXtbDWex8Y9mii6lfaljARA9qMZdsEBxTzNKYgGspEWwqHtmKjVCb0xe2FgDECxqI9guddZrltxvTt2Y/Hx7nqY07+UWv6Pk6n+TT0XxSNPfyXNp4GNdxOrzAZduVCNRiUgrYwFafyCkMUiLZFhyGiMCZyEJhji41lwBKAqqUIyYNoXy2vhdcTrPslbc75c4hckBrQ9ZQjC/SpEPgUvCFpQYNVsOX4LIRE+KZPBA9zC1ZEzdn3R8f34t8nQ7rPO3uRx5abdZVV5NzNSdkZ5IDSsUigNIeEBOUkIvJBiz6bBz7YpOXFmuL+dvI35r9QeSbQom1xuwyJU6aI2Ac1UCWNFMyA3ljDdYcKkoGNhEdOTE125qEH0Re88k6lzlBikAKf64hVZtr8c1zioY5ELGnUsiI4sOtdOuhgrhSv4+8ph5eyTzi7nI5HY/TvN5PAkaRGAOgc9ATyhaHpXlTpXrfOBbNQVsyK+hA0QFoAWZyVHzFWpr5Nglfe/BjfBAQBiNsciVOZJwjaDlpojKZ0jCTjdp4SkvG14a2uYA1Ri0WdkUhfZAPaMyaVVyCBS10UI1eS5ykQFCV0bXk9AIZH4JWTWEAcoZSU/q6zHf5OIrM32cihNbYeqedL2cBZzAksNxiSpi9MGhw1aP4XLQFFQNaKJqMSlaUFNl/m4kvbf8YB9YiWZ9FM13bHmpPdj5rybZgvHJhWND50kLWjpRSNqS1IM0nKQQ5RnqQA+09gTwq6KS9QPlUYSNWtNzJOmgORfmJ4D1zRlbmdTgQlVS5OtTgH+Kg0nj5fprf3o89NWlFPchBcmgsOUdopEBbC66Xp5arZr43pbgohMZqvvVBlvTLpXuq4Gxzlh2uwpd0mg/T6V4OGu6W/0ECl1SyBC2EWHU2Vm2FzmRXay2JbbZBiuZoY9OxEfGhJhVIHphT0wbzIAnsaokWctGQdCiAr9GT9n/tttqHdAJ5pbJoGzRWW1TRKkmkrVEboK0hcrglQd9vzvO54oq76ep33SOeMUvfD6I9n9ytEi/3PS/PJ3dJeEZwPFy9PLybVIHG3ge8OR+xKiRdFV7psvH137/mcZXPv3fjflw/KbjZEDYvb1eXoW84Q99wng6HacDjcTfeWBtwWWQ+iw3TPGzVT/Wn4m6Qw7txng4dsYGwvlX2dk9uAd38uRUNbrhbaIbb2JcBZxmQli7U5mk/yD9ST+rwToZFdlK7pafDupVxHpY6dvfaWIc+xrrMqF6c1kVXLr2jH78+v3ilzr8b5f2TjvebRx8f/QfrpzxpzwkAAA=="
+    },
+    "jdr-main-catalog-identity-r1.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipBase64": "H4sIAAAAAAACAzPgAgASzUp+AgAAAA=="
+    },
+    "jdr-main-catalog-identity-r1-execution.json": {
+      "bytes": 555,
+      "sha256": "1f3248188d1eadff8535cfe09537f990faddca106241ceacbab6b8619c5b5f8e",
+      "gzipBase64": "H4sIAAAAAAACA4WRPU8DMQyG9/4K6+am9wFioBMDEwtiZnET65peLoniXD+E+O8416uAATFkiOP39eM3HyuASodxRG+qR6g4TEkT1KeQBo6oqSYzDW2ntAuTqVFne8RMG96/ex8MgVJ2jCFlyHz+KdtN3jhS1scpc30wSS2Vruke2uauqfWe9KBGtF5pzOhCr6whn22+qNRuxszVeqY7zWS/kV4E6du0ZkpHSkoO2+DrHeqBZKFZz3ty7vlss7g010o2YSrXqlj8SXDg4KubgFL6VyD3pV+HSKU9ERoVvLvASBmNaGCJS/KGmxbmKHgLPoBIk/U9hASlfYdMgFoTL2mIY8ES7ydjbJZt0cEUOcvDCK9v920jduh7YkjUW3m4wPUXtlBwoOCsy6hEkeQvDWCMzspCYlbm3hCQJdZS5E21+lx9AYx4YLErAgAA"
+    },
     "jdr-lifecycle-result.json": {
       "bytes": 22164,
       "sha256": "ea7182bd2eccc8c91e1ba7344d04b33f2e487c25fadfb1ed0fd4951a10ef1a96",
@@ -420,14 +465,14 @@
         6
       ],
       "caseBranches": {
-        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "1": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "2": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "3": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "4": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "6": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record."
+        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "1": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "2": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "3": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "4": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "6": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record."
       },
-      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
+      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
       "originalShellExit": 0,
       "shellExitFile": "adult-applicability.exit"
     },
@@ -472,9 +517,9 @@
         5
       ],
       "caseBranches": {
-        "5": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record."
+        "5": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record."
       },
-      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
+      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
       "originalShellExit": 0,
       "shellExitFile": "adult-distinct-context.exit"
     },
@@ -500,10 +545,10 @@
         1
       ],
       "caseBranches": {
-        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "1": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record."
+        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "1": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record."
       },
-      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
+      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
       "originalShellExit": 0,
       "shellExitFile": "subject-identity-r1.exit"
     },
@@ -524,9 +569,9 @@
         0
       ],
       "caseBranches": {
-        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record."
+        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record."
       },
-      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
+      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
       "originalShellExit": 0,
       "shellExitFile": "independent-tool.exit"
     },
@@ -587,17 +632,17 @@
         8
       ],
       "caseBranches": {
-        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "1": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "2": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "3": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "4": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "5": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "6": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "7": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
-        "8": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record."
+        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "1": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "2": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "3": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "4": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "5": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "6": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "7": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
+        "8": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record."
       },
-      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
+      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
       "originalShellExit": 0,
       "shellExitFile": "jdr-model.exit"
     },
@@ -622,9 +667,9 @@
         0
       ],
       "caseBranches": {
-        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record."
+        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record."
       },
-      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
+      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
       "originalShellExit": 1,
       "shellExitFile": "jdr-lifecycle-r1.exit"
     },
@@ -645,9 +690,9 @@
         0
       ],
       "caseBranches": {
-        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record."
+        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record."
       },
-      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
+      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
       "originalShellExit": 0,
       "shellExitFile": "jdr-ui.exit"
     },
@@ -668,9 +713,9 @@
         0
       ],
       "caseBranches": {
-        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record."
+        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record."
       },
-      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
+      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
       "originalShellExit": 0,
       "shellExitFile": "jdr-lifecycle-r2.exit"
     },
@@ -691,9 +736,9 @@
         0
       ],
       "caseBranches": {
-        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record."
+        "0": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record."
       },
-      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called. Full command and environment limitations remain in the original execution record.",
+      "branchReview": "Actual passed branch only; frozen core/source/Context and report paths exercised here are unchanged after this call. Optional additions retain absent legacy declarations; upstream pagination is not called and the 51 added or updated catalog-only descriptors do not enter the exact executable selection, as confirmed by the separate current identity read. Full command and environment limitations remain in the original execution record.",
       "originalShellExit": 0,
       "shellExitFile": "jdr-workflow-r2.exit"
     }

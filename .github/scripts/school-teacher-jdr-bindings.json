@@ -4,11 +4,11 @@
   "repository": "caohuibj/eduK12-new-version",
   "branch": "feat/teacher-jdr-bundle-20261030",
   "enabled": false,
-  "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
-  "productHead": "b40e7514217712a40905ba4592c879b3546397c2",
-  "productTree": "ac317d58895fe72b96e6d4e7ed2b8fdf73ca76f7",
+  "base": "8bd86e4059125b9ee868d4777795e513d36cba71",
+  "productHead": "47a00dabda5767d01b9c1eb0f27e1beafeed27ca",
+  "productTree": "3f758aa1d3646622df45fbc02a093a7134e92daf",
   "frontendTree": "f9be4ad6cd12a0fa39b88ba4c10ca637b72a4fae",
-  "backendTree": "ff1c7d6abaae7c5add4b667c1c1912c4437eedbf",
+  "backendTree": "89c27fa1b5fcc660debdb75a146e23c6732f7f6d",
   "review": {
     "status": "PENDING",
     "recordSha256": null
@@ -206,7 +206,7 @@
     },
     ".github/workflows/ci.yml": {
       "before": "8c717d88d6cdc5673d8c11a05714ad56caf09ef8",
-      "after": "1783eb99091a9ba012bc34a24f0d5fab5a29047b"
+      "after": "12bbb37d2f3cafbc40fc0ba9049928966ced9b93"
     },
     ".github/scripts/school-teacher-jdr-bindings.json": {
       "before": null,
@@ -214,7 +214,7 @@
     },
     ".github/scripts/school-teacher-jdr-evidence.json": {
       "before": null,
-      "after": "5977c04d90a77498c9348d0821fed125a193a5dd"
+      "after": "61d60dccf61289e9c5ab029b6fe7c73d6a6d488d"
     },
     ".github/scripts/school-teacher-jdr.test.mjs": {
       "before": null,
@@ -222,11 +222,11 @@
     },
     "docs/bundle-declarative-onboarding/teacher-jdr-ci-plan.md": {
       "before": null,
-      "after": "5c01a1523080f89fc29b9795c277b00b795210ea"
+      "after": "0327b2ea280333d0c2456c14aa0cc8aa72a8e889"
     },
     "docs/bundle-declarative-onboarding/teacher-jdr-implementation.md": {
       "before": null,
-      "after": "5af84642399ba3e391be9e3b2a9f225d7e038df4"
+      "after": "a28963f445e9fc524fe8beb51c0e0091c1e2ecd4"
     },
     "docs/release/README.md": {
       "before": "cd7858296514a91a892fdb44e03e1715a1625414",
@@ -297,8 +297,8 @@
       "ordinary-collection-and-frozen-history",
       "generic-four-axis-report-and-development-browser"
     ],
-    "manifestSha256": "51f8c4a3ac09bb5ed48b16d45e65403a6e866ab26428be58aace0f73d7014d4e",
-    "reviewSha256": "effb7525c56b88b701ca89dc499cb54f9492d8a664f2544ff82806ead8d4616b",
-    "selectionSha256": "a2c427c0ec494b96a136f666c166d7fe022eca0f7512992f288d007d6315334d"
+    "manifestSha256": "2d07e1c7c132acb80dccd1f3f062366d70e8b15d7b1833af9778fc83d6ea77fb",
+    "reviewSha256": "e98575d938a7f75b8b70e8daaf88027fba44353cc452dc7d3a5eba70b5d83552",
+    "selectionSha256": "826bf6fb9a793a8fbb4d1c69b2b4ce86976088cf8760fcb3805c106f876acf9a"
   }
 }
