@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "base": "1e7326c1584a2354f02db0bb93b8b21dd96b8997",
+  "verifiedMain": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "recordedAt": "2026-10-29T22:07:08.184440+00:00",
+  "results": {
+    "pureAssertionsPassed": 5,
+    "finalOfficialNodeClosureTypesExit": 0,
+    "originalTypeHarnessFailureRetained": true
+  },
+  "environment": {
+    "node": "24.21.0 official runtime",
+    "databaseWrites": 0,
+    "productionAccessed": false
+  },
+  "scope": "New composition preview mechanical R-required band validation only. Historical compiler, renderer, scoring and source materials unchanged.",
+  "raw": {
+    "file": "report-parameter-compatibility-raw.json",
+    "sha256": "996136bd2d978f43c4d728634a99863062f7d7fe80f3ca1a0b1df00685b595b5"
+  },
+  "finalFilesSha256": {
+    "server-version/backend/src/modules/measurement-content/standard-report-parameters.ts": "9f6aa839d7b9644fcd4fd084da0bfc319d38f540a9e0d0952f0adde93612b9e8",
+    "server-version/backend/src/modules/survey/standard-triplet.model.ts": "cc40e0542b8124dd524efa467038ee1b2537984079705f32b5868a4d059dd97f",
+    "server-version/backend/src/__tests__/measurement-content/standard-report-parameters.test.ts": "a42501718f5a118fa95cac3f0f92d33d93c1f724df78503b0a03411df650bca4"
+  },
+  "evidenceLimit": "Post-execution source inventory, not signed dependency/official CI evidence.",
+  "notExecuted": [
+    "approval DB/UI new lifecycle",
+    "formal CI/PR/merge/deployment",
+    "historical reports replay (compiler/read paths unchanged)",
+    "original three-scale synthetic report suite (inputs unchanged)"
+  ]
+}

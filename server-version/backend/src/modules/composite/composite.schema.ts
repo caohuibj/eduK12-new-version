@@ -5,7 +5,7 @@ import { formQuestionSchema } from '../assessment-core/form/definition'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { MAX_TOKEN_USES } from '../../constants'
 import { deviceInputProvenanceV1Schema } from '../scale/device-input-provenance'
-import {standardCombinationPointerSchema} from '../measurement-content/standard-combination'
+import {trainingStandardSelectionSchema} from '../assessment-authorization/standard-configuration-binding'
 
 const dateTime = z.string().datetime()
 const exportDate = z.string().refine((value) => !Number.isNaN(new Date(value).getTime()), { message: '日期格式无效' })
@@ -70,7 +70,7 @@ export const addCompositeItemSchema = z.object({
   position: z.number().int().min(0).optional(),
   required: z.boolean().optional().default(true),
   scaleId: z.string().min(1).optional(),
-  standardCombination: standardCombinationPointerSchema.optional(),
+  standardCombination: trainingStandardSelectionSchema.optional(),
   cognitiveAssignmentId: z.string().min(1).optional(),
   situationalInstrumentKey: z.string().min(1).max(120).optional(),
   situationalInstrumentVersion: z.string().regex(/^\d+\.\d+\.\d+$/, '必须指定精确情境化题包版本').optional(),

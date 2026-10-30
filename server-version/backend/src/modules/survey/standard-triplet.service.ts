@@ -1,5 +1,5 @@
 import {scaleSourceClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
-import {approveToolEntryPolicies,exactToolEntryProducts} from '../assessment-governance/tool-entry-policy'
+import {approveStandardCombinationEntryPolicies,exactStandardCombinationEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {toolReference} from './tool-reference'
 import {copyTripletContent} from './standard-triplet.content'
 import {randomUUID} from 'node:crypto'
@@ -91,11 +91,11 @@ export async function readStandardApprovalIntent(tx:Db,row:StandardRelease){
   }
  }
  if(!evidence||typeof evidence.reason!=='string')fail(409,'原批准入口范围缺少可核验证据；请核对历史审批并使用正式入口范围调整流程')
- try{return {products:exactToolEntryProducts(evidence!.allowedProducts),reason:evidence!.reason}}
+ try{return {products:exactStandardCombinationEntryProducts(evidence!.allowedProducts),reason:evidence!.reason}}
  catch{ return fail(409,'原批准入口范围缺少可核验证据；请核对历史审批并使用正式入口范围调整流程') }
 }
 export async function approveStandardTriplet(actor:string,input:Selection&{requestId:string;expectedCombinationHash:string;reason:string;allowedProducts?:unknown},proof?:AdminSessionProof){
- const products=exactToolEntryProducts(input.allowedProducts)
+ const products=exactStandardCombinationEntryProducts(input.allowedProducts)
  const triplet=await previewStandardTriplet(prisma,actor,input)
  if(triplet.combinationHash!==input.expectedCombinationHash)fail(409,'审核预览已变化，请重新核对三份版本')
  if(triplet.blockers.length)fail(409,triplet.blockers.join('；'))
@@ -118,7 +118,7 @@ export async function approveStandardTriplet(actor:string,input:Selection&{reque
   }
   triplet.reference.approvals.push({actorId:actor,decision:'APPROVED',reason:input.reason,requestId:input.requestId,at:new Date().toISOString(),versions:input.expectedCombinationHash,allowedProducts:products})
   await tx.$executeRaw`INSERT INTO survey_standard_releases(id,tool_key,combination_hash,snapshot,reference,state,approved_by) VALUES(${input.requestId},${triplet.toolKey},${triplet.combinationHash},${JSON.stringify(triplet)}::jsonb,${JSON.stringify(triplet.reference)}::jsonb,'APPROVED',${actor})`
-  await approveToolEntryPolicies(tx,{resourceKey:'standard-release:'+input.requestId,fingerprint:triplet.combinationHash},products,actor,input.reason)
+  await approveStandardCombinationEntryPolicies(tx,{resourceKey:'standard-release:'+input.requestId,fingerprint:triplet.combinationHash},products,actor,input.reason)
   await audit(tx,actor,'STANDARD_TRIPLET_APPROVED',{releaseId:input.requestId,combinationHash:triplet.combinationHash,reason:input.reason,allowedProducts:products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0})
   return input.requestId
  },{timeout:15000})

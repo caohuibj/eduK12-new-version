@@ -1,3 +1,5 @@
+import {grantEducationCognitiveProfileUse,educationCognitiveProfileUseInput} from '../assessment-authorization/education-cognitive-profile-use'
+import {educationCognitiveProfileManagementCatalog,educationCognitiveProfileManagementRecipients,educationCognitiveProfileManagementPreview} from '../assessment-authorization/education-cognitive-profile-management'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
@@ -6,7 +8,14 @@ import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import { withLoginPasswordVerification } from '../../middleware/loginRateLimit'
 import { comparePassword } from '../../utils/password'
 import { forbidden, error, success } from '../../utils/response'
-import { assertEntryAdmin } from '../admin-permissions/service'
+import { assertEntryAdmin,AdminPermissionError } from '../admin-permissions/service'
+import {ContentReleaseError} from '../measurement-content/release'
+import {ContentAuthorityError} from '../measurement-content/content-authority'
+import {EducationAssessmentSourceError} from '../education-tools/assessment-resource.repository'
+import {educationStandardManagementCatalog,educationStandardManagementPreview,educationStandardManagementRecipients,
+ educationStandardManagementGrants,educationStandardManagementOperation} from '../assessment-authorization/education-standard-management'
+import {grantEducationStandardConfigurationUse,educationStandardUseInput} from '../assessment-authorization/education-standard-use'
+import {revokeEducationStandardConfigurationUse,educationStandardRevokeInput} from '../assessment-authorization/education-standard-revoke'
 import { requireRecentAdminKey } from '../admin-permissions/guards'
 import type { EducationProduct } from '../organization/educationProductAccess'
 import { changeTeacherScaleLicense,TeacherScaleLicenseError } from './scaleLicense.service'
@@ -67,6 +76,10 @@ const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respo
   catch(e){
     if(e instanceof z.ZodError)return error(res,'请求格式不合法',-1,400)
     if(e instanceof EducationProductGovernanceError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof AdminPermissionError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof ContentReleaseError)return error(res,e.code,-1,409)
+    if(e instanceof ContentAuthorityError)return error(res,e.code,-1,403)
+    if(e instanceof EducationAssessmentSourceError)return error(res,e.code,-1,e.statusCode)
     if(e instanceof TeacherScaleLicenseError)return error(res,'教师量表资源或学校授权条件不满足',-1,e.statusCode)
     if(e instanceof TeacherPersonalGrantError)return error(res,'个人量表授权条件不满足',-1,e.statusCode)
     next(e)
@@ -74,6 +87,53 @@ const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respo
 }
 router.use(authenticate,platformEducationOrigin,limiter)
 router.use((req,res,next)=>['GET','HEAD','OPTIONS'].includes(req.method)?next():requireRecentAdminKey(req,res,next))
+const configurationBase='/organizations/:organizationId/products/:product/standard-configurations'
+router.use(configurationBase,(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
+const configurationScope=(req:Request)=>({product:product.parse(req.params.product)==='HUISCHOOL'?'SCHOOL' as const:'TEACHER' as const,
+ organizationId:uuid.parse(req.params.organizationId)})
+const configurationId=(req:Request)=>uuid.parse(req.params.combinationId)
+const sourceQuery=z.object({combinationHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
+router.get(configurationBase,handle(req=>educationStandardManagementCatalog(req.user!.userId,configurationScope(req),req.query)))
+router.get(configurationBase+'/:combinationId/preview',handle(req=>educationStandardManagementPreview(req.user!.userId,configurationScope(req),configurationId(req),sourceQuery.parse(req.query).combinationHash)))
+router.get(configurationBase+'/:combinationId/recipients',handle(req=>{
+ const input=sourceQuery.extend({page:z.coerce.number().int().min(1).max(10000).default(1),q:z.string().trim().max(120).default('')}).parse(req.query)
+ return educationStandardManagementRecipients(req.user!.userId,configurationScope(req),configurationId(req),input.combinationHash,{page:input.page,q:input.q})
+}))
+router.get(configurationBase+'/:combinationId/use-grants',handle(req=>educationStandardManagementGrants(req.user!.userId,configurationScope(req),configurationId(req),req.query)))
+router.get(configurationBase+'/:combinationId/operations/:requestId',handle(req=>educationStandardManagementOperation(req.user!.userId,configurationScope(req),configurationId(req),uuid.parse(req.params.requestId))))
+router.post(configurationBase+'/:combinationId/use-grants',handle(async req=>{
+ const {currentPassword,...input}=educationStandardUseInput.extend({configurationName:educationStandardUseInput.shape.configurationName.unwrap(),currentPassword:password}).parse(req.body)
+ await adminStepUp(req,currentPassword)
+ return grantEducationStandardConfigurationUse(req.user!.userId,configurationScope(req),configurationId(req),input)
+}))
+router.post(configurationBase+'/:combinationId/use-grants/:grantId/revoke',handle(async req=>{
+ const {currentPassword,...input}=educationStandardRevokeInput.extend({currentPassword:password}).parse(req.body)
+ await adminStepUp(req,currentPassword)
+ return revokeEducationStandardConfigurationUse(req.user!.userId,configurationScope(req),configurationId(req),uuid.parse(req.params.grantId),input)
+}))
+const cognitiveConfigurationBase='/organizations/:organizationId/products/:product/cognitive-profile-configurations'
+router.use(cognitiveConfigurationBase,(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
+const cognitiveConfigId=(req:Request)=>uuid.parse(req.params.configId)
+const cognitiveProfile=(req:Request)=>z.enum(['experience','standard','research']).parse(req.params.profile)
+const artifactHash=z.string().regex(/^[a-f0-9]{64}$/)
+router.get(cognitiveConfigurationBase,handle(req=>educationCognitiveProfileManagementCatalog(req.user!.userId,configurationScope(req),req.query)))
+router.get(cognitiveConfigurationBase+'/:configId/:profile/preview',handle(req=>educationCognitiveProfileManagementPreview(req.user!.userId,configurationScope(req),cognitiveConfigId(req),cognitiveProfile(req),z.object({artifactHash}).strict().parse(req.query).artifactHash)))
+router.get(cognitiveConfigurationBase+'/:configId/:profile/recipients',handle(req=>{
+ const {artifactHash:hash,...query}=z.object({artifactHash,page:z.coerce.number().int().min(1).max(10000).default(1),q:z.string().trim().max(120).default('')}).strict().parse(req.query)
+ return educationCognitiveProfileManagementRecipients(req.user!.userId,configurationScope(req),cognitiveConfigId(req),cognitiveProfile(req),hash,query)
+}))
+router.get(cognitiveConfigurationBase+'/:configId/use-grants',handle(req=>educationStandardManagementGrants(req.user!.userId,configurationScope(req),cognitiveConfigId(req),req.query)))
+router.get(cognitiveConfigurationBase+'/:configId/operations/:requestId',handle(req=>educationStandardManagementOperation(req.user!.userId,configurationScope(req),cognitiveConfigId(req),uuid.parse(req.params.requestId))))
+router.post(cognitiveConfigurationBase+'/:configId/:profile/use-grants',handle(async req=>{
+ const {currentPassword,...input}=educationCognitiveProfileUseInput.extend({currentPassword:password}).strict().parse(req.body)
+ await adminStepUp(req,currentPassword)
+ return grantEducationCognitiveProfileUse(req.user!.userId,configurationScope(req),cognitiveConfigId(req),cognitiveProfile(req),input)
+}))
+router.post(cognitiveConfigurationBase+'/:configId/use-grants/:grantId/revoke',handle(async req=>{
+ const {currentPassword,...input}=educationStandardRevokeInput.extend({currentPassword:password}).strict().parse(req.body)
+ await adminStepUp(req,currentPassword)
+ return revokeEducationStandardConfigurationUse(req.user!.userId,configurationScope(req),cognitiveConfigId(req),uuid.parse(req.params.grantId),input)
+}))
 router.get('/organizations/:organizationId/products',handle(req=>
   readEducationProductEntitlements(req.user!.userId,uuid.parse(req.params.organizationId))))
 router.get('/organizations/:organizationId/teacher-admins',handle(req=>

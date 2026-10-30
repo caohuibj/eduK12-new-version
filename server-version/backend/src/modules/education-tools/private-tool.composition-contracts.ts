@@ -5,6 +5,7 @@ import {resultAudiencePolicySchema} from '../assessment-policy/result-disclosure
 import {compileEducationApplicability} from '../scale-library-governance/education-applicability'
 import {expertCompositionAdministrationSchema,expertTargetKindSchema,isExpertComposition} from './expert-observation.contract'
 import {educationCognitiveSourceSchema,educationSjtSourceSchema} from './native-source.contracts'
+import {selectedConfigurationPointerSchema} from '../assessment-authorization/standard-configuration-binding'
 
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 // P1 consumes immutable author-private leaves. Public/native providers are added
@@ -12,7 +13,7 @@ const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 export const privateCompositionSourceSchema=z.discriminatedUnion('provider',[
  z.object({provider:z.literal('PRIVATE_VERSION'),kind:z.enum(['SCALE','FORM']),versionId:id,contentHash:hash}).strict(),
  z.object({provider:z.literal('LIBRARY_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash}).strict(),
- z.object({provider:z.literal('STANDARD_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash}).strict(),
+ z.object({provider:z.literal('STANDARD_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash,selectedBinding:selectedConfigurationPointerSchema.optional()}).strict(),
  z.object({provider:z.literal('PUBLIC_FORM'),kind:z.literal('FORM'),versionId:id,contentHash:hash}).strict(),
  educationCognitiveSourceSchema,educationSjtSourceSchema,
 ])
@@ -69,7 +70,7 @@ export function matchesEducationCompositionRespondent(origin:Pick<z.infer<typeof
 }
 export const educationCompositionBindingSchema=z.object({schemaVersion:z.literal(1),origin:educationCompositionOriginSchema,
  sealed:z.literal(true),context:z.object({sectionId:id,itemIds:z.array(id).min(1).max(5)}).strict().optional(),manifest:z.array(z.object({blockId:id,instruction:z.string().max(16000),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']),versionId:id,contentHash:hash,
-  sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE','COGNITIVE_CONFIG','SJT_RELEASE']),sourceInstruction:z.string().max(16000).optional(),
+  sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE','COGNITIVE_CONFIG','SJT_RELEASE']),sourceInstruction:z.string().max(16000).optional(),profileArtifactHash:hash.optional(),
   toolId:id,itemIds:z.array(id).min(1).max(1000),sectionIds:z.array(id).max(500)}).strict()).min(1).max(50),
 }).strict().superRefine((binding,ctx)=>{
  const {manifest}=binding

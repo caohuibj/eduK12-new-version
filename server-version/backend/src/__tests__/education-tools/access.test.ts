@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { resolveEducationToolAuthoringCapabilities, resolveEducationToolAuthoringContext } from '../../modules/education-tools/access'
-import { resolveEducationProductMemberScope } from '../../modules/organization/educationProductAccess'
+import { resolveEducationProductMemberScope,listEducationAuthoringMemberCandidates } from '../../modules/organization/educationProductAccess'
 
 const mocks = vi.hoisted(() => ({ query: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: { $queryRaw: mocks.query } }))
@@ -9,6 +9,20 @@ const row = { organizationId: 'school', organizationName: 'Private school name',
 beforeEach(() => { vi.clearAllMocks(); mocks.query.mockResolvedValue([row]) })
 
 describe('education tool authoring capability contract', () => {
+  it('never interprets a missing single actor as a batch request for another school member',async()=>{
+    expect(await resolveEducationProductMemberScope({actorUserId:'',organizationId:'school',product:'HUITEACHER'})).toBeNull()
+    expect(mocks.query).not.toHaveBeenCalled()
+  })
+  it.each(['HUISCHOOL','HUITEACHER'] as const)('uses the same canonical %s qualification and current deny predicates for one bounded candidate query',async product=>{
+    mocks.query.mockResolvedValue([{...row,userId:'recipient',username:'A teacher',productAdmin:product==='HUITEACHER'}])
+    expect(await listEducationAuthoringMemberCandidates({product,organizationId:'school',page:1,q:'teacher'})).toMatchObject({hasMore:false,list:[{userId:'recipient',username:'A teacher'}]})
+    expect(mocks.query).toHaveBeenCalledOnce()
+    const sql=mocks.query.mock.calls[0][0]
+    expect(sql.values).toContain('school');expect(sql.values).toContain('teacher');expect(sql.sql).toContain('DISTINCT ON (u.id)')
+    expect(sql.sql).toContain('"is_frozen"=FALSE');expect(sql.sql).toContain('"must_change_password"=FALSE');expect(sql.sql).toContain("'EDUCATION_ACCESS'")
+    if(product==='HUISCHOOL')expect(sql.sql).toContain('professional_deny')
+    else{expect(sql.sql).not.toContain('professional_deny');expect(sql.sql).toContain('eligible."productAdmin"');expect(sql.values).toContain(true)}
+  })
   it.each([['SCHOOL', 'HUISCHOOL'], ['TEACHER', 'HUITEACHER']] as const)('maps %s to its own product in one current authority query', async (entry, product) => {
     mocks.query.mockResolvedValue([{ ...row, productAdmin: entry === 'TEACHER' }])
     expect(await resolveEducationToolAuthoringContext({ ...input(), entry })).toEqual({

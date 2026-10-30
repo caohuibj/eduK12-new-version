@@ -1,0 +1,1111 @@
+{
+  "schemaVersion": 1,
+  "runs": [
+    {
+      "name": "training-standard-replacement",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-replacement.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-standard-replacement.json"
+        ],
+        "startedAt": "2026-10-29T20:48:07.084245+00:00",
+        "finishedAt": "2026-10-29T20:48:21.833643+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 4,
+        "numPassedTests": 0,
+        "numFailedTests": 4,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793306887854,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently explicitly revokes the already active target and prepares actual GENERAL, COURSE and admitted old bindings",
+                "status": "failed",
+                "title": "explicitly revokes the already active target and prepares actual GENERAL, COURSE and admitted old bindings",
+                "duration": 1441.7448069999991,
+                "failureMessages": [
+                  "AssertionError: 公开链接有效期必须在未来一年内，且不能晚于综合测评有效期: expected 400 to be 200 // Object.is equality\n    at call (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts:16:268)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts:58:8\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently rejects another recipient, wrong old revision, injected pointer and a substituted target id without changing either use",
+                "status": "failed",
+                "title": "rejects another recipient, wrong old revision, injected pointer and a substituted target id without changing either use",
+                "duration": 0.9757919999992737,
+                "failureMessages": [
+                  "Error: Prior fixture incomplete; dependent mutation forbidden\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts:72:18\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64\n    at run (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1150:20)\n    at limiterFn (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1162:59)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:38\n    at Traces.$ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)\n    at trace (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/test.DNmyFkvJ.js:4398:21)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:13"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently atomically issues target revision5 and revokes original revision5 while old admitted recovery remains fixed and new START is denied",
+                "status": "failed",
+                "title": "atomically issues target revision5 and revokes original revision5 while old admitted recovery remains fixed and new START is denied",
+                "duration": 0.6021830000008777,
+                "failureMessages": [
+                  "Error: Prior fixture incomplete; replacement forbidden\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts:83:18\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64\n    at run (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1150:20)\n    at limiterFn (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1162:59)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:38\n    at Traces.$ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)\n    at trace (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/test.DNmyFkvJ.js:4398:21)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:13"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently accepts one concurrent replacement back to the original target and preserves the first original receipt after further revisions",
+                "status": "failed",
+                "title": "accepts one concurrent replacement back to the original target and preserves the first original receipt after further revisions",
+                "duration": 0.5160420000011072,
+                "failureMessages": [
+                  "Error: Prior replacement incomplete; concurrent mutation forbidden\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts:109:20\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64\n    at run (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1150:20)\n    at limiterFn (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1162:59)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:38\n    at Traces.$ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)\n    at trace (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/test.DNmyFkvJ.js:4398:21)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:13"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793306900202,
+            "endTime": 1793306901645.6023,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Actual Training manager/author/public HTTP, exact source preparation, independent old/target revisions, admitted recovery and new report binding. No scoring/FINAL/report rerun.",
+        "observations": [],
+        "requests": [
+          {
+            "route": "/api/questionnaire-products/standard-combination-use-grants/b559c930-122a-4183-9d56-89f3cb5f6376/revoke",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/c32e8ee5-ba11-4a00-85eb-79dc57028219/items",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/c32e8ee5-ba11-4a00-85eb-79dc57028219/items",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/345ff60b-25be-49d5-bcb1-c78c1942a930/items",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/345ff60b-25be-49d5-bcb1-c78c1942a930/items",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/c32e8ee5-ba11-4a00-85eb-79dc57028219/publish",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/1319077e-d9c1-4a03-b900-bb502fd5ba7a/items",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/1319077e-d9c1-4a03-b900-bb502fd5ba7a/items",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/1319077e-d9c1-4a03-b900-bb502fd5ba7a/publish",
+            "status": 200
+          },
+          {
+            "route": "/api/composite-assessments/c32e8ee5-ba11-4a00-85eb-79dc57028219/public-tokens",
+            "status": 400
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-standard-replacement-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-replacement.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-standard-replacement-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:51:13.131148+00:00",
+        "finishedAt": "2026-10-29T20:51:24.550862+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793307073762,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently explicitly revokes the already active target and prepares actual GENERAL, COURSE and admitted old bindings",
+                "status": "passed",
+                "title": "explicitly revokes the already active target and prepares actual GENERAL, COURSE and admitted old bindings",
+                "duration": 611.1637260000007,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently rejects another recipient, wrong old revision, injected pointer and a substituted target id without changing either use",
+                "status": "passed",
+                "title": "rejects another recipient, wrong old revision, injected pointer and a substituted target id without changing either use",
+                "duration": 102.97619699999996,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently atomically issues target revision5 and revokes original revision5 while old admitted recovery remains fixed and new START is denied",
+                "status": "passed",
+                "title": "atomically issues target revision5 and revokes original revision5 while old admitted recovery remains fixed and new START is denied",
+                "duration": 849.7470420000009,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently accepts one concurrent replacement back to the original target and preserves the first original receipt after further revisions",
+                "status": "passed",
+                "title": "accepts one concurrent replacement back to the original target and preserves the first original receipt after further revisions",
+                "duration": 142.1082979999992,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793307082736,
+            "endTime": 1793307084443.1084,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Actual Training manager/author/public HTTP, exact source preparation, independent old/target revisions, admitted recovery and new report binding. No scoring/FINAL/report rerun.",
+        "observations": [
+          {
+            "resumedReadbackOnly": true,
+            "existingTasksReused": 3,
+            "targetRevokedVersion": 4,
+            "noReplacementEventsBeforeResume": 0
+          },
+          {
+            "oldId": "3556d111-ec36-4dde-8f2e-de5ef4ae9f6b",
+            "oldVersion": 5,
+            "targetId": "b559c930-122a-4183-9d56-89f3cb5f6376",
+            "targetRevokedVersion": 4,
+            "generalId": "c32e8ee5-ba11-4a00-85eb-79dc57028219",
+            "courseId": "1319077e-d9c1-4a03-b900-bb502fd5ba7a",
+            "waitingId": "345ff60b-25be-49d5-bcb1-c78c1942a930",
+            "oldAttemptId": "d82c7cd4-8474-427c-91d8-1b7393cdd92d"
+          },
+          {
+            "oldOrdinaryRevokedVersion": 6,
+            "newTargetVersion": 5,
+            "supersedes": {
+              "selectedBinding": {
+                "bindingHash": "501571e82e681e8297159a583f286ee45bcbe0f65108231e6eee28e1f59316c0",
+                "configurationHash": "9a30d47cccc1feb416f6cd8cfebb0dda6e60388f0c4e0f068ac894958dbc4405",
+                "authorizationId": "3556d111-ec36-4dde-8f2e-de5ef4ae9f6b",
+                "authorizationRevision": 5
+              },
+              "reason": "Replace the exact full report with the approved absent report"
+            },
+            "oldDraftPublishAndNewStartDenied": true,
+            "admittedScaleRecovered": true,
+            "originalT1AndPublishedBindingsUnchanged": true,
+            "newAttemptId": "65f1d2e2-6ec2-471b-b31c-3af8eb9592e3",
+            "newReportExplicitlyAbsent": true,
+            "nativeDefaultReportUnchanged": true
+          },
+          {
+            "concurrentAccepted": 1,
+            "concurrentConflict": 1,
+            "totalGrantRows": 4,
+            "oldPhysicalUseRevision": 7,
+            "targetPhysicalUseRevision": 6,
+            "initialTemplateTasksAndSourceRowsUnchanged": true,
+            "historicalOriginalRequestStillReportsItsOwnRevision": true
+          }
+        ],
+        "requests": [
+          {
+            "route": "/api/composite-assessments/c32e8ee5-ba11-4a00-85eb-79dc57028219/public-tokens",
+            "status": 200
+          },
+          {
+            "route": "/api/public/composite-assessments/:token/start",
+            "status": 200
+          },
+          {
+            "route": "/api/public/composite-assessments/attempts/d82c7cd4-8474-427c-91d8-1b7393cdd92d",
+            "status": 200
+          },
+          {
+            "route": "/api/public/composite-assessments/attempts/d82c7cd4-8474-427c-91d8-1b7393cdd92d/form-sections/a282fed0-7dad-4872-aa07-fcd5e5cdb750/submit",
+            "status": 200
+          },
+          {
+            "route": "/api/public/composite-assessments/attempts/d82c7cd4-8474-427c-91d8-1b7393cdd92d",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 409
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 409
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 400
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 409
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-requests/5140868e-d61a-42cf-a1db-1f00ce3084e9",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/345ff60b-25be-49d5-bcb1-c78c1942a930/publish",
+            "status": 403
+          },
+          {
+            "route": "/api/public/composite-assessments/:token/start",
+            "status": 403
+          },
+          {
+            "route": "/api/public/composite-assessments/:token/start",
+            "status": 200
+          },
+          {
+            "route": "/api/public/composite-assessments/attempts/d82c7cd4-8474-427c-91d8-1b7393cdd92d",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/5e2ea476-ed92-4c93-9dab-11e0bdfe2698/items",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/5e2ea476-ed92-4c93-9dab-11e0bdfe2698/items",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/5e2ea476-ed92-4c93-9dab-11e0bdfe2698/publish",
+            "status": 200
+          },
+          {
+            "route": "/api/composite-assessments/5e2ea476-ed92-4c93-9dab-11e0bdfe2698/public-tokens",
+            "status": 200
+          },
+          {
+            "route": "/api/public/composite-assessments/:token/start",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-requests/5140868e-d61a-42cf-a1db-1f00ce3084e9",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 200
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-standard-replacement-header",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-training-replacement.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts",
+          "-t",
+          "reads only original identity headers",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-standard-replacement-header.json"
+        ],
+        "startedAt": "2026-10-29T21:15:51.220384+00:00",
+        "finishedAt": "2026-10-29T21:16:02.165849+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 5,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 4,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793308551980,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently explicitly revokes the already active target and prepares actual GENERAL, COURSE and admitted old bindings",
+                "status": "skipped",
+                "title": "explicitly revokes the already active target and prepares actual GENERAL, COURSE and admitted old bindings",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently rejects another recipient, wrong old revision, injected pointer and a substituted target id without changing either use",
+                "status": "skipped",
+                "title": "rejects another recipient, wrong old revision, injected pointer and a substituted target id without changing either use",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently atomically issues target revision5 and revokes original revision5 while old admitted recovery remains fixed and new START is denied",
+                "status": "skipped",
+                "title": "atomically issues target revision5 and revokes original revision5 while old admitted recovery remains fixed and new START is denied",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently accepts one concurrent replacement back to the original target and preserves the first original receipt after further revisions",
+                "status": "skipped",
+                "title": "accepts one concurrent replacement back to the original target and preserves the first original receipt after further revisions",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training replacement locks original and target revisions independently"
+                ],
+                "fullName": "Training replacement locks original and target revisions independently reads only original identity headers and enforces actual issuer and dual-qualified self-use without adding roles during issuance",
+                "status": "passed",
+                "title": "reads only original identity headers and enforces actual issuer and dual-qualified self-use without adding roles during issuance",
+                "duration": 506.94472199999836,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793308561547,
+            "endTime": 1793308562053.9448,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Actual Training manager/author/public HTTP, exact source preparation, independent old/target revisions, admitted recovery and new report binding. No scoring/FINAL/report rerun.",
+        "observations": [
+          {
+            "originalIdentityHeaderOnly": true,
+            "headerSqlCount": 16,
+            "twoRecipientHeaderQueries": 2,
+            "noContentBodyQueries": true,
+            "unqualifiedIssuerDeniedWithoutRoleWrite": true,
+            "qualifiedOtherIssuerStillDenied": true,
+            "unqualifiedRecipientSelfDenied": true,
+            "activeTargetAndSameCombinationReplacementDenied": true,
+            "explicitFixtureQualificationSeparateFromIssuance": true,
+            "qualifiedSelfUse": true,
+            "selfGrantId": "78d5ad04-100c-4752-816b-b8eb6a3ee1cc",
+            "selfGrantRevision": 3,
+            "userAndEntryUnchangedDuringSelfIssue": true,
+            "otherBusinessReportDenied": true,
+            "totalGrantRows": 4
+          }
+        ],
+        "requests": [
+          {
+            "route": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants?userId=23f0e14d-a573-48d7-a437-a7540d254806",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants?userId=23f0e14d-a573-48d7-a437-a7540d254806",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 403
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 409
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 403
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 409
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/f1325458-3d65-4989-b3ef-769f867eeea5/use-grants",
+            "status": 409
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combination-use-grants/78d5ad04-100c-4752-816b-b8eb6a3ee1cc/revoke",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants",
+            "status": 200
+          },
+          {
+            "route": "/api/questionnaire-products/standard-combinations/60fbd117-c2a4-4b93-ab88-9ef422241990/use-grants?userId=603b717c-a734-483c-b693-b8a430767f71",
+            "status": 200
+          },
+          {
+            "route": "/api/composite-assessments/:task/attempts/:attempt/report (BUSINESS)",
+            "status": 403
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-standard-replacement-types",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/training-replacement-types.json"
+        ],
+        "startedAt": "2026-10-29T20:48:07.073862+00:00",
+        "finishedAt": "2026-10-29T20:48:33.636626+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "training-standard-replacement-types-final",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/training-replacement-types.json"
+        ],
+        "startedAt": "2026-10-29T21:20:09.454556+00:00",
+        "finishedAt": "2026-10-29T21:20:34.823609+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "training-replacement-ui",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/api/standardConfigurationGrants.test.ts",
+          "src/training/TrainingStandardConfigurationGrants.test.tsx",
+          "--maxWorkers=2",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/training-replacement-ui.json"
+        ],
+        "startedAt": "2026-10-29T21:13:48.208386+00:00",
+        "finishedAt": "2026-10-29T21:13:53.917957+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 7,
+        "numPassedTestSuites": 7,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 28,
+        "numPassedTests": 28,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793308428618,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training original issue intent projection"
+                ],
+                "fullName": "Training original issue intent projection admits only bounded non-secret intent with a paired original use identity and revision",
+                "status": "passed",
+                "title": "admits only bounded non-secret intent with a paired original use identity and revision",
+                "duration": 6.409779999999955,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training original issue intent projection"
+                ],
+                "fullName": "Training original issue intent projection matches the complete original actor, entry basis, source, recipient, label and predecessor",
+                "status": "passed",
+                "title": "matches the complete original actor, entry basis, source, recipient, label and predecessor",
+                "duration": 1.1918840000000728,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training original issue intent projection"
+                ],
+                "fullName": "Training original issue intent projection requires the recorded predecessor id and next revision rather than accepting any active grant",
+                "status": "passed",
+                "title": "requires the recorded predecessor id and next revision rather than accepting any active grant",
+                "duration": 0.6092490000000907,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training original issue intent projection"
+                ],
+                "fullName": "Training original issue intent projection accepts an explicitly historical result without misreporting it as current or reconstructing deleted rows",
+                "status": "passed",
+                "title": "accepts an explicitly historical result without misreporting it as current or reconstructing deleted rows",
+                "duration": 5.519076000000041,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training independent old and new-target replacement revisions"
+                ],
+                "fullName": "Training independent old and new-target replacement revisions keeps the prior target id/revision and the replaced id/revision separate, rejecting incomplete or self-referencing intent",
+                "status": "passed",
+                "title": "keeps the prior target id/revision and the replaced id/revision separate, rejecting incomplete or self-referencing intent",
+                "duration": 0.854481000000078,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training independent old and new-target replacement revisions"
+                ],
+                "fullName": "Training independent old and new-target replacement revisions compares the full returned old lineage and reason, preserving an explicitly superseded original operation",
+                "status": "passed",
+                "title": "compares the full returned old lineage and reason, preserving an explicitly superseded original operation",
+                "duration": 0.9380119999998442,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training independent old and new-target replacement revisions"
+                ],
+                "fullName": "Training independent old and new-target replacement revisions recognizes only the original matching current or revoked identity header without fabricating a legacy binding",
+                "status": "passed",
+                "title": "recognizes only the original matching current or revoked identity header without fabricating a legacy binding",
+                "duration": 0.7159050000000207,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793308430421,
+            "endTime": 1793308430438.7158,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/api/standardConfigurationGrants.test.ts"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution sends the selected combination identity through the dedicated issuer API and never the legacy SCALE writer",
+                "status": "passed",
+                "title": "sends the selected combination identity through the dedicated issuer API and never the legacy SCALE writer",
+                "duration": 299.5828100000001,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution does not let a late read for another recipient populate or authorize the current selection",
+                "status": "passed",
+                "title": "does not let a late read for another recipient populate or authorize the current selection",
+                "duration": 196.15873499999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution blocks a second mutation after an uncertain outcome until the full original intent is read back",
+                "status": "passed",
+                "title": "blocks a second mutation after an uncertain outcome until the full original intent is read back",
+                "duration": 212.21013300000004,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution keeps another issuer grant visible without exposing overwrite or revoke actions",
+                "status": "passed",
+                "title": "keeps another issuer grant visible without exposing overwrite or revoke actions",
+                "duration": 60.48763400000007,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution allows readback and versioned revocation after withdrawal while refusing new assignment",
+                "status": "passed",
+                "title": "allows readback and versioned revocation after withdrawal while refusing new assignment",
+                "duration": 109.51426700000002,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution refuses incomplete or cross-configuration readback instead of writing against an empty grant list",
+                "status": "passed",
+                "title": "refuses incomplete or cross-configuration readback instead of writing against an empty grant list",
+                "duration": 90.46012800000017,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery recovers the original recipient, label and revision after closing the dialog and never substitutes current grants",
+                "status": "passed",
+                "title": "recovers the original recipient, label and revision after closing the dialog and never substitutes current grants",
+                "duration": 155.73941400000012,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery retries only after verified absence and with the complete same original body",
+                "status": "passed",
+                "title": "retries only after verified absence and with the complete same original body",
+                "duration": 212.08298799999966,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery keeps the original unknown outcome when its retry is now refused",
+                "status": "passed",
+                "title": "keeps the original unknown outcome when its retry is now refused",
+                "duration": 160.43736799999988,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original userId",
+                "status": "passed",
+                "title": "does not clear a mismatching original userId",
+                "duration": 95.70793400000002,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original configurationName",
+                "status": "passed",
+                "title": "does not clear a mismatching original configurationName",
+                "duration": 92.19214999999986,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original actorId",
+                "status": "passed",
+                "title": "does not clear a mismatching original actorId",
+                "duration": 147.46727799999962,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original expectedUseVersion",
+                "status": "passed",
+                "title": "does not clear a mismatching original expectedUseVersion",
+                "duration": 139.85142900000028,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery restores a prior revoked grant identity and reports its subsequently superseded operation as historical",
+                "status": "passed",
+                "title": "restores a prior revoked grant identity and reports its subsequently superseded operation as historical",
+                "duration": 17.090596000000005,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery keeps malformed absence and legacy results unresolved",
+                "status": "passed",
+                "title": "keeps malformed absence and legacy results unresolved",
+                "duration": 111.23772000000008,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery scopes restored state and late responses to the current live account and hides the workspace on logout",
+                "status": "passed",
+                "title": "scopes restored state and late responses to the current live account and hides the workspace on logout",
+                "duration": 87.27142100000037,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "opens the exact Training grant editor chosen by the shared C/P/R finder without issuing immediately",
+                "status": "passed",
+                "title": "opens the exact Training grant editor chosen by the shared C/P/R finder without issuing immediately",
+                "duration": 41.493005999999696,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator explicit configuration replacement"
+                ],
+                "fullName": "Training administrator explicit configuration replacement preserves the recipient and sends distinct old and target revisions after an explicit reason, without the legacy SCALE writer",
+                "status": "passed",
+                "title": "preserves the recipient and sends distinct old and target revisions after an explicit reason, without the legacy SCALE writer",
+                "duration": 130.65329399999973,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator explicit configuration replacement"
+                ],
+                "fullName": "Training administrator explicit configuration replacement retains both original revision identities after response loss and refuses a mismatching replacement reason during recovery",
+                "status": "passed",
+                "title": "retains both original revision identities after response loss and refuses a mismatching replacement reason during recovery",
+                "duration": 272.2761449999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator explicit configuration replacement"
+                ],
+                "fullName": "Training administrator explicit configuration replacement does not replace the original recipient with a different current qualified teacher when eligibility changes",
+                "status": "passed",
+                "title": "does not replace the original recipient with a different current qualified teacher when eligibility changes",
+                "duration": 165.4065700000001,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator explicit configuration replacement"
+                ],
+                "fullName": "Training administrator explicit configuration replacement keeps a precise use from another issuer read-only rather than offering replacement or takeover",
+                "status": "passed",
+                "title": "keeps a precise use from another issuer read-only rather than offering replacement or takeover",
+                "duration": 264.99742499999957,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793308430743,
+            "endTime": 1793308433805.9973,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "name": "training-replacement-frontend-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "startedAt": "2026-10-29T21:13:48.204295+00:00",
+        "finishedAt": "2026-10-29T21:14:43.861559+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "training-replacement-lint",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/eslint/bin/eslint.js",
+          "src/api/standardConfigurationGrants.ts",
+          "src/api/standardConfigurationGrants.test.ts",
+          "src/training/TrainingStandardConfigurationGrants.tsx",
+          "src/training/TrainingStandardConfigurationGrants.test.tsx",
+          "src/training/useTrainingStandardConfigurationIssue.ts"
+        ],
+        "startedAt": "2026-10-29T21:13:48.215380+00:00",
+        "finishedAt": "2026-10-29T21:13:50.083159+00:00",
+        "exitCode": 0
+      }
+    }
+  ],
+  "readbackAfterFirstFailure": {
+    "command": "psql explicit precise_training_replacement_test_20261029; BEGIN REPEATABLE READ READ ONLY; grant/task/event aggregate read; COMMIT",
+    "exitCode": 0,
+    "users": 4,
+    "grantRows": 4,
+    "grantVersions": [
+      1,
+      5,
+      3,
+      4
+    ],
+    "revokedGrantVersion": 4,
+    "tasks": 11,
+    "newTasks": {
+      "GENERAL": "PUBLISHED revision3",
+      "COURSE": "PUBLISHED revision3",
+      "waiting": "DRAFT revision2"
+    },
+    "replacementEvents": 0,
+    "risk": "No old/target replacement yet. First active target ordinary revoke and three initial tasks retained; no reset."
+  }
+}
