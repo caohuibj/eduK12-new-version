@@ -1,3 +1,5 @@
+import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
+import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
 import {freezeExactStandardScaleDefinition} from './training-standard-combination'
 import {readVerifiedEducationStart,readVerifiedCompositionStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
@@ -638,6 +640,12 @@ export const assertValidItem = async (
     }
     if (assignment.listedStandalone === false) {
       throw compositeForbidden('报告包内部认知任务不能用于仅收集综合测评')
+    }
+    const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
+    if(pin){
+     if(assignment.createdBy!==userId)throw compositeForbidden('不能使用其他接收者的固定认知配置')
+     const fixed=await loadPinnedTrainingCognitiveProfile(prisma as Prisma.TransactionClient,pin,{userId,configId:assignment.configId},true)
+     assertCognitiveAssignmentFreeze(assignment,fixed.artifact)
     }
     validateCognitiveConfig(assignment.config)
     if (role !== UserRole.ADMIN && assignment.createdBy !== userId) {
@@ -1285,6 +1293,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
           title: assignment.title || assignment.config.name,
           instruction: assignment.instruction ?? assignment.config.instruction ?? null,
           sourceFreeze: {
+            ...(readTrainingCognitiveTaskBinding(assignment.courseSnapshot)?{selectedCognitiveProfile:readTrainingCognitiveTaskBinding(assignment.courseSnapshot)!}:{}),
             profile: assignment.profile ?? null,
             profileDefinitionVersion: assignment.profileDefinitionVersion ?? null,
             resolvedConfigSnapshotEncrypted: assignment.resolvedConfigSnapshotEncrypted ?? null,
@@ -2018,6 +2027,12 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
       if (!['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind) && !composite.reportPackageKey && item.cognitiveAssignment.listedStandalone === false) {
         throw compositeBadRequest('报告包内部认知任务不能用于仅收集综合测评')
       }
+      const pin=readTrainingCognitiveTaskBinding(item.cognitiveAssignment.courseSnapshot)
+      if(pin){
+       if(item.cognitiveAssignment.createdBy!==userId)throw compositeForbidden('不能发布其他接收者的固定认知配置')
+       const fixed=await loadPinnedTrainingCognitiveProfile(prisma as Prisma.TransactionClient,pin,{userId,configId:item.cognitiveAssignment.configId},true)
+       assertCognitiveAssignmentFreeze(item.cognitiveAssignment,fixed.artifact)
+      }
       validateCognitiveConfig(item.cognitiveAssignment.config, true)
     }
     if (item.type === 'SITUATIONAL') {
@@ -2462,11 +2477,14 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   if (!assignment || !config) throw compositeBadRequest('认知任务配置不存在')
   const anonymous = !userId
   const sessionConfig = prepared ? prepared.snapshot.config : resolvedCompositeCognitiveConfig(assignment)
+  const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
+  const fixed=!prepared&&pin?await loadPinnedTrainingCognitiveProfile(db as Prisma.TransactionClient,pin,{userId:assignment.createdBy,configId:config.id},false):null
+  if(fixed)assertCognitiveAssignmentFreeze(assignment,fixed.artifact)
   const unifiedSnapshot = runtimeReference && prepared ? {encrypted:runtimeReference,compiledRuntime:prepared.compiledRuntime} : prepared
     ? await cognitiveSessionService.persistPreparedUnifiedCognitiveSessionConfigSnapshot(prepared, db)
     : attempt.runtimeGeneration === 'UNIFIED_V1'
       ? await cognitiveSessionService.createUnifiedCognitiveSessionConfigSnapshot({db, testType:config.testType,
-          configVersion:config.configVersion,engineVersion:config.engineVersion,scoringVersion:config.scoringVersion,config:sessionConfig})
+          configVersion:config.configVersion,engineVersion:config.engineVersion,scoringVersion:config.scoringVersion,config:sessionConfig,...(fixed?{frozenProfile:fixed.artifact}:{})})
       : null
   const configSnapshotEncrypted = unifiedSnapshot?.encrypted ?? cognitiveSessionService.createCognitiveSessionConfigSnapshot({
     testType: config.testType,
@@ -2936,6 +2954,9 @@ const createAttempt = async (
         assertCognitiveModuleEnabled()
         const assignment=item.cognitiveAssignment
         const config=assignment.config
+        const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
+        const fixed=pin?await loadPinnedTrainingCognitiveProfile(db as Prisma.TransactionClient,pin,{userId:assignment.createdBy,configId:config.id},true):null
+        if(fixed)assertCognitiveAssignmentFreeze(assignment,fixed.artifact)
         if (composite.deliveryCourseId) prepared.assignments.set(item.id, await prepareTeacherPublishedAssignment(db, {
           userId:assignment.createdBy,courseId:composite.deliveryCourseId,configId:assignment.configId,
           title:assignment.title,instruction:assignment.instruction??null,
@@ -2946,7 +2967,7 @@ const createAttempt = async (
         }))
         prepared.cognitive.set(item.id, await cognitiveSessionService.prepareUnifiedCognitiveSessionConfigSnapshot({
           db,testType:config.testType,configVersion:config.configVersion,engineVersion:config.engineVersion,
-          scoringVersion:config.scoringVersion,config:resolvedCompositeCognitiveConfig(item.cognitiveAssignment),
+          scoringVersion:config.scoringVersion,config:resolvedCompositeCognitiveConfig(item.cognitiveAssignment),...(fixed?{frozenProfile:fixed.artifact}:{}),
         }))
       }
     }

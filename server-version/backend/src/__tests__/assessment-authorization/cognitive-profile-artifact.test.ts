@@ -29,7 +29,8 @@ describe('exact cognitive profile content before recipient authorization',()=>{
   expect(short.resolvedConfig.totalTrials).toBe(8);expect(research.resolvedConfig.totalTrials).toBe(60)
   expect(cognitiveProfileArtifactHash(short)).not.toBe(cognitiveProfileArtifactHash(research))
   expect(short.identity.resolvedConfigHash).not.toBe(research.identity.resolvedConfigHash)
-  expect(Object.keys(short).sort()).toEqual(['identity','protocol','resolvedConfig','resolvedReport','schemaVersion'])
+  expect(Object.keys(short).sort()).toEqual(['execution','identity','protocol','resolvedConfig','resolvedReport','schemaVersion'])
+  expect(short.execution?.compiledRuntime.instrumentType).toBe('COGNITIVE');expect(short.execution?.compiledRuntime.scorerVersion).toBe('1.0.0')
   for(const field of ['randomSeed','seed','issuerId','recipientId','authorization','attemptId']){
    expect(short).not.toHaveProperty(field);expect(short.resolvedConfig).not.toHaveProperty(field)
   }
@@ -92,5 +93,15 @@ describe('exact cognitive profile content before recipient authorization',()=>{
   expect(()=>buildCognitiveProfileArtifact({...input(),profile:'unregistered' as 'experience'})).toThrow()
   const value=artifact(),wrong={...value.identity,configVersion:'latest'}
   expect(()=>readCognitiveProfileArtifact(value,wrong)).toThrow('EXPECTED_IDENTITY_MISMATCH')
+ })
+ it('retains v1 content-only records without upgrading them from current definitions, and rejects forged v2 execution',()=>{
+  const original=artifact(),{execution,...body}=structuredClone(original),legacy={...body,schemaVersion:1}
+  const restored=readCognitiveProfileArtifact(legacy,original.identity)
+  expect(restored.schemaVersion).toBe(1);expect(restored.execution).toBeUndefined()
+  expect(cognitiveProfileArtifactHash(restored)).not.toBe(cognitiveProfileArtifactHash(original))
+  const changed=structuredClone(original);changed.execution!.compiledRuntime.scorerVersion='9.0.0'
+  expect(()=>readCognitiveProfileArtifact(changed)).toThrow()
+  const missing=structuredClone(original);delete missing.execution
+  expect(()=>readCognitiveProfileArtifact(missing)).toThrow()
  })
 })

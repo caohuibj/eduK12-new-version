@@ -36,6 +36,8 @@ import {selectedReferenceChanges,type SelectedReferenceAudit} from '../assessmen
 import {listTrainingStandardCombinationChoices} from '../measurement-content/standard-combination-use'
 import { situationalReleaseKey, listSituationalResourceSummaries } from '../situational/situational-release.service'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../cognitive/profile-freeze'
+import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
+import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { z } from 'zod'
 
@@ -491,6 +493,9 @@ async function prepareOwnedCognitiveMeasurements(tx:Tx,actor:Actor,row:any) {
   const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
     for (const item of row.items) {
       const copiedBinding = copiedCognitiveBinding(item, row)
+      const fixedPin=item.type==='COGNITIVE'?readTrainingCognitiveTaskBinding(item.cognitiveAssignment?.courseSnapshot):null
+      const precise=fixedPin?await loadPinnedTrainingCognitiveProfile(tx,fixedPin,{userId:actor.userId,configId:item.cognitiveAssignment.configId},true):null
+      if(precise)assertCognitiveAssignmentFreeze(item.cognitiveAssignment,precise.artifact)
       if (item.type === 'COGNITIVE' && !copiedBinding) {
         const source = item.cognitiveAssignment
         const entry = requireCognitiveRegistryEntry(source.config.testType, source.config.engineVersion, source.config.scoringVersion)
@@ -503,11 +508,14 @@ async function prepareOwnedCognitiveMeasurements(tx:Tx,actor:Actor,row:any) {
           configId: source.configId, createdBy: actor.userId, title: source.title, instruction: source.instruction,
           status: 'PUBLISHED', publishedAt: new Date(), listedStandalone: false, required: false, ...freeze,
           quotaSourceAssignmentId: source.createdBy === actor.userId ? source.quotaSourceAssignmentId ?? source.id : null, maxAttempts: source.maxAttempts,
+          ...(precise?{courseSnapshot:{selectedCognitiveProfile:fixedPin,selectedCognitiveConfigurationName:precise.configurationName}}:{}),
         } })
         await tx.compositeAssessmentItem.update({ where: { id: item.id }, data: { cognitiveAssignmentId: binding.id } })
-        await publishAssignmentMeasurementRelease(tx,actor.userId,binding.id)
+        if(precise)await publishAssignmentMeasurementRelease(tx,actor.userId,binding.id,precise.artifact)
+        else await publishAssignmentMeasurementRelease(tx,actor.userId,binding.id)
       } else if (item.type==='COGNITIVE') {
-        await publishAssignmentMeasurementRelease(tx,actor.userId,item.cognitiveAssignment.id)
+        if(precise)await publishAssignmentMeasurementRelease(tx,actor.userId,item.cognitiveAssignment.id,precise.artifact)
+        else await publishAssignmentMeasurementRelease(tx,actor.userId,item.cognitiveAssignment.id)
       }
     }
   return expiry
@@ -738,6 +746,9 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
       for (const item of composite!.items) {
         if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, placeholder: item.formPlaceholder ?? null } as any)
         const { id: _id, compositeAssessmentId: _parent, cognitiveAssignment, ...data } = item
+        const fixedCognitivePin=cognitiveAssignment?readTrainingCognitiveTaskBinding(cognitiveAssignment.courseSnapshot):null
+        const preciseCognitive=fixedCognitivePin?await loadPinnedTrainingCognitiveProfile(tx,fixedCognitivePin,{userId:actor.userId,configId:cognitiveAssignment!.configId},true):null
+        if(preciseCognitive)assertCognitiveAssignmentFreeze(cognitiveAssignment!,preciseCognitive.artifact)
         if (cognitiveAssignment?.listedStandalone === false) {
           const binding = await tx.cognitiveAssignment.create({ data: {
             configId: cognitiveAssignment.configId, createdBy: actor.userId, title: cognitiveAssignment.title,
@@ -749,6 +760,7 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
             resolvedReportSnapshotEncrypted: cognitiveAssignment.resolvedReportSnapshotEncrypted,
             maxAttempts: cognitiveAssignment.maxAttempts,
             quotaSourceAssignmentId: cognitiveAssignment.createdBy === actor.userId ? cognitiveAssignment.quotaSourceAssignmentId ?? cognitiveAssignment.id : null,
+            ...(preciseCognitive?{courseSnapshot:{selectedCognitiveProfile:fixedCognitivePin,selectedCognitiveConfigurationName:preciseCognitive.configurationName}}:{}),
           } })
           data.cognitiveAssignmentId = binding.id
         }

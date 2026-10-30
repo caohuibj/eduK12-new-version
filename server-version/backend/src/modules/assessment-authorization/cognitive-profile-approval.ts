@@ -14,7 +14,7 @@ export const cognitiveProfileApprovalInput=z.object({requestId:id,expectedArtifa
  allowedProducts:z.array(z.enum(['TRAINING','SURVEY','SCHOOL','TEACHER'])).min(1).max(4),reason:z.string().trim().min(1).max(1000)}).strict()
 export const cognitiveProfileApprovalReceipt=z.object({schemaVersion:z.literal(1),requestIntentHash:hash,artifactHash:hash,
  configuration:selectedConfigurationSchema.options[1],allowedProducts:cognitiveProfileApprovalInput.shape.allowedProducts,
- reason:cognitiveProfileApprovalInput.shape.reason}).strict()
+ reason:cognitiveProfileApprovalInput.shape.reason,artifactFormatVersion:z.union([z.literal(1),z.literal(2)]).optional()}).strict()
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000}
 async function assertSystem(tx:Prisma.TransactionClient,actorId:string,proof?:AdminSessionProof,requireProof=false){
  const [actor]=await tx.$queryRaw<Array<{id:string;tokenVersion:number}>>`SELECT id,token_version AS "tokenVersion" FROM users
@@ -53,7 +53,7 @@ export async function approveCognitiveProfile(actorId:string,configId:string,raw
   const saved=await saveCognitiveProfileArtifact(source.artifact,publicTemplatesForDatabase(tx))
   await approveCognitiveProfileEntryPolicies(tx,cognitiveProfilePolicyIdentity(configId,selected,saved.artifactHash),products,actorId,input.reason)
   await tx.assessmentManagementEvent.create({data:{id:input.requestId,actorId,resourceId:configId,action:'COGNITIVE_PROFILE_APPROVED',
-   metadata:{schemaVersion:1,requestIntentHash:intentHash,artifactHash:saved.artifactHash,configuration:saved.identity,allowedProducts:products,reason:input.reason}}})
+   metadata:{schemaVersion:1,requestIntentHash:intentHash,artifactHash:saved.artifactHash,configuration:saved.identity,artifactFormatVersion:source.artifact.schemaVersion,allowedProducts:products,reason:input.reason}}})
   return {requestId:input.requestId,artifactHash:saved.artifactHash,allowedProducts:products,replayed:false,changed:true}
  },options)
 }
