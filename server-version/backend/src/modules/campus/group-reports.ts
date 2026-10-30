@@ -13,6 +13,10 @@ import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail, type ReportingCohortSnapshotRecord, type ReportingLeafSourceV2 } from '../reporting/types'
 import { withCampusReportReleaseLock } from './report-release-lock'
 import { unsafeComparableGeneralOverlapCounts } from './generalGroupV2.differencing'
+import {readFrozenPrivacyForRun} from '../report-privacy/snapshot.service'
+import {ENHANCED} from '../report-privacy/registry'
+import {parseFrozenSchoolOptions} from './privacyV2'
+import {projectCampusGeneralGroupV2} from './generalGroupV2.projection'
 
 /** PR5 first tranche: INTERNAL school-only, whole frozen SELF/STUDENT Run.
  * This route never publishes peer/teacher ratings or longitudinal comparisons.
@@ -270,6 +274,36 @@ export function projectCampusLeafGroupReport(input:{artifactId:string;generatedA
   }}
 }
 
+/** Both new and historical leaf reads use the existing frozen privacy policy.
+ * A legacy Run keeps its strict projection; selecting a leaf is not a policy reset. */
+export async function projectCampusLeafGroupWithPolicy(input:Parameters<typeof projectCampusLeafGroupReport>[0]&{
+  organizationId:string;runId:string
+},leaf:ReportingLeafSourceV2){
+  const frozen=await readFrozenPrivacyForRun(prisma,{organizationId:input.organizationId,runId:input.runId,
+    product:'HUISCHOOL',scenario:['SCHOOL_GENERAL_EDUCATION_GROUP','SCHOOL_SENSITIVE_WELLBEING_GROUP']})
+  let options=ENHANCED
+  if(frozen.mode==='FROZEN_V1'){
+    if(frozen.scenario!=='SCHOOL_GENERAL_EDUCATION_GROUP'&&frozen.scenario!=='SCHOOL_SENSITIVE_WELLBEING_GROUP')hidden()
+    options=parseFrozenSchoolOptions(frozen.effective,frozen.scenario)
+  }
+  const report=projectCampusLeafGroupReport(input,leaf)
+  const safe=projectCampusGeneralGroupV2({artifactId:input.artifactId,projection:input.projection,options,
+    minimumN:CAMPUS_GROUP_MIN_N,metricMinimums:Object.fromEntries(report.projection.metrics
+      .map(metric=>[metric.key,Math.max(CAMPUS_GROUP_MIN_N,input.metricMetadata?.[metric.key]?.minimumN??0)]))})
+  report.projection.completedN=safe.completedN
+  report.projection.assignedN=safe.participantN
+  report.projection.metrics=report.projection.metrics.map(metric=>{
+    const approved=safe.metrics[metric.key]
+    const present=metric.state==='present'&&!!approved
+    return {...metric,state:present?'present' as const:'suppressed' as const,
+      validN:present?approved.validN??null:null,missingN:present?approved.missingN??null:null,
+      mean:present?approved.mean:null,sdSample:present?approved.sdSample??null:null,
+      observedRange:null,frequencies:[],distributionSuppressed:false}
+  })
+  report.projection.limitations.push('人数、统计精度和可见项目遵循任务发布时冻结的披露政策；旧任务延续受限摘要。')
+  return report
+}
+
 async function reviewedSpec(specId:string){
   const spec=await getPublishedReportingSpec(specId)
   if(spec.definition.analysisKind!=='GROUP'){
@@ -350,7 +384,7 @@ export async function generateCampusGroupReport(input:{
     })
     if(!input.leaf)await assertCampusNoGroupDifferencing(input)
     await requireCampusGroupManager(input.actor,input.organizationId)
-    if(input.leaf)return projectCampusLeafGroupReport(authorized,input.leaf)
+    if(input.leaf)return projectCampusLeafGroupWithPolicy({...authorized,organizationId:input.organizationId,runId:input.runId},input.leaf)
     return projectCampusGroupReport(authorized)
   })
 }
@@ -401,7 +435,7 @@ export async function readCampusGroupReport(input:{
       organizationId:input.organizationId,runId:target[0].runId,trackId:target[0].trackId,
     })
     await requireCampusGroupManager(input.actor,input.organizationId)
-    if(leaf)return projectCampusLeafGroupReport(report,leaf)
+    if(leaf)return projectCampusLeafGroupWithPolicy({...report,organizationId:input.organizationId,runId:target[0].runId},leaf)
     return projectCampusGroupReport(report)
   })
 }

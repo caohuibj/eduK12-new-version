@@ -66,12 +66,12 @@ export function generalRunApproved(input:{
     &&exactOne(track.perspectives,'SELF_REPORT')
     &&track.analysisMode==='COHORT_AGGREGATE')
 }
-export function parseFrozenSchoolOptions(input:unknown):PrivacyOptions {
+export function parseFrozenSchoolOptions(input:unknown,scenario:'SCHOOL_GENERAL_EDUCATION_GROUP'|'SCHOOL_SENSITIVE_WELLBEING_GROUP'='SCHOOL_GENERAL_EDUCATION_GROUP'):PrivacyOptions {
   if(!input||typeof input!=='object'||Array.isArray(input))
     throw new Error('CAMPUS_GENERAL_POLICY_INVALID')
   const val=input as Record<string,unknown>
   if(val.schemaVersion!==1||val.product!=='HUISCHOOL'
-    ||val.scenario!=='SCHOOL_GENERAL_EDUCATION_GROUP'
+    ||val.scenario!==scenario
     ||val.source!=='APPROVED_REPORT_PREFERENCE_V1')
     throw new Error('CAMPUS_GENERAL_POLICY_INVALID')
   return privacyOptionsSchema.parse(val.options)
