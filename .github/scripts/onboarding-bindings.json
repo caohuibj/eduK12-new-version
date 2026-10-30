@@ -197,7 +197,7 @@
     "414": {
       "schemaVersion": 1,
       "pr": 414,
-      "enabled": false,
+      "enabled": true,
       "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
       "product": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
       "controlCheckpoint": "880223ffdd8092731438b0b25ec27dd8f03ab3d3",
@@ -428,6 +428,10 @@
         "docs/evidence/group-report-school-20261030/main55-source-diff.raw": {
           "before": null,
           "after": "5965fe51febf73c42f0b40c68ad97e8b160cc450"
+        },
+        "docs/evidence/group-report-school-20261030/mainfa/activation-preparation.json": {
+          "before": null,
+          "after": "d4ad21ceed034a2e50a5162215b316fd35220448"
         },
         "docs/evidence/group-report-school-20261030/mainfa/backend-types.json": {
           "before": null,
@@ -666,7 +670,7 @@
           "after": "24f7d521a70de4e058f382a62623cd1039045d49"
         }
       },
-      "activationNote": "Exact mainfa School source/control/evidence preparation; candidate disabled pending final actual source binding check, designated checklist and live PR identity before activation. Two new source cases and one control case only, original41 observations read without business replay; both current combined component compilers passed. No new workflow, merge or deployment."
+      "activationNote": "Specific PR414 base/main, Ready and scoped formal-CI confirmation received. Actual mainfa/source10b merge preview matched its source tree before final metadata binding. Existing exact route only;41 original observations and unchanged current component receipts admitted without business/PG replay. Hui checklist remapping uses Git/local record per latest instruction and adds no new gate. No merge or deployment authorization."
     },
     "393": {
       "schemaVersion": 1,
