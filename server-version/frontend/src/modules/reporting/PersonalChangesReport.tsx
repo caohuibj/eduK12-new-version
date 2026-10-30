@@ -5,7 +5,7 @@ import {toPersonalChangesTrend,type PersonalChangesMetric} from './longitudinalV
 export type PersonalChangesResponse={status:'NOT_CONFIGURED'|'WAITING'|'AVAILABLE';reportId?:string;generatedAt?:string;
   metrics?:PersonalChangesMetric[];note?:string}
 const signed=(n:number)=>n>0?'+'+n:String(n)
-const missing:Record<string,string>={NOT_COMPLETED:'本轮未完成',NOT_DISCLOSED:'本轮暂不提供本人指标',NOT_COMPARABLE:'测量定义不可比',INVALID_OR_MISSING:'指标无效或缺失'}
+const missing:Record<string,string>={NOT_COMPLETED:'本轮未完成',NOT_EXECUTED:'本轮未呈现此工具',PENDING_RELEASE:'本轮指标尚未开放',NOT_DISCLOSED:'本轮暂不提供本人指标',NOT_COMPARABLE:'测量定义不可比',INVALID_OR_MISSING:'指标无效或缺失'}
 function Metric({metric}:{metric:PersonalChangesMetric}){
   const model=useMemo(()=>toPersonalChangesTrend(metric),[metric])
   return <article className="min-w-0 space-y-3 rounded-xl border p-3">

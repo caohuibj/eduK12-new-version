@@ -7,9 +7,9 @@ import {createServer as createViteServer} from 'vite'
 import type {Server} from 'node:http'
 import {PrismaClient} from '@prisma/client'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
-import {createDraft,updateDraft} from '../../modules/survey/builder.service'
+import {createDraft,updateDraft,reviseDraft} from '../../modules/survey/builder.service'
 import {publishSurveyMeasurementDraft} from '../../modules/survey/measurement-publication.service'
-import {createWave,createNextWave,getWave,updateWave} from '../../modules/survey/waves.service'
+import {createWave,createNextWave,getWave,updateWave,preflightWave} from '../../modules/survey/waves.service'
 import {prepareWave,openWave} from '../../modules/survey/waves.publish'
 import {joinLinkedStudy,startLinkedWave} from '../../modules/survey/admission.service'
 import {getOwnResearchTask} from '../../modules/survey/task.public'
@@ -163,5 +163,45 @@ suite('Survey personal tracking real publication/FINAL/HTTP loop',()=>{
     await expect(db.$executeRaw`UPDATE survey_waves SET longitudinal_source_wave_id=NULL WHERE id=${next.id}`).rejects.toThrow('Published personal tracking source is immutable')
     expect((await db.surveyProject.findUniqueOrThrow({where:{id:first.projectId}})).longitudinalPlan).toEqual(first.project.longitudinalPlan)
   })
+
+  it('inherits frozen tracked C after the same source draft is revised, while untracked Form edits remain current',async()=>{
+    const scaleId=uuid(),formId=uuid(),scaleKey=key(),formKey=key()
+    const definition={schemaVersion:1,respondentType:'participant_self_report',aggregation:'mean',
+      responseOptions:[{optionKey:'zero',label:'0',score:0},{optionKey:'one',label:'1',score:1}],dimensions:[{dimensionKey:'total',label:'总分',direction:'descriptive'}],
+      items:[{itemKey:'original',prompt:'T1原题',required:true,reverse:false,dimensionKeys:['total']}]}
+    await createDraft(owner,projectId,{requestId:scaleId,instrumentKey:scaleKey,kind:'SCALE',title:'冻结A'})
+    await updateDraft(owner,projectId,scaleId,{revision:0,title:'冻结A',definition})
+    await publishSurveyMeasurementDraft(owner,projectId,scaleId,1)
+    const formDefinition={schemaVersion:1,pages:[{pageKey:'page',title:'说明',questions:[{itemKey:'note',type:'SHORT_TEXT',prompt:'旧说明',required:false,options:[],rows:[]}]}]}
+    await createDraft(owner,projectId,{requestId:formId,instrumentKey:formKey,kind:'FORM',title:'可改D'})
+    await updateDraft(owner,projectId,formId,{revision:0,title:'可改D',definition:formDefinition})
+    const consent='通过原始研究编号关联不同轮次，自愿参加，本例只验证固定追踪测量来源与非追踪内容的独立修改。'
+    const first=await createWave(owner,projectId,{requestId:uuid(),title:'固定来源T1',consentText:consent,instrumentIds:[scaleId,formId],linkageNoticeConfirmed:true})
+    await prepareWave(owner,projectId,first.id,0,undefined,[{instrumentId:scaleId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['total'],release:'AFTER_FINAL'}}],
+      {mode:'LONGITUDINAL',metrics:[{instrumentId:scaleId,scoreKey:'total'}]})
+    const source=await getWave(owner,projectId,first.id)
+    const opened=await openWave(owner,projectId,first.id,source.revision)
+    await reviseDraft(owner,projectId,scaleId,1)
+    await updateDraft(owner,projectId,scaleId,{revision:2,title:'工具库新版A',definition:{...definition,responseOptions:definition.responseOptions.map(o=>({...o,score:o.score*9})),items:[{...definition.items[0],itemKey:'changed',prompt:'新版题目'}]}})
+    await updateDraft(owner,projectId,formId,{revision:1,title:'新版D',definition:{...formDefinition,pages:[{...formDefinition.pages[0],title:'新说明'}]}})
+    const next=await createNextWave(owner,projectId,first.id,uuid())
+    expect(next.inheritedTrackingUnits?.find(u=>u.id===scaleId)?.definition).toMatchObject({items:[{itemKey:'original',prompt:'T1原题'}]})
+    expect((await preflightWave(owner,projectId,next.id)).ok).toBe(true)
+    await prepareWave(owner,projectId,next.id,0)
+    const finalWave=await getWave(owner,projectId,next.id)
+    await openWave(owner,projectId,next.id,finalWave.revision)
+    const publication=await db.surveyPublication.findUniqueOrThrow({where:{id:finalWave.publicationId!}})
+    const frozen=publication.compiledSnapshot as any
+    expect(frozen.units.find((u:any)=>u.draftId===scaleId).displayDefinition.items[0].itemKey).toBe('original')
+    expect(frozen.units.find((u:any)=>u.draftId===formId).displayDefinition.pages[0].title).toBe('新说明')
+    // Read the actual task through a new participant admitted to T1, then T2.
+    const joined=await joinLinkedStudy({publicId:opened.publicId,waveId:first.id,entryToken:opened.entrySecret,consent:true,consentVersion:1})
+    const proof={researchCode:joined.researchCode,accessCredential:joined.accessCredential}
+    const attempt=await startLinkedWave({publicId:opened.publicId,waveId:next.id,...proof,consent:true,consentVersion:1})
+    await submitResearchFinal({publicId:opened.publicId,attemptId:attempt.attemptId,...proof,submissionId:uuid(),answers:{[scaleKey]:{original:'one'},[formKey]:{}}})
+    const general=await readGeneralForOwnAttempt({publicId:opened.publicId,attemptId:attempt.attemptId,...proof})
+    expect(general).toMatchObject({kind:'DESCRIPTIVE',measurements:[{metrics:[{key:'total',value:1}]}]})
+    expect((await db.surveyInstrumentDraft.findUniqueOrThrow({where:{id:scaleId}})).definition).toMatchObject({items:[{itemKey:'changed'}]})
+  },30000)
 
 })

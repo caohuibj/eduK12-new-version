@@ -1,3 +1,4 @@
+import {inheritedSurveyTrackingUnit} from '../../modules/survey/tracking-source'
 import {describe,it,expect} from 'vitest'
 import {randomUUID} from 'node:crypto'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
@@ -30,6 +31,19 @@ describe('Personal exact raw-score changes',()=>{
     expect(report.metrics[1].points.map(p=>p.value)).toEqual([10,null,null])
     expect(report.metrics[1].adjacent.map(p=>p.delta)).toEqual([null,null])
     expect(()=>projectPersonalChanges(plan,waves,[row(1,0,0),{...row(2,1,1),scopedSubjectId:'different-person'}])).toThrow('one scoped subject')
+  })
+  it('retains wholly missing disclosed metrics and separates release timing from authorization',()=>{
+    const first=row(1,0,null),second=row(2,1,null)
+    const hidden={...plan.metrics[1],id:'private',label:'不可见指标'}
+    for(const r of [first,second])r.metrics.private={value:999,visible:false,measurementHash:hash,unit:'points'}
+    const report=projectPersonalChanges({...plan,metrics:[...plan.metrics,hidden]},waves.slice(0,2),[first,second])
+    expect(report.status).toBe('AVAILABLE')
+    expect(report.metrics.map(m=>m.id)).toEqual(['A-total','B-total'])
+    expect(report.metrics[1].points.map(p=>p.missingReason)).toEqual(['INVALID_OR_MISSING','INVALID_OR_MISSING'])
+    for(const r of [first,second]){r.metrics['B-total'].pending=true;r.metrics['B-total'].value=123}
+    const pending=projectPersonalChanges(plan,waves.slice(0,2),[first,second])
+    expect(pending.metrics[1].points.map(p=>p.value)).toEqual([null,null])
+    expect(pending.metrics[1].points.map(p=>p.missingReason)).toEqual(['PENDING_RELEASE','PENDING_RELEASE'])
   })
   it('does not bridge a missing T2; baseline-to-T3 stays possible',()=>{
     const report=projectPersonalChanges(plan,waves,[row(1,1,1),row(3,3,3)])
@@ -97,6 +111,32 @@ describe('Frozen Survey tracking plan and leaf identity',()=>{
       snapshot,result:{schemaVersion:1,definitionDigest:hash,units:[result]},collectionClosed:true})
     expect(leaf.metrics.hit.value).toBeNull()
     expect(leaf.metrics.hit.visible).toBe(true)
+  })
+  it('keeps raw-score disclosure eligibility when values are invalid, absent, unreached or not yet released',()=>{
+    const u=unit('B');u.longitudinalMetricKeys=['total']
+    const result={instrumentKey:u.instrumentKey,kind:u.kind,sourceDigest:u.sourceDigest,scoringDigest:u.scoringDigest,rawAnswers:{},missing:[],
+      privateScoring:{scores:[{key:'total',value:null,status:'not_calculable'}],quality:{status:'invalid'}}}
+    const snapshot={units:[u],longitudinal:{planId:plan.id,metrics:[{metricId:'B-total',draftId:u.draftId,instrumentKey:'B',scoreKey:'total',measurementHash:hash,unit:'points'}]}} as ResearchFrozenPublication
+    const read=(closed:boolean,notExecuted=false)=>surveyPersonalLeaf({scopedSubjectId:'subject',waveId:'t1',ordinal:1,attemptId:'a',resultId:'r',completedAt:new Date().toISOString(),sourceHash:hash,
+      snapshot,result:{schemaVersion:1,definitionDigest:hash,units:[{...result,...(notExecuted?{notExecuted:true as const}:{})}]},collectionClosed:closed}).metrics['B-total']
+    expect(read(true)).toMatchObject({visible:true,pending:false,value:null})
+    u.participantFeedback!.release='AFTER_COLLECTION'
+    expect(read(false)).toMatchObject({visible:true,pending:true,value:null})
+    result.privateScoring.scores=[]
+    expect(read(true)).toMatchObject({visible:true,pending:false,value:null})
+    expect(read(true,true)).toMatchObject({visible:true,value:null,missingReason:'NOT_EXECUTED'})
+    u.sourceProvenance={reportConfigured:false}
+    expect(read(true).visible).toBe(false)
+  })
+  it('inherits every required slot of a tracked fixed Bundle without cloning or mutating its source',()=>{
+    const a=unit('A'),b=unit('B'),source={units:[a,b],longitudinal:{planId:plan.id,metrics:[{metricId:'a',draftId:a.draftId,instrumentKey:'A',scoreKey:'total',measurementHash:hash,unit:'points'}]},
+      governedPackages:[{family:'BUNDLE',slots:[{draftId:a.draftId},{draftId:b.draftId}]}]} as ResearchFrozenPublication
+    const inherited=inheritedSurveyTrackingUnit(source,{id:b.draftId,instrumentKey:'B'})!
+    expect(inherited).toEqual(b)
+    inherited.title='local change'
+    expect(b.title).toBe('B')
+    expect(inheritedSurveyTrackingUnit({...source,governedPackages:[]},{id:b.draftId,instrumentKey:'B'})).toBeUndefined()
+    expect(()=>inheritedSurveyTrackingUnit(source,{id:a.draftId,instrumentKey:'A',catalogGrantId:'other-grant'})).toThrow('来源授权不一致')
   })
   it('C identity excludes report wording and P/R selections, while preserving item/scoring definitions',()=>{
     const d={id:randomUUID(),instrumentKey:'scale',kind:'SCALE',title:'量表',revision:1,definition:{schemaVersion:1,respondentType:'participant_self_report',aggregation:'mean',

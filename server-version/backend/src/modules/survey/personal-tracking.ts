@@ -4,8 +4,8 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {personalTrackingPlanSchema,type PersonalTrackingPlan,type PersonalLeafResult} from '../reporting/personal-tracking'
 import type {ResearchFrozenUnit,ResearchFrozenPublication} from './publication.service'
 import type {SurveyComputedFinal} from './final.compute'
-import {rawParticipantFeedback} from './participant-feedback'
-import {cognitiveParticipantFeedback} from './measurement.result'
+import {rawParticipantFeedback,surveyRawMetricDisclosure} from './participant-feedback'
+import {cognitiveParticipantFeedback,surveyCognitiveMetricDisclosure} from './measurement.result'
 import {SurveyWaveError} from './waves.service'
 import type {FormDraft} from './builder.definition'
 
@@ -68,7 +68,7 @@ export function freezeSurveyTracking(input:{projectId:string;waveId:string;ordin
 export function surveyPersonalLeaf(input:{scopedSubjectId:string;waveId:string;ordinal:number;attemptId:string;resultId:string;
   completedAt:string;sourceHash:string;snapshot:ResearchFrozenPublication;result:SurveyComputedFinal;collectionClosed:boolean}):PersonalLeafResult{
   const metrics:PersonalLeafResult['metrics']={}
-  const publicByUnit=new Map<string,Map<string,number|null>>()
+  const publicByUnit=new Map<string,{values:Map<string,number|null>;keys:readonly string[];pending:boolean}>()
   for(const binding of input.snapshot.longitudinal?.metrics??[]){
     const unit=input.snapshot.units.find(u=>u.draftId===binding.draftId&&u.instrumentKey===binding.instrumentKey)
     const matches=input.result.units.filter(r=>r.instrumentKey===binding.instrumentKey)
@@ -76,16 +76,18 @@ export function surveyPersonalLeaf(input:{scopedSubjectId:string;waveId:string;o
     const result=matches[0]
     if(result.kind!==unit!.kind||result.sourceDigest!==unit!.sourceDigest||result.scoringDigest!==unit!.scoringDigest)fail('纵向结果与冻结工具身份不一致')
     if(!publicByUnit.has(unit!.instrumentKey)){
+      const disclosure=unit!.kind==='COGNITIVE'?surveyCognitiveMetricDisclosure(unit!,input.collectionClosed):surveyRawMetricDisclosure(unit!,input.collectionClosed)
+      const keys=disclosure?('keys' in disclosure?disclosure.keys:disclosure.policy.metricKeys):[]
       const feedback=unit!.kind==='COGNITIVE'?cognitiveParticipantFeedback(unit!,result,input.collectionClosed):rawParticipantFeedback(unit!,result,input.collectionClosed)
-      publicByUnit.set(unit!.instrumentKey,new Map(feedback&&!feedback.pending?feedback.metrics.map(m=>[m.key,feedback.quality==='interpretable'?m.value:null]):[]))
+      publicByUnit.set(unit!.instrumentKey,{keys,pending:disclosure?.pending??false,values:new Map(feedback&&!feedback.pending?feedback.metrics.map(m=>[m.key,feedback.quality==='interpretable'?m.value:null]):[])})
     }
     const disclosed=publicByUnit.get(unit!.instrumentKey)!
-    const visible=unit!.longitudinalMetricKeys?.includes(binding.scoreKey)===true&&disclosed.has(binding.scoreKey)
+    const visible=unit!.longitudinalMetricKeys?.includes(binding.scoreKey)===true&&disclosed.keys.includes(binding.scoreKey)
     const privateResult=result.privateScoring as {scores?:Array<{key:string;value:number|null;status:string}>;metrics?:Array<{key:string;value:number|null;status:string}>;quality?:{status:string}}|null
     const internal=result.notExecuted?null:unit!.kind==='FORM'?result.rawAnswers[binding.scoreKey]:unit!.kind==='COGNITIVE'?
       result.measurement?.quality.status==='interpretable'?result.measurement.metrics.find(m=>m.key===binding.scoreKey&&m.status==='OK')?.value:null:
       privateResult?.quality?.status==='interpretable'?(privateResult.scores??privateResult.metrics??[]).find(m=>m.key===binding.scoreKey&&m.status==='calculated')?.value:null
-    metrics[binding.metricId]={visible,value:visible?disclosed.get(binding.scoreKey)??null:typeof internal==='number'&&Number.isFinite(internal)?internal:null,
+    metrics[binding.metricId]={visible,pending:disclosed.pending,...(result.notExecuted?{missingReason:'NOT_EXECUTED' as const}:{}),value:visible&&!disclosed.pending?disclosed.values.get(binding.scoreKey)??null:typeof internal==='number'&&Number.isFinite(internal)?internal:null,
       measurementHash:binding.measurementHash,unit:binding.unit}
   }
   return {scopedSubjectId:input.scopedSubjectId,waveId:input.waveId,ordinal:input.ordinal,attemptId:input.attemptId,

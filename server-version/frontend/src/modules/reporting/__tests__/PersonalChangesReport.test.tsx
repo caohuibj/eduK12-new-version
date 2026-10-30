@@ -8,6 +8,16 @@ const metric:PersonalChangesMetric={id:'a',label:'A 原始分',unit:'points',
   adjacent:[{fromOrdinal:1,toOrdinal:2,delta:null,comparability:{level:'EXACT',allowedOperations:['DESCRIPTIVE_TREND','NUMERIC_DELTA']}},{fromOrdinal:2,toOrdinal:3,delta:null,comparability:{level:'EXACT',allowedOperations:['DESCRIPTIVE_TREND','NUMERIC_DELTA']}}],
   baseline:[{fromOrdinal:1,toOrdinal:2,delta:null,intermediateMissing:false},{fromOrdinal:1,toOrdinal:3,delta:-2,intermediateMissing:true}]}
 describe('Personal changes report',()=>{
+  it('shows a disclosed wholly missing metric and its release/validity notes',()=>{
+    const missingMetric:PersonalChangesMetric={...metric,id:'missing',label:'已披露 B',points:[
+      {ordinal:1,value:null,observedAt:'2026-10-01T12:00:00Z',missingReason:'INVALID_OR_MISSING'},
+      {ordinal:2,value:null,observedAt:'2026-10-02T12:00:00Z',missingReason:'PENDING_RELEASE'},
+    ]}
+    render(<PersonalChangesReport report={{status:'AVAILABLE',metrics:[metric,missingMetric]}}/>)
+    expect(screen.getByRole('table',{name:'已披露 B各轮记录'})).toBeInTheDocument()
+    expect(screen.getByRole('cell',{name:'指标无效或缺失'})).toBeInTheDocument()
+    expect(screen.getByRole('cell',{name:'本轮指标尚未开放'})).toBeInTheDocument()
+  })
   it('keeps zero, actual dates, signed baseline differences and a missing-wave note',()=>{
     render(<PersonalChangesReport report={{status:'AVAILABLE',metrics:[metric]}}/>)
     expect(screen.getByRole('cell',{name:'0'})).toBeInTheDocument()

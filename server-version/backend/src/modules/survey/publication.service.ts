@@ -1,3 +1,4 @@
+import {loadSurveyTrackingSource,inheritedSurveyTrackingUnit} from './tracking-source'
 import {freezeSurveyTracking,surveyFormTrackingIdentity,type SurveyTrackingSelection,type SurveyTrackingBinding} from './personal-tracking'
 import type {SurveyNativeBundle} from '../bundle-product/survey-native'
 import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
@@ -220,13 +221,17 @@ export async function freezeResearchWaveDraft(input:{
     const rows=await tx.surveyInstrumentDraft.findMany({
       where:{projectId:input.projectId,id:{in:orderedIds},status:{in:['DRAFT','PUBLISHED']}},
     })
+    const inheritedSnapshot=await loadSurveyTrackingSource(tx,input.projectId,wave.longitudinalSourceWaveId)
     const sources=await catalogSnapshotsForDrafts(tx,input.actorUserId,rows.flatMap(r=>r.catalogGrantId?[r.catalogGrantId]:[]))
     const byId=new Map(rows.map(row=>[row.id,row]))
     const frozenAt=new Date()
     const units=orderedIds.map(id=>{
       const draft=byId.get(id)
       if(!draft)stop('研究工具来源已发生变化')
-      const unit=draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
+      const catalogUnit=draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):undefined
+      const inherited=inheritedSurveyTrackingUnit(inheritedSnapshot,draft!)
+      if(inherited&&catalogUnit&&inherited.sourceDigest!==catalogUnit.sourceDigest)stop('冻结追踪工具的授权来源版本已变化')
+      const unit=inherited??catalogUnit??compileFrozenResearchUnit(draft!)
       return unit.nativeSituational?{...unit,nativeSituational:{...unit.nativeSituational,attemptEpoch:1 as const,frozenAt:frozenAt.toISOString()}}:unit
     })
     const feedbackMetrics=new Map<string,string[]>()
@@ -248,13 +253,6 @@ export async function freezeResearchWaveDraft(input:{
     for(const unit of units){await bindApprovedTripletContent(tx,unit,input.actorUserId);await bindGovernedToolContent(tx,unit,input.actorUserId)}
     if((input.participantFeedback??[]).some(s=>units.some(u=>s.feedback.mode==='DESCRIPTIVE'&&u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId)&&u.sourceProvenance?.reportConfigured===false)))stop('已批准组合明确不反馈，不能在投放时添加报告反馈')
     if((input.contentSelections??[]).some(s=>units.some(u=>u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId))))stop('已批准标准工具的参数与报告组合已冻结，不能在投放时替换版本')
-    let inheritedSnapshot:ResearchFrozenPublication|undefined
-    if(wave.longitudinalSourceWaveId){
-      const previous=await tx.surveyWave.findFirst({where:{id:wave.longitudinalSourceWaveId,projectId:input.projectId},include:{publication:true}})
-      if(!previous?.publication||canonicalHash(previous.publication.compiledSnapshot)!==previous.publication.definitionDigest)stop('续轮来源缺失或摘要不一致')
-      inheritedSnapshot=previous!.publication!.compiledSnapshot as unknown as ResearchFrozenPublication
-      if(!inheritedSnapshot.longitudinal)stop('续轮来源没有冻结追踪计划')
-    }
     const inheritedFeedback=inheritedSnapshot?.units.flatMap(prior=>{
       const unit=units.find(u=>u.instrumentKey===prior.instrumentKey)
       return unit&&prior.participantFeedback?[{instrumentId:unit.draftId,feedback:prior.participantFeedback}]:[]

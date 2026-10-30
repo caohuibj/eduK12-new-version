@@ -134,3 +134,89 @@ official consumer; no Ready/full-platform run is activated by this batch.
 Draft success will not mean final merge qualification. The exact candidate and
 selected official results are for DOT's independent review before any merge;
 APPROVE, merge, real-user publication and deployment are not performed.
+
+## DOT review continuation: eligible nulls and frozen source inheritance
+
+The two P2 items from the independent review of `68bfc81ed` are repaired:
+
+- Numeric disclosure eligibility and its release time are now read from the
+  same static policy/ceiling helpers used by existing single feedback. They no
+  longer depend on whether the stored result happened to contain a calculable
+  metric. Authorized null metrics remain in an available report, with distinct
+  invalid/missing, not-executed, and pending-release notes. Wholly unauthorized
+  metrics remain excluded; any one metric still needs two valid released points
+  before the report is AVAILABLE. The saved projection's existing source-key
+  kind advances to V2 for this semantic repair, retaining V1 snapshots. This
+  does not add a renderer-version framework or latest-template regeneration.
+- `tracking-source.ts` resolves the existing immutable source publication.
+  Preflight, freeze, draft display and preview use that source for tracked
+  leaves, even if the same editable Scale draft row has since been revised.
+  Non-tracked content continues to use its current draft. Tracked fixed Bundles
+  inherit every required slot without copying/unpacking them. The original
+  catalog grant, source-version and published-release checks remain active at
+  preparation/publication; an old frozen pointer does not grant continued use
+  of a withdrawn source. No new table, column or universal clone was added.
+
+The actual regression case revised A's original item key and scoring to a new
+same-row draft, updated an untracked Form, and then created/published T2 without
+manually restoring A. T2 exposed the original A definition, accepted its original
+answer key and scored it as 1 (rather than the new draft's 9), while the Form used
+its new content. The revised A draft remained intact in the library.
+
+New primary checks, independently scoped rather than replaying the original 31:
+
+| Check | Result |
+| --- | --- |
+| eligible-null/release raw adapter and projection | 2 PASS, other core cases filtered |
+| fixed Bundle source selection/isolation | 1 PASS, other core cases filtered |
+| inherited-source same-row mutation, real PG/FINAL | 1 PASS, old PG/browser cases filtered |
+| existing raw-feedback and measurement-result consumers affected by helper extraction | 25 PASS |
+| wholly missing disclosed metric UI | 1 PASS, old report UI cases filtered |
+| existing Draft scope/strict selected-outcome contracts | 1 PASS, old scope cases filtered |
+| backend and frontend app TypeScript | exit 0 |
+| affected frontend ESLint | exit 0; one existing Wave hook warning |
+| actionlint 1.7.12, shellcheck/pyflakes explicitly not run | exit 0 |
+
+The actionlint archive came from the official release; its official checksum
+was verified as `8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8`.
+Original outputs are durably retained under
+`docs/evidence/personal-longitudinal-20261030/originals/` with a byte/hash manifest.
+The new targeted continuation outputs are retained alongside them separately.
+No dependency tree, secret or database dump is included.
+
+### Why the original Draft CI selected maintenance
+
+The actual full raw diff included backend runtime, frontend and Prisma changes.
+It correctly did not qualify as content-only, frontend-only or maintenance-only;
+`content-scope.mjs` conservatively emitted `application_route=legacy`,
+`scenario=platform`, `maintenance=false`. The existing workflow condition
+selected maintenance for *any* platform scenario, and `requiredChecks` also
+unconditionally required maintenance and mini-program in that Draft branch.
+The maintenance job used `ci-maintenance.yml`, whose generic path contains
+attachment launcher and `host-ops/ci-backup-smoke.py` checks. These exercise the
+host backup/restore implementation; they do not apply this candidate's Prisma
+migrations or restore its actual plan/participant snapshots. Cancellation did
+not establish that those later steps had run. Original job metadata is retained
+as `originals/ci-41007596628-jobs.json`; no missing raw job log is fabricated.
+
+The minimal change bounds only this feature's *Draft* use of the existing
+compile/type producers. A complete regular-file allowlist includes the product,
+its additive migrations, direct tests/controls and this evidence directory.
+Unknown paths/modes or a force-full request refuse this choice. Existing scope
+and the stable gate independently recompute the actual complete diff. The same
+backend job compiles TypeScript without replaying unchanged instrument manifests
+or unrelated parent-portal tests; frontend lint/type checks remain selected.
+Maintenance and mini-program are not required by this bounded Draft selection.
+There is no new workflow, producer platform or claim of Ready qualification.
+Ready, main and unrelated changes retain their existing requirements.
+
+The cancelled `41007596628` and failing aggregate remain original records.
+Before another automatic Draft activation, the cancellation, repair and selected
+checking list are appended to the existing CI error page. The two application
+P2 resolutions remain subject to DOT's independent disposition.
+
+For an eventual Ready qualification, the relevant migration proof is an actual
+main-schema upgrade plus native dump/restore of rows containing the plan,
+source pointer, encrypted snapshots and existing FINALs, followed by unchanged
+source/identity reads. That work remains NOTRUN in official CI. It is not waived
+because the host backup smoke is unrelated, and no broad Ready run is started.

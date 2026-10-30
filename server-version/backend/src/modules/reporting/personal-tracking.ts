@@ -19,7 +19,7 @@ export type TrackedMetric=z.infer<typeof trackedMetricSchema>
 export interface PersonalLeafResult {
   scopedSubjectId:string;waveId:string;ordinal:number;attemptId:string;resultId:string;
   completedAt:string;sourceHash:string;
-  metrics:Record<string,{value:number|null;measurementHash:string;unit:string;visible:boolean}>
+  metrics:Record<string,{value:number|null;measurementHash:string;unit:string;visible:boolean;pending?:boolean;missingReason?:'NOT_EXECUTED'}>
 }
 
 /** Select a whole completed parent first, including stable tie-breaking. A newer
@@ -46,12 +46,12 @@ export function projectPersonalChanges(plan:PersonalTrackingPlan,waves:readonly 
       const parent=parents.get(wave.id),value=parent?.metrics[metric.id]
       const visible=value?.visible===true
       const exact=visible&&value.measurementHash===metric.measurementHash&&value.unit===metric.unit
-      const numeric=exact?finiteReportingNumber(value.value):null
+      const numeric=exact&&!value.pending?finiteReportingNumber(value.value):null
       return {ordinal:wave.ordinal,observedAt:parent?.completedAt??null,value:numeric,
-        missingReason:numeric!==null?null:!parent?'NOT_COMPLETED':!visible?'NOT_DISCLOSED':!exact?'NOT_COMPARABLE':'INVALID_OR_MISSING'}
+        missingReason:numeric!==null?null:!parent?'NOT_COMPLETED':!visible?'NOT_DISCLOSED':value?.missingReason??(value?.pending?'PENDING_RELEASE':!exact?'NOT_COMPARABLE':'INVALID_OR_MISSING')}
     })
     const present=points.filter(p=>p.value!==null).length
-    if(present===0)return []
+    if(!ordered.some(wave=>parents.get(wave.id)?.metrics[metric.id]?.visible))return []
     if(present>=2)available=true
     const decision=resolveReportingComparability({metricId:metric.id,
       left:{family:metric.kind==='SJT'?'SITUATIONAL':metric.kind==='FORM'?'SCALE':metric.kind,key:metric.id,version:metric.measurementHash},

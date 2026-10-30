@@ -1,3 +1,4 @@
+import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
 import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
 export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd()}={}) {
   const actual=readCognitiveIntakeDiff(base,head,{cwd});
@@ -117,6 +118,7 @@ export function requiredChecks(needs, draft) {
   if(scope.application_route==='scale-library-governance')return ['scope','scale-library-governance','codeql'];
   if(scope.application_route==='composite-csv-memory')return ['scope','composite-csv-memory','codeql'];
   if(scope.application_route === 'training-workspace') return ['scope','training-workspace','codeql'];
+  if(draft&&scope.personal_tracking_draft==='true')return ['scope','pr-light-backend','pr-light-frontend'];
   if(scope.scenario === 'survey-wave-selection') return ['scope','backend-regression','frontend','docker','codeql'];
   if(scope.scenario === 'frontend-performance') return ['scope','frontend','frontend-build','docker','codeql'];
   if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
@@ -465,6 +467,8 @@ export function failedChecks(needs, draft) {
   if(scope.cognitive_intake_light !== undefined && (!['true','false'].includes(scope.cognitive_intake_light) || scope.cognitive_intake_light==='true' &&
     (scope.content!=='true'||scope.cognitive!=='true'||scope.frontend!=='false'||scope.codeql!=='true'||scope.scenario!=='content'||scope.scale_intake_light==='true'||scope.scale==='true'||scope.situational==='true'||scope.bundle==='true')))
     failed.push('scope');
+  if(scope.personal_tracking_draft!==undefined&&!['true','false'].includes(scope.personal_tracking_draft))failed.push('scope');
+  if(scope.personal_tracking_draft==='true'&&(!draft||scope.application_route!=='legacy'||scope.scenario!=='platform'))failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
   const scenarios = {'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
@@ -507,6 +511,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.personal_tracking_draft==='true'){
+    try{const {changedEntries}=await import('./content-scope.mjs');if(!personalTrackingDraftScope(changedEntries(process.env.CI_BASE_SHA),{event:process.env.CI_EVENT,draft,forceFull:process.env.CI_FORCE_FULL==='true'}))failed.push('recomputed-personal-tracking-draft');}catch{failed.push('recomputed-personal-tracking-draft');}
+  }
   if(needs.scope?.outputs?.application_route==='onboarding-structure'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.onboarding_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(onboardingPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-onboarding-plan');}catch{failed.push('recomputed-onboarding-plan');}
   }

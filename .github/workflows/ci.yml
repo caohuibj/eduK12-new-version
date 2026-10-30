@@ -382,6 +382,7 @@ jobs:
       canonical_visual: ${{ steps.scope.outputs.canonical_visual }}
       perf_smoke: ${{ steps.scope.outputs.perf_smoke }}
       ops: ${{ steps.scope.outputs.ops }}
+      personal_tracking_draft: ${{ steps.scope.outputs.personal_tracking_draft }}
       content: ${{ steps.scope.outputs.content }}
       presentation: ${{ steps.scope.outputs.presentation }}
       scale: ${{ steps.scope.outputs.scale }}
@@ -746,7 +747,7 @@ jobs:
 
   maintenance:
     needs: scope
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && ((needs.scope.outputs.maintenance == 'true' || needs.scope.outputs.scenario == 'platform' || needs.scope.outputs.scenario == 'dependencies') && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ needs.scope.outputs.personal_tracking_draft != 'true' && needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && ((needs.scope.outputs.maintenance == 'true' || needs.scope.outputs.scenario == 'platform' || needs.scope.outputs.scenario == 'dependencies') && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
     uses: ./.github/workflows/ci-maintenance.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -968,13 +969,15 @@ jobs:
       - name: npm ci
         run: npm ci
       - name: content routing boundary tests
+        if: needs.scope.outputs.personal_tracking_draft != 'true'
         run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
         run: npx prisma generate
       - name: situational data-only manifests and publication gates
+        if: needs.scope.outputs.personal_tracking_draft != 'true'
         run: npm run situational:contracts
       - name: verify SJT immutable releases and publication authority
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && needs.scope.outputs.personal_tracking_draft != 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -982,14 +985,22 @@ jobs:
           git fetch --no-tags origin "$PUBLICATION_BASE_SHA"
           npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
       - name: cognitive task manifests and dependency boundaries
+        if: needs.scope.outputs.personal_tracking_draft != 'true'
         run: npm run cognitive:contracts
       - name: Bundle content and immutable history
+        if: needs.scope.outputs.personal_tracking_draft != 'true'
         env:
           BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: npx tsx scripts/bundle-content-check.ts
       - name: build (tsc)
-        run: npm run build
+        run: |
+          if [ "${{ needs.scope.outputs.personal_tracking_draft }}" = "true" ]; then
+            npx tsc
+          else
+            npm run build
+          fi
       - name: Mini identity and parent authorization unit contracts
+        if: needs.scope.outputs.personal_tracking_draft != 'true'
         run: >-
           npx vitest run src/__tests__/parent-portal
           src/__tests__/mobile/discovery.test.ts
@@ -1558,7 +1569,7 @@ jobs:
   miniprogram:
     name: mini program / foundation contract and page smoke
     needs: scope
-    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')) }}
+    if: ${{ needs.scope.outputs.personal_tracking_draft != 'true' && !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

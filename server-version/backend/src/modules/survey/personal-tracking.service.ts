@@ -58,7 +58,7 @@ export async function readSurveyPersonalChanges(input:Proof){
     })
     // Source identity includes missing waves, the selected complete parent and
     // its exact publication/disclosure. Future T3 never rewrites a T1–T2 view.
-    const sourceHash=canonicalHash({kind:'SURVEY_PERSONAL_CHANGES_V1',plan,subjectId:person!.id,
+    const sourceHash=canonicalHash({kind:'SURVEY_PERSONAL_CHANGES_V2',plan,subjectId:person!.id,
       sources:sources.map(s=>({waveId:s.wave.id,ordinal:s.wave.ordinal,digest:s.wave.publication?.definitionDigest??null,
         finalId:s.final?.id??null,resultHash:s.final?.resultsHash??null,completedAt:s.final?.completedAt.toISOString()??null,closed:s.closed}))})
     const [cached]=await tx.$queryRaw<Array<{cipher:string|null}>>`

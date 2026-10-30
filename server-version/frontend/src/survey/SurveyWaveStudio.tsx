@@ -27,6 +27,7 @@ type InstrumentDetails=Instrument&{catalogGrantId?:string|null;readOnly?:boolean
 type Project={firstPublishedAt?:string|null;longitudinalPlan?:{metrics:Array<{id:string;label:string}>}|null;participantIdentityMode?:'PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE';id:string;collectionMode:'LINKED_WAVES'|'SINGLE_UNLINKED';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
 type GroupIpPolicy={schemaVersion:1;timeZone:string;activationDate?:string}
 type Wave={
+  inheritedTrackingUnits?:InstrumentDetails[]
   longitudinal?:{planId:string}|null
   longitudinalSourceWaveId?:string|null
   frozenContentSelections?:FrozenWaveContent[]
@@ -199,10 +200,10 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
         requests.set(id,request)
       }
       return request
-    })).then(items=>{if(current)setDetails(Object.fromEntries(items.map(item=>[item.id,item])))})
+    })).then(items=>{if(current)setDetails(Object.fromEntries(items.map(item=>[item.id,{...item,...editing?.inheritedTrackingUnits?.find(unit=>unit.id===item.id)}])))})
       .catch(e=>{if(current)setDetailsError(message(e))})
     return()=>{current=false}
-  },[path,instrumentsRevision,form.instrumentIds,detailsRetry])
+  },[path,instrumentsRevision,form.instrumentIds,detailsRetry,editing?.inheritedTrackingUnits])
   const act=async(action:()=>Promise<void>)=>{
     const epoch=projectEpoch.current,request=++actionRequest.current
     setError('');setNotice('');setBusy(true)
@@ -235,7 +236,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   const previewStudy=()=>void act(async()=>{
     const epoch=++previewEpoch.current,saved=structuredClone(form)
     setStudyPreview(null)
-    const drafts=await Promise.all(form.instrumentIds.map(id=>surveyApi<ResearchDraft>(path+'/instruments/'+id)))
+    const drafts=(await Promise.all(form.instrumentIds.map(id=>surveyApi<ResearchDraft>(path+'/instruments/'+id)))).map(draft=>({...draft,...editing?.inheritedTrackingUnits?.find(unit=>unit.id===draft.id)}) as ResearchDraft)
     const snapshots:Record<string,CognitivePreviewSnapshot>={}
     for(const draft of drafts.filter(d=>d.kind==='COGNITIVE')){
       const result=await surveyApi<{ok:boolean;cognitivePreview?:CognitivePreviewSnapshot}>(path+'/instruments/'+draft.id+'/validate','POST',{})
@@ -676,6 +677,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
         {editing&&project?.collectionMode==='LINKED_WAVES'&&<section className="rounded-xl border p-3 space-y-3" aria-label="纵向追踪计划">
           <h3 className="font-semibold">纵向追踪计划</h3>
           <p>追踪具体子工具的原始指标；本人只能查看工具原披露允许的指标。分量表选择不会删除评分所需题目。</p>
+          {!!editing.inheritedTrackingUnits?.length&&<p>追踪项沿用原轮次冻结的题目与计分：{editing.inheritedTrackingUnits.map(unit=>unit.title).join('、')}。工具库中的后续修订不会替换本计划。</p>}
           {project.longitudinalPlan?<><p>首次发布已冻结，后续波次自动继承全部追踪指标。</p>{project.longitudinalPlan.metrics.map(m=><p key={m.id}>{m.label}</p>)}</>:
             !editing.publicationId&&!project.firstPublishedAt&&editing.ordinal===1?<>
               <label><input type="radio" name="survey-tracking-mode" checked={tracking.mode==='SINGLE'} disabled={busy||!!activePending} onChange={()=>setTracking({mode:'SINGLE',metrics:[]})}/>单次报告</label>
