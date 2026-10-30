@@ -1,16 +1,16 @@
 # 四入口单次群体报告来源核对（main 9f135a2）
 
-这是现有报告升级的覆盖说明，不增加一套报告、计分或授权系统。当前切片仅补 Training 独立 Cognitive；不修改 Teacher 的个人报告合同、School 目录、纵向计划或 `composite.service.ts`。
+这是现有报告升级的覆盖说明，不增加一套报告、计分或授权系统。基线核对为 main 9f135a2；后续 #423 已保存新独立 Scale 的课程 Episode，本子分支接其群报读取。Teacher 合同仍为只读方案，不修改 School 目录、纵向计划或 `composite.service.ts`。
 
 | 入口／来源 | 已有真实来源与当前覆盖 | 本轮处理／限制 |
 | --- | --- | --- |
 | Survey 发布问卷中的 Scale / Cognitive / SJT / Form | 项目授权 → 已发布波次 → 冻结 unit → 已保存正式结果；共用单次统计、Task Artifact、阅读／打印页面 | 已接通的问卷叶来源保持不变。不是任意独立产品历史记录拼接。变体不能混合。 |
 | Training 普通组合 / 固定 Bundle 的四类叶 | 冻结父任务、投放课程、slot、正式子结果；Context 必需输入保留，Bundle Profile 不参与群体分析 | #408 / #419 已进入 main。旧父结果缺失历史课程时不回填。#419 的 N=5 已披露原件是 Scale；不将此前单人 Cognitive / SJT 原件称作多人可披露证明。 |
 | Training 独立 Cognitive | `CognitiveAssignment.courseId`、发布时的 `courseSnapshot`、冻结 Profile / config / report；正式 `CognitiveSession`；已有课程所有者和任务创建者范围 | **本切片接线**：仅 `listedStandalone=true`、精确历史课程一致的已发布任务。归档任务保留已生成版本读取，不再生成。排除 composite 子 session。 |
-| Training 独立 Scale | `Assessment` 没有直接课程字段；但已有 `AssessmentEpisode.courseId`，不能笼统称系统无可复用字段 | 普通 `startStandaloneScaleAssessment` 按工具／用户恢复在途结果，没有冻结 course / episode 的普通入参。当前 `CourseScale` 或 `CourseStudent` 不能证明旧施测归属。缺失可靠归属的旧结果不按课程汇总。 |
+| Training 独立 Scale | `Assessment` 没有直接课程字段；但已有 `AssessmentEpisode.courseId`，不能笼统称系统无可复用字段 | #423 已为新启动保存经真实投放／成员验证的 Episode.courseId，本子分支沿其正式结果接群报生成与快照读取。原无归属记录仍不汇总；当前 `CourseScale` / `CourseStudent` 不证明历史归属。 |
 | Training 独立 SJT | `startSituationalAttempt` 只有 instrumentKey / instrumentVersion；正式记录有用户／参与者身份，普通启动没有冻结课程投放来源 | 不猜课程，不按当前名册补历史。课程中的 SJT 已通过普通组合／Bundle 叶适配，独立任务尚无同等可靠课程归属。 |
 | Training 独立 Form | 当前课程 Form 已在普通问卷／组合 task 内，有父任务和冻结题目 | 不建立不存在的第二种独立 Form 任务模型。 |
-| School SELF 的四类合法叶 | Run / Track 的冻结来源、组织／历史人群、具体叶 GROUP 披露合同；父／叶／spec 最低人数取最大值；年级／班级／标签子群 | 已有受权公开来源沿原适配读取。无合法 GROUP 合同的私有组合不列为可生成来源。DOT 正处理目录分页，本切片不修改目录／routes。旧 V1 继续原兼容边界。 |
+| School SELF 的 Scale / Cognitive / SJT 三类数值叶 | Run / Track 的冻结来源、组织／历史人群、具体叶 GROUP 披露合同；父／叶／spec 最低人数取最大值；当前子群为班级／标签 | Form 叶和年级选择尚未接通，不能将规划描述为当前能力。已有受权来源沿原适配读取，无合法 GROUP 合同的私有组合不列为可生成来源。DOT 处理目录分页，本切片不修改目录／routes；旧 V1 继续原兼容边界。 |
 | Teacher 成人自填 Form | 原 Form 群体服务、版本 Artifact、历史任教班级／标签人群；内部人口依据不进入公开结果 | #415 / #418 已进入 main，保持现有边界。学生评教、专家共识属于原独立业务，不混入 SELF。 |
 | Teacher SELF Scale | `teacher-scale:<uuid>:INDIVIDUAL` 的独立审阅发布合同；`analysisMode=INDIVIDUAL_ONLY`，ORGANIZATION audience `NONE` | **属于合同限制，不是遗漏一个 UI 入口**。当前不得将其个人结果转给组织群体报告。 |
 | Teacher SELF Cognitive / SJT / Bundle 叶 | `assertTeacherPersonalAssessmentPolicy` 明确 SELF / SELF_REPORT / INDIVIDUAL_ONLY，minimumRespondents=null，并受内容上限收窄 | 同属真实可见范围限制；个人纵向能力不等于群体披露许可。本轮未改。 |
@@ -26,7 +26,7 @@
 
 ## 需先确认的最小后续方案
 
-**Teacher 非 Form GROUP 合同**：复用同一测量 C 和计分结果，新增明确经审阅的 GROUP 资源／合同版本，由原发布机制给出 ORGANIZATION 的 GROUP 披露、最小人数与专业／管理者范围。Run 策略允许该合同下的 SELF / SELF_REPORT / COHORT_AGGREGATE，再接现有 Run 群体报告的叶适配与 Artifact／人数／差分保护。保留现有 INDIVIDUAL 资源及旧任务，不能直接把 `INDIVIDUAL_ONLY` / `NONE` 开关放宽。最小改动预计涉及 Teacher 已发布资源识别、个人任务策略的明确 GROUP 分支、Run group 消费接线；不新增一套统计或授权表。**这是扩大当前产品可见范围的方案，尚未实施，交 DOT／用户确认。**
+**Teacher 非 Form GROUP 合同**：库 Scale 在首批既定工具范围内。新明确审阅发布的 GROUP 版本应使用同一 C / FINAL 事实，在各受众 resultDisclosure 内保留原已批准的本人摘要上限、只向组织披露群体，不把两者做成必须二选一。现有合同字段能表示，但 registry／个人 reader 有具体硬拦截，最小修订及发布角色见 `teacher-nonform-group-contract-proposal-20261030.md`。旧 INDIVIDUAL_ONLY / NONE 版本不变；方案待 DOT 确认，未实施权限变化。
 
 **新的课程独立 Scale 投放**：优先复用 `AssessmentEpisode.courseId`，在经过现有课程投放授权的新 start / assignment 边界创建或使用与本次课程及主体绑定的 episode，并将 assessment 绑定它；恢复在途时也必须沿同一 episode 区分课程。具体触点为课程独立 Scale 启动调用与 `scale-start.controller.ts` 的新施测／恢复段、原 episode 创建服务；先核发布合同是否允许此来源，再确定是否仅需已有字段。历史缺失 episode 的结果不迁移、不猜填。当前未修改这些文件。
 
