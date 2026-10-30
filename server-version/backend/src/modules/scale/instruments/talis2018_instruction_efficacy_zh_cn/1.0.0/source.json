@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "talis2018_instruction_efficacy_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "TALIS2018目录资料：教学策略自我效能（暂无可作答包）",
+      "abbreviation": "T3SEINS",
+      "instrumentFamily": "TALIS2018 TSES-derived selected item-set metadata only"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [],
+      "constructDefinition": "教师对教学策略自我效能的自我把握；仅登记官方四题集合与来源，不提供题文、计分或个体结果。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "talis2018_instruction_efficacy_zh_cn",
+        "domain:teacher_workplace",
+        "construct:self_efficacy",
+        "population:teacher",
+        "source:TALIS2018",
+        "source:third_party_TSES",
+        "availability:catalog_only",
+        "rights:public_item_redistribution_scope_unresolved"
+      ]
+    },
+    "population": {
+      "populationNotes": "上海ISCED2教师原题本的现成中文版本定位；目录仅记录来源。未建立本地独立四题施测效度，无常模或标签。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "原问卷一般教学语境；目录不提供施测",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "只登记T3SEINS原项TT3G34C, TT3G34J, TT3G34K, TT3G34L；保留精确版本，不合并为12题总工具。",
+        "此包无题文、选项、指导语、计分或可作答配置；原题公开再分发范围尚未明确。",
+        "公开目录不代表施测授权或已建立独立四题量表效度。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "作者scholarly research使用许可不等于完整题文公开Git再分发已获允许；此处不提供可施测内容。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "仅定位既有上海ISCED2中文问卷版本，不在目录包中复制题文。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "元数据来源为TALIS2018上海原件和第三方TSES来源定位；本包没有新翻译或实际施测内容。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "TALIS2018 T3SEINS item-set metadata; underlying TSES third-party material",
+      "citation": "OECD TALIS2018 Technical Report pp285,294–300; Tschannen-Moran and Woolfolk Hoy TSES permissions require separate redistribution-scope clarification.",
+      "url": "https://mxtsch.pages.wm.edu/research-tools/",
+      "publicationYear": 2018
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "教学策略自我效能"
+      ],
+      "limitations": [
+        "当前只是来源与题集元数据，不可施测、不提供得分或个体解释。",
+        "第三方题项的公开Git再分发范围未明确；不能把免费科研使用推成再分发已获许可。",
+        "未来若选项目描述性均分，应另行明确计分/缺失和报告版本，不能冒称OECD CFA因子分。"
+      ],
+      "disclaimer": "当前没有可作答包或报告结果。三种效能是三个独立候选，不合并生成教师效能总分。"
+    },
+    "blockers": [
+      "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "EXECUTABLE_CONTENT_NOT_PREPARED"
+    ]
+  }
+}
