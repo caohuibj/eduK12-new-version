@@ -21,6 +21,7 @@ async function main(){
   else if(p.endsWith('/evaluation-events'))data={list:[{id:'event',targetId:'target',title:'学期教师调查',kind:'ASSESSMENT',status:'CLOSED',version:3}]}
   else if(p.endsWith('/forms'))data={list:[{id:'form',title:'教师体验表',status:'PUBLISHED',definitionDigest:'a'.repeat(64)}]}
   else if(p.endsWith('/evaluation-events/event/run'))data={eventId:'event',runId:'run',status:'CLOSED',version:4,trackCount:1}
+  else if(p.endsWith('/evaluation-events/event/run/tracking'))data={baselineId:null}
   else if(p.endsWith('/forms/form/group-report/released'))data=report
   res.setHeader('Content-Type','application/json');res.end(JSON.stringify({code:0,data,message:'synthetic fixture'}))
  })

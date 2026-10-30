@@ -457,7 +457,10 @@ function admit(){
   }else assert(!review.pr381LocalChecks);
   const types=p.pr===395?admitPr395LocalTypes(p,review):p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
-  if([372,374,404,408,414,415].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
+  if([372,374,404,408,414].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
+  // The fixed415 source plan proves its backend tree equals the exact base.
+  // Do not rerun or invent a compiler receipt for this unchanged component.
+  if(p.pr===415)assert.deepEqual(types.map(t=>t.component),['frontend']);
   const observations=[];
   if([404,408,414,415].includes(p.pr)){
     assert.equal(review.groupReportObservations.length,p.pr===415?1:2);

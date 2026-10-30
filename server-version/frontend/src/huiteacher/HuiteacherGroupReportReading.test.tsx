@@ -16,6 +16,7 @@ it('opens an existing Teacher Form release through the real product navigation a
   if(url.endsWith('/evaluation-events'))return reply({list:[{id:'event',targetId:'target',title:'学期教师调查',kind:'ASSESSMENT',status:'CLOSED',version:3}]})
   if(url.endsWith('/forms'))return reply({list:[{id:'form',title:'教师体验表',status:'PUBLISHED',definitionDigest:'a'.repeat(64)}]})
   if(url.endsWith('/evaluation-events/event/run'))return reply({eventId:'event',runId:'run',status:'CLOSED',version:4,trackCount:1})
+  if(url.endsWith('/evaluation-events/event/run/tracking'))return reply({baselineId:null})
   if(url.endsWith('/forms/form/group-report/released'))return reply({eventId:'event',formId:'form',definitionDigest:'a'.repeat(64),releasedAt:'2026-10-20T00:00:00Z',independentRespondents:null,minimumRespondents:10,distributions:[
    {itemKey:'single',prompt:'教学支持',status:'READY',precision:'ROUNDED_10_PERCENT',cells:[{key:'yes',label:'支持充分',percentage:60},{key:'none',label:'未选',percentage:0}]},
    {itemKey:'multi',prompt:'所需资源',status:'READY',selectionMode:'NON_EXCLUSIVE',precision:'ROUNDED_10_PERCENT',cells:[{key:'time',label:'时间',percentage:60},{key:'training',label:'培训',percentage:60}]},
@@ -42,5 +43,7 @@ it('opens an existing Teacher Form release through the real product navigation a
  expect(print).toHaveBeenCalledOnce()
  expect(fetch.mock.calls.some(([url])=>url.endsWith('/group-report/released'))).toBe(true)
  expect(fetch.mock.calls.some(([url])=>url.endsWith('/group-report/release'))).toBe(false)
+ expect(fetch.mock.calls.some(([url])=>url.endsWith('/evaluation-events/event/run/tracking'))).toBe(true)
+ expect(screen.queryByRole('button',{name:'创建下一轮教师自评'})).not.toBeInTheDocument()
  expect(report.textContent).not.toContain('NaN')
 })
