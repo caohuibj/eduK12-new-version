@@ -283,3 +283,28 @@ reporter/logs. No lockfile or package manifest changed.
 
 Training WIP is preserved separately in /workspace/eduK12-new-version on
 feat/personal-longitudinal-training-20261030. This patch changes Survey only.
+
+### Untracked C edits and main PR401 alignment
+
+DOT closed the stale-feedback disclosure issue and the prior P/R status issue
+at `2f8829d64`. Its next ordinary P2 found that default private P/R inheritance
+also attached D's old pointers when untracked D legitimately changed C. Defaults
+now retain private P/R only if both measurement release ID and content hash
+still match. A changed untracked C stays unselected; explicit new selections
+still pass the original current-state/scope/compatibility validator.
+
+The single targeted untracked-D case passes (11 other cases filtered). It proves
+the unchanged tracking source does not copy D, old P/R stays absent, incompatible
+explicit old P/R is still refused, and compatible explicit new P/R succeeds.
+No old 31-case suite or full feedback matrix was replayed.
+
+Main PR401 `1cc077a8ee8e9475799788ab2b8bf5a4511630fe` was merged normally.
+The sole conflict was the top import block of publication.service.ts; both the
+tracking imports and the new cognitive-profile measurement import were retained.
+The current source passed backend tsc and merged-workflow actionlint. No original
+application journey was replayed merely for already-reviewed upstream code.
+Raw targeted reporter, merge/setup logs and hashes are retained in
+continuation/untracked-content-manifest.json. A wrong relative git-add path
+initially left the resolved file unmarked; staging the exact absolute path
+completed the merge. It did not change the resolved product source or qualify
+any failed setup as an application pass.
