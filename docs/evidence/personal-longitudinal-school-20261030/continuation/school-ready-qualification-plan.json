@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-10-30T14:04:58.613588+00:00",
+  "pr": 416,
+  "base": "8bc677156a3548333450363a31e33812ad2a9f0c",
+  "anchor": "2d72ed1e4092250bbf2411f3210ae1a6a5f17727",
+  "originalSource": "aecb26636ebec3d7e8fe27201bc01ad7840ca7e2",
+  "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+  "applicationFiles": 55,
+  "deltaMismatch": [],
+  "mergeConflict": false,
+  "autoMergedBoundary": "campus/report.routes.ts retains both independently qualified group routes and School own changes route; exact School delta unchanged",
+  "productionTree": "646f710df8a38b2cddf31a57afe61f968948b149",
+  "prisma": {
+    "currentBase": "eeeafc08104fd303620a5a8fbf069b6599c4c87f",
+    "currentCandidate": "eeeafc08104fd303620a5a8fbf069b6599c4c87f",
+    "qualifiedTeacherState": "eeeafc08104fd303620a5a8fbf069b6599c4c87f",
+    "newMigration": false
+  },
+  "evidence": {
+    "selectedRawReporters": 18,
+    "distinctSuccessfulObservations": 37,
+    "failedRawReportersRetained": 12,
+    "provenance": "unsigned local originals, never claimed current CI business executions",
+    "rawFailuresAndFilteredRows": "fully retained and exact named successful continuations required",
+    "businessBrowserPgReplayed": false
+  },
+  "localControls": {
+    "passed": 7,
+    "log": "school-ready-controls.log",
+    "workflowActionlintExit": 0,
+    "scope": "source delta refusal; unchanged original admission; exact current baseline/candidate state; missing/failed/expired native source; strict Ready gate"
+  },
+  "officialPlan": {
+    "workflow": ".github/workflows/ci.yml",
+    "route": "personal-tracking",
+    "jobs": [
+      "scope",
+      "personal-tracking original/native-state admission + current frontend types/lint",
+      "docker current images + HIGH/CRITICAL security scans",
+      "codeql selected changed JS/TS source and controls",
+      "merge-gate"
+    ],
+    "nativeReuse": {
+      "sourceHead": "1170ac40728191631be07330bc8d58712339de34",
+      "executionHead": "236c76ed82d654536c3112ff543e2316e8cc1b54",
+      "runId": 41061117266,
+      "jobId": 124080976872,
+      "serverVersionTree": "c218d9913a1294fbdaf5066eee04264cbdab9fa6",
+      "nativeOnly": true,
+      "maximumAgeHours": 24,
+      "candidateAsBaseline": true
+    },
+    "databaseRestoreReexecuted": false,
+    "backendAndFrontendAudits": "exact official locked-input success within24h, not unsigned local claim",
+    "applicationImagesSastReuse": false,
+    "reason": "School changes current production source and consumer context",
+    "budgetMinutes": "10-15; diagnose actual waiting at5",
+    "knownApiDiagnostic": "metadata non-OK now records HTTP status; no automatic retry or relaxed assertion"
+  },
+  "limitations": [
+    "Existing completion-only Form sources stay completion-only; no invented psychological score or new disclosure",
+    "Only existing SELF subject/respondent paths; no new observer, student-evaluation or expert-consensus personal trend",
+    "Bundle uses the same whole frozen definition and required slots; no Profile distribution/transition",
+    "Departed-member continuation retains existing current-authority refusal; no identity/roster redesign",
+    "Local source/tool snapshots and raw evidence limits remain unsigned, with no retroactive execution signatures",
+    "No group longitudinal expansion, deployment or production data access"
+  ],
+  "mergeApproval": "not granted for416; do not merge",
+  "notion": "Hui review only, recording nonblocking; old Qiang checklist ID not used"
+}

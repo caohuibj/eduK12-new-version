@@ -30,12 +30,13 @@ export const educationCompositionAdministrationForEntry=(entry:'SCHOOL'|'TEACHER
 export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.union([z.literal(1),z.literal(2)]),adapterVersion:z.enum(['1.0.0','2.0.0']),
  administration:privateCompositionAdministrationSchema,
  contextFields:z.array(z.object({contextKey:assessmentContextKeySchema,formType:z.enum(['year_month','single_choice','fill_blank']),formLabel:z.string().min(1).max(240),formOptions:z.array(z.object({value:z.string().min(1).max(240),label:z.string().min(1).max(240)}).strict()).max(50)}).strict()).min(1).max(5).optional(),
- instruction:z.string().max(16000),blocks:z.array(z.object({blockId:id,instruction:z.string().max(16000),
+ instruction:z.string().max(16000),blocks:z.array(z.object({blockId:id,instruction:z.string().max(16000),longitudinal:z.boolean().optional(),
   source:privateCompositionSourceSchema}).strict()).max(50),
 }).strict().superRefine((value,ctx)=>{
  if(isExpertComposition(value)?value.schemaVersion!==2||value.adapterVersion!=='2.0.0':value.schemaVersion!==1||value.adapterVersion!=='1.0.0')
   ctx.addIssue({code:'custom',message:'专家观察必须使用独立的 V2 合同，既有施测方式保持 V1'})
  if(isExpertComposition(value)&&value.contextFields?.length)ctx.addIssue({code:'custom',message:'专家背景不能作为受评教师的计分背景'})
+ if(value.blocks.some(block=>block.longitudinal&&(value.administration.responseMode!=='SELF'||block.source.kind==='FORM')))ctx.addIssue({code:'custom',message:'纵向披露只能选择已有本人数字反馈的非表单工具'})
  if(value.administration.responseMode!=='SELF'&&value.blocks.some(block=>['COGNITIVE','SJT'].includes(block.source.kind)))ctx.addIssue({code:'custom',message:'认知与 SJT 只能本人作答'})
  if(value.contextFields&&new Set(value.contextFields.map(field=>field.contextKey)).size!==value.contextFields.length)ctx.addIssue({code:'custom',path:['contextFields'],message:'背景字段不能重复'})
  if(new Set(value.blocks.map(block=>block.blockId)).size!==value.blocks.length)

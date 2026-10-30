@@ -1,3 +1,4 @@
+import {schoolTrackingOptions,createNextSchoolTrackingActivity,removeSchoolTrackingDraftSource} from './personal-tracking'
 import { Router } from 'express'
 import { z, ZodError } from 'zod'
 import { authenticateSchool } from '../../middleware/auth'
@@ -46,6 +47,11 @@ router.get('/organizations/:organizationId/activities/:courseId/runs/:runId/asse
     return success(res,await listEducationAssessmentResources({product:'SCHOOL',...scope,workflowId:scope.courseId,...query,actor:req.user!}))
   })
 )
+
+router.get('/organizations/:organizationId/activities/:courseId/runs/:runId/tracking',authenticateSchool,wrap(async(req,res)=>success(res,await schoolTrackingOptions({actor:req.user!,...runPath.parse(req.params)}))))
+router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/next-wave',authenticateSchool,wrap(async(req,res)=>success(res,await createNextSchoolTrackingActivity({actor:req.user!,...runPath.parse(req.params),...z.object({requestId:uuid}).strict().parse(req.body)}))))
+
+router.delete('/organizations/:organizationId/activities/:courseId/runs/:runId/tracks/:trackId',authenticateSchool,wrap(async(req,res)=>success(res,await removeSchoolTrackingDraftSource({actor:req.user!,...runPath.extend({trackId:uuid}).parse(req.params),...z.object({expectedVersion:z.number().int().positive()}).strict().parse(req.body)}))))
 
 router.post('/organizations/:organizationId/activities/:courseId/runs',
   authenticateSchool,wrap(async(req,res)=>{

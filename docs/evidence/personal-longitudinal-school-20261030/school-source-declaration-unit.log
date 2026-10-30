@@ -1,0 +1,23 @@
+✘ [ERROR] Could not resolve "/workspace/eduK12-new-version/server-version/backend/server-version/backend/vitest.config.ts"
+
+failed to load config from /workspace/eduK12-new-version/server-version/backend/server-version/backend/vitest.config.ts
+
+⎯⎯⎯⎯⎯⎯⎯ Startup Error ⎯⎯⎯⎯⎯⎯⎯⎯
+Error: Build failed with 1 error:
+error: Could not resolve "/workspace/eduK12-new-version/server-version/backend/server-version/backend/vitest.config.ts"
+    at failureErrorWithLog (/workspace/eduK12-new-version/server-version/backend/node_modules/esbuild/lib/main.js:1752:15)
+    at /workspace/eduK12-new-version/server-version/backend/node_modules/esbuild/lib/main.js:1211:25
+    at runOnEndCallbacks (/workspace/eduK12-new-version/server-version/backend/node_modules/esbuild/lib/main.js:1592:45)
+    at buildResponseToResult (/workspace/eduK12-new-version/server-version/backend/node_modules/esbuild/lib/main.js:1209:7)
+    at /workspace/eduK12-new-version/server-version/backend/node_modules/esbuild/lib/main.js:1236:16
+    at responseCallbacks.<computed> (/workspace/eduK12-new-version/server-version/backend/node_modules/esbuild/lib/main.js:886:9)
+    at handleIncomingPacket (/workspace/eduK12-new-version/server-version/backend/node_modules/esbuild/lib/main.js:941:12)
+    at Socket.readFromStdout (/workspace/eduK12-new-version/server-version/backend/node_modules/esbuild/lib/main.js:864:7)
+    at Socket.emit (node:events:514:28)
+    at addChunk (node:internal/streams/readable:568:12) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}
+
+
+
