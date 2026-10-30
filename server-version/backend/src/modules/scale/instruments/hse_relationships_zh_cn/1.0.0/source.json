@@ -1,0 +1,556 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "hse_relationships_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "选用HSE分量表·中文工作稿：工作人际关系",
+      "abbreviation": "HSE relationships",
+      "instrumentFamily": "HSE Management Standards Indicator Tool — selected subscale adaptation"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "关注冲突、紧张、骚扰或欺凌，不把问题归咎于个人性格。 本工具仅选用工作人际关系原分量表题项，不是完整35题HSE，也不声称为官方验证的独立短版。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "hse_relationships_zh_cn",
+        "domain:teacher_workplace",
+        "construct:psychosocial_work_environment",
+        "construct:relationships",
+        "population:adult",
+        "population:teacher",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:ogl_3_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人教师与相关工作群体的单一工作条件回顾；沿用独立简中工作稿。原35题外文证据不证明当前中文或单独选用形式的效度，不用于学生测评、教师绩效或学校排名。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去六个月",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "所选原题保持相对顺序及原逐题响应集，保留原题码。",
+        "从完整35题中选取一个原计分分量表，是明确标注的选用改编，不声称为官方独立短版。",
+        "时长为粗略阅读估计，保留过去六个月时段。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "根据原作者英文题本独立翻译的简体中文工作稿；原作者未审定或背书。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "复用hse_msit_zh_cn/1.0.1中独立简中工作稿的所选题文，不重新翻译；官方繁中仅为对照。本工具未建立中文及独立选用形式的效度证据，不把研究审查附注作为新增软件审批门禁。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "hse_relationships_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "hse_relationships_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "hse_relationships_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.",
+      "{\"license\": \"Open Government Licence v3.0\", \"licenseUrl\": \"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\", \"attribution\": \"Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.\", \"scope\": \"Crown questionnaire text only. HSE website copyright applies to Crown material in any medium unless indicated otherwise. Original35itemPDF and officialChinesePDF show no third-party copyright or special restriction in extracted text. Exclude HSElogo/images/design; no claim endorsement. Hosted commercialSIT subscription terms are a different service and not the licence for the freely downloaded35item questionnaire.\", \"changes\": \"Independent Simplified Chinese translation from originalEnglish; official Traditional Chinese preserved separately for reference, not silently simplified or claimed official zhCN.\"}",
+      "独立工作中译与原创通俗反馈，未建立本地常模；不得用于绩效、诊断或排名。",
+      "本工具选取原工作人际关系分量表，保留其题文、响应集、反向与均分；未保留完整35题施测形式。OGL改编不等于HSE背书或独立施测等效证明。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Selected HSE MSIT subscale: relationships; independent Simplified Chinese working translation",
+        "citation": "Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.",
+        "url": "https://www.hse.gov.uk/stress/assets/docs/indicatortool.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "{\"license\": \"Open Government Licence v3.0\", \"licenseUrl\": \"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\", \"attribution\": \"Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.\", \"scope\": \"Crown questionnaire text only. HSE website copyright applies to Crown material in any medium unless indicated otherwise. Original35itemPDF and officialChinesePDF show no third-party copyright or special restriction in extracted text. Exclude HSElogo/images/design; no claim endorsement. Hosted commercialSIT subscription terms are a different service and not the licence for the freely downloaded35item questionnaire.\", \"changes\": \"Independent Simplified Chinese translation from originalEnglish; official Traditional Chinese preserved separately for reference, not silently simplified or claimed official zhCN.\"} https://www.hse.gov.uk/stress/assets/docs/indicatortool.pdf https://www.hse.gov.uk/stress/assets/docs/indicatortoolmanual.pdf https://www.hse.gov.uk/help/copyright.htm https://www.hse.gov.uk/stress/assets/docs/chinese.pdf https://www.hse.gov.uk/stress/standards/notesindicatortool.htm https://www.hse.gov.uk/stress/assets/docs/analysistool.xls https://www.di.univr.it/documenti/OccorrenzaIns/matdid/matdid464820.pdf Selected-subscale adaptation: relationships; not the complete official35-item instrument or a validated standalone short form."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "hse_frequency_1_5",
+          "options": [
+            {
+              "value": "never",
+              "label": "从不",
+              "score": 1
+            },
+            {
+              "value": "seldom",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "sometimes",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "often",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "always",
+              "label": "总是",
+              "score": 5
+            }
+          ]
+        },
+        {
+          "key": "hse_agreement_1_5",
+          "options": [
+            {
+              "value": "strongly_disagree",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "disagree",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "neutral",
+              "label": "中立",
+              "score": 3
+            },
+            {
+              "value": "agree",
+              "label": "同意",
+              "score": 4
+            },
+            {
+              "value": "strongly_agree",
+              "label": "非常同意",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "HSE-05",
+          "content": "我遭受到针对个人的骚扰，例如不友善的言语或行为。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-14",
+          "content": "同事之间存在摩擦或愤怒情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-21",
+          "content": "我在工作中受到欺凌。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-34",
+          "content": "工作中的人际关系紧张。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "HSE-05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-14",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-21",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-34",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "relationships",
+            "type": "dimension",
+            "label": "人际相处是否安全、尊重",
+            "description": "关注冲突、紧张、骚扰或欺凌，不把问题归咎于个人性格。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HSE-05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-34",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "relationships"
+        ],
+        "scoreOrder": [
+          "relationships"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "relationships",
+            "headline": "工作人际关系：本次工作条件回顾",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "安全和尊重不应靠提高忍耐力来换取。\n\n本次得分反映过去六个月你对工作中冲突、紧张、骚扰或欺凌的自述。4题经反向计分后取1–5均分，越大表示较少报告这些不利经历，不是冲突更多，也不证明环境绝对安全。\n\n例如，持续令人不安的言语或行为值得认真对待。这是一般回顾提示，不是问卷查明的事件；一次伤害也不能被总体均分抵消。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如有不当对待，优先考虑自己的安全，选择可信支持或合适的组织渠道了解可以获得的帮助。"
+              },
+              {
+                "category": "environment",
+                "text": "先了解保密安排和可能后果，再决定如何处理；不要求独自与可能伤害自己的人对质，也不必等分数达到某条线才寻求支持。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本工具只选用HSE的一个原计分分量表，当前独立简中稿及独立施测形式未验证；单人回答不代表整个学校。",
+          "没有可用的中国教师常模或阈值。1–5是量尺范围，不是排名或百分位；不用于诊断、绩效问责或学校排名。"
+        ],
+        "disclaimer": "这份结果用于工作条件回顾与沟通，不评价教师能力。仅完整作答时形成该分量表均分；缺失不补分，不把未完成当零分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted content adaptation; not author approval or local validation",
+            "reviewedAt": "2026-10-29T23:27:53.467078Z",
+            "basis": "复用既有中文工作稿所选题与单分量表计分，生成单一教师语境报告；仅内容整理，未运行真实计分、报告消费、CI或数据库操作。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "hse_msit_relationships",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "HSE-05",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-14",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-21",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-34",
+            "responseValue": "strongly_agree"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "relationships": 1.0
+          },
+          "totalScoreKeys": [
+            "relationships"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "HSE-05",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-14",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-21",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-34",
+            "responseValue": "strongly_disagree"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "relationships": 5.0
+          },
+          "totalScoreKeys": [
+            "relationships"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "HSE-05",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-14",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-21",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-34",
+            "responseValue": "neutral"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "relationships": 3.0
+          },
+          "totalScoreKeys": [
+            "relationships"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "HSE-05",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-14",
+            "responseValue": "often"
+          },
+          {
+            "itemCode": "HSE-21",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-34",
+            "responseValue": "agree"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "relationships": 2.5
+          },
+          "totalScoreKeys": [
+            "relationships"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "以下问题选用HSE工作环境问卷的工作人际关系分量表，用于回顾这一方面的工作条件。请根据过去六个月的工作经历作答。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "Adapted selection introduction; six-month timeframe retained from hse_msit_zh_cn/1.0.1/instruction. Item text and scoring unchanged from that working translation; original HSE https://www.hse.gov.uk/stress/assets/docs/indicatortool.pdf"
+  }
+}

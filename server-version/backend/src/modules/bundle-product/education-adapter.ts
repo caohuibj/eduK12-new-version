@@ -36,12 +36,20 @@ export async function readEducationNativeBundleFeedback(input:{attemptId:string;
   await assertEducationNativeBundle(input.instance,input.identity)
   const {frozen,bindings}=readInstance(input.instance),pack=frozen.declarativePackage
   const hidden={schemaVersion:1 as const,kind:'NATIVE_BUNDLE_FEEDBACK' as const,status:'WITHHELD',title:frozen.reportDefinition.title,profileView:null}
-  if(pack?.schemaVersion!==2)return hidden
-  if(pack.profile.bindings.some(core=>{
-    const evidence=pack.evidence.find(e=>e.evidenceKey===core.evidenceKey)!,binding=bindings.slots.find(slot=>slot.slotKey===evidence.slotKey)
+  if(!pack)return hidden
+  const required=pack.schemaVersion===2?pack.profile.bindings.map(core=>pack.evidence.find(e=>e.evidenceKey===core.evidenceKey)!):pack.evidence.filter(e=>e.role!=='CONTEXT')
+  if(required.some(evidence=>{
+    const binding=bindings.slots.find(slot=>slot.slotKey===evidence.slotKey)
     return !binding||!input.availableItemIds.has(binding.itemId)||!input.metricKeys.has(evidence.selector)
   }))return hidden
   const {readReport}=await import('./analysis')
+  // "student" is the existing participant projection, never staff/admin access
+  // inferred from a Teacher participant's occupation. Read only saved INITIAL.
   const saved=await readReport(input.attemptId,'student',undefined,input.db)
+  if(pack.schemaVersion===1){
+    const view=saved.view as typeof saved.view&{declarativeState?:string|null;blocks?:Array<{blockId:string;title:string;conclusions:Array<{text:string}>;limitations:string[]}>}
+    return {...hidden,status:saved.status,factsHash:saved.factsHash,jointSummary:view?{state:view.declarativeState??null,
+      blocks:(view.blocks??[]).map(block=>({id:block.blockId,title:block.title,texts:[...block.conclusions.map(c=>c.text),...block.limitations]}))}:null}
+  }
   return {...hidden,status:saved.status,profileView:saved.view?.profileView??null,factsHash:saved.factsHash}
 }

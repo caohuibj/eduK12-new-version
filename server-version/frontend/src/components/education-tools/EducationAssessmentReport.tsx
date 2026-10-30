@@ -10,10 +10,13 @@ export function EducationAssessmentReport({data}:{data:EducationFeedbackData}){
   const recognized=data.schemaVersion===1&&data.kind==='EDUCATION_ASSESSMENT_PERSONAL_REPORT'
   const ready=recognized&&data.state==='READY'&&data.mode==='INDIVIDUAL_SUMMARY'
   const reports=ready&&Array.isArray((data as {reports?:unknown}).reports)?(data as unknown as {reports:Unit[]}).reports:[]
-  const native=ready?(data as unknown as {nativeBundle?:{schemaVersion:number;kind:string;status:string;title:string;profileView:BundleProfileView|null}}).nativeBundle:undefined
+  const native=ready?(data as unknown as {nativeBundle?:{schemaVersion:number;kind:string;status:string;title:string;profileView:BundleProfileView|null;
+    jointSummary?:{state:string|null;blocks:Array<{id:string;title:string;texts:string[]}>}|null}}).nativeBundle:undefined
   return <div className="education-personal-report">
     {recognized&&typeof data.message==='string'&&<p>{data.message}</p>}
-    {native?.schemaVersion===1&&native.kind==='NATIVE_BUNDLE_FEEDBACK'&&<section aria-label="整体理论报告"><h3>{native.title}</h3>{native.profileView?<BundleProfileSummary view={native.profileView}/>:<p>{native.status==='PENDING'?'单项作答已保存，综合报告正在生成。':'当前没有可展示的获准综合解释。'}</p>}</section>}
+    {native?.schemaVersion===1&&native.kind==='NATIVE_BUNDLE_FEEDBACK'&&<section aria-label="整体理论报告"><h3>{native.title}</h3>{native.profileView?<BundleProfileSummary view={native.profileView}/>:native.jointSummary?<>
+      {native.jointSummary.state&&<p>{native.jointSummary.state}</p>}{native.jointSummary.blocks.map(block=><section key={block.id}><h4>{block.title}</h4><ul>{block.texts.map((text,index)=><li key={index}>{text}</li>)}</ul></section>)}
+    </>:<p>{native.status==='PENDING'?'单项作答已保存，综合报告正在生成。':'当前没有可展示的获准综合解释。'}</p>}</section>}
     {ready&&reports.length===0&&<p>本次测评已完成，当前没有获准展示的逐工具报告内容。</p>}
     {ready&&reports.map((unit,index)=>unit&&typeof unit==='object'&&<article key={typeof unit.itemId==='string'?unit.itemId:index}>
       {unit.status==='READY'&&unit.rendered?.generatorVersion==='DECLARATIVE_REPORT_V1'?<>
