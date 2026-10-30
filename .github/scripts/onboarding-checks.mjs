@@ -11,6 +11,20 @@ import {changedEntries} from './content-scope.mjs';
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 function safePath(path){assert(typeof path==='string'&&!path.startsWith('/')&&!path.includes('\\')&&path.split('/').every(p=>p&&p!=='.'&&p!=='..'));return path;}
+/** Preserve the original native receipt's base. Only identical complete Prisma
+ * inputs on both sides admit it after an unrelated main update. */
+export function verifyGroupReportNativeBaseReuse(value,plan,proof,originalCandidate,treeAt){
+ if(value.base===plan.base){assert(!proof);return {reusedAcrossBase:false};}
+ assert(proof&&proof.schemaVersion===1,'Native base changed without exact-input reuse proof');
+ assert.equal(proof.originalBase,value.base);assert.equal(proof.currentBase,plan.base);
+ assert.equal(proof.originalCandidate,originalCandidate);assert.equal(proof.currentCandidate,plan.product);
+ for(const commit of [value.base,plan.base,originalCandidate,plan.product])assert.match(commit,/^[a-f0-9]{40}$/);
+ const baseTree=treeAt(value.base),candidateTree=treeAt(originalCandidate);
+ assert.equal(treeAt(plan.base),baseTree,'Native baseline Prisma inputs changed');
+ assert.equal(treeAt(plan.product),candidateTree,'Native candidate Prisma inputs changed');
+ assert.equal(proof.basePrismaTree,baseTree);assert.equal(proof.candidatePrismaTree,candidateTree);
+ return {reusedAcrossBase:true,originalBase:value.base,currentBase:plan.base,basePrismaTree:baseTree,candidatePrismaTree:candidateTree,nativeExecutedThisRun:false};
+}
 export function verifyOriginalReport(report,review,{allowDuplicateFiltered=false}={}){
   const cases=report.testResults.flatMap(s=>s.assertionResults.map(c=>({fullName:c.fullName,status:c.status})));
   for(const c of cases)assert(typeof c.fullName==='string'&&c.fullName&&['passed','failed','pending','skipped'].includes(c.status));
@@ -205,7 +219,7 @@ export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
  return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false},{kind:'REGISTERED_SAME_CP_NONEMPTY_REPORTS',tools:3,reports:6,actualFinals:2,entryBoundary:'SOURCE_IDENTITY_POLICY_ONLY',ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
 }
 export function task1SastConfig(p,b=binding.candidates?.[String(p.pr)]){
- assert(['task1','choice-page',404].includes(p.pr));assert.equal(p.product,b.product);
+ assert(['task1','choice-page',404,408].includes(p.pr));assert.equal(p.product,b.product);
  const paths=[...Object.keys(b.source),...(p.pr===404?['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/scripts/group-report-draft.mjs','.github/scripts/group-report-draft.test.mjs']:[]),'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs',p.pr==='task1'?'.github/scripts/task1-onboarding-controls.test.mjs':'.github/scripts/onboarding-controls.test.mjs'].filter(path=>/\.(?:[cm]?js|jsx|tsx?)$/.test(path));
  assert(paths.length);return {paths:[...new Set(paths)].sort()};
 }
@@ -384,9 +398,9 @@ async function reusePr395Sast(){
 }
 function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=[393,395,404,'task1','choice-page'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
+  const review=[393,395,404,408,'task1','choice-page'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
   assert(review,'Missing exact reviewed evidence');
-  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,(p.pr===404||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
+  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
   if(p.pr==='choice-page'){
@@ -406,7 +420,7 @@ function admit(){
     assert(Array.isArray(roots)&&roots.length&&new Set(roots).size===roots.length);
     for(const root of roots)assert(['server-version/backend','server-version/frontend'].includes(root));
     const delta=git('diff','--name-only',original.originalSourceAssociation,p.product,'--',...roots).split('\n').filter(Boolean);
-    assert.deepEqual(delta,p.pr===404?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
+    assert.deepEqual(delta,[404,408].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
     assert(original.deltaRationale&&original.sourceAssociationBasis);
     const caseNames=verifyOriginalReport(readOriginal(original),original);
     admitted.push({id:original.id,caseNames,originalSourceAssociation:original.originalSourceAssociation,sourceAssociationBasis:original.sourceAssociationBasis,originalReportSHA256:original.sha256,originalReportSuccess:original.summary.success,originalFailedCount:original.summary.numFailedTests,ciExecuted:false});
@@ -422,15 +436,21 @@ function admit(){
   }else assert(!review.pr381LocalChecks);
   const types=p.pr===395?admitPr395LocalTypes(p,review):p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
-  if([372,374,404].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
+  if([372,374,404,408].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   const observations=[];
-  if(p.pr===404){
+  if([404,408].includes(p.pr)){
     assert.equal(review.groupReportObservations.length,2);
     for(const record of review.groupReportObservations){
       const value=readOriginal(record);assert.equal(value.passed,true);assert(record.sourceAssociationBasis&&record.limitations?.length);
-      if(record.kind==='browser'){assert.equal(value.actualReactComponents,true);assert(value.checks.includes('all metrics printed'));assert.equal(value.synthetic,true);}
-      else {assert.equal(record.kind,'native');assert.equal(value.base,p.base);assert.equal(value.encryptedArtifactRead,true);assert.equal(value.immutableTriggerVerified,true);assert.deepEqual(value.addedMigrations,['20261030160000_reporting_task_artifacts']);assert.equal(value.sourceSchema,value.restoreSchema);assert.equal(value.retainedNativeRestoreContinued,true);assert.equal(value.nativeRestorePerformedThisInvocation,false);assert.equal(value.dumpUploaded,false);}
-      observations.push({kind:record.kind,originalSHA256:record.sha256,ciExecuted:false,sourceAssociationBasis:record.sourceAssociationBasis,limitations:record.limitations});
+      let nativeBaseReuse;
+      if(record.kind==='browser'){assert.equal(value.actualReactComponents,true);assert(value.checks.includes(p.pr===408?'print all metrics':'all metrics printed'));assert.equal(value.synthetic,true);}
+      else if(record.kind==='course-entry'){assert.equal(p.pr,408);assert.equal(value.actualCoursePageRouterTabsAndFlags,true);assert.equal(value.syntheticBackendAndOwner,true);assert(value.checks.includes('actual course assessment tab to group report'));assert(value.checks.includes('direct analysis URL after reload'));}
+      else {assert.equal(p.pr,404);assert.equal(record.kind,'native');nativeBaseReuse=verifyGroupReportNativeBaseReuse(value,p,review.nativeBaseReuse,
+        review.reports.find(report=>report.id==='native-continuation')?.originalSourceAssociation,commit=>{
+          try{return git('rev-parse',commit+':server-version/backend/prisma');}
+          catch{git('fetch','--no-tags','--depth=1','origin',commit);return git('rev-parse',commit+':server-version/backend/prisma');}
+        });assert.equal(value.encryptedArtifactRead,true);assert.equal(value.immutableTriggerVerified,true);assert.deepEqual(value.addedMigrations,['20261030160000_reporting_task_artifacts']);assert.equal(value.sourceSchema,value.restoreSchema);assert.equal(value.retainedNativeRestoreContinued,true);assert.equal(value.nativeRestorePerformedThisInvocation,false);assert.equal(value.dumpUploaded,false);}
+      observations.push({kind:record.kind,originalSHA256:record.sha256,ciExecuted:false,sourceAssociationBasis:record.sourceAssociationBasis,limitations:record.limitations,...(nativeBaseReuse?{nativeBaseReuse}:{})});
     }
   }else assert(!review.groupReportObservations);
 

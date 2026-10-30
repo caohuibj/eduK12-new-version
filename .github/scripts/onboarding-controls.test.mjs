@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
+import {verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
@@ -357,4 +357,33 @@ test('group-report qualification keeps admission and SAST mandatory and rejects 
  const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b),outputs=Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)]));const needs={scope:{result:'success',outputs},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
  assert.deepEqual(requiredChecks(needs,false),['scope','onboarding-structure','codeql']);assert.deepEqual(failedChecks(needs,false),[]);assert(failedChecks(needs,true).length);
  for(const name of ['onboarding-structure','codeql'])for(const result of ['skipped','failure','cancelled',undefined])assert(failedChecks({...needs,[name]:{result}},false).length);
+});
+
+test('group-report qualification reuses native evidence only for identical baseline and candidate Prisma inputs',()=>{
+ const oldBase=h('1'),newBase=h('2'),oldProduct=h('3'),newProduct=h('4'),baseTree=h('5'),candidateTree=h('6');
+ const value={base:oldBase},plan={base:newBase,product:newProduct},proof={schemaVersion:1,originalBase:oldBase,currentBase:newBase,originalCandidate:oldProduct,currentCandidate:newProduct,basePrismaTree:baseTree,candidatePrismaTree:candidateTree};
+ const trees={[oldBase]:baseTree,[newBase]:baseTree,[oldProduct]:candidateTree,[newProduct]:candidateTree};
+ const read=commit=>trees[commit];
+ assert.equal(verifyGroupReportNativeBaseReuse(value,plan,proof,oldProduct,read).nativeExecutedThisRun,false);
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,undefined,oldProduct,read));
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,proof,oldProduct,c=>c===newBase?h('7'):read(c)));
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,proof,oldProduct,c=>c===newProduct?h('8'):read(c)));
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,{...proof,originalBase:newBase},oldProduct,read));
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,proof,h('9'),read));
+});
+
+test('Training group qualification binds the existing shared family and requires admission plus SAST',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/training-analysis/group-report.service.ts',frontend='server-version/frontend/src/training/TrainingGroupReports.tsx';
+ f.b={...f.b,pr:408,source:Object.fromEntries([backend,frontend].map(file=>[file,{before:null,after:blob}]))};
+ f.entries=[backend,frontend,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.env={...f.env,CI_PR_NUMBER:'408',CI_HEAD_REF:BRANCHES[408]};
+ const call=(b=f.b,entries=f.entries,env=f.env)=>onboardingPlan(entries,base,head,f.read,env,b),p=call();
+ assert.equal(p.pr,408);assert.equal(p.route,'onboarding-structure');
+ const sast=task1SastConfig(p,f.b);for(const file of [backend,frontend,'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs'])assert(sast.paths.includes(file));
+ const outputs=Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)])),needs={scope:{result:'success',outputs},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','onboarding-structure','codeql']);assert.deepEqual(failedChecks(needs,false),[]);
+ for(const name of ['onboarding-structure','codeql'])assert(failedChecks({...needs,[name]:{result:'skipped'}},false).length);
+ for(const patch of [{CI_PR_NUMBER:'404'},{CI_HEAD_REF:'other'},{CI_FORCE_FULL:'true'},{CI_EVENT:'workflow_dispatch'}])assert.throws(()=>call(f.b,f.entries,{...f.env,...patch}));
+ const unknown='server-version/backend/src/unrelated.ts';assert.throws(()=>call({...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}},[...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}]));
+ assert.throws(()=>call(f.b,f.entries.map(e=>e.file===backend?{...e,newMode:'120000'}:e)));
 });

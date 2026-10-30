@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_in_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III IN 工作影响力：2025中国医疗S1中文来源（文字已审校／不可施测）",
+      "abbreviation": "COPSOQ3-IN-S1-ZH",
+      "instrumentFamily": "COPSOQ III 2025 Chinese medical personnel supplemental S1, IN; distinct from 2018 international English Long and China K12 official versions"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "工作影响力：仅登记2025中国医疗人员研究补充材料S1的6项中文来源身份；用户已批准中文措辞，不表示中国K12教师科研效度或独立IN尺度计分规则已获确认。",
+      "constructOverlapTags": [
+        "copsoq3_in_zh_cn",
+        "source:COPSOQ_III_2025_China_medical_S1",
+        "source_scale_code:IN",
+        "international_related_key:copsoq3_in_en",
+        "jdr_editorial_role:RESOURCE",
+        "population:china_medical_staff_study_not_teacher_norm",
+        "population:adult_teacher_interest",
+        "availability:catalog_only",
+        "translation_editorial:user_approved_2026_10_30",
+        "rights:country_version_and_extraction_unverified",
+        "scoring:unverified",
+        "report:not_runtime"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "2025 S1取自中国医疗人员研究样本而非中国K12教师；不证明独立尺度适用、测量等值或本地常模。18+仅为项目材料定位。"
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "医疗人员研究补充S1中文材料来源，非已审定K12教师施测指导/回顾期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "仅冻结2025中国研究S1来源尺度码IN和6个中文条目元数据；不公开上传问卷题文/数字选项。",
+        "S1原响应类型线索：1（代码非可执行映射）；不推断原版评分方向、反向/缺失。",
+        "本尺度6/6条在审核台账标为源版本/对位冲突；文字审校通过不解除这些科学或原件差异。",
+        "国际英文Long与2025医疗人员S1题码、译意及删题关系尚不能等同；不是正式中文K12版本。",
+        "仅项目阅读用时估计，尚未数字施测测得。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅来源查找/对位候选，不提供可执行版、医学/职业诊断或中国教师信效度宣称。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "2025 China medical personnel COPSOQ III study supplemental S1 Chinese question forms; original 2018 International English Long is separate. User 2026-10-30 editorial approval only; 133 S1+8 WP/ED/PR private rows SHA-256 in provenance note; no questionnaire items copied.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Source contrast copsoq3_in_en. S1 source conflict flags 6/6; original response type 1; country implementation/scoring/rights unresolved; no expert validation or original question text in public Git."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "COPSOQ III China medical 2025 supplemental S1, IN 工作影响力",
+      "citation": "2025 China medical personnel COPSOQ III adaptation, supplemental material S1; journal Healthcare 13(7):825, doi:10.3390/healthcare13070825. Not a standardized China K12 teacher scale.",
+      "url": "https://doi.org/10.3390/healthcare13070825",
+      "publicationYear": 2025
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "工作影响力"
+      ],
+      "limitations": [
+        "该目录仅来源6项；用户已确认中文文字，但6项存在跨版本原件对位风险。",
+        "不包含题文/响应选项/实际scorer、P参数或R报告。所有具体分档和个人计分需再根据国家版本确认。",
+        "英文原长版与中国医疗人员研究S1不应直接混并/合计。没有中国K12教师信效度或阈值，目录结构PASS不是施测PASS。",
+        "复制或公开电子施测须再核COPSOQ网络指南、国家版本协调与有关授权范围。"
+      ],
+      "disclaimer": "CATALOG_ONLY来源：不可施测、不计分、不发放/公开，不能用于教师考核或诊断。"
+    },
+    "blockers": [
+      "CHINA_MEDICAL_S1_NOT_VALIDATED_AS_K12_TEACHER_FORM",
+      "COUNTRY_LANGUAGE_USE_AND_ELECTRONIC_REUSE_NOT_ESTABLISHED",
+      "ORIGINAL_RESPONSE_SCORING_AND_MISSING_RULES_NOT_VERIFIED",
+      "PUBLIC_ITEM_REDISTRIBUTION_NOT_ESTABLISHED",
+      "ENGLISH_LONG_TO_CHINA_S1_SOURCE_CONFLICT_UNRESOLVED"
+    ]
+  }
+}

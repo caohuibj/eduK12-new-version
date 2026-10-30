@@ -560,11 +560,11 @@
       "schemaVersion": 1,
       "pr": 404,
       "enabled": true,
-      "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
-      "product": "78899e7fefc1ea6ca14ca4d144f6a37bb275472e",
-      "controlCheckpoint": "0e2731f62fe2f45ae01e21cfb5679fdf21eb0cfd",
+      "base": "b85e3466819266ffb8cd844b39d87aa566fb90e6",
+      "product": "f831f3db3190e4cc684ea4d8a568690e3b57809e",
+      "controlCheckpoint": "7fd77d417cb91e2e1f7c2a1353e9167e89db0798",
       "components": {
-        "backend": "b81911415277e35b673dc95300720043ac8ac796",
+        "backend": "3aec4bd4f19888eb9f02ea8cbd2f470a03de6365",
         "frontend": "dbbeb1ec1230710d5c9108e1f4be7dd42768efdd"
       },
       "controlBefore": {
@@ -739,7 +739,7 @@
         },
         "docs/evidence/group-report-20261030/qualification/README.md": {
           "before": null,
-          "after": "c32cfcf2369c1dca73c8bd1d3c53138cb10608c3"
+          "after": "92e8d7afb52d08ec6d63f5a3f3854e5aceca8289"
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.exit": {
           "before": null,
@@ -747,7 +747,7 @@
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.json": {
           "before": null,
-          "after": "14422874d03067ece0e0433096bd6e04a234310a"
+          "after": "37c14835dc32ac30d015e1ce45f06a362f48cad9"
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.log": {
           "before": null,
@@ -910,7 +910,361 @@
           "after": "28a9ce5d85c814eb367fe6f7316a09cd15be9684"
         }
       },
-      "activationNote": "Scoped inline-classifier repair after preserved Draft41022894812/Ready41022969851. Same application trees, original evidence and three required jobs; no application checks or restore replay. Actual inline and CLI will be previewed on a clearly marked local synthetic merge before a new CI event."
+      "activationNote": "One bounded mainb85 repair after preserved source/merge drift run41032121655. No unchanged test/native/frontend replay. Native exact-input proof and all three required jobs remain. If main advances again stop qualification restarts for DOT sequencing; Azure ZIP403 unchanged."
+    },
+    "408": {
+      "schemaVersion": 1,
+      "pr": 408,
+      "enabled": true,
+      "base": "31845e3a14dd5edf6e03c90e7f71c014bcf0aa06",
+      "product": "33750283bda22a24eb698fd14f35858c4ebfe50d",
+      "controlCheckpoint": "d10399486338f5094557c2b2a195583ffa5fe3fb",
+      "components": {
+        "backend": "bb14d816fe41247b7872c06acc48eedf7e7842d7",
+        "frontend": "509e0d9f6303c945f7569087140ecdc5017c514e"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "2e1dde28b2d1269b2c7565df7c9bae17764e85c5",
+        ".github/scripts/merge-gate.mjs": "9fcd7c78ed892066bb84bd9975bfdc9e7523776c",
+        ".github/scripts/onboarding-bindings.json": "18c94f1f22cbfe67da54035c76df272836847525",
+        ".github/scripts/onboarding-checks.mjs": "e80daa4c3433ad8a68063e2161714f8bbee85048",
+        ".github/scripts/onboarding-controls.test.mjs": "a17a95b294e7c543c77a773c4cfeb1a3f64d75fe",
+        ".github/scripts/onboarding-evidence.json": "8922e1bb372ac7ee96d9143c7857030f27d9de14",
+        ".github/scripts/onboarding-scope.mjs": "05a08ac034e1414862d98f319f7e3fe6c63a2a44",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "04cd5a8ac238aab570030a506aa45051460979b7"
+      },
+      "source": {
+        "docs/development/group-report-training-20261030.md": {
+          "before": null,
+          "after": "f5b2187735a7f520bccc937ce18ddfb2ce797a9e"
+        },
+        "docs/evidence/group-report-training-20261030/backend-tests-first.json": {
+          "before": null,
+          "after": "b1718b81edbfd8e7819822b8618a71b8b2c61276"
+        },
+        "docs/evidence/group-report-training-20261030/backend-tests-first.log": {
+          "before": null,
+          "after": "987e6566b9c8a7c14e489ccf13a04126e999a39d"
+        },
+        "docs/evidence/group-report-training-20261030/backend-types-candidate.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/backend-types-final.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/backend-types-redundant.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-training-20261030/backend-types-redundant.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/browser-first.log": {
+          "before": null,
+          "after": "eaaeb28d563a249635844eb210ba0927eb956cc7"
+        },
+        "docs/evidence/group-report-training-20261030/browser.json": {
+          "before": null,
+          "after": "0f3e154fc18804dba1a24f3b223041cc96816707"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/course-browser-assets-failed.log": {
+          "before": null,
+          "after": "b99c023a55ca8299345821c375c63c49d6f75fea"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/course-browser-final.log": {
+          "before": null,
+          "after": "3e70451ad9a72e11378398d700395982a11ced9a"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/course-browser-setup-failed.log": {
+          "before": null,
+          "after": "81a578ea341c1bb8a1acca763332a8a6b1505478"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/course-entry.json": {
+          "before": null,
+          "after": "349bddbd9af340f979dbe7ed9d8e0787f36f9f08"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/course-route.json": {
+          "before": null,
+          "after": "c9bd1af1f71d5abd82fbec5a3625d1e643f84a64"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/course-route.log": {
+          "before": null,
+          "after": "35511a4cf6639422b342528b3639e1946d90b6e2"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/entry-lint.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/entry-lint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/entry-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/entry-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/manifest.json": {
+          "before": null,
+          "after": "5ac1686b2a9ce83fb4891838b791b4a63e415bcd"
+        },
+        "docs/evidence/group-report-training-20261030/course-entry/training-course-entry.png": {
+          "before": null,
+          "after": "7b2fa7b3b230c3d8fb8e2e007015504d94c0c3dc"
+        },
+        "docs/evidence/group-report-training-20261030/form-cache.json": {
+          "before": null,
+          "after": "0c094aba64ed85e36fa19bbf3783060774f5b1c5"
+        },
+        "docs/evidence/group-report-training-20261030/form-cache.log": {
+          "before": null,
+          "after": "ed79061942f467e2d236481e856a7ee133633dd6"
+        },
+        "docs/evidence/group-report-training-20261030/frontend-lint.log": {
+          "before": null,
+          "after": "a3054a95dc77775eb17f53aa9bfed586b87cac73"
+        },
+        "docs/evidence/group-report-training-20261030/frontend-tests.json": {
+          "before": null,
+          "after": "ce1026d1a666d463fe7e6cc37b29e9ad0cec59b5"
+        },
+        "docs/evidence/group-report-training-20261030/frontend-tests.log": {
+          "before": null,
+          "after": "15467e2719cef45cdc227e299a1e454bf370657c"
+        },
+        "docs/evidence/group-report-training-20261030/frontend-types-final.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/http.json": {
+          "before": null,
+          "after": "0b52e2e434d863eedd1016dec0a4a7a3010d3bfb"
+        },
+        "docs/evidence/group-report-training-20261030/initial-setup-types.log": {
+          "before": null,
+          "after": "ecbadbfa8ad90c830fa9a7315e92d99f1a77f245"
+        },
+        "docs/evidence/group-report-training-20261030/leaf-scope.json": {
+          "before": null,
+          "after": "0dae6500b5c8f86910981c97df6a39161ab04939"
+        },
+        "docs/evidence/group-report-training-20261030/leaf-scope.log": {
+          "before": null,
+          "after": "b43598e33d7ae06889e821013016770e66ae418e"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/backend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/backend-types.json": {
+          "before": null,
+          "after": "f9af49a77d7e9576cabdafdb9da2a557e7f6d4bd"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/frontend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/frontend-types.json": {
+          "before": null,
+          "after": "465d8c48b59831dd718404575edfcf24d4dc638b"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/pr404-formal-result.json": {
+          "before": null,
+          "after": "a21e63954036853ef5fa5fff03e7d19bfe994647"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/qualification-control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-training-20261030/main-alignment/qualification-control.log": {
+          "before": null,
+          "after": "60f85f5713a0c4d8188962d63f5d6dd95678aab4"
+        },
+        "docs/evidence/group-report-training-20261030/manifest.json": {
+          "before": null,
+          "after": "ac3a9dc59ca912bb118116aeba97f633321e410b"
+        },
+        "docs/evidence/group-report-training-20261030/migrate.log": {
+          "before": null,
+          "after": "75313f29d5f8d853a46fd1d32238a4aac1da79f7"
+        },
+        "docs/evidence/group-report-training-20261030/postgres-first.json": {
+          "before": null,
+          "after": "8c8f088cdea1e6a74274b8ab845940d221f9dbdc"
+        },
+        "docs/evidence/group-report-training-20261030/postgres-first.log": {
+          "before": null,
+          "after": "d35036f4a6864b820c43ffdb03633f7e96f15789"
+        },
+        "docs/evidence/group-report-training-20261030/postgres-resume.json": {
+          "before": null,
+          "after": "3153096247bbf27b5a0fa85ddecd9ecdad9272f3"
+        },
+        "docs/evidence/group-report-training-20261030/postgres-resume.log": {
+          "before": null,
+          "after": "1e81af0ba5c4ade299024617c0f7e53aa2cab3f3"
+        },
+        "docs/evidence/group-report-training-20261030/setup-diagnosis.log": {
+          "before": null,
+          "after": "730d70d61864c96bbab54b5b8cecbdae0ef9ce9e"
+        },
+        "docs/evidence/group-report-training-20261030/targeted-repair.json": {
+          "before": null,
+          "after": "2be5bbbb2ee7d5900e393632bb477e5e92093b85"
+        },
+        "docs/evidence/group-report-training-20261030/targeted-repair.log": {
+          "before": null,
+          "after": "bb22c2803aec3962f90b04b4fe8bc09738b0d235"
+        },
+        "docs/evidence/group-report-training-20261030/training-group-1440.png": {
+          "before": null,
+          "after": "c30be47495483cddc6cee881073e2f658514e7d5"
+        },
+        "docs/evidence/group-report-training-20261030/training-group-390.png": {
+          "before": null,
+          "after": "c4f5695613e9719f80905c60e6cbad02d983dc48"
+        },
+        "docs/evidence/group-report-training-20261030/training-group-report.pdf": {
+          "before": null,
+          "after": "d375ff1dd08e82cbc48f9526463d895d145d7bb7"
+        },
+        "docs/evidence/group-report-training-20261030/training-group-report.txt": {
+          "before": null,
+          "after": "87276ecb655354cff2a454a315bf3ba77663fe1d"
+        },
+        "server-version/backend/src/__tests__/training-analysis/group-report.postgres.integration.test.ts": {
+          "before": null,
+          "after": "a6b33be994a7767b8134cf05d12c69f3d28151f8"
+        },
+        "server-version/backend/src/__tests__/training-analysis/group-report.test.ts": {
+          "before": null,
+          "after": "1fa4a7c71503d1a71401b7a0abf6ce8939271298"
+        },
+        "server-version/backend/src/__tests__/training-analysis/source.test.ts": {
+          "before": "16e7ca276212f3893d0d02b30faf0824e3302674",
+          "after": "ae9052b5f3dd384a2894561671e1ba9b69b3cf5e"
+        },
+        "server-version/backend/src/controllers/trainingAnalysisController.ts": {
+          "before": "c5d1ef2f38d1ad72447a676ed895e4c55e25ccb4",
+          "after": "d05ffa6b7398bf494b9a2729681f133b3bad4093"
+        },
+        "server-version/backend/src/modules/composite/composite-report-read-batch.ts": {
+          "before": "687169213405743308618337aba06a098eccb8f9",
+          "after": "43df1a3d55a73fa7c48f846f9d1dd41727c2102f"
+        },
+        "server-version/backend/src/modules/reporting/group-summary.ts": {
+          "before": "dc44ba4d2aeee6479bc07fa822297b3fc0166285",
+          "after": "963d8f607b9c532d60ffbb69e073cd3e77281279"
+        },
+        "server-version/backend/src/modules/reporting/task-artifact.ts": {
+          "before": "44fc80492b338c0111f26d87f5376a42beac70dc",
+          "after": "6a6edab4db26798576e32b1859d85bba1755a2c2"
+        },
+        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
+          "before": null,
+          "after": "542307abd805eaca6559dac518688060acbca5db"
+        },
+        "server-version/backend/src/modules/training-analysis/group-source.ts": {
+          "before": null,
+          "after": "aad76c377f609270e22cd941fa9b985339cf3005"
+        },
+        "server-version/backend/src/modules/training-analysis/service.ts": {
+          "before": "5381ce62497b399a766bc13c8dcf212077b995ab",
+          "after": "eba9239cd23ea2c01c7de9f6363e3e73314644c1"
+        },
+        "server-version/backend/src/modules/training-analysis/source.ts": {
+          "before": "c3dcd864b1052319056005f61e19c75e1d1fc9e2",
+          "after": "2bb3951d985ee64ea9f451efaff26aeee15943e1"
+        },
+        "server-version/backend/src/routes/courses.ts": {
+          "before": "70a8d6d1f457ccb6ab92c1cff2d570493cc69fd2",
+          "after": "327d832b59d4624db8a507731cef85f06b488226"
+        },
+        "server-version/e2e/training-group-course-fixture.tsx": {
+          "before": null,
+          "after": "20520e54dd962c28c5307a93a4d6b05a6dedeaa8"
+        },
+        "server-version/e2e/training-group-report-browser.cjs": {
+          "before": null,
+          "after": "db8571395c4b232d0ba2044fdd7b71aff354ff30"
+        },
+        "server-version/e2e/training-group-report-fixture.tsx": {
+          "before": null,
+          "after": "2e7040cc1405b9bf1e119c1d9ac23288ab5fb753"
+        },
+        "server-version/frontend/src/modules/reporting/TaskGroupReport.tsx": {
+          "before": "cb17ef70143f7c16dc6f3b373053ed5a12de2bc2",
+          "after": "e4e57a5b592b073c1e9ca86b18aeb1ed4ff5f89f"
+        },
+        "server-version/frontend/src/training/TrainingCourseAnalysis.integration.test.tsx": {
+          "before": "3bf323b8bed61d41fe0032d7eaec4033ad8ef993",
+          "after": "649f2ff6b8f57f97a7003f0be20212795fa58fe2"
+        },
+        "server-version/frontend/src/training/TrainingCourseAnalysis.test.tsx": {
+          "before": "6b47918565c1db01b9d73a3ab9314764bcefc0dd",
+          "after": "9ba636d6c55c7ea04d24b84536222ed89b9c26e2"
+        },
+        "server-version/frontend/src/training/TrainingCourseAnalysis.tsx": {
+          "before": "bff2d54b6b7d9c2a7ae4f2d2bbd40b8966d36f42",
+          "after": "85f00726dfcb75adf591f9306a83f64a7add8f96"
+        },
+        "server-version/frontend/src/training/TrainingCoursePages.test.tsx": {
+          "before": "e625a5c10ca6177de7681e577d87edcfd63c6748",
+          "after": "05650bb31c77a0740a5162ce6479c3c56d77eeef"
+        },
+        "server-version/frontend/src/training/TrainingCourseTabs.test.tsx": {
+          "before": "bda531a57bf258564a4d47b7a384528aba096046",
+          "after": "5fdf93280ad3f116c6ed8f38b60c2d61d8e53c65"
+        },
+        "server-version/frontend/src/training/TrainingCourseTabs.tsx": {
+          "before": "849a75585ce832f1e710a9e8dfc0a672f5478021",
+          "after": "403c425414e862d20d0be557d963624784ebcfb1"
+        },
+        "server-version/frontend/src/training/TrainingGroupReports.test.tsx": {
+          "before": null,
+          "after": "0910ea35263d857e6fd7b91d799828353e3922cc"
+        },
+        "server-version/frontend/src/training/TrainingGroupReports.tsx": {
+          "before": null,
+          "after": "a634a314bd3e3bff87e9005c55ee9d2ec5e9d0fd"
+        },
+        "server-version/frontend/src/training/TrainingTrainerCourse.tsx": {
+          "before": "e27415ef936f7d4daa01cf1a761379afc4643809",
+          "after": "77deb07d0b4844c49c3a570787dfea1c6f6ad2e1"
+        },
+        "server-version/frontend/src/training/courseNavigation.ts": {
+          "before": "ddcae2042606ce2e39b1b492ce2fed97933c68ec",
+          "after": "78e070e504433b12f1988bda429efbc61dd2d128"
+        },
+        "server-version/frontend/src/training/training-group-reports.css": {
+          "before": null,
+          "after": "22e5b980e43b74a130699a754787522f901febf8"
+        }
+      },
+      "activationNote": "Delegated scoped self-review under current autonomous CI authorization; DOT background review remains independent, not claimed performed here. Existing actual scope/admission/SAST/Ready only, no extra job. Reuse175 case owners, same frontend types and both browser receipts. Current changed backend types and new local control passed once; neither old suites nor new local fixture replayed in CI. Separate concrete merge approval for408 remains required."
     },
     "task1": {
       "schemaVersion": 1,

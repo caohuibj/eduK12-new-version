@@ -145,3 +145,15 @@ PR408仍为独立stacked Draft。PR404未经用户确认尚未merge；不擅自r
 大差异的CI，不为feature-base新增workflow/门禁。待第一批实际进入main后，按真实完整差异
 确定本批缺失正式检查，复用当前未变的175项原件。独立/Bundle叶消费、School/Teacher与子群、
 预配置群体纵向仍在清单；没有把本课程普通组合通过表述为全部来源完成。
+
+## PR404 merged: exact main318 qualification preparation
+
+PR404 is merged as `31845e3a14dd5edf6e03c90e7f71c014bcf0aa06`; Training merged it without conflict at `2e29af18e06942240e7d5a4f573cea3605550735`. Application behavior is unchanged from296c941; only approved upstream catalogs/registry and PR404 qualification controls arrived. Current backend tree `bb14d816fe41247b7872c06acc48eedf7e7842d7` received one actual type compiler exit0; frontend tree `509e0d9f6303c945f7569087140ecdc5017c514e` remains identical to the retained exit0 receipt, and was not recompiled.
+
+Qualification extends the existing onboarding-structure family for PR408: exact27 application/test/e2e paths plus this bounded evidence directory, actual existing scope/admission/CodeQL/Ready gate. No new workflow, job, queue or stacked-base gate. One new local control case passed once, covering exact branch/PR, unknown source/mode, no-full/manual fallback and both mandatory admission/SAST outcomes; it is not replayed in CI. Formal actual-input scope/admission/SAST still remain to execute.
+
+Original175 different successful cases are admitted by case ownership, never by summing repeated runs: original168 partial successes, the failed matrix case's positive continuation, later leaf/legacy/cache cases, actual retained-fixture PG/HTTP success, original2 frontend cases and the real course-navigation1 case. Latest cache rechecks own their overlapping cases; original failed/pending/setup rows remain unchanged. Original unsigned WIP provenance is explicit: reference commits are retrospective associations, not invented signed/contemporaneous full dependency fingerprints. Current merged types close only the changed component compiler input. Existing form-cache/browser/setup failures remain raw.
+
+No schema/migration change: existing main artifact storage already covers Training. No database journey/native restore, old174/175 suite, scoring or browser replay. Actual React/synthetic API reading/print PDF and actual course navigation/deep-link evidence are retained separately; they are not production auth/capacity claims. Fixed independent/Bundle runtime sources and group longitudinal remain out of this batch.
+
+The original PR404 Azure ZIP403 remains disclosed. No retry/bypass and no SARIF-body/ZIP-byte assertion is introduced for Training. This PR needs its own formal successful run and separate specific merge approval; PR404's approval does not authorize merging408.
