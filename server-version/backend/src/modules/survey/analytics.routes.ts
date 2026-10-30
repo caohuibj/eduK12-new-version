@@ -18,6 +18,7 @@ import { loadSurveyItemDictionary,loadSurveySource } from './analytics.source'
 import { describeWave } from './analytics.descriptive'
 import { describeSurveyFlowOperations } from './analytics.flow-operations'
 import { assertRecentSurveyMfa } from './analytics.export.service'
+import { surveyGroupCatalog, generateSurveyGroupReport, readSurveyGroupReport } from './group-report.service'
 
 
 export const surveyAnalyticsRouter=Router()
@@ -59,6 +60,14 @@ surveyAnalyticsRouter.post('/:pid/analytics/quality/attempts/:attemptId',wrap(re
     ...review.parse(req.body)})))
 
 const key=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
+const groupReportScope=(req:Request)=>({actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid)})
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/group-reports',wrap(req=>surveyGroupCatalog(groupReportScope(req))))
+surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/group-reports',wrap(req=>{
+  assertRecentSurveyMfa(req)
+  return generateSurveyGroupReport({...groupReportScope(req),...z.object({instrumentKey:key}).strict().parse(req.body)})
+}))
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/group-reports/:artifactId',wrap(req=>
+  readSurveyGroupReport({...groupReportScope(req),artifactId:id.parse(req.params.artifactId)})))
 const flowCohortInput=z.object({
   category:z.object({instrumentKey:key,itemKey:key}).strict().optional(),
   score:z.object({instrumentKey:key,scoreKey:key}).strict().optional(),

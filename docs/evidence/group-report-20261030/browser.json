@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "synthetic": true,
+  "printOnlyContinuation": true,
+  "actualReactComponents": true,
+  "widths": [
+    1440,
+    390
+  ],
+  "checks": [
+    "open saved artifact",
+    "select leaf tool",
+    "explicit generation",
+    "read original version",
+    "local metric switch",
+    "actual fullscreen",
+    "all metrics printed",
+    "responsive overflow",
+    "no page errors"
+  ],
+  "screenshots": [
+    "group-1440.png",
+    "group-390.png"
+  ]
+}

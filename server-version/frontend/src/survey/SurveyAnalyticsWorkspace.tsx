@@ -1,3 +1,4 @@
+import {SurveyGroupReports} from './SurveyGroupReports'
 import {StoredPackageReports} from './StoredPackageReports'
 import './survey-workspace-polish.css'
 import {CheckCircle2,ClipboardCheck,Filter,UserMinus} from 'lucide-react'
@@ -720,6 +721,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             FINAL 页可合并，独立参与状态页按研究编号与波次关联；不要将两类 CSV 直接拼接。</p>}
         </div>}
       </div>
+      {waveId&&<SurveyGroupReports key={'group:'+actorId+':'+projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
       {waveId&&<details className="survey-data-advanced">
         <summary>参考版本与历史报告 · 高级工具</summary>
         <p>需要编制项目样本参考或查看已保存报告时，再展开以下工具。</p>
