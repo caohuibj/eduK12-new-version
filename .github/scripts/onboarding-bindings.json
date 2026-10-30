@@ -918,7 +918,7 @@
       "enabled": true,
       "base": "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
       "product": "e0c993ef672e889c9373d68d1c90541f61b53e5e",
-      "controlCheckpoint": "d10399486338f5094557c2b2a195583ffa5fe3fb",
+      "controlCheckpoint": "131fad32c002e3b1a0915d7661daed78bc32856a",
       "components": {
         "backend": "94f9e5bb921ec587774857e7dc85ef4518616eb6",
         "frontend": "f9d4530ad115402477acdaed7993d7b0f51ac804"
