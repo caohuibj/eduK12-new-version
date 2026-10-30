@@ -2093,7 +2093,7 @@
         "backend": "86330943ba93e2688656ddd8fc6643baf83022d6",
         "frontend": "43e5e363e2b8ac8f40da27af293d02a73a89eb8c"
       },
-      "activationNote": "Exact 17-path source/control diagnostic and scoped originals accepted; normal Ready qualification via existing scope/onboarding/CodeQL/gate, no application producer replay."
+      "activationNote": "Ready synchronize after initial Draft/Ready event competition; exact source/control unchanged, original cancelled/Draft runs retained. Qualify existing admission, scoped SAST and stable gate only."
     }
   }
 }
