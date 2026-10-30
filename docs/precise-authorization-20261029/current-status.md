@@ -1,9 +1,13 @@
 # 当前状态：四入口精确授权工程候选，尚未正式合格/合入 main
 
 Task 1 分支 `task1-scale-exact-authorization-20261029` 正常整合 main
-`dc796e04203696b4a579aa6fd2428df592031ee3`（merge `bdd7f6987`），保留已合入的
+`13884d7386987068f14b77ec5bbbcb8d431681d8`（merge `f008a76f`），保留已合入的
 Task 2 Bundle 工作；`.github` 相对该 main 无差异。逐阶段文件记录各自实际基线和执行范围，
 不是用本页把旧证据重新标记为当前完整候选通过。
+
+DOT 集中审阅提出的三项认知管理缺口已修复，9 个组件契约、2 个受限角色保护 HTTP/PG
+及合并后相关类型通过；见[本轮修订](cognitive-management-review-progress.md)。未重跑
+已认可的 136 次试次或 #395 加载验证，正式限定 CI 的本候选登记仍未完成。
 
 | 范围 | 实际状态 |
 | --- | --- |

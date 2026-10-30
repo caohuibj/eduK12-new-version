@@ -5,7 +5,7 @@ import {AdminPermissionError} from '../admin-permissions/service'
 import {assertEducationConfigurationManager,educationConfigurationDistributionRoots} from './education-standard-management'
 import {readApprovedCognitiveProfileArtifact} from './cognitive-profile-approved-source'
 import type {EducationConfigurationScope} from './education-standard-use'
-import {educationCognitiveProfileHeaderJoins} from '../education-tools/public-source.headers'
+import {EDUCATION_STANDARD_USE_ACTION} from './education-standard-use'
 import {listEducationAuthoringMemberCandidates} from '../organization/educationProductAccess'
 const query=z.object({page:z.coerce.number().int().min(1).max(10000).default(1),q:z.string().trim().max(120).default('')}).strict()
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000}
@@ -20,12 +20,27 @@ export async function educationCognitiveProfileManagementCatalog(actorId:string,
  const input=query.parse(raw),size=25
  return prisma.$transaction(async tx=>{
   await assertEducationConfigurationManager(tx,actorId,scope)
-  const rows=await tx.$queryRaw<Array<{configId:string;title:string;profile:string;artifactHash:string;configuration:unknown;authorities:unknown[]}>>(Prisma.sql`SELECT c.id AS "configId",c.name AS title,e.metadata#>>'{configuration,profile}' AS profile,p.fingerprint AS "artifactHash",e.metadata->'configuration' AS configuration,
+  const rows=await tx.$queryRaw<Array<{configId:string;title:string;profile:string;artifactHash:string;configuration:unknown;available:boolean;authorities:unknown[]}>>(Prisma.sql`WITH approvals AS (
+   SELECT DISTINCT ON (resource_id,metadata->>'artifactHash') resource_id,metadata FROM assessment_management_events
+   WHERE action='COGNITIVE_PROFILE_APPROVED' AND metadata->>'artifactFormatVersion'='2' ORDER BY resource_id,metadata->>'artifactHash',id
+  ), headers AS (SELECT e.resource_id AS "configId",COALESCE(c.name,'原认知测验') AS title,e.metadata#>>'{configuration,profile}' AS profile,e.metadata->>'artifactHash' AS "artifactHash",e.metadata->'configuration' AS configuration,
+   COALESCE(c.status='PUBLISHED' AND c.measurement_release_id=m.id AND m.layer='MEASUREMENT' AND m.family='COGNITIVE' AND m.status='PUBLISHED'
+    AND m.scope->>'kind'='PLATFORM' AND m.content_hash=e.metadata#>>'{configuration,measurement,contentHash}' AND t.template_hash IS NOT NULL AND p.decision='APPROVED' AND NOT p.paused,false) AS available,
+   EXISTS(SELECT 1 FROM content_capability_grants own JOIN assessment_management_events issuance ON issuance.id=own.id AND issuance.action=${EDUCATION_STANDARD_USE_ACTION}
+    WHERE own.issuer_id=${actorId} AND own.product=${scope.product} AND own.scope_kind='ORGANIZATION' AND own.scope_id=${scope.organizationId}
+     AND issuance.actor_id=${actorId} AND issuance.resource_id=e.resource_id AND issuance.metadata->>'artifactHash'=e.metadata->>'artifactHash'
+     AND issuance.metadata#>>'{selectedBinding,binding,configuration,kind}'='COGNITIVE_PROFILE') AS "ownIssued",
    COALESCE((SELECT jsonb_agg(jsonb_build_object('id',r.id,'version',r.version,'validFrom',r.valid_from AT TIME ZONE 'UTC','expiresAt',r.expires_at AT TIME ZONE 'UTC')) FROM (${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`m.id`)} ORDER BY g.id LIMIT 129) r),'[]'::jsonb) AS authorities
-   FROM (SELECT 1) anchor ${educationCognitiveProfileHeaderJoins(scope.product)}
-   WHERE EXISTS(${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`m.id`)}) AND (${input.q}='' OR strpos(lower(c.name),lower(${input.q}))>0 OR strpos(lower(c.test_type),lower(${input.q}))>0)
-   ORDER BY c.id,p.fingerprint LIMIT ${size+1} OFFSET ${(input.page-1)*size}`)
-  return {page:input.page,hasMore:rows.length>size,list:rows.slice(0,size).map(row=>({...row,assignable:row.authorities.length>0&&row.authorities.length<=128,authorities:row.authorities.length<=128?row.authorities:[]}))}
+   FROM approvals e LEFT JOIN cognitive_test_configs c ON c.id=e.resource_id
+   LEFT JOIN measurement_content_releases m ON m.id=e.metadata#>>'{configuration,measurement,releaseId}'
+   LEFT JOIN assessment_public_templates t ON t.template_hash=e.metadata->>'artifactHash' AND t.template_kind='COGNITIVE_PROFILE_CONFIGURATION'
+   LEFT JOIN survey_tool_policies p ON p.product=${scope.product} AND p.resource_key='cognitive-profile:'||e.resource_id||':'||(e.metadata#>>'{configuration,profile}') AND p.fingerprint=e.metadata->>'artifactHash'
+   WHERE (${input.q}='' OR strpos(lower(COALESCE(c.name,'')),lower(${input.q}))>0 OR strpos(lower(COALESCE(c.test_type,'')),lower(${input.q}))>0))
+   SELECT "configId",title,profile,"artifactHash",configuration,available,authorities FROM headers
+   WHERE (available AND jsonb_array_length(authorities)>0) OR "ownIssued"
+   ORDER BY "configId","artifactHash" LIMIT ${size+1} OFFSET ${(input.page-1)*size}`)
+  return {page:input.page,hasMore:rows.length>size,list:rows.slice(0,size).map(({available,...row})=>({...row,assignable:available&&row.authorities.length>0&&row.authorities.length<=128,authorities:available&&row.authorities.length<=128?row.authorities:[],
+   unavailableReason:!available?'原配置已停止新增分发或当前入口未批准':!row.authorities.length?'当前缺少本校、本来源的精确分发委托':row.authorities.length>128?'精确分发委托过多，请整理后选择':null}))}
  },options)
 }
 export async function educationCognitiveProfileManagementRecipients(actorId:string,scope:EducationConfigurationScope,configId:string,profile:unknown,artifactHash:string,raw:unknown){
