@@ -1,0 +1,49 @@
+✘ [ERROR] No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-05.avif
+
+    server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:15:24:
+      15 │ ...Avif from '../../../../assets/emotion-faces-ai-zh-v1.0.0/sheet-...
+         ╵              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+✘ [ERROR] No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-01.avif
+
+    server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:11:24:
+      11 │ ...Avif from '../../../../assets/emotion-faces-ai-zh-v1.0.0/sheet-...
+         ╵              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+✘ [ERROR] No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-02.avif
+
+    server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:12:24:
+      12 │ ...Avif from '../../../../assets/emotion-faces-ai-zh-v1.0.0/sheet-...
+         ╵              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+✘ [ERROR] No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-03.avif
+
+    server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:13:24:
+      13 │ ...Avif from '../../../../assets/emotion-faces-ai-zh-v1.0.0/sheet-...
+         ╵              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+✘ [ERROR] No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-04.avif
+
+    server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:14:24:
+      14 │ ...Avif from '../../../../assets/emotion-faces-ai-zh-v1.0.0/sheet-...
+         ╵              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Error: Build failed with 5 errors:
+server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:11:24: ERROR: No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-01.avif
+server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:12:24: ERROR: No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-02.avif
+server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:13:24: ERROR: No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-03.avif
+server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:14:24: ERROR: No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-04.avif
+server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts:15:24: ERROR: No loader is configured for ".avif" files: server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/sheet-05.avif
+    at failureErrorWithLog (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:1467:15)
+    at /workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:926:25
+    at /workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:878:52
+    at buildResponseToResult (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:924:7)
+    at /workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:951:16
+    at responseCallbacks.<computed> (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:514:28)
+    at addChunk (node:internal/streams/readable:568:12) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}

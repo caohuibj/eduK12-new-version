@@ -1,0 +1,111 @@
+{
+  "status": "IN_PROGRESS_NOT_MERGE_READY",
+  "base": "296c941419d76b360405c2c487d10514cd5c530e",
+  "productHead": "cd19b063615726e5b517045746dfe721ee78d512",
+  "componentTrees": {
+    "backend": "1b598408c21af58e8ba55287bd1c7b3b09b2ba98",
+    "frontend": "83917ae150cafbbe825a269d4c56a0e08a98e0a8"
+  },
+  "localTypes": [
+    {
+      "component": "backend",
+      "report": "backend-presentation-types.log",
+      "exitCode": 0
+    },
+    {
+      "component": "frontend app",
+      "report": "frontend-final-types.log",
+      "exitCode": 0
+    }
+  ],
+  "distinctUnitAndMockHttpCases": 32,
+  "postgres": {
+    "initial": "failed after historical class/tag/source assertions, invalid staff-role fixture enum",
+    "continuation": "one retained staff-class step passed; no fixture reset or replay",
+    "isFullSchoolServiceJourney": false
+  },
+  "browser": {
+    "report": "browser.json",
+    "realSchoolAppNavigation": true,
+    "syntheticAuthAndApi": true,
+    "pdfPages": 2
+  },
+  "notQualification": [
+    "frontend-types.log runs empty root tsconfig and is not application type evidence",
+    "preparation shell paths failed before some checks; initial PostgreSQL test continued after that preparation error",
+    "backend types before later source edits retained as earlier checkpoints only"
+  ],
+  "remaining": [
+    "Mandatory: integrate existing frozen School privacy options before publishing this candidate; current numeric projector alone is insufficient for a frozen restricted profile",
+    "Teacher actual product entry and product-admin adaptation",
+    "School Form choices and unsupported standalone/Bundle runtime adapters",
+    "group longitudinal awaits stable personal contract"
+  ],
+  "reports": {
+    "backend-delta.json": {
+      "sha256": "2684a545392afb6a18c07d0dd204711b29ccdacff0d1cf9ca4712f020abecfed",
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "numPendingTests": 17
+    },
+    "backend-final-delta.json": {
+      "sha256": "25acc300726464e0c0f40781288da36a3708a340ad4898260f56306dd82dd11c",
+      "numPassedTests": 9,
+      "numFailedTests": 0,
+      "numPendingTests": 13
+    },
+    "backend-unit.json": {
+      "sha256": "dc9929e6495d8c761eef42dd37c61560fa74852ed06672b6b2f8a0965d329e9d",
+      "numPassedTests": 21,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "browser.json": {
+      "sha256": "7791ffd1feecb7227a8ef682bfe013eef5d0b28e15ee3b73054837cc8e1b6daa"
+    },
+    "frontend-renderer-delta.json": {
+      "sha256": "437a3d269d34e12fb83b1c04312c3e85a091baf94c9a1e0de070bb529b406603",
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 2
+    },
+    "frontend-unit.json": {
+      "sha256": "3e6dcaefa9273816f5885a871b65696d2b6ab04f0a700571563e57f62daebcee",
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "leaf-current-epoch.json": {
+      "sha256": "eeae411c7413e1a7d8a5d0c0efbd91008402c7bcf20096911a669b66a5cd85e5",
+      "numPassedTests": 6,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "postgres-continuation.json": {
+      "sha256": "b9f0441d384e03089ff70df3f3f7f91376714c66f51bd70ff7653475471a1653",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 1
+    },
+    "postgres.json": {
+      "sha256": "a40a837700683f7bb55dfea98d2bcf3d874948d62935da9a5ebafcbd549df77f",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "presentation-delta.json": {
+      "sha256": "4dd4fb5464ff20de9258ba45805194e6a657948f3a565eca17c539b7c0a1b57e",
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 19
+    },
+    "routes.json": {
+      "sha256": "e2cada086cd988e05da342cd15dece86c150b6e7b398d020058bbb924748a04e",
+      "numPassedTests": 6,
+      "numFailedTests": 0,
+      "numPendingTests": 28
+    }
+  },
+  "ciExecuted": false,
+  "productionTouched": false
+}
