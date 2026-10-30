@@ -157,3 +157,7 @@ Original175 different successful cases are admitted by case ownership, never by 
 No schema/migration change: existing main artifact storage already covers Training. No database journey/native restore, old174/175 suite, scoring or browser replay. Actual React/synthetic API reading/print PDF and actual course navigation/deep-link evidence are retained separately; they are not production auth/capacity claims. Fixed independent/Bundle runtime sources and group longitudinal remain out of this batch.
 
 The original PR404 Azure ZIP403 remains disclosed. No retry/bypass and no SARIF-body/ZIP-byte assertion is introduced for Training. This PR needs its own formal successful run and separate specific merge approval; PR404's approval does not authorize merging408.
+
+## main2fc alignment after core Bundle merge
+
+Original formal41035994222 success remains attached to20de08b63/base318. PR405 main2fccefaf838fe24c3d2ec3a63b32d016dbe18866 merged normally at807bf702 without conflicts; Training's27 source/test/e2e blobs unchanged. Both full component trees changed upstream, so current backend94f9e5bb921ec587774857e7dc85ef4518616eb6 and frontendf9d4530ad115402477acdaed7993d7b0f51ac804 each compiled once exit0. Original175 cases, browser, PG/native restore and local control fixture not replayed. New exact formal scope/admission/current affected CodeQL/Ready remains pending the new candidate. No School/Teacher source, no new workflow or broad fallback, no merge/deploy. Details main-2fc-alignment/README.md; original success not retagged.
