@@ -562,7 +562,7 @@
       "enabled": true,
       "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
       "product": "78899e7fefc1ea6ca14ca4d144f6a37bb275472e",
-      "controlCheckpoint": "42ffcb500183b5b914192dbc83abe96921ed42d1",
+      "controlCheckpoint": "0e2731f62fe2f45ae01e21cfb5679fdf21eb0cfd",
       "components": {
         "backend": "b81911415277e35b673dc95300720043ac8ac796",
         "frontend": "dbbeb1ec1230710d5c9108e1f4be7dd42768efdd"
@@ -739,7 +739,7 @@
         },
         "docs/evidence/group-report-20261030/qualification/README.md": {
           "before": null,
-          "after": "3f737714005d328131898e0a704028ac6e859770"
+          "after": "c32cfcf2369c1dca73c8bd1d3c53138cb10608c3"
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.exit": {
           "before": null,
@@ -764,6 +764,22 @@
         "docs/evidence/group-report-20261030/qualification/candidate-migrate.log": {
           "before": null,
           "after": "fd5cb4463cca7e2491f24913f20f3a6580688e82"
+        },
+        "docs/evidence/group-report-20261030/qualification/ci-draft-scope.log": {
+          "before": null,
+          "after": "4f15d59a41a1fde056df14424de2ab055f097c80"
+        },
+        "docs/evidence/group-report-20261030/qualification/ci-draft.json": {
+          "before": null,
+          "after": "a89050a03197f593a7a5058c90b681b6caac4966"
+        },
+        "docs/evidence/group-report-20261030/qualification/ci-ready-first.json": {
+          "before": null,
+          "after": "a50b19cadaba71bc2373892c401cd5111e5bb308"
+        },
+        "docs/evidence/group-report-20261030/qualification/ci-ready-first.log": {
+          "before": null,
+          "after": "d54c970b2cf04d029f51e73e051291613357f41d"
         },
         "docs/evidence/group-report-20261030/qualification/frontend-types.exit": {
           "before": null,
@@ -894,7 +910,7 @@
           "after": "28a9ce5d85c814eb367fe6f7316a09cd15be9684"
         }
       },
-      "activationNote": "Activate only the existing immutable reviewed-evidence admission and required SAST for PR404 on main8cf. Original unsigned runs retained; missing exact component types and native table restore completed locally. Delegated scoped self-review; DOT background review remains independent. No workflow/job or deployment grant added."
+      "activationNote": "Scoped inline-classifier repair after preserved Draft41022894812/Ready41022969851. Same application trees, original evidence and three required jobs; no application checks or restore replay. Actual inline and CLI will be previewed on a clearly marked local synthetic merge before a new CI event."
     },
     "task1": {
       "schemaVersion": 1,
