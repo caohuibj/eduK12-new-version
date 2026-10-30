@@ -14,10 +14,11 @@ export const NATIVE_JOBS=['admission','frontend','backend-self','native-evidence
 const hash=x=>createHash('sha256').update(x).digest('hex');
 const sha=x=>typeof x==='string'&&/^[a-f0-9]{40}$/.test(x);
 export const nativeBinding=(branch=NATIVE_BRANCH)=>{assert(isNativeBranch(branch),'Unknown native branch');return JSON.parse(readFileSync(new URL(branch===PACKAGE_BRANCH?'./school-teacher-package-bindings.json':'./school-teacher-native-bindings.json',import.meta.url)))};
-export function nativeSastConfig(paths){
+export function nativeSastConfig(paths,b=paths.some(p=>p.includes('school-teacher-package'))?nativeBinding(PACKAGE_BRANCH):null){
  const python=new Set(['.github/scripts/school-teacher-native-runtime.py','.github/scripts/school-teacher-native-runtime.test.py','.github/scripts/exact-candidate-runtime.py']);
  assert([...python].every(p=>paths.includes(p)),'Native Python extractor inputs missing');
- return {paths:['server-version/backend/src','server-version/frontend/src','.github/scripts',...(paths.some(p=>p.includes('school-teacher-package'))?['server-version/e2e']:[])],
+ const reusedApplicationScan=b?.execution.sastContinuation===40980640181;
+ return {paths:reusedApplicationScan?['.github/scripts','server-version/e2e','server-version/frontend/e2e','server-version/frontend/vite.config.ts']:['server-version/backend/src','server-version/frontend/src','.github/scripts',...(paths.some(p=>p.includes('school-teacher-package'))?['server-version/e2e']:[])],
   'paths-ignore':paths.filter(p=>p.startsWith('.github/scripts/')&&p.endsWith('.py')&&!python.has(p)).sort(),queries:[{uses:'security-extended'}]};
 }
 export function requireNativeQualification(b){

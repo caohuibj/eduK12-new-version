@@ -21,6 +21,13 @@ export function verifyOriginalScans(read,b){
  assert.deepEqual(r.results.map(x=>x.component),['frontend','backend']);for(const item of r.results){const c=item.context;assert.equal(c.head,origin.checkout);assert.equal(c.runId,String(origin.run));assert.equal(c.attempt,'1');assert.equal(c.tree,b[item.component+'Tree']);const scan=read('native-'+item.component+'-trivy.json');assert.equal(scan.Metadata.ImageID,item.imageId);assert(scan.Results.length);assert(!scan.Results.flatMap(v=>v.Vulnerabilities||[]).some(v=>['HIGH','CRITICAL'].includes(v.Severity)&&v.FixedVersion));}
  return r;
 }
+export function verifyApplicationSast(r,j,git){
+  assert.equal(r.id,40980640181);assert.equal(r.head_sha,'f3ac63d2c56ea21c1dbea9833c73aa9c3846fd2b');assert.equal(r.event,'pull_request');assert.equal(r.path,'.github/workflows/ci.yml');assert.equal(r.status,'completed');assert.equal(r.conclusion,'failure');
+  assert.equal(j.id,123819670249);assert.equal(j.run_id,r.id);assert.equal(j.head_sha,r.head_sha);assert.equal(j.name,'codeql (javascript/typescript SAST)');assert.equal(j.status,'completed');assert.equal(j.conclusion,'success');for(const name of ['initialize CodeQL','analyze with CodeQL'])assert(j.steps.some(s=>s.name===name&&s.conclusion==='success'));
+  for(const component of ['frontend','backend'])assert.equal(git('rev-parse','HEAD:server-version/'+component),git('rev-parse',r.head_sha+':server-version/'+component));
+  assert.equal(git('diff','--name-only',r.head_sha,'HEAD','--','*.py'),'','Unchanged Python belongs to the original successful scan');
+  return {originalRun:r.id,originalJob:j.id,originalHead:r.head_sha,originalParentConclusion:r.conclusion,originalJobConclusion:j.conclusion,currentChangedControlScanRequired:true,applicationScannedAgain:false};
+}
 export async function resumePackagePhase(phase,b,plan,d){
  assert.equal(plan.publicPackage,true);assert.equal(plan.continuation,'package-browser-only');assert.equal(b.execution.officialContinuation,origin.run);assert.equal(b.branch,'feat/education-package-runtime-20261029');
  for(const component of ['frontend','backend'])assert.equal(d.git('rev-parse','HEAD:server-version/'+component),d.git('rev-parse',origin.head+':server-version/'+component));
@@ -28,9 +35,11 @@ export async function resumePackagePhase(phase,b,plan,d){
  const old=JSON.parse(d.git('show',origin.head+':.github/scripts/school-teacher-package-bindings.json'));assert.deepEqual(b.evidence,old.evidence);assert.deepEqual(b.execution.runtime,old.execution.runtime);
  const run=await d.officialApi('/actions/runs/'+origin.run),job=await d.officialApi('/actions/jobs/'+origin.jobs[phase]);verifyOriginJob(run,job,phase);
  const zip=async key=>{const[id,digest,suffix]=artifacts[key];return d.officialZip(id,digest,'school-teacher-'+suffix+'-'+origin.checkout,origin.run,origin.head)};
- const proof={status:'VERIFIED_OFFICIAL_SUBCHECKS',currentHead:plan.head,currentRun:process.env.GITHUB_RUN_ID,originalRun:origin.run,originalHead:origin.head,originalCheckout:origin.checkout,originalJob:job.id,originalJobConclusion:job.conclusion,originalParentConclusion:run.conclusion,applicationExecuted:false,buildExecuted:false,auditExecuted:false};
+ let applicationSast;
+ if(phase==='audit'&&b.execution.sastContinuation===40980640181)applicationSast=verifyApplicationSast(await d.officialApi('/actions/runs/40980640181'),await d.officialApi('/actions/jobs/123819670249'),d.git);
+ const proof={status:'VERIFIED_OFFICIAL_SUBCHECKS',currentHead:plan.head,currentRun:process.env.GITHUB_RUN_ID,originalRun:origin.run,originalHead:origin.head,originalCheckout:origin.checkout,originalJob:job.id,originalJobConclusion:job.conclusion,originalParentConclusion:run.conclusion,applicationExecuted:false,buildExecuted:false,auditExecuted:false,...(applicationSast?{applicationSast}: {})};
  if(phase!=='native-runtime'){
-  const read=d.jsonZip(await zip(phase)),file=phase==='audit'?'audit.json':phase==='native-evidence'?'native-evidence.json':phase+'-fresh-build.json';proof.original=read(file);d.receipt(phase+'-official-continuation',proof);return;
+  const read=d.jsonZip(await zip(phase)),file=phase==='audit'?'audit.json':phase==='native-evidence'?'native-reviewed-local-evidence.json':phase+'-fresh-build.json';proof.original=read(file);d.receipt(phase+'-official-continuation',proof);return;
  }
  const runtimeZip=await zip('runtime'),read=d.jsonZip(runtimeZip),runtime=verifyOriginalScans(read,b);
  for(const item of runtime.results){const raw=spawnSync('unzip',['-p',runtimeZip,'native-'+item.component+'-trivy.json']);assert.equal(raw.status,0);assert.equal(hash(raw.stdout),item.reportSha256);}const out=resolve('school-teacher-evidence');mkdirSync(out,{recursive:true});

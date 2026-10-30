@@ -46,3 +46,13 @@ test('PR392 continuation skips producers and audits and keeps the failed parent 
  verifyOriginJob(run,job,'frontend');assert.throws(()=>verifyOriginJob({...run,conclusion:'success'},job,'frontend'));assert.throws(()=>verifyOriginJob(run,{...job,conclusion:'failure'},'frontend'));
  const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8');assert(workflow.includes("continuation != 'package-browser-only'"));assert(workflow.includes('confirmed-public-package-scope'));
 });
+
+test('package consumer reads the original receipt name and waits for its own source and dirty state',()=>{
+ const reuse=readFileSync(new URL('./school-teacher-package-resume.mjs',import.meta.url),'utf8'),browser=readFileSync(new URL('../../server-version/e2e/school-teacher-package-browser.cjs',import.meta.url),'utf8');assert(reuse.includes('native-reviewed-local-evidence.json'));assert(browser.includes("selector.locator('option:not([value=\"\"]):enabled')"));assert(!browser.includes("document.querySelectorAll('select')[0]"));assert(browser.includes(".and(page.locator(':disabled')).waitFor()"));assert(browser.includes('report.failureLine='));
+});
+
+test('continued SAST scans current controls while the audit consumer requires the exact successful original application scan',async()=>{
+ const{nativeSastConfig}=await import('./school-teacher-native.mjs'),paths=['.github/scripts/school-teacher-native-runtime.py','.github/scripts/school-teacher-native-runtime.test.py','.github/scripts/exact-candidate-runtime.py'];
+ assert.deepEqual(nativeSastConfig(paths,{execution:{sastContinuation:40980640181}}).paths,['.github/scripts','server-version/e2e','server-version/frontend/e2e','server-version/frontend/vite.config.ts']);assert(nativeSastConfig(paths,null).paths.includes('server-version/backend/src'));
+ const reuse=readFileSync(new URL('./school-teacher-package-resume.mjs',import.meta.url),'utf8');assert(reuse.includes("assert.equal(j.conclusion,'success')"));assert(reuse.includes('currentChangedControlScanRequired:true'));assert(reuse.includes("'*.py'"));assert(readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8').includes("continuation == 'package-browser-only' && 'javascript-typescript'"));
+});
