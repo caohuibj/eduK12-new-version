@@ -1,0 +1,16 @@
+{
+  "recordedAt": "2026-10-30T11:41:05.985603+00:00",
+  "schoolHeadBeforeEvidence": "4668ba69ccde20e9eef709d9cd81feaf7178cb86",
+  "main": "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
+  "surveyHead": "26d1268ce2146fe3005a36582ace16c0bcbda09a",
+  "trainingHead": "1f108f03bca14d266e6ace066f9b441feaa2f347",
+  "teacherHead": "147c2e6267b032d48661fa71b54a83986534f27a",
+  "nativeSource": "Original same School/Teacher mixed-composition source files preserved; no accepted publication/FINAL replay. Main PR405 changes Bundle definition provider, so only that affected existing ceiling case executed on aligned source.",
+  "bundleCeilingResult": {
+    "passed": 1,
+    "failed": 0,
+    "inputHead": "4668ba69ccde20e9eef709d9cd81feaf7178cb86",
+    "report": "education-leafs-main2fc-bundle-ceiling.json"
+  },
+  "typeEvidence": "Prior backend/frontend types remain qualified only for fe06 source input table; no claim new full main-aligned types or formal CI. Main-only formal checks remain on PR399 first."
+}

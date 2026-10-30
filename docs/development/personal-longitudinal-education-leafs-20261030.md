@@ -72,3 +72,13 @@ School browser evidence remains at its recorded input stage. Conservative source
 roster inheritance can still refuse departed members; no identity/roster redesign
 is introduced. Sequential main alignment and exact formal qualification remain
 for the Survey→Training→Teacher→School dependency chain before merge confirmation.
+
+## Main2fc sequential alignment
+
+After the feature checkpoint, Survey26d1268ce was merged into Training1f108f03b,
+then Teacher147c2e626, then School4668ba69c, without conflicts, force-push or
+application replay. Main PR405 changed the Bundle definition provider; the one
+affected existing fixed-ceiling case passed on the aligned source. Original
+feature types/journeys retain the earlier recorded source stage; this alignment
+does not relabel them as freshly executed main-aligned checks. Exact branch
+SHAs and raw focused result are in leaf-extension/main2fc-alignment.json.
