@@ -13,3 +13,7 @@
 当前仅 Draft 准备，不激活正式CI、不合并、不部署、不修改真实用户/数据/权限。
 
 最终frontend树00a843d3164e16ae7b7b4045ee0597db2812d790真实 app types exit0，3个触达前端文件lint exit0（原有scopeGeneration cleanup-ref警告1条，未改规则/阈值）。原执行无签名，报告和输入后续精确归档，不伪造历史签名或称本地等于正式CI。
+
+## mainfa / PR414 资格等待期间的独立收口
+
+只在本Reader分支合入School已冻结候选77e276724，检查点68f047824a940595a9a9346298235c3f4cddaa56；不修改PR414候选。当前backend tree2342ff04dd851b9c82383fd5835f35935ecb67fa与School实际已验tree完全相同，复用原类型收据，不运行后端检查。当前Reader frontend treeb6e7cfb9d6bd52c9f67fcb3b744f3d9b8936f31f实际仅补一次app类型检查，exit0。原导航/浏览器/PDF不重播。PR415保持Draft，尚无自己的正式CI资格。

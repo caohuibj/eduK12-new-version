@@ -120,7 +120,27 @@
     "frontend-lint.log.gz": {
       "sha256": "0def6a4ca42738764b513ccc8e794f60b99e280edd6533693ba0d108fa9c3043",
       "bytes": 302
+    },
+    "mainfa/frontend-types.json": {
+      "sha256": "6e3ed12d1457bfe76d23beb01e02a8ae287b341495d3ce2da69062057568c1da",
+      "bytes": 528
+    },
+    "mainfa/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
     }
   },
-  "rawLogTransport": "frontend-lint.log.gz losslessly preserves original lint output, including trailing blank line; no output trimming"
+  "rawLogTransport": "frontend-lint.log.gz losslessly preserves original lint output, including trailing blank line; no output trimming",
+  "mainfaQualificationPreparation": {
+    "main": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "schoolDependency": "77e2767248d171f8914fe94b9f3debada424a4d4",
+    "sourceCheckpoint": "68f047824a940595a9a9346298235c3f4cddaa56",
+    "frontendTree": "b6e7cfb9d6bd52c9f67fcb3b744f3d9b8936f31f",
+    "frontendTypes": "mainfa/frontend-types.json: actual once exit0",
+    "backendTree": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+    "backendTypes": "Exact unchanged backend tree equals PR414 current mainfa/backend-types.json receipt; no backend replay.",
+    "oldNavigationBrowserReexecuted": false,
+    "formalCiActivated": false,
+    "schoolCandidateModified": false
+  }
 }
