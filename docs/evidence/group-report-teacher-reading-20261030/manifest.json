@@ -128,6 +128,14 @@
     "mainfa/frontend-types.log": {
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0
+    },
+    "mainfb/frontend-types.json": {
+      "sha256": "fc4cd9fc51b83b2d96f1081b7a471726606ce2ee69741f9be7be067664f97de0",
+      "bytes": 528
+    },
+    "mainfb/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
     }
   },
   "rawLogTransport": "frontend-lint.log.gz losslessly preserves original lint output, including trailing blank line; no output trimming",
@@ -142,5 +150,17 @@
     "oldNavigationBrowserReexecuted": false,
     "formalCiActivated": false,
     "schoolCandidateModified": false
+  },
+  "mainfbPreparation": {
+    "main": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+    "schoolDependency": "f5fabe490334f06c7f97436e82545d3b55b921f6",
+    "sourceCheckpoint": "704a0ab779929592f201a54d367a9d9e295f29c9",
+    "frontendTree": "b672a3fcf90f535079675048a7a013fbbbf660fb",
+    "frontendTypes": "mainfb/frontend-types.json: once exit0",
+    "backendTree": "dc9a331f08901238236ec3664e3173aba3f15030",
+    "backendTypesReused": "Exact same tree as School mainfb/backend-types.json; no backend replay.",
+    "businessOrBrowserReexecuted": false,
+    "formalCiActivated": false,
+    "schoolFinalCandidateModified": false
   }
 }

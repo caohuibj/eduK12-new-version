@@ -23,3 +23,9 @@
 正式41057783824在candidate77e276724/basefa038041上四作业成功，41个观察实际接纳而非重播；完整126作业列表、原件接纳JSON、两个ZIP的真实下载哈希及原SARIF lossless gzip已在本后续分支归档。SARIF保留一条主线既有测试断言告警，不声称零告警，不改旧源码/阈值。School已验77候选不变。
 
 用户批准406/414依次合并后，新mainfb3a0cab6f3f28e737a38550167ff6b2affcae56尚未在此节点对齐：Git fetch认证失败，新对象本地不存在。GitHub API仍可读，Hui新审阅页已成功追加正式原件与准确阻碍，未重复两项修复结论。停止Git凭据重试，不用旧run代替新基线资格；这些归档先本地保存，恢复Git传输后再推送。没有合并或部署。
+
+## main406 / School最终资格归档
+
+Git公开只读fetch成功后，PR414原分支完成mainfb对齐。通过既有授权官方Git数据API逐对象保留并验证本地SHA（40对象），再按期望旧head77e276724快进原School分支到f5fabe490；未新建凭据、未改main。实际merge78c76f50父提交为mainfb和该candidate，tree122aceed8与source相同。正式41062520295四作业全部success、126作业完整分页核对；41观察继续接纳未重播，两个ZIP均实际核验，SARIF保留同一条历史测试断言告警。旧凭据故障为历史，当前资格完成，node不合并/部署。正式原件在本后续分支mainfb/formal目录，School已通过candidate不改。
+
+本Reader独立合入该School候选后，检查点704a0ab779929592f201a54d367a9d9e295f29c9当前frontend treeb672a3fcf90f535079675048a7a013fbbbf660fb只补一次app类型检查，exit0。backend tree与School dc9a331f完全相同，复用其新收据，不重复后端/业务/PG/浏览器。PR415仍Draft，无自己的正式资格。旧d1fe67归档保留为祖先。
