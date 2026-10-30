@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ets16_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Engaged Teachers Scale 英文16题原版（仅目录，未准备施测）",
+      "abbreviation": "ETS16-EN",
+      "instrumentFamily": "Engaged Teachers Scale original 16 items and four factors"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "Engaged Teachers Scale 英文16题原版：仅记录准确版本、构念维度、已有选题/计分线索与缺件；不含题文、可执行计分或个体结果。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ets16_en",
+        "domain:teacher_workplace",
+        "construct:engagement",
+        "population:adult_teacher",
+        "response:self",
+        "locale:en",
+        "availability:catalog_only",
+        "rights:public_redist_unknown",
+        "project:source_identity_only",
+        "scoring:not_runtime",
+        "report:original_draft_only"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向成年教师研究资料定位；原文和既有研究不能替代中国K12教师效度或常模。18+是项目应用边界，目录不可施测。"
+    },
+    "administration": {
+      "itemCount": 16,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "目录来源依精确原作者版本；正式指导语/回忆期和数字施测版本尚未确认",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "本目录仅标记16题版本；认知：原编号4/8/11/15；情感2/5/10/13；学生社会投入3/6/14/16；同事社会投入1/7/9/12。独立实施指引、逐档选项与明确个体计分/缺失规则未取得，不能由论文统计均值倒推。",
+        "没有公开题文、选项、指导语、可执行评分规则和用户结果。",
+        "使用、版权、译本、研究效度属真实附注，尚未获得本项目具体公开Git/商业授权。",
+        "用时为目录估计，非实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "目前只能作来源识别、版本交叉审计和受限材料追索；本独立数字执行形式尚无证据。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Klassen et al., Engaged Teachers Scale 16-item original development report; publisher BY-NC-ND conditions；本目录无公开题项或新译文。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "认知：原编号4/8/11/15；情感2/5/10/13；学生社会投入3/6/14/16；同事社会投入1/7/9/12。独立实施指引、逐档选项与明确个体计分/缺失规则未取得，不能由论文统计均值倒推。 当前语言/译本权利及独立计分、漏答适用条件按来源保持未知，不把报告草稿当已发布版本。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Engaged Teachers Scale original 16 items and four factors",
+      "citation": "Klassen et al., Engaged Teachers Scale 16-item original development report; publisher BY-NC-ND conditions",
+      "url": "https://www.frontlinelearningresearch.org/index.php/journal/article/view/44",
+      "publicationYear": 2013
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "认知投入",
+        "情感投入",
+        "学生社会投入",
+        "同事社会投入"
+      ],
+      "limitations": [
+        "目录无可执行题本/计分/报告；不表示当前工具已可施测或已获授权。",
+        "认知：原编号4/8/11/15；情感2/5/10/13；学生社会投入3/6/14/16；同事社会投入1/7/9/12。独立实施指引、逐档选项与明确个体计分/缺失规则未取得，不能由论文统计均值倒推。",
+        "出版商标记BY-NC-ND；不等于允许翻译、商业活动或公开可执行电子题库。",
+        "无适用于中国K12教师的常模/阈值；当前只保留原创中文教师报告的编辑方向，不生成结果、分级或图。"
+      ],
+      "disclaimer": "仅为来源目录候选：未授权装载、无独立报告版本、不可施测/计算个人分数。"
+    },
+    "blockers": [
+      "PUBLISHER_BY_NC_ND_RESTRICTIONS",
+      "ORIGINAL_ADMINISTRATION_FORM_NOT_OBTAINED",
+      "RESPONSE_LABELS_AND_SCORING_UNKNOWN",
+      "PUBLIC_REDISTRIBUTION_SCOPE_UNRESOLVED"
+    ]
+  }
+}

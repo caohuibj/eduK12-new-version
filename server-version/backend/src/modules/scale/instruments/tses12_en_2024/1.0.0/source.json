@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "tses12_en_2024",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "TSES 教师自我效能英文12题（2024版题序）（仅目录，未准备施测）",
+      "abbreviation": "TSES12-2024-EN",
+      "instrumentFamily": "TSES short 12, specifically author-hosted 2024 revision"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [],
+      "constructDefinition": "TSES 教师自我效能英文12题（2024版题序）：仅记录准确版本、构念维度、已有选题/计分线索与缺件；不含题文、可执行计分或个体结果。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "tses12_en_2024",
+        "domain:teacher_workplace",
+        "construct:self_efficacy",
+        "population:adult_teacher",
+        "response:self",
+        "locale:en",
+        "availability:catalog_only",
+        "rights:public_redist_unknown",
+        "project:source_identity_only",
+        "scoring:not_runtime",
+        "report:original_draft_only"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向成年教师研究资料定位；原文和既有研究不能替代中国K12教师效度或常模。18+是项目应用边界，目录不可施测。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "目录来源依精确原作者版本；正式指导语/回忆期和数字施测版本尚未确认",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "本目录仅标记12题版本；2024短版：学生参与2/3/4/11；教学策略5/9/10/12；课堂管理1/6/7/8。不可套用旧版短12编号：旧版学生参与2/4/7/11、课堂管理1/3/6/8；2024短版题3与7位置/语义对调。1–9锚点与旧独立版不同。",
+        "没有公开题文、选项、指导语、可执行评分规则和用户结果。",
+        "使用、版权、译本、研究效度属真实附注，尚未获得本项目具体公开Git/商业授权。",
+        "用时为目录估计，非实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "目前只能作来源识别、版本交叉审计和受限材料追索；本独立数字执行形式尚无证据。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Tschannen-Moran & Woolfolk Hoy 2024 combined TSES forms; 12-item form and embedded key；本目录无公开题项或新译文。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "2024短版：学生参与2/3/4/11；教学策略5/9/10/12；课堂管理1/6/7/8。不可套用旧版短12编号：旧版学生参与2/4/7/11、课堂管理1/3/6/8；2024短版题3与7位置/语义对调。1–9锚点与旧独立版不同。 当前语言/译本权利及独立计分、漏答适用条件按来源保持未知，不把报告草稿当已发布版本。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "TSES short 12, specifically author-hosted 2024 revision",
+      "citation": "Tschannen-Moran & Woolfolk Hoy 2024 combined TSES forms; 12-item form and embedded key",
+      "url": "https://bpb-us-w2.wpmucdn.com/u.osu.edu/dist/2/5604/files/2024/07/TSES-Forms-2024.pdf",
+      "publicationYear": 2024
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "学生参与自我效能",
+        "教学策略自我效能",
+        "课堂管理自我效能"
+      ],
+      "limitations": [
+        "目录无可执行题本/计分/报告；不表示当前工具已可施测或已获授权。",
+        "2024短版：学生参与2/3/4/11；教学策略5/9/10/12；课堂管理1/6/7/8。不可套用旧版短12编号：旧版学生参与2/4/7/11、课堂管理1/3/6/8；2024短版题3与7位置/语义对调。1–9锚点与旧独立版不同。",
+        "仅研究使用许可线索；公开Git题文、商业数字施测再分发未确证。",
+        "无适用于中国K12教师的常模/阈值；当前只保留原创中文教师报告的编辑方向，不生成结果、分级或图。"
+      ],
+      "disclaimer": "仅为来源目录候选：未授权装载、无独立报告版本、不可施测/计算个人分数。"
+    },
+    "blockers": [
+      "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "2024_SCORING_CROSSWALK_MUST_MATCH",
+      "INDIVIDUAL_MISSING_RULE_NOT_VERIFIED"
+    ]
+  }
+}
