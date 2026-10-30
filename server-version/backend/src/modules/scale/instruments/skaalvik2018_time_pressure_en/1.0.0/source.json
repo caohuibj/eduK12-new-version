@@ -26,11 +26,12 @@
         "jdr_role:demand",
         "population:teacher",
         "source_language:en",
-        "response:six_point_endpoint_known_only",
+        "response:five_point_endpoint_known_only_2018",
         "availability:catalog_only",
         "items:5_original_2018_two_missing",
         "scoring:unverified_original",
-        "rights:article_cc_by_4_0_unpublished_items_not_supplied"
+        "rights:article_cc_by_4_0_unpublished_items_not_supplied",
+        "source_protocol:five_point_time_pressure_distinct_from_2016_six_point"
       ]
     },
     "population": {
@@ -55,7 +56,7 @@
       "layoutConstraints": [
         "2018文章§3.2.2明示time pressure原量尺五题，但只公开三题示例；其他两题未核原文，当前不得发布实际题本。",
         "2016单独时间压力五题已作为独立来源版本进入Git main；不能推断它们与2018五题完全逐字一致，也不能把2016 C/R重贴2018标签。",
-        "作者论文六点响应1=Completely disagree、6=Completely agree，未取得中间2–5原文字。当前不给选项、题文、计分、缺失/均分规则。",
+        "2018原论文§3.2.2明确时间压力使用五级响应：1=Completely disagree、5=Completely agree；2–4原标签未见。2016时间压力为六级，不可互换。当前不给选项、题文、计分、缺失/均分规则。",
         "无作者正式评分算法、常模、阈值、报告消费者和个体结果；目录用时不是实测。"
       ]
     },
@@ -89,7 +90,7 @@
     "cognitiveDebriefStatus": "NOT_ESTABLISHED",
     "localEvidenceRefs": [],
     "reviewStatus": "PENDING",
-    "notes": "2016 item texts are independently traceable but not verified as exact 2018 protocol. Paper shows 5-item study and three public examples. Unknown remaining two and author missing/individual scoring; no executable."
+    "notes": "2016 item texts are independently traceable but not verified as exact 2018 protocol. Paper shows 5-item study and three public examples. Unknown remaining two and author missing/individual scoring; no executable. Correction verified against original Springer 2018 §3.2.2: time-pressure five categories 1–5; separately published 2016 time-pressure six categories 1–6."
   },
   "educationApplicability": {
     "schemaVersion": 1,
@@ -115,7 +116,7 @@
       "limitations": [
         "2018文献只给出5题中3个示例；余下2题未获原版，不能生成可施测内容。",
         "2016年5题是已独立注册的另一版来源工具。未经逐题原文确证，不把2016题本默认为2018版。",
-        "六点端点已见，但中间2–5的作者原版标签、个体计分/缺失策略和中文教师效度未核实。",
+        "2018时间压力是五级原版（端点1=Completely disagree、5=Completely agree），但2–4原版标签、个体计分/缺失策略和中文教师效度未核；2016时间压力为不同的六级版本。",
         "无可靠中国教师阈值和常模，不制作个人分数或报告。"
       ],
       "disclaimer": "目录来源，仅用于溯源和补查，不生成实际评估、分数、教师报告或JD-R总分。"
@@ -124,7 +125,8 @@
       "TWO_ORIGINAL_2018_ITEMS_NOT_RETRIEVED",
       "COMPLETE_ADMINISTRATION_AND_RESPONSE_ANCHORS_NOT_VERIFIED",
       "AUTHOR_SCORING_AND_MISSING_POLICY_NOT_VERIFIED",
-      "CHINESE_VALIDATION_NOT_ESTABLISHED"
+      "CHINESE_VALIDATION_NOT_ESTABLISHED",
+      "FIVE_POINT_2018_RESPONSE_NOT_COMPATIBLE_WITH_SIX_POINT_2016"
     ]
   }
 }
