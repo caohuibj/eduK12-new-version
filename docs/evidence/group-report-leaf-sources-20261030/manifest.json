@@ -135,6 +135,50 @@
     },
     "draftRoute": "Reuse existing group-report-draft scope-only route for exact leaf branch;one targeted control PASS;no Ready qualification,new workflow,PG/browser/shared-statistics replay.",
     "newDraftAuthorization": "User specifically allowed existing leaf branch update and Draft to main;verify no duplicate before single authorized retry",
-    "mergeDeploy": false
+    "mergeDeploy": false,
+    "rawMigrationLog": {
+      "transport": "lossless gzip",
+      "path": "mainf674/existing-main-migrations.log.gz",
+      "originalSHA256": "89f59aaadb1e80203c9fb7594b22301faa1178380b1837730974c2b95a393ab0",
+      "why": "Preserve original migration output including trailing whitespace without trimming"
+    },
+    "rawEvidence": {
+      "disclosed-five-person.log": {
+        "sha256": "6eec488fdd53ed2d1359cfa9d4414257cacfe4621fe12fbfd53f7d051cab63ce",
+        "bytes": 138
+      },
+      "disclosed-five-person-proof.json": {
+        "sha256": "be3ab77d220676fd9a083d252b44de923fa979bd63262c6dea005521562f32d8",
+        "bytes": 682
+      },
+      "backend-types.json": {
+        "sha256": "1eea91688198f706f8766e5778c98822de9e0556616411187af69578e2490530",
+        "bytes": 508
+      },
+      "disclosed-five-person.json": {
+        "sha256": "99d06a8ef153b8b655236e27a6fa58af79a97a28a140e6c9addd0b3f7f4ea8fa",
+        "bytes": 3581
+      },
+      "existing-main-migrations.log.gz": {
+        "sha256": "e3124be6d0125d24fb4de075d92da272b85cefd05c5310d7459423ced23421a0",
+        "bytes": 332
+      },
+      "disclosed-five-person-continuation.log": {
+        "sha256": "bdf8e8c4dc3410cf787810abf12febd3fefd74deec9da68b0ef79fd87d89e132",
+        "bytes": 151
+      },
+      "backend-types.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "disclosed-five-person-continuation.json": {
+        "sha256": "880303a1d33b7f2fb8400d7b3f98d41602d0339f39438f31e618d6f7e3eb69fe",
+        "bytes": 1936
+      },
+      "draft-scope-control.log": {
+        "sha256": "3b7e3494f90e30258136fe1d6f1860eddee16f46306d287d0a7e9a04121da0e2",
+        "bytes": 242
+      }
+    }
   }
 }
