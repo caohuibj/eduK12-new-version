@@ -1,0 +1,2 @@
+src/modules/composite/personal-tracking.service.ts(25,50): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.

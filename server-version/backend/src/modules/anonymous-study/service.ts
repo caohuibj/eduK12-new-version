@@ -202,6 +202,20 @@ async function participant(db:Db,studyId:string,credential:string) {
   if(!rows[0]) return hidden()
   return rows[0]
 }
+/** Internal personal-report scope. The existing study credential, ACTIVE
+ * identity and current owner remain the authority, including cached reads. */
+export async function lockPersonalTrackingSubject(db:Db,studyId:string,credential:string){
+ const first=await participant(db,studyId,credential)
+ await db.$queryRaw`SELECT id FROM anonymous_study_participants WHERE id=${first.id} FOR UPDATE`
+ const current=await participant(db,studyId,credential)
+ const attempts=await db.$queryRaw<Array<{attemptId:string;compositeId:string}>>`
+  SELECT sa.attempt_id AS "attemptId",t.composite_assessment_id AS "compositeId"
+  FROM anonymous_study_attempts sa JOIN anonymous_study_waves w ON w.id=sa.wave_id AND w.study_id=sa.study_id
+  JOIN composite_assessment_access_tokens t ON t.id=w.access_token_id
+  JOIN anonymous_studies s ON s.id=w.study_id JOIN composite_assessments c ON c.id=t.composite_assessment_id AND c.created_by=s.owner_user_id
+  WHERE sa.study_id=${studyId} AND sa.participant_id=${current.id}`
+ return {scopedSubjectId:'training-study:'+studyId+':'+current.id,attemptIds:attempts.map(a=>a.attemptId),compositeIds:attempts.map(a=>a.compositeId)}
+}
 export async function participantHome(studyId:string,credential:string) {
   const p=await participant(prisma,studyId,credential)
   const rows=await prisma.$queryRaw<Array<{id:string;title:string;ordinal:number;attemptId:string|null;state:string|null;completedAt:Date|null;accepting:boolean}>>`

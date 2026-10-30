@@ -1,0 +1,771 @@
+{
+  "note": "Original local outputs, including failed/partial stages. These are not formal CI qualification. Unique cases must be deduplicated by title and input; see development note.",
+  "files": [
+    {
+      "file": "longitudinal-training-browser-continuation.json",
+      "bytes": 2495,
+      "sha256": "2a0f9163edadb2f1063082daf10fdc943f9400115125e33ac2298e447f586aff",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 2,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "failed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-browser-continuation.log",
+      "bytes": 76,
+      "sha256": "60d03252f31424afcac9210c61df7ae659450184c0ed1d9d995bf7b782cc075b"
+    },
+    {
+      "file": "longitudinal-training-browser-corrected-submit.json",
+      "bytes": 2402,
+      "sha256": "df403ecd6300e3d84c4aefb5619c0bf5452fedc7fd532012ab2f079a4dee2ac1",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 2,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "failed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-browser-corrected-submit.log",
+      "bytes": 80,
+      "sha256": "69ab2964d92a88d7e5042b685159c6153f7f6ebc38c2839b1e343f4d0199ad2c"
+    },
+    {
+      "file": "longitudinal-training-browser-failure.png",
+      "bytes": 131466,
+      "sha256": "b7edce2d91d58f77f4ac0784e348e53371dc991e59c74005c86ab048695beefd"
+    },
+    {
+      "file": "longitudinal-training-browser-first-failure.png",
+      "bytes": 140936,
+      "sha256": "8d444936a82f93f258c80fa90e71cf44cb7bac55a2c57b5f6aefa72775fc65ec"
+    },
+    {
+      "file": "longitudinal-training-browser-first.json",
+      "bytes": 2675,
+      "sha256": "07500a8e14387b959394a69854d17c4a4a9048223c29bec97eaa948b7eaabaae",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 2,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "failed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-browser-first.log",
+      "bytes": 69,
+      "sha256": "cddc51e725c7515f69f36db569843853fea9ca2f6ea0fcd3478c75b71032f26d"
+    },
+    {
+      "file": "longitudinal-training-browser-navigation-failure.png",
+      "bytes": 55275,
+      "sha256": "60abf324355e96ac060a5b8ba82a5d85696fe981f54d78821f6079b0a4117cb8"
+    },
+    {
+      "file": "longitudinal-training-browser-navigation.json",
+      "bytes": 2486,
+      "sha256": "b527b579a385efb30dfe3f48b19c322dd1222faee4ca9f33fa5536b90e9aba9c",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 2,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "failed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-browser-navigation.log",
+      "bytes": 74,
+      "sha256": "4074c9a2bfa393467c807e08c400839c5c15d62437ebf673753cfa43c4998a5a"
+    },
+    {
+      "file": "longitudinal-training-browser-response-failure.png",
+      "bytes": 131466,
+      "sha256": "b7edce2d91d58f77f4ac0784e348e53371dc991e59c74005c86ab048695beefd"
+    },
+    {
+      "file": "longitudinal-training-browser-response-fixed.json",
+      "bytes": 2061,
+      "sha256": "ea3ebbcc25beaa76f1ea5fb0813acd0720620fd43ad037d1e0dd630ff8c6c3e9",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 2,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "passed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-browser-response-fixed.log",
+      "bytes": 78,
+      "sha256": "e1bcff45e2cc32e63ecee7dc18c93ed21a4d902c5301a04b1a2f193cd45d1ba2"
+    },
+    {
+      "file": "longitudinal-training-browser-submit.json",
+      "bytes": 2470,
+      "sha256": "a83e3a19b785cb271306b35ef0788509c83baf427bebc53fe836753f8536586c",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 2,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "failed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-browser-submit.log",
+      "bytes": 70,
+      "sha256": "85557299c670e82c16e6ea7ad0e0ceada673175cad3cad55a17fa5bfa513081d"
+    },
+    {
+      "file": "longitudinal-training-browser.png",
+      "bytes": 208881,
+      "sha256": "37303544e291c343156dc0678678312c276e3083e1276ad057bd16f2058682a6"
+    },
+    {
+      "file": "longitudinal-training-bundle-frontend-types.log",
+      "bytes": 107,
+      "sha256": "2770422701a46d1ec50abf32b789e977a38f15d6cadd35a8b931dc2358716d26"
+    },
+    {
+      "file": "longitudinal-training-bundle-pg-context.json",
+      "bytes": 3813,
+      "sha256": "8164c90bcc977c93848a9b526dd238569299bb98a629c93f08d4e4b1a843d45f",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 3,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "skipped"
+        },
+        {
+          "title": "keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+          "status": "failed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-bundle-pg-context.log",
+      "bytes": 73,
+      "sha256": "ba969306dd3af2a05ffe0cd6cfdabd3cc4a3cdd8aa59bf512c0c9253332f849d"
+    },
+    {
+      "file": "longitudinal-training-bundle-pg-course.json",
+      "bytes": 2500,
+      "sha256": "8f26a89378f4da1fcc2f24d168a945024bea613eecbee6572ec69aa4a9f60752",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 3,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "skipped"
+        },
+        {
+          "title": "keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+          "status": "passed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-bundle-pg-course.log",
+      "bytes": 72,
+      "sha256": "9721411ac0d62fc3108a46e4ed799fdab14aeb3074d0a51e0c51e1af9b3c5b93"
+    },
+    {
+      "file": "longitudinal-training-bundle-pg-key.json",
+      "bytes": 3523,
+      "sha256": "2d0a210d38256d92d90a7c5920b9fceeb88b9e24ff8f4b7164785ba681cd97c3",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 3,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "skipped"
+        },
+        {
+          "title": "keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+          "status": "failed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-bundle-pg-key.log",
+      "bytes": 69,
+      "sha256": "611a535eeb557e6cbbc45649a917bb9424f43f127f62506730301f021c349460"
+    },
+    {
+      "file": "longitudinal-training-bundle-pg-population.json",
+      "bytes": 3355,
+      "sha256": "79ee54466b9a98ec5ccd9ad2f1b6bf71f3c7c44eece1dbb16a477f58f4ce709e",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 3,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "skipped"
+        },
+        {
+          "title": "keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+          "status": "failed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-bundle-pg-population.log",
+      "bytes": 76,
+      "sha256": "86754babd020f3a2385d23e1ef32c8827767f3b592285519cd077a8557ad63cf"
+    },
+    {
+      "file": "longitudinal-training-bundle-pg.json",
+      "bytes": 3781,
+      "sha256": "dbaaa84167c96dd66c1e2ee8efb0591c8417aca46f8588f395b4c277a6be2520",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 3,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "skipped"
+        },
+        {
+          "title": "keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+          "status": "failed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-bundle-pg.log",
+      "bytes": 65,
+      "sha256": "57f6eab0323ddebb5ee4f6fe7ff4921a99675387b14fe566d1d4249799d31b92"
+    },
+    {
+      "file": "longitudinal-training-bundle-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-training-candidate-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-training-candidate-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-training-complete-frontend-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-training-complete-lint.log",
+      "bytes": 439,
+      "sha256": "d153e29d00bc92a455560c768953e029c2338dbcea4c9a0b591f42c82923dd32"
+    },
+    {
+      "file": "longitudinal-training-complete-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-training-complete-v2-frontend-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-training-complete-v2-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-training-contract.json",
+      "bytes": 2800,
+      "sha256": "fcd59c8d98f0838124dda8f771cb7122dea85b58467ef75e8f975cdb3e0766f5",
+      "numPassedTests": 1,
+      "numFailedTests": 1,
+      "numPendingTests": 0,
+      "cases": [
+        {
+          "title": "uses C plus actual cognitive mode, while full config report changes do not change raw-score identity",
+          "status": "passed"
+        },
+        {
+          "title": "preserves numeric Form meaning across copied slot keys, and refuses category encodings",
+          "status": "failed"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-contract.log",
+      "bytes": 64,
+      "sha256": "f5b49f4c7fd907b76158112ef9c8e34b7eccbf7f8a2ed6c9a339cbe5c0aacd8c"
+    },
+    {
+      "file": "longitudinal-training-disclosure.json",
+      "bytes": 8538,
+      "sha256": "5a3b3aa385475de703944c97128aaff32f846b6783f6dfcd94c45ad5e46003ec",
+      "numPassedTests": 21,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "cases": [
+        {
+          "title": "keeps the participant subject ceiling independent from teacher scores and cognitive research-only keys",
+          "status": "passed"
+        },
+        {
+          "title": "excludes research-only, nonstandard, product index and nonnumeric cognitive metrics, while preserving standard and QC facts",
+          "status": "passed"
+        },
+        {
+          "title": "does not promote an ADMIN-derived researcher label or a researcher template into extra cognitive data permission",
+          "status": "passed"
+        },
+        {
+          "title": "rejects a mismatched cognitive parent source",
+          "status": "passed"
+        },
+        {
+          "title": "rejects a mismatched cognitive item source",
+          "status": "passed"
+        },
+        {
+          "title": "rejects a mismatched cognitive assignment source",
+          "status": "passed"
+        },
+        {
+          "title": "rejects a mismatched cognitive config source",
+          "status": "passed"
+        },
+        {
+          "title": "rejects a mismatched cognitive submission source",
+          "status": "passed"
+        },
+        {
+          "title": "rejects a mismatched cognitive profile source",
+          "status": "passed"
+        },
+        {
+          "title": "rejects a mismatched cognitive runtime source",
+          "status": "passed"
+        },
+        {
+          "title": "rejects a mismatched cognitive provenance source",
+          "status": "passed"
+        },
+        {
+          "title": "retains QC numeric diagnostics without allowing them to acquire individual reference interpretation",
+          "status": "passed"
+        },
+        {
+          "title": "uses the frozen Scale V2 policy, independently gates references, and never reads answers or result bodies",
+          "status": "passed"
+        },
+        {
+          "title": "cannot promote researcher disclosure over an educational-only frozen teacher policy",
+          "status": "passed"
+        },
+        {
+          "title": "also retains a stricter frozen researcher audience restriction rather than replacing it with teacher permission",
+          "status": "passed"
+        },
+        {
+          "title": "preserves only explicit V1 custom-descriptive compatibility and denies unknown standard instruments",
+          "status": "passed"
+        },
+        {
+          "title": "fails closed for Scale epoch corruption",
+          "status": "passed"
+        },
+        {
+          "title": "fails closed for Scale scale corruption",
+          "status": "passed"
+        },
+        {
+          "title": "fails closed for Scale submission corruption",
+          "status": "passed"
+        },
+        {
+          "title": "fails closed for Scale hash corruption",
+          "status": "passed"
+        },
+        {
+          "title": "fails closed for Scale snapshot corruption",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-disclosure.log",
+      "bytes": 66,
+      "sha256": "bb5c213a5bccc80121f19b4305971e6cd7ed811bb0c5ac9c4723c931fad60fad"
+    },
+    {
+      "file": "longitudinal-training-draft-scope.log",
+      "bytes": 229,
+      "sha256": "cc80628baf71f0be597f744bf20926c7eb0d99d76518b47b5db26bfc859f82a5"
+    },
+    {
+      "file": "longitudinal-training-form-contract-corrected.json",
+      "bytes": 1467,
+      "sha256": "5aaf84e98f0ccaf99c59fdce9d606d1fb7a55b4f755b79ae383710779311ece7",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 1,
+      "cases": [
+        {
+          "title": "uses C plus actual cognitive mode, while full config report changes do not change raw-score identity",
+          "status": "skipped"
+        },
+        {
+          "title": "preserves numeric Form meaning across copied slot keys, and refuses category encodings",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-form-contract-corrected.log",
+      "bytes": 79,
+      "sha256": "c458b37dda7f910d45af5d06290818d277466ac9a3ff506f2d428dc5e417da09"
+    },
+    {
+      "file": "longitudinal-training-form-pg.json",
+      "bytes": 2956,
+      "sha256": "61e9aa91e045c5271e6e059d62f9fc16b88c0b357c30eae7e3632f206a314639",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 4,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "skipped"
+        },
+        {
+          "title": "keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+          "status": "skipped"
+        },
+        {
+          "title": "tracks a typed numeric Form response through copy and real FINAL without creating a psychological score",
+          "status": "passed"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-form-pg.log",
+      "bytes": 63,
+      "sha256": "abba1403889f0c1bdee21316760a88682b7bf02a6a0baad1f583e50eeda518c9"
+    },
+    {
+      "file": "longitudinal-training-form-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-training-frontend-types.log",
+      "bytes": 107,
+      "sha256": "2770422701a46d1ec50abf32b789e977a38f15d6cadd35a8b931dc2358716d26"
+    },
+    {
+      "file": "longitudinal-training-initial-types.log",
+      "bytes": 1625,
+      "sha256": "0008441937658d4d400a22738abab022c3736f2197d1de195dd38d923b26283a"
+    },
+    {
+      "file": "longitudinal-training-latest-pg-access.json",
+      "bytes": 3419,
+      "sha256": "5ae81ab914b6d0dc3ced499ee7da8e37e1bffa09fe3c6327eb496791ed3798ab",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 5,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "skipped"
+        },
+        {
+          "title": "keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+          "status": "skipped"
+        },
+        {
+          "title": "tracks a typed numeric Form response through copy and real FINAL without creating a psychological score",
+          "status": "skipped"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        },
+        {
+          "title": "selects the latest completed whole Training parent while retaining prior snapshots and rechecking course access",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-latest-pg-access.log",
+      "bytes": 72,
+      "sha256": "736e9c67bcc94c0c5c5604900264d1d4a648da0a2887b3c651613193f5b8bad4"
+    },
+    {
+      "file": "longitudinal-training-latest-pg.json",
+      "bytes": 5359,
+      "sha256": "ce2aa6ac44ce57a20fc5eaa381742139f3f89024245c57ddb8af9fec4576af0d",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 5,
+      "cases": [
+        {
+          "title": "runs native next-wave publication, real learner answer and both reports in Chromium",
+          "status": "skipped"
+        },
+        {
+          "title": "selects the latest completed whole Training parent while retaining prior snapshots and rechecking course access",
+          "status": "failed"
+        },
+        {
+          "title": "keeps a fixed Bundle complete while tracking one leaf through its own exact-version next deployment",
+          "status": "skipped"
+        },
+        {
+          "title": "tracks a typed numeric Form response through copy and real FINAL without creating a psychological score",
+          "status": "skipped"
+        },
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "skipped"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-latest-pg.log",
+      "bytes": 65,
+      "sha256": "085fe2661ff34fc2b9813b2464bab5ad6403931a56476eaa2862a4c7594c9a56"
+    },
+    {
+      "file": "longitudinal-training-lint.log",
+      "bytes": 840,
+      "sha256": "be12d9595c1324f9c65866dde2c64e1c34bfdb49cfe4ea56d3b436017bee3918"
+    },
+    {
+      "file": "longitudinal-training-migrate.log",
+      "bytes": 434,
+      "sha256": "f76eaefc08ebcfa7b40c379d27705f146bf84492ee763a1ae993ccd8f4367e0f"
+    },
+    {
+      "file": "longitudinal-training-pg-corrected.json",
+      "bytes": 1688,
+      "sha256": "55da45d4031b13a163696cc1104c890019ea157011668a96e845d080158ba4fb",
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "cases": [
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "passed"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-pg-corrected.log",
+      "bytes": 68,
+      "sha256": "4dd2a78e045b98c0ae436a06f13352f251f1e9029054f1f0b846b59ab405a9ef"
+    },
+    {
+      "file": "longitudinal-training-pg-first.json",
+      "bytes": 3394,
+      "sha256": "0843529a5f3406135c2bc383fbdf3fb169aa9d385778e77edc0647c12194a1ac",
+      "numPassedTests": 0,
+      "numFailedTests": 2,
+      "numPendingTests": 0,
+      "cases": [
+        {
+          "title": "publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports",
+          "status": "failed"
+        },
+        {
+          "title": "uses the actual stable anonymous Study credential, isolates identities and denies revoked cached reads",
+          "status": "failed"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-pg-first.log",
+      "bytes": 64,
+      "sha256": "63eb2146e7c1547b3de2493de441960505e872d57e05585eb2da44ae4eba3834"
+    },
+    {
+      "file": "longitudinal-training-prisma-generate.log",
+      "bytes": 328,
+      "sha256": "780fa3ecd87eb9c0107b9d1f351010a99781fe9888094dadf51db701ce49904d"
+    },
+    {
+      "file": "longitudinal-training-types-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "longitudinal-training-ui-scope.json",
+      "bytes": 1398,
+      "sha256": "bf454d99170be78f5729cd0b367436beb6f610ad1266ec2d4df7113ae2d73723",
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "cases": [
+        {
+          "title": "discards an old response when the account/attempt changes",
+          "status": "passed"
+        },
+        {
+          "title": "uses the stable study credential and clears the rendered view when it changes",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "longitudinal-training-ui-scope.log",
+      "bytes": 64,
+      "sha256": "e0e718364fd10605adb985cf1852726c53f28f5130a885ce72610e22e86b4e08"
+    },
+    {
+      "file": "longitudinal-training-wiring-types.log",
+      "bytes": 204,
+      "sha256": "3ed37e639a30e9e9df0ae71eb9cc4ded0f83536b3acbf042f76a7559e58b4f0c"
+    },
+    {
+      "file": "longitudinal-training-candidate-frontend-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sourceBase": "2f8829d64b37d2780e7b8546523a7a2d6d8f1a90",
+  "qualification": "LOCAL_ONLY; stacked Draft has no formal Training CI/Ready/native restore qualification"
+}
