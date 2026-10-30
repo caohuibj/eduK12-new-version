@@ -1,0 +1,491 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "hse_change_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "选用HSE分量表·中文工作稿：变革沟通",
+      "abbreviation": "HSE change",
+      "instrumentFamily": "HSE Management Standards Indicator Tool — selected subscale adaptation"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "关注工作变动前后有没有咨询、说明和可提问的机会。 本工具仅选用变革沟通原分量表题项，不是完整35题HSE，也不声称为官方验证的独立短版。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "hse_change_zh_cn",
+        "domain:teacher_workplace",
+        "construct:psychosocial_work_environment",
+        "construct:change",
+        "population:adult",
+        "population:teacher",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:ogl_3_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人教师与相关工作群体的单一工作条件回顾；沿用独立简中工作稿。原35题外文证据不证明当前中文或单独选用形式的效度，不用于学生测评、教师绩效或学校排名。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去六个月",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "所选原题保持相对顺序及原逐题响应集，保留原题码。",
+        "从完整35题中选取一个原计分分量表，是明确标注的选用改编，不声称为官方独立短版。",
+        "时长为粗略阅读估计，保留过去六个月时段。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "根据原作者英文题本独立翻译的简体中文工作稿；原作者未审定或背书。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "复用hse_msit_zh_cn/1.0.1中独立简中工作稿的所选题文，不重新翻译；官方繁中仅为对照。本工具未建立中文及独立选用形式的效度证据，不把研究审查附注作为新增软件审批门禁。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "hse_change_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "hse_change_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "hse_change_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.",
+      "{\"license\": \"Open Government Licence v3.0\", \"licenseUrl\": \"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\", \"attribution\": \"Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.\", \"scope\": \"Crown questionnaire text only. HSE website copyright applies to Crown material in any medium unless indicated otherwise. Original35itemPDF and officialChinesePDF show no third-party copyright or special restriction in extracted text. Exclude HSElogo/images/design; no claim endorsement. Hosted commercialSIT subscription terms are a different service and not the licence for the freely downloaded35item questionnaire.\", \"changes\": \"Independent Simplified Chinese translation from originalEnglish; official Traditional Chinese preserved separately for reference, not silently simplified or claimed official zhCN.\"}",
+      "独立工作中译与原创通俗反馈，未建立本地常模；不得用于绩效、诊断或排名。",
+      "本工具选取原变革沟通分量表，保留其题文、响应集、反向与均分；未保留完整35题施测形式。OGL改编不等于HSE背书或独立施测等效证明。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Selected HSE MSIT subscale: change; independent Simplified Chinese working translation",
+        "citation": "Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.",
+        "url": "https://www.hse.gov.uk/stress/assets/docs/indicatortool.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "{\"license\": \"Open Government Licence v3.0\", \"licenseUrl\": \"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\", \"attribution\": \"Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.\", \"scope\": \"Crown questionnaire text only. HSE website copyright applies to Crown material in any medium unless indicated otherwise. Original35itemPDF and officialChinesePDF show no third-party copyright or special restriction in extracted text. Exclude HSElogo/images/design; no claim endorsement. Hosted commercialSIT subscription terms are a different service and not the licence for the freely downloaded35item questionnaire.\", \"changes\": \"Independent Simplified Chinese translation from originalEnglish; official Traditional Chinese preserved separately for reference, not silently simplified or claimed official zhCN.\"} https://www.hse.gov.uk/stress/assets/docs/indicatortool.pdf https://www.hse.gov.uk/stress/assets/docs/indicatortoolmanual.pdf https://www.hse.gov.uk/help/copyright.htm https://www.hse.gov.uk/stress/assets/docs/chinese.pdf https://www.hse.gov.uk/stress/standards/notesindicatortool.htm https://www.hse.gov.uk/stress/assets/docs/analysistool.xls https://www.di.univr.it/documenti/OccorrenzaIns/matdid/matdid464820.pdf Selected-subscale adaptation: change; not the complete official35-item instrument or a validated standalone short form."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "hse_agreement_1_5",
+          "options": [
+            {
+              "value": "strongly_disagree",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "disagree",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "neutral",
+              "label": "中立",
+              "score": 3
+            },
+            {
+              "value": "agree",
+              "label": "同意",
+              "score": 4
+            },
+            {
+              "value": "strongly_agree",
+              "label": "非常同意",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "HSE-26",
+          "content": "关于工作中的变动，我有充分机会向管理者提问。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-28",
+          "content": "工作发生变动时，总会征求员工的意见。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-32",
+          "content": "工作发生变动时，我清楚这些变动将如何实际开展。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "HSE-26",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-32",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "change",
+            "type": "dimension",
+            "label": "变化是否解释清楚",
+            "description": "关注工作变动前后有没有咨询、说明和可提问的机会。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HSE-26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-32",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "change"
+        ],
+        "scoreOrder": [
+          "change"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "change",
+            "headline": "变革沟通：本次工作条件回顾",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "想知道变化怎样落地，不等于抗拒改变。\n\n本次得分反映过去六个月工作变动中的提问、征求意见和实施说明是否充分。3题取1–5均分，越大表示自述变革沟通更清楚、更有参与机会，不是越愿意接受所有变化。\n\n例如，课表或工作流程调整时，是否知道何时实施、职责如何变化、哪里可以提问？这是回顾提示，不代表系统已经评价某次学校改革。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选择一个最影响日常工作的问题，如执行时间、职责变化或更新信息的渠道，先整理需要澄清的内容。"
+              },
+              {
+                "category": "environment",
+                "text": "安全可行时通过合适渠道询问或反馈；暂缺的信息如实保留，不要求自己立刻适应。若近期没有相关变动，不凭空补答，未完整作答时不生成完整分数。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本工具只选用HSE的一个原计分分量表，当前独立简中稿及独立施测形式未验证；单人回答不代表整个学校。",
+          "没有可用的中国教师常模或阈值。1–5是量尺范围，不是排名或百分位；不用于诊断、绩效问责或学校排名。"
+        ],
+        "disclaimer": "这份结果用于工作条件回顾与沟通，不评价教师能力。仅完整作答时形成该分量表均分；缺失不补分，不把未完成当零分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted content adaptation; not author approval or local validation",
+            "reviewedAt": "2026-10-29T23:27:53.471160Z",
+            "basis": "复用既有中文工作稿所选题与单分量表计分，生成单一教师语境报告；仅内容整理，未运行真实计分、报告消费、CI或数据库操作。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "hse_msit_change",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "HSE-26",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-28",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-32",
+            "responseValue": "strongly_disagree"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "change": 1.0
+          },
+          "totalScoreKeys": [
+            "change"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "HSE-26",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-28",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-32",
+            "responseValue": "strongly_agree"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "change": 5.0
+          },
+          "totalScoreKeys": [
+            "change"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "HSE-26",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-28",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-32",
+            "responseValue": "neutral"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "change": 3.0
+          },
+          "totalScoreKeys": [
+            "change"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "HSE-26",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-28",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-32",
+            "responseValue": "disagree"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "change": 2.0
+          },
+          "totalScoreKeys": [
+            "change"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "以下问题选用HSE工作环境问卷的变革沟通分量表，用于回顾这一方面的工作条件。请根据过去六个月的工作经历作答。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "Adapted selection introduction; six-month timeframe retained from hse_msit_zh_cn/1.0.1/instruction. Item text and scoring unchanged from that working translation; original HSE https://www.hse.gov.uk/stress/assets/docs/indicatortool.pdf"
+  }
+}

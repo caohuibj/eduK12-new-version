@@ -1,0 +1,123 @@
+{
+  "batch": "jdr-independent-teacher-20261030",
+  "target": "MAIN",
+  "status": "LOCAL_CONTENT_CANDIDATE",
+  "tools": [
+    {
+      "instrumentKey": "cbi_personal_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_personal_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "cbi_work_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_work_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "cbi_client_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_client_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "hse_demands_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_demands_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "hse_control_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_control_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "hse_managerial_support_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_managerial_support_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "hse_peer_support_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_peer_support_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "hse_relationships_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_relationships_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "hse_role_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_role_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "hse_change_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "referencePolicy": "none",
+      "reportVariants": 1,
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_change_zh_cn/1.0.0/source.json",
+      "localSelectedCheck": "PASS",
+      "databaseInstallation": "NOT_RUN",
+      "production": "NOT_RUN"
+    }
+  ],
+  "notes": [
+    "CBI independent subscales retain original scoring and missing rules.",
+    "HSE selected subscales are explicitly adapted standalone Chinese working versions, not validated official short forms.",
+    "PUBLISHED inside executable sources is a package capability flag, not a database publication or public-library installation receipt.",
+    "One teacher-context report per tool; no new report illustration renderer."
+  ]
+}
