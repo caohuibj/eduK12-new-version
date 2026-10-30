@@ -54,3 +54,9 @@ That concrete repair is prepared locally but not pushed because required existin
 Notion CI checklist404d27635a388186ac80de3593da05a5 now returns404. No replacement
 page or CI restart bypasses this rule. DOT retains merge responsibility.
 Departed-member continuation remains at its original conservative boundary.
+
+The dependent stack is aligned to the published Survey52/main28 baseline.
+Training99b6e5690 and Teacherf0bf64596 were pushed; School84572ac15 merges that
+stack. Backend and frontend trees are identical before/after this control-only
+alignment, recorded in native-extension/main28-alignment.json. The unpushed
+Survey4a98 setup repair is deliberately excluded; no new CI is activated.
