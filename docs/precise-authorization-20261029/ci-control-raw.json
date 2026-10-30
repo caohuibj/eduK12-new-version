@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "product": "e71d5f71f7223fefdce3e4f36ee0f6e619acf361",
+  "base": "13884d7386987068f14b77ec5bbbcb8d431681d8",
+  "savedAt": "2026-10-30T04:34:17.214505+00:00",
+  "reports": [
+    {
+      "id": "task1-ci-controls-initial",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "--test",
+          "--test-reporter=tap",
+          ".github/scripts/task1-onboarding-controls.test.mjs"
+        ],
+        "startedAt": "2026-10-30T04:29:03.083495+00:00",
+        "finishedAt": "2026-10-30T04:29:03.363819+00:00",
+        "exitCode": 1
+      },
+      "log": "TAP version 13\n# Subtest: Task1 exact candidate remains disabled, while its reviewed scope permits both components without numeric PR guessing\nnot ok 1 - Task1 exact candidate remains disabled, while its reviewed scope permits both components without numeric PR guessing\n  ---\n  duration_ms: 7.12663\n  type: 'test'\n  location: '/workspace/eduK12-new-version/.github/scripts/task1-onboarding-controls.test.mjs:27:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    + actual - expected\n    \n    + undefined\n    - '01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9'\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: '01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9'\n  operator: 'strictEqual'\n  stack: |-\n    onboardingPlan (file:///workspace/eduK12-new-version/.github/scripts/onboarding-scope.mjs:71:20)\n    TestContext.<anonymous> (file:///workspace/eduK12-new-version/.github/scripts/task1-onboarding-controls.test.mjs:29:10)\n    Test.runInAsyncScope (node:async_hooks:227:14)\n    Test.run (node:internal/test_runner/test:1402:25)\n    Test.start (node:internal/test_runner/test:1262:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)\n  ...\n# Subtest: Task1 scope refuses incomplete inventories, unknown source/control paths, modes, base and source/merge drift\nok 2 - Task1 scope refuses incomplete inventories, unknown source/control paths, modes, base and source/merge drift\n  ---\n  duration_ms: 7.393781\n  type: 'test'\n  ...\n# Subtest: Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection\nok 3 - Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection\n  ---\n  duration_ms: 21.040154\n  type: 'test'\n  ...\n# Subtest: Task1 projections cannot invent missing cases, empty successful selections or traverse non-owned pointers\nok 4 - Task1 projections cannot invent missing cases, empty successful selections or traverse non-owned pointers\n  ---\n  duration_ms: 5.95526\n  type: 'test'\n  ...\n# Subtest: Task1 scan selection covers changed application and controls without selecting unrelated historical control sources\nnot ok 5 - Task1 scan selection covers changed application and controls without selecting unrelated historical control sources\n  ---\n  duration_ms: 2.175605\n  type: 'test'\n  location: '/workspace/eduK12-new-version/.github/scripts/task1-onboarding-controls.test.mjs:56:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    + actual - expected\n    \n    + undefined\n    - '01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9'\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: '01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9'\n  operator: 'strictEqual'\n  stack: |-\n    onboardingPlan (file:///workspace/eduK12-new-version/.github/scripts/onboarding-scope.mjs:71:20)\n    TestContext.<anonymous> (file:///workspace/eduK12-new-version/.github/scripts/task1-onboarding-controls.test.mjs:57:22)\n    Test.runInAsyncScope (node:async_hooks:227:14)\n    Test.run (node:internal/test_runner/test:1402:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n    Test.postRun (node:internal/test_runner/test:1542:19)\n    Test.run (node:internal/test_runner/test:1467:12)\n    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)\n  ...\n# Subtest: Task1 uses the existing admission/build/scan/gate, retaining missing builds once and leaving application producers dormant locally\nnot ok 6 - Task1 uses the existing admission/build/scan/gate, retaining missing builds once and leaving application producers dormant locally\n  ---\n  duration_ms: 3.964191\n  type: 'test'\n  location: '/workspace/eduK12-new-version/.github/scripts/task1-onboarding-controls.test.mjs:61:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    + actual - expected\n    \n    + undefined\n    - '01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9'\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: '01c2cd30bf4e37f16c269d931eeca7a0d1f31dd9'\n  operator: 'strictEqual'\n  stack: |-\n    onboardingPlan (file:///workspace/eduK12-new-version/.github/scripts/onboarding-scope.mjs:71:20)\n    TestContext.<anonymous> (file:///workspace/eduK12-new-version/.github/scripts/task1-onboarding-controls.test.mjs:65:22)\n    Test.runInAsyncScope (node:async_hooks:227:14)\n    Test.run (node:internal/test_runner/test:1402:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n    Test.postRun (node:internal/test_runner/test:1542:19)\n    Test.run (node:internal/test_runner/test:1467:12)\n    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)\n  ...\n# Subtest: Task1 final Git binding preserves disabled production state and verifies the actual fixed source/control inventory\nok 7 - Task1 final Git binding preserves disabled production state and verifies the actual fixed source/control inventory # SKIP\n  ---\n  duration_ms: 0.151577\n  type: 'test'\n  ...\n1..7\n# tests 7\n# suites 0\n# pass 3\n# fail 3\n# cancelled 0\n# skipped 1\n# todo 0\n# duration_ms 210.357071\n",
+      "logSHA256": "f0d2bec3ba80076068bddcbaf044e595923a5eb0d7943b3bd2ac7267f528373c",
+      "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
+      "selectedCases": [
+        "Task1 original embedded reports retain failed/filtered identities and only qualify the explicit disjoint passed selection",
+        "Task1 projections cannot invent missing cases, empty successful selections or traverse non-owned pointers"
+      ],
+      "allowPartialFailure": true,
+      "failureContinuations": [
+        {
+          "caseName": "Task1 exact candidate remains disabled, while its reviewed scope permits both components without numeric PR guessing",
+          "reportId": "task1-ci-controls-fixture-fixed"
+        },
+        {
+          "caseName": "Task1 scan selection covers changed application and controls without selecting unrelated historical control sources",
+          "reportId": "task1-ci-controls-fixture-fixed"
+        },
+        {
+          "caseName": "Task1 uses the existing admission/build/scan/gate, retaining missing builds once and leaving application producers dormant locally",
+          "reportId": "task1-ci-controls-fixture-fixed"
+        }
+      ],
+      "excludedPassedCases": [
+        {
+          "caseName": "Task1 scope refuses incomplete inventories, unknown source/control paths, modes, base and source/merge drift",
+          "reason": "Negative fixture first failed before reaching its intended mutation because mocked baseline control blobs were absent. Not qualified; fixed version adds a valid nominal baseline and re-executes it."
+        }
+      ]
+    },
+    {
+      "id": "task1-ci-controls-fixture-fixed",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "--test",
+          "--test-reporter=tap",
+          "--test-name-pattern",
+          "Task1 (exact candidate|scope refuses|scan selection|uses the existing)",
+          ".github/scripts/task1-onboarding-controls.test.mjs"
+        ],
+        "startedAt": "2026-10-30T04:29:21.698655+00:00",
+        "finishedAt": "2026-10-30T04:29:22.012842+00:00",
+        "exitCode": 0
+      },
+      "log": "TAP version 13\n# Subtest: Task1 exact candidate remains disabled, while its reviewed scope permits both components without numeric PR guessing\nok 1 - Task1 exact candidate remains disabled, while its reviewed scope permits both components without numeric PR guessing\n  ---\n  duration_ms: 15.442754\n  type: 'test'\n  ...\n# Subtest: Task1 scope refuses incomplete inventories, unknown source/control paths, modes, base and source/merge drift\nok 2 - Task1 scope refuses incomplete inventories, unknown source/control paths, modes, base and source/merge drift\n  ---\n  duration_ms: 13.283874\n  type: 'test'\n  ...\n# Subtest: Task1 scan selection covers changed application and controls without selecting unrelated historical control sources\nok 3 - Task1 scan selection covers changed application and controls without selecting unrelated historical control sources\n  ---\n  duration_ms: 6.134638\n  type: 'test'\n  ...\n# Subtest: Task1 uses the existing admission/build/scan/gate, retaining missing builds once and leaving application producers dormant locally\nok 4 - Task1 uses the existing admission/build/scan/gate, retaining missing builds once and leaving application producers dormant locally\n  ---\n  duration_ms: 9.93093\n  type: 'test'\n  ...\n1..4\n# tests 4\n# suites 0\n# pass 4\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 272.693129\n",
+      "logSHA256": "a53b765b26ac5d5ee1f6939eb18e503cd660fa097139985407786a030bce8f90",
+      "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
+      "selectedCases": [
+        "Task1 exact candidate remains disabled, while its reviewed scope permits both components without numeric PR guessing",
+        "Task1 scope refuses incomplete inventories, unknown source/control paths, modes, base and source/merge drift",
+        "Task1 scan selection covers changed application and controls without selecting unrelated historical control sources",
+        "Task1 uses the existing admission/build/scan/gate, retaining missing builds once and leaving application producers dormant locally"
+      ]
+    },
+    {
+      "id": "task1-ci-controls-existing-boundaries",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "--test",
+          "--test-reporter=tap",
+          "--test-name-pattern",
+          "^(onboarding scope binds exact source|stable gate still requires admission)",
+          ".github/scripts/onboarding-controls.test.mjs"
+        ],
+        "startedAt": "2026-10-30T04:29:54.341188+00:00",
+        "finishedAt": "2026-10-30T04:29:54.571878+00:00",
+        "exitCode": 0
+      },
+      "log": "TAP version 13\n# Subtest: onboarding scope binds exact source, modes, reviewed controls and the supported PR only\nok 1 - onboarding scope binds exact source, modes, reviewed controls and the supported PR only\n  ---\n  duration_ms: 7.480077\n  type: 'test'\n  ...\n# Subtest: stable gate still requires admission and SAST success and rejects Draft or missing outcomes\nok 2 - stable gate still requires admission and SAST success and rejects Draft or missing outcomes\n  ---\n  duration_ms: 8.370644\n  type: 'test'\n  ...\n1..2\n# tests 2\n# suites 0\n# pass 2\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 181.996237\n",
+      "logSHA256": "7676c7cb99a9b66b3521f6504d89aed480805e3f5cf6ebe906c151eff5699b66",
+      "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
+      "selectedCases": [
+        "onboarding scope binds exact source, modes, reviewed controls and the supported PR only",
+        "stable gate still requires admission and SAST success and rejects Draft or missing outcomes"
+      ]
+    },
+    {
+      "id": "task1-ci-controls-receipt-required-fields",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "--test",
+          "--test-reporter=tap",
+          "--test-name-pattern",
+          "Task1 control receipt admission",
+          ".github/scripts/task1-onboarding-controls.test.mjs"
+        ],
+        "startedAt": "2026-10-30T04:32:48.703368+00:00",
+        "finishedAt": "2026-10-30T04:32:48.907905+00:00",
+        "exitCode": 0
+      },
+      "log": "TAP version 13\n# Subtest: Task1 control receipt admission preserves a failed original and requires an actual successful continuation\nok 1 - Task1 control receipt admission preserves a failed original and requires an actual successful continuation\n  ---\n  duration_ms: 11.506315\n  type: 'test'\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 156.850722\n",
+      "logSHA256": "42849b543223fb7256ba7ba942f215d9a5bcc854fe4723e0a7a98432f900f1cc",
+      "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
+      "selectedCases": [
+        "Task1 control receipt admission preserves a failed original and requires an actual successful continuation"
+      ]
+    }
+  ],
+  "auxiliaryChecks": [
+    {
+      "id": "task1-ci-actionlint",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/actionlint-task1/actionlint",
+          "-shellcheck=",
+          "-pyflakes=",
+          ".github/workflows/ci.yml"
+        ],
+        "startedAt": "2026-10-30T04:30:09.363118+00:00",
+        "finishedAt": "2026-10-30T04:30:09.431142+00:00",
+        "exitCode": 0
+      },
+      "log": "",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
+      "name": "ACTIONLINT"
+    },
+    {
+      "id": "task1-ci-control-syntax",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "--input-type=module",
+          "-e",
+          "import {execFileSync} from 'node:child_process'; for (const path of ['.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs','.github/scripts/task1-onboarding-controls.test.mjs']) execFileSync(process.execPath,['--check',path],{stdio:'inherit'});"
+        ],
+        "startedAt": "2026-10-30T04:30:10.013128+00:00",
+        "finishedAt": "2026-10-30T04:30:10.152542+00:00",
+        "exitCode": 0
+      },
+      "log": "",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
+      "name": "NODE_SYNTAX"
+    }
+  ],
+  "supersededControlOnlySuccess": {
+    "id": "task1-ci-controls-receipt-admission",
+    "status": {
+      "command": [
+        "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "Task1 control receipt admission",
+        ".github/scripts/task1-onboarding-controls.test.mjs"
+      ],
+      "startedAt": "2026-10-30T04:31:54.478381+00:00",
+      "finishedAt": "2026-10-30T04:31:54.659366+00:00",
+      "exitCode": 0
+    },
+    "log": "TAP version 13\n# Subtest: Task1 control receipt admission preserves a failed original and requires an actual successful continuation\nok 1 - Task1 control receipt admission preserves a failed original and requires an actual successful continuation\n  ---\n  duration_ms: 9.926307\n  type: 'test'\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 141.851627\n",
+    "logSHA256": "c3c4a3141afb28781a8f56d84ce71b773b9fd6ec492df87c5f6c7e80bd509c79",
+    "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate."
+  },
+  "qualifiedControlCaseCount": 9,
+  "actionlintTool": {
+    "version": "1.7.12",
+    "officialRelease": "https://github.com/rhysd/actionlint/releases/tag/v1.7.12",
+    "archiveSHA256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+    "officialReleaseChecksumsVerified": true,
+    "shellcheck": "not selected",
+    "pyflakes": "not selected"
+  },
+  "qualification": "Initial three failed control cases remain failed; one initially passed negative case is explicitly invalidated and not admitted. Four fixture-dependent cases alone reran, then only the added control-receipt boundary after its new required-field assertions. Two independent initial evidence/pointer cases and two existing boundary cases were not repeated. Later helper additions parsed through the direct Node import in the new receipt case; original syntax receipt retains its own staged input. No original 235-file SHA256 replay, app tests, compilation, scoring, native trials or CI execution. Final Git-bound metadata check is deliberately not preclaimed here."
+}

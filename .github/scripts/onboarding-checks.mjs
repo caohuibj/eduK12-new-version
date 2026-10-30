@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {execFileSync,spawnSync} from 'node:child_process';
-import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,readdirSync,statSync,appendFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {onboardingPlan,binding} from './onboarding-scope.mjs';
 import {verifyPr374Observations} from './pr374-evidence.mjs';
@@ -154,6 +154,85 @@ function plan(){
 }
 function readOriginal(proof){const bytes=readFileSync(safePath(proof.path));assert.equal(hash(bytes),proof.sha256,'Original evidence bytes drift');return JSON.parse(bytes);}
 
+// Task1's preserved reports are embedded in immutable review records. Some
+// records retain a reporter projection rather than a second copied attachment.
+// Normalize field names only; never promote failed/filtered cases to passed.
+export function task1Report(value){
+ if(Array.isArray(value?.testResults))return value;
+ assert(value&&Array.isArray(value.assertions));
+ return {success:value.success,numPassedTests:value.passed,numFailedTests:value.failed,numPendingTests:value.filtered,
+  testResults:value.assertions.map(s=>({assertionResults:s.cases.map(c=>({fullName:c.name??c.title,status:c.status}))}))};
+}
+export function task1Pointer(value,path){
+ assert(Array.isArray(path)&&path.length);
+ for(const key of path){assert((typeof key==='string'||Number.isInteger(key))&&Object.hasOwn(value,key),'Original evidence pointer missing');value=value[key];}
+ return value;
+}
+export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
+ assert.equal(review.schemaVersion,1);assert.equal(review.reviewer,'root dot');assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');
+ assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);assert(review.environment.limitations.length);
+ const originals=new Map();
+ const original=proof=>{safePath(proof.path);assert.match(proof.sha256,/^[a-f0-9]{64}$/);if(!originals.has(proof.path)){
+  const bytes=readBytes(proof.path);assert.equal(hash(bytes),proof.sha256,'Retained Task1 evidence drift');originals.set(proof.path,{sha256:proof.sha256,value:JSON.parse(bytes)});
+ }assert.equal(originals.get(proof.path).sha256,proof.sha256);return originals.get(proof.path).value;};
+ const admitted=review.reports.map(record=>{
+  const raw=original(record),status=task1Pointer(raw,record.statusPointer);assert.equal(status.exitCode,0);assert(Array.isArray(status.command)&&status.command.length);assert(status.startedAt&&status.finishedAt);
+  const caseNames=verifyOriginalReport(task1Report(task1Pointer(raw,record.reportPointer)),record);
+  assert(record.sourceAssociationBasis&&record.coverage);return {id:record.id,caseNames,coverage:record.coverage,originalCommand:status.command,sourceAssociationBasis:record.sourceAssociationBasis,originalRecordSHA256:record.sha256,ciExecuted:false};
+ });
+ assert(admitted.length);assert.equal(new Set(admitted.map(r=>r.id)).size,admitted.length);
+ const names=admitted.flatMap(r=>r.caseNames);assert.equal(new Set(names).size,names.length,'Duplicate Task1 case qualification');
+ const proof=review.educationNativeReadback,db=task1Pointer(original(proof),proof.pointer);
+ assert.equal(db.productionAccessed,false);assert.equal(db.readOnlyTransaction,true);assert.equal(db.database,'precise_education_cognitive_runtime_test_20261030');
+ assert.deepEqual(db.counts,{users:13,nativeConfigs:1,nativeSessions:4,rawSubmissions:4,decodedTrialsInFourChains:136});
+ assert.deepEqual(db.chains.map(c=>[c.product,c.profile,c.decodedTrialCount]).sort(),[['SCHOOL','experience',8],['SCHOOL','research',60],['TEACHER','experience',8],['TEACHER','research',60]].sort());
+ for(const c of db.chains){assert.equal(c.parentStatus,'COMPLETED');assert.equal(c.sessionStatus,'COMPLETED');assert.equal(c.waitingParentAttempts,0);assert.equal(c.runtimeGeneration,'UNIFIED_V1');assert.equal(c.trialCount,c.decodedTrialCount);assert.equal(c.payloadSchemaVersion,1);assert.equal(c.encodingVersion,'CANONICAL_JSON_SHA256_V1');assert.equal(c.t2PointerMatches,true);}
+ const types=review.types.map(record=>{const status=task1Pointer(original(record),record.statusPointer);assert.equal(status.exitCode,0);assert(status.startedAt&&status.finishedAt&&Array.isArray(status.command));assert(record.coverage&&record.sourceAssociationBasis);return {id:record.id,component:record.component,coverage:record.coverage,originalCommand:status.command,sourceAssociationBasis:record.sourceAssociationBasis,originalRecordSHA256:record.sha256,ciExecuted:false,finalWholeTreeClaim:false};});
+ assert.equal(types.length,3);assert.equal(review.openAcceptanceItems.length,1);assert.equal(review.openAcceptanceItems[0],'SAME_CP_SECOND_REGISTERED_NONEMPTY_R_BLOCKED');
+ return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
+}
+export function task1SastConfig(p,b=binding.candidates?.task1){
+ assert.equal(p.pr,'task1');assert.equal(p.product,b.product);
+ const paths=[...Object.keys(b.source),'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs','.github/scripts/task1-onboarding-controls.test.mjs'].filter(path=>/\.(?:[cm]?js|jsx|tsx?)$/.test(path));
+ assert(paths.length);return {paths:[...new Set(paths)].sort()};
+}
+export function verifyTask1ControlEvidence(raw){
+ assert.equal(raw.schemaVersion,1);assert.equal(raw.ciExecuted,false);assert.equal(raw.originalExecutionSigned,false);
+ const admitted=raw.reports.map(record=>{
+  assert(Array.isArray(record.status.command)&&record.status.startedAt&&record.status.finishedAt);assert(record.sourceAssociationBasis);
+  assert.equal(hash(Buffer.from(record.log)),record.logSHA256);
+  const passed=[...record.log.matchAll(/^ok \d+ - (.+)$/gm)].map(m=>m[1]).filter(name=>!name.includes(' # SKIP'));
+  const failed=[...record.log.matchAll(/^not ok \d+ - (.+)$/gm)].map(m=>m[1]);
+  assert.equal(Number(record.log.match(/^# pass (\d+)$/m)?.[1]),passed.length);assert.equal(Number(record.log.match(/^# fail (\d+)$/m)?.[1]),failed.length);
+  assert(record.selectedCases.length);assert.equal(new Set(record.selectedCases).size,record.selectedCases.length);for(const name of record.selectedCases)assert(passed.includes(name));
+  if(failed.length){assert.equal(record.status.exitCode,1);assert.equal(record.allowPartialFailure,true);assert.deepEqual(record.failureContinuations.map(c=>c.caseName).sort(),failed.sort());}
+  else{assert.equal(record.status.exitCode,0);assert(!record.failureContinuations?.length);}
+  return {id:record.id,caseNames:record.selectedCases,originalExitCode:record.status.exitCode,ciExecuted:false};
+ });
+ assert(admitted.length,'Missing retained control checks');assert.equal(new Set(admitted.flatMap(r=>r.caseNames)).size,admitted.flatMap(r=>r.caseNames).length);verifyFailureContinuations(raw.reports,admitted);
+ assert.deepEqual(raw.auxiliaryChecks.map(c=>c.name).sort(),['ACTIONLINT','NODE_SYNTAX']);
+ for(const item of raw.auxiliaryChecks){assert.equal(item.status.exitCode,0);assert(item.status.command.length&&item.status.startedAt&&item.status.finishedAt);assert.equal(hash(Buffer.from(item.log)),item.logSHA256);}
+ return admitted;
+}
+function qualifyTask1Builds(p){
+ assert.equal(p.pr,'task1');assert.equal(process.version,'v24.21.0');mkdirSync('onboarding-evidence',{recursive:true});
+ const run=(component,name,args,extraEnv={})=>{
+  const result=spawnSync(process.execPath,args,{cwd:'server-version/'+component,encoding:'utf8',env:{...process.env,...extraEnv}}),log=(result.stdout??'')+(result.stderr??'')+(result.error?String(result.error):'');
+  writeFileSync('onboarding-evidence/'+name+'.log',log);
+  const receipt={component,componentTree:p.components[component],source:p.sourceHead,mergePreview:p.head,argv:['node',...args],node:process.version,exitCode:result.status,signal:result.signal,logSHA256:hash(Buffer.from(log)),ciExecuted:true,testsExecuted:false,...(component==='frontend'?{flags:{VITE_COGNITIVE_MODULE_ENABLED:'true'}}:{})};
+  writeFileSync('onboarding-evidence/'+name+'.json',JSON.stringify(receipt,null,2)+'\n');assert.equal(result.status,0,name+' failed; original log retained');return receipt;
+ };
+ // Direct compiler commands deliberately avoid npm build's unrelated suites.
+ const backend=run('backend','task1-backend-compile',['node_modules/typescript/bin/tsc']);
+ execFileSync('tar',['-czf','onboarding-evidence/backend-dist.tgz','-C','server-version/backend','dist']);
+ const archive=readFileSync('onboarding-evidence/backend-dist.tgz');backend.artifact={path:'backend-dist.tgz',bytes:archive.length,sha256:hash(archive)};
+ writeFileSync('onboarding-evidence/task1-backend-artifact.json',JSON.stringify(backend,null,2)+'\n');
+ const frontend=run('frontend','task1-frontend-build',['node_modules/vite/bin/vite.js','build','--outDir','../../onboarding-evidence/frontend-dist'],{VITE_COGNITIVE_MODULE_ENABLED:'true'});
+ const files=[],walk=(path,relative='')=>{for(const name of readdirSync(path)){const absolute=path+'/'+name,key=relative+name;if(statSync(absolute).isDirectory())walk(absolute,key+'/');else{const bytes=readFileSync(absolute);files.push({path:key,bytes:bytes.length,sha256:hash(bytes)});}}};
+ walk('onboarding-evidence/frontend-dist');assert(files.some(f=>f.path==='index.html'));frontend.files=files.sort((a,b)=>a.path.localeCompare(b.path));
+ writeFileSync('onboarding-evidence/task1-builds.json',JSON.stringify({backend,frontend,productionDeploymentQualified:false},null,2)+'\n');
+}
+
 // PR393 reuses reviewed tests, but its combined main backend has no exact-tree
 // compiler result. Execute only that missing check here, never npm run build
 // (which invokes unrelated onboarding/scoring suites). Failure logs survive.
@@ -221,11 +300,15 @@ async function reusePr395Sast(){
 }
 function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=[393,395].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
+  const review=[393,395,'task1'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
   assert(review,'Missing exact reviewed evidence');
   assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,p.pr===395?'independent Codex pr395_review':'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
+  if(p.pr==='task1'){
+    const accepted=verifyTask1Evidence(review),controls=verifyTask1ControlEvidence(JSON.parse(readFileSync('docs/precise-authorization-20261029/ci-control-raw.json')));mkdirSync('onboarding-evidence',{recursive:true});
+    writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,...accepted,controls,environment:review.environment,testsExecutedInCI:false,rootReviewAuthentication:'Immutable reviewed Git record, not a signed original execution',taskCompletionClaim:false},null,2)+'\n');return;
+  }
   const admitted=[];
   for(const original of review.reports){
     assert(typeof original.id==='string'&&original.id);
@@ -270,7 +353,11 @@ function admit(){
   writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,admitted,types,observations,...(originalTaskChecks?{originalTaskChecks}:{}),environment:review.environment,testsExecutedInCI:false,rootReviewAuthentication:'Immutable reviewed Git record, not a signed original execution'},null,2)+'\n');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
-  if(process.argv[2]==='sast-reuse')await reusePr395Sast();
+  if(process.argv[2]==='task1-build')qualifyTask1Builds(plan());
+  else if(process.argv[2]==='task1-sast-config'){
+    const p=plan(),config=task1SastConfig(p);appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify(config)+'\n');
+  }
+  else if(process.argv[2]==='sast-reuse')await reusePr395Sast();
   else if(process.argv[2]==='admit')admit();
   else if(process.argv[2]==='source')plan();
   else throw Error('Expected source or admit');
