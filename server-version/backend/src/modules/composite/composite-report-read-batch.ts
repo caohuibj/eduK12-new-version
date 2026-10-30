@@ -54,14 +54,14 @@ const identity = (attempt: any) => canonicalHash({
 
 /** Only already-authorized, projected parents enter this request-local batch.
  * Every source still passes the single-reader's parent/epoch/definition checks. */
-export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.TransactionClient = prisma, options?: { selectedItemIds?: Map<string, Set<string>>; numericOnly?: boolean }): Promise<CompositeReportFactsReader> {
+export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.TransactionClient = prisma, options?: { selectedItemIds?: Map<string, Set<string>>; numericOnly?: boolean; includeLegacyForm?: boolean }): Promise<CompositeReportFactsReader> {
   const templates = createReportReadTemplateStore(publicTemplatesForDatabase(db)), contexts = new Map<any, {identity: string; facts: CompositeReportFacts}>()
   const sectionsByAttempt = new Map<any, ReturnType<typeof mapCompositeSection>[]>()
   for (const attempt of attempts) {
     const scope = await resolveTrainingAttemptScope(attempt, attempt.compositeAssessment, {db})
     if (scope.items.length !== attempt.compositeAssessment.items.length || attempt.compositeAssessment.items.some((item: any) => !scope.itemIds.has(item.id))) throw new Error('Report batch requires projected selection')
     const requested = options?.selectedItemIds?.get(attempt.id)
-    const sections = (attempt.compositeAssessment.formSections ?? []).map(mapCompositeSection).filter((section: ReturnType<typeof mapCompositeSection>) => section.items.some(item => item.formDefinition != null) && (!requested || section.items.some(item => requested.has(item.id))))
+    const sections = (attempt.compositeAssessment.formSections ?? []).map(mapCompositeSection).filter((section: ReturnType<typeof mapCompositeSection>) => (options?.includeLegacyForm || section.items.some(item => item.formDefinition != null)) && (!requested || section.items.some(item => requested.has(item.id))))
     const sectionItemIds = new Set(sections.flatMap((section: ReturnType<typeof mapCompositeSection>) => section.items.map(item => item.id)))
     const typedCount = attempt.compositeAssessment.items.filter((item: any) => item.type === 'FORM' && item.formDefinition != null && (!requested || sectionItemIds.has(item.id))).length
     if (typedCount && (!sections.length || sections.reduce((n: number, section: ReturnType<typeof mapCompositeSection>) => n + section.items.filter(item => item.formDefinition != null).length, 0) !== typedCount)) throw new Error('Report batch typed sections missing')

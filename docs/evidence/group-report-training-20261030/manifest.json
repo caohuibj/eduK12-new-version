@@ -1,0 +1,120 @@
+{
+  "recordedAt": "2026-10-30T07:17:47.477896+00:00",
+  "productCommit": "5660eb1a8ce96def7495b029601164e30177b70f",
+  "productTree": "59515581e28bc9045049e1a6dfaf197393800c9c",
+  "base": "d21fe795639f340882426bcebeef78263c208221",
+  "mainIntegrated": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+  "environment": {
+    "node": "24.21.0",
+    "database": "isolated loopback eduk12_group_report_test_20261030 only",
+    "productionAccessed": false
+  },
+  "binding": "Post-execution record; no signed execution or formal CI admission. Original invocations and input evolution are described in the development note.",
+  "invocations": [
+    {
+      "name": "backend-tests-first",
+      "success": false,
+      "passed": 168,
+      "failed": 1,
+      "filteredOrPending": 0
+    },
+    {
+      "name": "targeted-repair",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "filteredOrPending": 88
+    },
+    {
+      "name": "leaf-scope",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 87
+    },
+    {
+      "name": "form-cache",
+      "success": true,
+      "passed": 4,
+      "failed": 0,
+      "filteredOrPending": 84
+    },
+    {
+      "name": "postgres-first",
+      "success": false,
+      "passed": 0,
+      "failed": 0,
+      "filteredOrPending": 1
+    },
+    {
+      "name": "postgres-resume",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 0
+    },
+    {
+      "name": "frontend-tests",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "filteredOrPending": 0
+    }
+  ],
+  "distinctPassedCases": 174,
+  "distinctFailedCasesLaterPassed": 1,
+  "unresolvedCaseFailures": [],
+  "formalCI": "NOTRUN: stacked Draft base is outside current main-only workflow trigger",
+  "productFiles": {
+    "server-version/backend/src/controllers/trainingAnalysisController.ts": "26434e10755ec1b2e32b7adf118ff9c53f473b092286948e31da29a30edea5a9",
+    "server-version/backend/src/modules/composite/composite-report-read-batch.ts": "77ee4d70d9f32612b43b177b0e3a7a0f3a06721ac60f843b6e797ccb7d08fc2b",
+    "server-version/backend/src/modules/reporting/group-summary.ts": "9bf92a356dac1e3da159df76b3306d57b22c979449e2c1f65ff8aacfc067c132",
+    "server-version/backend/src/modules/reporting/task-artifact.ts": "f5e51c2fdd67f1224afde7eada2e4a7ff2c59a46047be14260acee7bc919d282",
+    "server-version/backend/src/modules/training-analysis/group-report.service.ts": "f1b150e8d7fecad9f6956f6510a309cd35cde916e52595bb19d7eb934e34054d",
+    "server-version/backend/src/modules/training-analysis/group-source.ts": "dd55802109104334b9749a6f3c10f4d324df59fdb585a0723ba662d0715e39d7",
+    "server-version/backend/src/modules/training-analysis/service.ts": "0cb4e3434a1072915891e79e2659535790383015b3eeda0a13cc11c314fcd6a7",
+    "server-version/backend/src/modules/training-analysis/source.ts": "ad53215f5080303601900823dd49706ddfc38ff189c75f7e8c93ff808986590f",
+    "server-version/backend/src/routes/courses.ts": "497dce1b46bcb13dadfe936abc56437102fa29b7da98d132a3777516d2b75e50",
+    "server-version/frontend/src/modules/reporting/TaskGroupReport.tsx": "c15a0a6bfd10386d833420570d533879b80dcddd10941009793ba9d847bf5223",
+    "server-version/frontend/src/training/TrainingCourseAnalysis.tsx": "384465fd814b4d72d62c8037c9e5279b6c1606ff5f093113ccb21175b6315924",
+    "server-version/frontend/src/training/TrainingGroupReports.tsx": "374b59e93e8a9cc42ad59700609c3b5fadb767703d501191d70fac59cc118873",
+    "server-version/frontend/src/training/training-group-reports.css": "992cdb74898b5d7fa137f4877a81a2c07b3b98ace45aeb80fcc214d004340ab8"
+  },
+  "evidenceFiles": {
+    "postgres-first.json": "51598a743d60caed11a6b57df68230412e53baab8b0119b413f1944f2c1ece61",
+    "setup-diagnosis.log": "60d255f13d73d6a4c261dff3910ecc45b91d3689e50aa04a7b6c0d1c33a0d139",
+    "targeted-repair.json": "1472669c0e13e1e17d7d0a94198ff0d9cf75a0a3ea1d880d7c1bc32545ce4a16",
+    "form-cache.log": "d9bd05b764dc55a95f0818f747d1ccae67723f0ad40d4f24f2480210461267b7",
+    "backend-types-candidate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-tests-first.json": "56bb4014564af4c70ee5380cd5a8d824ed5d6e809f48e1e23f59fcb2e9f24520",
+    "backend-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "leaf-scope.json": "168c9b0c8e1fa99d23ac2b580f2b8bf736270869075d82c96d5a19adfbb97431",
+    "browser.json": "1b43da3ce6efae72210a5b276c6e6763a6010953a557817669a5cd4fb7007a3e",
+    "browser-first.log": "c62f8048b690d4870b5572aebfad1e6fb937b9da6e04be193da455e558dfa55c",
+    "targeted-repair.log": "b32b111805c17ed580c81bfb6976949160ad4cb3b3059d7296836bfa6650aeb3",
+    "training-group-report.txt": "4875523f3398645df0dbd1e0d6ffc2bb874aa000ba7488e9ff29ea2a10257f1f",
+    "backend-types-redundant.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "postgres-resume.json": "dc479364b0cefc535bf6662c17dbc0508bbcc944d7b95ba84232715de5d165d9",
+    "postgres-resume.log": "32b3c237ff429eeb4318195023239065fb0dbcedf8105ecd479a73f822034599",
+    "frontend-tests.json": "34a91ea899c782edb9f6049e1bc698eb9e866a3adc463e9e648666ca2d93d9c8",
+    "http.json": "2921930676e5d78cfd935b6561cd265b080658514fe5aac127059393dd67df07",
+    "frontend-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "training-group-1440.png": "c71c7a65083bcfc6e9b936484e72ae44488477c4a4a9c142c5ab75a470f39005",
+    "backend-tests-first.log": "3a4a723364bd7528944ac941c4f4c698558dc5f1587c0a7001d9296441d38273",
+    "frontend-tests.log": "e6f39d8ec008c761f0f08b0cad8a55efd6effa80580c4c20fa16da16d316c993",
+    "postgres-first.log": "a0909c4efaec905b67667d0b296219061c16f751ba42a9c141b6a0b4039d0f73",
+    "initial-setup-types.log": "375f435d99e693bb94176f14fd281d767ce7c29c210c85152a42a79e7af57209",
+    "leaf-scope.log": "9af74f5d6e42b8863be3119fae22114d13dff4eabf6498ea964e14ffc2912c7b",
+    "frontend-lint.log": "19b8fa902bfffba1cee1f5b1e7998be9daebdd1b82ab52f5054591b08c3e15ee",
+    "backend-types-redundant.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "training-group-report.pdf": "f12189b9247400ef2fc597aec0b266b0e03d15412cfbd3acd1eddc4118e93782",
+    "migrate.log": "67d11d7ae97f54e0f52134a9e0fb56686279a77c1beacf96535391325a20fded",
+    "form-cache.json": "6b80abd02a778468b85d89d885857056658aff3ec70f5ab21dc5edcf61204931",
+    "training-group-390.png": "e41d9a80c1a970320976f0b59090bfff234d61be6b9299355babfe00677f2d47"
+  },
+  "redundantInvocation": {
+    "check": "backend tsc --noEmit",
+    "reason": "Previous exit 0 returned with Notion fetch was overlooked; duplicate retained, not a new requirement",
+    "exit": 0
+  }
+}

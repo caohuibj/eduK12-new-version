@@ -7,7 +7,7 @@ import { trainingCourseContext } from './courseNavigation'
 it.each([
   ['/assignments?courseId=c', 'assignments'], ['/checkins?courseId=c', 'checkins'],
   ['/questionnaire-products/new?courseId=c', 'assessments'], ['/scales/s?courseId=c', 'assessments'],
-  ['/courses/c/students', 'management'], ['/courses/c/detail?section=analysis', 'assessments'],
+  ['/courses/c/students', 'management'], ['/courses/c/detail?section=analysis', 'analysis'],
 ])('keeps the same course and active section for %s', (target, section) => {
   const url = new URL(target, 'https://training.invalid')
   expect(trainingCourseContext(url.pathname, url.search)).toMatchObject({ courseId: 'c', section })
@@ -26,8 +26,8 @@ it('restores course context from a safe return link and preserves its per-sectio
   function Target() { const location = useLocation(); return <p data-testid="target">{location.pathname + location.search}</p> }
   render(<MemoryRouter><TrainingCourseTabs {...context} /><Target /></MemoryRouter>)
   const nav = screen.getByRole('navigation', { name: '课程管理内容' })
-  expect(within(nav).getAllByRole('link')).toHaveLength(4)
-  expect(within(nav).queryByRole('link', { name: '信息统计' })).toBeNull()
+  expect(within(nav).getAllByRole('link')).toHaveLength(5)
+  expect(within(nav).getByRole('link', { name: '群体报告' })).toHaveAttribute('href', expect.stringContaining('section=analysis'))
   expect(within(nav).getByRole('link', { name: '测评' })).toHaveAttribute('aria-current', 'page')
   fireEvent.click(within(nav).getByRole('link', { name: '打卡' }))
   const destination = new URL(screen.getByTestId('target').textContent!, 'https://training.invalid')

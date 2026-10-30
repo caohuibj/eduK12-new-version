@@ -564,3 +564,68 @@ describe('request-local immutable facts reader',()=>{
   }finally{decode.mockRestore()}
  })
 })
+
+describe('single group mode on the existing authorized source', () => {
+  it('selects the newest completed parent before metrics, keeps anonymous response identity, and headers do not read facts', async () => {
+    const f = fixture(4)
+    f.parents[1].userId = f.parents[0].userId
+    f.parents[1].completedAt = new Date('2026-10-19T00:00:00Z')
+    f.parents[2].userId = null
+    f.parents[3].userId = f.parents[0].userId; f.parents[3].status = 'IN_PROGRESS'
+    const headers = await loadTrainingAnalysisSources(f.db, actor, request(), {group: {headersOnly: true}})
+    expect(headers.group!.parents).toEqual([
+      {attemptId: 'attempt-1', attemptEpoch: 1, stableIdentity: 'user:user-0'},
+      {attemptId: 'attempt-2', attemptEpoch: 1, stableIdentity: null},
+    ])
+    expect(f.db.assessment.findMany).not.toHaveBeenCalled()
+    expect(f.db.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled()
+    const loaded = await loadTrainingAnalysisSources(f.db, actor, request(), {group: {parentIds: ['attempt-1', 'attempt-2']}})
+    expect(loaded.group!.observations.map(row => [row.parentId, row.value])).toEqual([['attempt-1', 1], ['attempt-2', 2]])
+    expect(loaded.source.observations).toHaveLength(1) // no invented identity in matched numeric source
+    expect(loaded.group!.snapshots).toHaveLength(2)
+  })
+  it('projects frozen multi-select Form choices without numeric coding or unrelated text reads', async () => {
+    const f = fixture(2)
+    Object.assign(f.field, {formType: 'multiple_choice', formOptions: [{value: 'a', label: '阅读'}, {value: 'b', label: '讨论'}], formDefinition: {...f.field.formDefinition, type: 'MULTIPLE', options: [{optionKey: 'a', label: '阅读'}, {optionKey: 'b', label: '讨论'}]}})
+    const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [{slotKey: `form-section:${f.section.id}`, unitType: 'FORM_SECTION', required: true,
+      sourceDefinitionIdentity: {key: f.section.id, version: '2', hash: canonicalHash(mapCompositeSection(f.section))}, sourceBinding: {sectionId: f.section.id}}]})
+    f.parents.forEach((parent, i) => {
+      parent.frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots); parent.frozenActiveSlotSetHash = slots.snapshotHash
+      f.snapshots[i].sourceDefinitionHash = canonicalHash(mapCompositeSection(f.section))
+      f.snapshots[i].collectionFactsEncrypted = encryptUnifiedRuntimePayload({schemaVersion: 2, sectionKey: f.section.id, items: [{key: f.field.id, label: f.field.formLabel, value: i ? ['a'] : ['a', 'b']}]})
+    })
+    const loaded = await loadTrainingAnalysisSources(f.db, actor, request(), {group: {}})
+    expect(loaded.group!.definitions[0]).toMatchObject({type: 'MULTIPLE', options: [{value: 'a', label: '阅读'}, {value: 'b', label: '讨论'}]})
+    expect(loaded.group!.observations.map(row => row.value)).toEqual([['a', 'b'], ['a']])
+    expect(loaded.source.observations).toEqual([])
+  })
+  it('reuses numeric Scale labels, real ranges and unchanged existing quality identity', async () => {
+    const f = scaleFixture()
+    const original = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+    const group = await loadTrainingAnalysisSources(f.db, actor, f.selector, {group: {}})
+    expect(group.group!.definitions[0]).toMatchObject({label: f.result.scores[0].label, range: f.result.scores[0].range})
+    expect(group.group!.observations[0].value).toBe(f.result.scores[0].value)
+    expect(group.manifest.attempts[0].sourceHash).toBe(original.manifest.attempts[0].sourceHash)
+  })
+})
+it('group mode reads legacy choices from accepted V1 section facts, never mutable String answers', async () => {
+  const f = fixture(1)
+  Object.assign(f.field, {formDefinition: null, formType: 'single_choice', formOptions: [{value: 'a', label: '阅读'}, {value: 'b', label: '讨论'}]})
+  const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [{slotKey: `form-section:${f.section.id}`, unitType: 'FORM_SECTION', required: true,
+    sourceDefinitionIdentity: {key: f.section.id, version: '2', hash: canonicalHash(mapCompositeSection(f.section))}, sourceBinding: {sectionId: f.section.id}}]})
+  f.parents[0].frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots); f.parents[0].frozenActiveSlotSetHash = slots.snapshotHash
+  f.snapshots[0].sourceDefinitionHash = canonicalHash(mapCompositeSection(f.section))
+  f.snapshots[0].collectionFactsEncrypted = encryptUnifiedRuntimePayload({schemaVersion: 1, sectionKey: f.section.id, items: [{key: f.field.id, label: f.field.formLabel, value: 'b'}]})
+  const selector = request(); selector.waves[0].metrics[0].metricKey = f.field.id
+  const result = await loadTrainingAnalysisSources(f.db, actor, selector, {group: {}})
+  expect(result.group!.definitions[0]).toMatchObject({type: 'SINGLE', key: f.field.id})
+  expect(result.group!.observations[0]).toMatchObject({value: 'b', missingReason: null})
+})
+it('group generation discovers only the selected Form leaf and does not read unrelated Scale or SJT facts', async () => {
+  const f = fixture(1)
+  f.task.items.push({id: 'unselected-scale', type: 'SCALE'}, {id: 'unselected-sjt', type: 'SITUATIONAL'})
+  f.db.assessment.findMany.mockImplementation(() => {throw Error('Unselected Scale read')})
+  f.db.assessmentUnitSnapshot.findMany.mockImplementation(() => {throw Error('Unselected SJT read')})
+  const catalog = await listTrainingAnalysisSources(f.db, actor, 'course', {group: true, taskId: 'task', groupKey: `FORM:${f.section.id}`})
+  expect(catalog.tools).toHaveLength(1); expect(catalog.tools[0].source.metrics).toEqual([{itemId: 'number', metricKey: 'stable_number', label: 'Original number'}])
+})

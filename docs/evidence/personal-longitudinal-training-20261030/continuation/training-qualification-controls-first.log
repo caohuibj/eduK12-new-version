@@ -1,0 +1,20 @@
+✔ original local cases and failed continuations retain their provenance without replay (83.947228ms)
+✔ exact app pins reject unknown inputs, changed main and full fallback (654.100553ms)
+✔ Ready requires actual native/image/SAST success; Draft never qualifies (601.119756ms)
+✔ actual entrypoint child resolves original admission without a top-level-await cycle (164.436587ms)
+✔ image reuse refuses failed, skipped or expired original producer steps (479.88866ms)
+✔ actual main schema archive exceeds 1 MiB without stdout buffer truncation (53.736531ms)
+✔ backend audit receipt cannot admit a failed or expired original audit step (556.85737ms)
+✔ retained application SAST requires exact official successful extraction and current tree (491.710208ms)
+✔ actual original source-SHA job metadata admits only its unchanged qualification scope (639.425367ms)
+✔ Training source-line deltas remain exact and old schema qualification cannot admit a new migration (787.19076ms)
+✔ frontend audit admission requires the exact successful unexpired original step (561.206398ms)
+✔ Training native fixture targets real old publication/report fields without application or new-column writes (0.283125ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5229.563866

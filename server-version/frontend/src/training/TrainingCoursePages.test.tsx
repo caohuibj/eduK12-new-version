@@ -234,16 +234,24 @@ describe('course-first training workspaces', () => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('/courses/course-1/training-assessments?includeManaged=true&view=summary&page=1&pageSize=20'))
   })
 
-  it('hides analysis and sends old analysis links to assessments without loading analysis sources', async () => {
-    mount('/courses/course-1/detail?section=analysis', '/courses/:courseId/detail', TrainingTrainerCourse)
+  it('opens single group reports through the real course tabs and direct analysis route without opening old comparison', async () => {
+    const original = get.getMockImplementation()!
+    get.mockImplementation((url: string) => url === '/courses/course-1/training-group-reports'
+      ? Promise.resolve({code: 0, data: {tasks: [], artifacts: []}}) : original(url))
+    const page = mount('/courses/course-1/detail?section=assessments', '/courses/:courseId/detail', TrainingTrainerCourse)
     await screen.findByRole('heading', { name: course.title })
-    expect(screen.queryByRole('button', { name: '信息统计' })).toBeNull()
-    expect(screen.queryByRole('region', { name: '课程数据分析' })).toBeNull()
-    expect(screen.getByRole('button', { name: '测评' })).toHaveAttribute('aria-pressed', 'true')
-    expect(await screen.findByRole('link', { name: /发布测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
+    fireEvent.click(screen.getByRole('button', {name: '群体报告'}))
+    await screen.findByRole('region', {name: 'Training 单次群体报告'})
+    expect(screen.getByRole('button', {name: '群体报告'})).toHaveAttribute('aria-pressed', 'true')
+    fireEvent.click(screen.getByRole('button', {name: '打开群体报告'}))
+    await waitFor(() => expect(get).toHaveBeenCalledWith('/courses/course-1/training-group-reports'))
+    expect(screen.queryByRole('button', {name: '前后测比较'})).toBeNull()
     expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)
-    fireEvent.click(screen.getByRole('button', { name: '学习' }))
-    expect(await screen.findByRole('button', { name: '发布练习' })).toBeVisible()
+    page.unmount()
+    mount('/courses/course-1/detail?section=analysis', '/courses/:courseId/detail', TrainingTrainerCourse)
+    await screen.findByRole('region', {name: 'Training 单次群体报告'})
+    expect(screen.getByRole('button', {name: '群体报告'})).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.queryByRole('button', {name: '前后测比较'})).toBeNull()
     expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)
   })
 

@@ -4,7 +4,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,mkdtempSync,statSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
-import {binding,personalTrackingReadyPlan,personalTrackingReadyOutputs,admitOriginalReports,admitOriginalReportsInChild,verifyOriginalImages,prepareMainSchema,verifyOriginalBackendAudit,verifyOriginalApplicationSast,verifyOriginalQualification} from './personal-tracking-ready.mjs';
+import {binding,personalTrackingReadyPlan,personalTrackingReadyOutputs,admitOriginalReports,admitOriginalReportsInChild,verifyOriginalImages,prepareMainSchema,verifyOriginalBackendAudit,verifyOriginalApplicationSast,verifyOriginalQualification,verifyOriginalFrontendAudit,nativeTrainingFixtureSql,nativeTrainingFactsSql} from './personal-tracking-ready.mjs';
 import {changedEntries} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
@@ -65,13 +65,34 @@ test('retained application SAST requires exact official successful extraction an
 
 test('actual original source-SHA job metadata admits only its unchanged qualification scope',async()=>{
  const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),old=process.env.GH_TOKEN;process.env.GH_TOKEN='synthetic-offline-metadata-reader';
- const prefix='docs/evidence/personal-longitudinal-20261030/continuation/',sast=JSON.parse(readFileSync(prefix+'personal-ready-af8-codeql-success.json')),native=JSON.parse(readFileSync(prefix+'personal-ready-e658-native-success.json'));
+ const prefix='docs/evidence/personal-longitudinal-20261030/continuation/',sast=JSON.parse(readFileSync(prefix+(binding.applicationSastReuse?.sourceHead==='52b4cbdb4463a7ffcaf5192cc577a6d4d71774dc'?'personal-main28-codeql-success.json':'personal-ready-af8-codeql-success.json'))),native=JSON.parse(readFileSync(prefix+'personal-ready-e658-native-success.json'));
  const read=job=>async()=>({ok:true,json:async()=>job});
  try{
   if(binding.applicationSastReuse){assert.equal(sast.head_sha,binding.applicationSastReuse.sourceHead);assert.equal((await verifyOriginalApplicationSast(plan,read(sast))).reexecuted,false);}else await assert.rejects(verifyOriginalApplicationSast({...plan,applicationSastReuse:binding.historicalMain318ApplicationSastReuse},read(sast)));
+  if(!binding.qualificationReuse){await assert.rejects(verifyOriginalQualification({...plan,qualificationReuse:binding.previousSliceQualification},read(native)));return;}
   const admitted=await verifyOriginalQualification(plan,read(native));assert.equal(admitted.reexecuted,false);assert.equal(admitted.status,binding.qualificationReuse.nativeOnly?'ADMITTED_NATIVE_QUALIFICATION_ONLY':'ADMITTED_COMPLETE_NATIVE_FRONTEND_QUALIFICATION');
   await assert.rejects(verifyOriginalQualification(plan,read({...native,conclusion:'failure'})));
   await assert.rejects(verifyOriginalQualification(plan,read({...native,steps:[]})));
   await assert.rejects(verifyOriginalQualification({...plan,qualificationReuse:{...plan.qualificationReuse,serverVersionTree:'0'.repeat(40)}},read(native)));
  }finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
+});
+
+test('Training source-line deltas remain exact and old schema qualification cannot admit a new migration',()=>{
+ if(binding.slice!=='training')return;
+ const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options);
+ assert(!plan.qualificationReuse);assert(!plan.imageReuse);assert(!plan.applicationSastReuse);
+ assert(plan.sastPaths.includes('server-version/backend/src/modules/composite/personal-tracking.ts'));
+ assert(plan.frontendLintPaths.includes('src/modules/composite/TrainingPersonalChanges.tsx'));
+ const path='server-version/backend/src/modules/composite/personal-tracking-results.ts',old=binding.files[path].originalDeltaSHA256;
+ try{binding.files[path].originalDeltaSHA256='0'.repeat(64);assert.throws(()=>personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),/Original Training delta changed/);}finally{binding.files[path].originalDeltaSHA256=old;}
+});
+test('frontend audit admission requires the exact successful unexpired original step',async()=>{
+ if(!binding.frontendAuditReuse)return;
+ const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),p=binding.frontendAuditReuse,old=process.env.GH_TOKEN;process.env.GH_TOKEN='synthetic-offline-audit-metadata';const now=Date.now();
+ const job={run_id:p.runId,head_sha:p.sourceHead,status:'completed',conclusion:'success',steps:[{name:p.step,conclusion:'success',completed_at:new Date(now).toISOString()}]},read=value=>async()=>({ok:true,json:async()=>value});
+ try{assert.equal((await verifyOriginalFrontendAudit(plan,read(job),now)).reexecuted,false);await assert.rejects(verifyOriginalFrontendAudit(plan,read({...job,steps:[{...job.steps[0],conclusion:'failure'}]}),now));await assert.rejects(verifyOriginalFrontendAudit(plan,read({...job,steps:[{...job.steps[0],completed_at:new Date(now-25*3600000).toISOString()}]}),now));}finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
+});
+test('Training native fixture targets real old publication/report fields without application or new-column writes',()=>{
+ const q=nativeTrainingFixtureSql({owner:'owner',id:'old',trackingId:'new',attempt:'attempt'});assert(q.includes('synthetic-opaque-old-report'));assert(q.includes("'COMPLETED'"));assert(!q.includes('personal_tracking'));assert(!q.includes('personal_changes_snapshots'));
+ assert(nativeTrainingFactsSql('old','attempt').includes("to_jsonb(a)-'personal_changes_snapshots'"));
 });

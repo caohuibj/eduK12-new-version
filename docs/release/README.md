@@ -2070,3 +2070,13 @@ are identical. This native-only receipt explicitly does not admit frontend;
 current frontend installation/audit/types/lint execute. Required original job
 identity/success/steps/24h remain unchanged. No application journey is replayed,
 no new workflow is added, and old failed runs remain failed.
+
+PR399 main28 continuation retains run41050414835's successful image and full
+selected SAST producers for the unchanged production tree. Native-only reuse
+skips DB replay, while locked backend install/Prisma generation still runs as
+a prerequisite for actual frontend type consumers importing backend definitions.
+Current SAST authenticates the original full extraction, then scans only changed
+JavaScript/TypeScript controls since it; no changed controls means authenticated
+whole selected-extraction reuse. Failed frontend job124044901601 remains failed.
+Its redirected logs returned403; job metadata and check annotations provide the
+independent diagnostic evidence, with no alternative log download.

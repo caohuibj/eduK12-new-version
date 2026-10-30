@@ -15,7 +15,7 @@ function sortedSources<T extends {waveKey:string;taskId:string;attemptId:string}
   return [...rows].sort((a,b)=>`${a.waveKey}:${a.taskId}:${a.attemptId}`.localeCompare(`${b.waveKey}:${b.taskId}:${b.attemptId}`))
 }
 const scopeKey = (row:{attemptId:string;attemptEpoch:number;sourceHash:string})=>`${row.attemptId}:${row.attemptEpoch}:${row.sourceHash}`
-async function readQuality(tx:Tx,courseId:string,sources:TrainingAnalysisManifestV1['sources']) {
+export async function readTrainingAnalysisQuality(tx:Tx,courseId:string,sources:TrainingAnalysisManifestV1['sources']) {
   const ids=[...new Set(sources.map(row=>row.attemptId))]
   const rows=ids.length ? await tx.trainingAnalysisQuality.findMany({where:{courseId,attemptId:{in:ids}}}) : []
   const byScope=new Map(rows.map(row=>[scopeKey(row),row]))
@@ -45,7 +45,7 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
     const loaded=await loadTrainingAnalysisSources(tx,{userId:input.actor.id,role:input.actor.role},selector,
       expected ? {authorityLock:'SHARE',...version,fixedManifest:{attempts:expected.sources,...(expected.schemaVersion===2?{researchSources:expected.researchSources}:{})},sourceCutoff} : {authorityLock:'SHARE',...version,sourceCutoff})
     const sources=sortedSources(loaded.manifest.attempts)
-    const {quality,qualityHash}=await readQuality(tx,input.courseId,sources)
+    const {quality,qualityHash}=await readTrainingAnalysisQuality(tx,input.courseId,sources)
     return {loaded,sources,sourceCutoff,quality,qualityHash}
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
   // Pure statistics/table construction happens after releasing the DB snapshot.
@@ -54,10 +54,7 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
   const governance=new Map(frozen.loaded.researchGovernance.map(row=>[row.attemptId,row]))
   const source={...frozen.loaded.source,observations:frozen.loaded.source.observations.map(row=>{
     const research=row.attemptId?governance.get(row.attemptId):undefined
-    const reason=research ? research.status==='WITHDRAWAL_PENDING'?'RESEARCH_WITHDRAWAL_PENDING' as const
-      : research.status==='EXCLUDED'?'RESEARCH_EXCLUDED' as const
-      : research.status!=='CONSENTED'||!research.acceptanceId?'RESEARCH_CONSENT_UNKNOWN' as const
-      : !row.researchCategory||!research.dataCategories?.includes(row.researchCategory)?'RESEARCH_SCOPE_NOT_COVERED' as const : null : null
+    const reason=trainingResearchReason(research,row.researchCategory)
     if(reason)return {...row,value:null,reason}
     return row.attemptId && excluded.has(`${row.attemptId}:${row.attemptEpoch}`)?{...row,value:null,reason:'QUALITY_EXCLUDED' as const}:row
   })}
@@ -118,4 +115,11 @@ export async function setTrainingAnalysisQuality(input:{actor:TrainingAnalysisAc
 export function trainingQualityPage(quality:Awaited<ReturnType<typeof analyzeTrainingCourse>>['quality'],page=1) {
   if(!Number.isInteger(page)||page<1||page>240) fail(400,'TRAINING_ANALYSIS_PAGE_INVALID','页码无效')
   return {list:quality.slice((page-1)*25,page*25),total:quality.length,page,pageSize:25}
+}
+
+export function trainingResearchReason(research: import('./source').TrainingResearchGovernance | undefined, category?: string) {
+  return research ? research.status==='WITHDRAWAL_PENDING'?'RESEARCH_WITHDRAWAL_PENDING' as const
+    : research.status==='EXCLUDED'?'RESEARCH_EXCLUDED' as const
+    : research.status!=='CONSENTED'||!research.acceptanceId?'RESEARCH_CONSENT_UNKNOWN' as const
+    : !category||!research.dataCategories?.includes(category)?'RESEARCH_SCOPE_NOT_COVERED' as const : null : null
 }

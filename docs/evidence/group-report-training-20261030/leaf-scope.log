@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/training-analysis/source.test.ts (88 tests | 87 skipped) 13ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 87 skipped (88)
+   Start at  07:09:35
+   Duration  4.57s (transform 3.22s, setup 0ms, import 4.43s, tests 13ms, environment 0ms)
+
+JSON report written to /tmp/training-group-leaf-scope.json
