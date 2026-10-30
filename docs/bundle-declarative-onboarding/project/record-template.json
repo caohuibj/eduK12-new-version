@@ -1,0 +1,23 @@
+{
+  "recordVersion": "0.2.0",
+  "purpose": "可选工作笔记；不是运行配置、API、强制清单或审批生命周期",
+  "key": null,
+  "kind": null,
+  "target": "MAIN",
+  "sourceRefs": [],
+  "components": [],
+  "profile": null,
+  "report": null,
+  "changedBehavior": [],
+  "reusedEvidence": [],
+  "remaining": [],
+  "delivery": {
+    "commit": null,
+    "merge": null,
+    "environmentLoaded": "NOT_RUN",
+    "databaseInstalled": "NOT_RUN",
+    "published": "NOT_RUN",
+    "assigned": "NOT_RUN",
+    "fullExample": "NOT_RUN"
+  }
+}
