@@ -198,7 +198,7 @@
     },
     ".github/scripts/school-teacher-package.test.mjs": {
       "before": null,
-      "after": "5e36f23d76427febada0748bfc49bb5b46fa85e8"
+      "after": "4e6deac569e3072281582070fba05b223b334fbd"
     },
     ".github/scripts/school-teacher-scope.mjs": {
       "before": "0f553bba6766571834830ea8af05371e54fb4d90",
@@ -214,7 +214,7 @@
     },
     "server-version/e2e/school-teacher-package-browser.cjs": {
       "before": null,
-      "after": "7e793d5a94e81e0902f5aebbed63e1eb61cd4893"
+      "after": "6120ab945ef25bcaed8ac8cb7fe3199dbae7a2e1"
     },
     "server-version/e2e/school-teacher-package-fixture.cjs": {
       "before": null,

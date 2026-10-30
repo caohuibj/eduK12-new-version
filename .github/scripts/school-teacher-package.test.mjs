@@ -18,7 +18,7 @@ test('only26 approved original passed rows are consumed, with original failures 
 test('single new browser consumer uses same compiled contexts and never replaces sandbox or replays FINAL',()=>{
  const runtime=readFileSync(new URL('./school-teacher-native-runtime.py',import.meta.url),'utf8'),browser=readFileSync(new URL('../../server-version/e2e/school-teacher-package-browser.cjs',import.meta.url),'utf8'),factory=readFileSync(new URL('../../server-version/e2e/school-teacher-package-fixture.cjs',import.meta.url),'utf8');
  assert(runtime.includes("if plan.get('publicPackage')"));assert(runtime.includes("'SCANNED_BROWSER_PENDING'"));assert(browser.includes('chromium.launch(CHROME_LAUNCH_OPTIONS)'));assert(browser.includes("runtime.baseImages.node"));assert(browser.includes('backend.imageId'));assert(!browser.includes('--no-sandbox'));assert(factory.includes('Only the isolated browser fixture database is allowed'));for(const forbidden of ['submitScaleAssessmentFinal','submitSituationalAttemptFinal','finalizeCompositeAttemptIfReady','computeProfile'])assert(!factory.includes(forbidden));
- assert(browser.includes("getByLabel('已授权测评 · 精确版本',{exact:true}).getByRole('option',{name:/P6 浏览器连接/}).waitFor({state:'attached'})"),'Catalog checks option presence within its exact select, without requiring native popup visibility');
+ assert(browser.includes("getByRole('combobox',{name:/^已授权测评 · 精确版本/}).getByRole('option',{name:/P6 浏览器连接/}).waitFor({state:'attached'})"),'Catalog checks option presence within its exact select, without requiring native popup visibility');
  const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8');assert(workflow.includes('fromJSON(inputs.plan).publicPackage == true'));assert(!workflow.includes('school-teacher-package.yml'));
 });
 test('old388/391 main observation still selects only388; package main can never borrow its green',async()=>{
@@ -55,4 +55,8 @@ test('continued SAST scans current controls while the audit consumer requires th
  const{nativeSastConfig}=await import('./school-teacher-native.mjs'),paths=['.github/scripts/school-teacher-native-runtime.py','.github/scripts/school-teacher-native-runtime.test.py','.github/scripts/exact-candidate-runtime.py'];
  assert.deepEqual(nativeSastConfig(paths,{execution:{sastContinuation:40980640181}}).paths,['.github/scripts','server-version/e2e','server-version/frontend/e2e','server-version/frontend/vite.config.ts']);assert(nativeSastConfig(paths,null).paths.includes('server-version/backend/src'));
  const reuse=readFileSync(new URL('./school-teacher-package-resume.mjs',import.meta.url),'utf8');assert(reuse.includes("assert.equal(j.conclusion,'success')"));assert(reuse.includes('currentChangedControlScanRequired:true'));assert(reuse.includes("'*.py'"));assert(readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8').includes("continuation == 'package-browser-only' && 'javascript-typescript'"));
+});
+
+test('wrapped select labels use combobox prefixes rather than exact full label text',()=>{
+ const browser=readFileSync(new URL('../../server-version/e2e/school-teacher-package-browser.cjs',import.meta.url),'utf8');assert(browser.includes("getByRole('combobox',{name:/^获授权来源/})"));assert(browser.includes("getByRole('combobox',{name:/^已授权测评 · 精确版本/})"));assert(!browser.includes("getByLabel('获授权来源',{exact:true})"));
 });
