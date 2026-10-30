@@ -10,6 +10,8 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {contentGrantInputSchema,type ContentGrantInput} from './content-authority'
 import {educationMaterialUse,parseEducationPublicSourceKey} from '../education-tools/public-source.identity'
 import {readEducationPublicSourceHeaders} from '../education-tools/public-source.headers'
+import {parseEducationPackageKey} from '../education-tools/package-reference.contracts'
+import {readEducationPackageHeaders} from '../education-tools/package-reference.headers'
 import {lockEducationNativeSourceIds} from '../education-tools/native-source.locks'
 const uuid=z.string().guid(),reason=z.string().trim().min(1).max(500)
 const wireGrant=z.object({ ...contentGrantInputSchema.shape,
@@ -17,7 +19,7 @@ const wireGrant=z.object({ ...contentGrantInputSchema.shape,
   expiresAt:z.string().datetime().transform(value=>new Date(value)),
 }).strict().pipe(contentGrantInputSchema).superRefine((grant,ctx)=>{
   if(!supported(grant)||!uuid.safeParse(grant.subjectId).success||(!platformSjt(grant)&&!platformReference(grant)&&!platformScaleLibrary(grant)&&!platformScalePublic(grant)&&!platformSjtDistribution(grant)&&!uuid.safeParse(grant.scope.scopeId).success)||
-    grant.scope.resourceKeys.some(key=>educationMaterialUse(grant)?!parseEducationPublicSourceKey(key):!uuid.safeParse(key).success))
+    grant.scope.resourceKeys.some(key=>educationMaterialUse(grant)?!parseEducationPublicSourceKey(key)&&!parseEducationPackageKey(key):!uuid.safeParse(key).success))
     ctx.addIssue({code:'custom',message:'Only supported exact project, course, governance, entry-distribution or education public-source use grants are allowed'})
   if(platformSjtDistribution(grant)&&(grant.remainingDelegationDepth!==0||grant.delegableCapabilities.length!==0))
     ctx.addIssue({code:'custom',message:'Situational entry distribution does not support delegation'})
@@ -110,7 +112,7 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
       if(mappings.length!==scope.resourceKeys.length||mappings.some(row=>!scope.resourceKeys.includes(row.id)))deny()
       registryResources=mappings
     }
-    if(isEducationUse)await lockEducationNativeSourceIds(tx,scope.resourceKeys.map(key=>parseEducationPublicSourceKey(key)!).filter(source=>source.kind==='SJT_RELEASE').map(source=>source.id))
+    if(isEducationUse)await lockEducationNativeSourceIds(tx,scope.resourceKeys.flatMap(key=>{const source=parseEducationPublicSourceKey(key);return source?.kind==='SJT_RELEASE'?[source.id]:[]}))
     const projects=isEducationDistribution||isEducationUse?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM organizations
       WHERE id=${scope.scopeId} AND product_domain='SCHOOL' AND status='ACTIVE' FOR UPDATE`)
       :isPlatformSjt||isPlatformReference||isLibrary||isScalePublic||isSjtDistribution?[{id:scope.scopeId}]:scope.product==='TRAINING'
@@ -215,8 +217,9 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
         WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND deleted_at IS NULL AND size_bytes>0 ORDER BY id FOR SHARE`)
       educationResources=[...composites,...releases,...assets]
     }
-    const publicHeaders=isEducationUse?await readEducationPublicSourceHeaders(tx,scope.resourceKeys.map(key=>parseEducationPublicSourceKey(key)!),true):null
-    const resources=isEducationUse?[...publicHeaders!.keys()].map(id=>({id})):isEducationDistribution?educationResources:isSjtDistribution?distributionResources:isScalePublic?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM scales WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND instrument_class='CUSTOM_DESCRIPTIVE' ORDER BY id FOR SHARE`)
+    const publicHeaders=isEducationUse?await readEducationPublicSourceHeaders(tx,scope.resourceKeys.flatMap(key=>{const source=parseEducationPublicSourceKey(key);return source?[source]:[]}),true):null
+    const packageHeaders=isEducationUse?await readEducationPackageHeaders(tx,scope.resourceKeys.flatMap(key=>{const source=parseEducationPackageKey(key);return source?[source]:[]}),true):null
+    const resources=isEducationUse?[...publicHeaders!.keys(),...packageHeaders!.keys()].map(id=>({id})):isEducationDistribution?educationResources:isSjtDistribution?distributionResources:isScalePublic?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM scales WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND instrument_class='CUSTOM_DESCRIPTIVE' ORDER BY id FOR SHARE`)
       :isLibrary?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND family='SCALE' AND layer='MEASUREMENT' AND status='PUBLISHED' ORDER BY id FOR SHARE`)
       :isPlatformSjt?registryResources:isPlatformReference
       ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases

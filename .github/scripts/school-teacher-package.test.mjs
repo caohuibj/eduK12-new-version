@@ -1,0 +1,62 @@
+import{execFileSync}from'node:child_process';import test from 'node:test';import assert from 'node:assert/strict';import{readFileSync}from'node:fs';
+import{nativeBinding,NATIVE_BRANCH,PACKAGE_BRANCH,PACKAGE_MARKER,requireNativeQualification,validateNativeBoundary,requireNativeEvidence,nativePlan,observeNativeMain}from'./school-teacher-native.mjs';
+import{binding}from'./school-teacher-scope.mjs';import{inspectHistoricalCase,requireReviewedCase}from'./school-teacher-checks.mjs';
+import{verifyNativeEvidence,readNativeEvidenceBytes}from'./school-teacher-native-evidence.mjs';
+function fixture(){const b=structuredClone(nativeBinding(PACKAGE_BRANCH));b.enabled=false;const entries=Object.entries({...b.source,...b.controls}).map(([file,e])=>({file,oldBlob:e.before||'0'.repeat(40),newBlob:e.after||'c'.repeat(40),oldMode:e.before?'100644':'000000',newMode:'100644',status:e.before?'M':'A'}));return{b,o:{event:'pull_request',repository:b.repository,branch:PACKAGE_BRANCH,draft:true,forceFull:false,base:b.base,sourceHead:'a'.repeat(40),checkoutHead:'b'.repeat(40),sourceTree:'d'.repeat(40),checkoutTree:'d'.repeat(40),productTree:b.productTree,frontendTree:b.frontendTree,backendTree:b.backendTree,protectedInputs:structuredClone(b.protectedInputs),entries}}}
+test('PR392 is independent of388, closed over the complete patch and cannot activate without new control review',()=>{
+ assert.equal(binding({CI_HEAD_REF:PACKAGE_BRANCH}).branch,PACKAGE_BRANCH);assert.equal(binding({CI_HEAD_REF:NATIVE_BRANCH}).branch,NATIVE_BRANCH);assert.equal(binding({PLAN:JSON.stringify({candidate:'native-bundle',publicPackage:true})}).branch,PACKAGE_BRANCH);
+ const{b,o}=fixture();assert.equal(b.enabled,false);assert.throws(()=>requireNativeQualification(b));assert.notEqual(b.evidence.reviewSha256,nativeBinding().evidence.reviewSha256);
+ const plan=validateNativeBoundary(b,o,{draftPreflight:true});assert.equal(plan.publicPackage,true);assert.deepEqual(plan.requiredJobs,['admission']);
+ for(const patch of [{branch:NATIVE_BRANCH},{base:'0'.repeat(40)},{entries:o.entries.slice(1)},{entries:[...o.entries,{file:'unexpected',status:'A'}]},{frontendTree:'0'.repeat(40)}])assert.throws(()=>validateNativeBoundary(b,{...o,...patch},{draftPreflight:true}));
+ assert.throws(()=>nativePlan([],b.base,o.checkoutHead,()=>'',{CI_HEAD_REF:PACKAGE_BRANCH,CI_EVENT:'workflow_dispatch'},b));
+ assert(b.controls[PACKAGE_MARKER]);
+});
+test('only26 approved original passed rows are consumed, with original failures and filtering preserved',()=>{
+ const b=nativeBinding(PACKAGE_BRANCH),bytes=readNativeEvidenceBytes(b),helpers={inspectHistoricalCase,requireReviewedCase};
+ const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();const result=verifyNativeEvidence(bytes,b,helpers,git);assert.equal(result.admittedCases.length,26);assert.equal(result.applicationTestsExecutedInCI,false);assert(result.observations.some(o=>o.wholeInvocationSuccess===false));const changed=JSON.parse(bytes);changed.reports[0].selected.push(0);assert.throws(()=>verifyNativeEvidence(Buffer.from(JSON.stringify(changed)),b,helpers,git));
+});
+test('single new browser consumer uses same compiled contexts and never replaces sandbox or replays FINAL',()=>{
+ const runtime=readFileSync(new URL('./school-teacher-native-runtime.py',import.meta.url),'utf8'),browser=readFileSync(new URL('../../server-version/e2e/school-teacher-package-browser.cjs',import.meta.url),'utf8'),factory=readFileSync(new URL('../../server-version/e2e/school-teacher-package-fixture.cjs',import.meta.url),'utf8');
+ assert(runtime.includes("if plan.get('publicPackage')"));assert(runtime.includes("'SCANNED_BROWSER_PENDING'"));assert(browser.includes('chromium.launch(CHROME_LAUNCH_OPTIONS)'));assert(browser.includes("runtime.baseImages.node"));assert(browser.includes('backend.imageId'));assert(!browser.includes('--no-sandbox'));assert(factory.includes('Only the isolated browser fixture database is allowed'));for(const forbidden of ['submitScaleAssessmentFinal','submitSituationalAttemptFinal','finalizeCompositeAttemptIfReady','computeProfile'])assert(!factory.includes(forbidden));
+ assert(browser.includes("getByRole('combobox',{name:/^已授权测评 · 精确版本/}).getByRole('option',{name:/P6 浏览器连接/}).waitFor({state:'attached'})"),'Catalog checks option presence within its exact select, without requiring native popup visibility');
+ const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8');assert(workflow.includes('fromJSON(inputs.plan).publicPackage == true'));assert(!workflow.includes('school-teacher-package.yml'));
+});
+test('old388/391 main observation still selects only388; package main can never borrow its green',async()=>{
+ let first;await assert.rejects(observeNativeMain({candidate:'native-bundle',postMerge:true,requiredJobs:nativeBinding().requiredJobs},async path=>{first=path;throw Error('stop')}));assert.equal(first,'/pulls/388');
+ await assert.rejects(observeNativeMain({candidate:'native-bundle',postMerge:true,publicPackage:true,requiredJobs:nativeBinding().requiredJobs},async path=>{first=path;throw Error('stop')}));assert.equal(first,'/pulls/392');
+});
+
+test('shallow product fetch covers both native PR branches and their exact main merge bases',()=>{
+ const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const block=workflow.split('- name: fetch reviewed School Teacher product anchor without full history')[1].split('- name:')[0];
+ const condition=block.match(/\n\s+if: (.*)/)[1],selected=new Function('github','return ('+condition+')');
+ for(const branch of [NATIVE_BRANCH,PACKAGE_BRANCH])assert(selected({event_name:'pull_request',event:{pull_request:{head:{ref:branch}}}}));
+ for(const before of ['e65d87222d351e5dfde52e389f3aa403380443eb',nativeBinding(PACKAGE_BRANCH).base])assert(selected({event_name:'push',ref:'refs/heads/main',event:{before}}));
+ assert(!selected({event_name:'pull_request',event:{pull_request:{head:{ref:'unrelated'}}}}));
+ assert(block.includes("'--depth=1','origin',b.productHead"));
+});
+test('package Chrome diagnostics run in existing admission before producers and survive a preflight rejection',()=>{
+ const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8'),admission=workflow.split('  frontend:')[0],browser=readFileSync(new URL('../../server-version/e2e/school-teacher-package-browser.cjs',import.meta.url),'utf8');
+ assert(admission.includes('node server-version/e2e/school-teacher-chrome.cjs preflight'));assert(admission.includes('if: fromJSON(inputs.plan).publicPackage == true'));assert(admission.includes('if: always()'));
+ assert(browser.indexOf("report.error='CHROME_PREFLIGHT_REJECTED'")<browser.indexOf('assert(preflight.ok'));assert(browser.indexOf("report.preflight=preflight")<browser.indexOf('assert(preflight.ok'));
+});
+
+test('PR392 continuation skips producers and audits and keeps the failed parent identity',async()=>{
+ const{origin,verifyOriginJob}=await import('./school-teacher-package-resume.mjs'),run={id:origin.run,head_sha:origin.head,head_branch:PACKAGE_BRANCH,path:'.github/workflows/ci.yml',event:'pull_request',run_attempt:1,status:'completed',conclusion:'cancelled'},job={id:origin.jobs.frontend,run_id:origin.run,head_sha:origin.head,status:'completed',conclusion:'success',name:'school-teacher / frontend'};
+ verifyOriginJob(run,job,'frontend');assert.throws(()=>verifyOriginJob({...run,conclusion:'success'},job,'frontend'));assert.throws(()=>verifyOriginJob(run,{...job,conclusion:'failure'},'frontend'));
+ const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8');assert(workflow.includes("continuation != 'package-browser-only'"));assert(workflow.includes('confirmed-public-package-scope'));
+});
+
+test('package consumer reads the original receipt name and waits for its own source and dirty state',()=>{
+ const reuse=readFileSync(new URL('./school-teacher-package-resume.mjs',import.meta.url),'utf8'),browser=readFileSync(new URL('../../server-version/e2e/school-teacher-package-browser.cjs',import.meta.url),'utf8');assert(reuse.includes('native-reviewed-local-evidence.json'));assert(browser.includes("selector.locator('option:not([value=\"\"]):enabled')"));assert(!browser.includes("document.querySelectorAll('select')[0]"));assert(browser.includes(".and(page.locator(':disabled')).waitFor()"));assert(browser.includes('report.failureLine='));
+});
+
+test('continued SAST scans current controls while the audit consumer requires the exact successful original application scan',async()=>{
+ const{nativeSastConfig}=await import('./school-teacher-native.mjs'),paths=['.github/scripts/school-teacher-native-runtime.py','.github/scripts/school-teacher-native-runtime.test.py','.github/scripts/exact-candidate-runtime.py'];
+ assert.deepEqual(nativeSastConfig(paths,{execution:{sastContinuation:40980640181}}).paths,['.github/scripts','server-version/e2e','server-version/frontend/e2e','server-version/frontend/vite.config.ts']);assert(nativeSastConfig(paths,null).paths.includes('server-version/backend/src'));
+ const reuse=readFileSync(new URL('./school-teacher-package-resume.mjs',import.meta.url),'utf8');assert(reuse.includes("assert.equal(j.conclusion,'success')"));assert(reuse.includes('currentChangedControlScanRequired:true'));assert(reuse.includes("'*.py'"));assert(readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8').includes("continuation == 'package-browser-only' && 'javascript-typescript'"));
+});
+
+test('wrapped select labels use combobox prefixes rather than exact full label text',()=>{
+ const browser=readFileSync(new URL('../../server-version/e2e/school-teacher-package-browser.cjs',import.meta.url),'utf8');assert(browser.includes("getByRole('combobox',{name:/^获授权来源/})"));assert(browser.includes("getByRole('combobox',{name:/^已授权测评 · 精确版本/})"));assert(!browser.includes("getByLabel('获授权来源',{exact:true})"));
+});

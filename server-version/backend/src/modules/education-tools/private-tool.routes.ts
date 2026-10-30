@@ -19,6 +19,8 @@ import {educationCompositionResponseModeSchema} from './private-tool.composition
 import {expertTargetKindSchema} from './expert-observation.contract'
 import {readEducationNativePreview} from './native-source.preview'
 import {educationCognitiveProfileSchema} from './native-source.contracts'
+import {listEducationPackageSources} from './package-reference.catalog'
+import {previewEducationWholePackage} from './package-reference.source'
 
 const sourcePreviewQuery=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
 
@@ -49,6 +51,8 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
   return service.listPrivateTools(context(req),query.cursor,query.kind)
  }))
  router.post('/',handle(req=>service.createPrivateTool(context(req),req.body)))
+ router.get('/package-sources',handle(req=>listEducationPackageSources(context(req),req.query)))
+ router.post('/package-sources/preview',handle(req=>previewEducationWholePackage(context(req),req.body)))
  router.get('/library-sources',handle(req=>listEducationLibrarySources(context(req),req.query)))
  router.get('/library-sources/:versionId',handle(req=>{
   const query=sourcePreviewQuery.parse(req.query)

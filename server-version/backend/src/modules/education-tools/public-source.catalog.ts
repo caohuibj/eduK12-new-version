@@ -10,8 +10,10 @@ import {educationApplicabilitySchema} from '../scale-library-governance/educatio
 import {educationCompositionResponseModeSchema,educationCompositionAdministrationForEntry} from './private-tool.composition-contracts'
 import {expertTargetKindSchema,supportsExpertSource,isNativeExpertObserver} from './expert-observation.contract'
 import {supportsStudentStandardSource} from './student-observation.contract'
+import {parseEducationPackageKey} from './package-reference.contracts'
 
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
+const useKey=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null||parseEducationPackageKey(value)!==null)
 export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
 type GrantRow={id:string;subject_id:string;issuer_id:string;product:'SCHOOL'|'TEACHER';scope_id:string;resource_keys:string[];
  valid_from:Date;expires_at:Date;read_at:Date;version:number;revoked_at:Date|null;parent_grant_id:string|null;ancestry:string[];
@@ -26,7 +28,7 @@ const grantFromRow=(row:GrantRow):ContentGrant=>({id:row.id,subjectId:row.subjec
  * One grant batch + one post-lock clock covers all referenced public leaves;
  * no per-card ancestry reads or persistent authorization cache. */
 export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:PrivateToolContext,keys:readonly string[],lock=false){
- const exact=[...new Set(keys)];if(exact.length>128||exact.some(value=>!key.safeParse(value).success))privateToolFail('PUBLIC_SOURCE_INPUT_INVALID',400)
+ const exact=[...new Set(keys)];if(exact.length>128||exact.some(value=>!useKey.safeParse(value).success))privateToolFail('PUBLIC_SOURCE_INPUT_INVALID',400)
  if(!exact.length)return new Map<string,{grantId:string;grantVersion:number;expiresAt:Date}>()
  const rows=await tx.$queryRaw<GrantRow[]>(Prisma.sql`SELECT g.id,g.subject_id,g.issuer_id,g.product,g.scope_id,g.resource_keys,
   g.valid_from,g.expires_at,clock_timestamp() AS read_at,g.version,g.revoked_at,g.parent_grant_id,g.ancestry,g.capabilities,g.delegable_capabilities,g.remaining_delegation_depth

@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import tempfile
 
@@ -54,6 +55,38 @@ def main():
         runtime.require(result.returncode == 0, 'Native runtime command failed: ' + name)
         return result.stdout.decode()
 
+    if plan.get('continuation') == 'package-browser-only':
+        original = json.loads((out / 'original-native-runtime.json').read_text())
+        runtime.require(original['head'] == '807e12c7edf061efc2ec1bd893690c7a0ca01ac3' and original['runId'] == '40977943858', 'Wrong original runtime')
+        with tempfile.TemporaryDirectory(prefix='package-browser-', dir=env['RUNNER_TEMP']) as temporary:
+            contexts = Path(temporary)
+            for item in original['results']:
+                kind = item['component']
+                directory = ROOT / 'native-runtime-inputs' / kind
+                archive = directory / (kind + '-runtime.tar.gz')
+                runtime.require(hashlib.sha256(archive.read_bytes()).hexdigest() == item['context']['archiveSha256'], 'Changed original compiled context')
+                runtime.require(item['context']['tree'] == plan['components'][kind], 'Changed current component')
+                target = contexts / kind
+                target.mkdir()
+                allowed = {'dist', 'Dockerfile', 'nginx.conf'} if kind == 'frontend' else {'dist', 'node_modules', 'assets', 'prisma', 'scripts', 'package.json', 'package-lock.json', 'Dockerfile'}
+                runtime.safe_extract(archive, target, allowed)
+                run(kind + '-retained-dist-bytes', ['node', '--input-type=module', '-e',
+                    "import assert from 'node:assert/strict';import{readFileSync}from'node:fs';import{treeDigest}from'./.github/scripts/ci-artifact.mjs';const[d,m]=process.argv.slice(1);const expected=JSON.parse(m);assert.deepEqual(JSON.parse(readFileSync(d+'/ci-build-manifest.json')),expected);assert.equal(treeDigest(d),expected.contentDigest)",
+                    str(target / 'dist'), json.dumps(item['context']['manifest'])])
+                env['P6_BROWSER_CONTEXT'] = str(contexts)
+            report = {'status': 'SCANNED_BROWSER_PENDING', 'head': plan['head'], 'runId': env['GITHUB_RUN_ID'],
+                      'originalRuntime': original, 'results': original['results'], 'baseImages': original['baseImages'],
+                      'buildExecuted': False, 'runtimeImageRebuilt': False, 'runtimeScanRepeated': False}
+            (out / 'native-runtime.json').write_text(json.dumps(report, indent=2))
+            env['P6_BROWSER_HOST_CONTEXT'] = 'true'
+            run('package-browser', ['node', 'server-version/e2e/school-teacher-package-browser.cjs'])
+            browser = json.loads((out / 'package-browser.json').read_text())
+            runtime.require(browser['status'] == 'PASSED' and browser['head'] == plan['head'] and browser['runId'] == env['GITHUB_RUN_ID'], 'Current missing browser failed')
+            report['status'] = 'PASSED'
+            report['browserSha256'] = hashlib.sha256((out / 'package-browser.json').read_bytes()).hexdigest()
+            (out / 'native-runtime.json').write_text(json.dumps(report, indent=2))
+        return
+
     version = run('trivy-version', ['trivy', '--version'])
     runtime.require(re.search(r'^Version:\s*0\.70\.0$', version, re.M), 'Pinned Trivy required')
     bases = {}
@@ -62,6 +95,7 @@ def main():
         digests = json.loads(run(component + '-digest', ['docker', 'image', 'inspect', '--format', '{{json .RepoDigests}}', tag]))
         bases[component] = next(d for d in digests if re.fullmatch(component + r'@sha256:[a-f0-9]{64}', d))
     results = []
+    browser_context = Path(os.environ['RUNNER_TEMP']) / 'p6-browser-context'
     for component in ('frontend', 'backend'):
         directory = ROOT / 'native-runtime-inputs' / component
         archive = directory / (component + '-runtime.tar.gz')
@@ -89,11 +123,28 @@ def main():
             runtime.require(isinstance(report.get('Results'), list) and report['Results'], 'Missing scan results')
             findings = [v for r in report['Results'] for v in r.get('Vulnerabilities', [])]
             runtime.require(not any(v['Severity'] in ('HIGH', 'CRITICAL') and v.get('FixedVersion') for v in findings), 'Fixable HIGH/CRITICAL runtime findings')
+            if plan.get('publicPackage'):
+                browser_context.mkdir(exist_ok=True)
+                shutil.copytree(context, browser_context / component)
+                (browser_context / component).chmod(0o755)
             results.append({'component': component, 'imageId': image, 'context': receipt, 'reportSha256': hashlib.sha256(report_path.read_bytes()).hexdigest()})
     metadata = Path(os.environ['TRIVY_CACHE_DIR']) / 'db/metadata.json'
     runtime.require(metadata.is_file(), 'Actual scanner database metadata required')
     (out / 'native-trivy-database.json').write_bytes(metadata.read_bytes())
-    (out / 'native-runtime.json').write_text(json.dumps({'status': 'PASSED', 'head': plan['head'], 'runId': os.environ['GITHUB_RUN_ID'], 'baseImages': bases, 'results': results}, indent=2))
+    report = {'status': 'SCANNED_BROWSER_PENDING' if plan.get('publicPackage') else 'PASSED', 'head': plan['head'], 'runId': os.environ['GITHUB_RUN_ID'], 'baseImages': bases, 'results': results}
+    (out / 'native-runtime.json').write_text(json.dumps(report, indent=2))
+    if plan.get('publicPackage'):
+        env['P6_BROWSER_CONTEXT'] = str(browser_context)
+        try:
+            run('package-browser', ['node', 'server-version/e2e/school-teacher-package-browser.cjs'])
+            browser = json.loads((out / 'package-browser.json').read_text())
+            runtime.require(browser['status'] == 'PASSED' and browser['head'] == plan['head'] and browser['runId'] == env['GITHUB_RUN_ID'], 'Missing current browser connection')
+            report['status'] = 'PASSED'
+            report['browserSha256'] = hashlib.sha256((out / 'package-browser.json').read_bytes()).hexdigest()
+            (out / 'native-runtime.json').write_text(json.dumps(report, indent=2))
+        finally:
+            shutil.rmtree(browser_context)
+
 
 
 if __name__ == '__main__':

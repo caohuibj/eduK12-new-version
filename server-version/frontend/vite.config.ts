@@ -26,5 +26,6 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    ...(process.env.P6_PACKAGE_PROBE_BUILD==='true'?{rollupOptions:{input:['index.html','p6-package-probe.html']}}:{}),
   },
 })
