@@ -136,3 +136,23 @@ controls and workflow actionlint passed locally. The new old-Run SQL fixture
 passed one rollback-only check; formal migration/dump/restore remains CI-only.
 The exact plan is continuation/teacher-ready-plan.json in this slice's evidence
 folder. This is preparation, not a formal success or merge/deployment claim.
+
+
+## main43 final qualification continuation
+
+After the independently qualified School group PR414 merged, this candidate
+aligns once to main43d119c9. The actual merge is conflict-free. All14 Teacher
+application blobs and original behavior reports remain exact; no application,
+answer, browser, PostgreSQL or native restore replay. Main changed group types
+but not reportingFail or Teacher's personal leaf/projection consumers.
+
+Both old/current baseline Prisma trees, candidate Prisma, locked backend tools,
+native program and native job commands remain identical. Existing formal
+run41061117266/job124080976872 may admit only its native migration/restore
+success within24h. Native-only verification no longer requires the historical
+combined frontend-install step; actual native prerequisites remain mandatory.
+Three affected route/admission controls passed, including skipped/failed/expired
+native-producer refusals. Current production source changed, so frontend
+consumers, images/security and selected SAST still execute on the new candidate.
+The plan is continuation/teacher-main43-qualification-plan.json. No School416
+feature is included, and no merge/deployment is performed by this node.

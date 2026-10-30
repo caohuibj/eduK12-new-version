@@ -3,12 +3,12 @@
   "repository": "caohuibj/eduK12-new-version",
   "slice": "teacher",
   "branch": "feat/personal-longitudinal-education-20261030",
-  "base": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
-  "reviewedCandidate": "483dde73c409eb8842e133ba281a69b51ddaf178",
+  "base": "43d119c9bfbc7949baab2edea29d96044b04607c",
+  "reviewedCandidate": "a539228a131f6bda6ee825a4a36ef16f7e799c03",
   "originalSource": "2160f195f67b211cc62ab8eda1ecf3f698927900",
   "originalCaseCount": 4,
   "originalReportPrefix": "docs/evidence/personal-longitudinal-teacher-20261030/",
-  "reviewBasis": "Teacher four distinct successful raw application/retained-state/browser JSON records plus one historical Draft control remain unsigned local evidence. Two original failed raw reporters remain failed, with explicit retained-state continuations; no application journey replay. All14 application deltas match original2160 relative to prerequisite dbcc; current frozen anchor only incorporates separately merged Training mainfb3. New education migration/restore, current image/security, selected SAST and frontend types remain actual formal checks.",
+  "reviewBasis": "Teacher four distinct successful raw application/retained-state/browser JSON records plus one historical Draft control remain unsigned local evidence. Two original failed raw reporters remain failed, with explicit retained-state continuations; no application journey replay. All14 application deltas match original2160 relative to prerequisite dbcc; current frozen anchor only incorporates separately merged Training mainfb3. New education migration/restore, current image/security, selected SAST and frontend types remain actual formal checks. Main43 merges independently qualified School group414. All14 Teacher blobs/deltas and original reports remain exact; no new application replay. Both baseline Prisma trees, candidate Prisma, backend locks and native program/job remain unchanged, so exact official Teacher native-only producer is admitted. Group changes production/consumer context, so current frontend types/lint, image/security and selected SAST still execute.",
   "files": {
     "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql": {
       "before": null,
@@ -311,5 +311,14 @@
       "continuation": "teacher-longitudinal-browser-resume",
       "disposition": "Original created/published/started T3; required-marker suffix broke selector. Continuation uses same accepted T3 and attempt; original failure not erased."
     }
-  ]
+  ],
+  "qualificationReuse": {
+    "sourceHead": "1170ac40728191631be07330bc8d58712339de34",
+    "executionHead": "236c76ed82d654536c3112ff543e2316e8cc1b54",
+    "runId": 41061117266,
+    "jobId": 124080976872,
+    "serverVersionTree": "c218d9913a1294fbdaf5066eee04264cbdab9fa6",
+    "nativeOnly": true,
+    "maximumAgeHours": 24
+  }
 }
