@@ -47,3 +47,21 @@ V2 已按 max(父冻结/任务请求、叶内容合同、科学方案) 传播现
 39个不同具名成功观察已去重列出：37个原单元/模拟HTTP、2个保留PGcase。重复原件不重复计数，所有首错、filtered与续行仍保留；没有重播原业务、浏览器或打印。schema tree 与main相同，不新增迁移/恢复检查。人数下限 V2 修订已获后台review认可，旧no-leaf V1仅保留准确兼容限制，不在本批另做迁移。前文409拒绝是历史状态：用户后续明确授权并已成功追加，当前不再以此阻塞。
 
 精确产品差异和下一步资格输入见 main55-qualification-plan.json、main55-source-diff.raw、qualification-case-inventory.json。拟延续现有 onboarding-structure 的原报告 admission、精确源/控制 CodeQL、稳定 gate，不新建 workflow，不走未知范围平台回退。现有候选表尚无414，必须先补精确绑定/受影响控制 review，读取CI清单并核真实PR base/head/merge后才激活；本段不是正式CI通过或可合并声明。PR414保持Draft。
+
+## 群体目录与内容合同一致
+
+按 DOT review 修复目录列出私有SELF组合但实际生成404的问题。现有私有组合父合同实际是INDIVIDUAL_ONLY，管理/专业受众为NONE；不能把个人或纵向能力当GROUP授权。School目录现在按真实受众的冻结父GROUP合同筛选；工具目录同样要求父GROUP合同，随后只列出已有叶GROUP适配及获准metricKeys。未知 education-private-scale:<versionId> 不能伪装通用注册测量，不再让用户选中不可生成的叶。没有改私有父合同、扩大权限或将个人接口复制成群体接口。
+
+只补2项针对性用例：个人/纵向合同不出现在GROUP目录且通用目录保留；直接工具目录拒绝个人父合同并隐藏未接通的私有叶，保留真实slot的已接通叶。2PASS/9filtered，不重复37项或PG。新backend源冻结后只补一次当前编译；frontend没有变化。旧 main55 资格计划将按此增量重新绑定，不能沿用旧产品tree做当前正式接纳。
+
+按用户账户迁移指令，后续进度先保存在本仓库，未向旧Qiang Notion页面追加，未自行迁移或新建目录。
+
+目录修订产品检查点 a2b20a6e66ac68fd38ca8c37b9128613c2a725f4 的 backend tree 95198c4740897cb76e4fddb8db8dbd78a232f1e7 已实际编译一次，exit0。frontend仍是7db01e8f旧已验tree，没有重编译。资格用例索引增至41个不同具名观察（39单元/模拟HTTP+2保留PG），新增的仅上述2项，不把旧37重播。接下来仅补现有固定候选绑定和受影响控制验证。
+
+PR414正式路线仅扩展既有onboarding-structure固定候选：完整白名单源/模式/组件绑定、原本地报告和当前类型接纳、School实际服务/浏览器原件校验、现有精确CodeQL及稳定gate。未新增workflow或应用重播。新增一项固定候选/原件控制用例已通过；其他控制用例filtered，现有扫描和gate成功要求保留。配置绑定完成前不激活CI。
+
+## mainfa 个人纵向主线对齐
+
+在下次正式冻结前一次性无冲突合入main fa038041c47b275d30ccb8b8b01ab019615906e0，检查点7cc7edb045f04981c6d64df65c5fa0290f7a109b。没有修改个人纵向/Survey公共契约，不插入群体纵向开发；ci.yml保留主线个人路线，School仅追加原CodeQL选择的414候选值。
+
+主线增加Prisma schema后仅生成当前client；未执行数据库迁移或PG重播。实际一次当前backend tree2342ff04dd851b9c82383fd5835f35935ecb67fa编译与frontend tree3346bc7d97cb4fb66560e25719f8d7d56f7e61c8 app类型检查均exit0。旧类型结果保留原tree归属，不改写成功身份。原41个具名观察不重跑；最新类型、精确产品diff及资格计划位于mainfa目录。固定候选绑定仍禁用，尚未正式CI/Ready/合并/部署。

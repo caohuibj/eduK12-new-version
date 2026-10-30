@@ -1,0 +1,43 @@
+{
+  "run": 41010101874,
+  "source": "64c8389a0eb6fe46abcfc001312c241d821b595d",
+  "eventBase": "40799e96f34d12047f31507ca2eba87e31fc08d3",
+  "preview": "3dcaf7e31dac80c0c32ba8b29967c5beddf8246f",
+  "previewParents": [
+    "0e8f1de8e7d68d7c8cc76230315abbbbbf47cf4d",
+    "64c8389a0eb6fe46abcfc001312c241d821b595d"
+  ],
+  "sourceTree": "a6771e71c93f4bb7d45ce1b3cd2bb2b6063b90b9",
+  "previewTree": "de3f3d76c70d8bd7a7d384bfa75e68b364da5839",
+  "upstreamOnlyPaths": [
+    "docs/scale-intake/jdr-20261030/copsoq-priority-catalog.md",
+    "docs/scale-intake/jdr-20261030/skaalvik-seven.md",
+    "server-version/backend/src/modules/scale/instruments/copsoq3_emotional_demands_en/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/copsoq3_emotional_demands_en/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/instruments/copsoq3_predictability_en/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/copsoq3_predictability_en/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/instruments/copsoq3_work_pace_en/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/copsoq3_work_pace_en/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2016_time_pressure_zh_cn/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2016_time_pressure_zh_cn/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_collective_culture_zh_cn/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_collective_culture_zh_cn/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_discipline_problems_zh_cn/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_discipline_problems_zh_cn/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_low_student_motivation_zh_cn/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_low_student_motivation_zh_cn/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_supervisory_support_zh_cn/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_supervisory_support_zh_cn/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_supportive_colleagues_zh_cn/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_supportive_colleagues_zh_cn/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_value_consonance_zh_cn/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/skaalvik2018_value_consonance_zh_cn/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
+  ],
+  "reproducedResult": "Personal tracking Draft has unplanned paths or modes; no broad fallback",
+  "alignedSource": "71fc66ece01345a5084032f46a24f6fe098a9833",
+  "alignedBase": "0e8f1de8e7d68d7c8cc76230315abbbbbf47cf4d",
+  "alignedTree": "de3f3d76c70d8bd7a7d384bfa75e68b364da5839",
+  "alignedScope": true,
+  "logAccess": "Azure Blob job-log GET returned HTTP403; no alternate log retrieval attempted. Annotations and Git metadata are separate authorized reads, not raw-log evidence."
+}
