@@ -8,7 +8,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
 import type { CourseAssessment } from './TrainingCourseAssessments'
 import { useAuth } from '../contexts/AuthContext'
-import { COURSE_ANALYSIS_ENABLED, resolveCourseSection, type CourseSection } from './courseNavigation'
+import { COURSE_ANALYSIS_ENABLED, COURSE_GROUP_REPORT_ENABLED, resolveCourseSection, type CourseSection } from './courseNavigation'
 import type { Course } from '../types'
 
 const CourseAssignmentWorkspace = lazy(() => import('../pages/AssignmentList'))
@@ -29,7 +29,7 @@ export default function TrainingTrainerCourse() {
   const section = resolveCourseSection(selected)
   const setSection = (value: Section) => setQuery(previous=>{const next=new URLSearchParams(previous);next.set('section',value);return next},{replace:true})
   useEffect(() => {
-    if (selected === 'analysis' && !COURSE_ANALYSIS_ENABLED) {
+    if (selected === 'analysis' && !COURSE_ANALYSIS_ENABLED && !COURSE_GROUP_REPORT_ENABLED) {
       setQuery(previous => { const next = new URLSearchParams(previous); next.set('section', 'assessments'); return next }, { replace: true })
     }
   }, [selected, setQuery])
@@ -102,7 +102,7 @@ export default function TrainingTrainerCourse() {
             {section === 'assessments' && <Suspense fallback={<p role="status">正在读取测评管理…</p>}><TrainingCourseAssessments key={course.id} course={course} actorId={user?.id||''}
               rows={assessments.rows} loading={assessments.loading} error={assessments.error} onRetry={retry} filtered={filtered}/></Suspense>}
             {section === 'assessments' && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={collectionTotal} loading={assessments.loading} label="测评"/>}
-            {COURSE_ANALYSIS_ENABLED && section === 'analysis' && <Suspense fallback={<p role="status">正在读取统计页面…</p>}><TrainingCourseAnalysis key={course.id} courseId={course.id} actorId={user?.id} /></Suspense>}
+            {(COURSE_ANALYSIS_ENABLED || COURSE_GROUP_REPORT_ENABLED) && section === 'analysis' && <Suspense fallback={<p role="status">正在读取统计页面…</p>}><TrainingCourseAnalysis key={course.id} courseId={course.id} actorId={user?.id} /></Suspense>}
 
             {section === 'management' && <Suspense fallback={<p role="status">正在读取课程设置…</p>}><TrainingCourseSettings key={course.id} course={course} onUpdated={retry} /></Suspense>}
             </div></div>

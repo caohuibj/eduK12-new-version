@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import { generateTrainingGroupReport, listTrainingGroupReports, readTrainingGroupReport, trainingGroupTools } from '../modules/training-analysis/group-report.service'
 import { z } from 'zod'
 import { analyzeTrainingCourse, discoverTrainingCourseSources, setTrainingAnalysisQuality, trainingQualityPage } from '../modules/training-analysis/service'
 import { trainingManifestSummary, type TrainingAnalysisActor } from '../modules/training-analysis/manifest'
@@ -27,6 +28,10 @@ async function reproduce(req:Request) {
   return result
 }
 export const trainingAnalysisController={
+  groupIndex: async(req:Request,res:Response)=>{try{return success(res,await listTrainingGroupReports({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id}))}catch(err){return respondError(res,err)}},
+  groupTools: async(req:Request,res:Response)=>{try{return success(res,await trainingGroupTools({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id,taskId:req.params.taskId}))}catch(err){return respondError(res,err)}},
+  groupGenerate: async(req:Request,res:Response)=>{try{return success(res,await generateTrainingGroupReport({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id,selection:req.body}))}catch(err){return respondError(res,err)}},
+  groupRead: async(req:Request,res:Response)=>{try{return success(res,await readTrainingGroupReport({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id,taskId:req.params.taskId,artifactId:req.params.artifactId}))}catch(err){return respondError(res,err)}},
   sources:async(req:Request,res:Response)=>{try{return success(res,await discoverTrainingCourseSources(actor(req),req.params.id))}catch(err){return respondError(res,err)}},
   analyze:async(req:Request,res:Response)=>{try{
     const result=await analyzeTrainingCourse({actor:actor(req),courseId:req.params.id,selector:selectorFor(req)})

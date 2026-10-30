@@ -1,0 +1,40 @@
+{
+  "recordedAt": "2026-10-30T07:34:05.014206+00:00",
+  "reviewedBefore": "69da22cfca3556af88106dadc3ef53d42b25a10c",
+  "scope": "Actual course page router/tabs/feature flags to existing single group report. Old comparison remains disabled.",
+  "tests": {
+    "routePassed": 1,
+    "filtered": 18,
+    "browser": "actual TrainingTrainerCourse + BrowserRouter + course tabs, synthetic HTTP and owner; not human login or a new backend authorization test",
+    "typesExit": 0,
+    "lintExit": 0
+  },
+  "source": {
+    "server-version/frontend/src/training/courseNavigation.ts": "36d2c57a93d1b5a87b91281e38e8612c66effa444c9113ffaaab7dd337b662c3",
+    "server-version/frontend/src/training/TrainingCourseTabs.tsx": "c55572d9984da0a88dd5a91a8e9ddc23364d2320974e741a787aeff92d257d80",
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": "c519733627603b33208830bdceb4d17146ca18d212d7df9c8473fcbec85c423c",
+    "server-version/frontend/src/training/TrainingCourseAnalysis.tsx": "4fe2053b88e639da5ef635c8fe958c15b212d129b84dd2c67c71addd958264fb",
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": "f78dfe523d68d8114ffaf484927128a9c2e15ba84f1adcd8c32b937259a38500",
+    "server-version/frontend/src/training/TrainingCourseTabs.test.tsx": "0a5aa5ef67c6159fd4c942954fb8b570ceb496c87b92b83395916744cc15b3d6",
+    "server-version/e2e/training-group-course-fixture.tsx": "f8f09dc55afc3d375dd371c55fa968c3a7eaaae06f981453decaa16df46e5e95",
+    "server-version/e2e/training-group-report-browser.cjs": "f74b545eaa49cb1da01185fd10b297560be4f1aa67d2641f68a12598fad65d11"
+  },
+  "evidence": {
+    "course-route.log": "162e512c1a4f5e09c6a8864d308aff919e8ec353393ecbaee9525abb62fbe8b8",
+    "training-course-entry.png": "1706d52f82b5dfc37c61a7341cf8c3ba4ae6aa205d067e9d058c524d8fe381c8",
+    "course-browser-final.log": "0a5e2cdda6a359a6381eb83840bcf29d50b0f6172cb101ab20fe8a23ca2f8d3d",
+    "entry-types.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "entry-lint.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "entry-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "entry-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "course-browser-assets-failed.log": "0b393c7533b459f5e208c74626512e3afd052bfbc0a34c2a96a7933d25606458",
+    "course-route.json": "1e682a42449739f8de914e160cc1e31e0d7b1461d6532543b7298e3a0e3fba41",
+    "course-entry.json": "bea442d8feb5b11e6edcef1dd3abdbf9c69f7b990b2b8bf8b2dc567d6fb54449",
+    "course-browser-setup-failed.log": "055bb732d9c0c9fab37e06aae1a20c81fc2b69dd236958b9d3a59b976cc2e1e7"
+  },
+  "originalFailuresPreserved": [
+    "sync esbuild API does not accept plugins",
+    "actual course CSS required a WebP loader and build env definition"
+  ],
+  "formalCI": "NOTRUN; stacked base unchanged"
+}

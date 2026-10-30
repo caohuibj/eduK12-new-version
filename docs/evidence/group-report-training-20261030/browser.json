@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "synthetic": true,
+  "actualReactComponents": true,
+  "calls": [
+    {
+      "method": "GET",
+      "path": "/api/courses/course/training-group-reports"
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/course/training-group-reports/task/old"
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/course/training-group-reports/sources/task"
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/course/training-group-reports"
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/course/training-group-reports/task/old"
+    }
+  ],
+  "checks": [
+    "saved snapshot without discovery",
+    "explicit selected tool generation",
+    "old version read",
+    "local metric switch",
+    "fullscreen",
+    "1440 and 390 overflow",
+    "print all metrics",
+    "no page errors"
+  ]
+}
