@@ -543,3 +543,23 @@ local parser assertion caught its own marker literal; anchored newline markers
 fix that without changing original qualification input. All raw failures remain.
 Only original receipt acceptance plus changed control SAST execute next; no
 repeated migration, frontend compile/audit, production build or application test.
+
+
+## Current main55 continuation
+
+PR399 now aligns with main55fab18e9933e58dcb800b20156f5b7e48858536
+(PR408). Actual main28 CodeQL conflict had already been resolved; main55 merged
+without conflict. Qualification now restores locked backend install/Prisma as
+frontend type prerequisites, while retaining original native migration/restore
+and exact backend audit evidence. Main55 changes production frontend/backend
+inputs, so successful main28 images and application SAST stay historical; their
+existing selected jobs execute for the new source. No prior16/2PG/10nonce or31
+application journey is replayed. Nine affected route/admission controls and
+actionlint pass for this alignment.
+
+Latest user direction makes ordinary Notion recording nonblocking: first errors,
+repairs and exact checking lists remain local and development/authorized CI
+continues, with later append to the same existing CI page. Refreshed tool metadata
+here still exposes no verifiable connection selector; requesting Qiang link
+returned the same integration404. No denied write or log403 is retried or bypassed.
+This recording limitation does not claim or impose another engineering gate.

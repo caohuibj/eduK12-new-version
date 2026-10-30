@@ -371,3 +371,19 @@ test('group-report qualification reuses native evidence only for identical basel
  assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,{...proof,originalBase:newBase},oldProduct,read));
  assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,proof,h('9'),read));
 });
+
+test('Training group qualification binds the existing shared family and requires admission plus SAST',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/training-analysis/group-report.service.ts',frontend='server-version/frontend/src/training/TrainingGroupReports.tsx';
+ f.b={...f.b,pr:408,source:Object.fromEntries([backend,frontend].map(file=>[file,{before:null,after:blob}]))};
+ f.entries=[backend,frontend,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.env={...f.env,CI_PR_NUMBER:'408',CI_HEAD_REF:BRANCHES[408]};
+ const call=(b=f.b,entries=f.entries,env=f.env)=>onboardingPlan(entries,base,head,f.read,env,b),p=call();
+ assert.equal(p.pr,408);assert.equal(p.route,'onboarding-structure');
+ const sast=task1SastConfig(p,f.b);for(const file of [backend,frontend,'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs'])assert(sast.paths.includes(file));
+ const outputs=Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)])),needs={scope:{result:'success',outputs},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','onboarding-structure','codeql']);assert.deepEqual(failedChecks(needs,false),[]);
+ for(const name of ['onboarding-structure','codeql'])assert(failedChecks({...needs,[name]:{result:'skipped'}},false).length);
+ for(const patch of [{CI_PR_NUMBER:'404'},{CI_HEAD_REF:'other'},{CI_FORCE_FULL:'true'},{CI_EVENT:'workflow_dispatch'}])assert.throws(()=>call(f.b,f.entries,{...f.env,...patch}));
+ const unknown='server-version/backend/src/unrelated.ts';assert.throws(()=>call({...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}},[...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}]));
+ assert.throws(()=>call(f.b,f.entries.map(e=>e.file===backend?{...e,newMode:'120000'}:e)));
+});

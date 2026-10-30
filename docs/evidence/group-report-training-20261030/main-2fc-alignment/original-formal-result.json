@@ -1,0 +1,48 @@
+{
+  "pr": 408,
+  "status": "FORMAL_SUCCESS_NOT_MERGED",
+  "source": "20de08b63b8b77efe1941c935ec154ca74177051",
+  "base": "31845e3a14dd5edf6e03c90e7f71c014bcf0aa06",
+  "actualGitHubMergeCheckout": "e311f6963bde974d8980a16c11259b68d986df1a",
+  "tree": "d2b4991338b5a1629fd3ec53d1da6b8815362257",
+  "run": 41035994222,
+  "attempt": 1,
+  "jobs": [
+    {
+      "databaseId": 123996842692,
+      "name": "classify changed content",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "databaseId": 123996966414,
+      "name": "codeql (javascript/typescript SAST)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "databaseId": 123996966878,
+      "name": "reviewed onboarding evidence admission",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "databaseId": 123997451359,
+      "name": "merge gate / ready PR",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "originalDistinctCasesAdmitted": 175,
+  "applicationTestsExecutedInCI": false,
+  "controlFixturesReplayedInCI": false,
+  "zipDownloaded": false,
+  "sarifBodyRead": false,
+  "limits": [
+    "Original unsigned local provenance is retained; no invented original signature or exact dependency fingerprint.",
+    "Prior PR404 Azure artifact ZIP403 is not retried or bypassed.",
+    "Formal SAST job success is not a claim of inspected SARIF contents or no findings."
+  ],
+  "mergeRequiresSeparateSpecificAuthorization": true,
+  "productionDeploymentQualified": false
+}

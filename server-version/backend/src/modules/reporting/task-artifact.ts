@@ -55,3 +55,11 @@ export async function listTaskGroupArtifacts(db: Db, source: TaskArtifactSource)
   `
   return rows.map(row => ({ ...row, generatedAt: row.generatedAt.toISOString() }))
 }
+
+export async function listTaskGroupArtifactsForContainer(db: Db, product: TaskArtifactSource['product'], containerId: string) {
+  const rows = await db.$queryRaw<Array<{artifactId: string; generatedAt: Date; taskId: string}>>`
+    SELECT id AS "artifactId", generated_at AS "generatedAt", task_id AS "taskId" FROM reporting_task_artifacts
+    WHERE product=${product} AND container_id=${containerId} ORDER BY generated_at DESC,id DESC LIMIT 25
+  `
+  return rows.map(row => ({...row, generatedAt: row.generatedAt.toISOString()}))
+}

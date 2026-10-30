@@ -1,0 +1,8 @@
+src/modules/training-analysis/source.ts(25,106): error TS2307: Cannot find module './group-source' or its corresponding type declarations.
+src/modules/training-analysis/source.ts(253,11): error TS2322: Type '({ OR: ({ assignmentRef: null; } | { assignmentRef: { in: string[]; }; })[]; } | { assignmentRef: null; status: string; deliveryMode: string; runtimeGeneration: string; } | { id: { in: string[]; }; } | { OR: { id: string; attemptEpoch: number; }[]; } | { ...; } | { ...; })[]' is not assignable to type 'CompositeAssessmentAttemptWhereInput[]'.
+  Type '{ OR: ({ assignmentRef: null; } | { assignmentRef: { in: string[]; }; })[]; } | { assignmentRef: null; status: string; deliveryMode: string; runtimeGeneration: string; } | { id: { in: string[]; }; } | { OR: { id: string; attemptEpoch: number; }[]; } | { ...; } | { ...; }' is not assignable to type 'CompositeAssessmentAttemptWhereInput'.
+    Type '{ assignmentRef: null; status: string; deliveryMode: string; runtimeGeneration: string; }' is not assignable to type 'CompositeAssessmentAttemptWhereInput'.
+      Types of property 'status' are incompatible.
+        Type 'string' is not assignable to type 'CompositeAssessmentAttemptStatus | EnumCompositeAssessmentAttemptStatusFilter<"CompositeAssessmentAttempt"> | undefined'.
+src/modules/training-analysis/source.ts(266,156): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/modules/training-analysis/source.ts(371,83): error TS7006: Parameter 'row' implicitly has an 'any' type.

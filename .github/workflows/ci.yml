@@ -1443,7 +1443,7 @@ jobs:
           JS
       - name: select exact Task1 changed application and control SAST inputs
         id: task1-codeql-config
-        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
+        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404,408]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
         env:
           CI: 'true'
           PLAN: ${{ needs.scope.outputs.onboarding_plan }}
@@ -1470,15 +1470,21 @@ jobs:
         run: |
           node --input-type=module <<'JS'
           import {appendFileSync,statSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
           import {verifyOriginalApplicationSast} from './.github/scripts/personal-tracking-ready.mjs';
           const plan=JSON.parse(process.env.PERSONAL_TRACKING_PLAN);
-          if(plan.applicationSastReuse)console.log(JSON.stringify(await verifyOriginalApplicationSast(plan)));
-          const paths=plan.applicationSastReuse?['.github/scripts/personal-tracking-ready.mjs']:['server-version/backend/src/modules/survey','server-version/backend/src/modules/reporting/personal-tracking.ts','server-version/frontend/src/survey','server-version/frontend/src/modules/reporting','.github/scripts/personal-tracking-ready.mjs'];
+          let paths=['server-version/backend/src/modules/survey','server-version/backend/src/modules/reporting/personal-tracking.ts','server-version/frontend/src/survey','server-version/frontend/src/modules/reporting','.github/scripts/personal-tracking-ready.mjs'];
+          if(plan.applicationSastReuse){
+            execFileSync('git',['fetch','--no-tags','--depth=1','origin',plan.applicationSastReuse.sourceHead]);
+            console.log(JSON.stringify(await verifyOriginalApplicationSast(plan)));
+            paths=execFileSync('git',['diff','--name-only',plan.applicationSastReuse.sourceHead,'HEAD','--','.github'],{encoding:'utf8'}).trim().split('\n').filter(path=>/\.(?:[cm]?js|[cm]?ts|jsx|tsx)$/.test(path));
+            if(!paths.length)appendFileSync(process.env.GITHUB_OUTPUT,'reused=true\n');
+          }
           for(const path of paths)statSync(path);
-          appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify({paths})+'\n');
+          if(paths.length)appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify({paths})+'\n');
           JS
       - name: initialize CodeQL
-        if: steps.appearance-codeql-reuse.outputs.reused != 'true' && needs.scope.outputs.application_route != 'pr364'
+        if: steps.appearance-codeql-reuse.outputs.reused != 'true' && steps.personal-codeql-config.outputs.reused != 'true' && needs.scope.outputs.application_route != 'pr364'
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ steps.native-bundle-codeql-config.outputs.config && (fromJSON(needs.scope.outputs.school_teacher_plan || '{}').continuation == 'package-browser-only' && 'javascript-typescript' || 'javascript-typescript,python') || needs.scope.outputs.application_route == 'survey-governance' && steps.governance-directory-config.outputs.languages || needs.scope.outputs.scenario == 'survey-wave-selection' && 'javascript-typescript,python' || contains(fromJSON('["shared-asset-storage","survey-candidate","reviewed-candidate","survey-mac-ui","exact-candidate","scale-library-governance"]'), needs.scope.outputs.application_route) && 'javascript-typescript,python' || 'javascript-typescript' }}
@@ -1490,7 +1496,7 @@ jobs:
           threads: ${{ steps.native-bundle-codeql-config.outputs.config && 4 || 2 }}
       - name: analyze with CodeQL
         id: standard-codeql-analysis
-        if: steps.appearance-codeql-reuse.outputs.reused != 'true' && needs.scope.outputs.application_route != 'pr364'
+        if: steps.appearance-codeql-reuse.outputs.reused != 'true' && steps.personal-codeql-config.outputs.reused != 'true' && needs.scope.outputs.application_route != 'pr364'
         uses: github/codeql-action/analyze@v3
         with:
           # This repository has not enabled GitHub code scanning yet. Keep the
@@ -3584,7 +3590,7 @@ jobs:
       - name: admit exact original local reporters without application replay
         run: node .github/scripts/personal-tracking-ready.mjs admit
       - name: install locked native migration tools
-        if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse }}
+        if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse || fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse.nativeOnly }}
         working-directory: server-version/backend
         env:
           PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
