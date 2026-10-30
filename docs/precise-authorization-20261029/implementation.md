@@ -29,6 +29,7 @@
 [当前组合编译页面](main-dc0f-built-ui-progress.md)补 main dc0f 整合后的单次前端产物及四入口八个只读页面检查。
 [量表 CommonJS 初始化](scale-commonjs-progress.md)补 38 个变更根的实际编译闭包及四个独立路由入口冷加载；[CI 独立复核准备](scale-ci-review-preparation.md)保留当前 platform 路由阻碍。
 [双非空 R 缺件](nonempty-r-blocker.md)明确115个来源和四个合成库的实际限制；[认知接口边界](cognitive-profile-contract.md)及[第一切片](cognitive-profile-artifact-progress.md)记录独立开展的精确 profile 内容闭包。
+[认知系统准入](cognitive-profile-approval-progress.md)补精确 native config/M/profile/artifact 的四入口批准范围及原请求不重新放行；这仍不是接收者使用权。
 以下共同契约和撤权矩阵是初始基线记录；当前新增源码仍在独立开发分支，未合入 main。
 
 ## 当前共同契约

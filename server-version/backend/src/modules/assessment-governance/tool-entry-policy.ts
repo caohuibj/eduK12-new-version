@@ -41,6 +41,13 @@ export async function approveStandardCombinationEntryPolicies(tx:Prisma.Transact
   ||!/^[a-f0-9]{64}$/.test(identity.fingerprint))throw new AdminPermissionError(400,'教育入口批准必须指向精确标准组合')
  return writeEntryPolicies(tx,identity,exactStandardCombinationEntryProducts(rawProducts),actorId,reason)
 }
+/** The system profile publisher supplies the server-resolved artifact hash.
+ * Approval never grants a recipient use or asserts an entry adapter is ready. */
+export async function approveCognitiveProfileEntryPolicies(tx:Prisma.TransactionClient,identity:PolicyIdentity,rawProducts:unknown,actorId:string,reason:string){
+ if(!/^cognitive-profile:[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}:(experience|standard|research)$/i.test(identity.resourceKey)
+  ||!/^[a-f0-9]{64}$/.test(identity.fingerprint))throw new AdminPermissionError(400,'认知入口批准必须指向精确配置和 profile')
+ return writeEntryPolicies(tx,identity,exactStandardCombinationEntryProducts(rawProducts),actorId,reason)
+}
 async function writeEntryPolicies<T extends StandardCombinationEntryProduct>(tx:Prisma.TransactionClient,identity:PolicyIdentity,products:T[],actorId:string,reason:string){
  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-tool:'+identity.resourceKey}))`
  // A later explicit scope change stops new admission in removed entries.
