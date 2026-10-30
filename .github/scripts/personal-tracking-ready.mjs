@@ -84,19 +84,21 @@ export async function verifyOriginalApplicationSast(plan,fetcher=fetch,now=Date.
  return {status:'ADMITTED_APPLICATION_SAST_ONLY',runId:proof.runId,jobId:proof.jobId,sourceHead:proof.sourceHead,executionHead:proof.executionHead,serverVersionTree:proof.serverVersionTree,paths:proof.paths,reexecuted:false,findingsDispositionChanged:false};
 }
 function nativeSourceInput(source){return source.slice(source.indexOf('\nexport function prepareMainSchema('),source.lastIndexOf("\nif(process.argv[1]"));}
-function qualificationJobInput(workflow){return workflow.slice(workflow.indexOf('  personal-tracking:\n'),workflow.indexOf('  merge-gate:\n')).split('\n').filter(line=>!line.includes("if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse }}")).join('\n');}
+function qualificationJobInput(workflow){return workflow.slice(workflow.indexOf('  personal-tracking:\n'),workflow.indexOf('  merge-gate:\n')).split('\n').filter(line=>!line.includes("if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse")).join('\n');}
 export async function verifyOriginalQualification(plan,fetcher=fetch,now=Date.now()){
  const proof=plan.qualificationReuse;assert(proof&&JSON.stringify(proof)===JSON.stringify(binding.qualificationReuse));assert(process.env.GH_TOKEN);
- assert.equal(git('rev-parse','HEAD:server-version'),proof.serverVersionTree);assert.equal(git('rev-parse',proof.sourceHead+':server-version'),proof.serverVersionTree);
+ assert.equal(git('rev-parse',proof.sourceHead+':server-version'),proof.serverVersionTree);
+ if(!proof.nativeOnly)assert.equal(git('rev-parse','HEAD:server-version'),proof.serverVersionTree);
+ for(const path of ['server-version/backend/prisma','server-version/backend/package.json','server-version/backend/package-lock.json'])assert.equal(git('rev-parse','HEAD:'+path),git('rev-parse',proof.sourceHead+':'+path),'Original native schema/tool input changed: '+path);
  const original=execFileSync('git',['show',proof.sourceHead+':.github/scripts/personal-tracking-ready.mjs'],{encoding:'utf8'}),current=readFileSync(new URL(import.meta.url),'utf8');
  assert.equal(nativeSourceInput(current),nativeSourceInput(original),'Native qualification code changed');
- const originalBinding=JSON.parse(execFileSync('git',['show',proof.sourceHead+':.github/scripts/personal-tracking-ready.json'],{encoding:'utf8'}));assert.equal(binding.base,originalBinding.base,'Original native main schema changed');
+ const originalBinding=JSON.parse(execFileSync('git',['show',proof.sourceHead+':.github/scripts/personal-tracking-ready.json'],{encoding:'utf8'}));assert.equal(git('rev-parse',binding.base+':server-version/backend/prisma'),git('rev-parse',originalBinding.base+':server-version/backend/prisma'),'Original native main schema changed');
  const workflow=readFileSync('.github/workflows/ci.yml','utf8'),originalWorkflow=execFileSync('git',['show',proof.sourceHead+':.github/workflows/ci.yml'],{encoding:'utf8'});assert.equal(qualificationJobInput(workflow),qualificationJobInput(originalWorkflow),'Original tool/qualification job input changed');
  const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official successful qualification metadata inaccessible');const job=await response.json();
  assert.equal(job.id,proof.jobId);assert.equal(job.run_id,proof.runId);assert([proof.sourceHead,proof.executionHead].includes(job.head_sha));assert.equal(job.name,'personal tracking / original evidence and native migration');assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
  const age=now-Date.parse(job.completed_at);assert(Number.isFinite(age)&&age>=-300000&&age<=proof.maximumAgeHours*3600000,'Original qualification expired');
  for(const name of ['admit exact original local reporters without application replay','install locked native migration tools','real nonempty main upgrade and native dump restore','install frontend tools and audit locked inputs','actual frontend app types and affected source lint'])assert.equal(job.steps.find(s=>s.name===name)?.conclusion,'success','Original qualification step missing or failed: '+name);
- return {status:'ADMITTED_COMPLETE_NATIVE_FRONTEND_QUALIFICATION',runId:proof.runId,jobId:proof.jobId,sourceHead:proof.sourceHead,executionHead:proof.executionHead,reexecuted:false,base:binding.base,serverVersionTree:proof.serverVersionTree};
+ return {status:proof.nativeOnly?'ADMITTED_NATIVE_QUALIFICATION_ONLY':'ADMITTED_COMPLETE_NATIVE_FRONTEND_QUALIFICATION',runId:proof.runId,jobId:proof.jobId,sourceHead:proof.sourceHead,executionHead:proof.executionHead,reexecuted:false,base:binding.base,originalServerVersionTree:proof.serverVersionTree,nativeSchemaTree:git('rev-parse','HEAD:server-version/backend/prisma'),frontendAdmitted:!proof.nativeOnly};
 }
 export function prepareMainSchema(temporary){
  const file=resolve(temporary,'main-schema.tar');

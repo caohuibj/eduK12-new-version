@@ -57,18 +57,19 @@ test('backend audit receipt cannot admit a failed or expired original audit step
 
 test('retained application SAST requires exact official successful extraction and current tree',async()=>{
  const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),proof=binding.applicationSastReuse,now=Date.now(),old=process.env.GH_TOKEN;process.env.GH_TOKEN='synthetic-read-only-metadata';
+ if(!proof){try{await assert.rejects(verifyOriginalApplicationSast({...plan,applicationSastReuse:binding.historicalMain318ApplicationSastReuse}));return;}finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}}
  const job={id:proof.jobId,run_id:proof.runId,head_sha:proof.executionHead,name:'codeql (javascript/typescript SAST)',status:'completed',conclusion:'success',completed_at:new Date(now).toISOString(),steps:['bound personal tracking SAST without extending the inline expression','initialize CodeQL','analyze with CodeQL'].map(name=>({name,conclusion:'success'}))};const fake=value=>async()=>({ok:true,json:async()=>value});
  try{assert.equal((await verifyOriginalApplicationSast(plan,fake(job),now)).reexecuted,false);await assert.rejects(verifyOriginalApplicationSast(plan,fake({...job,conclusion:'failure'}),now));await assert.rejects(verifyOriginalApplicationSast(plan,fake({...job,steps:[]}),now));await assert.rejects(verifyOriginalApplicationSast(plan,fake({...job,head_sha:'0'.repeat(40)}),now));await assert.rejects(verifyOriginalApplicationSast(plan,fake({...job,completed_at:new Date(now-25*3600000).toISOString()}),now));}finally{if(old===undefined)delete process.env.GH_TOKEN;else process.env.GH_TOKEN=old;}
 });
 
 
-test('actual original source-SHA job metadata admits unchanged complete native and application SAST only',async()=>{
+test('actual original source-SHA job metadata admits only its unchanged qualification scope',async()=>{
  const plan=personalTrackingReadyPlan(changedEntries(binding.base,head),binding.base,head,options),old=process.env.GH_TOKEN;process.env.GH_TOKEN='synthetic-offline-metadata-reader';
  const prefix='docs/evidence/personal-longitudinal-20261030/continuation/',sast=JSON.parse(readFileSync(prefix+'personal-ready-af8-codeql-success.json')),native=JSON.parse(readFileSync(prefix+'personal-ready-e658-native-success.json'));
  const read=job=>async()=>({ok:true,json:async()=>job});
  try{
-  assert.equal(sast.head_sha,binding.applicationSastReuse.sourceHead);assert.equal((await verifyOriginalApplicationSast(plan,read(sast))).reexecuted,false);
-  assert.equal((await verifyOriginalQualification(plan,read(native))).reexecuted,false);
+  if(binding.applicationSastReuse){assert.equal(sast.head_sha,binding.applicationSastReuse.sourceHead);assert.equal((await verifyOriginalApplicationSast(plan,read(sast))).reexecuted,false);}else await assert.rejects(verifyOriginalApplicationSast({...plan,applicationSastReuse:binding.historicalMain318ApplicationSastReuse},read(sast)));
+  const admitted=await verifyOriginalQualification(plan,read(native));assert.equal(admitted.reexecuted,false);assert.equal(admitted.status,binding.qualificationReuse.nativeOnly?'ADMITTED_NATIVE_QUALIFICATION_ONLY':'ADMITTED_COMPLETE_NATIVE_FRONTEND_QUALIFICATION');
   await assert.rejects(verifyOriginalQualification(plan,read({...native,conclusion:'failure'})));
   await assert.rejects(verifyOriginalQualification(plan,read({...native,steps:[]})));
   await assert.rejects(verifyOriginalQualification({...plan,qualificationReuse:{...plan.qualificationReuse,serverVersionTree:'0'.repeat(40)}},read(native)));

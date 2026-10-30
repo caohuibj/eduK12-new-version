@@ -2058,3 +2058,15 @@ inputs. Its failed sibling SAST adapter remains failed and is repaired separatel
 GitHub job.head_sha may carry the pinned PR source rather than checkout preview;
 only those two exact original identities are accepted. Current changed controls
 still receive actual SAST. No skipped producer is treated as a new execution.
+
+
+PR399 subsequently aligns with main2fccefaf838fe24c3d2ec3a63b32d016dbe18866
+(PR405 JD-R/Profile inputs). Original main318 image/application SAST receipts
+remain historical because production inputs changed; the existing jobs execute
+for the new candidate. The original complete native/frontend successful producer
+may admit only native migration/restore when base and candidate full Prisma
+trees, backend package/lock blobs, native source and original job/tool commands
+are identical. This native-only receipt explicitly does not admit frontend;
+current frontend installation/audit/types/lint execute. Required original job
+identity/success/steps/24h remain unchanged. No application journey is replayed,
+no new workflow is added, and old failed runs remain failed.
