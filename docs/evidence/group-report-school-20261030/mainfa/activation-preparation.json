@@ -1,0 +1,35 @@
+{
+  "status": "PREPARED_NOT_FORMAL_RESULT",
+  "pr": 414,
+  "preparationHead": "10bdaac268e7a61d1e620054497802f9215899f8",
+  "actualGithubMerge": "42e35024f32e09281d6a41bf1dd7254c68d563fb",
+  "actualParents": [
+    "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "10bdaac268e7a61d1e620054497802f9215899f8"
+  ],
+  "actualMergeTree": "f824c76c07087d8c8224d2a43a5a38e77f27df9c",
+  "sameSourceAndMergeTree": true,
+  "jobs": [
+    "scope",
+    "reviewed onboarding evidence admission",
+    "CodeQL javascript-typescript",
+    "merge gate / ready PR"
+  ],
+  "existingRoute": "onboarding-structure",
+  "businessOrPgReexecution": false,
+  "currentTypes": [
+    "backend2342ff04",
+    "frontend3346bc7d"
+  ],
+  "reviewedObservations": 41,
+  "checklist": {
+    "CI-014": "Keep established CodeQL30-minute budget and exact changed source/control roots; no extra scanners or platform jobs.",
+    "exactSource": "Current actual main/source/merge identity and complete NUL diff; no old Training base or skipped success.",
+    "originalEvidence": "41 disjoint original successful observations, failures/filtered retained; current type hashes only.",
+    "draft": "Only Ready qualifies; no Draft success called formal.",
+    "scopeFailure": "One local binding failure was explicit missing retained Training metadata path; fixed only that exact path and actual binding review passed."
+  },
+  "notionMigration": "Specific latest parent instruction: Hui checklist mapping pending; preserve Git/local records and do not make this a new CI blocker. No more old-ID reads or Qiang writes.",
+  "formalCiActivated": false,
+  "mergeOrDeploymentAuthorized": false
+}
