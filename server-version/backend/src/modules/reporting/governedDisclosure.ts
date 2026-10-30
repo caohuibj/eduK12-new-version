@@ -10,6 +10,14 @@ import { reportingFail, type ReportingArtifactRecord, type ReportingLeafSourceV2
 
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
 
+/** Discovery uses the same content-owned GROUP ceiling as generation/read.
+ * Personal or longitudinal delivery never makes a source group-selectable. */
+export function reportingGroupContract(policy:Record<string,unknown>|null|undefined,audience:ResultAudience){
+  if(!policy?.resultDisclosure)return null
+  const contract=validateResultDisclosureContract(policy.resultDisclosure)
+  return contract.audiences[audience].mode.includes('AGGREGATE')?contract:null
+}
+
 export async function reportingLeafDisclosureContract(leaf:ReportingLeafSourceV2){
   const entry=await resolveHistoricalRelationalEntry({resourceKind:leaf.unitType,
     resourceKey:leaf.instrumentKey,resourceVersion:leaf.instrumentVersion})

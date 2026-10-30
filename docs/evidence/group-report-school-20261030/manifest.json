@@ -247,6 +247,14 @@
     "main55-source-diff.raw": {
       "sha256": "aa293be63e2d11f893d5dfbadfabc70ef8e978d681a8cabbfd2759dcec9f5ac7",
       "bytes": 14595
+    },
+    "group-discovery-contract.json": {
+      "sha256": "9e64c85b2921b6454c87fbd724bcb09c4afc6566d31cfb407eb18a9d9bd61799",
+      "bytes": 5178
+    },
+    "group-discovery-contract.log": {
+      "sha256": "debbbdb8efbc40769f4832cd377cfa0e43711014906e445de34473641a0818db",
+      "bytes": 126
     }
   },
   "ciExecuted": false,
@@ -304,5 +312,14 @@
     "businessChecksReexecuted": false,
     "formalActivation": false,
     "remainingControlWork": "Extend the existing exact onboarding candidate configuration for PR414; no new workflow or broad fallback."
+  },
+  "groupDiscoveryContractFix": {
+    "scope": "School GROUP source catalog uses actual audience and frozen parent GROUP contract; leaf tools require the same parent ceiling and a resolvable leaf GROUP contract/metric keys",
+    "privateComposition": "Current private parent contract is INDIVIDUAL_ONLY with manager/professional NONE; private canonical instrument lacks generic registry adapter. Do not infer GROUP permission from personal or longitudinal fields; do not advertise until a valid GROUP source adapter and ceiling exist.",
+    "newCases": 2,
+    "report": "group-discovery-contract.json",
+    "old37AndPgReexecuted": false,
+    "backendTypes": "Earlier current-backend receipt is retained for its old tree; one affected backend compile follows new source freeze.",
+    "frontendChanged": false
   }
 }

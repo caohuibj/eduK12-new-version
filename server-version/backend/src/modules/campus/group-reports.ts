@@ -9,7 +9,7 @@ import { readReportingArtifactRecord } from '../reporting/artifact'
 import { listAuthoritativeRunLeafSources } from '../reporting/resultSource'
 import { educationGroupSelector, educationGroupPresentation, listEducationGroupSelections, type EducationGroupSelection } from '../reporting/education-group-selection'
 import { generateOrganizationGroupAnalysis } from '../reporting/service'
-import { reportingLeafDisclosureContract } from '../reporting/governedDisclosure'
+import { reportingAudienceForContext, reportingLeafDisclosureContract } from '../reporting/governedDisclosure'
 import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail, type ReportingCohortSnapshotRecord, type ReportingLeafSourceV2 } from '../reporting/types'
 import { withCampusReportReleaseLock } from './report-release-lock'
@@ -36,7 +36,7 @@ export async function requireCampusGroupManager(actor:AuthenticatedPrincipal, or
   // results. A professional is distinct from an ordinary TEACHER persona.
   if(c.orgRole!=='ORG_ADMIN'
     && !(c.personas.includes('COUNSELOR')&&contextHasCapability(c,'PSYCHOLOGY_STAFF')))hidden()
-  return {userId:actor.userId,platformRole:actor.platformRole}
+  return {userId:actor.userId,platformRole:actor.platformRole,groupAudience:reportingAudienceForContext(c)}
 }
 
 export function assertReviewedCampusGroupSpec(input:{
@@ -320,7 +320,7 @@ export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,
   const principal=await requireCampusGroupManager(actor,organizationId)
   const [specs,sources,artifacts]=await Promise.all([
     listPublishedReportingSpecs({principal,organizationId,analysisKind:'GROUP',page:1,pageSize:50}),
-    listOrganizationReportingSources({principal,organizationId,page:1,pageSize:100}),
+    listOrganizationReportingSources({principal,organizationId,page:1,pageSize:100,analysisKind:'GROUP'}),
     prisma.$queryRaw<Array<{artifactId:string;generatedAt:Date}>>`
       SELECT a.id AS "artifactId",a.generated_at AS "generatedAt" FROM reporting_analysis_artifacts a
       WHERE a.organization_id=${organizationId} AND a.analysis_kind='GROUP'
@@ -346,10 +346,10 @@ export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,
 }
 
 export async function listCampusGroupReportTools(input:{actor:AuthenticatedPrincipal;organizationId:string;runId:string;trackId:string}){
-  await requireCampusGroupManager(input.actor,input.organizationId)
+  const principal=await requireCampusGroupManager(input.actor,input.organizationId)
   await assertCampusWholeRunSource(input)
   const [tools,groups,artifacts]=await Promise.all([
-    listAuthoritativeRunLeafSources(input),listEducationGroupSelections({...input,product:'SCHOOL'}),
+    listAuthoritativeRunLeafSources({...input,groupAudience:principal.groupAudience}),listEducationGroupSelections({...input,product:'SCHOOL'}),
     prisma.$queryRaw<Array<{artifactId:string;generatedAt:Date}>>`
       SELECT id AS "artifactId",generated_at AS "generatedAt" FROM reporting_analysis_artifacts
       WHERE organization_id=${input.organizationId} AND analysis_kind='GROUP'
