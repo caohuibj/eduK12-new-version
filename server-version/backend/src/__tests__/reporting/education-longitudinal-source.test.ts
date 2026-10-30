@@ -28,3 +28,10 @@ it('preserves old private numeric rights without adding longitudinal disclosure 
  value.report.audienceContract.longitudinalMetricKeys=[];expect(rule().RESPONDENT.longitudinalMetricKeys).toEqual([])
  delete value.report.audienceContract;expect(rule().RESPONDENT).toEqual({mode:'NONE',metricKeys:[],longitudinalMetricKeys:[]})
 })
+
+
+it('accepts the existing generic participant SELF declaration for an explicitly adult Teacher audience',()=>{
+ const value=definition();value.report.audienceContract={schemaVersion:1,respondent:'ADULT_SELF',audience:'teacher',locale:'zh-CN',longitudinalMetricKeys:['total']}
+ expect(validateScaleDefinition(value).issues.filter(i=>i.path.includes('longitudinal'))).toEqual([])
+ value.respondentType='teacher_self_report';expect(validateScaleDefinition(value).issues.filter(i=>i.path.includes('longitudinal'))).toEqual([])
+})
