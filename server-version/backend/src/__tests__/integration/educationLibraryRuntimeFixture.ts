@@ -178,3 +178,6 @@ export async function setupEducationLibraryRuntimeFixture(input: {
     imageReference, workflow, catalog, requestedPolicy, open, preview, publish, executions,
     executionId: (await executions())[0]?.id ?? null, answers: [{ itemCode: 'Q1', responseValue: 'option_3' }] }
 }
+
+// Identity metadata only, for native-profile fixtures that reuse an already installed source.
+export {seedSchool as seedEducationSchoolRuntimeIdentity,seedTeacher as seedEducationTeacherRuntimeIdentity}
