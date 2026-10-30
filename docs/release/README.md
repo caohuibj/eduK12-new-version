@@ -2029,3 +2029,12 @@ job/run failure stays failed. Changed or missing producer inputs, failed/skipped
 steps, stale receipts and unreadable official metadata refuse admission. Only
 unchanged image/audit checks are retained; fresh native/schema/frontend and
 changed-control SAST outcomes remain mandatory.
+
+PR399 subsequently aligns with main31845e3a14dd5edf6e03c90e7f71c014bcf0aa06.
+Changed group/catalog production tree invalidates the571a image qualification
+for this new tree; successful original remains historical. Locked backend audit
+inputs remain exact and reusable. Full native database dump/restore compares
+opaque old facts plus DDL for the three changed Survey tables, indexes,
+constraints and triggers. The existing group native evidence documents unrelated
+PostgreSQL16.15 CHECK-expression reserialization; no platform-wide textual DDL
+equality claim is made.

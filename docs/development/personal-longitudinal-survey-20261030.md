@@ -479,3 +479,22 @@ or stale audit receipts are refused by a new boundary contract. Native SQL,
 frontend actual types/lint/audit and changed-control SAST still execute. Scope
 fetches both the immutable reviewed a62 and original571a producer objects for
 its shallow Git comparison. No previous successful application case is replayed.
+
+### Actual main31845 qualification checkpoint
+
+Merged main31845e3a14dd5edf6e03c90e7f71c014bcf0aa06, retaining both personal and
+group scope/gate branches in the only merge conflict. Original24 Survey
+application/test/schema blobs and locked backend audit inputs remain unchanged.
+The successful571a image producer is now historical because separately merged
+group/catalog production inputs changed; existing image job is required for
+this current tree. Original locked backend audit remains admitted by exact
+source/step/lock pins. Seven bounded changed-control tests passed, with original
+CLI admission71 successes preserved as unsigned local evidence and no app replay.
+
+The group native original already documents PostgreSQL16.15 rewriting redundant
+parentheses in unrelated CHECK constraints after restore. This qualification
+therefore compares native DDL for the three changed Survey tables, constraints,
+indexes and triggers, matching the existing group native approach. Native custom
+dump/restore still covers the full database; exact opaque old report/attempt/
+publication bytes and changed guards remain verified. No global SQL text
+normalization or assertion deletion. Original failed logs remain retained.
