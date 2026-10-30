@@ -1,0 +1,36 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ❯ src/__tests__/survey/group-report.test.ts (9 tests | 1 failed | 8 skipped) 5008ms
+     ↓ selects scale before metric extraction, so repeated total keys remain isolated
+     ↓ selects cognitive before metric extraction, so repeated total keys remain isolated
+     ↓ selects sjt before metric extraction, so repeated total keys remain isolated
+     ↓ adapts only real Form numbers and choice frequencies; excludes text and keeps missing null
+     ↓ catalog and saved reads never load/decrypt participant sources; read checks original pointers and authority
+     ↓ generates one frozen snapshot and does not request raw cognitive trials
+     ↓ rejects changed sample eligibility and cross-project authority before disclosing stored aggregate
+     ↓ rejects incompatible measurement identities instead of pooling them
+     × pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages 5007ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/survey/group-report.test.ts > Survey task group artifacts > pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/__tests__/survey/group-report.test.ts:78:3
+     76|     expect(() => surveyGroupFacts(input, 'scale')).toThrow('不能混合统计')
+     77|   })
+     78|   it('pages a wide Form within 25k projected rows, skips text before p…
+       |   ^
+     79|     const { projectGroupRawItems } = await vi.importActual<typeof impo…
+     80|     const items = Array.from({ length: 500 }, (_, i) => ({ itemKey: `q…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 skipped (9)
+   Start at  06:30:16
+   Duration  5.31s (transform 3.70s, setup 0ms, import 157ms, tests 5.01s, environment 0ms)
+
+JSON report written to /tmp/group-report-wide-form.json

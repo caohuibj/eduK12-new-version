@@ -1,0 +1,50 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts > exact main task artifact migration and native backup > upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows
+prisma:query SELECT migration_name AS name FROM _prisma_migrations WHERE finished_at IS NOT NULL ORDER BY migration_name
+
+stdout | src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts > exact main task artifact migration and native backup > upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows
+prisma:query SELECT to_regclass('reporting_task_artifacts')::text AS name
+
+stdout | src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts > exact main task artifact migration and native backup > upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows
+prisma:query SELECT migration_name AS name FROM _prisma_migrations WHERE finished_at IS NOT NULL ORDER BY migration_name
+
+stdout | src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts > exact main task artifact migration and native backup > upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows
+prisma:query INSERT INTO "public"."users" ("id","username","account_domain","password_hash","role","platform_role","is_active","token_version","must_change_password","created_at","updated_at","is_frozen","teacher_approved") VALUES ($1,$2,$3,$4,CAST($5::text AS "public"."UserRole"),CAST($6::text AS "public"."PlatformRole"),$7,$8,$9,$10,$11,$12,$13) RETURNING "public"."users"."id", "public"."users"."username", "public"."users"."account_domain", "public"."users"."password_hash", "public"."users"."role"::text, "public"."users"."platform_role"::text, "public"."users"."nickname", "public"."users"."avatar_url", "public"."users"."phone", "public"."users"."is_active", "public"."users"."token_version", "public"."users"."must_change_password", "public"."users"."created_at", "public"."users"."updated_at", "public"."users"."teacher_code_id", "public"."users"."expires_at", "public"."users"."is_frozen", "public"."users"."teacher_approved"
+
+stdout | src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts > exact main task artifact migration and native backup > upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows
+prisma:query 
+    INSERT INTO reporting_task_artifacts (id,product,container_id,task_id,generated_by,payload_cipher,payload_hash,generated_at)
+    VALUES ($1,$2,$3,$4,$5,
+      $6,$7,$8)
+  
+
+ ❯ src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts (1 test | 1 failed) 4950ms
+     × upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows 4933ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts > exact main task artifact migration and native backup > upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows
+AssertionError: expected '8a6f308b701c4c6457e7e8459e3d5e5204842…' to be '90081c9744eafc76854d74957ef328ba2eddb…' // Object.is equality
+
+Expected: "90081c9744eafc76854d74957ef328ba2eddb70ac7939eb8da376c4b72ae3cff"
+Received: "8a6f308b701c4c6457e7e8459e3d5e5204842c02bb794452417ce0914c74ebc2"
+
+ ❯ src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts:49:27
+     47|     const schema = (database: string) => normalized(postgres('pg_dump'…
+     48|     const sourceSchema = sha(schema(sourceUrl.pathname.slice(1))), res…
+     49|     expect(restoreSchema).toBe(sourceSchema)
+       |                           ^
+     50|     const copy = await readTaskGroupArtifact(restored, source, artifac…
+     51|     expect(copy).toMatchObject(artifact); expect(copy!.source).toEqual…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  07:36:48
+   Duration  5.34s (transform 176ms, setup 0ms, import 267ms, tests 4.95s, environment 0ms)
+
+JSON report written to /tmp/group-report-native-test.json

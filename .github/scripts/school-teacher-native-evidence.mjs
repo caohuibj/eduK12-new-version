@@ -8,7 +8,7 @@ import {execFileSync} from 'node:child_process';
 export const hash=x=>createHash('sha256').update(x).digest('hex');
 export const canonical=x=>JSON.stringify(x&&typeof x==='object'?Array.isArray(x)?x.map(v=>JSON.parse(canonical(v))):Object.fromEntries(Object.keys(x).sort().map(k=>[k,JSON.parse(canonical(x[k]))])):x);
 export const selection=data=>data.reports.map(r=>({group:r.group,sha256:r.report.sha256,selected:r.selected.map(index=>({index,...r.report.cases[index],branchReview:r.caseBranches[index]}))}));
-export const readNativeEvidenceBytes=b=>readFileSync(new URL(b?.branch==='feat/education-package-runtime-20261029'?'./school-teacher-package-evidence.json':'./school-teacher-native-evidence.json',import.meta.url));
+export const readNativeEvidenceBytes=b=>readFileSync(new URL(b?.branch==='feat/teacher-jdr-bundle-20261030'?'./school-teacher-jdr-evidence.json':b?.branch==='feat/education-package-runtime-20261029'?'./school-teacher-package-evidence.json':'./school-teacher-native-evidence.json',import.meta.url));
 export function verifyNativeEvidence(bytes,b,helpers,git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim()){
  assert(helpers?.inspectHistoricalCase&&helpers?.requireReviewedCase,'Native application assertions not admitted without original byte readers');
  assert.equal(hash(bytes),b.evidence.manifestSha256,'Reviewed original manifest changed');
@@ -28,16 +28,17 @@ export function verifyNativeEvidence(bytes,b,helpers,git=(...args)=>execFileSync
  const raw=path=>{assert(originals.has(path),'Missing actual original '+path);return originals.get(path)};
  const admitted=[],supplements=[],covered=new Set(),keys=new Set();
  const finalReviewed=b.enabled===true&&b.review?.status==='INDEPENDENTLY_REVIEWED'&&/^[a-f0-9]{64}$/.test(b.review.recordSha256??'');
+ const jdr=b.branch==='feat/teacher-jdr-bundle-20261030';
  for(const r of data.reports){
   const parsed=JSON.parse(raw(r.file)),actual=parsed.testResults.flatMap(s=>s.assertionResults??[]).map(a=>({name:a.fullName,status:a.status}));
   assert.deepEqual(actual,r.report.cases,'Original failed/filtered rows changed');assert.equal(r.report.invocationSuccess,parsed.success===true);
   assert.equal(r.report.sha256,hash(raw(r.file)));assert(r.selected.length&&r.branchReview.length>40);assert.deepEqual(Object.keys(r.caseBranches).sort(),r.selected.map(String).sort());
   if(r.shellExitFile)assert.equal(Number(raw(r.shellExitFile).toString().trim()),r.originalShellExit);else assert.equal(r.originalShellExit,null,'Missing exit cannot become zero');
-  const group={originalExecutionSigned:false,ciExecuted:false,reviewStatus:'INDEPENDENTLY_REVIEWED',reviewSha256:data.reviewSha256,inputClosure:{sha256:data.inputClosureSha256},admittedCaseKeys:r.selected.map(i=>r.report.sha256+':'+i)};
+  const group={originalExecutionSigned:false,ciExecuted:false,reviewStatus:jdr&&!finalReviewed?'PENDING':'INDEPENDENTLY_REVIEWED',reviewSha256:data.reviewSha256,inputClosure:{sha256:data.inputClosureSha256},admittedCaseKeys:r.selected.map(i=>r.report.sha256+':'+i)};
   for(const index of r.selected){
    const key=r.report.sha256+':'+index;assert(!keys.has(key),'Overlapping original assertion');keys.add(key);assert(r.caseBranches[index].length>40);
    const found=helpers.inspectHistoricalCase(group,r.report,index,raw(r.file));assert.equal(found.status,'passed');
-   const pending=r.group==='AUDIT'&&!finalReviewed;
+   const pending=(jdr||r.group==='AUDIT')&&!finalReviewed;
    const accepted=pending?{...found,historicalKind:'recorded-local-supplement-pending-final-review'}:helpers.requireReviewedCase(group,r.report,index,found);
    let offset=0,suiteIndex=-1,rowIndex=-1;
    for(const [i,suite]of parsed.testResults.entries()){const length=suite.assertionResults.length;if(index<offset+length){suiteIndex=i;rowIndex=index-offset;break}offset+=length}
@@ -48,6 +49,23 @@ export function verifyNativeEvidence(bytes,b,helpers,git=(...args)=>execFileSync
  const observations=[];
  for(const o of data.observations){
   assert(o.id&&!covered.has(o.id));covered.add(o.id);assert(o.scope.length>40);
+  if(jdr&&['jdr-saved-reports','jdr-workflow','jdr-report-browser'].includes(o.kind)){
+   const value=JSON.parse(raw(o.file));assert.deepEqual(value,o.expected,'Original JD-R observation changed');
+   if(o.kind==='jdr-saved-reports'){
+    assert.equal(value.stage,'ISOLATED_TRAINING_FIXED_JDR');assert.equal(value.profileView.state,'MATCHED');assert.equal(value.profileView.profileId,'J2');
+    assert.equal(value.profileView.constructs.length,4);assert.equal(value.profileView.actions.length,2);assert.equal(value.singleReports.length,5);
+    assert(value.singleReports.every(s=>s.scores.length===1&&s.interpretations.length>0&&s.interpretations.every(i=>i.label===null&&i.headline==='结果说明')));
+    assert.deepEqual(value.submitted,[],'This observation is the saved-read continuation, never a repeated FINAL');
+   }else if(o.kind==='jdr-workflow'){
+    assert.equal(value.status,'PUBLISHED');assert.equal(value.productKind,'QUESTIONNAIRE');assert.equal(value.independentTools,5);assert.equal(value.bundleInstance,null);
+    assert.equal(value.ordinaryScoringExecuted,false);assert.equal(value.historyUnchanged,true);assert.equal(value.savedTemplate,'0.1.0');
+   }else{
+    assert.equal(value.status,'PASS');assert.equal(value.sandbox,true);assert.deepEqual(value.pageErrors,[]);
+    for(const name of ['four-native-range-charts-and-text-table','self-only-personal-and-organization-actions','reload-reads-same-persisted-facts-hash','390px-report-no-document-overflow'])assert(value.checks.includes(name));
+    const saved=JSON.parse(raw(o.savedReport));assert(value.factsHashes.length>=2&&value.factsHashes.every(h=>h===saved.factsHash));
+   }
+   observations.push({id:o.id,kind:o.kind,scope:o.scope,originalExecutionSigned:false,ciExecuted:false,pendingFinalReview:!finalReviewed});continue;
+  }
   if(o.kind==='reached-package-start'){
    const report=JSON.parse(raw(o.file)),cases=report.testResults.flatMap(s=>s.assertionResults??[]);
    assert.equal(report.success,false);assert.equal(cases.length,2);

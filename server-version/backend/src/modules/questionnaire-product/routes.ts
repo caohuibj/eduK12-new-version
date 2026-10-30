@@ -51,6 +51,7 @@ router.get('/form-templates', handle(req => service.formTemplateSources(req.user
 router.post('/form-templates', handle(req => service.createFormTemplate(req.user!, req.body)))
 router.post('/:id/import-form', handle(req => service.importFormTemplate(req.user!, req.params.id, req.body)))
 router.get('/resources', handle(req => service.resources(req.user!)))
+router.get('/standard-combination-choices', handle(req => service.standardCombinationChoices(req.user!,req.query)))
 router.get('/', handle(req => { const p = pagination.parse(req.query); return service.list(req.user!, p.page, p.pageSize, { search: req.query.search, status: req.query.status, since: req.query.since, tags: req.query.tags, from: req.query.from, to: req.query.to, dateField: req.query.dateField }) }))
 router.post('/', handle(req => service.create(req.user!, req.body)))
 router.get('/:id/reports', handle(req => service.exportReports(req.user!, req.params.id, req.query)))

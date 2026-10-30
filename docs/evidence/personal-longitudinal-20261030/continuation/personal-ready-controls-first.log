@@ -1,0 +1,11 @@
+✔ original local cases and failed continuations retain their provenance without replay (10.285178ms)
+✔ exact app pins reject unknown inputs, changed main and full fallback (251.774516ms)
+✔ Ready requires actual native/image/SAST success; Draft never qualifies (245.961298ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 628.853532

@@ -1,0 +1,78 @@
+✖ actual original source-SHA job metadata admits unchanged complete native and application SAST only (245.574473ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 367.29007
+
+✖ failing tests:
+
+test at .github/scripts/personal-tracking-ready.test.mjs:65:1
+✖ actual original source-SHA job metadata admits unchanged complete native and application SAST only (245.574473ms)
+  AssertionError [ERR_ASSERTION]: Native qualification code changed
+  + actual - expected
+  
+  + `export function prepareMainSchema('),source.indexOf("`
+  - 'export function prepareMainSchema(temporary){\n' +
+  -   " const file=resolve(temporary,'main-schema.tar');\n" +
+  -   " execFileSync('git',['archive','--format=tar','--output',file,binding.base,'server-version/backend/prisma']);\n" +
+  -   " execFileSync('tar',['-xf',file,'-C',temporary]);\n" +
+  -   " return resolve(temporary,'server-version/backend/prisma/schema.prisma');\n" +
+  -   '}\n' +
+  -   '/** Synthetic old rows honor the existing LINKED_WAVES disclosure gate. */\n' +
+  -   'export function nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}){\n' +
+  -   " return `INSERT INTO survey_projects(id,owner_user_id,title,collection_mode,status) VALUES ('${id}','${owner}','native upgrade sentinel','LINKED_WAVES','ACTIVE');\n" +
+  -   '   INSERT INTO survey_publications(id,project_id,definition_digest,compiled_snapshot,consent_version,version) VALUES (\'${publication}\',\'${id}\',\'${digest}\',\'{"schemaVersion":1,"synthetic":true}\',1,1);\n' +
+  -   "   INSERT INTO survey_waves(id,project_id,publication_id,ordinal,title,status,consent_text,linkage_notice_confirmed) VALUES ('${wave}','${id}','${publication}',1,'T1','CLOSED','Synthetic isolated schema preservation fixture',true);\n" +
+  -   "   INSERT INTO survey_participants(id,project_id,research_code,credential_hash) VALUES ('${participant}','${id}','R-SYNTHETIC','${digest}');\n" +
+  -   "   INSERT INTO survey_wave_attempts(id,project_id,wave_id,participant_id,status,completed_at) VALUES ('${attempt}','${id}','${wave}','${participant}','COMPLETED',CURRENT_TIMESTAMP);\n" +
+  -   "   INSERT INTO survey_wave_finals(id,attempt_id,project_id,wave_id,publication_id,submission_id,payload_hash,definition_digest,results_cipher,results_hash) VALUES ('${final}','${attempt}','${id}','${wave}','${publication}','${randomUUID()}','${digest}','${digest}','synthetic-opaque-old-report','${digest}');`;\n" +
+  -   '}\n' +
+  -   'async function nativeDatabase(){\n' +
+  -   ' const service=process.env.PG_SERVICE;assert(service&&/^[a-zA-Z0-9_.-]+$/.test(service));\n' +
+  -   " const backend=resolve('server-version/backend'),temporary=mkdtempSync(resolve(tmpdir(),'personal-native-'));\n" +
+  -   " const names=['personal_tracking_upgrade_test','personal_tracking_restore_test'];\n" +
+  -   " const sql=(database,query)=>execFileSync('docker',['exec','-i',service,'psql','-XAt','-v','ON_ERROR_STOP=1','-U','ptool','-d',database],{input:query,encoding:'utf8'}).trim();\n" +
+  -   " const database=name=>'postgresql://ptool:ptool123@127.0.0.1:5432/'+name+'?schema=public';\n" +
+  -   " const deploy=(schema,url)=>execFileSync(process.execPath,[resolve(backend,'node_modules/prisma/build/index.js'),'migrate','deploy','--schema',schema],{env:{...process.env,DATABASE_URL:url},stdio:'inherit'});\n" +
+  -   ' try{\n' +
+  -   "  for(const name of names)sql('postgres','CREATE DATABASE '+name+';');\n" +
+  -   '  deploy(prepareMainSchema(temporary),database(names[0]));\n' +
+  -   "  const owner=randomUUID(),id=randomUUID(),participant=randomUUID(),wave=randomUUID(),publication=randomUUID(),attempt=randomUUID(),final=randomUUID(),digest='a'.repeat(64);\n" +
+  -   "  const {PrismaClient}=createRequire(resolve(backend,'package.json'))('@prisma/client'),db=new PrismaClient({datasources:{db:{url:database(names[0])}}}),login='native-'+owner.replaceAll('-','').slice(0,20);\n" +
+  -   "  try{await db.user.create({data:{id:owner,username:login,passwordHash:'synthetic-schema-fixture-not-a-login',role:'TEACHER',accountDomain:'SURVEY'}});await db.surveyAccount.create({data:{userId:owner,loginName:login,normalizedLogin:login}});}finally{await db.$disconnect()}\n" +
+  -   '  // Nonempty old-schema SQL fixture, not a repeated application journey or a\n' +
+  -   '  // claim of a newly accepted scientific FINAL. Opaque original bytes survive.\n' +
+  -   '  sql(names[0],nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}));\n' +
+  -   "  const facts=db=>sql(db,`SELECT jsonb_build_object('publication',(SELECT to_jsonb(p) FROM survey_publications p WHERE id='${publication}'),'final',(SELECT to_jsonb(f) FROM survey_wave_finals f WHERE id='${final}'),'attempt',(SELECT to_jsonb(a) FROM survey_wave_attempts a WHERE id='${attempt}'))::text;`);\n" +
+  -   '  const before=facts(names[0]);\n' +
+  -   "  deploy(resolve(backend,'prisma/schema.prisma'),database(names[0]));assert.equal(facts(names[0]),before,'Old publication/FINAL/attempt changed');\n" +
+  -   "  assert.equal(sql(names[0],`SELECT (longitudinal_plan IS NULL)::text FROM survey_projects WHERE id='${id}';`),'true');\n" +
+  -   "  assert.equal(sql(names[0],`SELECT longitudinal_snapshots::text FROM survey_participants WHERE id='${participant}';`),'{}');\n" +
+  -   '  sql(names[0],`UPDATE survey_projects SET longitudinal_plan=\'{"schemaVersion":1,"synthetic":true}\' WHERE id=\'${id}\';`);\n' +
+  -   "  assert.throws(()=>sql(names[0],`UPDATE survey_projects SET longitudinal_plan='{}' WHERE id='${id}';`),/Published personal tracking plan is immutable/);\n" +
+  -   "  assert.throws(()=>sql(names[0],`UPDATE survey_waves SET longitudinal_source_wave_id='different' WHERE id='${wave}';`),/Published personal tracking source is immutable/);\n" +
+  -   "  const dump=execFileSync('docker',['exec',service,'pg_dump','-U','ptool','-Fc',names[0]],{maxBuffer:64*1024*1024});\n" +
+  -   "  execFileSync('docker',['exec','-i',service,'pg_restore','-U','ptool','--no-owner','--no-privileges','-d',names[1]],{input:dump});\n" +
+  -   "  assert.equal(facts(names[1]),before,'Native restored facts changed');\n" +
+  -   "  const schema=db=>execFileSync('docker',['exec',service,'pg_dump','-U','ptool','--schema-only','--table=public.survey_projects','--table=public.survey_waves','--table=public.survey_participants','--no-owner','--no-privileges',db],{encoding:'utf8',maxBuffer:64*1024*1024}).split('\\n').filter(line=>!/^\\\\(?:un)?restrict /.test(line)&&!/^-- Dumped (?:from|by)/.test(line)).join('\\n');\n" +
+  -   "  assert.equal(schema(names[0]),schema(names[1]),'Native restored schema changed');\n" +
+  -   "  assert.throws(()=>sql(names[1],`UPDATE survey_projects SET longitudinal_plan='{}' WHERE id='${id}';`),/Published personal tracking plan is immutable/);\n" +
+  -   "  return {status:'PASSED',base:binding.base,postgres:sql(names[0],'SHOW server_version;'),schemaFixture:'nonempty old-schema SQL, no application replay',oldFactsSHA256:hash(before),dumpSHA256:hash(dump),dumpBytes:dump.length,restoredFactsEqual:true,restoredSchemaEqual:true,schemaScope:'changed survey_projects, survey_waves, survey_participants tables, constraints, indexes and triggers; full database native restore',immutableGuards:true,dumpPublished:false};\n" +
+  -   ' }finally{rmSync(temporary,{recursive:true,force:true});}\n' +
+  -   '}\n'
+  
+      at verifyOriginalQualification (file:///workspace/eduK12-longitudinal-survey-review/.github/scripts/personal-tracking-ready.mjs:92:9)
+      at TestContext.<anonymous> (file:///workspace/eduK12-longitudinal-survey-review/.github/scripts/personal-tracking-ready.test.mjs:71:23)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: `export function prepareMainSchema('),source.indexOf("`,
+    expected: 'export function prepareMainSchema(temporary){\n const file=resolve(temporary,\'main-schema.tar\');\n execFileSync(\'git\',[\'archive\',\'--format=tar\',\'--output\',file,binding.base,\'server-version/backend/prisma\']);\n execFileSync(\'tar\',[\'-xf\',file,\'-C\',temporary]);\n return resolve(temporary,\'server-version/backend/prisma/schema.prisma\');\n}\n/** Synthetic old rows honor the existing LINKED_WAVES disclosure gate. */\nexport function nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}){\n return `INSERT INTO survey_projects(id,owner_user_id,title,collection_mode,status) VALUES (\'${id}\',\'${owner}\',\'native upgrade sentinel\',\'LINKED_WAVES\',\'ACTIVE\');\n   INSERT INTO survey_publications(id,project_id,definition_digest,compiled_snapshot,consent_version,version) VALUES (\'${publication}\',\'${id}\',\'${digest}\',\'{"schemaVersion":1,"synthetic":true}\',1,1);\n   INSERT INTO survey_waves(id,project_id,publication_id,ordinal,title,status,consent_text,linkage_notice_confirmed) VALUES (\'${wave}\',\'${id}\',\'${publication}\',1,\'T1\',\'CLOSED\',\'Synthetic isolated schema preservation fixture\',true);\n   INSERT INTO survey_participants(id,project_id,research_code,credential_hash) VALUES (\'${participant}\',\'${id}\',\'R-SYNTHETIC\',\'${digest}\');\n   INSERT INTO survey_wave_attempts(id,project_id,wave_id,participant_id,status,completed_at) VALUES (\'${attempt}\',\'${id}\',\'${wave}\',\'${participant}\',\'COMPLETED\',CURRENT_TIMESTAMP);\n   INSERT INTO survey_wave_finals(id,attempt_id,project_id,wave_id,publication_id,submission_id,payload_hash,definition_digest,results_cipher,results_hash) VALUES (\'${final}\',\'${attempt}\',\'${id}\',\'${wave}\',\'${publication}\',\'${randomUUID()}\',\'${digest}\',\'${digest}\',\'synthetic-opaque-old-report\',\'${digest}\');`;\n}\nasync function nativeDatabase(){\n const service=process.env.PG_SERVICE;assert(service&&/^[a-zA-Z0-9_.-]+$/.test(service));\n const backend=resolve(\'server-version/backend\'),temporary=mkdtempSync(resolve(tmpdir(),\'personal-native-\'));\n const names=[\'personal_tracking_upgrade_test\',\'personal_tracking_restore_test\'];\n const sql=(database,query)=>execFileSync(\'docker\',[\'exec\',\'-i\',service,\'psql\',\'-XAt\',\'-v\',\'ON_ERROR_STOP=1\',\'-U\',\'ptool\',\'-d\',database],{input:query,encoding:\'utf8\'}).trim();\n const database=name=>\'postgresql://ptool:ptool123@127.0.0.1:5432/\'+name+\'?schema=public\';\n const deploy=(schema,url)=>execFileSync(process.execPath,[resolve(backend,\'node_modules/prisma/build/index.js\'),\'migrate\',\'deploy\',\'--schema\',schema],{env:{...process.env,DATABASE_URL:url},stdio:\'inherit\'});\n try{\n  for(const name of names)sql(\'postgres\',\'CREATE DATABASE \'+name+\';\');\n  deploy(prepareMainSchema(temporary),database(names[0]));\n  const owner=randomUUID(),id=randomUUID(),participant=randomUUID(),wave=randomUUID(),publication=randomUUID(),attempt=randomUUID(),final=randomUUID(),digest=\'a\'.repeat(64);\n  const {PrismaClient}=createRequire(resolve(backend,\'package.json\'))(\'@prisma/client\'),db=new PrismaClient({datasources:{db:{url:database(names[0])}}}),login=\'native-\'+owner.replaceAll(\'-\',\'\').slice(0,20);\n  try{await db.user.create({data:{id:owner,username:login,passwordHash:\'synthetic-schema-fixture-not-a-login\',role:\'TEACHER\',accountDomain:\'SURVEY\'}});await db.surveyAccount.create({data:{userId:owner,loginName:login,normalizedLogin:login}});}finally{await db.$disconnect()}\n  // Nonempty old-schema SQL fixture, not a repeated application journey or a\n  // claim of a newly accepted scientific FINAL. Opaque original bytes survive.\n  sql(names[0],nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}));\n  const facts=db=>sql(db,`SELECT jsonb_build_object(\'publication\',(SELECT to_jsonb(p) FROM survey_publications p WHERE id=\'${publication}\'),\'final\',(SELECT to_jsonb(f) FROM survey_wave_finals f WHERE id=\'${final}\'),\'attempt\',(SELECT to_jsonb(a) FROM survey_wave_attempts a WHERE id=\'${attempt}\'))::text;`);\n  const before=facts(names[0]);\n  deploy(resolve(backend,\'prisma/schema.prisma\'),database(names[0]));assert.equal(facts(names[0]),before,\'Old publication/FINAL/attempt changed\');\n  assert.equal(sql(names[0],`SELECT (longitudinal_plan IS NULL)::text FROM survey_projects WHERE id=\'${id}\';`),\'true\');\n  assert.equal(sql(names[0],`SELECT longitudinal_snapshots::text FROM survey_participants WHERE id=\'${participant}\';`),\'{}\');\n  sql(names[0],`UPDATE survey_projects SET longitudinal_plan=\'{"schemaVersion":1,"synthetic":true}\' WHERE id=\'${id}\';`);\n  assert.throws(()=>sql(names[0],`UPDATE survey_projects SET longitudinal_plan=\'{}\' WHERE id=\'${id}\';`),/Published personal tracking plan is immutable/);\n  assert.throws(()=>sql(names[0],`UPDATE survey_waves SET longitudinal_source_wave_id=\'different\' WHERE id=\'${wave}\';`),/Published personal tracking source is immutable/);\n  const dump=execFileSync(\'docker\',[\'exec\',service,\'pg_dump\',\'-U\',\'ptool\',\'-Fc\',names[0]],{maxBuffer:64*1024*1024});\n  execFileSync(\'docker\',[\'exec\',\'-i\',service,\'pg_restore\',\'-U\',\'ptool\',\'--no-owner\',\'--no-privileges\',\'-d\',names[1]],{input:dump});\n  assert.equal(facts(names[1]),before,\'Native restored facts changed\');\n  const schema=db=>execFileSync(\'docker\',[\'exec\',service,\'pg_dump\',\'-U\',\'ptool\',\'--schema-only\',\'--table=public.survey_projects\',\'--table=public.survey_waves\',\'--table=public.survey_participants\',\'--no-owner\',\'--no-privileges\',db],{encoding:\'utf8\',maxBuffer:64*1024*1024}).split(\'\\n\').filter(line=>!/^\\\\(?:un)?restrict /.test(line)&&!/^-- Dumped (?:from|by)/.test(line)).join(\'\\n\');\n  assert.equal(schema(names[0]),schema(names[1]),\'Native restored schema changed\');\n  assert.throws(()=>sql(names[1],`UPDATE survey_projects SET longitudinal_plan=\'{}\' WHERE id=\'${id}\';`),/Published personal tracking plan is immutable/);\n  return {status:\'PASSED\',base:binding.base,postgres:sql(names[0],\'SHOW server_version;\'),schemaFixture:\'nonempty old-schema SQL, no application replay\',oldFactsSHA256:hash(before),dumpSHA256:hash(dump),dumpBytes:dump.length,restoredFactsEqual:true,restoredSchemaEqual:true,schemaScope:\'changed survey_projects, survey_waves, survey_participants tables, constraints, indexes and triggers; full database native restore\',immutableGuards:true,dumpPublished:false};\n }finally{rmSync(temporary,{recursive:true,force:true});}\n}\n',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

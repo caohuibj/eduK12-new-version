@@ -1,0 +1,16 @@
+{
+  "runId": "41012289991",
+  "attempt": 1,
+  "source": "83f5e9a0a069d386d2ae230402f179c1ea69053a",
+  "actualBase": "dfd506347cfa2c684a75812936f32d48bdce34d4",
+  "frozenBase": "5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb",
+  "classificationJob": "123920641090",
+  "classificationState": "FAILURE",
+  "gateJob": "123920739968",
+  "gateState": "FAILURE",
+  "applicationChecks": "NOTRUN",
+  "newControlContracts": "NOTRUN",
+  "publicationRun": "41012289643",
+  "publicationState": "SUCCESS",
+  "targetFailureRounds": 1
+}

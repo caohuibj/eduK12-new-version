@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "tses12_2024_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "TSES2024 教师自我效能短版12题（简体中文编辑审校通过／不可施测）",
+      "abbreviation": "TSES12-2024-ZH-CN",
+      "instrumentFamily": "TSES 2024 short 12, distinct from legacy short12 key, Simplified Chinese working translation"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "TSES2024 教师自我效能短版12题（简体中文编辑审校通过／不可施测）；用户2026-10-30仅确认简体中文文字。2024短12（不要混用旧12键）：参与2/3/4/11、策略5/9/10/12、管理1/6/7/8；每维4题均分1–9。项目complete_required不是作者漏答规则。 目录条目不含题文、计分器、报告或有效施测许可。",
+      "constructOverlapTags": [
+        "tses12_2024_zh_cn",
+        "domain:teacher_workplace",
+        "population:adult_teacher",
+        "response:self",
+        "locale:zh-CN",
+        "availability:catalog_only",
+        "translation_editorial:user_approved_2026_10_30",
+        "rights:public_redist_not_verified",
+        "science:china_k12_validation_pending",
+        "C_S_R:private_draft_only"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "本目录仅面向成年教师材料检索，18+为项目定位；无可用于中国K12教师分级的效度或常模。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "仅登记作者对应原版；电子施测指导与回忆范围尚未通过项目正式准入",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "2024短12（不要混用旧12键）：参与2/3/4/11、策略5/9/10/12、管理1/6/7/8；每维4题均分1–9。项目complete_required不是作者漏答规则。",
+        "原题文/响应选项及私有报告保持在用户审校交接包中，不复制到公开Git或Notion。",
+        "2026-10-30用户审校批准仅为中文编辑文字，不能替代作者许可、心理测量专家或实际消费者检查。",
+        "CATALOG_ONLY不可施测/计分/生成个人报告；无可靠中国K12阈值/参考参数。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "资料识别/私有C/P/R草稿研究；未获得本产品公开数字题本部署所需权利及效度支持。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Tschannen-Moran & Woolfolk Hoy; author-hosted TSES combined short12 forms and score key, 2024; Chinese wording 2026-10-30 user editorial approval, private source SHA256 271a95ae49a7b3e8d0135ff3b94221145528dd3026e9e4831bc07be6dc54c936; no public questionnaire words.",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "用户确认文字版，不代表专业心理测量或作者正式译本验证；私有C/S1.0.0、Pnone、R1.0.0尚未运行真实scorer及report consumer。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "TSES 2024 short 12, distinct from legacy short12 key, Simplified Chinese working translation",
+      "citation": "Tschannen-Moran & Woolfolk Hoy; author-hosted TSES combined short12 forms and score key, 2024",
+      "url": "https://bpb-us-w2.wpmucdn.com/u.osu.edu/dist/2/5604/files/2024/07/TSES-Forms-2024.pdf",
+      "publicationYear": 2024
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "学生参与自我效能",
+        "教学策略自我效能",
+        "课堂管理自我效能"
+      ],
+      "limitations": [
+        "2024短12（不要混用旧12键）：参与2/3/4/11、策略5/9/10/12、管理1/6/7/8；每维4题均分1–9。项目complete_required不是作者漏答规则。",
+        "此公开目录不含可执行C/S/P/R；不得以私有已准备golden等同于真实计分与报告正式CI PASS。",
+        "用户仅批准中文措辞；作者和学术/数据共享/再分发条件尚未解决，职业健康/教师能力判断不适用。"
+      ],
+      "disclaimer": "仅来源、审校和私有开发状态目录，不可施测、无中国教师常模、未发放/未安装。"
+    },
+    "blockers": [
+      "TSES_PUBLIC_REDISTRIBUTION_OR_COMMERCIAL_DIGITAL_RIGHTS_UNRESOLVED",
+      "TSES_2024_VS_LEGACY_SHORT12_CROSSWALK_MUST_REMAIN_EXACT",
+      "PRIVATE_EXECUTABLE_NOT_INSTALLED_OR_CI_TESTED"
+    ]
+  }
+}

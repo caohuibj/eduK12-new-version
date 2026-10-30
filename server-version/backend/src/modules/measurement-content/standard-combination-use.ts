@@ -214,20 +214,12 @@ export async function revokeTrainingStandardCombinationUse(actorId:string,useId:
  },options)
 }
 
-/** Training's owned-source picker only, not a public/bulk catalog read model.
- * Returns at most 100 currently usable choices, not the first 100 raw grants.
- * Keyset batches keep memory bounded; the existing transaction timeout bounds work.
- * Metadata is a hint; add/publish repeat exact source and current rights checks. */
-export async function listTrainingStandardCombinationChoices(userId:string){
- return prisma.$transaction(async tx=>{
-  await assertTrainingStandardRecipient(tx,userId)
-  const choices=[]
-  let cursor:{toolKey:string;releaseId:string;useId:string}|undefined
-  const pageSize=100
-  while(choices.length<pageSize){
-  const rows=await tx.$queryRaw<Array<{id:string;combination_hash:string;title:string;tool_key:string;instrument_version:string;content_version:string;parameters_version:string;report_version:string;
-   content_hash:string;parameters_hash:string;report_hash:string;scale_id:string;measurement_release:{releaseId:string;contentHash:string};use_id:string;use_version:number;evidence:TrainingStandardUseEvidence[]}>>(Prisma.sql`
-   SELECT r.id,r.combination_hash,r.snapshot->>'title' AS title,r.tool_key,r.snapshot->>'instrumentVersion' AS instrument_version,
+type ChoiceRow={id:string;combination_hash:string;title:string;tool_key:string;instrument_version:string;content_version:string;parameters_version:string;report_version:string;
+ content_hash:string;parameters_hash:string;report_hash:string;scale_id:string;measurement_release:{releaseId:string;contentHash:string};use_id:string;use_version:number;evidence:TrainingStandardUseEvidence[]}
+const choicePageQuery=z.object({afterToolKey:z.string().min(1).max(300).optional(),afterReleaseId:uuid.optional(),afterUseId:uuid.optional()}).strict().superRefine((v,ctx)=>{
+ if([v.afterToolKey,v.afterReleaseId,v.afterUseId].filter(x=>x!==undefined).length%3)ctx.addIssue({code:'custom',message:'配置分页游标不完整'})
+})
+function choiceRowsQuery(userId:string,filter:Prisma.Sql){return Prisma.sql`   SELECT r.id,r.combination_hash,r.snapshot->>'title' AS title,r.tool_key,r.snapshot->>'instrumentVersion' AS instrument_version,
     r.snapshot#>>'{parts,CONTENT,version}' AS content_version,r.snapshot#>>'{parts,PARAMETERS,version}' AS parameters_version,r.snapshot#>>'{parts,REPORT,version}' AS report_version,
     r.snapshot#>>'{parts,CONTENT,hash}' AS content_hash,r.snapshot#>>'{parts,PARAMETERS,hash}' AS parameters_hash,r.snapshot#>>'{parts,REPORT,hash}' AS report_hash,
     s.id AS scale_id,r.measurement_release,g.id AS use_id,g.version AS use_version,
@@ -240,42 +232,68 @@ export async function listTrainingStandardCombinationChoices(userId:string){
    JOIN scales s ON s.code=r.tool_key AND s.instrument_version=r.snapshot->>'instrumentVersion'
    WHERE g.teacher_id=${userId} AND g.resource_type='STANDARD_COMBINATION' AND g.revoked_at IS NULL AND r.state='ONLINE'
     AND s.status='PUBLISHED' AND s.instrument_class='STANDARD' AND s.library_entry_id IS NULL
-    ${cursor?Prisma.sql`AND (r.tool_key,r.id,g.id)>(${cursor.toolKey},${cursor.releaseId},${cursor.useId})`:Prisma.empty}
-   ORDER BY r.tool_key,r.id,g.id LIMIT 100`)
-  for(const row of rows){
-   cursor={toolKey:row.tool_key,releaseId:row.id,useId:row.use_id}
-   let authority:Awaited<ReturnType<typeof assertTrainingStandardUse>>
-   try{await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+row.id,fingerprint:row.combination_hash},'TRAINING');authority=await assertTrainingStandardUse(tx,{userId,combination:{releaseId:row.id,combinationHash:row.combination_hash},measurementReleaseId:row.measurement_release.releaseId,useGrantId:row.use_id,useGrantVersion:row.use_version})}
-   catch(e){if(e instanceof AdminPermissionError||(e instanceof Error&&'statusCode'in e&&e.statusCode===403))continue;throw e}
-   let selected:ReturnType<typeof trainingStandardUseFromEvidence>=null,unavailableReason:string|null=null
-   if(row.evidence.length)try{
-    selected=trainingStandardUseFromEvidence({row:{id:row.id,combination_hash:row.combination_hash,snapshot:{toolKey:row.tool_key,instrumentVersion:row.instrument_version,
-     parts:{CONTENT:{version:row.content_version,hash:row.content_hash},PARAMETERS:{version:row.parameters_version,hash:row.parameters_hash},REPORT:{version:row.report_version,hash:row.report_hash}}}},measurement:row.measurement_release},userId,authority,row.evidence)
-   }catch{unavailableReason='原固定配置证据不完整，请管理员核对原授权修订。'}
-   choices.push({combination:{releaseId:row.id,combinationHash:row.combination_hash},scaleId:row.scale_id,title:row.title,
-    toolKey:row.tool_key,instrumentVersion:row.instrument_version,axisVersions:{CONTENT:row.content_version,PARAMETERS:row.parameters_version,REPORT:row.report_version},useGrantId:row.use_id,useGrantVersion:row.use_version,
-    authorizationMode:row.evidence.length?'PRECISE':'LEGACY',configurationName:selected?.configurationName??null,
-    ...(selected?{selectedBinding:selectedConfigurationPointer(selected.selectedBinding)}:{}),available:!unavailableReason,unavailableReason})
-   if(choices.length===pageSize)break
+    ${filter}
+   ORDER BY r.tool_key,r.id,g.id LIMIT 101`}
+async function resolveTrainingChoice(tx:Prisma.TransactionClient,userId:string,row:ChoiceRow){
+ let authority:Awaited<ReturnType<typeof assertTrainingStandardUse>>
+ try{await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+row.id,fingerprint:row.combination_hash},'TRAINING');authority=await assertTrainingStandardUse(tx,{userId,combination:{releaseId:row.id,combinationHash:row.combination_hash},measurementReleaseId:row.measurement_release.releaseId,useGrantId:row.use_id,useGrantVersion:row.use_version})}
+ catch(e){if(e instanceof AdminPermissionError||(e instanceof Error&&'statusCode'in e&&e.statusCode===403))return null;throw e}
+ let selected:ReturnType<typeof trainingStandardUseFromEvidence>=null,unavailableReason:string|null=null
+ if(row.evidence.length)try{
+  selected=trainingStandardUseFromEvidence({row:{id:row.id,combination_hash:row.combination_hash,snapshot:{toolKey:row.tool_key,instrumentVersion:row.instrument_version,
+   parts:{CONTENT:{version:row.content_version,hash:row.content_hash},PARAMETERS:{version:row.parameters_version,hash:row.parameters_hash},REPORT:{version:row.report_version,hash:row.report_hash}}}},measurement:row.measurement_release},userId,authority,row.evidence)
+ }catch{unavailableReason='原固定配置证据不完整，请管理员核对原授权修订。'}
+ return {combination:{releaseId:row.id,combinationHash:row.combination_hash},scaleId:row.scale_id,title:row.title,toolKey:row.tool_key,instrumentVersion:row.instrument_version,
+  axisVersions:{CONTENT:row.content_version,PARAMETERS:row.parameters_version,REPORT:row.report_version},useGrantId:row.use_id,useGrantVersion:row.use_version,
+  authorizationMode:row.evidence.length?'PRECISE' as const:'LEGACY' as const,configurationName:selected?.configurationName??null,
+  ...(selected?{selectedBinding:selectedConfigurationPointer(selected.selectedBinding)}:{}),available:!unavailableReason,unavailableReason}
+}
+type TrainingChoice=NonNullable<Awaited<ReturnType<typeof resolveTrainingChoice>>>
+
+/** Owned-source hints, not authority. At most 100 raw candidates per page;
+ * stale rights cannot turn this into an unbounded scan. The cursor always
+ * follows the last scanned row, including when a page contains no valid rows. */
+export async function listTrainingStandardCombinationChoicePage(userId:string,raw:unknown={}){
+ const input=choicePageQuery.parse(raw)
+ return prisma.$transaction(async tx=>{
+  await assertTrainingStandardRecipient(tx,userId)
+  const filter=input.afterToolKey?Prisma.sql`AND (r.tool_key,r.id,g.id)>(${input.afterToolKey},${input.afterReleaseId!},${input.afterUseId!})`:Prisma.empty
+  const rows=await tx.$queryRaw<ChoiceRow[]>(choiceRowsQuery(userId,filter)),scanned=rows.slice(0,100),choices:TrainingChoice[]=[],cache=new Map<string,TrainingChoice|null>()
+  for(const row of scanned){const choice=await resolveTrainingChoice(tx,userId,row);cache.set(row.use_id,choice);if(choice)choices.push(choice)}
+  const eligible=choices.filter(c=>c.available),groups=new Map<string,TrainingChoice>()
+  const ambiguous=(choice:TrainingChoice)=>{choice.available=false;choice.unavailableReason='同一工具存在同名或未命名配置，请管理员明确业务配置名称。'}
+  for(const choice of eligible){
+   if(choice.authorizationMode!=='PRECISE')continue
+   const peers=eligible.filter(other=>other.toolKey===choice.toolKey&&(!choice.configurationName||other.configurationName===choice.configurationName))
+   if(peers.length>1){ambiguous(choice);continue}
+   groups.set(JSON.stringify([choice.toolKey,choice.configurationName]),choice)
   }
-  if(rows.length<pageSize)break
+  // Probe only potential naming collisions, including beyond this page. Never
+  // treat an unchecked raw row as a currently eligible peer. One batch, bounded
+  // to 101 candidates per distinct name/tool; ordinary unique names need none.
+  if(groups.size){
+   const requests=[...groups.values()]
+   const peers=await tx.$queryRaw<Array<ChoiceRow&{choice_use_id:string}>>(Prisma.sql`
+    SELECT requested.use_id AS choice_use_id,peer.* FROM (VALUES ${Prisma.join(requests.map(c=>Prisma.sql`(${c.useGrantId}::text,${c.toolKey}::text,${c.configurationName}::text)`))}) AS requested(use_id,tool_key,configuration_name)
+    CROSS JOIN LATERAL (${choiceRowsQuery(userId,Prisma.sql`AND r.tool_key=requested.tool_key AND g.id<>requested.use_id
+     AND (requested.configuration_name IS NULL OR EXISTS (SELECT 1 FROM assessment_management_events n WHERE n.action='STANDARD_COMBINATION_USE_GRANTED' AND n.resource_id=r.id
+      AND n.metadata->>'grantId'=g.id AND n.metadata->>'useVersion'=g.version::text AND n.metadata?'selectedBinding' AND btrim(n.metadata->>'configurationName')=requested.configuration_name))`)}) peer`)
+   for(const choice of requests){
+    const candidates=peers.filter(p=>p.choice_use_id===choice.useGrantId)
+    let collision=false
+    for(const row of candidates.slice(0,100)){
+     if(!cache.has(row.use_id))cache.set(row.use_id,await resolveTrainingChoice(tx,userId,row))
+     const peer=cache.get(row.use_id)
+     if(peer?.available&&peer.toolKey===choice.toolKey&&(!choice.configurationName||peer.configurationName===choice.configurationName)){collision=true;break}
+    }
+    if(collision)ambiguous(choice)
+    else if(candidates.length>100){choice.available=false;choice.unavailableReason='同名授权候选较多，暂不能核对唯一配置，请管理员整理后重试。'}
+   }
   }
-  let overflow=false
-  if(choices.length===pageSize&&cursor){
-   const next=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT g.id FROM material_grants g JOIN survey_standard_releases r ON r.id=g.resource_id AND r.combination_hash=g.standard_combination_hash
-    JOIN scales s ON s.code=r.tool_key AND s.instrument_version=r.snapshot->>'instrumentVersion'
-    JOIN measurement_content_releases m ON m.id=r.measurement_release->>'releaseId' AND m.content_hash=r.measurement_release->>'contentHash' AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
-    WHERE g.teacher_id=${userId} AND g.resource_type='STANDARD_COMBINATION' AND g.revoked_at IS NULL AND r.state='ONLINE'
-     AND s.status='PUBLISHED' AND s.instrument_class='STANDARD' AND s.library_entry_id IS NULL AND (r.tool_key,r.id,g.id)>(${cursor.toolKey},${cursor.releaseId},${cursor.useId}) LIMIT 1`)
-   overflow=next.length>0
-  }
-  const eligible=choices.filter(choice=>choice.available)
-  for(const choice of choices){
-   if(choice.authorizationMode!=='PRECISE'||!choice.available)continue
-   const peers=eligible.filter(other=>other.toolKey===choice.toolKey)
-   const ambiguous=peers.length>1&&(!choice.configurationName||peers.filter(other=>other.configurationName===choice.configurationName).length>1)
-   if(overflow||ambiguous){choice.available=false;choice.unavailableReason=overflow?'精确配置超出当前目录读取范围，请管理员整理后重试；未选择任何默认版本。':'同一工具存在同名或未命名配置，请管理员明确业务配置名称。'}
-  }
-  return choices
+  const last=scanned[scanned.length-1]
+  return {list:choices,nextCursor:rows.length>100&&last?{afterToolKey:last.tool_key,afterReleaseId:last.id,afterUseId:last.use_id}:null}
  },options)
 }
+/** Existing small-catalog callers keep their array contract. UI pagination uses
+ * the explicit page API; this wrapper never silently selects another version. */
+export async function listTrainingStandardCombinationChoices(userId:string){return (await listTrainingStandardCombinationChoicePage(userId)).list}

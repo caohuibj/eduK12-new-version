@@ -61,7 +61,7 @@ export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublicati
      if(policy.disposition==='UNKNOWN'||native.reportAudiences[slot]!==audience)for(const key of Object.keys(capabilities) as Array<keyof typeof capabilities>)capabilities[key]=false
      return [slot,capabilities] as const
     }))
-    out.views[audience]=projectProfileView(profile,pack,policies,audience==='researcher')
+    out.views[audience]=projectProfileView(profile,pack,policies,audience==='researcher',audience==='student'?'student':'admin')
    }
    out.status=['INVALID','INSUFFICIENT','NOT_APPLICABLE'].includes(profile.state)?'UNAVAILABLE':'READY'
   }catch{out.errorCode='SURVEY_NATIVE_ANALYSIS_FAILED'}
