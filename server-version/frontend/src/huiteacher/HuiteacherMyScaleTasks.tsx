@@ -1,3 +1,4 @@
+import {TeacherPersonalChanges} from './TeacherPersonalTracking'
 import {deferredPage} from '../components/page-loading/deferredPage'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
@@ -194,6 +195,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
       <EducationTaskFeedback key={visibleFeedback.task.executionId} api={api} entry="TEACHER"
         executionId={visibleFeedback.task.executionId} title={visibleFeedback.task.title}
         loadFeedback={readFeedback} onClose={()=>setFeedback(null)} renderLegacy={renderTeacherLegacyFeedback}/>
+      <TeacherPersonalChanges key={visibleFeedback.task.executionId} api={api} executionId={visibleFeedback.task.executionId}/>
     </TeacherAssessmentPage>}
     {selected&&attempt&&attempt.status!=='COMPLETED'&&<TeacherAssessmentPage kind="answer" title={selected.title} showTitle={false}><div className="ht-task" ref={answering} tabIndex={-1} role="region" aria-label="当前测评作答">
       {!unified&&<h3>正在完成：{selected.title}</h3>}

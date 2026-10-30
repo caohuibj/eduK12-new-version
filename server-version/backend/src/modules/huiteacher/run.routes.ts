@@ -9,7 +9,7 @@ import { success } from '../../utils/response'
 import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
 import {
   HuiteacherRunError,addTeacherRunTrack,addTeacherPrivateRunTrack,addTeacherPrivateFormRunTrack,addTeacherPrivateCompositionRunTrack,previewTeacherRun,publishTeacherRun,
-  progressTeacherRun,closeTeacherRun,cancelTeacherRun,listTeacherAvailableScales,
+  progressTeacherRun,closeTeacherRun,cancelTeacherRun,listTeacherAvailableScales,teacherTrackingOptions,createNextTeacherTrackingEvent,
 } from './run.service'
 
 const router=Router()
@@ -91,8 +91,10 @@ router.post(base+'/preview',authenticateHuiteacher,requireTeacherProductAdmin,
   }))))
 router.post(base+'/publish',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await publishTeacherRun({
-    ...keys.parse(req.params),actorUserId:req.user!.userId,...version.parse(req.body),
+    ...keys.parse(req.params),actorUserId:req.user!.userId,...version.extend({tracking:z.unknown().optional()}).parse(req.body),
   }))))
+router.get(base+'/tracking',authenticateHuiteacher,requireTeacherProductAdmin,wrap(async(req,res)=>success(res,await teacherTrackingOptions({...keys.parse(req.params),actorUserId:req.user!.userId}))))
+router.post(base+'/next-wave',authenticateHuiteacher,requireTeacherProductAdmin,wrap(async(req,res)=>success(res,await createNextTeacherTrackingEvent({...keys.parse(req.params),actorUserId:req.user!.userId,...z.object({requestId:uuid}).strict().parse(req.body)}))))
 router.get(base+'/progress',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await progressTeacherRun({
     ...keys.parse(req.params),actorUserId:req.user!.userId,

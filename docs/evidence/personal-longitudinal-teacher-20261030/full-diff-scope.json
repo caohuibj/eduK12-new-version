@@ -1,0 +1,1443 @@
+{
+  "base": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+  "head": "working candidate stacked on dbcc7e597aba792aa052cd23634332d80a4252e1",
+  "entries": [
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": ".github/scripts/content-scope.mjs"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": ".github/scripts/content-scope.test.mjs"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": ".github/scripts/merge-gate.mjs"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": ".github/scripts/personal-tracking-draft-scope.mjs"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": ".github/workflows/ci.yml"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/development/personal-longitudinal-survey-20261030.md"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/development/personal-longitudinal-teacher-20261030.md"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/development/personal-longitudinal-training-20261030.md"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation-manifest.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-actionlint-final.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-backend-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-bounded-evidence-control.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-bundle-source.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-bundle-source.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-disclosure-complete.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-disclosure-complete.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-disclosure.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-disclosure.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-draft-control-final.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-failed-run-meta.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-feedback-consumers.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-feedback-consumers.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-frontend-lint.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-frontend-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-inheritance.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-inheritance.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-main401-actionlint.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-main401-commit-final.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-main401-commit-initial.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-main401-merge.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-main401-prisma.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-main401-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing-consumers.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing-consumers.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing-locked.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing-locked.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing-scope.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-narrowing.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-null-ui.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-null-ui.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-scope-annotations.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-scope-check-output.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-scope-job-meta.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-untracked-content.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/longitudinal-review-untracked-content.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/merge-base-reproduction.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/narrowing-manifest.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/continuation/untracked-content-manifest.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/official-ci-manifest.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/original-manifest.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/ci-41007596628-jobs.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-backend-types-frozen.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-backend-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-core-quality.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-core-quality.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-core-vitest.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-core-vitest.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-draft-scope.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-frontend-lint.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-frontend-types-frozen.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-guards-pg.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-guards-pg.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-migrate-guards.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-migrate-ready.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-migrate.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-browser-continuation.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-browser-continuation.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-browser-failure.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-browser-final.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-browser-final.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-browser.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-pg-browser.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-pg-browser.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-pg.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-survey-pg.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-ui-vitest.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-ui-vitest.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-wave-ui.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-20261030/originals/longitudinal-wave-ui.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-app-tsc.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-control-test.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-current-backend-tsc.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-final-backend-tsc.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-final-frontend-tsc.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-first-tsc.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-frontend-lint.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-migrate.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/education-reader-tsc.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/full-diff-scope.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/manifest.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-first-failure.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-first-requests.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-first.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-first.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-published.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-reports.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-requests.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-resume.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-browser-resume.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-invariants.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-invariants.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-pg-continuation.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-pg-continuation.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-pg-first.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-teacher-20261030/teacher-longitudinal-pg-first.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-continuation.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-continuation.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-corrected-submit.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-corrected-submit.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-failure.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-first-failure.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-first.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-first.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-navigation-failure.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-navigation.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-navigation.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-response-failure.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-response-fixed.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-response-fixed.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-submit.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser-submit.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-browser.png"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-frontend-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-context.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-context.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-course.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-course.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-key.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-key.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-population.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg-population.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-pg.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-bundle-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-candidate-frontend-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-candidate-lint.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-candidate-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-frontend-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-lint.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-v2-frontend-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-complete-v2-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-contract.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-contract.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-disclosure.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-disclosure.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-draft-scope.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-contract-corrected.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-contract-corrected.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-pg.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-pg.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-form-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-frontend-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-initial-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg-access.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg-access.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-latest-pg.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-lint.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-main401-frontend-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-main401-merge.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-main401-prisma.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-main401-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-migrate.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-corrected.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-corrected.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-first.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-pg-first.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-prisma-generate.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-types-final.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-ui-scope.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-ui-scope.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/longitudinal-training-wiring-types.log"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "docs/evidence/personal-longitudinal-training-20261030/manifest.json"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/prisma/schema.prisma"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/anonymous-study/routes.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/anonymous-study/service.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/assessment-run/publish.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/assessment-run/repository.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/assessment-run/run.controller.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/bundle-product/routes.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/bundle-product/service.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/composite/composite.routes.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/composite/composite.service.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/modules/composite/personal-tracking-results.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/modules/composite/personal-tracking.service.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/modules/composite/personal-tracking.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/composite/training-content-binding.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/composite/training-metric-disclosure.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/huiteacher/evaluation.service.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/huiteacher/run.routes.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/huiteacher/run.service.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/questionnaire-product/routes.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/questionnaire-product/service.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/modules/reporting/education-personal-tracking.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/modules/reporting/personal-tracking.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/survey/measurement.result.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/survey/participant-feedback.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/modules/survey/personal-tracking.service.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/modules/survey/personal-tracking.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/survey/public.routes.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/survey/publication.service.ts"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/backend/src/modules/survey/tracking-source.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/survey/waves.publish.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/survey/waves.routes.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/backend/src/modules/survey/waves.service.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/api/anonymousStudy.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/modules/composite/CompositeReportPage.tsx"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/frontend/src/modules/composite/TrainingPersonalChanges.tsx"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/frontend/src/modules/composite/__tests__/TrainingPersonalChanges.test.tsx"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.test.tsx"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/modules/reporting/longitudinalVisualization.ts"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/pages/bundle/BundleProducts.tsx"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/frontend/src/survey/SurveyPersonalChanges.tsx"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/survey/SurveyPublicApp.tsx"
+    },
+    {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "status": "A",
+      "file": "server-version/frontend/src/survey/SurveyWaveStudio.tracking.test.tsx"
+    },
+    {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "file": "server-version/frontend/src/survey/SurveyWaveStudio.tsx"
+    }
+  ],
+  "personal_tracking_draft": true,
+  "readyQualification": false,
+  "formalExecution": false
+}

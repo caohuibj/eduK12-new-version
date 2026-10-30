@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "scope": "Teacher personal SELF longitudinal, existing registered fixed Scale only",
+  "base": {
+    "trainingHead": "dbcc7e597aba792aa052cd23634332d80a4252e1",
+    "mainAncestor": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+    "surveyAncestor": "a62c9a5763da69aa13b4f70d062b0bf55d6db65f"
+  },
+  "productSources": {
+    ".github/scripts/content-scope.test.mjs": "bd4df8cb398e407f13a7e293fdcb66c0f0375fefd10bfaf1f566b11e27d8d6e7",
+    ".github/scripts/personal-tracking-draft-scope.mjs": "c4006f5298cdbc2ac69f1c1c9f2c769c1dd65114a3a1d0d875f77e32ab664c58",
+    "server-version/backend/src/modules/assessment-run/publish.ts": "e460ad105712af15f36e3ab594ea02169a4e73a498114071899e1dae387dfbc5",
+    "server-version/backend/src/modules/assessment-run/repository.ts": "e8a370506a66cad3c92bba90be81bc9cdee7d4ca6ef39f16cdd32396a868d605",
+    "server-version/backend/src/modules/assessment-run/run.controller.ts": "73d8278e8c9b217290c1cbc3631561686b1ab3c376b3c38c05254af235d9c0e2",
+    "server-version/backend/src/modules/huiteacher/evaluation.service.ts": "f9a426a01541eca23a88f5624e2bd6f1a0759a087eacd151eb0013ffc040db7d",
+    "server-version/backend/src/modules/huiteacher/run.routes.ts": "b7b8f0e25275c66e7ab151c51a9b9570c195d0aed21ba6eaf3b81e46a5dd2582",
+    "server-version/backend/src/modules/huiteacher/run.service.ts": "f658fedf90f7bf631169e26740986b3cc4510d7d81494673df67b6a3e8eccac8",
+    "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts": "78426c56339850fe99a8df8422d473e053157cb45233db266f09807b1d23b366",
+    "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": "90e30c58d04f0a8c05c6f9f674e2005392410da983ced6956c93a39b544e73a6",
+    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx": "69b4eba2f9ac6eae986363c74bee551c0cc439ca273e1a77347cb1f9774a289c",
+    "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql": "ee636ec6949c116174c943e86413fae4d380a62bdd26562fa15b16b9a5936875",
+    "server-version/backend/src/modules/reporting/education-personal-tracking.ts": "cf191a2625ec5b482073c0efcf76ef2caf948709014539c07ac282386034cbd1",
+    "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": "35a35da2b4ece5fa30ddff69315df3574ff8b69a9b924298f7f5981cca0f45df",
+    "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts": "09359063cb408dbd85b5037350ba122b7ef4de61cd121925b1875998a46ca332",
+    "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts": "44480be4344f713f37ec46be6110df53dcb541dbce7c9cbcece2de1ad679a7fd",
+    "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx": "24ad991a277c8ff102398bde0d25e2d98d85406a9162d0c0f7bf991d078fb8e4"
+  },
+  "evidence": {
+    "teacher-longitudinal-pg-first.json": "7a176fa1845e2975871df8c98e6a6f892cd08ed7a5a48dcd1dcf257b678bf1f8",
+    "teacher-longitudinal-pg-first.log": "ac3c6171ade2ac93733f74c8f1141f1c44a69901f86d78660fbf7e67dee7d39f",
+    "teacher-longitudinal-pg-continuation.json": "287c3a96c370af64eb9c91c7a2e6e3f11e28de5574d49a41b36b58d5649fd1f3",
+    "teacher-longitudinal-pg-continuation.log": "207e2c79035674bb1ccc4e3ca933020a0df0bf11d6ae4e393022bc8080bf5853",
+    "teacher-longitudinal-invariants.json": "a3e1434f8a469e031635df88bb7a22a2cbc9fdc6e6fb2db913b79d575c616956",
+    "teacher-longitudinal-invariants.log": "c77de238f78fce8a55efc6b954129f8181b6e82853cff8845423205e10ba4641",
+    "teacher-longitudinal-browser-first.json": "118c94903b2994528e918dbf977dc5f6fa525ac6395274a192bf2f335e884de8",
+    "teacher-longitudinal-browser-first.log": "a0fbbefe66dd6c47ee9ff47fbe5ba00c5fba865679a9b153592ce13ad0177f87",
+    "teacher-longitudinal-browser-first-requests.json": "5b05f2f0c0e29b9015a6144ffa1d8452c0b4a49359ccf607cfabb6092294f096",
+    "teacher-longitudinal-browser-first-failure.png": "d137db6ae3671cb4a2d56d026e63da4641578bdd23f298c68890f3087687cf50",
+    "teacher-longitudinal-browser-resume.json": "16a2c973713720a4e90a0761377ba2cf81fb42aba8e6531ece9fcdb1a1e43053",
+    "teacher-longitudinal-browser-resume.log": "7bf41e27a51df5c5450fd3a2586d664e0397e5a48bf68c013635203dad9c6e6f",
+    "teacher-longitudinal-browser-requests.json": "9cc8a5bc617ce834e8973eaff9a2e6b2cd6e8d428497e129e0a6048d417ae005",
+    "teacher-longitudinal-browser-published.png": "3b56eb7009dc9d32c6205536e9e0652884adf2793c1669b1f96dbbec8a6da798",
+    "teacher-longitudinal-browser-reports.png": "b1ada759a5d93f362fa234dd2f982bfadebc3de16ee17d4833cfedd41efd13cc",
+    "education-first-tsc.log": "3284271fa91992468240768f5f6b7f47d3024799cad2744ee399a4eed663e5f6",
+    "education-reader-tsc.log": "3284271fa91992468240768f5f6b7f47d3024799cad2744ee399a4eed663e5f6",
+    "education-current-backend-tsc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "education-app-tsc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "education-final-backend-tsc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "education-final-frontend-tsc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "education-frontend-lint.log": "ae5125e890561af48d1ebc73b6b4d6dff172eef51220d63296f3f3081fb6e215",
+    "education-control-test.log": "fabdd420ae8e9d4dddaa53ff4bcba4c1dbfc259ebee71b9b16eeb32696f83e4b",
+    "education-migrate.log": "dc5a1a5d0b137e97c57173d5757c97a86ea7f371629c249d25945796a57fd6bb",
+    "full-diff-scope.json": "074f9352cd64ca3d648ba34cd961b7c65c657085c88b6dd7d9b4940768f3b98b"
+  },
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "existing local loopback isolated eduk12_test; eight pending additive migrations deployed, see raw log",
+    "browser": "system Chromium; real publisher and SELF components served by Vite with actual protected HTTP routes and PostgreSQL; synthetic signed HUITEACHER MFA session only",
+    "productionAccessed": false,
+    "dependenciesInstalled": false
+  },
+  "results": {
+    "nativeJourney": "Original first PG case reached native T1/T2 FINAL, both single reports, AVAILABLE [3,9], wrong-user and membership denial, and unchanged cache. Last assertion wrongly expected revoked施测license to deny completed history. Existing historical disclosure deliberately retained; no permission widened. Only retained-state/report-denial continuation run; PASS1, original failed reporter kept.",
+    "invariants": "PASS1: published Teacher Run tracking immutable and own execution snapshots append-only",
+    "browser": "PASS1 across retained stages. Original browser really created/published native T3 and started own attempt, then exact-text selector missed required-marker suffix. Resume reuses same T3/attempt; no repeat publish or new attempt. Three browser responses accepted, own single6 plus [3,9,6], adjacent -3. Original screenshots/requests/failure retained.",
+    "control": "PASS1 new exact-path Teacher Draft case, Ready/unknown/force-full still refused",
+    "types": "backend tsc --noEmit EXIT0, frontend tsc -p tsconfig.app.json --noEmit EXIT0; root frontend empty references-only tsc was setup-only, not qualification",
+    "lint": "affected frontend ESLint EXIT0, one existing scopeGeneration ref cleanup warning at HuiteacherEvaluationStudio.tsx:141",
+    "distinctSuccessfulCases": 4,
+    "whitespace": "Code/document diff --check passed; original raw lint/migration logs retain original trailing whitespace rather than rewriting evidence."
+  },
+  "notRun": [
+    "School closure: no existing eligible SELF source with longitudinal disclosure",
+    "Teacher private/library/composition cognitive/SJT/numeric Form longitudinal: current source contracts give no longitudinal rights",
+    "old Survey31, Training32, formula/trial suites and full platform",
+    "Teacher formal CI/Ready, exact main migration/native restore, image/security/CodeQL, merge/deploy"
+  ],
+  "acceptance": "Development evidence, not signed admission or merge qualification. PR remains Draft."
+}
