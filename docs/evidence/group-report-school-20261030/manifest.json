@@ -133,5 +133,14 @@
     "continuation": "frozen-privacy-types-repair.json",
     "exitCodeAfter": 0,
     "policyCasesReplayed": false
+  },
+  "integrationCheckpoint": {
+    "head": "42e2a40d908cef7e3e0c4a52eeb1975c7079301a",
+    "trainingDependency": "20de08b63b8b77efe1941c935ec154ca74177051",
+    "mainIntegrated": "31845e3a14dd5edf6e03c90e7f71c014bcf0aa06",
+    "backendTree": "d11a452cf25da1465fbb745a6a7c5f86aab8fe29",
+    "frontendTree": "83917ae150cafbbe825a269d4c56a0e08a98e0a8",
+    "currentBackendTypes": "PENDING_NEXT_PRODUCT_FREEZE",
+    "frontendEvidenceReused": true
   }
 }
