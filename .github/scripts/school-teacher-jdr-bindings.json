@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 1,
+  "candidate": "native-bundle",
+  "repository": "caohuibj/eduK12-new-version",
+  "branch": "feat/teacher-jdr-bundle-20261030",
+  "enabled": true,
+  "base": "31845e3a14dd5edf6e03c90e7f71c014bcf0aa06",
+  "productHead": "ee72a4a3949652e9dd067bd1cb5d0cd1c27b3bd4",
+  "productTree": "a39f954a8b4b437ee64d9e2dc394286da24f54db",
+  "frontendTree": "5ccee9ffe412bd93f912821b3aad698619aa0671",
+  "backendTree": "c042e2783d094c62c7bdadaec3623641e86d0b64",
+  "review": {
+    "status": "INDEPENDENTLY_REVIEWED",
+    "recordSha256": "1d9e2fb4ae69ea79b96142c5984cd9367f435fc3c2363d4672ed9d0969864fa4",
+    "record": {
+      "kind": "project-review-and-activation-record",
+      "date": "2026-10-30",
+      "reviewer": "DOT parent thread",
+      "instructionSource": "01a17318-5715-7735-9afe-7834c577902b",
+      "independentlyReviewedImplementation": "c14496dd42ff2ad4034eaaacc917cf1f83a9148a",
+      "finalAlignedCandidate": "fceeb55aef75e317c37c150ff94f387e1dffec72",
+      "decision": "Proceed with the existing bounded formal qualification; no per-commit approval pause. Return actual qualification for user merge confirmation.",
+      "reviewScope": "Parent reports independent review of core implementation, actual package and test originals: fixed 30 items and parameters, CBI independent, participant-self-only approved Bundle interpretation intersected with source numeric/interpretation rights.",
+      "finalDeltaVerification": "Cloud node checked main alignment and control-only changes since the reviewed implementation: all 41 current source entries and 32 protected inputs unchanged, all 66 prior originals and 23 selections identical; 9 added originals only describe catalog identity/alignment. Control logic unchanged; main-before literal and exact base/product/component pins updated.",
+      "evidenceLimits": [
+        "Unsigned original executions; historical environment incompletely recorded.",
+        "Actual full journey is Training participant account with adult-teacher declarations, not system Teacher role or all four entrypoints.",
+        "Ordinary collection publication separation only; ordinary scoring not rerun.",
+        "First FINAL reached in failed lifecycle-r1 invocation; saved-read-r2 never rescores.",
+        "Browser is developer-environment report observation, not final image qualification."
+      ],
+      "notASignature": true,
+      "notGitHubApproval": true
+    }
+  },
+  "requiredJobs": [
+    "admission",
+    "frontend",
+    "backend-self",
+    "native-evidence",
+    "native-runtime",
+    "security"
+  ],
+  "source": {
+    "docs/bundle-declarative-onboarding/project/PROJECT-INSTRUCTIONS.md": {
+      "before": null,
+      "after": "1f6632ee9d976c70565989d16826c01b5d6dcd81"
+    },
+    "docs/bundle-declarative-onboarding/project/examples.md": {
+      "before": null,
+      "after": "55327cb4077af0e9d322f31d05ceb8a83bb9f66a"
+    },
+    "docs/bundle-declarative-onboarding/project/record-template.json": {
+      "before": null,
+      "after": "fffd67c4bb9eb0312e05f0e0d8b4843c42dc2c00"
+    },
+    "docs/bundle-declarative-onboarding/project/workflow.md": {
+      "before": null,
+      "after": "1e8bdfff642367ee0c612567a66dfd75b853d5f5"
+    },
+    "docs/bundle-declarative-onboarding/teacher-jdr-design-reference.json": {
+      "before": null,
+      "after": "09f1b070c0fa435c3cc17088210a86805583f70c"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts": {
+      "before": null,
+      "after": "e22c65825cf219775ccc800f4dd8d33c9e4108b5"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/profile-independent-tool.test.ts": {
+      "before": null,
+      "after": "bad4148920c65d425b05708d7ae48ef5210abe1b"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/profile-subject-identity.test.ts": {
+      "before": null,
+      "after": "f39f07d519fded1cabad3c2ba38f621021db1d86"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-admission.test.ts": {
+      "before": null,
+      "after": "fbfeec01c0c2f2ffe3244fc19e78b4ea5d52c7f9"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-lifecycle.postgres.integration.test.ts": {
+      "before": null,
+      "after": "bbba621934469928f6e7bcd72619273bc95c9fe9"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr-workflow.postgres.integration.test.ts": {
+      "before": null,
+      "after": "edae0c1bbb6644a6a5ece7966f10e4b3bbb105ac"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.fixture.ts": {
+      "before": null,
+      "after": "478f0fb614c52c8c3b83a89db43c1346a9bf6f87"
+    },
+    "server-version/backend/src/__tests__/bundle-onboarding/teacher-jdr.test.ts": {
+      "before": null,
+      "after": "05b8beaeec3013ade164ddfadf349e15424dc909"
+    },
+    "server-version/backend/src/modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json": {
+      "before": null,
+      "after": "96a857e583473502c6aabf001886cea203552c21"
+    },
+    "server-version/backend/src/modules/assessment-bundle/generated/packages.json": {
+      "before": "6ccb0569149b7ab60dd19562a7da77b055020623",
+      "after": "a655758f5bc76d6f0f149a0bbc9b1b31df5f88b1"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts": {
+      "before": "88d54cd45a800b84c95df4e339ce8e4a47f19d50",
+      "after": "7c92014194d2968abe7e7919f56ae9aa66f5e42d"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts": {
+      "before": "8896e3039ee2b737b77532909ac95e470931fc8b",
+      "after": "baad87cf5ea3b654c4b39acc32d83d22ee359b7b"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts": {
+      "before": "51695457de7e20dfb3d226891120bad778ef11f1",
+      "after": "0325897e19a7b0f5ff5894484803b008dcba4a44"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/context.json": {
+      "before": null,
+      "after": "d9b45af3317fb0366aae0d3a8bf664d662eb35f4"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/evidence-map.json": {
+      "before": null,
+      "after": "facbc0761f447c3f94fa86f338bc224f0d9c9c7b"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/invalid.json": {
+      "before": null,
+      "after": "3bd959b7da814b9fdd9f0e18b51d3db8b6617df5"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/missing.json": {
+      "before": null,
+      "after": "c059d14b915161713a62fad9a4ec9a039b056f84"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/not-applicable.json": {
+      "before": null,
+      "after": "a56bce30ab7c546707c7c796dbc6053e46bb241f"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/fixtures/valid.json": {
+      "before": null,
+      "after": "01353c15ba504468fa8f114432424220dd3ebe14"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/manifest.json": {
+      "before": null,
+      "after": "92096cb0ccb8f22dea574912a26a1af3dee9493a"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/profile.json": {
+      "before": null,
+      "after": "d38e5ac0aafedc99c7f893ea9269a4b7e63aae5d"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/publication.json": {
+      "before": null,
+      "after": "80d6b9ebbd1fdec46fd252888cfb5f1ef2aecf9c"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/report.json": {
+      "before": null,
+      "after": "6d5637bd536cabd564516f67c0fdca87c380e358"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/rules.json": {
+      "before": null,
+      "after": "27b7b88ac60133772499bb25a8c795992ff10d01"
+    },
+    "server-version/backend/src/modules/assessment-bundle/packages/teacher_jdr_workplace_zh_cn/0.1.0/scientific.json": {
+      "before": null,
+      "after": "f2a416b1f61562c96b88ea161887eecfba860534"
+    },
+    "server-version/backend/src/modules/assessment-bundle/profile/admission.ts": {
+      "before": "401fda13ed1fe900f85674ac313d4eb2f007109b",
+      "after": "6922e4650c4c64ee9af0e22212e7de28443f6dab"
+    },
+    "server-version/backend/src/modules/assessment-bundle/profile/contract.ts": {
+      "before": "59cc284dcfbfbd2c0ee68e9ae8a2ad550b55fd53",
+      "after": "32820b65f7fbf3d7de78a4353d69f7d3e4ff82e5"
+    },
+    "server-version/backend/src/modules/assessment-bundle/profile/match.ts": {
+      "before": "a6404114ab36600d8da9c683c54ba686d3f9ea8e",
+      "after": "6569b797a04050f88c455ff92fd328a907046fc6"
+    },
+    "server-version/backend/src/modules/assessment-bundle/profile/report.ts": {
+      "before": "dac3746688abe3ef09d20c631d19aab8a712bd0b",
+      "after": "f00696769fac063b1e0c2afbe303bf8428a786ac"
+    },
+    "server-version/backend/src/modules/bundle-product/analysis.ts": {
+      "before": "52d22bcd214c4864741cbddb7b4eda7ad1504ef4",
+      "after": "9e8e58a50ac5f921838d36075625a44f8d42a485"
+    },
+    "server-version/backend/src/modules/bundle-product/definition-provider.ts": {
+      "before": "4cc30a58093e343a54c074c1c8f7f306b20f1036",
+      "after": "debc8a1424bb34a444bdeb5bc89f7e08a980623d"
+    },
+    "server-version/backend/src/modules/bundle-product/service.ts": {
+      "before": "d8f8ab34f4d3da54c3d88743c82d36ea46e56745",
+      "after": "c330f7f35a5a8aea3ad9211cde1f375bc19f0800"
+    },
+    "server-version/backend/src/modules/bundle-product/survey-native.ts": {
+      "before": "730fa61bf4903002242193e920a0468194e90242",
+      "after": "e7063b05b444d3c54c7c743f6a80b4081e18714c"
+    },
+    "server-version/backend/src/services/materialGrant.ts": {
+      "before": "d69e7ddd0c863ae726a09d75d6b9edd3c0674f62",
+      "after": "1e1e9b14b04c6dbe9507209ecf0f6f2a26bd9207"
+    },
+    "server-version/frontend/src/pages/bundle/BundleProfileSummary.tsx": {
+      "before": "ce25e55861c3c17a791c3f94bd5acecac49525de",
+      "after": "327378b1bf47de86dfbf3d3ef045280ad834d39b"
+    },
+    "server-version/frontend/src/pages/bundle/__tests__/BundleProfileSummary.jdr.test.tsx": {
+      "before": null,
+      "after": "531cbee720d400f3fd9299098e1bec17cdbeeb87"
+    }
+  },
+  "controls": {
+    ".github/scripts/school-teacher-checks.mjs": {
+      "before": "8d565a850bd576d057635b7276b488949ee07199",
+      "after": "aa1d2124c1ebc5b70078040ceea300211c6e80fd"
+    },
+    ".github/scripts/school-teacher-native.mjs": {
+      "before": "67f19b19724bab9a52cb7b7dbffd152c73217f47",
+      "after": "8d2f4c8df49ab85bc0d23b38732348fed94c6d61"
+    },
+    ".github/scripts/school-teacher-native-evidence.mjs": {
+      "before": "68236e41ec233c71d75198b909c115f35ddeb039",
+      "after": "1446315a269cb6a15b2416e94097fd727d719deb"
+    },
+    ".github/scripts/school-teacher-scope.mjs": {
+      "before": "0579e1841f78eb18200a71e715422c0de449e21e",
+      "after": "daa9edb4379a2268ec42a7a6ce14e867782f8b6a"
+    },
+    ".github/workflows/ci.yml": {
+      "before": "04cd5a8ac238aab570030a506aa45051460979b7",
+      "after": "021cf3022aa87bf8206c380f7aa8929024c8a7c8"
+    },
+    ".github/scripts/school-teacher-jdr-bindings.json": {
+      "before": null,
+      "after": null
+    },
+    ".github/scripts/school-teacher-jdr-evidence.json": {
+      "before": null,
+      "after": "43bc8023d1eac04090024c61246d3e47c5c6c79c"
+    },
+    ".github/scripts/school-teacher-jdr.test.mjs": {
+      "before": null,
+      "after": "1826719d3de3f04b756938da1055810980bab8d7"
+    },
+    "docs/bundle-declarative-onboarding/teacher-jdr-ci-plan.md": {
+      "before": null,
+      "after": "a0f01647f0e696504c95bb415a389fc192f2958e"
+    },
+    "docs/bundle-declarative-onboarding/teacher-jdr-implementation.md": {
+      "before": null,
+      "after": "c4c6428a43476989f5c7702893232e21db114902"
+    },
+    "docs/release/README.md": {
+      "before": "cd7858296514a91a892fdb44e03e1715a1625414",
+      "after": "8173bc09dc27542e06792567ae5058d1e9da0827"
+    }
+  },
+  "protectedInputs": {
+    ".github/config/acceptance-scopes.json": "3e712ad61188aac0ec9af4cc4ca99496bde186df",
+    ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e",
+    ".github/release-tools/package.json": "1913b93fbd582fbbd28398488e8e91d6bb9865d5",
+    ".github/scripts/ci-artifact.mjs": "113e99e003bd376bb7a25d617dc299ae54418671",
+    ".github/scripts/exact-candidate-runtime.py": "cd0e30282a029194c25f471963be44f41e9d06c9",
+    ".github/scripts/school-teacher-bindings.json": "cd0ff6c2c87b3c124ea528ebff3abd77224b66b2",
+    ".github/scripts/school-teacher-evidence.json": "6f358e2ad7aefaa32c294f19cbb050b73c34b7c3",
+    ".github/scripts/school-teacher-native-runtime.py": "220f27f8c429590a45ed72e487c196987cde5f29",
+    ".github/scripts/school-teacher-native-runtime.test.py": "b989131402ef4e06fbe5298b28a536ec3f2c027e",
+    ".github/scripts/school-teacher-observer-reuse.cjs": "e67ce7300474f4562e47523539a57c4ac8e4fc53",
+    ".github/scripts/school-teacher-package-bindings.json": "eb4b67110dd3822f4dfc420b2687cb9c75705787",
+    ".github/scripts/school-teacher-package-evidence.json": "c6446d58676a80d4a48566a6358eba034fdb3765",
+    ".github/scripts/school-teacher-package-resume.mjs": "ab47b232b066b2b8cc8061a5a9ea8eb3b36e20e4",
+    ".github/scripts/school-teacher-self-bindings.json": "32a9ac97334735c7d7b663912cef7518bdb645c0",
+    ".github/workflows/ci-school-teacher.yml": "7fe3cebd84c1849c7ffbb48f26c808b79ff742e2",
+    "AGENTS.md": "27d6849de6d3461941a2772b008a28347e933e03",
+    "docs/release/README.md": "8173bc09dc27542e06792567ae5058d1e9da0827",
+    "server-version/backend/Dockerfile": "8dfd85f6e843d964eb192cfdf52addffdc3c4132",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/prisma/schema.prisma": "8beef2106fff0996ba42c9b9bfc3dd94a6e337d6",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/vitest.config.ts": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+    "server-version/frontend/Dockerfile": "45dd87f6a8ed5a5bf45d3ea1e4126ce5e8d9f8b4",
+    "server-version/frontend/nginx.conf": "8d24ece56129c7aedca32deb28f162686952440c",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/src/test/setup.ts": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/vite.config.ts": "ddbe5e7eec913fa3e952e2147666ed72505497e5",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7",
+    "server-version/scripts/ci-install-canvas-deps.sh": "75e8b7f5ce24a53e1c040d105b8b757e3686f102"
+  },
+  "execution": {
+    "buildComponents": [
+      "frontend",
+      "backend"
+    ],
+    "auditComponents": [
+      "frontend",
+      "backend"
+    ],
+    "historicalOfficialReuse": false,
+    "runtime": {
+      "node": "node:24.21.0-bookworm-slim",
+      "nginx": "nginx:1.31.6-alpine3.24-slim",
+      "trivy": "0.70.0",
+      "severity": [
+        "CRITICAL",
+        "HIGH"
+      ],
+      "ignoreUnfixed": true
+    },
+    "officialAuditReuse": 41031648227
+  },
+  "evidence": {
+    "status": "REVIEWED_LOCAL_EVIDENCE_BOUNDED_ORIGINALS",
+    "obligations": [
+      "adult-context-source-and-independent-binding",
+      "approved-jdr-mapping-states-and-self-projection",
+      "normal-install-review-whole-U-FINAL-and-saved-results",
+      "ordinary-collection-and-frozen-history",
+      "generic-four-axis-report-and-development-browser"
+    ],
+    "manifestSha256": "c016b5a7e9b9f6c2337bcee451a28abd7e4fa7186e824a183d79c0c1ddc7a2bd",
+    "reviewSha256": "7804bbaa6832e764f94a4542ada809818907630d5012cbc8b92ebc8d36aa2045",
+    "selectionSha256": "88bb98351efb4794e20e04a17f35c7ec3735e6e468ccddff913c1f0e537dbd94"
+  },
+  "baselineReview": {
+    "recordSha256": "4ca4d0c19315bbedac919ae1cdee815166ed75d9f5db7b644e2e986ae04f3b9b",
+    "record": {
+      "kind": "delegated-baseline-closure-review",
+      "date": "2026-10-30",
+      "reviewer": "Bundle cloud node scoped self-review; DOT background review continues",
+      "authority": "Parent explicitly directed autonomous closure against main31845e3a, reuse valid evidence and no per-commit approval pause.",
+      "priorIndependentReviewRecordSha256": "1d9e2fb4ae69ea79b96142c5984cd9367f435fc3c2363d4672ed9d0969864fa4",
+      "priorFormalRun": 41031648227,
+      "base": "31845e3a14dd5edf6e03c90e7f71c014bcf0aa06",
+      "productHead": "ee72a4a3949652e9dd067bd1cb5d0cd1c27b3bd4",
+      "directBusinessSourceFilesUnchanged": 41,
+      "protectedInputsUnchanged": 32,
+      "applicationSelectionsUnchanged": 23,
+      "change": "New component trees from upstream Survey reporting/catalogs; existing native route retained. New audit-only glue uses existing officialApi/officialZip/verifyCompletedAudit against one exact successful job, unchanged lock/manifests/workflow/audit policies and 24h age.",
+      "controlVerification": "Four directly affected controls PASS once; changed workflow actionlint exit0. Old SAST/main controls and application assertions not replayed.",
+      "limits": [
+        "This baseline glue self-review is not a new DOT independent review or signature. Prior independent core/engine/content review remains explicitly bounded.",
+        "Original cloud artifact HTTP403 is not retried. Normal Actions qualification consumer validates the ZIP privately and emits only its receipt; no ZIP is returned to cloud.",
+        "Both changed component inputs require new actual artifacts/scans and CodeQL. No model/PG/browser/application case replay."
+      ]
+    }
+  }
+}

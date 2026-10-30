@@ -87,7 +87,12 @@ export class BundleDefinitionProvider {
       blockers.push('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')
     }
     const population = entry.definition.population
+    // ADULT_TEACHER explicitly binds the two required boolean declarations.
+    // It covers exactly 18+ without an upper bound, never arbitrary age ranges.
+    const adultSelfDeclared=population.subjectPopulation==='adult' && population.subjectMinAgeYears===18 && population.subjectMaxAgeYears===undefined &&
+      entry.declarativePackage?.schemaVersion===2 && 'kind' in entry.declarativePackage.profile.applicability
     if ((population.subjectMinAgeYears !== undefined || population.subjectMaxAgeYears !== undefined) &&
+        !adultSelfDeclared &&
         !entry.contextDefinition?.fields.some(field => field.contextKey === 'subject_age_years' && field.required && field.valueType === 'number')) {
       blockers.push('AGE_POPULATION_REQUIRES_DECLARED_CONTEXT')
     }

@@ -1,6 +1,14 @@
 import type { DisclosureCapabilitiesV1 } from '../../scale/policy/types'
 import type { DeclarativePackage } from '../onboarding/contract'
 import type { ProfileResult } from './match'
+import type { BundleReportAudienceV1 } from '../types'
+
+/** `student` is the existing Bundle participant-self lane, including Teacher.
+ * Matching a frozen ADULT_SELF report is content selection, never data authority. */
+export function isAdultSelfBundleReport(pack:DeclarativePackage|undefined,contract:{audience?:string;respondent?:string}|undefined,audience:string){
+  return pack?.schemaVersion===2 && pack.report.profileInterpretationContent==='BUNDLE_OWNED_SELF' &&
+    'kind' in pack.profile.applicability && audience==='student' && contract?.audience==='teacher' && contract.respondent==='ADULT_SELF'
+}
 
 export interface ProfileView {
   schemaVersion:'bundle-profile-view-v1'
@@ -14,13 +22,15 @@ export interface ProfileView {
   limitation:string
 }
 /** Server-only dependency intersection. Never send full results for CSS to hide. */
-export function projectProfileView(result:ProfileResult,pack:DeclarativePackage,policies:ReadonlyMap<string,DisclosureCapabilitiesV1|null>,technical:boolean):ProfileView {
+export function projectProfileView(result:ProfileResult,pack:DeclarativePackage,policies:ReadonlyMap<string,DisclosureCapabilitiesV1|null>,technical:boolean,audience?:BundleReportAudienceV1):ProfileView {
   if(pack.schemaVersion!==2)throw new Error('PROFILE_PACKAGE_REQUIRED')
   const model=pack.profile
   const policyFor=(evidenceKey:string)=>policies.get(pack.evidence.find(e=>e.evidenceKey===evidenceKey)?.slotKey??'')
   const corePolicies=model.bindings.map(b=>policyFor(b.evidenceKey))
   const every=(capability:keyof DisclosureCapabilitiesV1)=>corePolicies.length>0 && corePolicies.every(p=>p?.[capability]===true)
-  const interpret=every('individualInterpretations') && every('scoreDerivedLabels')
+  const interpret=pack.report.profileInterpretationContent==='BUNDLE_OWNED_SELF'
+    ? audience==='student' && every('numericScores') && every('individualInterpretations')
+    : every('individualInterpretations') && every('scoreDerivedLabels')
   const numeric=every('numericScores')
   const profile=interpret?model.profiles.find(p=>p.id===result.profileId):undefined
   const view:ProfileView={
