@@ -557,3 +557,15 @@ CI计划：本地仅做上述新报告边界及受影响后端类型检查；生
 本地原始结果：profile-feedback.test.ts首轮10 PASS/exit0；随后仅把历史夹具的model元数据明确绑定旧模板，对应历史case单项1 PASS/exit0（另9项filtered，不计作重跑成功）。后端tsc --noEmit --incremental false实际exit0、0诊断。普通生成器成功登记3包；新0.1.2相对0.1.1只有manifest/profile/report三份内容变化，其他9份原件逐字相同。新包contentHash=ef95136e38c6c2c05956c6ea602644b8ffd39eb36bc63de1fa10fdd0ecc697e9。未安装或发布新包，未访问生产数据库。
 
 Draft首轮run40972703596/source1369d661d在backend job123793241307的Bundle content and immutable history步骤失败；前端类型、mini-program等结果保留，未执行下游backend build。官方日志下载403、未取得字节，不能声称读到官方具体异常；同一标准内容检查在隔离环境实际复现0.1.2缺少ci-fixtures同版本文件的ENOENT（exit1，原结果保留）。这是新增包遗漏正常登记fixture的工程错误。补0.1.2 smoke JSON，输入与0.1.1逐字相同；只readSmoke定向解析新文件实际PASS/exit0，没有重跑类型、报告10例、单项计分或旧完整旅程。未取消断言或修改检查器。原Ready仍是platform，未激活。Notion错误回写因既有同类披露拒绝保持pending，本对话保留原run/job/诊断/修复及下轮只核新fixture登记的清单。
+
+## 24. F01：经既有内容签审的Bundle自有建议
+
+用户已明确批准：具备Bundle内容审核能力的管理员可以批准Bundle自有行动建议；核心画像解释及受众权限仍须允许，不授予读取原量表教育材料的权利。工具继续固定必做，非核心变量只在各自单项报告反馈；不接入Modifier/可选工具/补做或成人模型。本轮没有改授权服务、审核服务、公共目录、School/Survey任务路由或PR392控制。
+
+最小实现是在V2 report中增加可选profileActionContent='BUNDLE_OWNED'声明。既有发布流程本来就要求独立ADMIN、精确contentHash的rights/report等签审，普通分配使用权不能替代这项签审；该新声明及所有建议正文均在原内容哈希内，不增加审核步骤、签名类型或逐被试检查。声明仅指profile.actions的Bundle自有文字，投影不读取源EducationalFeedbackDefinition。profile仍须通过该受众所有核心individualInterpretations与scoreDerivedLabels；不匹配/权限不足时没有建议。未声明该字段的旧包继续原educationalContent交集，不静默改变旧输出。源策略对象及源教育内容保持不变。
+
+只更新本PR尚未安装或发布的0.1.2 DRAFT候选，报告/模板版本升至0.1.2，模型0.1.0和映射0.1.1保持；旧0.1.1目录/哈希及报告不变。新DRAFT内容哈希e89a182bd7a499bbd1d0a23e1b76d28c0d7719145da2f0c50dceb696c7a14e4c；正常安装及独立内容审核发布后，新任务才可消费。没有生成真实审批记录或自动发布。
+
+实际投影样例采用已计算P4的合成呈现输入，不重新运行匹配：学生看到“看重学习，但把握与负担形成拉扯”和既有3条建议（十至十五分钟小任务；定位耗时点求助；连续一周记录进展与承受程度）。实际教师源策略仍WITHHELD且actions=[]；旧0.1.1学生视图仍actions=[]。原前端已显示actions并附教育支持限制说明，未修改前端。
+
+本轮最小验证：4项F01建议/限制/旧版本/内容签审边界，加3项受模板版本影响的既有报告断言，实际7 PASS/exit0；其余7项F02状态断言filtered，保留前轮成功，不冒充本轮执行。合成签审仅用于内存验证，分配者TEACHER和没有有效签审的普通ADMIN均被原发布函数拒绝；无真实DB发布。后端类型检查exit0、0诊断。原模型、入口计分、PG、浏览器及PR388/391观察未重跑。本次只提交推送普通Draft，等待PR392收口，不markReady/激活重型CI；旧Notion披露拒绝继续停止。

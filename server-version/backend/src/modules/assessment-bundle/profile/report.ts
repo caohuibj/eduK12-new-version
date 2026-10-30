@@ -34,7 +34,9 @@ export function projectProfileView(result:ProfileResult,pack:DeclarativePackage,
     })),
     candidates:technical && interpret && numeric && every('methods')?result.candidates.map(c=>({profileId:c.profileId,name:model.profiles.find(p=>p.id===c.profileId)!.name,matchingScore:c.matchingScore})):[],
     alternatives:interpret && result.state==='MIXED'?result.candidates.slice(0,2).map(c=>model.profiles.find(p=>p.id===c.profileId)!.name):[],
-    actions:profile && every('educationalContent')?profile.actions.map(a=>a.text):[],
+    // `profile` already requires this audience's core interpretation/label rights.
+    // Only frozen Bundle text is selected; no source educational material is read.
+    actions:profile && (pack.report.profileActionContent==='BUNDLE_OWNED' || every('educationalContent'))?profile.actions.map(a=>a.text):[],
     methods:every('methods')?{...result.model}:null,
     limitation:'理论试验画像；预设中心与分界尚未经真实人群验证。匹配分不是概率或常模，不用于诊断、排名或能力判断。',
   }

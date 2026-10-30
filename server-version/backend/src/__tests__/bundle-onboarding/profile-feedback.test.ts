@@ -48,9 +48,9 @@ describe('frozen profile status feedback',()=>{
     }
     expect(projectProfileView(result('UNCLASSIFIED'),current,new Map(),false)).toMatchObject({state:'WITHHELD',explanation:null,constructs:[],methods:null})
   })
-  it('keeps matched summaries and source-limited actions unchanged',()=>{
-    const matched=result('MATCHED')
-    expect(projectProfileView(matched,current,policies('subject'),false)).toMatchObject({profileId:'P4',explanation:old.profile.profiles.find(p=>p.id==='P4')!.summary,actions:[]})
+  it('keeps legacy matched summaries and source-limited actions unchanged',()=>{
+    const matched=result('MATCHED',old)
+    expect(projectProfileView(matched,old,policies('subject'),false)).toMatchObject({profileId:'P4',explanation:old.profile.profiles.find(p=>p.id==='P4')!.summary,actions:[]})
   })
   it('reopens the old frozen definition without importing the new template',()=>{
     const frozen=freezeBundleProductionDefinition(packageEntry(old),{frozenAt:'2026-10-29T12:00:00.000Z',sourceReference:'learning_motivation_math_support@0.1.1'})
@@ -62,7 +62,7 @@ describe('frozen profile status feedback',()=>{
     expect(JSON.stringify(frozen)).toBe(bytes)
     expect(hashDeclarativePackage(current)).not.toBe(hashDeclarativePackage(old))
     expect({...current.profile,templateVersion:old.profile.templateVersion}).toEqual(old.profile)
-    expect(current.report.version).toBe('0.1.1');expect(current.profile.templateVersion).toBe('0.1.1')
+    expect(current.report.version).toBe('0.1.2');expect(current.profile.templateVersion).toBe('0.1.2')
     expect(current.publication.requestedStatus).toBe('DRAFT')
   })
   it('freezes feedback in the package hash and requires a complete bounded state template',()=>{
@@ -71,7 +71,7 @@ describe('frozen profile status feedback',()=>{
     const incomplete=structuredClone(current) as unknown as {report:{profileStateExplanations:Record<string,string>}}
     delete incomplete.report.profileStateExplanations.INVALID
     expect(()=>parseDeclarativePackage(incomplete)).toThrow()
-    const mismatched=structuredClone(current);mismatched.report.version='0.1.2'
+    const mismatched=structuredClone(current);mismatched.report.version='0.1.3'
     expect(()=>parseDeclarativePackage(mismatched)).toThrow()
   })
 })

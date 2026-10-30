@@ -1,6 +1,6 @@
 {
   "key": "learning_motivation_math_support_report",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "locale": "zh-CN",
   "blocks": [
     {
@@ -52,5 +52,6 @@
     "UNCLASSIFIED": "现有理论组合还不足以充分概括这次结果。学习体验可以有不同组合，可先结合已获准展示的单项结果理解本次情况。",
     "MIXED": "本次结果与两种理论组合较为接近，暂不选定单一画像。可以结合已获准展示的单项结果，看看哪些描述更贴近近期的学习体验。",
     "BOUNDARY": "本次结果处在现有理论组合的边界附近，暂不足以清楚归入其中一种。可以先结合已获准展示的单项结果理解本次的学习体验。"
-  }
+  },
+  "profileActionContent": "BUNDLE_OWNED"
 }

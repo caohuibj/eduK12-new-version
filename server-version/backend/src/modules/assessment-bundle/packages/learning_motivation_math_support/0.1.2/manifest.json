@@ -60,7 +60,7 @@
     "contextDefinitionKey": "learning_motivation_math_context",
     "contextDefinitionVersion": "0.1.0",
     "reportDefinitionKey": "learning_motivation_math_support_report",
-    "reportDefinitionVersion": "0.1.1",
+    "reportDefinitionVersion": "0.1.2",
     "publicationRequirements": {
       "scientificGate": true,
       "rightsGate": true,

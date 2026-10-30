@@ -3,7 +3,7 @@
   "key": "learning_motivation_math_support",
   "version": "0.1.0",
   "mappingVersion": "0.1.1",
-  "templateVersion": "0.1.1",
+  "templateVersion": "0.1.2",
   "algorithm": "weighted-l1-guarded-v1",
   "maturity": "EXPERIMENTAL",
   "sourceArchiveHash": "d6583c15ae4e6de3e88a42d51c09f4aa588aced07dd38c6e064b723f7c1c01e0",

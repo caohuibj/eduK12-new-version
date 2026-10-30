@@ -1039,7 +1039,7 @@
         "contextDefinitionKey": "learning_motivation_math_context",
         "contextDefinitionVersion": "0.1.0",
         "reportDefinitionKey": "learning_motivation_math_support_report",
-        "reportDefinitionVersion": "0.1.1",
+        "reportDefinitionVersion": "0.1.2",
         "publicationRequirements": {
           "scientificGate": true,
           "rightsGate": true,
@@ -1131,7 +1131,7 @@
     },
     "report": {
       "key": "learning_motivation_math_support_report",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "locale": "zh-CN",
       "blocks": [
         {
@@ -1176,6 +1176,7 @@
         "limited": "作答或测量证据有限，仅阅读可支持的单项信息。",
         "unavailable": "当前证据或权限不足以形成综合画像。"
       },
+      "profileActionContent": "BUNDLE_OWNED",
       "profileStateExplanations": {
         "INSUFFICIENT": "本次用于组合分析的信息还不完整，暂不形成综合画像。你仍可查看已获准展示的单项结果。",
         "INVALID": "本次部分结果未满足组合分析所需的计算或质量条件，暂不形成综合画像。你仍可查看已获准展示的单项结果。",
@@ -1384,7 +1385,7 @@
       "key": "learning_motivation_math_support",
       "version": "0.1.0",
       "mappingVersion": "0.1.1",
-      "templateVersion": "0.1.1",
+      "templateVersion": "0.1.2",
       "algorithm": "weighted-l1-guarded-v1",
       "maturity": "EXPERIMENTAL",
       "sourceArchiveHash": "d6583c15ae4e6de3e88a42d51c09f4aa588aced07dd38c6e064b723f7c1c01e0",
