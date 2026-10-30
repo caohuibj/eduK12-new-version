@@ -106,3 +106,7 @@ Git 替身漏基线控制 blob，修正后只续验四个依赖该替身的 case
 没有复制或换路执行。当前 admission 明确保留这项 open acceptance，不宣称全任务完成。
 目录容量观察：`standard-combination-use.ts` 超过 100 个候选且 overflow 时会使前 100 个
 PRECISE 项均不可选。尚无本轮真实故障，留作后续按工具/分页处理，不新增本轮改造或压测。
+
+## 最终 main 目录增量对齐
+
+Draft PR #401 创建后只读发现 main 前移至 `5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb`（PR398）。正常合并产品 checkpoint `d38e1e74897cb56120b69fed0d9f170e5de3b3d8`；增量仅3个非可执行 COPSOQ 目录 source/index 与文档，未改接口、计分器、报告消费者、schema、锁或控制。后端tree因正常目录新增而变化，前端tree相同。上述双R原执行保持原main407输入/身份，不改标成新执行。目录项没有 executable，不参与本次CFQ/3材料注册；不重跑seed、FINAL、类型或旧链。候选完整source/component/control改绑后，仅补一次实际Git元数据检查，仍disabled。此前1000dc95审阅包保持其不可变身份，其应用原件/控制逻辑不变；最终base/head另给出。

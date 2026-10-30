@@ -560,9 +560,9 @@
       "schemaVersion": 1,
       "pr": "task1",
       "enabled": false,
-      "base": "40799e96f34d12047f31507ca2eba87e31fc08d3",
-      "product": "dd7715ede027287df109e9ae801698a3c49a6d69",
-      "controlCheckpoint": "e6e377657a584cf04c3942ef55990d1508a32e2e",
+      "base": "5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb",
+      "product": "d38e1e74897cb56120b69fed0d9f170e5de3b3d8",
+      "controlCheckpoint": "d38e1e74897cb56120b69fed0d9f170e5de3b3d8",
       "source": {
         "docs/precise-authorization-20261029/approved-scale-axes-progress.md": {
           "before": null,
@@ -2012,7 +2012,7 @@
         "docs/precise-authorization-20261029/ci-control-raw.json": null
       },
       "components": {
-        "backend": "211a96d6e70078cf78e08ddaa4eb87d037eba476",
+        "backend": "44013860f1c6ead94f1c4b63491f0f122b01abaa",
         "frontend": "44ac407e011dd17be8636b439b440a4d152b3304"
       },
       "activationNote": "Disabled pending independent review of newly completed real same-C/P dual-nonempty-R evidence and its exact control/source update; no formal CI or merge qualification."
