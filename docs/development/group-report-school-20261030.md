@@ -1,6 +1,6 @@
 # School 群体报告中间检查点（2026-10-30）
 
-独立于 PR404/408，base `296c941419d76b360405c2c487d10514cd5c530e`，产品提交 `cd19b063615726e5b517045746dfe721ee78d512`。当前不是合并候选，准备为代码审阅建立独立 Draft；未激活正式 CI。
+独立于 PR404/408，base `296c941419d76b360405c2c487d10514cd5c530e`，产品提交 `cd19b063615726e5b517045746dfe721ee78d512`。当前不是合并候选，已建立独立 Draft PR414供代码审阅；未激活正式 CI。
 
 现有 Organization 统计、cohort、Artifact 和 School 路由上升级：按实际 slot/工具定义先定位后取指标；当前完成父结果的 epoch 下推查询，不读取旧 epoch；新增 V2 artifact 保存叶来源、单位、实际人数下限、范围文字与描述版本，V1 字节形状保留。School 真实工作台接入单维班级/同维人员标签 OR、历史版本读取、共享阅读/全屏/打印。staff-class 适配只补成员关系能力，尚不代表 Teacher 入口已完成。
 
@@ -25,3 +25,5 @@
 ## 同步已验依赖后的继续节点
 
 main318与 Training候选20de08b63 已在 `42e2a40d908cef7e3e0c4a52eeb1975c7079301a` 无冲突合入。没有修改PR408冻结候选。当前backend树 `d11a452cf25da1465fbb745a6a7c5f86aab8fe29` 因依赖素材索引发生变化，尚未补当前完整树编译；保留旧95baa隐私修订源码的真实exit0，不把旧树说成新树。frontend83917ae未变，复用原types/browser。待实际School服务生成/持久化/读取旅程与产品修订完成后，再冻结当前必要检查，不为每次依赖合入机械重跑。Teacher真实入口、Form及其他runtime仍待后续。
+
+Draft审阅：https://github.com/caohuibj/eduK12-new-version/pull/414 。Training依赖PR408的正式41035994222四作业成功记录放在本后续分支 main-alignment/formal-result.json，不为补记录改动已资格通过的20de08b63。School实际PG服务旅程及当前最终编译仍在后续收口范围，未交合并。
