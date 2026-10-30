@@ -1,0 +1,9 @@
+npm warn Unknown env config "jobs". This will stop working in the next major version of npm.
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm.
+npm warn Unknown env config "nodedir". This will stop working in the next major version of npm.
+
+/workspace/eduK12-new-version/server-version/frontend/src/school/SchoolGroupReports.tsx
+  45:25  warning  The ref value 'request.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'request.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+

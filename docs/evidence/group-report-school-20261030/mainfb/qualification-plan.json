@@ -1,0 +1,26 @@
+{
+  "status": "PREPARED_NOT_NEW_MAIN_FORMAL_RESULT",
+  "pr": 414,
+  "base": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+  "productCheckpoint": "f736217fc2426cbcee35b602eafbed43a5a16164",
+  "components": {
+    "backend": "dc9a331f08901238236ec3664e3173aba3f15030",
+    "frontend": "cba77e36ec1ba531a20f7775ea00a34c91699fe5"
+  },
+  "selectedJobs": [
+    "scope",
+    "reviewed onboarding evidence admission",
+    "CodeQL javascript-typescript",
+    "merge gate / ready PR"
+  ],
+  "existingRoute": "onboarding-structure",
+  "distinctOriginalObservations": 41,
+  "businessPgOrBrowserReexecuted": false,
+  "schemaTree": {
+    "base": "f1f1e99ca9f1ca20541da05b3ba2ddbcd987b240",
+    "candidate": "f1f1e99ca9f1ca20541da05b3ba2ddbcd987b240"
+  },
+  "ciYamlChangeFromMainfa": "Only personal-tracking branch/route SAST/audit/lint selection changed upstream; the existing School admission job remains unchanged. Exact new base/control bindings still mandatory.",
+  "sastReuseBoundary": "Existing supported original-SAST reuse requires unchanged component trees; main406 changes both combined components, so retain original findings and run only existing selected affected SAST, not a platform scan.",
+  "publication": "Existing Ready PR414 synchronizes once after complete object/hash and expected old-head verification; no merge/deploy."
+}

@@ -1,0 +1,17 @@
+{
+  "source": "791ee465e20eb1c40f1d376035bc2c24bfffe5cc",
+  "component": "backend",
+  "componentTree": "9d62dc4ab03f8ca135656d2df74a2455558b1f7c",
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "node": "v24.21.0",
+  "startedAt": "2026-10-30T09:25:59.758Z",
+  "finishedAt": "2026-10-30T09:26:32.406Z",
+  "exitCode": 2,
+  "signal": null,
+  "logSHA256": "9c36ce4f57e75ca0bba0aae8fef0097bbfffa88083c1636d7f4b5b5f79953476",
+  "ciExecuted": false
+}
