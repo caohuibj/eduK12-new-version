@@ -59,3 +59,9 @@ V2 已按 max(父冻结/任务请求、叶内容合同、科学方案) 传播现
 目录修订产品检查点 a2b20a6e66ac68fd38ca8c37b9128613c2a725f4 的 backend tree 95198c4740897cb76e4fddb8db8dbd78a232f1e7 已实际编译一次，exit0。frontend仍是7db01e8f旧已验tree，没有重编译。资格用例索引增至41个不同具名观察（39单元/模拟HTTP+2保留PG），新增的仅上述2项，不把旧37重播。接下来仅补现有固定候选绑定和受影响控制验证。
 
 PR414正式路线仅扩展既有onboarding-structure固定候选：完整白名单源/模式/组件绑定、原本地报告和当前类型接纳、School实际服务/浏览器原件校验、现有精确CodeQL及稳定gate。未新增workflow或应用重播。新增一项固定候选/原件控制用例已通过；其他控制用例filtered，现有扫描和gate成功要求保留。配置绑定完成前不激活CI。
+
+## mainfa 个人纵向主线对齐
+
+在下次正式冻结前一次性无冲突合入main fa038041c47b275d30ccb8b8b01ab019615906e0，检查点7cc7edb045f04981c6d64df65c5fa0290f7a109b。没有修改个人纵向/Survey公共契约，不插入群体纵向开发；ci.yml保留主线个人路线，School仅追加原CodeQL选择的414候选值。
+
+主线增加Prisma schema后仅生成当前client；未执行数据库迁移或PG重播。实际一次当前backend tree2342ff04dd851b9c82383fd5835f35935ecb67fa编译与frontend tree3346bc7d97cb4fb66560e25719f8d7d56f7e61c8 app类型检查均exit0。旧类型结果保留原tree归属，不改写成功身份。原41个具名观察不重跑；最新类型、精确产品diff及资格计划位于mainfa目录。固定候选绑定仍禁用，尚未正式CI/Ready/合并/部署。

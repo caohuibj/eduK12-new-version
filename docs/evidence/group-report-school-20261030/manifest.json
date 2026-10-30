@@ -1,10 +1,10 @@
 {
   "status": "PREPARED_NOT_MERGE_READY",
-  "base": "55fab18e9933e58dcb800b20156f5b7e48858536",
-  "productHead": "a2b20a6e66ac68fd38ca8c37b9128613c2a725f4",
+  "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+  "productHead": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
   "componentTrees": {
-    "backend": "95198c4740897cb76e4fddb8db8dbd78a232f1e7",
-    "frontend": "7db01e8ff09cd4f5865e99fbb0438f2f4ff6caea"
+    "backend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+    "frontend": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8"
   },
   "localTypes": [
     {
@@ -49,6 +49,22 @@
       "componentTree": "95198c4740897cb76e4fddb8db8dbd78a232f1e7",
       "exitCode": 0,
       "sourceCheckpoint": "a2b20a6e66ac68fd38ca8c37b9128613c2a725f4",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "backend",
+      "report": "mainfa/backend-types.json",
+      "componentTree": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+      "exitCode": 0,
+      "sourceCheckpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "frontend",
+      "report": "mainfa/frontend-types.json",
+      "componentTree": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8",
+      "exitCode": 0,
+      "sourceCheckpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
       "originalExecutionSigned": false
     }
   ],
@@ -295,6 +311,40 @@
     "group-discovery-backend-types.log": {
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0
+    },
+    "mainfa/backend-types.json": {
+      "sha256": "dd458fa11d29e5c4e63bd36987d6abff9d76b996d1ee3508083c6330b9b962bc",
+      "bytes": 492
+    },
+    "mainfa/backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfa/frontend-types.json": {
+      "sha256": "676d4b28428ce44964d660035e9046b5b58ef07e629302ccfac1ab105c9288e4",
+      "bytes": 528
+    },
+    "mainfa/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfa/qualification-plan.json": {
+      "sha256": "aa3dae1e77a31a8dd541f35bb83ce62d46548105e00f86e19ec5ed0262e8df31",
+      "bytes": 2681
+    },
+    "mainfa/source-diff.raw": {
+      "sha256": "f91bfc34aa4ca246555f804bc2c9a41ddd5ccedda5d071809274cca151469d44",
+      "bytes": 17809
+    },
+    "mainfa/prisma-generate.log.gz": {
+      "sha256": "1ba4d378849898d61ba6b45e4d139c833d4fe51730199a33446e56a66f57f688",
+      "bytes": 242,
+      "transport": "lossless gzip; original trailing blank lines preserved",
+      "originalSHA256": "83e77ef372e807271b890e2150324d024ecf2bbac53f7f231b47a8510e79ad25"
+    },
+    "mainfa/receipt-review.json": {
+      "sha256": "0bc318b2af1cc16f7d95f32235f4e88767638c3d0e457ad8d207739ce2fc0632",
+      "bytes": 806
     }
   },
   "ciExecuted": false,
@@ -344,14 +394,14 @@
     ]
   },
   "qualificationPreparation": {
-    "plan": "main55-qualification-plan.json",
+    "plan": "mainfa/qualification-plan.json",
     "deduplicatedCases": "qualification-case-inventory.json",
     "distinctNamedPassed": 41,
     "unitAndMockHttp": 39,
     "retainedPg": 2,
     "businessChecksReexecuted": false,
     "formalActivation": false,
-    "remainingControlWork": "Extend the existing exact onboarding candidate configuration for PR414; no new workflow or broad fallback."
+    "remainingControlWork": "Final actual candidate binding verification and checklist/live PR identity before activation; existing fixed route only."
   },
   "groupDiscoveryContractFix": {
     "scope": "School GROUP source catalog uses actual audience and frozen parent GROUP contract; leaf tools require the same parent ceiling and a resolvable leaf GROUP contract/metric keys",
@@ -361,5 +411,15 @@
     "old37AndPgReexecuted": false,
     "backendTypes": "group-discovery-backend-types.json: one actual current backend compile exit0; no frontend replay.",
     "frontendChanged": false
+  },
+  "mainfaIntegration": {
+    "main": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "checkpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+    "conflicts": false,
+    "sharedPersonalFilesModifiedByThisNode": false,
+    "prismaClientGenerated": true,
+    "databaseMigrationApplied": false,
+    "oldBusinessTestsReexecuted": false,
+    "groupLongitudinalStarted": false
   }
 }
