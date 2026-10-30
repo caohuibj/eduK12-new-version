@@ -1,0 +1,96 @@
+{
+  "recordedAt": "2026-10-30T08:19:24.214047+00:00",
+  "run": 41024022582,
+  "attempt": 1,
+  "status": "completed",
+  "conclusion": "success",
+  "source": {
+    "schema": 1,
+    "route": "onboarding-structure",
+    "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
+    "head": "4a8875a3e3efaec5ed19c6fc1638dccc0786690c",
+    "sourceHead": "7c7c4021af5cfe5646c428e43908a347c5531f72",
+    "tree": "dd55be27be6ee4a39d6170b3297e03a27ce9ae44",
+    "product": "78899e7fefc1ea6ca14ca4d144f6a37bb275472e",
+    "components": {
+      "backend": "b81911415277e35b673dc95300720043ac8ac796",
+      "frontend": "dbbeb1ec1230710d5c9108e1f4be7dd42768efdd"
+    },
+    "controlCheckpoint": "0e2731f62fe2f45ae01e21cfb5679fdf21eb0cfd",
+    "pr": 404,
+    "postMerge": false,
+    "draft": false
+  },
+  "jobs": [
+    {
+      "id": 123957757861,
+      "name": "classify changed content",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 123957863365,
+      "name": "codeql (javascript/typescript SAST)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 123957864239,
+      "name": "reviewed onboarding evidence admission",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 123958267777,
+      "name": "merge gate / ready PR",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "newControlCases": {
+    "passed": 2,
+    "failed": 0,
+    "filtered": 0,
+    "primaryExecution": "GitHub Actions admission job"
+  },
+  "testsExecutedInCI": false,
+  "artifacts": [
+    {
+      "id": 12962643902,
+      "name": "onboarding-sast-4a8875a3e3efaec5ed19c6fc1638dccc0786690c",
+      "bytes": 71840,
+      "officialMetadataDigest": "sha256:d7e03dae46e2bfe038138ca1f088b6efd34f0849b915344e42f9b6ac47ba8b9d",
+      "zipDownloaded": false,
+      "digestMatchedToLocalBytes": false
+    },
+    {
+      "id": 12962043928,
+      "name": "onboarding-admission-4a8875a3e3efaec5ed19c6fc1638dccc0786690c",
+      "bytes": 4892,
+      "officialMetadataDigest": "sha256:e3e32794ae3fe82efaeffc9d1059058eb50973db2b77f14c3bd6e7314636db8f",
+      "zipDownloaded": false,
+      "digestMatchedToLocalBytes": false
+    }
+  ],
+  "downloadBlocker": {
+    "action": "GET official GitHub Actions artifact ZIP, following its official redirect",
+    "artifactIds": [
+      12962043928,
+      12962643902
+    ],
+    "redirectHost": "productionresultssa7.blob.core.windows.net",
+    "result": "HTTP 403 Forbidden",
+    "state": "denied; both local output files are zero bytes",
+    "cause": "Underlying storage/proxy authorization cause unknown; runtime diagnostics retained no record",
+    "stopped": true,
+    "alternateRouteAttempted": false,
+    "retryAttempted": false,
+    "signedURLOrCredentialRecorded": false
+  },
+  "remainingEvidenceGap": [
+    "Artifact ZIP byte/digest match unavailable",
+    "SARIF content and alert triage not inspected"
+  ],
+  "mergePerformed": false,
+  "deploymentPerformed": false
+}

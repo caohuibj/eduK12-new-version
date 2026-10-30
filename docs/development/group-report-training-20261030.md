@@ -118,3 +118,30 @@ frontend app types、四个受影响源文件 lint 均 exit 0。
 修对应构建入口后首次产出本次课程夹具；没有重跑旧全屏/打印/174 项。
 证据位于 `docs/evidence/group-report-training-20261030/course-entry/`。
 PR404 的 main/正式资格工作仍在其独立分支进行，本修订不混入该候选。
+
+## 对齐 PR404 正式候选与 main8cf
+
+入口修订后在干净节点合入 PR404 `7c7c4021af5cfe5646c428e43908a347c5531f72`，
+merge `4327eb5e8a6c4b9f76220d8f5397cb8684d1db8a`，无冲突。
+其祖先含 main8cf/PR407；只做合并后的 backend/frontend app types，各实际 exit0。
+组件 tree 分别为 backend `972a8ca1efe8bcb8f28eb256294de96b221d3c49`、
+frontend `509e0d9f6303c945f7569087140ecdc5017c514e`。
+旧 174 + 新课程路由 1 共175个不同成功case未重跑，原生migration/restore未重复。
+
+PR404 正式限定 run41024022582 attempt1已实际成功：scope123957757861、
+admission123957864239、CodeQL123957863365、Ready gate123958267777全部SUCCESS。
+实际 GitHub checkout是 `4a8875a3e3efaec5ed19c6fc1638dccc0786690c`，
+不是此前明确标记为本地预览的 a81；source7c/base8cf、tree dd55一致。
+CI只首次执行两个控制合同2PASS，接纳88个本地case原件，没有重播业务检查。
+
+官方admission12962043928、SAST12962643902元数据可读；下载ZIP在官方Azure重定向
+返回HTTP403。已停止、不重试、不换工具路径；零字节输出不作zip/hash校验。
+因此没有声称官方ZIP与digest已匹配，也没有声称SARIF已逐项检查或零告警。
+阻碍仅此下载动作，原因更深层未知；运行状态/实际计划/必需门禁成功已有官方API与job日志支持。
+脱敏结果见 `docs/evidence/group-report-training-20261030/main-alignment/pr404-formal-result.json`，
+不保存带签名的临时URL或凭据。
+
+PR408仍为独立stacked Draft。PR404未经用户确认尚未merge；不擅自retarget到main激活含两批
+大差异的CI，不为feature-base新增workflow/门禁。待第一批实际进入main后，按真实完整差异
+确定本批缺失正式检查，复用当前未变的175项原件。独立/Bundle叶消费、School/Teacher与子群、
+预配置群体纵向仍在清单；没有把本课程普通组合通过表述为全部来源完成。
