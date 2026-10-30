@@ -1,0 +1,1 @@
+{"status":"PASSED","scope":"corrected synthetic old-row SQL against existing isolated migrated test database","linkageConfirmed":true,"opaqueFinalInserted":true,"rolledBack":true,"migrationsReplayed":false,"nativeRestoreExecuted":false,"applicationJourneyReplayed":false}

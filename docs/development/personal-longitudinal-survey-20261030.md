@@ -498,3 +498,26 @@ indexes and triggers, matching the existing group native approach. Native custom
 dump/restore still covers the full database; exact opaque old report/attempt/
 publication bytes and changed guards remain verified. No global SQL text
 normalization or assertion deletion. Original failed logs remain retained.
+
+### Linkage fixture continuation, no application replay
+
+Official run41037266506/source af8/execution bb54 has successful scope,
+CodeQL124001202537 and production images124001203658. Native124001203409
+applied exact-main migrations, then the synthetic closed Wave INSERT failed
+the pre-existing explicit linkage-disclosure gate. Original logs retained.
+The fixture now sets linkage_notice_confirmed=true. A local rollback-only
+check on the existing isolated migrated test DB additionally found the old
+placeholder research code violated its original R-[A-Z0-9]{8,32} check; it
+was corrected to R-SYNTHETIC, and the exact shared six-row SQL now passes.
+Opaque FINAL insertion verified; all synthetic rows rolled back. This is not
+a migration/restore qualification or a repeat of an application journey.
+
+Same-af8 image inputs/producer are reused through the existing strict receipt.
+The current CodeQL job authenticates original successful application extraction
+with exact full server-version tree/source/job/required steps and24h age, then
+scans only the changed personal-tracking-ready.mjs controls. A new targeted
+positive/failed/missing/wrong-source/expired receipt contract passed; original
+application SAST findings/disposition are not changed. Existing audit success
+remains retained. Main31845 is unchanged. Only missing native/frontend checks
+remain; no CI activation until required Notion failure/checking-list append
+and exact-target writes succeed under the newly supplied authorization.

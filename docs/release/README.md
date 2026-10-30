@@ -2038,3 +2038,12 @@ opaque old facts plus DDL for the three changed Survey tables, indexes,
 constraints and triggers. The existing group native evidence documents unrelated
 PostgreSQL16.15 CHECK-expression reserialization; no platform-wide textual DDL
 equality claim is made.
+
+PR399's af8 run41037266506 produced successful official images and full selected
+application SAST for unchanged main31845 production inputs. A fixture-only
+continuation authenticates those exact original jobs and24h metadata. Current
+SAST still executes for changed personal-tracking-ready.mjs controls; original
+findings are retained without disposition changes. Native old-row fixture
+explicitly confirms linkage and uses a valid synthetic research code, honoring
+existing database guards. Local rollback-only fixture validation is not claimed
+as official migration/restore qualification.

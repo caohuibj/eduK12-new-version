@@ -403,7 +403,7 @@ jobs:
           node-version: '24.21.0'
       - name: fetch the immutable reviewed personal tracking source
         if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'feat/personal-longitudinal-survey-20261030'
-        run: git fetch --no-tags --depth=1 origin a62c9a5763da69aa13b4f70d062b0bf55d6db65f 571a14b73ef81148913f5ff1666e7e461f2f4b92
+        run: git fetch --no-tags --depth=1 origin a62c9a5763da69aa13b4f70d062b0bf55d6db65f 571a14b73ef81148913f5ff1666e7e461f2f4b92 af8fad552f776615afaa1e91e57a012768021bca
       - name: fetch the exact diff base without full history
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -1461,12 +1461,20 @@ jobs:
       - name: bound personal tracking SAST without extending the inline expression
         id: personal-codeql-config
         if: needs.scope.outputs.application_route == 'personal-tracking'
-        shell: node {0}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PERSONAL_TRACKING_PLAN: ${{ needs.scope.outputs.personal_tracking_plan }}
         run: |
-          const fs=require('node:fs');
-          const paths=['server-version/backend/src/modules/survey','server-version/backend/src/modules/reporting/personal-tracking.ts','server-version/frontend/src/survey','server-version/frontend/src/modules/reporting','.github/scripts/personal-tracking-ready.mjs','.github/scripts/personal-tracking-draft-scope.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs'];
-          for(const path of paths)fs.statSync(path);
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify({paths})+'\n');
+          git fetch --no-tags --depth=1 origin af8fad552f776615afaa1e91e57a012768021bca
+          node --input-type=module <<'JS'
+          import {appendFileSync,statSync} from 'node:fs';
+          import {verifyOriginalApplicationSast} from './.github/scripts/personal-tracking-ready.mjs';
+          const receipt=await verifyOriginalApplicationSast(JSON.parse(process.env.PERSONAL_TRACKING_PLAN));
+          console.log(JSON.stringify(receipt));
+          const paths=['.github/scripts/personal-tracking-ready.mjs'];
+          for(const path of paths)statSync(path);
+          appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify({paths})+'\n');
+          JS
       - name: initialize CodeQL
         if: steps.appearance-codeql-reuse.outputs.reused != 'true' && needs.scope.outputs.application_route != 'pr364'
         uses: github/codeql-action/init@v3

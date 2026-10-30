@@ -26,8 +26,9 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
  assert.deepEqual(entries.filter(e=>e.file.startsWith('server-version/')).map(e=>e.file).sort(),Object.keys(binding.files).sort());
  for(const [file,blob]of Object.entries(binding.protectedInputs))assert.equal(git('rev-parse',head+':'+file),blob,'Dependency/build input changed');
  if(binding.imageReuse){assert.equal(git('rev-parse',head+':server-version'),binding.imageReuse.serverVersionTree,'Image source tree changed');assert.equal(git('rev-parse',binding.imageReuse.sourceHead+':server-version'),binding.imageReuse.serverVersionTree);for(const [file,blob]of Object.entries(binding.imageReuse.inputs))assert.equal(git('rev-parse',head+':'+file),blob,'Original image producer input changed');}
+ if(binding.applicationSastReuse)assert.equal(git('rev-parse',head+':server-version'),binding.applicationSastReuse.serverVersionTree,'Original SAST application input changed');
  if(binding.backendAuditReuse)for(const file of ['server-version/backend/package.json','server-version/backend/package-lock.json'])assert.equal(git('rev-parse',binding.backendAuditReuse.sourceHead+':'+file),git('rev-parse',head+':'+file),'Original backend audit input changed');
- return {schemaVersion:1,route:'personal-tracking',base,head,tree:git('rev-parse',head+'^{tree}'),draft:draft===true,reviewedCandidate:binding.reviewedCandidate,...(binding.imageReuse?{imageReuse:binding.imageReuse}:{}),...(binding.backendAuditReuse?{backendAuditReuse:binding.backendAuditReuse}:{}),required:draft?['scope']:['scope','personal-tracking',...(binding.imageReuse?[]:['docker']),'codeql']};
+ return {schemaVersion:1,route:'personal-tracking',base,head,tree:git('rev-parse',head+'^{tree}'),draft:draft===true,reviewedCandidate:binding.reviewedCandidate,...(binding.imageReuse?{imageReuse:binding.imageReuse}:{}),...(binding.backendAuditReuse?{backendAuditReuse:binding.backendAuditReuse}:{}),...(binding.applicationSastReuse?{applicationSastReuse:binding.applicationSastReuse}:{}),required:draft?['scope']:['scope','personal-tracking',...(binding.imageReuse?[]:['docker']),'codeql']};
 }
 export function personalTrackingReadyOutputs(plan){const out=participantAccessOutputs(plan);delete out.participant_access_plan;return {...out,application_route:'personal-tracking',scenario:'personal-tracking',codeql:!plan.draft,personal_tracking_plan:JSON.stringify(plan),personal_tracking_draft:false};}
 export async function admitOriginalReports(read=readFileSync){
@@ -69,11 +70,33 @@ export async function verifyOriginalBackendAudit(plan,fetcher=fetch,now=Date.now
  const originalWorkflow=execFileSync('git',['show',proof.sourceHead+':.github/workflows/ci.yml'],{encoding:'utf8'});const block=originalWorkflow.slice(originalWorkflow.indexOf('- name: '+proof.step),originalWorkflow.indexOf('- name: real nonempty main upgrade'));assert(block.includes('npm audit --audit-level=high'),'Original audit threshold changed');
  return {status:'ADMITTED_BACKEND_AUDIT_ONLY',runId:proof.runId,jobId:job.id,sourceHead:proof.sourceHead,originalJobConclusion:job.conclusion,step:proof.step,completedAt:step.completed_at,ciExecutedInOriginalRun:true,reexecuted:false};
 }
+/** The original complete application extraction is retained. Changed controls
+ * are still analyzed by the current CodeQL job; findings are not disposed here. */
+export async function verifyOriginalApplicationSast(plan,fetcher=fetch,now=Date.now()){
+ const proof=plan.applicationSastReuse;assert(proof&&JSON.stringify(proof)===JSON.stringify(binding.applicationSastReuse));assert(process.env.GH_TOKEN);
+ assert.equal(git('rev-parse','HEAD:server-version'),proof.serverVersionTree);
+ assert.equal(git('rev-parse',proof.sourceHead+':server-version'),proof.serverVersionTree);
+ const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official original SAST metadata inaccessible');const job=await response.json();
+ assert.equal(job.run_id,proof.runId);assert.equal(job.head_sha,proof.executionHead);assert.equal(job.name,'codeql (javascript/typescript SAST)');assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
+ const age=now-Date.parse(job.completed_at);assert(Number.isFinite(age)&&age>=-300000&&age<=proof.maximumAgeHours*3600000,'Original application SAST expired');
+ for(const name of ['bound personal tracking SAST without extending the inline expression','initialize CodeQL','analyze with CodeQL'])assert.equal(job.steps.find(s=>s.name===name)?.conclusion,'success','Original application SAST step failed');
+ const original=execFileSync('git',['show',proof.sourceHead+':.github/workflows/ci.yml'],{encoding:'utf8'});for(const path of proof.paths)assert(original.includes("'"+path+"'"),'Original extraction path missing');
+ return {status:'ADMITTED_APPLICATION_SAST_ONLY',runId:proof.runId,jobId:proof.jobId,sourceHead:proof.sourceHead,executionHead:proof.executionHead,serverVersionTree:proof.serverVersionTree,paths:proof.paths,reexecuted:false,findingsDispositionChanged:false};
+}
 export function prepareMainSchema(temporary){
  const file=resolve(temporary,'main-schema.tar');
  execFileSync('git',['archive','--format=tar','--output',file,binding.base,'server-version/backend/prisma']);
  execFileSync('tar',['-xf',file,'-C',temporary]);
  return resolve(temporary,'server-version/backend/prisma/schema.prisma');
+}
+/** Synthetic old rows honor the existing LINKED_WAVES disclosure gate. */
+export function nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}){
+ return `INSERT INTO survey_projects(id,owner_user_id,title,collection_mode,status) VALUES ('${id}','${owner}','native upgrade sentinel','LINKED_WAVES','ACTIVE');
+   INSERT INTO survey_publications(id,project_id,definition_digest,compiled_snapshot,consent_version,version) VALUES ('${publication}','${id}','${digest}','{"schemaVersion":1,"synthetic":true}',1,1);
+   INSERT INTO survey_waves(id,project_id,publication_id,ordinal,title,status,consent_text,linkage_notice_confirmed) VALUES ('${wave}','${id}','${publication}',1,'T1','CLOSED','Synthetic isolated schema preservation fixture',true);
+   INSERT INTO survey_participants(id,project_id,research_code,credential_hash) VALUES ('${participant}','${id}','R-SYNTHETIC','${digest}');
+   INSERT INTO survey_wave_attempts(id,project_id,wave_id,participant_id,status,completed_at) VALUES ('${attempt}','${id}','${wave}','${participant}','COMPLETED',CURRENT_TIMESTAMP);
+   INSERT INTO survey_wave_finals(id,attempt_id,project_id,wave_id,publication_id,submission_id,payload_hash,definition_digest,results_cipher,results_hash) VALUES ('${final}','${attempt}','${id}','${wave}','${publication}','${randomUUID()}','${digest}','${digest}','synthetic-opaque-old-report','${digest}');`;
 }
 async function nativeDatabase(){
  const service=process.env.PG_SERVICE;assert(service&&/^[a-zA-Z0-9_.-]+$/.test(service));
@@ -90,12 +113,7 @@ async function nativeDatabase(){
   try{await db.user.create({data:{id:owner,username:login,passwordHash:'synthetic-schema-fixture-not-a-login',role:'TEACHER',accountDomain:'SURVEY'}});await db.surveyAccount.create({data:{userId:owner,loginName:login,normalizedLogin:login}});}finally{await db.$disconnect()}
   // Nonempty old-schema SQL fixture, not a repeated application journey or a
   // claim of a newly accepted scientific FINAL. Opaque original bytes survive.
-  sql(names[0],`INSERT INTO survey_projects(id,owner_user_id,title,collection_mode,status) VALUES ('${id}','${owner}','native upgrade sentinel','LINKED_WAVES','ACTIVE');
-   INSERT INTO survey_publications(id,project_id,definition_digest,compiled_snapshot,consent_version,version) VALUES ('${publication}','${id}','${digest}','{"schemaVersion":1,"synthetic":true}',1,1);
-   INSERT INTO survey_waves(id,project_id,publication_id,ordinal,title,status,consent_text) VALUES ('${wave}','${id}','${publication}',1,'T1','CLOSED','Synthetic isolated schema preservation fixture');
-   INSERT INTO survey_participants(id,project_id,research_code,credential_hash) VALUES ('${participant}','${id}','synthetic','${digest}');
-   INSERT INTO survey_wave_attempts(id,project_id,wave_id,participant_id,status,completed_at) VALUES ('${attempt}','${id}','${wave}','${participant}','COMPLETED',CURRENT_TIMESTAMP);
-   INSERT INTO survey_wave_finals(id,attempt_id,project_id,wave_id,publication_id,submission_id,payload_hash,definition_digest,results_cipher,results_hash) VALUES ('${final}','${attempt}','${id}','${wave}','${publication}','${randomUUID()}','${digest}','${digest}','synthetic-opaque-old-report','${digest}');`);
+  sql(names[0],nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}));
   const facts=db=>sql(db,`SELECT jsonb_build_object('publication',(SELECT to_jsonb(p) FROM survey_publications p WHERE id='${publication}'),'final',(SELECT to_jsonb(f) FROM survey_wave_finals f WHERE id='${final}'),'attempt',(SELECT to_jsonb(a) FROM survey_wave_attempts a WHERE id='${attempt}'))::text;`);
   const before=facts(names[0]);
   deploy(resolve(backend,'prisma/schema.prisma'),database(names[0]));assert.equal(facts(names[0]),before,'Old publication/FINAL/attempt changed');
