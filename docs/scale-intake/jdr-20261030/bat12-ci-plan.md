@@ -17,3 +17,5 @@
 本片没有重复BAT12三例、selected checker或其他应用验证。第一控制命令仅选三个BAT12新控制和两个受候选选择/YAML变动影响的393旧控制：4 PASS/1 FAIL。失败是新负例错选了不在历史13文件manifest中的scale-definition.ts；原命令reader不声称单独覆盖全内核，整体source/tree检查负责该闭包，已另有scale-scoring.ts越界拒绝断言。只把负例改为实际已记录的audience-report-gate.ts字节漂移，单独复验该失败控制，1 PASS/exit0；原4PASS及失败完整保留。不向历史manifest补造内核hash，不重跑其余控制或应用。
 
 候选在此阶段仍未审完；尚无CI/Ready/merge/装载/部署结果。正式资格预算约5分钟，CodeQL保留原30分钟，不承诺短时完成。旧PR381历史schema失败及393的Draft失败保持其原身份，本片不修无关历史。
+
+控制自审另移除了将真实metadata永久绑死为PENDING/null的测试断言：scope合成用例仍验证未审核/未分配拒绝，真实候选的disabled/null由只读预检核验；合法激活后旧控制不会因状态正常变化而失败。只复验这两个修改的控制用例，2 PASS，未重跑应用或其他已过控制。

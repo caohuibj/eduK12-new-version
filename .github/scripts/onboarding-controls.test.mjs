@@ -303,7 +303,7 @@ test('BAT12 pending branch binds an assigned PR only, rejects mixed inputs and p
 test('BAT12 original command admission verifies actual exits, captured stdout and current source without scoring replay',async()=>{
  const {createHash}=await import('node:crypto'),hash=bytes=>createHash('sha256').update(bytes).digest('hex');
  const review=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['bat12-report-language'];
- assert.equal(review.decision,'PENDING_INDEPENDENT_REVIEW');assert.deepEqual(review.types,[]);
+ assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);assert.deepEqual(review.types,[]);
  const record=review.bat12Selected,result=verifyBat12OriginalCommand(record);
  assert.equal(result.goldenCases,5);assert.equal(result.distinctScoringInputs,6);assert.equal(result.ciExecuted,false);assert.equal(result.administrationEligibility,'not-evaluated');
  for(const [field,value]of [['exit','1\n'],['stdout','{}']]){
@@ -327,5 +327,5 @@ test('BAT12 uses the existing compiler/admission/SAST/gate without an unreviewed
  assert(job.includes("contains(fromJSON('[374,376,378,380,381]')"));
  assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
  const binding=JSON.parse(readFileSync('.github/scripts/onboarding-bindings.json')).candidates['bat12-report-language'];
- assert.equal(binding.enabled,false);assert.equal(binding.pr,null);
+ assert.equal(binding.candidateKey,'bat12-report-language');assert.equal(binding.branch,'feat/jdr-bat-report-language-20261030');
 });
