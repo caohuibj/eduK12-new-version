@@ -31,7 +31,8 @@ const evidenceNames=['README.md','manifest.json','backend-tests.json','frontend-
   'postgres-setup-first.json','postgres-setup-diagnostic.json','postgres-setup-repair.json','postgres-query-count.json','postgres-query-count.log','actionlint.log','ci-first-failed.log','ci-first.json','ci-second-failed.log','ci-second-scope.log','ci-second.json','merge-parent-diagnostic.json','actionlint-current.log','wide-form-first.json','wide-form-first.log','wide-form-repair.json','wide-form-repair.log','p2-backend-types.log','postgres-first.json','postgres-boundary-repair.json','postgres-diagnostic.log','postgres-setup-repair.log','postgres-first.log','postgres-boundary-repair.log',
   'browser-original.cjs','browser-original.log','browser-print.log','browser.json','group-1440.png','group-390.png','group-report.pdf','group-report.txt',
   'backend-types.log','frontend-types.log','frontend-lint.log'];
-const allowed=new Set([...groupReportFiles,...evidenceNames.map(p=>'docs/evidence/group-report-20261030/'+p)]);
+export const groupReportAllowedPaths=Object.freeze([...groupReportFiles,...evidenceNames.map(p=>'docs/evidence/group-report-20261030/'+p)]);
+const allowed=new Set(groupReportAllowedPaths);
 
 /** A Draft review checkpoint only. No local-result admission, application
  * qualification, security waiver or Ready/main route is created here. */

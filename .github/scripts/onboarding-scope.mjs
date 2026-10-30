@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict';
+import {groupReportBranch,groupReportAllowedPaths} from './group-report-draft.mjs';
 import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 import {participantAccessOutputs} from './participant-access-scope.mjs';
 
-export const BRANCHES={'choice-page':'fix/training-exact-choices-pagination-20261030','task1':'task1-scale-exact-authorization-20261029','395':'fix/education-draft-review-20261030','393':'feat/bundle-profile-feedback-20261029','365':'scale-library-structure-20261027','366':'feat/cognitive-onboarding-structure-20261028','369':'perf/four-entry-feedback-baseline-20261028','372':'perf/four-entry-first-feedback-20261028','374':'fix/four-entry-scale-probe-20261028','376':'fix/education-observer-journeys-20261028','377':'perf/four-entry-storage-ledger-20261028','378':'perf/four-entry-page-loading-implementation-20261028','380':'perf/four-entry-postlogin-20261028','381':'perf/four-entry-runtime-next-20261028'};
+export const BRANCHES={'404':groupReportBranch,'choice-page':'fix/training-exact-choices-pagination-20261030','task1':'task1-scale-exact-authorization-20261029','395':'fix/education-draft-review-20261030','393':'feat/bundle-profile-feedback-20261029','365':'scale-library-structure-20261027','366':'feat/cognitive-onboarding-structure-20261028','369':'perf/four-entry-feedback-baseline-20261028','372':'perf/four-entry-first-feedback-20261028','374':'fix/four-entry-scale-probe-20261028','376':'fix/education-observer-journeys-20261028','377':'perf/four-entry-storage-ledger-20261028','378':'perf/four-entry-page-loading-implementation-20261028','380':'perf/four-entry-postlogin-20261028','381':'perf/four-entry-runtime-next-20261028'};
+export const GROUP_REPORT_CONTROLS=Object.freeze(['.github/scripts/group-report-draft.mjs','.github/scripts/group-report-draft.test.mjs']);
+export const GROUP_REPORT_QUALIFICATION_SOURCES=Object.freeze(['server-version/backend/src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts','docs/evidence/group-report-20261030/qualification/README.md',...['base-migrate.log','base-migrate.exit','candidate-migrate.log','native-first.json','native-first.log','native-schema-first.json','native-schema-first.log','native-continuation.json','native-continuation.log','native.json','native-schema-diff.txt','backend-types.json','backend-types.log','backend-types.exit','frontend-types.json','frontend-types.log','frontend-types.exit'].map(name=>'docs/evidence/group-report-20261030/qualification/'+name)]);
 export const MARKER='.github/scripts/onboarding-bindings.json';
 export const CONTROLS=Object.freeze([MARKER,'.github/scripts/pr395-browser.mjs','.github/scripts/pr381-browser.mjs','.github/scripts/pr380-browser-reuse.mjs','.github/scripts/pr380-browser-reuse.test.mjs','.github/scripts/pr380-browser.mjs','.github/scripts/pr378-browser.mjs','.github/scripts/pr376-browser.mjs','.github/scripts/pr374-evidence.mjs','.github/scripts/pr374-browser.mjs','.github/scripts/onboarding-evidence.json','.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs','.github/scripts/onboarding-controls.test.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml'].sort());
 export const TASK1_CONTROLS=Object.freeze(['.github/scripts/task1-onboarding-controls.test.mjs','docs/precise-authorization-20261029/ci-control-progress.md','docs/precise-authorization-20261029/ci-control-raw.json']);
@@ -14,6 +17,7 @@ const sha=value=>assert.match(value??'',/^[a-f0-9]{40}$/);
 
 /** One reviewed backend patch; route name retained for existing consumers. Unknown changes never select a broad fallback. */
 export function allowedSourcePath(path,pr){
+ if(pr==='404')return groupReportAllowedPaths.includes(path)||GROUP_REPORT_QUALIFICATION_SOURCES.includes(path);
  if(pr==='choice-page')return CHOICE_PAGE_SOURCES.includes(path);
  if(pr==='task1')return ['docs/precise-authorization-20261029/','server-version/backend/src/','server-version/frontend/src/','server-version/backend/prisma/migrations/'].some(root=>path.startsWith(root))||['server-version/backend/scripts/precise-authorization-read-performance.ts','server-version/e2e/precise-authorization-built-ui.cjs','server-version/e2e/precise-authorization-compiled-cold-load.cjs'].includes(path);
  if(pr==='395')return ["server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx", "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.unsaved-input.review.test.tsx", "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx", "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.loading.test.tsx", "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx"].includes(path)||path.startsWith('docs/performance/education-post-p6-20261030/');
@@ -33,7 +37,7 @@ export function onboardingPlan(entries,base,head,read=git,env=process.env,b=bind
  const ref=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
  const number=String(env.CI_PR_NUMBER);
  const candidates=b.candidates;
- for(const id of ['393','395','task1','choice-page']){const candidate=candidates?.[id];
+ for(const id of ['393','395','task1','choice-page','404']){const candidate=candidates?.[id];
  if(candidate&&(number===id||ref===BRANCHES[id]||(env.CI_EVENT==='push'&&base===candidate.base)))b=candidate;}
  const branch=BRANCHES[String(b.pr)];
  if(!Object.values(BRANCHES).includes(ref)&&!Object.hasOwn(BRANCHES,number)&&!entries.some(e=>e.file===MARKER))return null;
@@ -62,7 +66,7 @@ export function onboardingPlan(entries,base,head,read=git,env=process.env,b=bind
   }
  };
  sha(sourceHead);assert.equal(object(sourceHead,'^{tree}'),read('rev-parse',head+'^{tree}'),'Source/merge tree drift');
- const controls=b.pr==='task1'?[...CONTROLS,...TASK1_CONTROLS].sort():CONTROLS;
+ const controls=b.pr===404?[...CONTROLS,...GROUP_REPORT_CONTROLS].sort():b.pr==='task1'?[...CONTROLS,...TASK1_CONTROLS].sort():CONTROLS;
  assert.deepEqual(Object.keys(b.controlBefore).sort(),controls);
  const changedControls=controls.filter(path=>read('ls-tree',base,'--',path)!==read('ls-tree',head,'--',path));
  const expected=[...Object.keys(b.source),...changedControls];assert.equal(new Set(expected).size,expected.length);
@@ -80,7 +84,7 @@ export function onboardingPlan(entries,base,head,read=git,env=process.env,b=bind
  for(const path of controls.filter(path=>path!==MARKER&&!changedControls.includes(path)))assert.equal(read('ls-tree',head,'--',path),read('ls-tree',b.controlCheckpoint,'--',path));
  assert.deepEqual(Object.keys(b.components).sort(),['backend','frontend']);
  if([378,380,381,395].includes(b.pr))assert.equal(read('rev-parse',head+':server-version/backend'),read('rev-parse',base+':server-version/backend'),'Frontend loading must not change backend');
- if(![372,374,376,378,380,381,395,'task1','choice-page'].includes(b.pr))assert.equal(read('rev-parse',head+':server-version/frontend'),read('rev-parse',base+':server-version/frontend'),'No frontend change in backend onboarding route');
+ if(![372,374,376,378,380,381,395,404,'task1','choice-page'].includes(b.pr))assert.equal(read('rev-parse',head+':server-version/frontend'),read('rev-parse',base+':server-version/frontend'),'No frontend change in backend onboarding route');
  for(const [component,tree]of Object.entries(b.components)){
   sha(tree);assert.equal(read('rev-parse',head+':server-version/'+component),tree);
   assert.equal(object(b.product,':server-version/'+component),tree);

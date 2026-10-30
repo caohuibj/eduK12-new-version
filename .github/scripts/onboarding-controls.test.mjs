@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
+import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
 import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
@@ -337,4 +337,22 @@ test('PR395 SAST continuation requires the exact official successful scan despit
  for(const result of ['failure','skipped','cancelled'])assert.throws(()=>verifyPr395SastMetadata(run,{...job,conclusion:result},artifact,now));
  assert.throws(()=>verifyPr395SastMetadata(run,job,{...artifact,digest:'sha256:'+'0'.repeat(64)},now));assert.throws(()=>verifyPr395SastMetadata(run,job,{...artifact,expired:true},now));assert.throws(()=>verifyPr395SastMetadata(run,job,artifact,now+86400000));
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/onboarding-checks.mjs sast-reuse'));assert(yaml.includes('pr395-original-sast-${{ github.sha }}'));assert(yaml.includes(".pr == 395 && 'paths: [.github/scripts/onboarding-checks.mjs, .github/scripts/onboarding-controls.test.mjs, .github/scripts/pr395-browser.mjs]'"));
+});
+
+test('group-report qualification uses the existing exact family and rejects scope or identity drift',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/reporting/group-summary.ts',frontend='server-version/frontend/src/survey/SurveyGroupReports.tsx',controls=[...CONTROLS,...GROUP_REPORT_CONTROLS].sort();
+ f.b={...f.b,pr:404,source:Object.fromEntries([backend,frontend].map(path=>[path,{before:null,after:blob}])),controlBefore:Object.fromEntries(controls.map(path=>[path,null]))};
+ f.entries=[backend,frontend,...controls].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'404',CI_HEAD_REF:BRANCHES[404]};
+ const call=(b=f.b,entries=f.entries,env=f.env)=>onboardingPlan(entries,base,head,f.read,env,b),p=call();assert.equal(p.pr,404);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');
+ const sast=task1SastConfig(p,f.b);for(const file of [backend,frontend,'.github/scripts/content-scope.mjs','.github/scripts/group-report-draft.mjs'])assert(sast.paths.includes(file));
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'408'},{CI_EVENT:'workflow_dispatch'},{CI_FORCE_FULL:'true'}])assert.throws(()=>call(f.b,f.entries,{...f.env,...patch}));
+ assert.throws(()=>call({...f.b,enabled:false}));const unknown='server-version/backend/src/unrelated.ts';assert.throws(()=>call({...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}},[...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}]));
+ assert.throws(()=>call(f.b,f.entries.map(e=>e.file===backend?{...e,newMode:'120000'}:e)));
+});
+test('group-report qualification keeps admission and SAST mandatory and rejects Draft or incomplete outcomes',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/reporting/group-summary.ts',controls=[...CONTROLS,...GROUP_REPORT_CONTROLS].sort();
+ f.b={...f.b,pr:404,source:{[file]:{before:null,after:blob}},controlBefore:Object.fromEntries(controls.map(path=>[path,null]))};f.entries=[file,...controls].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'404',CI_HEAD_REF:BRANCHES[404]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b),outputs=Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)]));const needs={scope:{result:'success',outputs},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','onboarding-structure','codeql']);assert.deepEqual(failedChecks(needs,false),[]);assert(failedChecks(needs,true).length);
+ for(const name of ['onboarding-structure','codeql'])for(const result of ['skipped','failure','cancelled',undefined])assert(failedChecks({...needs,[name]:{result}},false).length);
 });

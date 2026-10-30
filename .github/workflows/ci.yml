@@ -1422,7 +1422,7 @@ jobs:
           JS
       - name: select exact Task1 changed application and control SAST inputs
         id: task1-codeql-config
-        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page"]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
+        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
         env:
           CI: 'true'
           PLAN: ${{ needs.scope.outputs.onboarding_plan }}
@@ -2507,6 +2507,9 @@ jobs:
       run: |
         npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
         node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
+    - name: validate group-report binding through the existing admission job
+      if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 404
+      run: node --test --test-name-pattern='group-report qualification' .github/scripts/onboarding-controls.test.mjs
     - name: admit reviewed results and qualify only missing compiler inputs
       run: node .github/scripts/onboarding-checks.mjs admit
     - name: compile each missing Task1 component once and retain those exact artifacts

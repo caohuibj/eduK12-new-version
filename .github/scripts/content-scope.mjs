@@ -332,11 +332,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const event = process.env.CI_EVENT;
   refuseUnplannedPR356();
   const base = process.env.CI_BASE_SHA;
+  const onboarding=onboardingPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(onboarding){const output=onboardingOutputs(onboarding);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const groupHead=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),groupBase=groupReportDiffBase(base,groupHead);
   const groupDraft=groupReportDraftPlan(event==='workflow_dispatch'?[]:changedEntries(groupBase),groupBase,groupHead);
   if(groupDraft){const output=groupReportDraftOutputs(groupDraft);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const onboarding=onboardingPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(onboarding){const output=onboardingOutputs(onboarding);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const pr364=pr364Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(pr364){const output=pr364Outputs(pr364);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const pr363=pr363Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

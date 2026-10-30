@@ -874,6 +874,1603 @@
         "exit": "docs/performance/education-post-p6-20261030/evidence/frontend-typecheck-deps-recheck.exit"
       }
     },
+    "404": {
+      "schemaVersion": 1,
+      "product": "78899e7fefc1ea6ca14ca4d144f6a37bb275472e",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "database": "New isolated loopback eduk12_group_qual_upgrade_test_20261030 and eduk12_group_qual_restore_test_20261030; original Survey receipts use their retained isolated test clone",
+        "limitations": [
+          "Original application executions were unsigned local WIP runs; original source associations and complete dependency/node_modules hashes were not recorded contemporaneously. Exact current source inventory is bound separately; no fabricated historical exact-tree signature.",
+          "Source association commits are saved reference snapshots reviewed after execution. The exact reviewed source delta includes upstream changes and the explicit P2 map/paging repair, not a claim that every changed byte is unrelated. New wide-Form evidence covers that repair; current combined component types are fresh.",
+          "Only passed cases from original partial failures are admitted; failed, filtered and setup records remain unchanged. No 81-case or 174-case replay, full trial journey, all-role matrix or production performance claim.",
+          "The initial browser interactions and print-only continuation reuse the same compiled synthetic fixture. The resulting PDF/Chinese text and actual React snapshot UI were inspected; backend authority is covered separately by original real HTTP/PG receipts.",
+          "Native pg_dump/pg_restore succeeded before a full-schema text comparison failed on four existing CHECK parentheses. The targeted continuation reuses the retained archive and restored DB, checks only the new table schema and missing read/immutable assertions, and expressly records no second restore.",
+          "The frontend compiler bootstrap first hit a concurrent git write-tree lock before the compiler started; source binding preparation was serialized, no lock was removed and both actual current component compilers ran once.",
+          "This merge qualification does not provide production images, deployment/production backup admission, or whole-platform acceptance."
+        ]
+      },
+      "reports": [
+        {
+          "id": "backend",
+          "path": "docs/evidence/group-report-20261030/backend-tests.json",
+          "sha256": "8ba1e4794f888d5ce898cdfdb9f09bae3b1ce9eb5a9d2f1985f8f195bf9d1ad5",
+          "originalSourceAssociation": "073c3422f1ae0fd413771ed0dd1a913bfc7aad06",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261029150000_standard_combination_education_admission/migration.sql",
+            "server-version/backend/prisma/migrations/20261029151000_standard_use_revision_evidence_index/migration.sql",
+            "server-version/backend/prisma/migrations/20261030001000_cognitive_profile_public_template/migration.sql",
+            "server-version/backend/prisma/migrations/20261030002000_cognitive_profile_entry_admission/migration.sql",
+            "server-version/backend/prisma/migrations/20261030003000_training_cognitive_profile_use_index/migration.sql",
+            "server-version/backend/prisma/migrations/20261030004000_survey_cognitive_frozen_trial_budget/migration.sql",
+            "server-version/backend/prisma/migrations/20261030005000_education_cognitive_profile_binding_guard/migration.sql",
+            "server-version/backend/scripts/precise-authorization-read-performance.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/dual-report-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/dual-report-setup.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-collection-boundary.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-binding.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-contract.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-guards.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-main-merge.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-operation.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-setup.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime-fixture.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-draft-replacement-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-clock.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-cross-report.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-source-current.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-source.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management-school.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-revoke.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-binding.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/exact-use-runtime-role.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/registered-report-variants.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/selected-configuration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/selected-reference-audit.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-configuration-binding.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-budget.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-definition.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-research.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use-revision.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-t2-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-configuration-management.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-general-exact-journey.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-selected-binding.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-t2-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/cognitive/assignment.service.test.ts",
+            "server-version/backend/src/__tests__/composite/training-flow-assignment-snapshot.test.ts",
+            "server-version/backend/src/__tests__/education-tools/access.test.ts",
+            "server-version/backend/src/__tests__/education-tools/education-observer-source-read.test.ts",
+            "server-version/backend/src/__tests__/education-tools/selected-source-binding.test.ts",
+            "server-version/backend/src/__tests__/education-tools/selected-source-catalog.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/field-expert-public-sources.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/__tests__/measurement-content/standard-report-parameters.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.test.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approval.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approved-source.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-artifact.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-assignment.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-source.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-binding.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-management.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-management.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-revoke.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-use-current.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/selected-configuration.ts",
+            "server-version/backend/src/modules/assessment-authorization/selected-reference-audit.ts",
+            "server-version/backend/src/modules/assessment-authorization/standard-configuration-binding.ts",
+            "server-version/backend/src/modules/assessment-authorization/survey-standard-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/training-cognitive-profile-use.ts",
+            "server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts",
+            "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+            "server-version/backend/src/modules/assessment-runtime/public-templates.ts",
+            "server-version/backend/src/modules/cognitive/assignment-measurement-release.ts",
+            "server-version/backend/src/modules/cognitive/assignment.service.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.controller.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.routes.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.schema.ts",
+            "server-version/backend/src/modules/cognitive/profile-configurations.routes.ts",
+            "server-version/backend/src/modules/cognitive/public.service.ts",
+            "server-version/backend/src/modules/cognitive/session.service.ts",
+            "server-version/backend/src/modules/composite/composite.schema.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-flow-assignment-snapshot.ts",
+            "server-version/backend/src/modules/composite/training-reference-audit.ts",
+            "server-version/backend/src/modules/composite/training-reference-selection.ts",
+            "server-version/backend/src/modules/composite/training-standard-combination.ts",
+            "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+            "server-version/backend/src/modules/education-tools/native-source.contracts.ts",
+            "server-version/backend/src/modules/education-tools/native-source.preview.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-runtime.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.routes.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+            "server-version/backend/src/modules/education-tools/public-source.headers.ts",
+            "server-version/backend/src/modules/education-tools/public-source.identity.ts",
+            "server-version/backend/src/modules/education-tools/selected-source-binding.ts",
+            "server-version/backend/src/modules/education-tools/selected-source-catalog.ts",
+            "server-version/backend/src/modules/huiteacher/platform.routes.ts",
+            "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+            "server-version/backend/src/modules/measurement-content/standard-combination-management.ts",
+            "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+            "server-version/backend/src/modules/measurement-content/standard-report-parameters.ts",
+            "server-version/backend/src/modules/organization/educationProductAccess.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/group-summary.ts",
+            "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/c_ets14_zh_hant/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/c_ets14_zh_hant/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/ets16_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/ets16_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2016_time_pressure_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2016_time_pressure_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_collective_culture_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_collective_culture_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_discipline_problems_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_discipline_problems_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_low_student_motivation_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_low_student_motivation_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supervisory_support_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supervisory_support_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supportive_colleagues_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supportive_colleagues_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_value_consonance_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_value_consonance_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/tses12_en_2024/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/tses12_en_2024/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/tses24_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/tses24_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/tses24_zh_hant/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/tses24_zh_hant/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/uwes3_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/uwes3_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/uwes9_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/uwes9_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts",
+            "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+            "server-version/backend/src/modules/scale/onboarding/report-variants.ts",
+            "server-version/backend/src/modules/scale/onboarding/source-snapshot.ts",
+            "server-version/backend/src/modules/survey/admin-role.ts",
+            "server-version/backend/src/modules/survey/analytics.cognitive.ts",
+            "server-version/backend/src/modules/survey/analytics.source.ts",
+            "server-version/backend/src/modules/survey/catalog.service.ts",
+            "server-version/backend/src/modules/survey/catalog.sources.ts",
+            "server-version/backend/src/modules/survey/cognitive-profile.definition.ts",
+            "server-version/backend/src/modules/survey/cognitive-profile.source.ts",
+            "server-version/backend/src/modules/survey/cognitive.definition.ts",
+            "server-version/backend/src/modules/survey/cognitive.public.routes.ts",
+            "server-version/backend/src/modules/survey/cognitive.results.ts",
+            "server-version/backend/src/modules/survey/cognitive.service.ts",
+            "server-version/backend/src/modules/survey/flow.definition.ts",
+            "server-version/backend/src/modules/survey/group-report.service.ts",
+            "server-version/backend/src/modules/survey/measurement-publication.service.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/platform.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/selected-reference-audit.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.model.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.routes.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+            "server-version/backend/src/modules/survey/task.public.ts",
+            "server-version/backend/src/modules/survey/tool-policy.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks.",
+          "cases": [
+            {
+              "fullName": "task group leaf statistics keeps zero, signed values and per-metric missing denominators, using existing statistics",
+              "status": "passed"
+            },
+            {
+              "fullName": "task group leaf statistics uses valid respondents as the multiple-choice denominator, preserves zero-frequency options and never averages codes",
+              "status": "passed"
+            },
+            {
+              "fullName": "task group leaf statistics does not revive an older score, infer people, count invalid quality or duplicate a parent",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'zero FINAL' retains frozen provenance and unchanged stored metrics without rescoring",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'one completed imported cognitive FINAL' retains frozen provenance and unchanged stored metrics without rescoring",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'one NOT_SHOWN cognitive FINAL' retains frozen provenance and unchanged stored metrics without rescoring",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'zero FINAL'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'one completed imported cognitive FINAL'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'one NOT_SHOWN cognitive FINAL'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'zero FINAL'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'one completed imported cognitive FINAL'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'one NOT_SHOWN cognitive FINAL'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets projects only the exact FINAL, Attempt, Participant and Wave fields at both source fences",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets uses one independent scalar budget query per fence, including a publication-only empty cohort",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets rejects finalCipherBytes over 8 MiB before any source data fetch",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets rejects frozenBytes over 8 MiB before any source data fetch",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets rejects nativeCipherBytes over 8 MiB before any source data fetch",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets counts native child originals together with parent cipher before loading either",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains separate inclusive 8 MiB FINAL and publication limits rather than a new combined cap",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets budgets variant attendance assignments before ciphertext and retains the exact inclusive boundary",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets checks current researcher authorization on the first read",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets checks current researcher authorization on the second read",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets rejects expiry crossed while acquiring source fence 1",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets rejects expiry crossed while acquiring source fence 2",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact revision post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact publication post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact finalCipher post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact finalHash post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact wavePublication post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact waveProject post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact attemptProject post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact attemptWave post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact attemptStatus post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact exclusion post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact quality post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact participantStatus post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact participantCode post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey exact source material and independent read budgets retains the exact assignment post-compute source fence",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey compact attendance shared ownership headers uses one scoped header read at each fence without loading a raw/score matrix",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey compact attendance shared ownership headers proves ownership of DRAFT waves before deciding whether they have collected schema",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey compact attendance shared ownership headers proves ownership of OPEN waves before deciding whether they have collected schema",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey compact attendance shared ownership headers does not treat a prepared DRAFT publication as collected attendance schema",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey task group artifacts selects cognitive before metric extraction, so repeated total keys remain isolated",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey task group artifacts selects sjt before metric extraction, so repeated total keys remain isolated",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey task group artifacts adapts only real Form numbers and choice frequencies; excludes text and keeps missing null",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey task group artifacts catalog and saved reads never load/decrypt participant sources; read checks original pointers and authority",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey task group artifacts generates one frozen snapshot and does not request raw cognitive trials",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey task group artifacts rejects changed sample eligibility and cross-project authority before disclosing stored aggregate",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey task group artifacts rejects incompatible measurement identities instead of pooling them",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary reads a valid empty-wave dictionary without FINAL/attempt loading, counting or decrypting",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary does not let an unrelated corrupt FINAL block the frozen dictionary",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary keeps full-schema collision IDs equal to export columns and excludes all free-text variables",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary continues to expose an existing PAUSED wave dictionary",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary continues to expose an existing CLOSED wave dictionary",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary keeps an unreleased DRAFT wave empty",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary denies a different actor even when they have a recent Survey MFA token",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects stale, mismatched or wrong-domain MFA before source access: {\"mfaAge\":301}",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects stale, mismatched or wrong-domain MFA before source access: {\"mfaAge\":-60}",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects stale, mismatched or wrong-domain MFA before source access: {\"tokenVersion\":2}",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects stale, mismatched or wrong-domain MFA before source access: {\"tokenActor\":\"another-user\"}",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects stale, mismatched or wrong-domain MFA before source access: {\"domain\":\"LEGACY\"}",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rechecks current owner, account, grant and enabled MFA after projection",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects revision changing between the two reads",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects publication-id changing between the two reads",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects publication-bytes changing between the two reads",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects publication-version changing between the two reads",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects wave-ordinal changing between the two reads",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects wave-status changing between the two reads",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary denies a wave removed from the current project during projection",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects invalid frozen source: digest",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects invalid frozen source: wrong-project",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects invalid frozen source: wrong-wave",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary rejects invalid frozen source: missing-publication",
+              "status": "passed"
+            },
+            {
+              "fullName": "Publication-only Survey item dictionary enforces the frozen-byte budget before loading Publication JSON",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 81,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          }
+        },
+        {
+          "id": "frontend-original",
+          "path": "docs/evidence/group-report-20261030/frontend-tests.json",
+          "sha256": "7fe4e7234993c14a86d96de5d6c81f84bec7e94ad27e344c626610e52e845beb",
+          "originalSourceAssociation": "073c3422f1ae0fd413771ed0dd1a913bfc7aad06",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/admin/AdminContentPermissions.test.tsx",
+            "server-version/frontend/src/admin/AdminContentPermissions.tsx",
+            "server-version/frontend/src/api/__tests__/educationCognitiveConfigurations.test.ts",
+            "server-version/frontend/src/api/__tests__/educationStandardConfigurations.test.ts",
+            "server-version/frontend/src/api/__tests__/surveyStandardConfigurations.test.ts",
+            "server-version/frontend/src/api/cognitiveProfileGrants.ts",
+            "server-version/frontend/src/api/educationCognitiveConfigurations.ts",
+            "server-version/frontend/src/api/educationStandardConfigurations.ts",
+            "server-version/frontend/src/api/standardConfigurationGrants.test.ts",
+            "server-version/frontend/src/api/standardConfigurationGrants.ts",
+            "server-version/frontend/src/api/surveyStandardConfigurations.ts",
+            "server-version/frontend/src/components/AssessmentToolPicker.tsx",
+            "server-version/frontend/src/components/__tests__/AssessmentToolPicker.test.tsx",
+            "server-version/frontend/src/components/assessment-tool-picker.css",
+            "server-version/frontend/src/components/education-tools/EducationCompositionSelectedStandard.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.exact-cognitive.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/components/education-tools/educationPublicFormClient.ts",
+            "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.test.tsx",
+            "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.tsx",
+            "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.test.tsx",
+            "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.tsx",
+            "server-version/frontend/src/components/scale-governance/approved-scale-axes.css",
+            "server-version/frontend/src/modules/cognitive/api.ts",
+            "server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.test.tsx",
+            "server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.tsx",
+            "server-version/frontend/src/pages/admin/EducationProductGovernance.tsx",
+            "server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx",
+            "server-version/frontend/src/pages/admin/EducationStandardConfigurations.tsx",
+            "server-version/frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+            "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+            "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx",
+            "server-version/frontend/src/pages/admin/SurveyCatalogGrants.cognitive-profile.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.identity.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.links.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.verification.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx",
+            "server-version/frontend/src/pages/admin/education-products.css",
+            "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+            "server-version/frontend/src/pages/questionnaire/TrainingContentSelection.tsx",
+            "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+            "server-version/frontend/src/pages/questionnaire/__tests__/TrainingContentSelection.test.tsx",
+            "server-version/frontend/src/pages/teacher/CognitiveAssignmentEdit.tsx",
+            "server-version/frontend/src/pages/teacher/CognitiveAssignmentList.tsx",
+            "server-version/frontend/src/pages/teacher/__tests__/CognitiveAssignmentList.precise.test.tsx",
+            "server-version/frontend/src/survey/ResearchCatalog.tsx",
+            "server-version/frontend/src/survey/useSurveyStandardConfigurationGrant.ts",
+            "server-version/frontend/src/training/TrainingAdminResources.tsx",
+            "server-version/frontend/src/training/TrainingCognitiveProfileGrants.test.tsx",
+            "server-version/frontend/src/training/TrainingCognitiveProfileGrants.tsx",
+            "server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx",
+            "server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx",
+            "server-version/frontend/src/training/training-admin-workspace.css",
+            "server-version/frontend/src/training/useTrainingStandardConfigurationIssue.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
+          "deltaRationale": "The selected Survey snapshot cases use unchanged final reader inputs; original failed read/update case is admitted only from its successful continuation. Upstream main Training picker changes do not mount in Survey, and current merged frontend types are fresh.",
+          "cases": [
+            {
+              "fullName": "Survey group snapshot reading opens the saved version, switches metrics locally, prints and uses explicit generation for an update",
+              "status": "failed"
+            },
+            {
+              "fullName": "Survey group snapshot reading clears a stale report after scope changes and rejects stale responses",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 1,
+            "numPendingTests": 0
+          },
+          "allowPartialFailure": true,
+          "selectedCases": [
+            "Survey group snapshot reading clears a stale report after scope changes and rejects stale responses"
+          ],
+          "failureContinuations": [
+            {
+              "caseName": "Survey group snapshot reading opens the saved version, switches metrics locally, prints and uses explicit generation for an update",
+              "reportId": "frontend-repair"
+            }
+          ]
+        },
+        {
+          "id": "frontend-repair",
+          "path": "docs/evidence/group-report-20261030/frontend-repair.json",
+          "sha256": "170c94c6f661e384c21fec421ef41f9921b7aa83f9c8e1d300869646af32277e",
+          "originalSourceAssociation": "073c3422f1ae0fd413771ed0dd1a913bfc7aad06",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/admin/AdminContentPermissions.test.tsx",
+            "server-version/frontend/src/admin/AdminContentPermissions.tsx",
+            "server-version/frontend/src/api/__tests__/educationCognitiveConfigurations.test.ts",
+            "server-version/frontend/src/api/__tests__/educationStandardConfigurations.test.ts",
+            "server-version/frontend/src/api/__tests__/surveyStandardConfigurations.test.ts",
+            "server-version/frontend/src/api/cognitiveProfileGrants.ts",
+            "server-version/frontend/src/api/educationCognitiveConfigurations.ts",
+            "server-version/frontend/src/api/educationStandardConfigurations.ts",
+            "server-version/frontend/src/api/standardConfigurationGrants.test.ts",
+            "server-version/frontend/src/api/standardConfigurationGrants.ts",
+            "server-version/frontend/src/api/surveyStandardConfigurations.ts",
+            "server-version/frontend/src/components/AssessmentToolPicker.tsx",
+            "server-version/frontend/src/components/__tests__/AssessmentToolPicker.test.tsx",
+            "server-version/frontend/src/components/assessment-tool-picker.css",
+            "server-version/frontend/src/components/education-tools/EducationCompositionSelectedStandard.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.exact-cognitive.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/components/education-tools/educationPublicFormClient.ts",
+            "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.test.tsx",
+            "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.tsx",
+            "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.test.tsx",
+            "server-version/frontend/src/components/scale-governance/EntryAdmissionChoices.tsx",
+            "server-version/frontend/src/components/scale-governance/approved-scale-axes.css",
+            "server-version/frontend/src/modules/cognitive/api.ts",
+            "server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.test.tsx",
+            "server-version/frontend/src/pages/admin/EducationCognitiveConfigurations.tsx",
+            "server-version/frontend/src/pages/admin/EducationProductGovernance.tsx",
+            "server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx",
+            "server-version/frontend/src/pages/admin/EducationStandardConfigurations.tsx",
+            "server-version/frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+            "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+            "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx",
+            "server-version/frontend/src/pages/admin/SurveyCatalogGrants.cognitive-profile.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.identity.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.links.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.verification.test.tsx",
+            "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx",
+            "server-version/frontend/src/pages/admin/education-products.css",
+            "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx",
+            "server-version/frontend/src/pages/questionnaire/TrainingContentSelection.tsx",
+            "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+            "server-version/frontend/src/pages/questionnaire/__tests__/TrainingContentSelection.test.tsx",
+            "server-version/frontend/src/pages/teacher/CognitiveAssignmentEdit.tsx",
+            "server-version/frontend/src/pages/teacher/CognitiveAssignmentList.tsx",
+            "server-version/frontend/src/pages/teacher/__tests__/CognitiveAssignmentList.precise.test.tsx",
+            "server-version/frontend/src/survey/ResearchCatalog.tsx",
+            "server-version/frontend/src/survey/useSurveyStandardConfigurationGrant.ts",
+            "server-version/frontend/src/training/TrainingAdminResources.tsx",
+            "server-version/frontend/src/training/TrainingCognitiveProfileGrants.test.tsx",
+            "server-version/frontend/src/training/TrainingCognitiveProfileGrants.tsx",
+            "server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx",
+            "server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx",
+            "server-version/frontend/src/training/training-admin-workspace.css",
+            "server-version/frontend/src/training/useTrainingStandardConfigurationIssue.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
+          "deltaRationale": "The selected Survey snapshot cases use unchanged final reader inputs; original failed read/update case is admitted only from its successful continuation. Upstream main Training picker changes do not mount in Survey, and current merged frontend types are fresh.",
+          "cases": [
+            {
+              "fullName": "Survey group snapshot reading opens the saved version, switches metrics locally, prints and uses explicit generation for an update",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey group snapshot reading clears a stale report after scope changes and rejects stale responses",
+              "status": "skipped"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          }
+        },
+        {
+          "id": "postgres-original",
+          "path": "docs/evidence/group-report-20261030/postgres-first.json",
+          "sha256": "a8a39042954796ff8593bb800345dc33a1b1b670ce5375c210a84abbb6903958",
+          "originalSourceAssociation": "073c3422f1ae0fd413771ed0dd1a913bfc7aad06",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261029150000_standard_combination_education_admission/migration.sql",
+            "server-version/backend/prisma/migrations/20261029151000_standard_use_revision_evidence_index/migration.sql",
+            "server-version/backend/prisma/migrations/20261030001000_cognitive_profile_public_template/migration.sql",
+            "server-version/backend/prisma/migrations/20261030002000_cognitive_profile_entry_admission/migration.sql",
+            "server-version/backend/prisma/migrations/20261030003000_training_cognitive_profile_use_index/migration.sql",
+            "server-version/backend/prisma/migrations/20261030004000_survey_cognitive_frozen_trial_budget/migration.sql",
+            "server-version/backend/prisma/migrations/20261030005000_education_cognitive_profile_binding_guard/migration.sql",
+            "server-version/backend/scripts/precise-authorization-read-performance.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/dual-report-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/dual-report-setup.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-collection-boundary.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-binding.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-contract.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-guards.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-main-merge.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-operation.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-setup.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime-fixture.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-draft-replacement-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-clock.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-cross-report.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-source-current.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-source.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management-school.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-revoke.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-binding.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/exact-use-runtime-role.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/registered-report-variants.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/selected-configuration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/selected-reference-audit.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-configuration-binding.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-budget.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-definition.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-research.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use-revision.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-t2-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-configuration-management.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-general-exact-journey.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-selected-binding.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-t2-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/cognitive/assignment.service.test.ts",
+            "server-version/backend/src/__tests__/composite/training-flow-assignment-snapshot.test.ts",
+            "server-version/backend/src/__tests__/education-tools/access.test.ts",
+            "server-version/backend/src/__tests__/education-tools/education-observer-source-read.test.ts",
+            "server-version/backend/src/__tests__/education-tools/selected-source-binding.test.ts",
+            "server-version/backend/src/__tests__/education-tools/selected-source-catalog.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/field-expert-public-sources.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/__tests__/measurement-content/standard-report-parameters.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.test.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approval.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approved-source.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-artifact.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-assignment.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-source.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-binding.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-management.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-management.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-revoke.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-use-current.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/selected-configuration.ts",
+            "server-version/backend/src/modules/assessment-authorization/selected-reference-audit.ts",
+            "server-version/backend/src/modules/assessment-authorization/standard-configuration-binding.ts",
+            "server-version/backend/src/modules/assessment-authorization/survey-standard-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/training-cognitive-profile-use.ts",
+            "server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts",
+            "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+            "server-version/backend/src/modules/assessment-runtime/public-templates.ts",
+            "server-version/backend/src/modules/cognitive/assignment-measurement-release.ts",
+            "server-version/backend/src/modules/cognitive/assignment.service.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.controller.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.routes.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.schema.ts",
+            "server-version/backend/src/modules/cognitive/profile-configurations.routes.ts",
+            "server-version/backend/src/modules/cognitive/public.service.ts",
+            "server-version/backend/src/modules/cognitive/session.service.ts",
+            "server-version/backend/src/modules/composite/composite.schema.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-flow-assignment-snapshot.ts",
+            "server-version/backend/src/modules/composite/training-reference-audit.ts",
+            "server-version/backend/src/modules/composite/training-reference-selection.ts",
+            "server-version/backend/src/modules/composite/training-standard-combination.ts",
+            "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+            "server-version/backend/src/modules/education-tools/native-source.contracts.ts",
+            "server-version/backend/src/modules/education-tools/native-source.preview.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-runtime.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.routes.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+            "server-version/backend/src/modules/education-tools/public-source.headers.ts",
+            "server-version/backend/src/modules/education-tools/public-source.identity.ts",
+            "server-version/backend/src/modules/education-tools/selected-source-binding.ts",
+            "server-version/backend/src/modules/education-tools/selected-source-catalog.ts",
+            "server-version/backend/src/modules/huiteacher/platform.routes.ts",
+            "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+            "server-version/backend/src/modules/measurement-content/standard-combination-management.ts",
+            "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+            "server-version/backend/src/modules/measurement-content/standard-report-parameters.ts",
+            "server-version/backend/src/modules/organization/educationProductAccess.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/group-summary.ts",
+            "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/c_ets14_zh_hant/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/c_ets14_zh_hant/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/ets16_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/ets16_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2016_time_pressure_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2016_time_pressure_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_collective_culture_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_collective_culture_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_discipline_problems_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_discipline_problems_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_low_student_motivation_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_low_student_motivation_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supervisory_support_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supervisory_support_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supportive_colleagues_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supportive_colleagues_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_value_consonance_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_value_consonance_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/tses12_en_2024/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/tses12_en_2024/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/tses24_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/tses24_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/tses24_zh_hant/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/tses24_zh_hant/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/uwes3_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/uwes3_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/uwes9_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/uwes9_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts",
+            "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+            "server-version/backend/src/modules/scale/onboarding/report-variants.ts",
+            "server-version/backend/src/modules/scale/onboarding/source-snapshot.ts",
+            "server-version/backend/src/modules/survey/admin-role.ts",
+            "server-version/backend/src/modules/survey/analytics.cognitive.ts",
+            "server-version/backend/src/modules/survey/analytics.source.ts",
+            "server-version/backend/src/modules/survey/catalog.service.ts",
+            "server-version/backend/src/modules/survey/catalog.sources.ts",
+            "server-version/backend/src/modules/survey/cognitive-profile.definition.ts",
+            "server-version/backend/src/modules/survey/cognitive-profile.source.ts",
+            "server-version/backend/src/modules/survey/cognitive.definition.ts",
+            "server-version/backend/src/modules/survey/cognitive.public.routes.ts",
+            "server-version/backend/src/modules/survey/cognitive.results.ts",
+            "server-version/backend/src/modules/survey/cognitive.service.ts",
+            "server-version/backend/src/modules/survey/flow.definition.ts",
+            "server-version/backend/src/modules/survey/group-report.service.ts",
+            "server-version/backend/src/modules/survey/measurement-publication.service.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/platform.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/selected-reference-audit.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.model.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.routes.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+            "server-version/backend/src/modules/survey/task.public.ts",
+            "server-version/backend/src/modules/survey/tool-policy.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks.",
+          "cases": [
+            {
+              "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
+              "status": "passed"
+            },
+            {
+              "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries",
+              "status": "failed"
+            }
+          ],
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 1,
+            "numPendingTests": 0
+          },
+          "allowPartialFailure": true,
+          "selectedCases": [
+            "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration"
+          ],
+          "failureContinuations": [
+            {
+              "caseName": "Survey generated group snapshot / real HTTP and PostgreSQL creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries",
+              "reportId": "postgres-repair"
+            }
+          ]
+        },
+        {
+          "id": "postgres-repair",
+          "path": "docs/evidence/group-report-20261030/postgres-boundary-repair.json",
+          "sha256": "0e2aa501534b82be1a19df7ca93f8c193891ed7ebc2087357777c119f5fc42bf",
+          "originalSourceAssociation": "073c3422f1ae0fd413771ed0dd1a913bfc7aad06",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261029150000_standard_combination_education_admission/migration.sql",
+            "server-version/backend/prisma/migrations/20261029151000_standard_use_revision_evidence_index/migration.sql",
+            "server-version/backend/prisma/migrations/20261030001000_cognitive_profile_public_template/migration.sql",
+            "server-version/backend/prisma/migrations/20261030002000_cognitive_profile_entry_admission/migration.sql",
+            "server-version/backend/prisma/migrations/20261030003000_training_cognitive_profile_use_index/migration.sql",
+            "server-version/backend/prisma/migrations/20261030004000_survey_cognitive_frozen_trial_budget/migration.sql",
+            "server-version/backend/prisma/migrations/20261030005000_education_cognitive_profile_binding_guard/migration.sql",
+            "server-version/backend/scripts/precise-authorization-read-performance.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/dual-report-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/dual-report-setup.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-collection-boundary.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-binding.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-contract.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-guards.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-main-merge.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-operation.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-setup.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime-fixture.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-draft-replacement-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-clock.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-cross-report.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-source-current.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-source.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management-school.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-revoke.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-binding.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/exact-use-runtime-role.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/registered-report-variants.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/selected-configuration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/selected-reference-audit.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-configuration-binding.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-budget.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-definition.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-research.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use-revision.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-t2-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-configuration-management.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-general-exact-journey.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-selected-binding.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-t2-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/cognitive/assignment.service.test.ts",
+            "server-version/backend/src/__tests__/composite/training-flow-assignment-snapshot.test.ts",
+            "server-version/backend/src/__tests__/education-tools/access.test.ts",
+            "server-version/backend/src/__tests__/education-tools/education-observer-source-read.test.ts",
+            "server-version/backend/src/__tests__/education-tools/selected-source-binding.test.ts",
+            "server-version/backend/src/__tests__/education-tools/selected-source-catalog.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/field-expert-public-sources.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/__tests__/measurement-content/standard-report-parameters.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.test.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approval.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approved-source.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-artifact.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-assignment.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-source.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-binding.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-management.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-management.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-revoke.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-use-current.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/selected-configuration.ts",
+            "server-version/backend/src/modules/assessment-authorization/selected-reference-audit.ts",
+            "server-version/backend/src/modules/assessment-authorization/standard-configuration-binding.ts",
+            "server-version/backend/src/modules/assessment-authorization/survey-standard-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/training-cognitive-profile-use.ts",
+            "server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts",
+            "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+            "server-version/backend/src/modules/assessment-runtime/public-templates.ts",
+            "server-version/backend/src/modules/cognitive/assignment-measurement-release.ts",
+            "server-version/backend/src/modules/cognitive/assignment.service.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.controller.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.routes.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.schema.ts",
+            "server-version/backend/src/modules/cognitive/profile-configurations.routes.ts",
+            "server-version/backend/src/modules/cognitive/public.service.ts",
+            "server-version/backend/src/modules/cognitive/session.service.ts",
+            "server-version/backend/src/modules/composite/composite.schema.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-flow-assignment-snapshot.ts",
+            "server-version/backend/src/modules/composite/training-reference-audit.ts",
+            "server-version/backend/src/modules/composite/training-reference-selection.ts",
+            "server-version/backend/src/modules/composite/training-standard-combination.ts",
+            "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+            "server-version/backend/src/modules/education-tools/native-source.contracts.ts",
+            "server-version/backend/src/modules/education-tools/native-source.preview.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-runtime.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.routes.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+            "server-version/backend/src/modules/education-tools/public-source.headers.ts",
+            "server-version/backend/src/modules/education-tools/public-source.identity.ts",
+            "server-version/backend/src/modules/education-tools/selected-source-binding.ts",
+            "server-version/backend/src/modules/education-tools/selected-source-catalog.ts",
+            "server-version/backend/src/modules/huiteacher/platform.routes.ts",
+            "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+            "server-version/backend/src/modules/measurement-content/standard-combination-management.ts",
+            "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+            "server-version/backend/src/modules/measurement-content/standard-report-parameters.ts",
+            "server-version/backend/src/modules/organization/educationProductAccess.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/group-summary.ts",
+            "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/c_ets14_zh_hant/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/c_ets14_zh_hant/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/ets16_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/ets16_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2016_time_pressure_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2016_time_pressure_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_collective_culture_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_collective_culture_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_discipline_problems_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_discipline_problems_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_low_student_motivation_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_low_student_motivation_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supervisory_support_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supervisory_support_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supportive_colleagues_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_supportive_colleagues_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_value_consonance_zh_cn/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/skaalvik2018_value_consonance_zh_cn/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/tses12_en_2024/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/tses12_en_2024/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/tses24_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/tses24_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/tses24_zh_hant/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/tses24_zh_hant/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/uwes3_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/uwes3_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/instruments/uwes9_en/1.0.0/instrument.ts",
+            "server-version/backend/src/modules/scale/instruments/uwes9_en/1.0.0/source.json",
+            "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts",
+            "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+            "server-version/backend/src/modules/scale/onboarding/report-variants.ts",
+            "server-version/backend/src/modules/scale/onboarding/source-snapshot.ts",
+            "server-version/backend/src/modules/survey/admin-role.ts",
+            "server-version/backend/src/modules/survey/analytics.cognitive.ts",
+            "server-version/backend/src/modules/survey/analytics.source.ts",
+            "server-version/backend/src/modules/survey/catalog.service.ts",
+            "server-version/backend/src/modules/survey/catalog.sources.ts",
+            "server-version/backend/src/modules/survey/cognitive-profile.definition.ts",
+            "server-version/backend/src/modules/survey/cognitive-profile.source.ts",
+            "server-version/backend/src/modules/survey/cognitive.definition.ts",
+            "server-version/backend/src/modules/survey/cognitive.public.routes.ts",
+            "server-version/backend/src/modules/survey/cognitive.results.ts",
+            "server-version/backend/src/modules/survey/cognitive.service.ts",
+            "server-version/backend/src/modules/survey/flow.definition.ts",
+            "server-version/backend/src/modules/survey/group-report.service.ts",
+            "server-version/backend/src/modules/survey/measurement-publication.service.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/platform.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/selected-reference-audit.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.model.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.routes.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+            "server-version/backend/src/modules/survey/task.public.ts",
+            "server-version/backend/src/modules/survey/tool-policy.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks.",
+          "cases": [
+            {
+              "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          }
+        },
+        {
+          "id": "sql-events",
+          "path": "docs/evidence/group-report-20261030/postgres-query-count.json",
+          "sha256": "137051a63379f10e0af7a5338cd97193c70fd27827d7393c0d4be105a8017113",
+          "originalSourceAssociation": "f84424dacf7907a84a089a50f01ccd97efd9b15e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261029150000_standard_combination_education_admission/migration.sql",
+            "server-version/backend/prisma/migrations/20261029151000_standard_use_revision_evidence_index/migration.sql",
+            "server-version/backend/prisma/migrations/20261030001000_cognitive_profile_public_template/migration.sql",
+            "server-version/backend/prisma/migrations/20261030002000_cognitive_profile_entry_admission/migration.sql",
+            "server-version/backend/prisma/migrations/20261030003000_training_cognitive_profile_use_index/migration.sql",
+            "server-version/backend/prisma/migrations/20261030004000_survey_cognitive_frozen_trial_budget/migration.sql",
+            "server-version/backend/prisma/migrations/20261030005000_education_cognitive_profile_binding_guard/migration.sql",
+            "server-version/backend/scripts/precise-authorization-read-performance.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-execution.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/dual-report-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/dual-report-setup.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-collection-boundary.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-management-history.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-binding.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-contract.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-guards.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-main-merge.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-operation.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile-setup.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime-fixture.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-cognitive-runtime.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-draft-replacement-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-clock.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog-cross-report.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-catalog.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-source-current.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-selected-source.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management-school.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-revoke.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-binding.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use-current.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/education-standard-use.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/exact-authorization-inventory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/exact-use-runtime-role.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/registered-report-variants.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/selected-configuration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/selected-reference-audit.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-configuration-binding.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/standard-education-admission.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-budget.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-definition.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile-research.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-cognitive-profile.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use-revision.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-standard-use.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/survey-t2-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-composite.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile-general.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-cognitive-profile.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-configuration-management.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-general-exact-journey.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.http.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-named-configuration.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-selected-binding.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-standard-replacement.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-t2-audit.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/cognitive/assignment.service.test.ts",
+            "server-version/backend/src/__tests__/composite/training-flow-assignment-snapshot.test.ts",
+            "server-version/backend/src/__tests__/education-tools/access.test.ts",
+            "server-version/backend/src/__tests__/education-tools/education-observer-source-read.test.ts",
+            "server-version/backend/src/__tests__/education-tools/selected-source-binding.test.ts",
+            "server-version/backend/src/__tests__/education-tools/selected-source-catalog.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/field-expert-public-sources.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/__tests__/measurement-content/standard-report-parameters.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.test.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approval.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-approved-source.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-artifact.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-assignment.ts",
+            "server-version/backend/src/modules/assessment-authorization/cognitive-profile-source.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-binding.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-management.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-cognitive-profile-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-management.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-revoke.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-use-current.ts",
+            "server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/selected-configuration.ts",
+            "server-version/backend/src/modules/assessment-authorization/selected-reference-audit.ts",
+            "server-version/backend/src/modules/assessment-authorization/standard-configuration-binding.ts",
+            "server-version/backend/src/modules/assessment-authorization/survey-standard-use.ts",
+            "server-version/backend/src/modules/assessment-authorization/training-cognitive-profile-use.ts",
+            "server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts",
+            "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+            "server-version/backend/src/modules/assessment-runtime/public-templates.ts",
+            "server-version/backend/src/modules/cognitive/assignment-measurement-release.ts",
+            "server-version/backend/src/modules/cognitive/assignment.service.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.controller.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.routes.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.schema.ts",
+            "server-version/backend/src/modules/cognitive/profile-configurations.routes.ts",
+            "server-version/backend/src/modules/cognitive/public.service.ts",
+            "server-version/backend/src/modules/cognitive/session.service.ts",
+            "server-version/backend/src/modules/composite/composite.schema.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-flow-assignment-snapshot.ts",
+            "server-version/backend/src/modules/composite/training-reference-audit.ts",
+            "server-version/backend/src/modules/composite/training-reference-selection.ts",
+            "server-version/backend/src/modules/composite/training-standard-combination.ts",
+            "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+            "server-version/backend/src/modules/education-tools/native-source.contracts.ts",
+            "server-version/backend/src/modules/education-tools/native-source.preview.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-runtime.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.routes.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+            "server-version/backend/src/modules/education-tools/public-source.headers.ts",
+            "server-version/backend/src/modules/education-tools/public-source.identity.ts",
+            "server-version/backend/src/modules/education-tools/selected-source-binding.ts",
+            "server-version/backend/src/modules/education-tools/selected-source-catalog.ts",
+            "server-version/backend/src/modules/huiteacher/platform.routes.ts",
+            "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+            "server-version/backend/src/modules/measurement-content/standard-combination-management.ts",
+            "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+            "server-version/backend/src/modules/measurement-content/standard-report-parameters.ts",
+            "server-version/backend/src/modules/organization/educationProductAccess.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/group-summary.ts",
+            "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json",
+            "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json",
+            "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts",
+            "server-version/backend/src/modules/scale/onboarding/report-variants.ts",
+            "server-version/backend/src/modules/scale/onboarding/source-snapshot.ts",
+            "server-version/backend/src/modules/survey/admin-role.ts",
+            "server-version/backend/src/modules/survey/analytics.cognitive.ts",
+            "server-version/backend/src/modules/survey/analytics.source.ts",
+            "server-version/backend/src/modules/survey/catalog.service.ts",
+            "server-version/backend/src/modules/survey/catalog.sources.ts",
+            "server-version/backend/src/modules/survey/cognitive-profile.definition.ts",
+            "server-version/backend/src/modules/survey/cognitive-profile.source.ts",
+            "server-version/backend/src/modules/survey/cognitive.definition.ts",
+            "server-version/backend/src/modules/survey/cognitive.public.routes.ts",
+            "server-version/backend/src/modules/survey/cognitive.results.ts",
+            "server-version/backend/src/modules/survey/cognitive.service.ts",
+            "server-version/backend/src/modules/survey/flow.definition.ts",
+            "server-version/backend/src/modules/survey/group-report.service.ts",
+            "server-version/backend/src/modules/survey/measurement-publication.service.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/platform.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/selected-reference-audit.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.model.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.routes.ts",
+            "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+            "server-version/backend/src/modules/survey/task.public.ts",
+            "server-version/backend/src/modules/survey/tool-policy.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts",
+            "server-version/backend/src/services/materialGrant.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks.",
+          "cases": [
+            {
+              "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL counts SQL for one generated report and its snapshot read without repeating the application assertions",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          }
+        },
+        {
+          "id": "wide-form",
+          "path": "docs/evidence/group-report-20261030/wide-form-repair.json",
+          "sha256": "47008cdef79adbb4dcd588f68fa1ee6fe3c0665c7a7c479b9edc8f2f581aa1d2",
+          "originalSourceAssociation": "be1c10330901c03741b2e9356a50b8f6bc7e5a6a",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/measurement-content/training-choice-pagination.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts",
+            "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks.",
+          "cases": [
+            {
+              "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey task group artifacts selects cognitive before metric extraction, so repeated total keys remain isolated",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey task group artifacts selects sjt before metric extraction, so repeated total keys remain isolated",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey task group artifacts adapts only real Form numbers and choice frequencies; excludes text and keeps missing null",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey task group artifacts catalog and saved reads never load/decrypt participant sources; read checks original pointers and authority",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey task group artifacts generates one frozen snapshot and does not request raw cognitive trials",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey task group artifacts rejects changed sample eligibility and cross-project authority before disclosing stored aggregate",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey task group artifacts rejects incompatible measurement identities instead of pooling them",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Survey task group artifacts pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 8
+          }
+        },
+        {
+          "id": "native-continuation",
+          "path": "docs/evidence/group-report-20261030/qualification/native-continuation.json",
+          "sha256": "c9a240ab41926116c9943cf2feb2d225af7d08a918d81fe66cae65df08cb3b58",
+          "originalSourceAssociation": "78899e7fefc1ea6ca14ca4d144f6a37bb275472e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks.",
+          "cases": [
+            {
+              "fullName": "exact main task artifact migration and native backup upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          }
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-20261030/qualification/backend-types.json",
+          "sha256": "44117e96ac14df2e55094e6cfeae6298c5f164ff4edc915557d7e0a39e2679ee",
+          "component": "backend",
+          "componentTree": "b81911415277e35b673dc95300720043ac8ac796",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-20261030/qualification/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/group-report-20261030/qualification/frontend-types.json",
+          "sha256": "758a8650c19a10c563f333997217c2629803e4709cc1d57c75af491799c2835a",
+          "component": "frontend",
+          "componentTree": "dbbeb1ec1230710d5c9108e1f4be7dd42768efdd",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-20261030/qualification/frontend-types.log"
+        }
+      ],
+      "groupReportObservations": [
+        {
+          "kind": "browser",
+          "path": "docs/evidence/group-report-20261030/browser.json",
+          "sha256": "2a5d8919c2e03849300998e462308a92514df96c9f4fca749438dd4299daad04",
+          "sourceAssociationBasis": "Retained actual React synthetic fixture and print-only continuation; reader files inspected unchanged under this main merge.",
+          "limitations": [
+            "Synthetic UI backend; no fresh human login, production capacity or full browser suite claim."
+          ]
+        },
+        {
+          "kind": "native",
+          "path": "docs/evidence/group-report-20261030/qualification/native.json",
+          "sha256": "bfe8bdf9b1647c4ab2c10a8d09b0ed61b2adf578fc406f934bc634031b692891",
+          "sourceAssociationBasis": "Actual exact-main schema migration and retained native PostgreSQL restore; only new table/read/immutable continuation was rerun.",
+          "limitations": [
+            "No second dump/restore; original failures and schema-text differences are retained and source/restore table schema digests match."
+          ]
+        }
+      ]
+    },
     "task1": {
       "schemaVersion": 1,
       "product": "7403128fed365351cacbaa59c75cbe57a7cf810e",
