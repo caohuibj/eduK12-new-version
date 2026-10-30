@@ -21,7 +21,7 @@ export function nativeSastConfig(paths,b=null){
  const python=new Set(['.github/scripts/school-teacher-native-runtime.py','.github/scripts/school-teacher-native-runtime.test.py','.github/scripts/exact-candidate-runtime.py']);
  assert([...python].every(p=>paths.includes(p)),'Native Python extractor inputs missing');
  const reusedApplicationScan=b?.execution.sastContinuation===40980640181;
- return {paths:reusedApplicationScan?['.github/scripts','server-version/e2e','server-version/frontend/e2e','server-version/frontend/vite.config.ts']:['server-version/backend/src','server-version/frontend/src','.github/scripts',...(paths.some(p=>p.includes('school-teacher-package'))?['server-version/e2e']:[])],
+ return {paths:reusedApplicationScan?['.github/scripts','server-version/e2e','server-version/frontend/e2e','server-version/frontend/vite.config.ts']:['server-version/backend/src','server-version/frontend/src','.github/scripts',...Object.keys(b?.source??{}).filter(p=>p.startsWith('server-version/e2e/'))],
   'paths-ignore':paths.filter(p=>p.startsWith('.github/scripts/')&&p.endsWith('.py')&&!python.has(p)).sort(),queries:[{uses:'security-extended'}]};
 }
 export function requireNativeQualification(b){

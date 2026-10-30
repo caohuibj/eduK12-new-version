@@ -156,3 +156,19 @@ test('original byte reader refuses byte drift, filtered selection, invented exit
   const d=JSON.parse(bytes),b=structuredClone(base);mutate(d);const raw=Buffer.from(JSON.stringify(d));b.evidence.manifestSha256=hash(raw);b.evidence.selectionSha256=hash(canonical(selection(d)));assert.throws(()=>verifyNativeEvidence(raw,b,helpers));
  }
 });
+
+// Resource/scope selection only: no application or database replay.
+test('native SAST selects candidate e2e inputs instead of all e2e by filename presence',()=>{
+ const paths=['.github/scripts/school-teacher-native-runtime.py','.github/scripts/school-teacher-native-runtime.test.py','.github/scripts/exact-candidate-runtime.py','.github/scripts/school-teacher-package.test.mjs'];
+ const b={execution:{},source:{'server-version/e2e/jdr-report.cjs':{},'server-version/backend/src/modules/assessment-bundle/profile/report.ts':{}}};
+ const config=nativeSastConfig(paths,b);
+ assert.deepEqual(config.paths,['server-version/backend/src','server-version/frontend/src','.github/scripts','server-version/e2e/jdr-report.cjs']);
+ assert.deepEqual(config.queries,[{uses:'security-extended'}]);
+ assert(ci.includes('nativeSastConfig(paths,binding())'));
+ assert(nativeSastConfig(paths).paths.includes('server-version/backend/src'));
+ assert(!nativeSastConfig(paths,{execution:{},source:{}}).paths.includes('server-version/e2e'));
+ // The established separately authenticated continuation is not changed here.
+ assert(nativeSastConfig(paths,{execution:{sastContinuation:40980640181},source:{}}).paths.includes('server-version/e2e'));
+ assert(ci.includes('ram: ${{ steps.native-bundle-codeql-config.outputs.config && 8000 || 3500 }}'));
+ assert(ci.includes('threads: ${{ steps.native-bundle-codeql-config.outputs.config && 4 || 2 }}'));
+});
