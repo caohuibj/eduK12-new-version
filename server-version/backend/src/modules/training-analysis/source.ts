@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { compileTrainingFlow, type FrozenTrainingFlow } from '../assessment-core/flow/training'
 import { buildTrainingFlowUnits } from '../composite/training-flow-definition'
 import { Prisma, UserRole } from '@prisma/client'
@@ -22,6 +23,8 @@ import { createScaleProjectionContext } from '../scale/projection/context-factor
 import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { resolveTrainingComparability } from './core'
+import { trainingGroupFormDefinitions, trainingGroupFormQuestion, selectLatestTrainingGroupParents, type TrainingGroupSource } from './group-source'
+import type { GroupMetricDefinition, GroupMetricObservation } from '../reporting/group-summary'
 import type { TrainingAnalysisRequestV1, TrainingAnalysisSourceV1, TrainingAnalysisWaveV1, TrainingMetricIdentityV1, TrainingNumericObservationV1, TrainingObservationReason } from './types'
 
 export const TRAINING_ANALYSIS_SOURCE_LIMIT = 6000
@@ -42,6 +45,7 @@ export interface TrainingResearchGovernance {
   acceptedVersionId:string|null;bodyHash:string|null;scopeHash:string|null;dataCategories:string[]|null;status:string|null;revision:number;
 }
 export interface LoadedTrainingAnalysisSources {
+  group?: TrainingGroupSource
   researchGovernance: TrainingResearchGovernance[];
   source: TrainingAnalysisSourceV1; manifest: TrainingAnalysisSourceManifestV1
   authorityHash: string; sourceFingerprint: string; dictionary: TrainingAnalysisSourceManifestV1['dictionary']
@@ -142,7 +146,7 @@ const groupRows = (rows: any[], key: (row: any) => string) => {
 }
 
 /** Only database-backed user or study-local linkage may establish a pair. */
-async function participantIdentities(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, attempts: any[]) {
+export async function trainingParticipantIdentities(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, attempts: any[]) {
   const ids = new Map<string, {participantKey: string; participantKind: 'USER' | 'STUDY_LOCAL'}>()
   for (const attempt of attempts) if (attempt.userId) {
     // Relational observations concern the explicitly bound subject; a teacher
@@ -227,10 +231,11 @@ function cognitivePermission(item: any, key: string, actor: TrainingAnalysisActo
  * including shared plans/templates/facts, uses that exact client. No current
  * CourseStudent join is used: departed students keep their historical records. */
 export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, selector: TrainingAnalysisRequestV1,
-  options: {authorityLock?: 'SHARE' | 'UPDATE'; expectedTokenVersion?: number; fixedManifest?: {attempts: TrainingAnalysisManifestAttemptV1[];researchSources?:Array<{taskId:string;attemptId:string;attemptEpoch:number}>}; sourceCutoff?: string} = {}): Promise<LoadedTrainingAnalysisSources> {
+  options: {authorityLock?: 'SHARE' | 'UPDATE'; expectedTokenVersion?: number; fixedManifest?: {attempts: TrainingAnalysisManifestAttemptV1[];researchSources?:Array<{taskId:string;attemptId:string;attemptEpoch:number}>}; sourceCutoff?: string; group?: {headersOnly?: boolean; parentIds?: string[]}} = {}): Promise<LoadedTrainingAnalysisSources> {
   const cutoff = options.sourceCutoff ? new Date(options.sourceCutoff) : null
   if (cutoff && !Number.isFinite(cutoff.getTime())) throw compositeBadRequest('来源截止时间无效')
   const auth = await authority(tx, actor, selector.courseId, options.authorityLock, options.expectedTokenVersion)
+  if (options.group && selector.waves.length !== 1) throw compositeBadRequest('单次群体报告只选择一个任务来源')
   if (!selector.waves.length || selector.waves.length > 8) throw compositeBadRequest('请选择 1–8 个明确波次')
   const tasks = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, selector.courseId), id: {in: [...new Set(selector.waves.map(wave => wave.taskId))]}}, include: templateInclude})
   if (tasks.length !== new Set(selector.waves.map(wave => wave.taskId)).size) unavailable()
@@ -240,7 +245,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   const taskAuthority: unknown[] = [], policies: unknown[] = []
   for (const wave of selector.waves) {
     const task: any = byTask.get(wave.taskId)
-    if (iso(task.publishedAt) !== wave.publication || !wave.metrics.length || wave.metrics.length > 32) unavailable()
+    if (iso(task.publishedAt) !== wave.publication || !wave.metrics.length || wave.metrics.length > (options.group ? 500 : 32)) unavailable()
     if ((task.trainingVariantDigest ?? null) !== wave.configDigest || Boolean(wave.configDigest) !== Boolean(wave.variantKey)) unavailable()
     const material = materialConfig(task)
     if (material?.schemaVersion === 2 ? !material.experiment.groups.some(group => group.groupKey === wave.materialGroupKey) : wave.materialGroupKey !== undefined) unavailable()
@@ -248,6 +253,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     taskAuthority.push({id: task.id, createdBy: task.createdBy, productKind: task.productKind})
     const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [
       ...(auth.visibility ? [auth.visibility] : []),
+      ...(options.group ? [{assignmentRef: null, status: 'COMPLETED' as const, deliveryMode: 'FINAL_ONLY' as const, runtimeGeneration: 'UNIFIED_V1' as const}, ...(options.group.parentIds ? [{id: {in: options.group.parentIds}}] : [])] : []),
       ...(fixed ? [{OR: [...fixed.filter(row => row.waveKey === wave.waveKey),...(options.fixedManifest?.researchSources??[]).filter(row=>row.taskId===wave.taskId)].map(row => ({id: row.attemptId, attemptEpoch: row.attemptEpoch}))}] : []),
       ...(cutoff ? [{startedAt: {lte: cutoff}}, {OR: [{completedAt: null}, {completedAt: {lte: cutoff}}]}] : []),
     ]
@@ -257,9 +263,12 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     const graph = await loadTrainingVariantExportGraph(task.id, where, {previewLimit: TRAINING_ANALYSIS_SOURCE_LIMIT + 1}, true, tx)
     const attempts: any[] = graph?.template.attempts ?? await tx.compositeAssessmentAttempt.findMany({where, orderBy: {id: 'asc'}, take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1})
     if (attempts.length > TRAINING_ANALYSIS_SOURCE_LIMIT) throw compositeBadRequest('分析来源超过 6000 条，请缩小选择范围')
+    const identitySelection = options.group ? await trainingParticipantIdentities(tx, actor, attempts) : null
+    const groupIds = options.group ? new Set((options.group.parentIds ? attempts : selectLatestTrainingGroupParents(attempts, identitySelection!.ids)).map(row => row.id)) : null
     const eligibleForSlots = attempts.filter(row => row.runtimeGeneration === 'UNIFIED_V1' && row.frozenActiveSlotSetEncrypted && row.frozenActiveSlotSetHash)
     const slotSets = graph?.frozenSlotSets ?? await loadSituationalExportSlotSets(eligibleForSlots, tx)
     for (const row of attempts) {
+      if (groupIds && !groupIds.has(row.id)) continue
       if (row.compositeAssessmentId !== task.id || row.deliveryCourseId !== selector.courseId) invalid('课程来源绑定不一致')
       const attempt = {...row, compositeAssessment: task, scaleAssessments: [], cognitiveSessions: [], formAnswers: []}
       const scope = graph?.scopes.get(row.id) ?? await resolveTrainingAttemptScope(attempt, task, {db: tx, frozenSlotSets: slotSets})
@@ -278,9 +287,13 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
       WHERE a.id IN (${Prisma.join([...new Set(entries.map(entry => entry.attempt.id))])}) AND t.frozen_resource_policy ? 'resultDisclosure' LIMIT 1`
     if (governed.length) unavailable()
   }
+  const {ids:identities,researchGovernance} = await trainingParticipantIdentities(tx, actor, entries.map(entry => entry.attempt))
+  const selected = entries.filter(entry => options.group || identities.has(entry.attempt.id))
+  const group: TrainingGroupSource | undefined = options.group ? {parents: selected.map(({attempt}) => ({attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, stableIdentity: identities.get(attempt.id)?.participantKey ?? null})), definitions: [], observations: [], snapshots: []} : undefined
+  if (options.group?.headersOnly) {
+    return {group, researchGovernance, source: {schemaVersion: 1, courseId: selector.courseId, observations: []}, manifest: {schemaVersion: 1, courseId: selector.courseId, selectorHash: hash(selector), attempts: [], dictionary: [], authoritySnapshot: null, exclusions: {IDENTITY_UNAVAILABLE: 0}}, authorityHash: hash({principal: auth.principal, course: auth.course}), sourceFingerprint: hash({selector, parents: group?.parents ?? []}), dictionary: []}
+  }
   if (entries.reduce((count, entry) => count + entry.wave.metrics.length, 0) > 50000) throw compositeBadRequest('数值观测超过 50000 条，请缩小指标范围')
-  const {ids:identities,researchGovernance} = await participantIdentities(tx, actor, entries.map(entry => entry.attempt))
-  const selected = entries.filter(entry => identities.has(entry.attempt.id))
   const final = selected.filter(entry => entry.attempt.status === 'COMPLETED' && entry.attempt.deliveryMode === 'FINAL_ONLY' && entry.attempt.runtimeGeneration === 'UNIFIED_V1' && entry.slots)
   const finalSet = new Set(final.map(entry => entry.attempt))
   const childConditions = final.map(({attempt, wave, scope}) => ({compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch,
@@ -334,33 +347,45 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   // frozen policy validation. It does not load answers or item-level raw data.
   const selectedItemIds = new Map<string, Set<string>>()
   for (const {wave, attempt} of final) {const ids = selectedItemIds.get(attempt.id) ?? new Set<string>(); wave.metrics.forEach(metric => ids.add(metric.itemId)); selectedItemIds.set(attempt.id, ids)}
-  const factsFor = await preloadCompositeReportFacts(final.map(entry => entry.attempt), tx, {selectedItemIds, numericOnly: true})
+  const factsFor = await preloadCompositeReportFacts(final.map(entry => entry.attempt), tx, {selectedItemIds, numericOnly: true, includeLegacyForm: Boolean(options.group)})
   // Existing canonical validation may internally expand scored item facts, but
   // never reads raw answers. Reuse the same invocation-local fact rows/body;
   // neither scored items nor raw fields enter analysis/export output.
   const uniqueCiphers = [...new Set(canonicalCiphers)]
   const canonicalViews = await loadStoredCanonicalUnitResults(uniqueCiphers, tx, [], factsFor.scaleFacts)
   const canonicalByCipher = new Map(uniqueCiphers.map((cipher, index) => [cipher, canonicalViews[index]]))
+  if (group) group.snapshots = snapshots.map(row => ({attemptId: row.compositeAttemptId!, attemptEpoch: row.attemptEpoch, slotKey: row.slotKey, hash: trainingGroupSnapshotHash(row)}))
+  const groupForms = new Map<string, {question: ReturnType<typeof trainingGroupFormQuestion>; definitions: GroupMetricDefinition[]}>()
+  const categoricalGroup = options.group && selector.waves.some(wave => wave.metrics.some(metric => {const item: any = byTask.get(wave.taskId)!.items.find(item => item.id === metric.itemId); return item.type === 'FORM' && !['NUMBER', 'SLIDER'].includes(item.formDefinition?.type)}))
   const observations: TrainingNumericObservationV1[] = [], manifests: TrainingAnalysisManifestAttemptV1[] = [], formSourceHashes = new WeakMap<object, string>()
   for (const {wave, attempt, scope, slots} of selected) {
-    const participant = identities.get(attempt.id)!, attemptObservations: TrainingNumericObservationV1[] = []
-    const sourceHashes: Record<string, string> = {participant: hash(participant), parent: hash(parentIdentity(attempt)), publication: hash({taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey, ...materialFields(wave)})}
+    const participant = identities.get(attempt.id), attemptObservations: TrainingNumericObservationV1[] = [], groupObservations: GroupMetricObservation[] = []
+    const sourceHashes: Record<string, string> = {participant: hash(participant ?? {response: attempt.id}), parent: hash(parentIdentity(attempt)), publication: hash({taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey, ...materialFields(wave)})}
     if(scope.flow?.materialAssignment){sourceHashes.materialAssignment=scope.flow.materialAssignment.assignmentHash;sourceHashes.materialConfig=scope.flow.config.flowDigest;sourceHashes.materialPath=scope.flow.pathHash}
     const isFinal = finalSet.has(attempt), facts = isFinal ? factsFor(attempt) : null
+    const itemsById = new Map(scope.items.map(item => [item.id, item]))
     for (const metric of wave.metrics) {
-      const item = scope.items.find(candidate => candidate.id === metric.itemId)
+      const item = itemsById.get(metric.itemId)
       let measurementQuality: string | undefined, metricQuality: string | undefined
+      let groupDefinition: GroupMetricDefinition | undefined, groupValue: GroupMetricObservation['value'] = null
       let value: number | null = null, measurement: TrainingMetricIdentityV1 | null = null, reason: TrainingObservationReason | null = null
       if (!item) reason = 'NOT_ASSIGNED'
       else if (!isFinal) reason = 'NON_FINAL'
       else if (item.type === 'FORM') {
-        const question = formMetric(item, metric.metricKey), raw = facts!.typedFormValues.get(item.id), state = facts!.typedFormStates.get(item.id)?.state
+        let groupForm = groupForms.get(item.id)
+        if (options.group && !groupForm) {groupForm = {question: trainingGroupFormQuestion(item), definitions: trainingGroupFormDefinitions(item)}; groupForms.set(item.id, groupForm)}
+        groupDefinition = groupForm?.definitions.find(row => row.key === metric.metricKey)
+        const question = groupForm?.question ?? formMetric(item, metric.metricKey)
+        if (options.group && !groupDefinition) unavailable()
+        const raw = facts!.typedFormValues.get(item.id), state = facts!.typedFormStates.get(item.id)?.state
         const section = scope.formSections.find(candidate => candidate.id === item.formSectionId), slot = slots!.slots.find(candidate => candidate.slotKey === formSectionSlotKey(item.formSectionId))
         if (!section || !slot || slot.sourceDefinitionIdentity.hash !== hash(mapCompositeSection(section))) invalid('表单冻结定义不一致')
-        measurement = {instrumentKey: `FORM:${question.itemKey}`, scoreKey: question.itemKey, scoringDigest: hash(item.formDefinition), responseSignature: hash({type: question.type, definition: item.formDefinition}),
+        measurement = {instrumentKey: `FORM:${question.itemKey}`, scoreKey: question.itemKey, scoringDigest: hash(item.formDefinition ?? {type: question.type, options: question.options}), responseSignature: hash({type: question.type, definition: item.formDefinition ?? {options: question.options}}),
           respondentType: attempt.respondentType ?? 'SELF', unit: null, version: 'training-typed-form-v1'}
+        const projected = question.type === 'MATRIX' || question.type === 'MATRIX_MULTIPLE' ? (raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>)[metric.metricKey.slice(question.itemKey.length + 1)] : null) : raw
+        groupValue = numeric(projected) || typeof projected === 'string' || (Array.isArray(projected) && projected.every(value => typeof value === 'string')) ? projected as GroupMetricObservation['value'] : null
         value = numeric(raw) ? raw : null
-        reason = state === 'NOT_SHOWN' ? 'NOT_ASSIGNED' : raw == null || state === 'REFUSED' || state === 'SHOWN_MISSING' ? 'UNANSWERED' : !numeric(raw) ? 'INVALID_VALUE' : null
+        reason = options.group ? state === 'NOT_SHOWN' ? 'NOT_ASSIGNED' : state === 'REFUSED' || state === 'SHOWN_MISSING' || groupValue === null ? 'UNANSWERED' : null : state === 'NOT_SHOWN' ? 'NOT_ASSIGNED' : raw == null || state === 'REFUSED' || state === 'SHOWN_MISSING' ? 'UNANSWERED' : !numeric(raw) ? 'INVALID_VALUE' : null
         const formRows = (snapshotsByParent.get(attempt.id) ?? []).filter(row => row.slotKey === slot.slotKey && row.attemptEpoch === attempt.attemptEpoch)
         const formRow = formRows[0]
         if (formRows.length !== 1 || !formRow.sourceAttemptId || !formRow.sourceSubmissionId || formRow.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
@@ -383,6 +408,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
         } else {
           const core = envelope.core, storedMetric = core.metrics.find(candidate => candidate.key === metric.metricKey)
           if (!storedMetric) unavailable()
+          if (options.group) groupDefinition = {key: metric.metricKey, label: metric.metricKey, measurement: null, type: 'NUMBER', unit: storedMetric.unit ?? null, range: null}
           measurementQuality = core.quality.status
           metricQuality = storedMetric.quality
           let responseSignature = core.scientificProvenance.protocolSignature ?? core.compiledRuntimeHash
@@ -410,6 +436,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
             // inferred from numericScores, and neither is returned by this API.
             policies.push({taskId: wave.taskId, itemId: item.id, policy: policy.policy, capability})
             const score = result.scores.find(candidate => candidate.key === metric.metricKey)
+            if (groupDefinition && score) {groupDefinition.label = score.label; groupDefinition.range = score.range ?? null}
             if (!score || score.value !== storedMetric.value || (runtime.compiledRuntime.metricDefinitions[metric.metricKey]?.unit ?? null) !== (storedMetric.unit ?? null)
               || hash({status: result.quality.status, flags: [...result.quality.flags].sort()}) !== hash(core.quality)) invalid('量表分数与已接受事实不一致')
             responseSignature = hash({items: runtime.definition.items.map(row => ({itemCode: row.itemCode, responseSetKey: row.responseSetKey})), responseSets: runtime.definition.responseSets})
@@ -423,6 +450,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
             sourceHashes[`scale:${item.id}`] = hash({id: child.id, epoch: child.attemptEpoch, submissionId: child.submissionId, payloadHash: child.submissionPayloadHash, runtime: runtime.snapshotHash, result: sourceResultHash})
           } else if (item.type === 'COGNITIVE') {
             const {report, metric: definition} = cognitivePermission(item, metric.metricKey, actor)
+            if (groupDefinition) groupDefinition.label = definition.label ?? metric.metricKey
             if ((definition.unit ?? null) !== (storedMetric.unit ?? null)) invalid('认知指标单位不一致')
             policies.push({taskId: wave.taskId, itemId: item.id, metricKey: metric.metricKey, profile: report.profile, role: definition.role ?? null, availableProfiles: definition.availableProfiles ?? null})
           } else if (item.type === 'SITUATIONAL') {
@@ -432,15 +460,21 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
             scoringDigest: hash({scorer: core.scorerKey, version: core.scorerVersion, definition: core.sourceDefinitionHash, runtime: core.compiledRuntimeHash}),
             responseSignature, respondentType: attempt.respondentType ?? 'SELF', unit: storedMetric.unit ?? null, version: core.instrumentVersion}
           value = numeric(storedMetric.value) ? storedMetric.value : null
+          groupValue = value
           reason = storedMetric.quality === 'not_calculable' ? 'NOT_CALCULABLE' : core.quality.status === 'invalid' ? 'INVALID_VALUE' : storedMetric.value === null ? 'UNANSWERED' : !numeric(storedMetric.value) ? 'INVALID_VALUE' : null
           sourceHashes[item.id] = envelope.resultHash
         }
       }
-      attemptObservations.push({...participant,...(participant.participantKind==='STUDY_LOCAL'?{researchCategory:item?.type==='SITUATIONAL'?'SJT':item?.type}:{}), waveKey: wave.waveKey, taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey, ...materialFields(wave),
+      if (group) {
+        if (groupDefinition) group.definitions.push({...groupDefinition, measurement})
+        groupObservations.push({parentId: attempt.id, metricKey: metric.metricKey, value: groupValue, missingReason: reason, quality: metricQuality === 'invalid' ? 'invalid' : measurementQuality ?? null})
+      }
+      if (participant && (!groupDefinition || groupDefinition.type === 'NUMBER')) attemptObservations.push({...participant,...(participant.participantKind==='STUDY_LOCAL'?{researchCategory:item?.type==='SITUATIONAL'?'SJT':item?.type}:{}), waveKey: wave.waveKey, taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey, ...materialFields(wave),
         attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, sourceHashes, metricKey: metric.metricKey, itemId: metric.itemId, measurement, value, reason,
         ...(measurementQuality===undefined?{}:{measurementQuality}),...(metricQuality===undefined?{}:{metricQuality}),originalFinalStatus: attempt.status, taskSatisfied: attempt.taskSatisfaction === 'SATISFIED' ? true : attempt.taskSatisfaction === 'NOT_SATISFIED' ? false : null})
     }
-    const sourceHash = hash({sourceHashes, observations: attemptObservations.map(({metricKey, itemId, measurement, value, reason}) => ({metricKey, itemId, measurement, value, reason}))})
+    if (group) group.observations.push(...groupObservations)
+    const sourceHash = hash({sourceHashes, ...(categoricalGroup ? {groupObservations} : {}), observations: attemptObservations.map(({metricKey, itemId, measurement, value, reason}) => ({metricKey, itemId, measurement, value, reason}))})
     sourceHashes.sourceHash = sourceHash
     manifests.push({waveKey: wave.waveKey, taskId: wave.taskId, ...materialFields(wave), attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, sourceHash, sourceHashes,
       status: attempt.status, taskSatisfaction: attempt.taskSatisfaction ?? null})
@@ -459,7 +493,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     exclusions: {IDENTITY_UNAVAILABLE: entries.length - selected.length}}
   // If a frozen parent disappeared, moved, changed epoch or lost authority,
   // rereading can only shrink its sample and must change this fingerprint.
-  return {researchGovernance,source: {schemaVersion: 1, courseId: selector.courseId, observations}, manifest, dictionary,
+  return {...(group ? {group} : {}),researchGovernance,source: {schemaVersion: 1, courseId: selector.courseId, observations}, manifest, dictionary,
     authorityHash: hash(authoritySnapshot), sourceFingerprint: hash({selector: manifest.selectorHash, attempts: manifests, dictionary})}
 }
 const taskIdOf = (attempt: any) => attempt.compositeAssessmentId
@@ -503,12 +537,12 @@ async function discoveryScaleRuntimes(rows: any[], tx: Prisma.TransactionClient)
 /** Discovery reads every authorized frozen dictionary, never editable templates.
  * The public selector cannot distinguish conflicting meanings for one item/key. */
 async function discoverFrozenScaleMetrics(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string,
-  tasks: any[], visibility: Prisma.CompositeAssessmentAttemptWhereInput | null) {
+  tasks: any[], visibility: Prisma.CompositeAssessmentAttemptWhereInput | null, itemId?: string) {
   const scaleTasks = tasks.filter(task => task.items.some((item: any) => item.type === 'SCALE'))
   const metrics = new Map<string, Array<{itemId: string; metricKey: string; label: string}>>()
   if (!scaleTasks.length) return metrics
   const rows: any[] = await tx.assessment.findMany({where: {
-    status: 'COMPLETED', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1',
+    status: 'COMPLETED', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', ...(itemId ? {compositeItemId: itemId} : {}),
     compositeAttempt: {is: {compositeAssessmentId: {in: scaleTasks.map(task => task.id)}, deliveryCourseId: courseId,
       status: 'COMPLETED', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', ...(visibility ? {AND: [visibility]} : {})}},
   }, select: {id: true, compositeAttemptId: true, compositeItemId: true, scaleId: true, attemptEpoch: true,
@@ -600,9 +634,9 @@ async function discoverFrozenScaleMetrics(tx: Prisma.TransactionClient, actor: T
 
 /** Bounded, owner-authorized discovery. Actual runs revalidate every frozen
  * source and disclosure; Scale selectors come only from frozen runtimes. */
-export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string, options: {authorityLock?: 'SHARE' | 'UPDATE'} = {}) {
+export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string, options: {authorityLock?: 'SHARE' | 'UPDATE'; group?: boolean; taskId?: string; groupKey?: string} = {}) {
   const auth = await authority(tx, actor, courseId, options.authorityLock)
-  const tasks: any[] = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId), publishedAt: {not: null}}, include: templateInclude,
+  const tasks: any[] = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId), publishedAt: {not: null}, ...(options.taskId ? {id: options.taskId} : {})}, include: templateInclude,
     orderBy: [{publishedAt: 'desc'}, {id: 'asc'}], take: 101})
   const list: Array<{taskId: string; taskName: string; publication: string; configDigest: string | null; variantKey: string | null; materialGroupKey?: string; metrics: Array<{itemId: string; metricKey: string; label: string}>}> = []
   // Discover SJT metric keys from accepted frozen facts, never from a mutable
@@ -612,8 +646,8 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     JOIN assessment_run_tracks t ON t.organization_id=e.organization_id AND t.run_id=e.run_id AND t.id=e.track_id
     WHERE a.composite_assessment_id IN (${Prisma.join(tasks.map(task => task.id))}) AND t.frozen_resource_policy ? 'resultDisclosure'` : []
   const blocked = new Set(governed.map(row => row.id)), available = tasks.slice(0, 100).filter(task => !blocked.has(task.id))
-  const sjtTasks = available.filter(task => task.items.some((item: any) => item.type === 'SITUATIONAL'))
-  const sjtRows: any[] = sjtTasks.length ? await tx.assessmentUnitSnapshot.findMany({where: {unitType: 'SITUATIONAL', compositeAttempt: {is: {
+  const sjtTasks = available.filter(task => task.items.some((item: any) => item.type === 'SITUATIONAL' && (!options.groupKey || item.id === options.groupKey)))
+  const sjtRows: any[] = sjtTasks.length ? await tx.assessmentUnitSnapshot.findMany({where: {unitType: 'SITUATIONAL', ...(options.groupKey ? {slotKey: compositeItemSlotKey(options.groupKey, 'SITUATIONAL')} : {}), compositeAttempt: {is: {
     compositeAssessmentId: {in: sjtTasks.map(task => task.id)}, deliveryCourseId: courseId, status: 'COMPLETED', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1',
     ...(auth.visibility ? {AND: [auth.visibility]} : {}),
   }}}, include: {compositeAttempt: true}, orderBy: {id: 'asc'}, take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1}) : []
@@ -662,11 +696,15 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     for (const metric of envelope?.core.metrics ?? []) if ((metric.value === null || numeric(metric.value)) && !existing.some(value => value.itemId === item.id && value.metricKey === metric.key)) existing.push({itemId: item.id, metricKey: metric.key, label: metric.key})
     sjtMetrics.set(task.id, existing)
   }
-  const scaleMetrics = await discoverFrozenScaleMetrics(tx, actor, courseId, available, auth.visibility)
+  const scaleTasks = options.groupKey ? available.filter(task => task.items.some((item: any) => item.type === 'SCALE' && item.id === options.groupKey)) : available
+  const scaleMetrics = await discoverFrozenScaleMetrics(tx, actor, courseId, scaleTasks, auth.visibility, options.groupKey)
   for (const task of available) {
     const metrics: Array<{itemId: string; metricKey: string; label: string}> = [...(sjtMetrics.get(task.id) ?? []), ...(scaleMetrics.get(task.id) ?? [])]
     for (const item of task.items) {
-      if (item.type === 'FORM' && item.formDefinition && ['NUMBER', 'SLIDER'].includes(item.formDefinition.type)) {
+      if (options.groupKey && (item.type === 'FORM' ? `FORM:${item.formSectionId}` : item.id) !== options.groupKey) continue
+      if (options.group && item.type === 'FORM') {
+        for (const definition of trainingGroupFormDefinitions(item)) metrics.push({itemId: item.id, metricKey: definition.key, label: definition.label})
+      } else if (item.type === 'FORM' && item.formDefinition && ['NUMBER', 'SLIDER'].includes(item.formDefinition.type)) {
         const question = formMetric(item, item.formDefinition.itemKey); metrics.push({itemId: item.id, metricKey: question.itemKey, label: question.prompt})
       } else if (item.type === 'COGNITIVE') {
         const frozen = readFrozenReport(item.cognitiveAssignment?.resolvedReportSnapshotEncrypted)
@@ -687,6 +725,33 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
         variantKey: group.variantKey, metrics: metrics.filter(metric => group.selectedItemIds.includes(metric.itemId))})
     } else list.push({taskId: task.id, taskName: task.name, publication: iso(task.publishedAt)!, configDigest: null, variantKey: null, metrics})
   }
-  return {list, total: list.length, hasMore: tasks.length > 100, canQuality: true, canExport: true,
+  const tools = options.group ? list.flatMap(source => {
+    const task = available.find(task => task.id === source.taskId)!
+    const keys = new Set(source.metrics.map(metric => {const item = task.items.find((item: any) => item.id === metric.itemId)!; return item.type === 'FORM' ? `FORM:${item.formSectionId}` : item.id}))
+    return [...keys].map(key => {
+      const metrics = source.metrics.filter(metric => {const item = task.items.find((item: any) => item.id === metric.itemId)!; return (item.type === 'FORM' ? `FORM:${item.formSectionId}` : item.id) === key})
+      const item = task.items.find((item: any) => item.id === metrics[0].itemId)!
+      const definitions = metrics.map(metric => {const field = task.items.find((candidate: any) => candidate.id === metric.itemId)!; return field.type === 'FORM' ? trainingGroupFormDefinitions(field).find(definition => definition.key === metric.metricKey)! : {key: metric.metricKey, label: metric.label, type: 'NUMBER' as const, measurement: null, unit: null, range: null}})
+      return {source: {...source, metrics}, definitions, key, kind: item.type === 'SITUATIONAL' ? 'SJT' : item.type, title: item.scale?.name ?? item.cognitiveAssignment?.title ?? (item.type === 'FORM' ? `${task.formSections.find((section: any) => section.id === item.formSectionId)?.title ?? '表单'} · ${item.formLabel}` : null) ?? item.situationalInstrumentKey ?? key}
+    })
+  }) : []
+  return {tools, list, total: list.length, hasMore: tasks.length > 100, canQuality: true, canExport: true,
     unsupportedReason: '独立 Assessment 或缺少冻结课程来源的数据标记为 LEGACY_UNSCOPED，不依据当前班级成员推断。'}
+}
+
+/** Reuse original course/task ownership at the snapshot boundary; no result read. */
+export async function assertTrainingGroupAccess(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string, taskId?: string) {
+  await authority(tx, actor, courseId, 'SHARE')
+  if (taskId && !await tx.compositeAssessment.findFirst({where: {...authorizedTaskWhere(actor, courseId), id: taskId}, select: {id: true}})) unavailable()
+}
+/** Immutable accepted slot pointers can be checked without decrypting facts. */
+export function trainingGroupSnapshotHash(row: any) {
+  return hash({slotKey: row.slotKey, terminalState: row.terminalState, payloadKind: row.payloadKind, sourceType: row.sourceType ?? null,
+    sourceAttemptId: row.sourceAttemptId ?? null, sourceSubmissionId: row.sourceSubmissionId ?? null, sourceDefinitionHash: row.sourceDefinitionHash ?? null,
+    canonicalDigest: row.canonicalDigest ?? (row.canonicalResultEncrypted ? createHash('md5').update(row.canonicalResultEncrypted).digest('hex') : null), collectionDigest: row.collectionDigest ?? (row.collectionFactsEncrypted ? createHash('md5').update(row.collectionFactsEncrypted).digest('hex') : null), completedAt: iso(row.completedAt)})
+}
+
+export async function listTrainingGroupTasks(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string) {
+  await assertTrainingGroupAccess(tx, actor, courseId)
+  return tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId), publishedAt: {not: null}}, select: {id: true, name: true}, orderBy: {publishedAt: 'desc'}, take: 100})
 }
