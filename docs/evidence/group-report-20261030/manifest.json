@@ -77,12 +77,17 @@
       "download": "official GitHub release; published archive checksum verified",
       "shellcheck": false,
       "pyflakes": false
+    },
+    "firstDraftCi": {
+      "runId": "41012289991",
+      "state": "FAILURE",
+      "reason": "precise base correctly rejected moved main; no application/new control contracts ran"
     }
   },
   "files": {
     "README.md": {
-      "bytes": 3259,
-      "sha256": "a47ac5bb1b5a223941de4429391fb38edbc3de942b86e7d73b56a1d5481a452d"
+      "bytes": 4183,
+      "sha256": "846f4e89de010e54e71ae16383caa4d627e62b3b0ba649eb2029003bab72cb92"
     },
     "actionlint.log": {
       "bytes": 0,
@@ -111,6 +116,14 @@
     "browser.json": {
       "bytes": 463,
       "sha256": "2a5d8919c2e03849300998e462308a92514df96c9f4fca749438dd4299daad04"
+    },
+    "ci-first-failed.log": {
+      "bytes": 9189,
+      "sha256": "bf55c87517a88dec6a70ddf441dafc97443fcab7c0d41c97f428fcc12c131c8f"
+    },
+    "ci-first.json": {
+      "bytes": 515,
+      "sha256": "bcf5599e75424fe535f0e83a1ced2ebc703ab2778f76a45bdefe5109131faada"
     },
     "frontend-lint.log": {
       "bytes": 695,
@@ -206,5 +219,6 @@
     "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": "c113769b253e0ab587e07cf9d120ad973933177fd4725bcfeb2ada5dc5587d1c",
     "server-version/frontend/src/survey/SurveyGroupReports.test.tsx": "8aaa80c22bd7894f33e9277132501011c185f880355a2adf96d01fd4a3f69b71",
     "server-version/frontend/src/survey/SurveyGroupReports.tsx": "2fb81cb4eb0c9a5dcdc339b58e746bcdd384d0577685b437d42ddb7680d95bc4"
-  }
+  },
+  "integratedMain": "dfd506347cfa2c684a75812936f32d48bdce34d4"
 }

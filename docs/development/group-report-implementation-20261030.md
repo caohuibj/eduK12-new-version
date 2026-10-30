@@ -36,6 +36,10 @@
 
 个人纵向 PR399 的 `reporting/personal-tracking.ts`、Survey 计划/波次/个人投影由另一节点所有；本批没有修改、复制该分支或新增第二套 SelectedFinalResolver/Observation。PR401 多版本控制/授权文件未改。
 
+## 主干前移与首轮 Draft 分类
+
+PR404 创建时 main 已前移到 `dfd506347cfa2c684a75812936f32d48bdce34d4`（PR400/402，仅量表素材/目录），首轮 CI `41012289991` 在分类阶段按精确旧 base 正确拒绝；没有应用检查或新控制合同执行。已安全 merge 最新 main，原应用源码、锁、schema 与本批新增迁移未变，仅更新精确 Draft base，不为纯素材重跑应用回归。原 run/head/job/首错及下游未执行保留于证据目录。
+
 ## 第 1a 批：Survey 单次完整闭环
 
 本 PR 先拆出 Survey，Training 为下一入口批次；当前没有声称四入口或群体纵向全部完成。

@@ -14,3 +14,9 @@
 所有原 FAIL、setup 未执行和过滤项保留，不将后续通过改写为原调用全绿。`browser.json` 是原打印续行脚本生成的合并摘要，应结合原脚本/失败位置/截图及本 README 判断其分段来源。
 
 当前 CI 只准备 Draft 源码/范围控制预检；三项新的控制合同主要执行位置为 GitHub，不在本地重复执行。正式构建/适用镜像扫描、SAST、精确 main 升级与 native dump/restore、Ready 汇总尚未执行。没有 APPROVE、合并、部署或真实用户写入。
+
+## 首轮真实 CI 与受控续行
+
+PR404 / source `83f5e9a0a069d386d2ae230402f179c1ea69053a` 的 CI `41012289991` 在 `classify changed content` job `123920641090` 的 lightweight 分类 step 拒绝：实际 base 已是 `dfd506347cfa2c684a75812936f32d48bdce34d4`，原精确 pin 为 `5a39fd7b...`。这是新 main 被正确拒绝，不是应用失败；三个新控制合同也未执行。`merge gate` job `123920739968` 为下游 failure。独立 publication `41012289643` 成功。原记录见 `ci-first.*`。
+
+新 main 是 PR400/402 的纯量表素材和目录，无 reporting/Survey/schema/锁变化。安全 merge 后仅更新 Draft 精确 base；原应用源码与受影响消费者输入未变，不重跑单元、类型、PG、浏览器或构建。下次仅执行尚未运行的新控制合同、当前 scope/gate，继续保持 Draft；CI-019/020 的来源/消费者绑定检查适用。正式资格仍 NOTRUN。

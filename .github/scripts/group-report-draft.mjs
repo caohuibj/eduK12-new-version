@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {participantAccessOutputs} from './participant-access-scope.mjs';
 
 export const groupReportBranch='feat/group-report-snapshots-20261030';
-export const groupReportBase='5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb';
+export const groupReportBase='dfd506347cfa2c684a75812936f32d48bdce34d4';
 export const groupReportFiles=Object.freeze([
   '.github/scripts/group-report-draft.mjs','.github/scripts/group-report-draft.test.mjs',
   '.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml',
@@ -14,7 +14,7 @@ export const groupReportFiles=Object.freeze([
   'server-version/e2e/group-report-browser.cjs','server-version/e2e/group-report-fixture.tsx',
 ]);
 const evidenceNames=['README.md','manifest.json','backend-tests.json','frontend-tests.json','frontend-repair.json',
-  'postgres-setup-first.json','postgres-setup-diagnostic.json','postgres-setup-repair.json','postgres-query-count.json','postgres-query-count.log','actionlint.log','postgres-first.json','postgres-boundary-repair.json','postgres-diagnostic.log','postgres-setup-repair.log','postgres-first.log','postgres-boundary-repair.log',
+  'postgres-setup-first.json','postgres-setup-diagnostic.json','postgres-setup-repair.json','postgres-query-count.json','postgres-query-count.log','actionlint.log','ci-first-failed.log','ci-first.json','postgres-first.json','postgres-boundary-repair.json','postgres-diagnostic.log','postgres-setup-repair.log','postgres-first.log','postgres-boundary-repair.log',
   'browser-original.cjs','browser-original.log','browser-print.log','browser.json','group-1440.png','group-390.png','group-report.pdf','group-report.txt',
   'backend-types.log','frontend-types.log','frontend-lint.log'];
 const allowed=new Set([...groupReportFiles,...evidenceNames.map(p=>'docs/evidence/group-report-20261030/'+p)]);
