@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
+import {verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
@@ -408,4 +408,15 @@ test('Teacher Form reader qualification stays frontend-only and reuses the origi
  const original=JSON.parse(readFileSync('docs/evidence/group-report-teacher-reading-20261030/browser.json'));
  assert.equal(verifyTeacherReadingObservation(original,'browser').testsExecutedInCI,false);
  assert.throws(()=>verifyTeacherReadingObservation({...original,readOnlyPublishedProjection:false},'browser'));
+});
+
+test('Teacher subgroup qualification keeps native versions and retained stage observations on the fixed route',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/huiteacher/groupReport.service.ts',b={...f.b,pr:418,source:{[file]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file}:e),env={...f.env,CI_PR_NUMBER:'418',CI_HEAD_REF:BRANCHES[418]};
+ const p=onboardingPlan(entries,base,head,f.read,env,b);assert.equal(p.pr,418);assert(task1SastConfig(p,b).paths.includes(file));
+ assert.throws(()=>onboardingPlan(entries.map(e=>e.file===file?{...e,file:'server-version/backend/src/unrelated.ts'}:e),base,head,f.read,env,b));
+ const native=JSON.parse(readFileSync('docs/evidence/group-report-teacher-subgroups-20261030/postgres-proof.json')),browser=JSON.parse(readFileSync('docs/evidence/group-report-teacher-subgroups-20261030/browser.json'));
+ assert.equal(verifyTeacherSubgroupObservation(native,'teacher-native').testsExecutedInCI,false);assert.equal(verifyTeacherSubgroupObservation(browser,'browser').testsExecutedInCI,false);
+ assert.throws(()=>verifyTeacherSubgroupObservation({...native,privateManifestNotReturned:false},'teacher-native'));
+ assert.throws(()=>verifyTeacherSubgroupObservation({...browser,snapshotReadsAndOneExplicitGeneration:false},'browser'));
 });
