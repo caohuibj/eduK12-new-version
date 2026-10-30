@@ -196,8 +196,19 @@ export function parseDeclarativePackage(raw: unknown): DeclarativePackage {
   if(value.schemaVersion===2){
     const profile=value.profile
     validateProfileModel(profile)
-    const grade=evidence.get(profile.applicability.gradeEvidenceKey)
-    if(!grade || slots.get(grade.slotKey)?.unitType!=='FORM' || grade.valueType!=='number')fail('profile.applicability','declared numeric grade context required')
+    if('gradeEvidenceKey' in profile.applicability){
+      const grade=evidence.get(profile.applicability.gradeEvidenceKey)
+      if(!grade || slots.get(grade.slotKey)?.unitType!=='FORM' || grade.valueType!=='number')fail('profile.applicability','declared numeric grade context required')
+    }else{
+      const context=value.context===undefined?null:parseBundleContextDefinition(value.context)
+      const selectors:string[]=[]
+      for(const key of [profile.applicability.adultEvidenceKey,profile.applicability.teacherEvidenceKey]){
+        const e=evidence.get(key),slot=e?slots.get(e.slotKey):undefined,field=context?.fields.find(f=>f.contextKey===e?.selector)
+        if(!e || e.role!=='CONTEXT' || e.valueType!=='boolean' || slot?.unitType!=='FORM' || !slot.required || !field?.required || field.valueType!=='boolean')fail('profile.applicability','required boolean adult/teacher FORM context required')
+        selectors.push(e!.selector)
+      }
+      unique(selectors,'profile.applicability.context')
+    }
     const sourceMetrics:string[]=[]
     for(const b of profile.bindings){
       const e=evidence.get(b.evidenceKey),slot=e?slots.get(e.slotKey):undefined

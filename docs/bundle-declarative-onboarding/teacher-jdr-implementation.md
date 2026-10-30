@@ -99,3 +99,13 @@ HSE 指令为过去六个月；CBI 为当前工作感受，未指定相同固定
 - 后端类型/正式产物与安全 → 组合类型不兼容、未编译源码及受影响安全路径 → 在最终完整 diff 冻结后核现有 route，缺失检查仅选必需项，真实 CodeQL 与稳定 gate 保留。前端未修改不构建。若现有分类强制无关平台，先给出精确阻碍，不新建 workflow 或旁路。
 
 本地定向检查预计分钟级；正式 CI 的精确 jobs、证据是否正式可接纳和预算在候选冻结后填写，当前**未启动 CI**。适用正式激活前读原 Notion checklist，首错保留、只修受影响项，同产物不重复构建。没有代码或输入变化的旧成功证据不重跑。最终给出精确 PR/head/正式结果，等待本轮具体合并确认；不部署。
+
+## 成人适用切片实际记录
+
+已增加 `ADULT_TEACHER` applicability，绑定两个不同、必做的布尔 FORM Context；原 grade 声明不加默认字段。中文表单复用已有单选和布尔提交转换，成人声明不写 canonical grade/role，不读取个人资料或变更授权。
+
+- `profile-adult-applicability.test.ts` 首轮 7 PASS；随后补充“两个证据不能来自同一答案”的负例，只执行该变动 case，1 PASS / 6 filtered。其余六例未重复。
+- 后端 `tsc --noEmit --pretty false` 首轮真实 exit 2：成人/年级表单返回联合类型使原写法触发 TS2783（重复字段展开）。改为先选择完整表单对象再展开，修复后同命令 exit 0；不改类型为 any，不降低断言。
+- 原始 reporter、日志、退出码及命令/源码/锁文件/运行环境清单保留在本节点 `/workspace/bundle-inputs/jdr-bundle-20261030/`。这是本地结果，尚未正式 CI 接纳。没有安装、计分、DB 旅程或浏览器执行。
+
+还确认既有 `dependencyBlockers` 将每个核心来源的 `versionAxes.subjectKey` 与整个模型 domain 相等比较。这只适合原 EVC 同学科映射，四个 HSE 各自有真实 subjectKey，不能伪改源身份。后续最小兼容修复是在每个 binding 的 source 中可选冻结自己的 subjectKey；未声明的旧包仍按原 domain 校验。不改 C/P/R 或授权服务。

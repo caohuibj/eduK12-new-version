@@ -11,7 +11,11 @@ export const profileSchema = z.object({
   key, version, mappingVersion: version, templateVersion: version,
   algorithm: z.literal('weighted-l1-guarded-v1'), maturity: z.literal('EXPERIMENTAL'),
   sourceArchiveHash: hash,
-  applicability: z.object({ domain: text, gradeEvidenceKey: key, minGrade: z.number().int().min(1).max(12), maxGrade: z.number().int().min(1).max(12) }).strict(),
+  applicability: z.union([
+    // Keep the original grade declaration byte-compatible for frozen EVC packages.
+    z.object({ domain: text, gradeEvidenceKey: key, minGrade: z.number().int().min(1).max(12), maxGrade: z.number().int().min(1).max(12) }).strict(),
+    z.object({ domain: text, kind: z.literal('ADULT_TEACHER'), adultEvidenceKey: key, teacherEvidenceKey: key }).strict(),
+  ]),
   bindings: z.array(z.object({
     constructKey: key, evidenceKey: key, label: text, contributionGroup: key, weight: z.number().finite().positive().max(1000),
     source: z.object({
@@ -44,7 +48,9 @@ export function validateProfileModel(model: ProfileModel) {
   const unique = (values:string[]) => { if(new Set(values).size!==values.length)throw new Error('PROFILE_DUPLICATE_IDENTITY') }
   unique(model.bindings.map(b=>b.constructKey));unique(model.bindings.map(b=>b.evidenceKey));unique(model.bindings.map(b=>b.contributionGroup));unique(model.profiles.map(p=>p.id));unique(model.modifierRuleIds)
   const m=model.matching
-  if(!(m.lowMax<m.highMin && m.fuzzyLowPlateauEnd<m.fuzzyMidpoint && m.fuzzyMidpoint<m.fuzzyHighPlateauStart) || model.applicability.minGrade>model.applicability.maxGrade)throw new Error('PROFILE_INVALID_BOUNDARY')
+  if(!(m.lowMax<m.highMin && m.fuzzyLowPlateauEnd<m.fuzzyMidpoint && m.fuzzyMidpoint<m.fuzzyHighPlateauStart) ||
+    ('gradeEvidenceKey' in model.applicability && model.applicability.minGrade>model.applicability.maxGrade))throw new Error('PROFILE_INVALID_BOUNDARY')
+  if('kind' in model.applicability && model.applicability.adultEvidenceKey===model.applicability.teacherEvidenceKey)throw new Error('PROFILE_DUPLICATE_APPLICABILITY_CONTEXT')
   const keys=model.bindings.map(b=>b.constructKey).sort().join('|'), patterns:string[]=[]
   for(const b of model.bindings)if(b.transformation.max<=b.transformation.min)throw new Error('PROFILE_INVALID_RANGE')
   for(const p of model.profiles){
