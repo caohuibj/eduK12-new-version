@@ -200,7 +200,7 @@
       "enabled": false,
       "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
       "product": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
-      "controlCheckpoint": "c81e11ccda2a006949dd7c91f084fb75b4cf953e",
+      "controlCheckpoint": "880223ffdd8092731438b0b25ec27dd8f03ab3d3",
       "components": {
         "backend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
         "frontend": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8"
