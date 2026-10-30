@@ -1,3 +1,4 @@
+import {surveyTrackingSelectionSchema} from './personal-tracking'
 import {listSurveyContentOptions,surveyContentOptionsQuerySchema} from './content-options.service'
 import {SurveyBuilderError} from './builder.service'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -63,6 +64,8 @@ surveyWavesRouter.get('/:pid/waves/:wid',handle(req=>
   service.getWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid))))
 surveyWavesRouter.patch('/:pid/waves/:wid',handle(req=>
   service.updateWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),update.parse(req.body))))
+surveyWavesRouter.post('/:pid/waves/:wid/next',handle(req=>
+  service.createNextWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),z.object({requestId:id}).strict().parse(req.body).requestId)))
 surveyWavesRouter.post('/:pid/waves/:wid/preflight',handle(req=>
   service.preflightWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid))))
 
@@ -76,8 +79,8 @@ for(const [name,action] of [['rotate','ROTATE'],['revoke','REVOKE']] as const){
     })))
 }
 surveyWavesRouter.post('/:pid/waves/:wid/prepare',handle(req=>{
-  const input=revision.extend({contentSelections:surveyContentSelectionsSchema.optional(),participantFeedback:surveyParticipantFeedbackSelectionsSchema.optional()}).parse(req.body)
-  return publish.prepareWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),input.revision,input.contentSelections,input.participantFeedback)
+  const input=revision.extend({contentSelections:surveyContentSelectionsSchema.optional(),participantFeedback:surveyParticipantFeedbackSelectionsSchema.optional(),tracking:surveyTrackingSelectionSchema.optional()}).parse(req.body)
+  return publish.prepareWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),input.revision,input.contentSelections,input.participantFeedback,input.tracking)
 }))
 surveyWavesRouter.post('/:pid/waves/:wid/open',handle(req=>
   publish.openWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),

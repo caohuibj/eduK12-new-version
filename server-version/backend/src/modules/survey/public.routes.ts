@@ -1,3 +1,4 @@
+import {readSurveyPersonalChanges} from './personal-tracking.service'
 import { surveySituationalRouter } from './situational-native.public.routes'
 import { SurveySituationalProtocolError } from './situational-native.contract'
 import { surveySituationalReceiptReferenceSchema } from './situational-native.contract'
@@ -114,6 +115,8 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/final',handle(req=>
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/screen-out',handle(req=>
   screenOutResearchAttempt({publicId:id.parse(req.params.publicId),
     attemptId:id.parse(req.params.attemptId),...submission.parse(req.body)})))
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/changes',handle(req=>
+  readSurveyPersonalChanges({publicId:id.parse(req.params.publicId),attemptId:id.parse(req.params.attemptId),...proof.parse(req.body)})))
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/general',handle(req=>
   readGeneralForOwnAttempt({publicId:id.parse(req.params.publicId),
     attemptId:id.parse(req.params.attemptId),...proof.parse(req.body)})))

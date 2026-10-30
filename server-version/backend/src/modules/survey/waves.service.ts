@@ -1,3 +1,4 @@
+import {surveyFormTrackingIdentity} from './personal-tracking'
 import {surveyFrozenMeasurementPointerSchema,surveyFrozenContentSelectionSchema} from './content-selection'
 import {z} from 'zod'
 import {surveyRawFeedbackSchema} from './participant-feedback'
@@ -7,7 +8,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { surveyKindSchema } from './builder.definition'
 import { previewResearchInstrument } from './builder.compiler'
-import { compileFrozenResearchUnit,resolveSurveyMeasurementUnit,surveyMeasurementPublicationMode,type ResearchFrozenUnit } from './publication.service'
+import { compileFrozenResearchUnit,resolveSurveyMeasurementUnit,surveyMeasurementReleaseInput,surveyMeasurementPublicationMode,type ResearchFrozenUnit,type ResearchFrozenPublication } from './publication.service'
 import { assertSurveyMediaOwned } from './media.references'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { compileSurveyFlow,parseSurveyFlowDraft,SurveyFlowError } from './flow.definition'
@@ -100,7 +101,7 @@ export async function getWave(uid:string,pid:string,wid:string){
     if(parsed.data.units.some(unit=>unit.contentSelection&&(!unit.measurementRelease||unit.kind==='FORM'||
       unit.contentSelection.referencePolicy.measurementReleaseId!==unit.measurementRelease.releaseId)))
       return fail(409,'冻结内容版本来源校验失败')
-    return {...wave,frozenContentSelections:parsed.data.units.filter(unit=>unit.kind!=='FORM').map(unit=>({
+    return {...wave,longitudinal:(publication.compiledSnapshot as unknown as ResearchFrozenPublication).longitudinal??null,frozenContentSelections:parsed.data.units.filter(unit=>unit.kind!=='FORM').map(unit=>({
       draftId:unit.draftId,instrumentKey:unit.instrumentKey,title:unit.title,
       measurementRelease:unit.measurementRelease??null,contentSelection:unit.contentSelection??null})),frozenParticipantFeedback:parsed.data.units.filter(unit=>unit.kind==='SCALE'||unit.kind==='SJT')
       .map(unit=>({draftId:unit.draftId,instrumentKey:unit.instrumentKey,title:unit.title,participantFeedback:unit.participantFeedback??null}))}
@@ -108,6 +109,7 @@ export async function getWave(uid:string,pid:string,wid:string){
 }
 type WaveInput={
   requestId:string;title:string;consentText:string;generalText?:string;instrumentIds:string[];
+  longitudinalSourceWaveId?:string;
   opensAt?:string|null;closesAt?:string|null;finishUntil?:string|null;
   quotaStarts?:number|null;allowNewParticipants?:boolean;
   linkageNoticeConfirmed?:boolean
@@ -136,6 +138,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
         ||existing.revision!==0||existing.title!==input.title
         ||existing.consentText!==input.consentText
         ||existing.generalText!==(input.generalText??'')
+        ||existing.longitudinalSourceWaveId!==(input.longitudinalSourceWaveId??null)
         ||existing.linkageNoticeConfirmed!==(input.linkageNoticeConfirmed===true)
         ||JSON.stringify(existing.instrumentIds)!==JSON.stringify(input.instrumentIds)
         ||canonicalHash(existing.flowDefinition)!==canonicalHash(flowDefinition)
@@ -150,12 +153,19 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
         fail(409,'同一波次创建请求 ID 已用于不同内容')
       return existing
     }
+    if(input.longitudinalSourceWaveId){
+      const source=await ownWave(tx,pid,input.longitudinalSourceWaveId)
+      if(!source.publicationId||source.status==='DRAFT')fail(409,'续轮须来自已经正式开放的纵向波次')
+      const publication=await tx.surveyPublication.findUniqueOrThrow({where:{id:source.publicationId!}})
+      if(!(publication.compiledSnapshot as unknown as ResearchFrozenPublication).longitudinal)fail(409,'来源波次未配置纵向计划')
+    }
     await validateDraftRefs(tx,pid,input.instrumentIds)
     const ordinal=await tx.surveyWave.aggregate({where:{projectId:pid},_max:{ordinal:true}})
     const next=(ordinal._max.ordinal||0)+1
     if(next>100)fail(400,'首版单项目最多 100 个波次')
     const row=await tx.surveyWave.create({data:{
       id:input.requestId,projectId:pid,ordinal:next,title:input.title,
+      longitudinalSourceWaveId:input.longitudinalSourceWaveId??null,
       consentText:input.consentText,generalText:input.generalText??'',consentVersion:1,
       linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
       instrumentIds:input.instrumentIds,
@@ -175,7 +185,22 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
     return row
   })
 }
-type WaveUpdate=Omit<WaveInput,'requestId'>&{revision:number}
+/** Reuse Survey's existing project drafts, package membership and Flow. No
+ * universal clone or Bundle unpacking: immutable publications stay intact. */
+export async function createNextWave(uid:string,pid:string,wid:string,requestId:string){
+  const source=await prisma.$transaction(async tx=>{
+    await ownProject(tx,uid,pid,true)
+    const wave=await ownWave(tx,pid,wid)
+    if(!wave.publicationId||wave.status==='DRAFT')return fail(409,'请先正式开放来源波次')
+    return wave
+  })
+  return createWave(uid,pid,{requestId,title:source.title+' · 下一轮',consentText:source.consentText,
+    generalText:source.generalText,instrumentIds:source.instrumentIds as string[],
+    linkageNoticeConfirmed:source.linkageNoticeConfirmed,allowNewParticipants:false,
+    flowDefinition:source.flowDefinition,quotaPolicy:source.quotaPolicy,checkpointPolicy:source.checkpointPolicy,
+    longitudinalSourceWaveId:source.id})
+}
+type WaveUpdate=Omit<WaveInput,'requestId'|'longitudinalSourceWaveId'>&{revision:number}
 export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpdate){
   ensureWindow(input)
   const requestedFlow=input.flowDefinition===undefined?undefined:
@@ -287,10 +312,12 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     checks.push({key:'linkage_disclosure',ok:linkedConfirmed,
       issues:linkedConfirmed?[]:['跨波次研究必须由研究者确认已明确告知：随机研究编号将关联不同时间点的答案']})
   }
+  const trackingTools:ResearchFrozenUnit[]=[]
   const measured:ResearchFrozenUnit[]=[]
   for(const draft of input.drafts){
     if(draft.catalogGrantId){
       const compiled=compileCatalogUnit(draft,input.catalogSources.get(draft.catalogGrantId)!)
+      trackingTools.push(compiled)
       checks.push({key:draft.id,ok:true,issues:[],digest:compiled.sourceDigest})
       if(surveyMeasurementPublicationMode(compiled)==='EXPLICIT')measured.push(compiled)
       continue
@@ -302,7 +329,7 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     checks.push({key:draft.id,ok:compilation.ok,
       issues:compilation.issues.map(issue=>issue.path+': '+issue.message),
       digest:compilation.definitionDigest})
-    if(compilation.ok&&draft.kind!=='FORM')measured.push(compileFrozenResearchUnit(draft))
+    if(compilation.ok){const compiled=compileFrozenResearchUnit(draft);trackingTools.push(compiled);if(draft.kind!=='FORM')measured.push(compiled)}
   }
   if(measured.length)await prisma.$transaction(async tx=>{
     await ownProject(tx,uid,pid,false)
@@ -323,6 +350,14 @@ export async function preflightWave(uid:string,pid:string,wid:string){
   // Attempt, public token or scientific catalog status.
   return {projectId:pid,waveId:wid,revision:input.wave.revision,
     selectionDigest:canonicalHash(input.selected),checks,
+    trackingOptions:trackingTools.flatMap(unit=>{
+      try{
+        const release=unit.kind==='FORM'?null:surveyMeasurementReleaseInput(unit,uid,pid)
+        if(release&&release.layer!=='MEASUREMENT')return []
+        const metrics=release&&release.layer==='MEASUREMENT'?release.content.metrics.map(m=>({key:m.metricKey,unit:m.unit,label:m.metricKey})):surveyFormTrackingIdentity(unit).metrics
+        return metrics.map(m=>({instrumentId:unit.draftId,instrumentKey:unit.instrumentKey,scoreKey:m.key,label:unit.title+' · '+m.label,unit:m.unit}))
+      }catch{return []}
+    }),
     ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?4:3)+
       (input.wave.flowDefinition?1:0)+(input.wave.quotaPolicy?1:0)+
       (input.wave.checkpointPolicy?1:0)+(input.wave.groupIpPolicy?1:0)+measured.length&&checks.every(c=>c.ok),
