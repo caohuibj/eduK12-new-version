@@ -92,7 +92,7 @@ export async function getOwnResearchTask(input:{
         templateKey:frozen.templateKey,measurementDigest:frozen.measurementDigest,
         devicePolicy:frozen.devicePolicy,timingPolicy:frozen.timingPolicy,
         maturity:frozen.maturity,restartLimit:frozen.restartLimit,
-        totalTrials:120,estimatedDurationSeconds:180,
+        totalTrials:frozen.schemaVersion===2?frozen.maxTrials:120,...(frozen.schemaVersion===1?{estimatedDurationSeconds:180}:{}),
         feedback:{mode:frozen.feedback.mode,release:frozen.feedback.release},
         partialRetentionDays:frozen.partialRetentionDays}
     }

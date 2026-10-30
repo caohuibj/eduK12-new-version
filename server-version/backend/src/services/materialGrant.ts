@@ -121,6 +121,8 @@ export const canInstantiateConfig = async (
   role: UserRole | string,
   testConfig: { id: string; status: string; accessPolicy?: 'OPEN' | 'GRANT' | string | null },
 ): Promise<boolean> => {
+  const {hasTrainingCognitiveProfileHistory}=await import('../modules/assessment-authorization/training-cognitive-profile-use')
+  if(await hasTrainingCognitiveProfileHistory(prisma,userId,testConfig.id))return false
   if (role === UserRole.ADMIN) return true
   if (testConfig.status !== 'PUBLISHED') return false
   if (!config.materialGrantsEnabled) return true

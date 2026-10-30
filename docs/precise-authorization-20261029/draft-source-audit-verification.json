@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "base": "c21bccf7bb278161f76b49141b8489abd9487358",
+  "verifiedMain": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "recordedAt": "2026-10-29T22:01:17.279730+00:00",
+  "results": {
+    "pureAssertionsPassed": 3,
+    "trainingPostgresHttpPassed": 2,
+    "trainingProtectedHttpRequests": 9,
+    "surveyPostgresServicePassed": 2,
+    "surveyChangedHeaderQueries": 1,
+    "surveyMetadataOrReorderHeaderQueries": 0,
+    "trainingCopyPostgresPassed": 2,
+    "copyOriginalFailuresRetained": 2,
+    "finalOfficialNodeClosureTypesExit": 0,
+    "originalHostTypesNotQualified": true,
+    "originalOfficialNodeTypesFailureRetained": true
+  },
+  "environment": {
+    "node": "24.21.0 official runtime (initial host typecheck 24.19.0 excluded)",
+    "postgres": "16.15 localhost:55439 owner role",
+    "databases": [
+      "precise_training_t2_audit_test_20261029",
+      "precise_survey_t2_audit_test_20261029"
+    ],
+    "productionAccessed": false,
+    "runtimeRoleQualified": false
+  },
+  "raw": {
+    "file": "draft-source-audit-raw.json",
+    "sha256": "4d59744eb7f383b5be0157d79eeedd99c9a974567d7af7e8574fbffceb1434dd"
+  },
+  "finalFilesSha256": {
+    "server-version/backend/src/modules/questionnaire-product/service.ts": "327d72e567cfd81086d355fe765f9138193287319c11779449588bd4c0c9d0eb",
+    "server-version/backend/src/modules/survey/waves.service.ts": "712d6a3e391abd90d716f20e59431eeb82f04bbb8b1d972776ae49c5056e5f43",
+    "server-version/backend/src/__tests__/assessment-authorization/selected-reference-audit.test.ts": "e31505c74d74732d15e637ba1e44b8d649d5b7891b11056a7c2033fe50f98dde",
+    "server-version/backend/src/__tests__/assessment-authorization/survey-t2-audit.postgres.integration.test.ts": "bfc5e96a5dccab0873407de7da3c0f610642fee8e101d1dcba77cb744dc690e6",
+    "server-version/backend/src/__tests__/assessment-authorization/training-t2-audit.postgres.integration.test.ts": "4fa6c2d82564dc3cffb6659c62c8b9052dbfc046b91b2a909e99de1252b0dd19",
+    "server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts": "87f194e229d7879b3780939cc06beae1e1c360acb7f1431118ca42fc1f14caa6",
+    "server-version/backend/src/modules/assessment-authorization/selected-reference-audit.ts": "7c1dadbcf76c5eca2eea82fe45353cd40aead20aaef2588eb3c65e0a63ee990f",
+    "server-version/backend/src/modules/composite/training-reference-audit.ts": "2ff389d91c0a2183678d14b73c47c55b0ad3cfaa4f54b065ca2479c2ecc72b9a",
+    "server-version/backend/src/modules/survey/selected-reference-audit.ts": "1b82c4198762749fc64504db19b4d2b08214ed0a3688b6abc918258a7102374b"
+  },
+  "evidenceLimit": "Post-execution final source hashes; no signed historical dependency inventory or official CI qualification. Passed earlier normal paths were not replayed for later disjoint copy/body or stored-integrity error wording changes.",
+  "notExecuted": [
+    "frontend/browser (no frontend delta)",
+    "Survey authenticated HTTP",
+    "participant FINAL/scoring/report replay",
+    "runtime DB role",
+    "same-environment latency distribution/performance budget",
+    "formal CI/PR/merge/deployment"
+  ]
+}

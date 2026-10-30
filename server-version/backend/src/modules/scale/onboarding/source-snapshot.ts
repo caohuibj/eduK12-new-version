@@ -1,5 +1,12 @@
 import {canonicalHash} from '../../assessment-runtime/canonical'
 import type {ScaleInstrumentSourceV1} from './types'
+/** The existing C/P/R split, shared by registration and normal installation. */
+export function scaleSourceAxisPayloads(source:ScaleInstrumentSourceV1){
+ const executable=source.executable
+ if(!executable)throw new Error('Scale source is not executable')
+ const {report,referencePolicy,source:provenance,license,...content}=executable.definition
+ return {content,parameters:{referencePolicy,references:executable.references},report,provenance,license}
+}
 /** The existing axis-snapshot contract binds plugin key/version, rather than
  * JavaScript function identity. All other source fields remain in the strict
  * canonical closure (content, scoring, reports, references, rights and policy).

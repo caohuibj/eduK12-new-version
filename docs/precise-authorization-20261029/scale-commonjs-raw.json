@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "compile": {
+    "status": {
+      "command": [
+        "env",
+        "NODE_OPTIONS=--max-old-space-size=4096",
+        "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "/workspace/materials-load-20261029/task1-scale-compiled-types.json"
+      ],
+      "startedAt": "2026-10-29T23:51:09.763330+00:00",
+      "finishedAt": "2026-10-29T23:51:40.355943+00:00",
+      "exitCode": 0
+    },
+    "log": "",
+    "config": {
+      "extends": "/workspace/eduK12-new-version/server-version/backend/tsconfig.json",
+      "compilerOptions": {
+        "outDir": "/workspace/materials-load-20261029/backend-task1-scale-main-dc0-dist"
+      },
+      "include": [
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/education-standard-management.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/education-standard-revoke.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/education-standard-use-current.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/education-standard-use.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/selected-configuration.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/selected-reference-audit.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/standard-configuration-binding.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-authorization/survey-standard-use.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/composite/composite.schema.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-reference-audit.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-reference-selection.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/education-tools/private-tool.service.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/education-tools/public-source.catalog.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/education-tools/selected-source-binding.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/education-tools/selected-source-catalog.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/huiteacher/platform.routes.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/measurement-content/standard-combination-management.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/measurement-content/standard-report-parameters.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/organization/educationProductAccess.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/questionnaire-product/routes.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/questionnaire-product/service.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/survey/admin-role.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/survey/catalog.service.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/survey/platform.routes.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/survey/selected-reference-audit.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/survey/standard-triplet.model.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/survey/standard-triplet.routes.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/survey/standard-triplet.service.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/survey/tool-policy.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/modules/survey/waves.service.ts",
+        "/workspace/eduK12-new-version/server-version/backend/src/middleware/auth.ts"
+      ],
+      "exclude": []
+    }
+  },
+  "coldEntries": [
+    {
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "NODE_PATH=/workspace/eduK12-new-version/server-version/backend/node_modules",
+          "PRECISE_COMPILED_COLD_LOAD=1",
+          "PRECISE_CJS_CASE=training",
+          "PRECISE_CJS_OUTPUT=/workspace/materials-load-20261029/evidence/precise-compiled-cold-training.json",
+          "node",
+          "/workspace/eduK12-new-version/server-version/e2e/precise-authorization-compiled-cold-load.cjs"
+        ],
+        "startedAt": "2026-10-29T23:52:16.142964+00:00",
+        "finishedAt": "2026-10-29T23:52:17.829973+00:00",
+        "exitCode": 0
+      },
+      "result": {
+        "schemaVersion": 1,
+        "case": "training",
+        "module": "modules/questionnaire-product/routes.js",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:52:16.219Z",
+        "scope": "Compiled entry initialization only; no database query, HTTP, grant, seed or FINAL. Education router serves both original School and Teacher adapters.",
+        "productionAccessed": false,
+        "sourceRunnerSha256": "06384b7fac6d0658199afe4039e4e1a10e5e72205744fd27d89a05a68a344fb9",
+        "compiledEntrySha256": "e9af96c1477f6ebae3732c22d96f365eea282485bd345f3c61d2fc37998ebba0",
+        "elapsedMs": 1527.005914,
+        "status": "PASS",
+        "finishedAt": "2026-10-29T23:52:17.748Z"
+      },
+      "log": ""
+    },
+    {
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "NODE_PATH=/workspace/eduK12-new-version/server-version/backend/node_modules",
+          "PRECISE_COMPILED_COLD_LOAD=1",
+          "PRECISE_CJS_CASE=survey",
+          "PRECISE_CJS_OUTPUT=/workspace/materials-load-20261029/evidence/precise-compiled-cold-survey.json",
+          "node",
+          "/workspace/eduK12-new-version/server-version/e2e/precise-authorization-compiled-cold-load.cjs"
+        ],
+        "startedAt": "2026-10-29T23:52:41.739376+00:00",
+        "finishedAt": "2026-10-29T23:52:43.453064+00:00",
+        "exitCode": 0
+      },
+      "result": {
+        "schemaVersion": 1,
+        "case": "survey",
+        "module": "modules/survey/platform.routes.js",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:52:41.806Z",
+        "scope": "Compiled entry initialization only; no database query, HTTP, grant, seed or FINAL. Education router serves both original School and Teacher adapters.",
+        "productionAccessed": false,
+        "sourceRunnerSha256": "06384b7fac6d0658199afe4039e4e1a10e5e72205744fd27d89a05a68a344fb9",
+        "compiledEntrySha256": "96d3d4c24ec7d6658539ae400a2ff1bf4c1cc38747b0527a6b83047d3e3d97f9",
+        "elapsedMs": 1545.073561,
+        "status": "PASS",
+        "finishedAt": "2026-10-29T23:52:43.353Z"
+      },
+      "log": ""
+    },
+    {
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "NODE_PATH=/workspace/eduK12-new-version/server-version/backend/node_modules",
+          "PRECISE_COMPILED_COLD_LOAD=1",
+          "PRECISE_CJS_CASE=education",
+          "PRECISE_CJS_OUTPUT=/workspace/materials-load-20261029/evidence/precise-compiled-cold-education.json",
+          "node",
+          "/workspace/eduK12-new-version/server-version/e2e/precise-authorization-compiled-cold-load.cjs"
+        ],
+        "startedAt": "2026-10-29T23:52:41.744214+00:00",
+        "finishedAt": "2026-10-29T23:52:43.193532+00:00",
+        "exitCode": 0
+      },
+      "result": {
+        "schemaVersion": 1,
+        "case": "education",
+        "module": "modules/huiteacher/platform.routes.js",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:52:41.840Z",
+        "scope": "Compiled entry initialization only; no database query, HTTP, grant, seed or FINAL. Education router serves both original School and Teacher adapters.",
+        "productionAccessed": false,
+        "sourceRunnerSha256": "06384b7fac6d0658199afe4039e4e1a10e5e72205744fd27d89a05a68a344fb9",
+        "compiledEntrySha256": "e5f6ce6510c0898a64da09885e77c46c05301ed8a4eb62fd1c2a452a9af35605",
+        "elapsedMs": 1229.723135,
+        "status": "PASS",
+        "finishedAt": "2026-10-29T23:52:43.072Z"
+      },
+      "log": ""
+    },
+    {
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "env",
+          "NODE_PATH=/workspace/eduK12-new-version/server-version/backend/node_modules",
+          "PRECISE_COMPILED_COLD_LOAD=1",
+          "PRECISE_CJS_CASE=approval",
+          "PRECISE_CJS_OUTPUT=/workspace/materials-load-20261029/evidence/precise-compiled-cold-approval.json",
+          "node",
+          "/workspace/eduK12-new-version/server-version/e2e/precise-authorization-compiled-cold-load.cjs"
+        ],
+        "startedAt": "2026-10-29T23:52:41.732375+00:00",
+        "finishedAt": "2026-10-29T23:52:43.294106+00:00",
+        "exitCode": 0
+      },
+      "result": {
+        "schemaVersion": 1,
+        "case": "approval",
+        "module": "modules/survey/standard-triplet.routes.js",
+        "node": "v24.21.0",
+        "startedAt": "2026-10-29T23:52:41.813Z",
+        "scope": "Compiled entry initialization only; no database query, HTTP, grant, seed or FINAL. Education router serves both original School and Teacher adapters.",
+        "productionAccessed": false,
+        "sourceRunnerSha256": "06384b7fac6d0658199afe4039e4e1a10e5e72205744fd27d89a05a68a344fb9",
+        "compiledEntrySha256": "19245bf867122ee408ed2ca370e58e21754f178b31ab982b9aeae80cb1cbbfad",
+        "elapsedMs": 1418.256573,
+        "status": "PASS",
+        "finishedAt": "2026-10-29T23:52:43.233Z"
+      },
+      "log": ""
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "priorHead": "117f19ce4ffa67b8beb00903736e1d8129d65d36",
+  "priorMain": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "integratedMain": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+  "integrationCommit": "fe5cd70eac53feb16fb2544245748a9148cdf6cf",
+  "recordedAt": "2026-10-29T23:34:17.813328+00:00",
+  "scope": "Normal current-main merge of already merged PR388/391, then only saved Task1 result consumers/typing. No Bundle engine edits, seed replay or production.",
+  "results": {
+    "distinctSavedReadCasesPassed": 4,
+    "actualSavedReadHttpRequests": 2,
+    "originalSchoolTimeoutRetained": true,
+    "teacherPassedNotReplayed": true,
+    "schoolContinuationPassed": 1,
+    "schoolContinuationFilteredTeacher": 1,
+    "sourceModuleInitializationMs": 6815.644166,
+    "schoolSavedReadMs": 174.078541,
+    "businessCaseBudgetMs": 30000,
+    "backendBoundaryTypesExit": 0,
+    "frontendAppTypesExit": 0,
+    "mainCandidatePrismaSchemaByteIdentical": true,
+    "generatedClientSchemaFormattingEquivalent": true
+  },
+  "raw": {
+    "file": "main-dc0f-integration-raw.json",
+    "sha256": "bcfeeb8805f26b60a1ee2ae3a50de99ab95b3b6770818183e6fa20c5db8e95c5"
+  },
+  "finalFilesSha256": {
+    "server-version/backend/src/__tests__/assessment-authorization/education-selected-lifecycle-readback.postgres.integration.test.ts": "98b8ed7c86185ff90a31f01c9003c650f7e758efa6ed2181b71e6f34602f5d80",
+    "server-version/backend/src/__tests__/assessment-authorization/merged-main-saved-consumers.http.postgres.integration.test.ts": "e766a537ec2fa844e38ded42ea73757ec68776341605d8a38ff7304ad4fecb85"
+  },
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost55439",
+    "trainingRuntimeRole": "precise_task1_runtime",
+    "surveyAndEducationRole": "materials_owner as original retained fixtures",
+    "productionAccessed": false
+  },
+  "evidenceLimit": "Post-execution source inventory; diagnostic module/read timings are not production cold startup or p50/p95 comparison. Prior build and permissions remain bound to their original commits, not relabelled current-main execution.",
+  "notExecuted": [
+    "current combined source production compilation/browser",
+    "new START/FINAL or grant write replay",
+    "formal CI/PR/merge-to-main/deploy",
+    "full performance budget"
+  ]
+}

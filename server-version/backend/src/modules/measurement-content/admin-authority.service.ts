@@ -4,7 +4,7 @@ import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
-import {AdminPermissionError} from '../admin-permissions/service'
+import {AdminPermissionError,assertEntryAdmin} from '../admin-permissions/service'
 import {ADMIN_STEP_UP_SECONDS,validAdminProof,type AdminSessionProof} from '../admin-permissions/proof'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {contentGrantInputSchema,type ContentGrantInput} from './content-authority'
@@ -23,6 +23,7 @@ const wireGrant=z.object({ ...contentGrantInputSchema.shape,
     ctx.addIssue({code:'custom',message:'Only supported exact project, course, governance, entry-distribution or education public-source use grants are allowed'})
   if(platformSjtDistribution(grant)&&(grant.remainingDelegationDepth!==0||grant.delegableCapabilities.length!==0))
     ctx.addIssue({code:'custom',message:'Situational entry distribution does not support delegation'})
+  if(educationMaterialUse(grant)&&grant.scope.resourceKeys.some(key=>parseEducationPublicSourceKey(key)?.kind==='COGNITIVE_PROFILE'))ctx.addIssue({code:'custom',message:'Exact cognitive profile use must be issued by its authorized education entry manager'})
   if(educationMaterialUse(grant)&&(grant.remainingDelegationDepth!==0||grant.delegableCapabilities.length!==0))
     ctx.addIssue({code:'custom',message:'Education exact public-source use does not support delegation'})
 })
@@ -139,7 +140,12 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
       if(!entitlement)deny()
       // A distinct explicit system authorization, never implied by target admin
       // status or by being able to read the underlying Training definitions.
-      if(target.account_domain!=='SCHOOL'&&!(target.platform_role==='SYSTEM_ADMIN'&&['LEGACY','TRAINING'].includes(target.account_domain)))deny()
+      if(['LEGACY','TRAINING'].includes(target.account_domain)&&target.platform_role==='STANDARD'){
+        // A platform manager remains separate from this school's productAdmin.
+        // The exact organization/material root is still explicit system-issued
+        // authority, and does not follow merely from the entry qualification.
+        await assertEntryAdmin(tx,target.id,scope.product==='TEACHER'?'HUITEACHER':'HUISCHOOL')
+      }else if(target.account_domain!=='SCHOOL'&&!(target.platform_role==='SYSTEM_ADMIN'&&['LEGACY','TRAINING'].includes(target.account_domain)))deny()
       if(target.account_domain==='SCHOOL'){
         const {captureEducationAssessmentIssuer}=await import('../education-tools/assessment-resource.issuer')
         await captureEducationAssessmentIssuer(tx,{product:scope.product as 'SCHOOL'|'TEACHER',organizationId:scope.scopeId,

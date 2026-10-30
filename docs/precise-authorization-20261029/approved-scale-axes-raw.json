@@ -1,0 +1,1502 @@
+{
+  "schemaVersion": 1,
+  "runs": [
+    {
+      "name": "approved-scale-axes-ui",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/components/scale-governance/ApprovedScaleAxes.test.tsx",
+          "src/training/TrainingStandardConfigurationGrants.test.tsx",
+          "src/pages/admin/EducationStandardConfigurations.test.tsx",
+          "src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+          "-t",
+          "shared administrator approved|shared C/P/R finder|through shared axis|Survey axis discovery",
+          "--maxWorkers=2",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/approved-scale-axes-ui.json"
+        ],
+        "startedAt": "2026-10-29T20:12:21.850044+00:00",
+        "finishedAt": "2026-10-29T20:12:25.233814+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 9,
+        "numPassedTestSuites": 9,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 41,
+        "numPassedTests": 6,
+        "numFailedTests": 0,
+        "numPendingTests": 35,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304742202,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution sends the selected combination identity through the dedicated issuer API and never the legacy SCALE writer",
+                "status": "skipped",
+                "title": "sends the selected combination identity through the dedicated issuer API and never the legacy SCALE writer",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution does not let a late read for another recipient populate or authorize the current selection",
+                "status": "skipped",
+                "title": "does not let a late read for another recipient populate or authorize the current selection",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution blocks a second mutation after an uncertain outcome until the full original intent is read back",
+                "status": "skipped",
+                "title": "blocks a second mutation after an uncertain outcome until the full original intent is read back",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution keeps another issuer grant visible without exposing overwrite or revoke actions",
+                "status": "skipped",
+                "title": "keeps another issuer grant visible without exposing overwrite or revoke actions",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution allows readback and versioned revocation after withdrawal while refusing new assignment",
+                "status": "skipped",
+                "title": "allows readback and versioned revocation after withdrawal while refusing new assignment",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training administrator exact combination distribution"
+                ],
+                "fullName": "Training administrator exact combination distribution refuses incomplete or cross-configuration readback instead of writing against an empty grant list",
+                "status": "skipped",
+                "title": "refuses incomplete or cross-configuration readback instead of writing against an empty grant list",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery recovers the original recipient, label and revision after closing the dialog and never substitutes current grants",
+                "status": "skipped",
+                "title": "recovers the original recipient, label and revision after closing the dialog and never substitutes current grants",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery retries only after verified absence and with the complete same original body",
+                "status": "skipped",
+                "title": "retries only after verified absence and with the complete same original body",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery keeps the original unknown outcome when its retry is now refused",
+                "status": "skipped",
+                "title": "keeps the original unknown outcome when its retry is now refused",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original userId",
+                "status": "skipped",
+                "title": "does not clear a mismatching original userId",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original configurationName",
+                "status": "skipped",
+                "title": "does not clear a mismatching original configurationName",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original actorId",
+                "status": "skipped",
+                "title": "does not clear a mismatching original actorId",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery does not clear a mismatching original expectedUseVersion",
+                "status": "skipped",
+                "title": "does not clear a mismatching original expectedUseVersion",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery restores a prior revoked grant identity and reports its subsequently superseded operation as historical",
+                "status": "skipped",
+                "title": "restores a prior revoked grant identity and reports its subsequently superseded operation as historical",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery keeps malformed absence and legacy results unresolved",
+                "status": "skipped",
+                "title": "keeps malformed absence and legacy results unresolved",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training exact issuance durable original-intent recovery"
+                ],
+                "fullName": "Training exact issuance durable original-intent recovery scopes restored state and late responses to the current live account and hides the workspace on logout",
+                "status": "skipped",
+                "title": "scopes restored state and late responses to the current live account and hides the workspace on logout",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "opens the exact Training grant editor chosen by the shared C/P/R finder without issuing immediately",
+                "status": "passed",
+                "title": "opens the exact Training grant editor chosen by the shared C/P/R finder without issuing immediately",
+                "duration": 263.82106299999987,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304743760,
+            "endTime": 1793304744023.821,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "shared administrator approved scale axis discovery"
+                ],
+                "fullName": "shared administrator approved scale axis discovery requires all explicit axes and the exact combination before selecting, without issuing or constructing content",
+                "status": "passed",
+                "title": "requires all explicit axes and the exact combination before selecting, without issuing or constructing content",
+                "duration": 164.96333700000002,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "shared administrator approved scale axis discovery"
+                ],
+                "fullName": "shared administrator approved scale axis discovery refuses to imply a new approval when individually existing axes have no approved combination",
+                "status": "passed",
+                "title": "refuses to imply a new approval when individually existing axes have no approved combination",
+                "duration": 32.992980999999986,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "shared administrator approved scale axis discovery"
+                ],
+                "fullName": "shared administrator approved scale axis discovery never resolves equal displayed versions by first/latest row and requires the actual selected source",
+                "status": "passed",
+                "title": "never resolves equal displayed versions by first/latest row and requires the actual selected source",
+                "duration": 52.37814400000002,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "shared administrator approved scale axis discovery"
+                ],
+                "fullName": "shared administrator approved scale axis discovery does not substitute an alternative after withdrawal or refresh removes the explicitly chosen source",
+                "status": "passed",
+                "title": "does not substitute an alternative after withdrawal or refresh removes the explicitly chosen source",
+                "duration": 25.424121000000014,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "shared administrator approved scale axis discovery"
+                ],
+                "fullName": "shared administrator approved scale axis discovery treats explicitly absent parameters/report as selectable facts and resets all choices when changing tools",
+                "status": "passed",
+                "title": "treats explicitly absent parameters/report as selectable facts and resets all choices when changing tools",
+                "duration": 59.60968099999991,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304744869,
+            "endTime": 1793304745204.6096,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.test.tsx"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement",
+                "status": "skipped",
+                "title": "distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery School uses its own manager path and shows the original report audience before saving the psychologist configuration",
+                "status": "skipped",
+                "title": "School uses its own manager path and shows the original report audience before saving the psychologist configuration",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery selects an approved exact source, legal recipient and delegation and keeps passwords out of retained request data",
+                "status": "skipped",
+                "title": "selects an approved exact source, legal recipient and delegation and keeps passwords out of retained request data",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery requires readback before an unknown issuance retries the identical ID and complete parameters",
+                "status": "skipped",
+                "title": "requires readback before an unknown issuance retries the identical ID and complete parameters",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery does not accept a resource-only match when readback names another recipient",
+                "status": "skipped",
+                "title": "does not accept a resource-only match when readback names another recipient",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery restores an unknown revoke without replaying it and confirms the exact revision/reason through readback",
+                "status": "skipped",
+                "title": "restores an unknown revoke without replaying it and confirms the exact revision/reason through readback",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery does not let a late old-scope readback replace the next school screen",
+                "status": "skipped",
+                "title": "does not let a late old-scope readback replace the next school screen",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request",
+                "status": "skipped",
+                "title": "explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery recovers a replacement only when the original prior revision and reason also match",
+                "status": "skipped",
+                "title": "recovers a replacement only when the original prior revision and reason also match",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery cannot substitute another receiver when the original replacement recipient has lost current eligibility",
+                "status": "skipped",
+                "title": "cannot substitute another receiver when the original replacement recipient has lost current eligibility",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304742202,
+            "endTime": 1793304742202,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery requires a business name, issues one exact server-bound request and never lets the researcher choose R",
+                "status": "skipped",
+                "title": "requires a business name, issues one exact server-bound request and never lets the researcher choose R",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery retains no secret and confirms a lost response through original complete intent without a second write",
+                "status": "skipped",
+                "title": "retains no secret and confirms a lost response through original complete intent without a second write",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery allows only an original-number retry after explicit absent readback",
+                "status": "skipped",
+                "title": "allows only an original-number retry after explicit absent readback",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery keeps a conflicting request blocked and cannot turn a different recipient into the original grant",
+                "status": "skipped",
+                "title": "keeps a conflicting request blocked and cannot turn a different recipient into the original grant",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery recovers the original recipient even after the manager changes the visible researcher",
+                "status": "skipped",
+                "title": "recovers the original recipient even after the manager changes the visible researcher",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery does not fall back to untyped standard issuance when the authenticated catalog lacks actor identity",
+                "status": "skipped",
+                "title": "does not fall back to untyped standard issuance when the authenticated catalog lacks actor identity",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery requires the live authenticated account to match the issuer returned by the source catalog",
+                "status": "skipped",
+                "title": "requires the live authenticated account to match the issuer returned by the source catalog",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery rejects malformed absence readback and keeps the original operation blocked without a retry button",
+                "status": "skipped",
+                "title": "rejects malformed absence readback and keeps the original operation blocked without a retry button",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery shows a researcher the fixed business configuration and imports its exact grant without an R selector",
+                "status": "skipped",
+                "title": "shows a researcher the fixed business configuration and imports its exact grant without an R selector",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304742202,
+            "endTime": 1793304742202,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "name": "approved-scale-axes-ui-integration",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/admin/EducationStandardConfigurations.test.tsx",
+          "src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+          "-t",
+          "through shared axis|Survey axis discovery",
+          "--maxWorkers=2",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/approved-scale-axes-ui-integration.json"
+        ],
+        "startedAt": "2026-10-29T20:13:26.166318+00:00",
+        "finishedAt": "2026-10-29T20:13:32.363844+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 4,
+        "numPassedTestSuites": 3,
+        "numFailedTestSuites": 1,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 22,
+        "numPassedTests": 1,
+        "numFailedTests": 2,
+        "numPendingTests": 19,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304806826,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement",
+                "status": "skipped",
+                "title": "distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery School uses its own manager path and shows the original report audience before saving the psychologist configuration",
+                "status": "skipped",
+                "title": "School uses its own manager path and shows the original report audience before saving the psychologist configuration",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery selects an approved exact source, legal recipient and delegation and keeps passwords out of retained request data",
+                "status": "skipped",
+                "title": "selects an approved exact source, legal recipient and delegation and keeps passwords out of retained request data",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery requires readback before an unknown issuance retries the identical ID and complete parameters",
+                "status": "skipped",
+                "title": "requires readback before an unknown issuance retries the identical ID and complete parameters",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery does not accept a resource-only match when readback names another recipient",
+                "status": "skipped",
+                "title": "does not accept a resource-only match when readback names another recipient",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery restores an unknown revoke without replaying it and confirms the exact revision/reason through readback",
+                "status": "skipped",
+                "title": "restores an unknown revoke without replaying it and confirms the exact revision/reason through readback",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery does not let a late old-scope readback replace the next school screen",
+                "status": "skipped",
+                "title": "does not let a late old-scope readback replace the next school screen",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request",
+                "status": "skipped",
+                "title": "explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery recovers a replacement only when the original prior revision and reason also match",
+                "status": "skipped",
+                "title": "recovers a replacement only when the original prior revision and reason also match",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery cannot substitute another receiver when the original replacement recipient has lost current eligibility",
+                "status": "skipped",
+                "title": "cannot substitute another receiver when the original replacement recipient has lost current eligibility",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "selects the exact existing HUISCHOOL source through shared axis discovery without bypassing recipient or delegation",
+                "status": "failed",
+                "title": "selects the exact existing HUISCHOOL source through shared axis discovery without bypassing recipient or delegation",
+                "duration": 1143.481248,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"option\" and name `/已批准固定量表/`\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<option\u001b[39m\n  \u001b[33mvalue\u001b[39m=\u001b[32m\"synthetic\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m已批准固定量表\u001b[0m\n\u001b[36m</option>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<option\u001b[39m\n  \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m已批准固定量表\u001b[0m\n  \u001b[0m · C \u001b[0m\n  \u001b[0mC-1\u001b[0m\n  \u001b[0m / P \u001b[0m\n  \u001b[0mnone-v1\u001b[0m\n  \u001b[0m / R \u001b[0m\n  \u001b[0mR-2\u001b[0m\n\u001b[36m</option>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<section\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"固定量表配置授权\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"epg-panel epg-fixed-configurations\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<h2>\u001b[39m\n        \u001b[0m固定量表配置授权\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<p>\u001b[39m\n        \u001b[0m为\u001b[0m\n        \u001b[0m本校心理教师\u001b[0m\n        \u001b[0m选定已批准配置。接收者直接使用此配置创建任务；修改配置应创建新授权，旧作答与报告保留原版。\u001b[0m\n      \u001b[36m</p>\u001b[39m\n      \u001b[36m<details\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"approved-scale-axes\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<summary>\u001b[39m\n          \u001b[0m按题本、参数和报告查找已批准配置\u001b[0m\n        \u001b[36m</summary>\u001b[39m\n        \u001b[36m<p>\u001b[39m\n          \u001b[0m当前已读取的本校可分发配置，可继续读取更多配置\u001b[0m\n          \u001b[0m；仅查找已批准且当前可分配的完整组合。不会为新搭配代作系统审批。请核对人群、用途及报告措辞，专业搭配由管理员决定。\u001b[0m\n        \u001b[36m</p>\u001b[39m\n        \u001b[36m<fieldset>\u001b[39m\n          \u001b[36m<legend>\u001b[39m\n            \u001b[0m手选 C/P/R 查找配置\u001b[0m\n          \u001b[36m</legend>\u001b[39m\n          \u001b[36m<label>\u001b[39m\n            \u001b[0m量表工具\u001b[0m\n            \u001b[36m<select>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m选择量表工具\u001b[0m\n              \u001b[36m</option>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"synthetic\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m已批准固定量表\u001b[0m\n              \u001b[36m</option>\u001b[39m\n            \u001b[36m</select>\u001b[39m\n          \u001b[36m</label>\u001b[39m\n          \u001b[36m<label>\u001b[39m\n            \u001b[0m题本 C\u001b[0m\n            \u001b[36m<select\u001b[39m\n              \u001b[33maria-label\u001b[39m=\u001b[32m\"题本 C\"\u001b[39m\n              \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m明确选择\u001b[0m\n                \u001b[0m题本 C\u001b[0m\n              \u001b[36m</option>\u001b[39m\n            \u001b[36m</select>\u001b[39m\n          \u001b[36m</label>\u001b[39m\n          \u001b[36m<label>\u001b[39m\n            \u001b[0m解释参数 P\u001b[0m\n            \u001b[36m<select\u001b[39m\n              \u001b[33maria-label\u001b[39m=\u001b[32m\"解释参数 P\"\u001b[39m\n              \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m明确选择\u001b[0m\n                \u001b[0m解释参数 P\u001b[0m\n              \u001b[36m</option>\u001b[39m\n            \u001b[36m</select>\u001b[39m\n          \u001b[36m</label>\u001b[39m\n          \u001b[36m<label>\u001b[39m\n            \u001b[0m报告 R\u001b[0m\n            \u001b[36m<select\u001b[39m\n              \u001b[33maria-label\u001b[39m=\u001b[32m\"报告 R\"\u001b[39m\n              \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m明确选择\u001b[0m\n                \u001b[0m报告 R\u001b[0m\n              \u001b[36m</option>\u001b[39m\n            \u001b[36m</select>\u001b[39m\n          \u001b[36m</label>\u001b[39m\n          \u001b[36m<button\u001b[39m\n            \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n            \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0m使用所选已批准组合\u001b[0m\n          \u001b[36m</button>\u001b[39m\n        \u001b[36m</fieldset>\u001b[39m\n      \u001b[36m</details>\u001b[39m\n      \u001b[36m<label>\u001b[39m\n        \u001b[0m已批准量表配置\u001b[0m\n        \u001b[36m<select>\u001b[39m\n          \u001b[36m<option\u001b[39m\n            \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0m选择固定配置\u001b[0m\n          \u001b[36m</option>\u001b[39m\n          \u001b[36m<option\u001b[39m\n            \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0m已批准固定量表\u001b[0m\n            \u001b[0m · C \u001b[0m\n            \u001b[0mC-1\u001b[0m\n            \u001b[0m / P \u001b[0m\n            \u001b[0mnone-v1\u001b[0m\n            \u001b[0m / R \u001b[0m\n            \u001b[0mR-2\u001b[0m\n          \u001b[36m</option>\u001b[39m\n        \u001b[36m</select>\u001b[39m\n      \u001b[36m</label>\u001b[39m\n      \u001b[36m<label>\u001b[39m\n        \u001b[0m本次配置操作的管理员密码\u001b[0m\n        \u001b[36m<input\u001b[39m\n          \u001b[33mautocomplete\u001b[39m=\u001b[32m\"off\"\u001b[39m\n          \u001b[33mtype\u001b[39m=\u001b[32m\"password\"\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</label>\u001b[39m\n    \u001b[36m</section>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n\u001b[36m</body>\u001b[39m\n    at waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at /workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33\n    at /workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx:198:87\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "selects the exact existing HUITEACHER source through shared axis discovery without bypassing recipient or delegation",
+                "status": "failed",
+                "title": "selects the exact existing HUITEACHER source through shared axis discovery without bypassing recipient or delegation",
+                "duration": 1054.871878,
+                "failureMessages": [
+                  "Error: Found multiple elements with the role \"option\" and name `/已批准固定量表/`\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<option\u001b[39m\n  \u001b[33mvalue\u001b[39m=\u001b[32m\"synthetic\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m已批准固定量表\u001b[0m\n\u001b[36m</option>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<option\u001b[39m\n  \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0m已批准固定量表\u001b[0m\n  \u001b[0m · C \u001b[0m\n  \u001b[0mC-1\u001b[0m\n  \u001b[0m / P \u001b[0m\n  \u001b[0mnone-v1\u001b[0m\n  \u001b[0m / R \u001b[0m\n  \u001b[0mR-2\u001b[0m\n\u001b[36m</option>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<section\u001b[39m\n      \u001b[33maria-label\u001b[39m=\u001b[32m\"固定量表配置授权\"\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"epg-panel epg-fixed-configurations\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<h2>\u001b[39m\n        \u001b[0m固定量表配置授权\u001b[0m\n      \u001b[36m</h2>\u001b[39m\n      \u001b[36m<p>\u001b[39m\n        \u001b[0m为\u001b[0m\n        \u001b[0m本校 Teacher 产品管理员\u001b[0m\n        \u001b[0m选定已批准配置。接收者直接使用此配置创建任务；修改配置应创建新授权，旧作答与报告保留原版。\u001b[0m\n      \u001b[36m</p>\u001b[39m\n      \u001b[36m<details\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"approved-scale-axes\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<summary>\u001b[39m\n          \u001b[0m按题本、参数和报告查找已批准配置\u001b[0m\n        \u001b[36m</summary>\u001b[39m\n        \u001b[36m<p>\u001b[39m\n          \u001b[0m当前已读取的本校可分发配置，可继续读取更多配置\u001b[0m\n          \u001b[0m；仅查找已批准且当前可分配的完整组合。不会为新搭配代作系统审批。请核对人群、用途及报告措辞，专业搭配由管理员决定。\u001b[0m\n        \u001b[36m</p>\u001b[39m\n        \u001b[36m<fieldset>\u001b[39m\n          \u001b[36m<legend>\u001b[39m\n            \u001b[0m手选 C/P/R 查找配置\u001b[0m\n          \u001b[36m</legend>\u001b[39m\n          \u001b[36m<label>\u001b[39m\n            \u001b[0m量表工具\u001b[0m\n            \u001b[36m<select>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m选择量表工具\u001b[0m\n              \u001b[36m</option>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"synthetic\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m已批准固定量表\u001b[0m\n              \u001b[36m</option>\u001b[39m\n            \u001b[36m</select>\u001b[39m\n          \u001b[36m</label>\u001b[39m\n          \u001b[36m<label>\u001b[39m\n            \u001b[0m题本 C\u001b[0m\n            \u001b[36m<select\u001b[39m\n              \u001b[33maria-label\u001b[39m=\u001b[32m\"题本 C\"\u001b[39m\n              \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m明确选择\u001b[0m\n                \u001b[0m题本 C\u001b[0m\n              \u001b[36m</option>\u001b[39m\n            \u001b[36m</select>\u001b[39m\n          \u001b[36m</label>\u001b[39m\n          \u001b[36m<label>\u001b[39m\n            \u001b[0m解释参数 P\u001b[0m\n            \u001b[36m<select\u001b[39m\n              \u001b[33maria-label\u001b[39m=\u001b[32m\"解释参数 P\"\u001b[39m\n              \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m明确选择\u001b[0m\n                \u001b[0m解释参数 P\u001b[0m\n              \u001b[36m</option>\u001b[39m\n            \u001b[36m</select>\u001b[39m\n          \u001b[36m</label>\u001b[39m\n          \u001b[36m<label>\u001b[39m\n            \u001b[0m报告 R\u001b[0m\n            \u001b[36m<select\u001b[39m\n              \u001b[33maria-label\u001b[39m=\u001b[32m\"报告 R\"\u001b[39m\n              \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<option\u001b[39m\n                \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0m明确选择\u001b[0m\n                \u001b[0m报告 R\u001b[0m\n              \u001b[36m</option>\u001b[39m\n            \u001b[36m</select>\u001b[39m\n          \u001b[36m</label>\u001b[39m\n          \u001b[36m<button\u001b[39m\n            \u001b[33mdisabled\u001b[39m=\u001b[32m\"\"\u001b[39m\n            \u001b[33mtype\u001b[39m=\u001b[32m\"button\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0m使用所选已批准组合\u001b[0m\n          \u001b[36m</button>\u001b[39m\n        \u001b[36m</fieldset>\u001b[39m\n      \u001b[36m</details>\u001b[39m\n      \u001b[36m<label>\u001b[39m\n        \u001b[0m已批准量表配置\u001b[0m\n        \u001b[36m<select>\u001b[39m\n          \u001b[36m<option\u001b[39m\n            \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0m选择固定配置\u001b[0m\n          \u001b[36m</option>\u001b[39m\n          \u001b[36m<option\u001b[39m\n            \u001b[33mvalue\u001b[39m=\u001b[32m\"00000000-0000-4000-8000-000000000003\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0m已批准固定量表\u001b[0m\n            \u001b[0m · C \u001b[0m\n            \u001b[0mC-1\u001b[0m\n            \u001b[0m / P \u001b[0m\n            \u001b[0mnone-v1\u001b[0m\n            \u001b[0m / R \u001b[0m\n            \u001b[0mR-2\u001b[0m\n          \u001b[36m</option>\u001b[39m\n        \u001b[36m</select>\u001b[39m\n      \u001b[36m</label>\u001b[39m\n      \u001b[36m<label>\u001b[39m\n        \u001b[0m本次配置操作的管理员密码\u001b[0m\n        \u001b[36m<input\u001b[39m\n          \u001b[33mautocomplete\u001b[39m=\u001b[32m\"off\"\u001b[39m\n          \u001b[33mtype\u001b[39m=\u001b[32m\"password\"\u001b[39m\n          \u001b[33mvalue\u001b[39m=\u001b[32m\"\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n      \u001b[36m</label>\u001b[39m\n    \u001b[36m</section>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n\u001b[36m</body>\u001b[39m\n    at waitForWrapper (/workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27)\n    at /workspace/eduK12-new-version/server-version/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33\n    at /workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx:198:87\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304810069,
+            "endTime": 1793304812269.8718,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx"
+          },
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery requires a business name, issues one exact server-bound request and never lets the researcher choose R",
+                "status": "skipped",
+                "title": "requires a business name, issues one exact server-bound request and never lets the researcher choose R",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery retains no secret and confirms a lost response through original complete intent without a second write",
+                "status": "skipped",
+                "title": "retains no secret and confirms a lost response through original complete intent without a second write",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery allows only an original-number retry after explicit absent readback",
+                "status": "skipped",
+                "title": "allows only an original-number retry after explicit absent readback",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery keeps a conflicting request blocked and cannot turn a different recipient into the original grant",
+                "status": "skipped",
+                "title": "keeps a conflicting request blocked and cannot turn a different recipient into the original grant",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery recovers the original recipient even after the manager changes the visible researcher",
+                "status": "skipped",
+                "title": "recovers the original recipient even after the manager changes the visible researcher",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery does not fall back to untyped standard issuance when the authenticated catalog lacks actor identity",
+                "status": "skipped",
+                "title": "does not fall back to untyped standard issuance when the authenticated catalog lacks actor identity",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery requires the live authenticated account to match the issuer returned by the source catalog",
+                "status": "skipped",
+                "title": "requires the live authenticated account to match the issuer returned by the source catalog",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery rejects malformed absence readback and keeps the original operation blocked without a retry button",
+                "status": "skipped",
+                "title": "rejects malformed absence readback and keeps the original operation blocked without a retry button",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey named fixed standard configuration and exact request recovery"
+                ],
+                "fullName": "Survey named fixed standard configuration and exact request recovery shows a researcher the fixed business configuration and imports its exact grant without an R selector",
+                "status": "skipped",
+                "title": "shows a researcher the fixed business configuration and imports its exact grant without an R selector",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "keeps Survey axis discovery in the authenticated approved page and submits the exact chosen source after normal name/password checks",
+                "status": "passed",
+                "title": "keeps Survey axis discovery in the authenticated approved page and submits the exact chosen source after normal name/password checks",
+                "duration": 756.9498799999997,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304810401,
+            "endTime": 1793304811157.95,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "name": "approved-scale-axes-education-ui-v2",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/admin/EducationStandardConfigurations.test.tsx",
+          "--maxWorkers=1",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/approved-scale-axes-education-ui-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:14:59.825262+00:00",
+        "finishedAt": "2026-10-29T20:15:02.620989+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 1,
+        "numFailedTestSuites": 1,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 12,
+        "numPassedTests": 10,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304900232,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement",
+                "status": "passed",
+                "title": "distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement",
+                "duration": 218.55392800000004,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery School uses its own manager path and shows the original report audience before saving the psychologist configuration",
+                "status": "passed",
+                "title": "School uses its own manager path and shows the original report audience before saving the psychologist configuration",
+                "duration": 161.08626700000013,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery selects an approved exact source, legal recipient and delegation and keeps passwords out of retained request data",
+                "status": "passed",
+                "title": "selects an approved exact source, legal recipient and delegation and keeps passwords out of retained request data",
+                "duration": 124.322633,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery requires readback before an unknown issuance retries the identical ID and complete parameters",
+                "status": "passed",
+                "title": "requires readback before an unknown issuance retries the identical ID and complete parameters",
+                "duration": 144.21700499999997,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery does not accept a resource-only match when readback names another recipient",
+                "status": "passed",
+                "title": "does not accept a resource-only match when readback names another recipient",
+                "duration": 112.28214500000013,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery restores an unknown revoke without replaying it and confirms the exact revision/reason through readback",
+                "status": "passed",
+                "title": "restores an unknown revoke without replaying it and confirms the exact revision/reason through readback",
+                "duration": 27.793980000000147,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery does not let a late old-scope readback replace the next school screen",
+                "status": "passed",
+                "title": "does not let a late old-scope readback replace the next school screen",
+                "duration": 37.11323800000014,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request",
+                "status": "passed",
+                "title": "explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request",
+                "duration": 140.74891000000002,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery recovers a replacement only when the original prior revision and reason also match",
+                "status": "passed",
+                "title": "recovers a replacement only when the original prior revision and reason also match",
+                "duration": 38.191847999999936,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery cannot substitute another receiver when the original replacement recipient has lost current eligibility",
+                "status": "passed",
+                "title": "cannot substitute another receiver when the original replacement recipient has lost current eligibility",
+                "duration": 101.70130300000005,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "selects the exact existing HUISCHOOL source through shared axis discovery without bypassing recipient or delegation",
+                "status": "failed",
+                "title": "selects the exact existing HUISCHOOL source through shared axis discovery without bypassing recipient or delegation",
+                "duration": 97.75056200000017,
+                "failureMessages": [
+                  "Error: expect(element).toBeDisabled()\n\nReceived element is not disabled:\n  <button />\n    at Proxy.__VITEST_EXTEND_ASSERTION__ (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/expect/dist/index.js:1888:12)\n    at Proxy.<anonymous> (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/chai/index.js:1737:25)\n    at /workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx:202:180\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "selects the exact existing HUITEACHER source through shared axis discovery without bypassing recipient or delegation",
+                "status": "failed",
+                "title": "selects the exact existing HUITEACHER source through shared axis discovery without bypassing recipient or delegation",
+                "duration": 82.26092299999982,
+                "failureMessages": [
+                  "Error: expect(element).toBeDisabled()\n\nReceived element is not disabled:\n  <button />\n    at Proxy.__VITEST_EXTEND_ASSERTION__ (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/expect/dist/index.js:1888:12)\n    at Proxy.<anonymous> (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/chai/index.js:1737:25)\n    at /workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx:202:180\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304901275,
+            "endTime": 1793304902562.261,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "name": "approved-scale-axes-education-ui-v3",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/admin/EducationStandardConfigurations.test.tsx",
+          "-t",
+          "through shared axis",
+          "--maxWorkers=1",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/approved-scale-axes-education-ui-v3.json"
+        ],
+        "startedAt": "2026-10-29T20:15:46.463683+00:00",
+        "finishedAt": "2026-10-29T20:15:48.090115+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 12,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 10,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304946804,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement",
+                "status": "skipped",
+                "title": "distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery School uses its own manager path and shows the original report audience before saving the psychologist configuration",
+                "status": "skipped",
+                "title": "School uses its own manager path and shows the original report audience before saving the psychologist configuration",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery selects an approved exact source, legal recipient and delegation and keeps passwords out of retained request data",
+                "status": "skipped",
+                "title": "selects an approved exact source, legal recipient and delegation and keeps passwords out of retained request data",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery requires readback before an unknown issuance retries the identical ID and complete parameters",
+                "status": "skipped",
+                "title": "requires readback before an unknown issuance retries the identical ID and complete parameters",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery does not accept a resource-only match when readback names another recipient",
+                "status": "skipped",
+                "title": "does not accept a resource-only match when readback names another recipient",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery restores an unknown revoke without replaying it and confirms the exact revision/reason through readback",
+                "status": "skipped",
+                "title": "restores an unknown revoke without replaying it and confirms the exact revision/reason through readback",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery does not let a late old-scope readback replace the next school screen",
+                "status": "skipped",
+                "title": "does not let a late old-scope readback replace the next school screen",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request",
+                "status": "skipped",
+                "title": "explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery recovers a replacement only when the original prior revision and reason also match",
+                "status": "skipped",
+                "title": "recovers a replacement only when the original prior revision and reason also match",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "education manager exact configuration and unknown-result recovery"
+                ],
+                "fullName": "education manager exact configuration and unknown-result recovery cannot substitute another receiver when the original replacement recipient has lost current eligibility",
+                "status": "skipped",
+                "title": "cannot substitute another receiver when the original replacement recipient has lost current eligibility",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "selects the exact existing HUISCHOOL source through shared axis discovery without bypassing recipient or delegation",
+                "status": "passed",
+                "title": "selects the exact existing HUISCHOOL source through shared axis discovery without bypassing recipient or delegation",
+                "duration": 251.88139999999987,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [],
+                "fullName": "selects the exact existing HUITEACHER source through shared axis discovery without bypassing recipient or delegation",
+                "status": "passed",
+                "title": "selects the exact existing HUITEACHER source through shared axis discovery without bypassing recipient or delegation",
+                "duration": 99.68127200000004,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304947701,
+            "endTime": 1793304948052.6812,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx"
+          }
+        ]
+      }
+    },
+    {
+      "name": "approved-scale-axes-catalog",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-standard-use.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/approved-scale-axes-catalog.json"
+        ],
+        "startedAt": "2026-10-29T20:13:26.199177+00:00",
+        "finishedAt": "2026-10-29T20:13:38.774212+00:00",
+        "exitCode": 1
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 0,
+        "numPendingTests": 1,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304807616,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey axis discovery labels outside immutable source/grant identity"
+                ],
+                "fullName": "Survey axis discovery labels outside immutable source/grant identity labels only the original exact combination in one batched header query and preserves every source/grant/publication field",
+                "status": "skipped",
+                "title": "labels only the original exact combination in one batched header query and preserves every source/grant/publication field",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304807616,
+            "endTime": 1793304807616,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Existing authenticated manager sourceCatalog, display labels only; no grant/task write, no old content/participant replay"
+      }
+    },
+    {
+      "name": "approved-scale-axes-catalog-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-survey-standard-use.py",
+          "npx",
+          "vitest",
+          "run",
+          "src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/workspace/materials-load-20261029/evidence/approved-scale-axes-catalog-v2.json"
+        ],
+        "startedAt": "2026-10-29T20:14:59.825284+00:00",
+        "finishedAt": "2026-10-29T20:15:08.564854+00:00",
+        "exitCode": 0
+      },
+      "vitest": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793304900564,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey axis discovery labels outside immutable source/grant identity"
+                ],
+                "fullName": "Survey axis discovery labels outside immutable source/grant identity labels only the original exact combination in one batched header query and preserves every source/grant/publication field",
+                "status": "passed",
+                "title": "labels only the original exact combination in one batched header query and preserves every source/grant/publication field",
+                "duration": 233.4580249999999,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793304908148,
+            "endTime": 1793304908381.458,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "observations": {
+        "productionAccessed": false,
+        "scope": "Existing authenticated manager sourceCatalog, display labels only; no grant/task write, no old content/participant replay",
+        "additionalLabelHeaderQueries": 1,
+        "totalCatalogQueriesObserved": 25,
+        "preciseChoices": 3,
+        "sourceGrantPublicationUnchanged": true,
+        "labels": [
+          {
+            "sourceId": "survey-standard:9245522f-cb61-4745-a569-5095de771a43",
+            "sourceVersion": "deec45923838f7f94072cf25daf026d5e526b3eaa16bfbcabbb4025a740e52b0",
+            "axisVersions": {
+              "CONTENT": "1.0.0:1.0.0",
+              "PARAMETERS": "wave1-20261001-v2",
+              "REPORT": "1.1.0"
+            }
+          },
+          {
+            "sourceId": "survey-standard:9f431b10-30e9-4cf5-9874-48b28487ec80",
+            "sourceVersion": "fbbba9411e6ad33ca1334e127d6542cd328e98cefc189689da011852f1b39f55",
+            "axisVersions": {
+              "CONTENT": "1.0.0:1.0.0",
+              "PARAMETERS": "none-v1",
+              "REPORT": "1.1.0"
+            }
+          },
+          {
+            "sourceId": "survey-standard:e35aa04d-fad5-4188-8fbe-4f793dd25583",
+            "sourceVersion": "27e505bc39728a1e1a8fcc6db1a67e17a490b279b45088140e75714ed643d051",
+            "axisVersions": {
+              "CONTENT": "1.0.0:1.0.0",
+              "PARAMETERS": "none-v1",
+              "REPORT": "none-v1"
+            }
+          }
+        ],
+        "configurationBodyTransmitted": false
+      }
+    },
+    {
+      "name": "approved-scale-axes-backend-types",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-education.py",
+          "npx",
+          "tsc",
+          "--project",
+          "/workspace/materials-load-20261029/approved-scale-axes-backend-types.json"
+        ],
+        "startedAt": "2026-10-29T20:13:26.171933+00:00",
+        "finishedAt": "2026-10-29T20:14:03.933026+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "approved-scale-axes-frontend-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "startedAt": "2026-10-29T20:13:26.187194+00:00",
+        "finishedAt": "2026-10-29T20:14:34.656692+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "approved-scale-axes-lint",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/eslint/bin/eslint.js",
+          "src/components/scale-governance/ApprovedScaleAxes.tsx",
+          "src/components/scale-governance/ApprovedScaleAxes.test.tsx",
+          "src/pages/admin/EducationStandardConfigurations.tsx",
+          "src/pages/admin/EducationStandardConfigurations.test.tsx",
+          "src/pages/admin/SurveyCatalogGrants.tsx",
+          "src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+          "src/training/TrainingStandardConfigurationGrants.tsx",
+          "src/training/TrainingStandardConfigurationGrants.test.tsx"
+        ],
+        "startedAt": "2026-10-29T20:13:26.288237+00:00",
+        "finishedAt": "2026-10-29T20:13:30.162808+00:00",
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "approved-scale-axes-education-test-lint-final",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/eslint/bin/eslint.js",
+          "src/pages/admin/EducationStandardConfigurations.test.tsx"
+        ],
+        "startedAt": "2026-10-29T20:16:57.803146+00:00",
+        "finishedAt": "2026-10-29T20:16:58.733020+00:00",
+        "exitCode": 0
+      }
+    }
+  ]
+}

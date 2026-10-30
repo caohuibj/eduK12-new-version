@@ -1,0 +1,1361 @@
+{
+  "schemaVersion": 1,
+  "mainSha": "2de32609e1888cf28b73cb26e2c0cf38b11ff875",
+  "source": {
+    "repository": "caohuibj/eduK12-new-version",
+    "branch": "feat/dot-cognitive-content-integration-20261028",
+    "commit": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+    "tree": "a516533b2c87ce4a96a610ad3c8f51f5b5e5b9a3",
+    "files": [
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/config-seeds.ts",
+        "sha256": "a48ff1a612fccd93f8040a2a794b3b48e1350a0bef957dbc7619aaeda8efb6df",
+        "blob": "95258cb45f5cc4578a685831f119fe941f3bf2f7"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/onboarding/install.ts",
+        "sha256": "24563c978b743f8430335b1fe145435145bbf63c8d05098a62cc23deaffe7365",
+        "blob": "610331380aef035c6bfab20a9ee0887247d32ec7"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/task-resource.ts",
+        "sha256": "2f0884bac981970cd65cce3fcb95b6996e83e6abbbc0cb4437c6db6d40f79743",
+        "blob": "ecebd91fcd3554d41f1b8a53d1098b8fd1b95d37"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/profile-freeze.ts",
+        "sha256": "ae5ede034afcbc632b1d29c9c7cf5f7168c9fd442cd4dc9dce6185e59b8e2f1e",
+        "blob": "21133caf94fe0601d8fe0586d446744bacc163a0"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/native-runners.tsx",
+        "sha256": "85db19d7cfe8043d6c2738c90d7024bbfbaf085a402dcdfdb2fa1b5d97f77953",
+        "blob": "fa1fa03f74cd89a4180bdbaf384bb7b49249fc0c"
+      }
+    ]
+  },
+  "kind": "source provenance and isolated load; not main runtime admission",
+  "rows": [
+    {
+      "testType": "ant",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "sourceCoreHash": "485c3bcb9a7318c66d71c3e3625e2e6fca393f626d07a055b2f99e69a2b96111",
+      "databaseCoreHash": "485c3bcb9a7318c66d71c3e3625e2e6fca393f626d07a055b2f99e69a2b96111",
+      "localConfigId": "329c1b7b-21b4-45f1-b55f-a0c3a5e01c6b",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "1.1.0",
+          "configHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+          "reportHash": "43e510f8c5cd2ceb46dbd5c3eb105565885e574f50d9c5db7e185019cfaea3e3",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 48,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "1.1.0",
+          "configHash": "ebd1e9f3f352ca31b949577466d89ab54cc2553b865c6fd350c3ab7e06fa52de",
+          "reportHash": "79f6b980123a1323187152b694b8ee7c54898a8398019dc361e76a2d2f72ee0e",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 288,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "attentional-blink",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "3ef57cf71a9ccf5072b94a4f72f430194dff058d9bceae9db5d54c04b6aa7a45",
+      "databaseCoreHash": "3ef57cf71a9ccf5072b94a4f72f430194dff058d9bceae9db5d54c04b6aa7a45",
+      "localConfigId": "e5d3a5a2-0c7f-4699-ad7b-8e599ecb3778",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "a11027931d04226897bc03de9b97702dcebe3dda8b7afb7583cfe5a80afd1c50",
+          "reportHash": "8b2f3eb43220f06250cab00ef5f1638903634561b8f92eb8f33724842dc94f8c",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 50,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "637bcc8cc0ec83f61479df2cb7a9a99d2465694b79d86c04f5b59f386bd92664",
+          "reportHash": "936691bfc06b5e79ed558b525f64d4cd53a8dfc29032579bc66c1a5f440ccc5b",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 200,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "balloon-effort",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "4e14b4ab66762cc04e35d37f886ab8c055fa947c52da39e819643074b2c6f032",
+      "databaseCoreHash": "4e14b4ab66762cc04e35d37f886ab8c055fa947c52da39e819643074b2c6f032",
+      "localConfigId": "54fbe2b6-ea2c-4af8-82a3-5e985d44713a",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+          "reportHash": "bd3af2883a8c65897c68c1a78a154c93903bbe1b1d7340acadf2e8b4a4569a11",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 18,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "7c529ef53d47709bb17c4489086757ba135ac9747be90671722cd2f9da77686a",
+          "reportHash": "c38b89d8be02422a0d8e576a9b3335264a25ebc209fadfe8e77944eda14adc73",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 72,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "dual-arrow",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "f5a623f397198f9c7cf73174253fa5c48258a3d19342887edcabf704d57800ca",
+      "databaseCoreHash": "f5a623f397198f9c7cf73174253fa5c48258a3d19342887edcabf704d57800ca",
+      "localConfigId": "2ddeac81-d324-4a0b-be2e-6515be9d6749",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+          "reportHash": "9e55342883cb21c5fcc1a21bd3b33cbf797b2a6e61000590c1d6087adcfc9743",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 60,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "e8a1abbb613f44f1b5a81d214b7c11735acb313201af99c7d2b1cab1bb7ebef9",
+          "reportHash": "4cf99a90e3ebebadf1b8e6fd6d03df3014de4d3c3c4d4660fe388b26fdcdf8e2",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 300,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "enumeration",
+      "configVersion": "0.3.0",
+      "engineVersion": "0.2.0",
+      "scoringVersion": "0.2.0",
+      "sourceCoreHash": "afaa0328620bbb5691b42bd6466c85eeb20f436be0d72f6b0b8463903a5cd3f3",
+      "databaseCoreHash": "afaa0328620bbb5691b42bd6466c85eeb20f436be0d72f6b0b8463903a5cd3f3",
+      "localConfigId": "a6d07393-cfab-418a-80e5-ffec84e81a25",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.3.0",
+          "configHash": "7b1ce6092bb2eeb105826848dc69095c35d237217750e4cc7fdfb7c1d5f38317",
+          "reportHash": "3435f8cd9f11a42f8c8a6fa920b4532d2481cdefa431015d678c2908b96bb607",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 25,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.3.0",
+          "configHash": "f08fc6767b1b5edb2ad7b1022b99d745dc19a9d886e751d467c35faedbd5c70e",
+          "reportHash": "edc9e1dc0464f1e1630860ac1b85e4e7ec96a6b0a2aab86815e3a147df7ae6ee",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 100,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "gradcpt",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "a98ae1bfd1035245810580f4365a97ae11f448727e1b9bb4653ab12e1aadae09",
+      "databaseCoreHash": "a98ae1bfd1035245810580f4365a97ae11f448727e1b9bb4653ab12e1aadae09",
+      "localConfigId": "647887c3-2488-416f-b2a8-516e49989378",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "809207140532bbb48104c8eda456bdca1b12a632e5a1caf1b6ecc41b70e4538c",
+          "reportHash": "556db81216bae44475ce707ed1ae68e0b8e80fe6ea6866b8bb8c3c1bd0fa7254",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 100,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "1eea7e00cd6dc1b17547248db5bc44e814bb5a0d6fbdbbd0491c01da035a168e",
+          "reportHash": "d19eac48fab99d78f4506243803f65d36e483c29dae01af82d346a9a93921ada",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 300,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "hearts-flowers",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985",
+      "databaseCoreHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985",
+      "localConfigId": "22547568-b3aa-43dc-a119-6e96a40b1a56",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+          "reportHash": "6380d883b5ce3df44f7f99ef14e0cbc3a7c4742cc0567e2e1964b9ea676d04ff",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 32,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "76fa42c68d72f39c26206515a5a015757cf076c97a21939765de5359d3043672",
+          "reportHash": "e56ad991016020e05d6f50247b5b2ba48833c435a86111d439ae1a4833f14bd2",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 57,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "horizon-exploration",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "d1160648b0e566a1f79bc8bc811ca991821cc193ab1d58d39e2b3f37ea724bae",
+      "databaseCoreHash": "d1160648b0e566a1f79bc8bc811ca991821cc193ab1d58d39e2b3f37ea724bae",
+      "localConfigId": "0053e697-9ddd-41cd-8f4c-204071352dae",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+          "reportHash": "784b53458106716a627e18977a0a026302aed0df9d0325f968cdf4e66a6bde57",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 40,
+          "unit": "games"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "23d1e7567738d2ae373f5380e26f2235db19e6e55936deb39c11d5f7b94a0327",
+          "reportHash": "3fd7e205f740097a63d532caa1f0452a0d93dc75d57dbb93f0694c9f6ed09044",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 320,
+          "unit": "games"
+        }
+      ]
+    },
+    {
+      "testType": "mot",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.1.1",
+      "scoringVersion": "1.1.0",
+      "sourceCoreHash": "841592e8854b388aeb492a1e30bd204a49fe345df504a18c9b3327bb534b583c",
+      "databaseCoreHash": "841592e8854b388aeb492a1e30bd204a49fe345df504a18c9b3327bb534b583c",
+      "localConfigId": "881d239b-28dc-4904-b9d3-b90d69e02750",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "1.0.0",
+          "configHash": "ac18eb0d0ee10f354a6ae9dd9d8bdec4587f991c6e19676eb0f45041154eaf13",
+          "reportHash": "7c0497ca52591fbbec962dba182a21f89eb756e4b9f4f7470b0be9a841b5dd88",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 9,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "1.0.0",
+          "configHash": "a7a2660c4defe8d336926e63ae821d6e750130226bbfba85e8b054d891e4fbba",
+          "reportHash": "c35442eb22ec667475beb559e1ec0441c639145c8574c40d9d9f9892779a2aac",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 45,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "precision-working-memory",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "ca8135dc866ea2d2e69adc5c643b952b0acfff8c676563d4f7bacec6c4f19e33",
+      "databaseCoreHash": "ca8135dc866ea2d2e69adc5c643b952b0acfff8c676563d4f7bacec6c4f19e33",
+      "localConfigId": "af1827c1-24db-4060-8c1a-5fc417570197",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "cb0854e4aaecafb2642add136057de71a619abc933255ed7e23afd12f2c7a5ff",
+          "reportHash": "ba1239158410e19e24906ee5a9262a93c4bfef76c55a0c9c6db48e66c4c723b6",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 40,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "c3138d9059159f04e51d4fdd8ce73c50a579e7d5883167f8a9e6cf00f082d7c6",
+          "reportHash": "2f36d506faec386bd9a28c0aeaed3c00cf9fadb6db7ba5e70c6d8070d8b943ed",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 400,
+          "unit": "trials"
+        }
+      ]
+    },
+    {
+      "testType": "visual-search-two-stage",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "sourceCoreHash": "23251f0754b34bfe80dd1afca31f09e2852ad817029da352def298d6f81dd1c2",
+      "databaseCoreHash": "23251f0754b34bfe80dd1afca31f09e2852ad817029da352def298d6f81dd1c2",
+      "localConfigId": "47cc43dd-7f3e-4ea1-b92d-b9347c53e98f",
+      "status": "DRAFT",
+      "accessPolicy": "GRANT",
+      "mainRuntimeRegistered": false,
+      "expectedProducts": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL",
+        "TEACHER"
+      ],
+      "entryAdmission": "NOT_GRANTED",
+      "profiles": [
+        {
+          "profile": "experience",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+          "reportHash": "782dca01dbff60b2d9dee782e3c6a2e61b9822b53b6cc780e7b383c6992876a6",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 36,
+          "unit": "trials"
+        },
+        {
+          "profile": "research",
+          "profileDefinitionVersion": "0.1.0",
+          "configHash": "3d49a1ebadb43daa274ca235da870e4b4971b2677a4e0af11ff840dc58415523",
+          "reportHash": "796a3d85bb017022f84904c5868673a886c98c2f6b612245fa6a9f7231baf862",
+          "reportHashScheme": "CANONICAL_JSON_SHA256_V1",
+          "formalCount": 180,
+          "unit": "trials"
+        }
+      ]
+    }
+  ],
+  "loadEvidence": {
+    "createdDrafts": 11,
+    "frozenProfileArtifacts": 22,
+    "idempotent": true,
+    "installAudits": 11,
+    "assignments": 0,
+    "materialGrants": 0,
+    "database": "isolated materials_load_20261029",
+    "verifiedAt": "2026-10-29T14:52:53.502Z",
+    "seedSourceEvidence": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/installation-continued.json",
+    "localReadbackSha256": "378f1e331b97df09107392c60dee76752e0fb556b7c9a3dc40986754fc451d52"
+  },
+  "missing": [
+    {
+      "key": "continuous-recognition",
+      "reason": "no registered seed; real asset pool and integrated native runner absent"
+    },
+    {
+      "key": "CFQ-7/IPIP-C1/BPS9 independent fun R registration",
+      "reason": "Pure source JSON available and exact C/P hashes verified; main has no automatic sidecar registry/seed. Specifically denied engineering commit is not reproduced. Only 3 basic R embedded in DRAFT definitions loaded."
+    }
+  ],
+  "scaleMaterials": {
+    "source": {
+      "repository": "caohuibj/eduK12-new-version",
+      "branch": "content/scale-materials-three-20261029",
+      "commit": "6fa885ec74ca01350db25c44bd61c700648b05d1",
+      "tree": "bf8fc715333ab3d96e0faa73249bb385a52e4248",
+      "parent": "2de32609e1888cf28b73cb26e2c0cf38b11ff875",
+      "pullRequest": 387
+    },
+    "runtimeSource": "detached exact reviewed-content worktree; not merged into task1 or main",
+    "backendLockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "existingMaterializerBlob": "2292d7d622098715d0e582f50caad10aea0a02ee",
+    "existingSeedBlob": "8dd2c511e515c067232a619d48d2daf9e5f52783",
+    "database": "isolated materials_load_20261029",
+    "verifiedAt": "2026-10-29T15:40:51.509228+00:00",
+    "rows": [
+      {
+        "key": "cfq7_zh_cn_research",
+        "version": "1.0.1",
+        "title": "认知融合问卷（CFQ-7，7题）— 中文工作译稿",
+        "sourcePath": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/source.json",
+        "sourceFileSHA256": "095500af6fc1dceace4bdf12f2a9087d78254ad56d8ee8263772c59f3ab39bc9",
+        "variantsPath": "docs/scale-intake/materials-three-20261029/cfq7_zh_cn_research/report-variants.json",
+        "variantsFileSHA256": "f47c6464a43e88bc5ff15bf052b93425aa02d9d56978e0fe0332d45a19bfefd0",
+        "measurementHash": "7882f8b3cb47f768e66dc346e017870ec689e30f1a833c50a014113ffde7807c",
+        "C": {
+          "version": "1.0.1:1.0.0",
+          "hash": "7882f8b3cb47f768e66dc346e017870ec689e30f1a833c50a014113ffde7807c"
+        },
+        "P": {
+          "version": "none-v1",
+          "hash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+          "referencePolicy": "none",
+          "references": 0
+        },
+        "basicR": {
+          "version": "1.0.2",
+          "hash": "1cae636bad1bcba70f19063a543f089ba66ecc015d676d78adc277a91023ae99",
+          "status": "EMBEDDED_DRAFT_DEFINITION"
+        },
+        "funR": {
+          "version": "1.1.0",
+          "hash": "3914eefde15920b523f3a23437e899577b564a0391b4d3831fa41588c6cd7e83",
+          "status": "MATERIAL_ONLY_NOT_REGISTERED"
+        },
+        "id": "d0ad3805-dd1f-426c-aa80-492741bb3cd9",
+        "definitionCanonicalHash": "f9d553563819ecb20619582c3b449c864971cdf231688ff956a0cb53ed7c7b95",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "axisHash": "7e119b8ce5cdf9bd221d47887d55683735cceb77724ba80017926a05acf4e287",
+        "sourceSnapshotHash": "a79a18d4065e86752aa6b97804ccb5b0406e0f1eb2f16cd600105fb60032f6d5",
+        "createdAt": "2026-10-29T15:39:59.818Z",
+        "updatedAt": "2026-10-29T15:39:59.818Z",
+        "deploymentActive": false,
+        "standardCombinationRegistered": false,
+        "entryUseGranted": false
+      },
+      {
+        "key": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+        "version": "1.0.0",
+        "title": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+        "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+        "sourceFileSHA256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+        "variantsPath": "docs/scale-intake/materials-three-20261029/ipip_neo_c1_self_efficacy10_zh_cn_research/report-variants.json",
+        "variantsFileSHA256": "170d74225c01d0cac897b5f99e96db46bb768865a86da171fff7e2b161bde288",
+        "measurementHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+        "C": {
+          "version": "1.0.0:1.0.0",
+          "hash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c"
+        },
+        "P": {
+          "version": "none-v1",
+          "hash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+          "referencePolicy": "none",
+          "references": 0
+        },
+        "basicR": {
+          "version": "1.0.1",
+          "hash": "444693a791fa7856aaa20347369472973ee2857ba8c858fb0406a933eb9fbce9",
+          "status": "EMBEDDED_DRAFT_DEFINITION"
+        },
+        "funR": {
+          "version": "1.1.0",
+          "hash": "186cb189fa80992b892ff16b9581baa8062c0f5989ed14acd25245fc8d680f54",
+          "status": "MATERIAL_ONLY_NOT_REGISTERED"
+        },
+        "id": "2657e18e-d23e-4ad2-aab6-4ba2ba9adb12",
+        "definitionCanonicalHash": "af9ca60acb2e393c673f2f683e29581d26a5568d86ec2974033856f40c5142fb",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "axisHash": "5c4b8ccc9ff8d9c5847471de0a4fd35cfd474e7d2141400f3d042180d4ee1590",
+        "sourceSnapshotHash": "b04261c5a8e4ec59b108901e05c55e09ec1ba18ba44c99b829a9df58b97d2c32",
+        "createdAt": "2026-10-29T15:39:59.844Z",
+        "updatedAt": "2026-10-29T15:39:59.844Z",
+        "deploymentActive": false,
+        "standardCombinationRegistered": false,
+        "entryUseGranted": false
+      },
+      {
+        "key": "bps9_zh_cn_research",
+        "version": "1.0.0",
+        "title": "上床拖延问卷（BPS成人9题，中文工作稿）",
+        "sourcePath": "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/source.json",
+        "sourceFileSHA256": "e6306dd5537786e28cd086aea62462ed7634627bc070f7c08d5c48df27c6dcb4",
+        "variantsPath": "docs/scale-intake/materials-three-20261029/bps9_zh_cn_research/report-variants.json",
+        "variantsFileSHA256": "0c4530fb2123663cb58c2685c56d48b39413427a600345223368adc502020f68",
+        "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+        "C": {
+          "version": "1.0.0:1.0.0",
+          "hash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c"
+        },
+        "P": {
+          "version": "none-v1",
+          "hash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+          "referencePolicy": "none",
+          "references": 0
+        },
+        "basicR": {
+          "version": "1.0.0",
+          "hash": "bc979155b76e92348da1a0ed1a0a2ce0a7cbcec408dcbcc01dbef6fe320ab057",
+          "status": "EMBEDDED_DRAFT_DEFINITION"
+        },
+        "funR": {
+          "version": "1.1.0",
+          "hash": "bde2ca82c804a2f8f688947e986fd50170f89f11b79056343d2d7a78195799b7",
+          "status": "MATERIAL_ONLY_NOT_REGISTERED"
+        },
+        "id": "f511609e-43e8-4217-a3ca-ce78eb05c92a",
+        "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "axisHash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+        "sourceSnapshotHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+        "createdAt": "2026-10-29T15:39:59.860Z",
+        "updatedAt": "2026-10-29T15:39:59.860Z",
+        "deploymentActive": false,
+        "standardCombinationRegistered": false,
+        "entryUseGranted": false
+      }
+    ],
+    "counts": {
+      "scales": 3,
+      "configs": 11,
+      "materialGrants": 0,
+      "contentUseGrants": 0,
+      "assignments": 0,
+      "axisSnapshots": 3
+    },
+    "idempotent": true,
+    "repeatCreated": 0,
+    "funRegistered": 0,
+    "sourcePartBindingVerified": true,
+    "normalSourceSeedWouldLoadBasic": true,
+    "fullSetupExecuted": false,
+    "entryUseGranted": false,
+    "evidence": [
+      {
+        "file": "three-basic-preflight.json",
+        "sha256": "6ee59d07085c3a43a820485156d351ad6762154baaf41f9f326c8e1f3372fdd3"
+      },
+      {
+        "file": "three-basic-readback.json",
+        "sha256": "a5e2c084b908b4807984c54319fdeda4ed338310556b2ae0322497fc61536821"
+      },
+      {
+        "file": "three-basic-repeat-readback.json",
+        "sha256": "0b7c216e53dc9a8286651969e62ae8a8ad7b3f9d828dcdc53af603c99a0ccf26"
+      }
+    ],
+    "harnessSHA256": "5adaeb93dd2486efc74509fa3039c009d2fd10b33ea42b041ae757256181ca3b",
+    "reusedEvidence": "DOT reports twenty scoring/report comparisons; not rerun here, not claimed as cloud permission/UI qualification"
+  },
+  "previousMainSetup": {
+    "sourceCommit": "6142ddc74db9787f6606746610df58c73de256f5",
+    "sourceTree": "bf8fc715333ab3d96e0faa73249bb385a52e4248",
+    "node": "v24.21.0",
+    "backendLockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "expectedExecutableScales": 56,
+    "expectedSeedConfigs": 32,
+    "seedFileHashes": {
+      "prisma/seed.ts": "06b400c876bac0576b9c8c5283514ade59344527cce87119b7fcb047bcde26e8",
+      "prisma/seeds/scales.ts": "f6e7714173469a71d9eaee52c809a0e9416b27937654cf0b9fcb19b4b64f2570",
+      "prisma/seeds/cognitive.ts": "e39cbf8727fc4ee78157bf07f8c96d1502f2714f135ba57e2ed88be0f0eca3fd",
+      "prisma/seeds/cognitive-timing-pilot.ts": "e180f69dc2620c0c18800700e21705ea882d0f3c65300bf6293f4f0a107b965e"
+    },
+    "canonicalStateHash": "2175cdd75219bcfab7ac2a7f7a022d58b0bb88cf54f3b11c0719daa0043d1e4c",
+    "scope": "Official guarded migrate + full db:seed at exact main with matched installed dependencies; not fresh dependency installation, frontend build, production or runtime-role qualification",
+    "database": "main_setup_test_20261029",
+    "sameTreeAsPureContentCommit": "6fa885ec74ca01350db25c44bd61c700648b05d1",
+    "counts": {
+      "users": 1,
+      "scales": 56,
+      "configs": 32,
+      "materialGrants": 0,
+      "contentGrants": 0,
+      "assignments": 0,
+      "assessments": 0,
+      "composites": 0,
+      "entryGrants": 0,
+      "systemAdmins": 0,
+      "publishedScales": 0,
+      "deployments": 0,
+      "standardCombinations": 0,
+      "standardVersions": 0
+    },
+    "targetBasics": [
+      {
+        "id": "ffec0dbf-fb14-4d50-b4d5-d00f225c34da",
+        "code": "bps9_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "78f791dc-9d34-4f31-8c6a-f91216bac751",
+        "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+        "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+        "createdAt": "2026-10-29T16:35:07.428Z",
+        "updatedAt": "2026-10-29T16:35:07.428Z",
+        "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1",
+        "basicReportVersion": "1.0.0",
+        "funReport": "MATERIAL_ONLY_NOT_REGISTERED"
+      },
+      {
+        "id": "734d27b1-e36e-4ca5-881e-00a83c8d3e13",
+        "code": "cfq7_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "78f791dc-9d34-4f31-8c6a-f91216bac751",
+        "definitionHash": "7882f8b3cb47f768e66dc346e017870ec689e30f1a833c50a014113ffde7807c",
+        "instruction": "下面是一些描述你与自己想法之间关系的句子。\n\n请仔细阅读每一句，根据自己的真实经验，选择这种情况出现的频率。没有对错之分。",
+        "createdAt": "2026-10-29T16:35:07.476Z",
+        "updatedAt": "2026-10-29T16:35:07.476Z",
+        "definitionCanonicalHash": "f9d553563819ecb20619582c3b449c864971cdf231688ff956a0cb53ed7c7b95",
+        "basicReportVersion": "1.0.2",
+        "funReport": "MATERIAL_ONLY_NOT_REGISTERED"
+      },
+      {
+        "id": "021c36fe-6c62-49cc-bf66-4220d1008915",
+        "code": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "78f791dc-9d34-4f31-8c6a-f91216bac751",
+        "definitionHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+        "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+        "createdAt": "2026-10-29T16:35:07.670Z",
+        "updatedAt": "2026-10-29T16:35:07.670Z",
+        "definitionCanonicalHash": "af9ca60acb2e393c673f2f683e29581d26a5568d86ec2974033856f40c5142fb",
+        "basicReportVersion": "1.0.1",
+        "funReport": "MATERIAL_ONLY_NOT_REGISTERED"
+      }
+    ],
+    "repeatStateIdentical": true,
+    "funReportsRegistered": 0,
+    "cognitiveCandidateImport": false,
+    "evidence": [
+      {
+        "file": "main-6142-setup-before.json",
+        "sha256": "404d711e184d614701c25d68e6afad21fdb789dca28effe11bea2c0ad0d6bfaf"
+      },
+      {
+        "file": "main-6142-seed-first-status.json",
+        "sha256": "82b6f7476a62521084f1c561c5aff8670ceb2aeee61b688469a3c018d677a6db"
+      },
+      {
+        "file": "main-6142-setup-first-readback.json",
+        "sha256": "d22a84ac8c210f40a361ed21b14737ea6270830efb5b22c686f8cb6c7c777826"
+      },
+      {
+        "file": "main-6142-migrate-repeat-status.json",
+        "sha256": "fab8284885d4dc272d67f4c27a83e3d17058e90e942b944e3f93efb832343fb3"
+      },
+      {
+        "file": "main-6142-seed-repeat-status.json",
+        "sha256": "bfdf7065cf862ab63f22aa0ec147f1a25754b26dcf4cbfbb7a7185f5aa228cda"
+      },
+      {
+        "file": "main-6142-setup-repeat-readback.json",
+        "sha256": "f04514b5b338778b01e63fc0d9aebf41fb572381cdac2d5f735b7b434c4fca36"
+      }
+    ]
+  },
+  "currentMainSetup": {
+    "sourceCommit": "c52e1675fe7990ce49b42589d993fb12e8541ae1",
+    "sourceTree": "269d73372e9d47b578059c7078bb66402e1b689c",
+    "node": "v24.21.0",
+    "backendLockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "expectedExecutableScales": 88,
+    "expectedSeedConfigs": 32,
+    "registryIndexSHA256": "0f7b1f2e0b12042fb31f7b91b6babc3a6d5466a7ef28452cb4e69ddbde6e9c2d",
+    "seedFileHashes": {
+      "prisma/seed.ts": "06b400c876bac0576b9c8c5283514ade59344527cce87119b7fcb047bcde26e8",
+      "prisma/seeds/scales.ts": "f6e7714173469a71d9eaee52c809a0e9416b27937654cf0b9fcb19b4b64f2570",
+      "prisma/seeds/cognitive.ts": "e39cbf8727fc4ee78157bf07f8c96d1502f2714f135ba57e2ed88be0f0eca3fd",
+      "prisma/seeds/cognitive-timing-pilot.ts": "e180f69dc2620c0c18800700e21705ea882d0f3c65300bf6293f4f0a107b965e"
+    },
+    "canonicalStateHash": "4add92f85e5ea1da1ae01a3d85d836818c03b0201f1f96b6a2c33c41c9610ca9",
+    "scope": "Official guarded migrate + full db:seed at exact main with matched installed dependencies; not fresh dependency installation, frontend build, production or runtime-role qualification",
+    "database": "main_setup_test_c52_20261029",
+    "counts": {
+      "users": 1,
+      "scales": 88,
+      "configs": 32,
+      "materialGrants": 0,
+      "contentGrants": 0,
+      "assignments": 0,
+      "assessments": 0,
+      "composites": 0,
+      "entryGrants": 0,
+      "systemAdmins": 0,
+      "publishedScales": 0,
+      "deployments": 0,
+      "standardCombinations": 0,
+      "standardVersions": 0
+    },
+    "targetBasics": [
+      {
+        "id": "5f75c058-f8dc-4a76-9098-6b0759f2f405",
+        "code": "bps9_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+        "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+        "createdAt": "2026-10-29T17:23:20.437Z",
+        "updatedAt": "2026-10-29T17:23:20.437Z",
+        "reportVersion": "1.0.0",
+        "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1",
+        "basicReportVersion": "1.0.0",
+        "funReport": "MATERIAL_ONLY_NOT_REGISTERED"
+      },
+      {
+        "id": "aaa03495-2a12-4827-89f8-5439578d9b79",
+        "code": "cfq7_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "7882f8b3cb47f768e66dc346e017870ec689e30f1a833c50a014113ffde7807c",
+        "instruction": "下面是一些描述你与自己想法之间关系的句子。\n\n请仔细阅读每一句，根据自己的真实经验，选择这种情况出现的频率。没有对错之分。",
+        "createdAt": "2026-10-29T17:23:20.508Z",
+        "updatedAt": "2026-10-29T17:23:20.508Z",
+        "reportVersion": "1.0.2",
+        "definitionCanonicalHash": "f9d553563819ecb20619582c3b449c864971cdf231688ff956a0cb53ed7c7b95",
+        "basicReportVersion": "1.0.2",
+        "funReport": "MATERIAL_ONLY_NOT_REGISTERED"
+      },
+      {
+        "id": "f0505846-39f5-4d22-95a4-544dfb6f0983",
+        "code": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+        "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+        "createdAt": "2026-10-29T17:23:20.997Z",
+        "updatedAt": "2026-10-29T17:23:20.997Z",
+        "reportVersion": "1.0.1",
+        "definitionCanonicalHash": "af9ca60acb2e393c673f2f683e29581d26a5568d86ec2974033856f40c5142fb",
+        "basicReportVersion": "1.0.1",
+        "funReport": "MATERIAL_ONLY_NOT_REGISTERED"
+      }
+    ],
+    "additionalStandardReports": [
+      {
+        "id": "87faaba4-fdb9-46f9-b6de-f42af077c038",
+        "code": "ars30_2016_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+        "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+        "createdAt": "2026-10-29T17:23:20.408Z",
+        "updatedAt": "2026-10-29T17:23:20.408Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "636ea63ed2dd595f90b7847c96fabfb0f37d2a25ae83c8d806ce043b0e9d15ef"
+      },
+      {
+        "id": "ba5c3199-370c-402f-8832-f2bcf413e95d",
+        "code": "bpses5_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+        "instruction": "下面五句话描述你对自己引导孩子行为的信心。请阅读每句话，根据自己的情况选择同意程度，每题选择一项。这里请回答你对自身的看法。",
+        "createdAt": "2026-10-29T17:23:20.456Z",
+        "updatedAt": "2026-10-29T17:23:20.456Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "234f5a79dbd378cf0ca2f12b29ac799af01b1a3995da1647413f106d55058abb"
+      },
+      {
+        "id": "87e8e3ac-2388-4833-8d1c-d448550d66f4",
+        "code": "brcs4_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "b9298f5b505c0246e341e8370bddb5f79a562e869ca021360fb55da87d93d80f",
+        "instruction": "请想一想自己通常面对困难时的行为和做法，再判断下面的说法有多符合自己。选项从1（完全不符合我）到5（非常符合我），2、3、4表示两端之间逐渐增加的符合程度。请根据自己的实际情况作答，没有对错。",
+        "createdAt": "2026-10-29T17:23:20.470Z",
+        "updatedAt": "2026-10-29T17:23:20.470Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "3b7e1b227fd3df270456a44c38697300c7faf5a2c1cd9de9a24a8eaf5dafc2a4"
+      },
+      {
+        "id": "d5fd186e-b885-4402-bb48-aa367d3a326d",
+        "code": "cfsr12_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "334c59b2a74834d776a4fe9dde8c3be9851413245e1ee584fe9dbbf649fa2e2b",
+        "instruction": "请想一想，你平常遇到有压力的事情时，是否会有下列做法。对每个说法选择一个与你通常情况相符的程度。没有正确答案；你可以按照真实体验回答。",
+        "createdAt": "2026-10-29T17:23:20.528Z",
+        "updatedAt": "2026-10-29T17:23:20.528Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "c95eee9aa908c0499c15e2c9012f74ce2666f60cf18f0ce051eb3d5179fbb3aa"
+      },
+      {
+        "id": "c53043f8-492b-464d-9626-6bf71d8529e6",
+        "code": "gse3_asku_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "9fa68f4016d21e1a564781535e16d29332513869adbac30afd9bfebdd4c977e9",
+        "instruction": "以下陈述与你的实际情况可能有不同程度的符合。你认为每项陈述在多大程度上符合你个人的情况？",
+        "createdAt": "2026-10-29T17:23:20.888Z",
+        "updatedAt": "2026-10-29T17:23:20.888Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "6cafbe958fec3ff89e9ac109608da8d42521da72f32d4647b9b53a4a9b9a482c"
+      },
+      {
+        "id": "46e558ce-1758-42b1-824b-cf70320d6912",
+        "code": "ie4_zh_cn_research",
+        "instrumentVersion": "1.2.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "a1d2bfbc1d0c0433d996968241d4f7585a2791bf037a01406ae7e2a35ca84597",
+        "instruction": "以下陈述可能在不同程度上符合您的情况。您觉得每条陈述在多大程度上符合您本人？",
+        "createdAt": "2026-10-29T17:23:20.915Z",
+        "updatedAt": "2026-10-29T17:23:20.915Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "97410c0eec97202bdf04a52b3c84e9e0df8549c77c16741da9ce68659f2b83cf"
+      },
+      {
+        "id": "45067a9b-4a9f-43c5-8110-4b597a73073a",
+        "code": "ipip50_zh_cn_research",
+        "instrumentVersion": "1.1.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "14b1bbfb3d5df508e2cc08ff71f93941a88e95e83c50ee801261400198677277",
+        "instruction": "请描述您目前通常的样子，而不是您希望将来成为的样子。请如实判断每项描述与自己的符合程度。",
+        "createdAt": "2026-10-29T17:23:21.117Z",
+        "updatedAt": "2026-10-29T17:23:21.117Z",
+        "reportVersion": "1.1.2",
+        "definitionCanonicalHash": "201aa0c6210e2c8c28d742e19356a8ff09757e037710e31afd28e19470a26ce4"
+      },
+      {
+        "id": "7378b823-077f-4182-929b-06a598863e9f",
+        "code": "ipip_attending_emotions10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "f2b3e97bdf000ef0665edc0b2e8cc4f814b218dc3a2b83afc0e79e029199e5c4",
+        "instruction": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "createdAt": "2026-10-29T17:23:20.929Z",
+        "updatedAt": "2026-10-29T17:23:20.929Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "932456856075a8d2defef83d785abfbee849fa189a1eca31f310824da7d80f96"
+      },
+      {
+        "id": "5dda77d3-9b9b-40a7-9d99-1e3c8cf49e9b",
+        "code": "ipip_emotion_based_decision9_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "a2c05ac0e02463c723cd986b0c7bbd9c514f35b455ba582c60988e30e6965c11",
+        "instruction": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "createdAt": "2026-10-29T17:23:20.945Z",
+        "updatedAt": "2026-10-29T17:23:20.945Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "c8cb15839e4c400494e57befa399bdcc578443af55f7306f80f1a5d0bddcbd38"
+      },
+      {
+        "id": "f390f4ba-4ff7-4da9-a33e-7128c45b495d",
+        "code": "ipip_empathic_concern10_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "0b7ba86044f94297cf876b23a841a06cbdcc923ce4f2c3b94d45e208965d176f",
+        "instruction": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "createdAt": "2026-10-29T17:23:20.959Z",
+        "updatedAt": "2026-10-29T17:23:20.959Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "aaf5c124c08b151d7773a6d1d25aa41dd2b64cbcaa42d17e0c3ac80d66ff9ea1"
+      },
+      {
+        "id": "42c51833-bcdc-40bd-9e62-1cabfb39114b",
+        "code": "ipip_negative_expressivity10_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "db881941217057cefaa71b9b19f9e137689997752b96224ecd2eb7d4aecfbaa7",
+        "instruction": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+        "createdAt": "2026-10-29T17:23:20.981Z",
+        "updatedAt": "2026-10-29T17:23:20.981Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "91c2ce8c8d1384045def810c8019a369a6b43d43f475168990daa5c14dee4243"
+      },
+      {
+        "id": "aad7fa8c-5c33-4186-818d-eaa7912211c4",
+        "code": "ipip_neo_c5_self_discipline10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "b1e223884fe39aae725ff26a363814f0c882f472c5862bce892d513c57d782be",
+        "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+        "createdAt": "2026-10-29T17:23:21.017Z",
+        "updatedAt": "2026-10-29T17:23:21.017Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "541c6219cbeef69fb38b1a106a280d89148237961a8fb36e741bfa4cff471841"
+      },
+      {
+        "id": "f3b856a6-3646-49ad-a2e1-96fc500198dd",
+        "code": "ipip_nfc10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "12d62646f9e28fb576a8aaa4f677b8c5ab2964c379a6d956fea1cbf13de384a3",
+        "instruction": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+        "createdAt": "2026-10-29T17:23:21.031Z",
+        "updatedAt": "2026-10-29T17:23:21.031Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "889703b1f3c921d9c5c9fb0eb7e469bf391a99e0e3dca9e64a69337b4d038b77"
+      },
+      {
+        "id": "b78370b1-78a1-4374-be87-4fc2b9763187",
+        "code": "ipip_opt10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "925c9bc83a091c84098ced9cd5332cd826f5e77f77f4de1c397ca4d7d6b88792",
+        "instruction": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+        "createdAt": "2026-10-29T17:23:21.048Z",
+        "updatedAt": "2026-10-29T17:23:21.048Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "43f93398a5f92e26ee83da7d11bd56dbff80d42d07295dbccfd51e2014db60b5"
+      },
+      {
+        "id": "32940989-7a53-47b7-95ab-e41aed2c40ed",
+        "code": "ipip_positive_expressivity9_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "7bdd3b63016b885b4da52a8bd1447f6e9b80a9e7bebcf85e6be6a5a6b341c6b7",
+        "instruction": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "createdAt": "2026-10-29T17:23:21.069Z",
+        "updatedAt": "2026-10-29T17:23:21.069Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "e06ea788efed7343354c3fe34f940a1d3f66b56d767acae0bb180ec51c477b2a"
+      },
+      {
+        "id": "1d2aa389-3958-417b-95bc-37ea574e324d",
+        "code": "ipip_responsive_distress10_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "5ad790661f6d1bd3d5ddeff28be876d4106b79fddcab9cbf14b2ce58f7114494",
+        "instruction": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+        "createdAt": "2026-10-29T17:23:21.082Z",
+        "updatedAt": "2026-10-29T17:23:21.082Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "026d0f8636ee194bf5a9a235e054d33f33a4ca0a37b2c232e794943a9ff9a36b"
+      },
+      {
+        "id": "ac625e3a-9ccf-4586-bf13-49b4cf2fd075",
+        "code": "ipip_responsive_joy10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "43f89eedfe82ca1cf7627cf739a95b499239f11830f87842b0b510b6199ab42b",
+        "instruction": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "createdAt": "2026-10-29T17:23:21.097Z",
+        "updatedAt": "2026-10-29T17:23:21.097Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "577975ace0ffd963207951d888d9c919e8618f8c194c60217d74ad4eddc2b49f"
+      },
+      {
+        "id": "4483b949-8894-4af2-962c-f1202cad4e73",
+        "code": "ips9_2021_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "8ea23acea7db2c58eb2d40f31182ce2b0711cc3cd93f62ac123b75c377160009",
+        "instruction": "请根据你一般情况下处理日常任务的习惯，判断每句话有多符合你。请想到自己的实际生活，而不是理想中的做法。这里没有正确或错误答案；有些延期有实际原因，也请按你对句子的理解作答。每题选一个最合适的选项。\n\n1＝极少如此／不符合我；2；3；4；5＝非常经常如此／符合我。",
+        "createdAt": "2026-10-29T17:23:21.150Z",
+        "updatedAt": "2026-10-29T17:23:21.150Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "6b9100ff245d7b39886ef718fccec77b14a4ef62b2384323d74ff552984d3ced"
+      },
+      {
+        "id": "c53746d0-fa3d-429d-91f6-0d2aa5df43eb",
+        "code": "jss8_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "259e77fadda6395c2617432c72454ae377c64b8a145edd5d923ae9f8d007337b",
+        "instruction": "人们面对不公平的情境时，反应很不一样。下面想了解您在这类情境中会如何反应。请阅读各项陈述，选择它们与您相符的程度。如果您从未亲身遇到某种情境，请试着想象自己遇到时会如何反应。",
+        "createdAt": "2026-10-29T17:23:21.189Z",
+        "updatedAt": "2026-10-29T17:23:21.189Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "c8fe79a47f7d14358bc03c0fa68a2f260ee7a724b85f9aedc319ade8bfc52117"
+      },
+      {
+        "id": "3e7ee066-8b13-4d7f-9d2a-73be963cd47c",
+        "code": "kseg6_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "0e267be459d2be7784dfe4c7f556f3b04e4c169ae275a4e39d61d1199c2c65fe",
+        "instruction": "下面这些说法与你的实际情况可能有不同程度的符合。请指出每句话与你有多符合。",
+        "createdAt": "2026-10-29T17:23:21.206Z",
+        "updatedAt": "2026-10-29T17:23:21.206Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "6f7c918f12660a37035e452c6e1ba75b0e60f728410045db5d9386411af2e677"
+      },
+      {
+        "id": "eea48026-8ff5-42ea-8ca4-7a33c25b9149",
+        "code": "kusiv3_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "c3ff75082ebeef348e1bcd1a29db87c84ee7d022d944d0062d5966b2881f38c8",
+        "instruction": "下面我们想了解你对其他人的看法。请指出你对以下每句话的同意或不同意程度。",
+        "createdAt": "2026-10-29T17:23:21.222Z",
+        "updatedAt": "2026-10-29T17:23:21.222Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "9b6bcf88f6e5590de406f1a07417f8a32efabf0a9783d6acba9dccfe669ba519"
+      },
+      {
+        "id": "c96b1e29-cad3-4cac-bc25-2df7a11b5a63",
+        "code": "mslq_critical_thinking5_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "8c7e926b6627d8d9b7be715b88e1af526c3eb50ed8f0730b7d74a125a508dc2a",
+        "instruction": "请先选定一门具体课程，所有问题都围绕同一门课程回答。按每句话与您的实际情况相符的程度作答，1表示“完全不符合我”，7表示“非常符合我”。",
+        "createdAt": "2026-10-29T17:23:21.236Z",
+        "updatedAt": "2026-10-29T17:23:21.236Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "cbc89bdea11714233f7723197c5f13831003b7b3f3ab3dc67776022087e740f2"
+      },
+      {
+        "id": "5435bbe3-6e03-4d10-8b80-4ba1ce7a0af6",
+        "code": "mwq5_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "0d2ec9bd126f179ed522e0f24853c04a47473dade3bd88ae9e3cabe622bbc3e6",
+        "instruction": "请根据平时的情况，选择以下每句话发生的频繁程度。",
+        "createdAt": "2026-10-29T17:23:21.257Z",
+        "updatedAt": "2026-10-29T17:23:21.257Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "046482ef0bbe648636b3daff095319920ace84568f5a1dce5aabf60086b6886c"
+      },
+      {
+        "id": "c60ba0f4-c4d3-4920-97d9-6118a17628d5",
+        "code": "ofs10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+        "instruction": "下面是一些陈述，你可能会在不同程度上认同它们。请根据以下选项，选择你对每项陈述的同意或不同意程度。\n\n选项为：1＝非常不同意，2＝有些不同意，3＝既不同意也不反对，4＝有些同意，5＝非常同意。\n\n答案没有对错，重要的是你的想法。不必花很长时间琢磨句子的确切意思，请选择第一时间最符合你想法的答案。",
+        "createdAt": "2026-10-29T17:23:21.274Z",
+        "updatedAt": "2026-10-29T17:23:21.274Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "aa413d0ae9bd4f8986a6100bd5059d58e58d99270ae9ed8e2929334a42c024e3"
+      },
+      {
+        "id": "1a5875be-da0a-4e1e-bff5-98465ec4cf72",
+        "code": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "0c62c74a47a7a64d75f4b6a008753365a4fe39dfdaf507d947edc9dcce72d8d6",
+        "instruction": "下面的问题关注你作为父母的感受，而不是评价孩子。请根据自己的实际体验，选择每种感受出现的频率。没有对错答案，不愿作答时可以暂停或退出。爱孩子和感到疲惫可以同时存在。",
+        "createdAt": "2026-10-29T17:23:21.294Z",
+        "updatedAt": "2026-10-29T17:23:21.294Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "cc83a9ea2bf8deef84344cd993b3be457a43c6ed48f1197f58fbf69be63985bb"
+      },
+      {
+        "id": "fe700eff-c619-41c7-be4b-01886c753e7b",
+        "code": "res9_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "22ea0b5aca530238904b11c06200837a75e2f16b1bbd1c2ec8bee93afc492a6b",
+        "instruction": "请根据自己通常如何应对困难情境，选择你对以下每项陈述的同意程度。",
+        "createdAt": "2026-10-29T17:23:21.321Z",
+        "updatedAt": "2026-10-29T17:23:21.321Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "39b35ce69315231f70006935a981bd966d4328eca593f3a2be50cfdbf4258478"
+      },
+      {
+        "id": "e15b8afb-e342-4133-8f78-e1817fcec105",
+        "code": "rses10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "d953c5df70384c7e43e12d8e8b9e56f478bdeaeade0860b02100c5274ec672df",
+        "instruction": "下面是一些关于你对自己总体感受的陈述。请根据你的实际感受，选择你对每句话的同意程度。",
+        "createdAt": "2026-10-29T17:23:21.342Z",
+        "updatedAt": "2026-10-29T17:23:21.342Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "105ce17b6fe21e72e202ddfda33e6df66f30ca93e69c0b6bf06bab14e8a02c31"
+      },
+      {
+        "id": "6ba37d79-e022-44a6-b943-4f8c41f0b5df",
+        "code": "sci8_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "f1b65d64a6ab33fc7e4b3a1b2848ab23ff39b50b87f8a7b8d07cdb420098c6f9",
+        "instruction": "第1—4题，请想一想过去一个月里通常一晚的睡眠情况。第5—7题，请回想过去一个月睡眠不好对你的影响。最后一题询问睡眠问题持续了多久。",
+        "createdAt": "2026-10-29T17:23:21.364Z",
+        "updatedAt": "2026-10-29T17:23:21.364Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "33bae4da32ea9391fc53793a41df7a09698fa6086248444b24559e28fcdc2fcc"
+      },
+      {
+        "id": "e05fb4e4-bce2-4853-af0d-d3e72da46aa7",
+        "code": "sop2_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "a8fb697db6b0844e0ef686f0417a9fc849953aab1031b606cfc2d300231f594f",
+        "instruction": null,
+        "createdAt": "2026-10-29T17:23:21.408Z",
+        "updatedAt": "2026-10-29T17:23:21.408Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "5b40300f6d898b92605df7d74b2029f1e225e9a23ce57f7b30cd8a0be61196a1"
+      },
+      {
+        "id": "9beece7e-a1c8-4e6c-b347-bcd0a0fa4dfe",
+        "code": "sswq16_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "651b20917021d8cbb0ad46bcd15d943671b4fb338ddeb4fcc4f0ed4c6e7107c0",
+        "instruction": "下面的问题涉及你在学校的想法、感受和行为。请阅读每句话，选择最符合你过去一个月情况的答案。",
+        "createdAt": "2026-10-29T17:23:21.425Z",
+        "updatedAt": "2026-10-29T17:23:21.425Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "4ccea1780b033a7aa374b405b8245735657702a3b0e40701cf03b1c71ad663c8"
+      },
+      {
+        "id": "7e5b5b83-9b52-471a-b224-8e017b67ef2a",
+        "code": "tswq_zh_cn",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "b5201ad62ee47d2e7ab7b59abd614bd5ea3f6da0b5b5f48103c9bda6185b4382",
+        "instruction": "下面是一些关于你作为教师的经历的问题。请阅读每句话，选择最能描述你在过去一个月中感受的选项。",
+        "createdAt": "2026-10-29T17:23:21.685Z",
+        "updatedAt": "2026-10-29T17:23:21.685Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "61a6fec75d271cf917ad1b3f13aedab9629523eaa2bc8165db235844c2924268"
+      },
+      {
+        "id": "0ff375ef-b898-420c-bad9-9e1169893118",
+        "code": "wibps7_adolescent_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "4bbf725c-4faf-4f86-81fc-786fc5b12a37",
+        "definitionHash": "61a55d5952d229115182ee341527a0972d4f8a384b2e333b3d9ee85f07a81d6c",
+        "instruction": "请根据平时的情况，选择自己上床后、入睡前进行下列活动的频率。没有对错，请按实际情况选择。选项从几乎从不到几乎总是；中间选项“中立”保留原论文Neutral的表述，不等于漏答。",
+        "createdAt": "2026-10-29T17:23:22.130Z",
+        "updatedAt": "2026-10-29T17:23:22.130Z",
+        "reportVersion": "1.1.0",
+        "definitionCanonicalHash": "53d63893314b9bccd5a165a310d32d75b3cafc57c545722190d43c8e38d9a39c"
+      }
+    ],
+    "repeatStateIdentical": true,
+    "funReportsRegistered": 0,
+    "cognitiveCandidateImport": false,
+    "priorMain": "6142ddc74db9787f6606746610df58c73de256f5",
+    "deltaScope": "32 additional declarative standard scale sources and material files; no seed/runtime/schema/permission/CI change",
+    "evidence": [
+      {
+        "file": "main-c52-migration-status.json",
+        "sha256": "710b8cfb77c134ae91216362ae9e6b6ba394139bd7bccdad6010db5e23e094d1"
+      },
+      {
+        "file": "main-c52-before-status.json",
+        "sha256": "0d375ea8ac8b12d5de05356e29d5e564eaf02243739207a290c704778bad2636"
+      },
+      {
+        "file": "main-c52-seed-first-status.json",
+        "sha256": "f1b04abc246cb5a4c62d46abb6b728c07b356d7ad4db36b6fbb5b9f6969e972a"
+      },
+      {
+        "file": "main-c52-first-status.json",
+        "sha256": "6944e695a5ab1b202eb5ac33137323db2c2793835d6c333aa3ad0eeab9f5baf7"
+      },
+      {
+        "file": "main-c52-migrate-repeat-status.json",
+        "sha256": "710b8cfb77c134ae91216362ae9e6b6ba394139bd7bccdad6010db5e23e094d1"
+      },
+      {
+        "file": "main-c52-seed-repeat-status.json",
+        "sha256": "f1b04abc246cb5a4c62d46abb6b728c07b356d7ad4db36b6fbb5b9f6969e972a"
+      },
+      {
+        "file": "main-c52-repeat-status.json",
+        "sha256": "5acca047f430122d60f01ccc6e37f81b42bd7c43ae102633e57e73d6d4c04c6e"
+      },
+      {
+        "file": "main-c52-setup-first-readback.json",
+        "sha256": "d54253d001f54cdeb6d645a707c3792e607859fc58f2524cebfa07c2d6cae161"
+      },
+      {
+        "file": "main-c52-setup-repeat-readback.json",
+        "sha256": "53024ccd41e547bc97821a23a2322726a23d977847e50f03fb532a74cc7178ce"
+      }
+    ]
+  },
+  "currentCodeMain": {
+    "commit": "e65d87222d351e5dfde52e389f3aa403380443eb",
+    "tree": "04cb6aa255e6d6d1e205077ede59311bfd253361",
+    "integratedBy": "69ba08ac461476885422f2c86e3bc007eff66dde",
+    "previousMain": "c52e1675fe7990ce49b42589d993fb12e8541ae1",
+    "diffPaths": 72,
+    "scope": "72 pure materials/declarative instrument/generated index/doc paths; no dependency, schema, seed implementation, authorization, engine or CI changes",
+    "setupExecutedAtThisMain": false,
+    "lastQualifiedSetup": "currentMainSetup retains exact c52 evidence; 88 rows is not asserted as latest main count",
+    "contentEvidence": "Reuse DOT original content qualification, not replayed here; newly documented fun R still not registered"
+  }
+}

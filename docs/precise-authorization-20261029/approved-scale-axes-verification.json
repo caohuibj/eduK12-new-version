@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "base": "ec498ad9f91026d94608a65dd31455dc9da88b86",
+  "main": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "scope": "Shared administrator C/P/R discovery of existing approved exact rows; one batched Survey display-only axis label query. No new combination approval or source snapshot mutation.",
+  "results": {
+    "newUiDistinctPassed": 9,
+    "affectedOriginalEducationUiPassed": 10,
+    "newCatalogPgPassed": 1,
+    "newHeaderBatchQueries": 1,
+    "totalCatalogQueriesObservedForFixturePage": 25,
+    "backendTypesExit": 0,
+    "frontendTypesExit": 0,
+    "changedFrontendLintExit": 0,
+    "finalChangedEducationTestLintExit": 0
+  },
+  "raw": {
+    "file": "approved-scale-axes-raw.json",
+    "sha256": "a1fbcf5f697b33e1a84112a7f159339e99bd01de0e3a70e77a4c8cae93fc4988"
+  },
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/survey-axis-labels.postgres.integration.test.ts",
+      "sha256": "d5ba984c24da5f5f56fb1292152f3c5421976fb48146b112fcea95a60b6a1491"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "sha256": "b893f9e6ec42a1e1bba0ea31384610aefc3ae51eda4a289c2ea641a941236269"
+    },
+    {
+      "path": "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.test.tsx",
+      "sha256": "32e3cc5f9e6903c3fb44245c2af29b3a28d20358b27004e1910137275d467089"
+    },
+    {
+      "path": "server-version/frontend/src/components/scale-governance/ApprovedScaleAxes.tsx",
+      "sha256": "b8939316e466e05038f246a405260301d98629931c462c68a2429f184d5baed0"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationStandardConfigurations.test.tsx",
+      "sha256": "a893d25c6a6cc5d665e7be3a2ac40450942b5b89319aee1054efef46dea7b007"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/EducationStandardConfigurations.tsx",
+      "sha256": "0bc69ac0efa2e09bd03fb518d473bd033ccaa8b1b531f4ba55f0a3b03126572c"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.standard.test.tsx",
+      "sha256": "e3fbe3a6eb94e11e04020389d2823411dd8772ec7bfb3f9cbd6a900160104730"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx",
+      "sha256": "61daa094527f17dcac9a5b00e18187057298a9b3ad5f47854ad6659afd1f384f"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.test.tsx",
+      "sha256": "56182d6c6894862184039fd05bbe6412ad85e748badaac9622f32e7bcfd3c805"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx",
+      "sha256": "2c2ab115fe64b139b184cb9eb28374495dfd6dc9ee679a4955f3fe9536c9d690"
+    }
+  ],
+  "captureAt": "2026-10-29T20:16:59.352500+00:00",
+  "inputCapture": "Post-execution direct inventory, not full signed dependency qualification. Only fixture selector/assertion and cold import timeout corrected after initial types/lint; application source frozen before those checks.",
+  "failuresPreserved": [
+    "Initial preparation used doubled relative paths under frontend workdir: no target files created; initial selected suite contained only six present tests, all passed. New three integration cases prepared at repository root afterward.",
+    "Education new tool-name option made the prior broad option selector ambiguous. Updated affected education test selectors to the specific original combination option; original10 passed on v2. New2 then exposed a wrong test assumption that original save button is disabled before form completion; unchanged handler actually refuses incomplete form. v3 clicks and asserts exact required-input refusal plus no POST, only failed2 rerun.",
+    "Catalog beforeAll cold module loading exceeded the default10seconds while typechecks were active; no test/body write ran. Setup timeout aligned to existing60seconds fixture bound, API test remains20seconds; v2 passed. No assertion/security timeout relaxed."
+  ],
+  "reuseBoundary": "No repeated source approval, setup, source adapter identity checks, scoring, old HTTP/participant tests. Shared finder5, Training1 and Survey1 passed in original invocations; education old10+new2 separately. No formal CI/build.",
+  "notExecuted": [
+    "Compiled browser keyboard/visual layout",
+    "Arbitrary new C/P/R composition approval beyond existing approved combinations",
+    "Representative latency/payload baseline and full catalog N+1 resolution",
+    "New participant journey",
+    "Runtime-role DB",
+    "Formal CI / PR / merge / deployment"
+  ]
+}

@@ -342,6 +342,32 @@
 .training-resource-grant-dialog input[type="checkbox"] { accent-color:#365a48;width:16px;height:16px; }
 .training-resource-management .training-accounts-pagination { background:var(--tm-surface);border:1px solid var(--tm-line);border-radius:8px; }
 .training-resources-panel .training-accounts-pagination { border-inline:0;border-bottom:0;border-radius:0; }
+.training-configuration-workspace { display:grid;gap:20px;min-width:0;padding:20px; }
+.training-configuration-heading { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px; }
+.training-configuration-heading h2 { margin:0;font-size:22px;font-weight:600;line-height:1.5;color:var(--tm-ink); }
+.training-configuration-workspace>p { max-width:80ch;margin:0;color:var(--tm-muted);font-size:14px;line-height:1.8; }
+.training-configurations-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;min-width:0; }
+.training-configuration-card { display:grid;align-content:start;gap:14px;min-width:0;padding:18px;border:1px solid var(--tm-line);border-radius:10px;background:var(--tm-surface); }
+.training-configuration-card h3 { margin:0;color:var(--tm-ink);font-size:17px;font-weight:600;line-height:1.6; }
+.training-configuration-card>p { margin:0;color:var(--tm-muted);font-size:13px;line-height:1.7; }
+.training-configuration-card>button { justify-self:start; }
+.training-configuration-card>details { padding-top:12px;border-top:1px solid var(--tm-line);color:var(--tm-muted);font-size:12px;line-height:1.8; }
+.training-configuration-card summary { cursor:pointer; }
+.training-configuration-versions { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0; }
+.training-configuration-versions>div { min-width:0; }
+.training-configuration-versions dt { margin-bottom:5px;color:var(--tm-muted);font-size:12px; }
+.training-configuration-versions dd { margin:0;color:var(--tm-ink);font-size:13px;font-weight:500;line-height:1.65;overflow-wrap:anywhere; }
+.training-configuration-pagination { display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:12px;color:var(--tm-muted);font-size:13px; }
+.training-configuration-dialog .staff-dialog__body { display:grid;gap:16px; }
+.training-configuration-dialog .staff-dialog__body>p { margin:0;font-size:14px;line-height:1.75; }
+.training-configuration-dialog .staff-dialog__body>label { display:grid;gap:7px;min-width:0;font-size:13px;font-weight:500; }
+.training-configuration-dialog .staff-dialog__body>label :is(input,select) { width:100%;min-width:0;min-height:42px; }
+.training-configuration-dialog .staff-dialog__body>button { justify-self:start;min-height:36px;padding:6px 10px;border:1px solid currentColor;border-radius:6px;font-size:12px; }
+@media(max-width:700px) {
+ .training-configuration-workspace { gap:16px;padding:14px; }
+ .training-configuration-card { padding:14px; }
+ .training-configuration-versions { gap:8px; }
+}
 @media(max-width:700px) {
  .training-resource-views { width:100%; }
  .training-resource-views button { flex:1;padding-inline:10px; }

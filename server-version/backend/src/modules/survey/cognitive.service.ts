@@ -67,7 +67,7 @@ async function sessionView(tx:Tx,known:Known,slotKey:string,
     configVersion:snapshot.configVersion,engineVersion:snapshot.engineVersion,scoringVersion:snapshot.scoringVersion,
     protocolSignature:snapshot.protocolSignature,protocol:snapshot.protocol,presentation:snapshot.presentation,
     config:snapshot.config,randomSeed:decryptUnifiedRuntimePayload<string>(session.randomSeedCipher),
-    profile:null,feedbackDeferred:true,freshAdmission:false,lockedPriorAnswers,nextTrialIndex:0,finishedAt:session.finishedAt,result:null,
+    profile:frozen.schemaVersion===2?frozen.artifact.identity.profile:null,feedbackDeferred:true,freshAdmission:false,lockedPriorAnswers,nextTrialIndex:0,finishedAt:session.finishedAt,result:null,
     resultReference:result?surveyCognitiveResultReference(result):null,
     surveyBinding:{projectId:known.projectId,waveId:known.waveId,attemptId:known.attemptId,slotKey,
       measurementDigest:frozen.measurementDigest},
@@ -81,7 +81,7 @@ export async function startSurveyCognitive(proof:SurveyCognitiveProof,slotKey:st
     const frozen=frozenUnit(snapshot,slotKey)
     const existing=await latest(tx,known,slotKey)
     if(existing)return sessionView(tx,known,slotKey,existing,frozen)
-    const hold=getAssessmentOperationalHold({family:'COGNITIVE',key:'gonogo',version:'1.0.0',scoringVersion:'1.0.0'})
+    const hold=getAssessmentOperationalHold({family:'COGNITIVE',key:frozen.sessionSnapshot.testType,version:frozen.sessionSnapshot.engineVersion,scoringVersion:frozen.sessionSnapshot.scoringVersion})
     if(hold)cognitiveFail(409,'该认知协议暂停新任务，请联系研究者')
     const assignment=snapshot.flow?await ensureSurveyFlowAssignment(tx,{...scope(known,slotKey),participantId:known.participantId,
       researchCode:proof.researchCode,accessCredential:proof.accessCredential,snapshot}):null
@@ -151,18 +151,20 @@ export async function submitSurveyCognitiveFinal(proof:SurveyCognitiveProof,slot
   const submissionId=validateSubmissionId(input.submissionId)
   const known=await verifiedSurveyAttempt(proof)
   const frozen=frozenUnit(known.compiledSnapshot,slotKey)
-  const definition=surveyCognitiveTaskDefinition(),snapshot=frozen.sessionSnapshot
+  const definition=surveyCognitiveTaskDefinition(frozen),snapshot=frozen.sessionSnapshot
   if(input.definitionHash!==snapshot.configHash||(input.contextSnapshotHash??null)!==null)
     cognitiveFail(409,'认知提交配置身份不匹配')
   const provenance=assertDevice(input.administrationProvenance)
+  const expectedTrials=frozen.schemaVersion===2?frozen.maxTrials:120
+  if(input.trials.length!==expectedTrials)cognitiveFail(400,'认知试次数与原冻结配置不一致')
   let trials
-  try{trials=validateAndNormalizeTrials({definition,values:input.trials,maxTrials:120})}
+  try{trials=validateAndNormalizeTrials({definition,values:input.trials,maxTrials:frozen.schemaVersion===2?frozen.maxTrials:120})}
   catch{ return cognitiveFail(400,'认知试次结构或试次数不合法') }
   const raw=createUnifiedCognitiveRawSubmissionPayload({attemptEpoch:input.attemptEpoch,trials,administrationProvenance:provenance})
   const canonical=prepareCanonicalSubmission({sessionId,slotKey,measurementDigest:frozen.measurementDigest,
     definitionHash:input.definitionHash,raw})
   assertCanonicalSubmissionPayloadSize(canonical,MAX_RAW_BYTES,'研究认知 FINAL')
-  // Bounded 120-trial scoring occurs under the same current parent authority lock.
+  // Scoring under the original exact frozen trial budget occurs under the same current parent authority lock.
   // Replays return before invoking the scorer or constructing another encrypted raw record.
   return withFinalOnlyCompletionTransaction(async tx=>{
     const {attempt,snapshot:publication}=await lockAccess(tx,proof,known,true)
@@ -192,8 +194,9 @@ export async function submitSurveyCognitiveFinal(proof:SurveyCognitiveProof,slot
     const completedAt=new Date(),rawHash=canonicalHash(raw)
     const result:SurveyCognitiveStoredResult={schemaVersion:1,sessionId:current.id,...scope(known,slotKey),
       epoch:current.epoch,measurementDigest:frozen.measurementDigest,configHash:snapshot.configHash,
-      protocolSignature:snapshot.protocolSignature,testType:'gonogo',configVersion:'1.1.0',engineVersion:'1.0.0',scoringVersion:'1.0.0',
-      timingPolicy:'software-frame-v1',maturity:'PILOT',referenceMode:'none',metrics:scored.metrics,
+      protocolSignature:snapshot.protocolSignature,testType:snapshot.testType,configVersion:snapshot.configVersion,engineVersion:snapshot.engineVersion,scoringVersion:snapshot.scoringVersion,
+      ...(frozen.schemaVersion===2?{profileArtifactHash:frozen.artifactHash,profile:frozen.artifact.identity.profile,maxTrials:frozen.maxTrials}:{}),
+      timingPolicy:frozen.timingPolicy,maturity:frozen.maturity,referenceMode:frozen.referenceMode,metrics:scored.metrics,
       quality:scored.quality,audit:scored.audit,administrationProvenance:provenance,restartCount:current.epoch-1,
       rawHash,completedAt:completedAt.toISOString(),
     }

@@ -5,6 +5,7 @@ import { SurveyCatalogGrants } from './SurveyCatalogGrants'
 import { ProductPage } from '../../components/product-ui'
 import AdminStepUp from '../../admin/AdminStepUp'
 import './survey-admin.css'
+import {useAuth} from '../../contexts/AuthContext'
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;status:string;createdAt:string}
 type Invitation={id:string;kind:'INVITE';createdBy:string;createdAt:string;expiresAt:string;
@@ -45,6 +46,12 @@ async function platformApi<T>(path:string,method='GET',body?:unknown):Promise<T>
   return envelope.data
 }
 export default function SurveyResearchersAdmin(){
+  const {user}=useAuth()
+  return user?<SurveyResearchersWorkspace key={user.id} actorId={user.id}/>:null
+}
+/** The production wrapper keys all retained UI/password/request state to the
+ * live authenticated account. Tests may exercise this workspace separately. */
+export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
   const [list,setList]=useState<Researcher[]>([]),[pending,setPending]=useState<Invitation[]>([])
   const [researcherPage,setResearcherPage]=useState(1),[invitationPage,setInvitationPage]=useState(1)
   const [password,setPassword]=useState('')
@@ -206,7 +213,7 @@ export default function SurveyResearchersAdmin(){
       <p className="text-sm text-gray-500">邀请 7 天有效；不包含研究者密码。请勿存入公开日志或群聊。</p>
     </div>}
     <section role="tabpanel" id="survey-admin-panel-tools" aria-labelledby="survey-admin-tab-tools" hidden={section!=='tools'}>
-      <SurveyCatalogGrants api={catalogApi} password={password} researchers={list} ensureVerification={ensureVerification}/>
+      <SurveyCatalogGrants api={catalogApi} password={password} researchers={list} ensureVerification={ensureVerification} actorId={actorId}/>
     </section>
     <section role="tabpanel" id="survey-admin-panel-invitations" aria-labelledby="survey-admin-tab-invitations" hidden={section!=='invitations'} className="survey-admin-panel survey-admin-invitations">
     <div className="survey-admin-section-heading"><div className="survey-admin-panel-heading"><span className="survey-admin-avatar"><MailPlus size={22} aria-hidden="true"/></span><div><h2>研究者邀请</h2><p>签发开户邀请，或查看尚未领取的邀请元数据。</p></div></div>

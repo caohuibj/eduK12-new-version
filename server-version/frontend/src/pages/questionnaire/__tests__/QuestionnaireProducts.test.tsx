@@ -1124,20 +1124,32 @@ it('distinguishes approved parameter/report versions sharing one content version
 })
 
 
-it('keeps course-only approved combinations out of GENERAL while retaining an authorized native Scale',async()=>{
+it('offers granted exact configurations in GENERAL while retaining authorized native Scale choices',async()=>{
  vi.resetAllMocks();sessionStorage.clear();capabilities.enabled=true
  trainingPresentation.enabled=true
  const row={id:'general-exact',name:'通用问卷',status:'DRAFT',revision:4,questionnaireType:'GENERAL',expiresAt:'2027-01-01T00:00:00.000Z',questionnaireCourses:[],items:[],formSections:[],publicEnabled:false}
- const combo={combination:{releaseId:'course-only',combinationHash:'c'.repeat(64)},scaleId:'approved-scale',title:'课程批准组合',toolKey:'synthetic',instrumentVersion:'1.0.0',axisVersions:{CONTENT:'1.0.0:1.0.0',PARAMETERS:'none-v1',REPORT:'none-v1'}}
+ const combo={combination:{releaseId:'exact-approved',combinationHash:'c'.repeat(64)},scaleId:'approved-scale',title:'固定批准组合',toolKey:'synthetic',instrumentVersion:'1.0.0',axisVersions:{CONTENT:'1.0.0:1.0.0',PARAMETERS:'none-v1',REPORT:'none-v1'}}
  api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[{id:'native-general',name:'通用可用量表',instrumentVersion:'1.0.0'}],cognitive:[],situational:[],courses:[],standardCombinations:[combo]}:row}))
  api.post.mockResolvedValue({code:0,data:{...row,revision:5}})
  mount('general-exact','#questionnaire-content')
  fireEvent.click(await screen.findByRole('button',{name:'量表'}))
- expect(screen.getByText('精确批准组合目前适用于课程问卷。')).toBeVisible()
  fireEvent.click(await screen.findByRole('button',{name:/^选择量表/}))
  const dialog=await screen.findByRole('dialog',{name:'选择量表'})
- expect(within(dialog).queryByRole('button',{name:/选择 课程批准组合/})).toBeNull()
- fireEvent.click(within(dialog).getByRole('button',{name:'选择 通用可用量表，版本 1.0.0'}))
+ expect(within(dialog).getByRole('button',{name:'选择 通用可用量表，版本 1.0.0'})).toBeVisible()
+ fireEvent.click(within(dialog).getByRole('button',{name:/选择 固定批准组合/}))
  fireEvent.click(screen.getByRole('button',{name:'添加到测评'}))
- await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/general-exact/items',{revision:4,item:{type:'SCALE',required:true,scaleId:'native-general'}}))
+ await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/general-exact/items',{revision:4,item:{type:'SCALE',required:true,scaleId:combo.scaleId,standardCombination:combo.combination}}))
+})
+
+it('uses named precise Training choices and sends the original selected binding while disabling ambiguous choices',async()=>{
+ vi.resetAllMocks();sessionStorage.clear();capabilities.enabled=true;trainingPresentation.enabled=true
+ const row={id:'named',name:'具名配置草稿',status:'DRAFT',revision:4,questionnaireType:'GENERAL',questionnaireCourses:[],items:[],formSections:[],publicEnabled:false}
+ const pointer={schemaVersion:1,artifactHash:'d'.repeat(64),bindingHash:'e'.repeat(64),authorizationId:'original-use',authorizationRevision:3}
+ const good={combination:{releaseId:'reviewed',combinationHash:'c'.repeat(64)},scaleId:'physical-scale',title:'注意力',toolKey:'hidden-code',instrumentVersion:'technical-version',axisVersions:{CONTENT:'c-secret',PARAMETERS:'p-secret',REPORT:'r-secret'},authorizationMode:'PRECISE',configurationName:'教学简报',selectedBinding:pointer,available:true,unavailableReason:null}
+ const ambiguous={...good,combination:{releaseId:'unavailable',combinationHash:'b'.repeat(64)},configurationName:'待管理员配置',available:false,unavailableReason:'同名配置，请管理员明确用途'}
+ api.get.mockImplementation(async(path:string)=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[],standardCombinations:[good,ambiguous]}:row}));api.post.mockResolvedValue({code:0,data:{...row,revision:5}})
+ mount('named','#questionnaire-content');fireEvent.click(await screen.findByRole('button',{name:'量表'}));fireEvent.click(await screen.findByRole('button',{name:/^选择量表/}))
+ const dialog=await screen.findByRole('dialog',{name:'选择量表'});expect(within(dialog).getByRole('button',{name:/待管理员配置.*暂不可用/})).toBeDisabled();expect(within(dialog).getByText('同名配置，请管理员明确用途')).toBeVisible();expect(dialog).not.toHaveTextContent(/technical-version|c-secret|p-secret|r-secret|hidden-code/)
+ fireEvent.click(within(dialog).getByRole('button',{name:'选择 注意力 · 教学简报'}));fireEvent.click(screen.getByRole('button',{name:'添加到测评'}))
+ await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/named/items',{revision:4,item:{type:'SCALE',required:true,scaleId:good.scaleId,standardCombination:{...good.combination,selectedBinding:pointer}}}))
 })

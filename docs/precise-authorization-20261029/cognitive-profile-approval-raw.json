@@ -1,0 +1,569 @@
+{
+  "schemaVersion": 1,
+  "invocations": [
+    {
+      "name": "cognitive-profile-admission-migrate",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_PROFILE_MIGRATION_OWNER=1",
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "npm",
+          "run",
+          "db:migrate:guarded"
+        ],
+        "startedAt": "2026-10-30T00:18:13.829621+00:00",
+        "finishedAt": "2026-10-30T00:18:15.190964+00:00",
+        "exitCode": 0
+      },
+      "log": "\n> ptool-backend@1.0.0 db:migrate:guarded\n> node scripts/pr24-migration-preflight.mjs && prisma migrate deploy && node scripts/runtime-role-contract.mjs post-migrate\n\n{\"ok\":true,\"skipped\":true,\"reason\":\"destructive_migration_already_applied\",\"migration\":\"20260827100000_scale_assessment_v2_foundation\"}\nPrisma schema loaded from prisma/schema.prisma\nDatasource \"db\": PostgreSQL database \"precise_cognitive_profile_artifact_test_20261030\", schema \"public\" at \"127.0.0.1:55439\"\n\n257 migrations found in prisma/migrations\n\nApplying migration `20261030002000_cognitive_profile_entry_admission`\n\nThe following migration(s) have been applied:\n\nmigrations/\n  └─ 20261030002000_cognitive_profile_entry_admission/\n    └─ migration.sql\n      \nAll migrations have been successfully applied.\n{\"ok\":true,\"runtimeTables\":267,\"runtimeSequences\":1,\"restrictedRuntimeRole\":true,\"migrationCount\":257,\"migrationFingerprint\":\"bc6a1c9dfe19ac5c9c63add30574850bd7b28d57fdbdf404c0fb3dfd45ef2c5b\"}\nnpm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n"
+    },
+    {
+      "name": "cognitive-profile-approval-http",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_COGNITIVE_PROFILE_APPROVAL=1",
+          "PRECISE_COGNITIVE_APPROVAL_EVIDENCE=/workspace/materials-load-20261029/evidence/cognitive-profile-approval-http-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/cognitive-profile-approval-http.json"
+        ],
+        "startedAt": "2026-10-30T00:19:51.521660+00:00",
+        "finishedAt": "2026-10-30T00:19:52.588204+00:00",
+        "exitCode": 1
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/cognitive-profile-approval-http.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 3,
+        "numPassedTests": 0,
+        "numFailedTests": 0,
+        "numPendingTests": 3,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793319591834,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL"
+                ],
+                "fullName": "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL resolves exact profile/M provenance only for the separate system approver, without granting a user",
+                "status": "skipped",
+                "title": "resolves exact profile/M provenance only for the separate system approver, without granting a user",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL"
+                ],
+                "fullName": "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL approves each server-resolved profile for all four entries and compares complete idempotent intent",
+                "status": "skipped",
+                "title": "approves each server-resolved profile for all four entries and compares complete idempotent intent",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL"
+                ],
+                "fullName": "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL does not reactivate removed entry scopes on an old request replay, and preserves all existing user/task/template data",
+                "status": "skipped",
+                "title": "does not reactivate removed entry scopes on an old request replay, and preserves all existing user/task/template data",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793319591834,
+            "endTime": 1793319591834,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "scope": "System approval of two existing main profiles for exact four entry scopes; synthetic JWT recent-MFA proof, not real browser MFA or recipient use.",
+        "configId": "76162502-e649-4e30-ba23-34856594fb9b",
+        "requests": [],
+        "observations": []
+      }
+    },
+    {
+      "name": "cognitive-profile-approval-http-v2",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_COGNITIVE_PROFILE_APPROVAL=1",
+          "PRECISE_COGNITIVE_APPROVAL_EVIDENCE=/workspace/materials-load-20261029/evidence/cognitive-profile-approval-http-v2-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/cognitive-profile-approval-http-v2.json"
+        ],
+        "startedAt": "2026-10-30T00:21:19.200212+00:00",
+        "finishedAt": "2026-10-30T00:21:29.505232+00:00",
+        "exitCode": 1
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\nstdout | src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL\n[2026-10-30T00:21:29.394Z] [INFO] 队列已关闭\n\n × src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL > resolves exact profile/M provenance only for the separate system approver, without granting a user 206ms\n   → expected '' to contain 'no-store'\n × src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL > approves each server-resolved profile for all four entries and compares complete idempotent intent 1ms\n   → Source preflight incomplete; approval forbidden\n × src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL > does not reactivate removed entry scopes on an old request replay, and preserves all existing user/task/template data 4ms\n   → Source preflight incomplete\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL > resolves exact profile/M provenance only for the separate system approver, without granting a user\nAssertionError: expected '' to contain 'no-store'\n\n- Expected\n+ Received\n\n- no-store\n\n ❯ call src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts:17:139\n     15|   requests.push({method,path,status:response.status,expectedStatus:sta…\n     16|   if(!response.headers.get('content-type')?.includes('application/json…\n     17|   const value=JSON.parse(text);expect(response.status,value.message??p…\n       |                                                                                                                                           ^\n     18|  }\n     19|  beforeAll(async()=>{\n ❯ src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts:63:3\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯\n\n FAIL  src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL > approves each server-resolved profile for all four entries and compares complete idempotent intent\nError: Source preflight incomplete; approval forbidden\n ❯ src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts:69:19\n     67|  },30000)\n     68|  it('approves each server-resolved profile for all four entries and co…\n     69|   if(!ready)throw Error('Source preflight incomplete; approval forbidd…\n       |                   ^\n     70|   const path='/system/'+config.id+'/experience/approve'\n     71|   expect(await call(system,'POST',path,request)).toMatchObject({artifa…\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯\n\n FAIL  src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL > does not reactivate removed entry scopes on an old request replay, and preserves all existing user/task/template data\nError: Source preflight incomplete\n ❯ src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts:85:19\n     83|  },30000)\n     84|  it('does not reactivate removed entry scopes on an old request replay…\n     85|   if(!ready)throw Error('Source preflight incomplete')\n       |                   ^\n     86|   const path='/system/'+config.id+'/experience/approve'\n     87|   await call(system,'POST',path,{...request,requestId:randomUUID(),all…\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯\n\n\n Test Files  1 failed (1)\n      Tests  3 failed (3)\n   Start at  00:21:19\n   Duration  9.85s (transform 6.63s, setup 0ms, import 120ms, tests 9.59s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/cognitive-profile-approval-http-v2.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 3,
+        "numPassedTests": 0,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793319679539,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL"
+                ],
+                "fullName": "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL resolves exact profile/M provenance only for the separate system approver, without granting a user",
+                "status": "failed",
+                "title": "resolves exact profile/M provenance only for the separate system approver, without granting a user",
+                "duration": 205.56979200000023,
+                "failureMessages": [
+                  "AssertionError: expected '' to contain 'no-store'\n    at call (/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts:17:139)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts:63:3\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL"
+                ],
+                "fullName": "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL approves each server-resolved profile for all four entries and compares complete idempotent intent",
+                "status": "failed",
+                "title": "approves each server-resolved profile for all four entries and compares complete idempotent intent",
+                "duration": 1.3927939999994123,
+                "failureMessages": [
+                  "Error: Source preflight incomplete; approval forbidden\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts:69:19\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64\n    at run (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1150:20)\n    at limiterFn (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1162:59)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:38\n    at Traces.$ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)\n    at trace (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/test.DNmyFkvJ.js:4398:21)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:13"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL"
+                ],
+                "fullName": "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL does not reactivate removed entry scopes on an old request replay, and preserves all existing user/task/template data",
+                "status": "failed",
+                "title": "does not reactivate removed entry scopes on an old request replay, and preserves all existing user/task/template data",
+                "duration": 3.6443169999984093,
+                "failureMessages": [
+                  "Error: Source preflight incomplete\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts:85:19\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64\n    at run (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1150:20)\n    at limiterFn (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1162:59)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:38\n    at Traces.$ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)\n    at trace (file:///workspace/eduK12-new-version/server-version/backend/node_modules/vitest/dist/chunks/test.DNmyFkvJ.js:4398:21)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:13"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793319689173,
+            "endTime": 1793319689383.6443,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "scope": "System approval of two existing main profiles for exact four entry scopes; synthetic JWT recent-MFA proof, not real browser MFA or recipient use.",
+        "configId": "76162502-e649-4e30-ba23-34856594fb9b",
+        "setupStage": "ready",
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/research",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience",
+            "status": 401,
+            "expectedStatus": 401
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 409,
+            "expectedStatus": 409
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 403,
+            "expectedStatus": 403
+          }
+        ],
+        "observations": []
+      }
+    },
+    {
+      "name": "cognitive-profile-approval-http-v3",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_COGNITIVE_PROFILE_APPROVAL=1",
+          "PRECISE_COGNITIVE_APPROVAL_EVIDENCE=/workspace/materials-load-20261029/evidence/cognitive-profile-approval-http-v3-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/cognitive-profile-approval-http-v3.json"
+        ],
+        "startedAt": "2026-10-30T00:22:53.340369+00:00",
+        "finishedAt": "2026-10-30T00:23:03.756315+00:00",
+        "exitCode": 0
+      },
+      "log": "\n RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend\n\n ✓ src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL > resolves exact profile/M provenance only for the separate system approver, without granting a user 179ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL > approves each server-resolved profile for all four entries and compares complete idempotent intent 149ms\n ✓ src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL > does not reactivate removed entry scopes on an old request replay, and preserves all existing user/task/template data 77ms\nstdout | src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts > Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL\n[2026-10-30T00:23:03.670Z] [INFO] 队列已关闭\n\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Start at  00:22:53\n   Duration  9.95s (transform 6.74s, setup 0ms, import 116ms, tests 9.69s, environment 0ms)\n\nJSON report written to /workspace/materials-load-20261029/evidence/cognitive-profile-approval-http-v3.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 3,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793319773700,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL"
+                ],
+                "fullName": "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL resolves exact profile/M provenance only for the separate system approver, without granting a user",
+                "status": "passed",
+                "title": "resolves exact profile/M provenance only for the separate system approver, without granting a user",
+                "duration": 178.66916700000002,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL"
+                ],
+                "fullName": "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL approves each server-resolved profile for all four entries and compares complete idempotent intent",
+                "status": "passed",
+                "title": "approves each server-resolved profile for all four entries and compares complete idempotent intent",
+                "duration": 148.83038299999862,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL"
+                ],
+                "fullName": "Exact cognitive profile system approval through protected HTTP and actual runtime PostgreSQL does not reactivate removed entry scopes on an old request replay, and preserves all existing user/task/template data",
+                "status": "passed",
+                "title": "does not reactivate removed entry scopes on an old request replay, and preserves all existing user/task/template data",
+                "duration": 76.9539760000007,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793319783256,
+            "endTime": 1793319783659.9539,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-approval.http.postgres.integration.test.ts"
+          }
+        ]
+      },
+      "readback": {
+        "productionAccessed": false,
+        "scope": "System approval of two existing main profiles for exact four entry scopes; synthetic JWT recent-MFA proof, not real browser MFA or recipient use.",
+        "configId": "76162502-e649-4e30-ba23-34856594fb9b",
+        "setupStage": "ready",
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/research",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "GET",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience",
+            "status": 401,
+            "expectedStatus": 401
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 409,
+            "expectedStatus": 409
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 403,
+            "expectedStatus": 403
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/research/approve",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 409,
+            "expectedStatus": 409
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 409,
+            "expectedStatus": 409
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/research/approve",
+            "status": 409,
+            "expectedStatus": 409
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 200,
+            "expectedStatus": 200
+          },
+          {
+            "method": "POST",
+            "path": "/system/76162502-e649-4e30-ba23-34856594fb9b/experience/approve",
+            "status": 200,
+            "expectedStatus": 200
+          }
+        ],
+        "observations": [
+          {
+            "twoNonemptyFrozenProfileReports": true,
+            "sameNativeConfigAndM": true,
+            "systemDistinctFromEntryIssuer": true,
+            "staleMfaAndWrongArtifactDenied": true
+          },
+          {
+            "exactEntryPolicies": 8,
+            "profileApprovalAudits": 2,
+            "retryCreatesNoAuditOrReapproval": true,
+            "changedReasonProductsAndProfileRejected": true,
+            "missingServiceProofDenied": true
+          },
+          {
+            "oldRequestCannotReactivateRemovedScope": true,
+            "oneConfigTwoProfilesNoNewTestType": true,
+            "existingSixUsersFourGrantsThirteenTasksAndTemplatesUnchanged": true,
+            "noUseGrantAssignmentOrAttemptCreated": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "cognitive-profile-approval-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/cognitive-profile-approval-types.json"
+        ],
+        "startedAt": "2026-10-30T00:20:13.781016+00:00",
+        "finishedAt": "2026-10-30T00:20:37.487715+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "name": "cognitive-profile-approval-types-final",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/cognitive-profile-approval-types.json"
+        ],
+        "startedAt": "2026-10-30T00:25:34.434606+00:00",
+        "finishedAt": "2026-10-30T00:25:59.596644+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    }
+  ],
+  "afterFirstSetupReadback": {
+    "sql": "BEGIN READ ONLY; SELECT json_build_object('policyColumns',(SELECT json_agg(column_name ORDER BY ordinal_position) FROM information_schema.columns WHERE table_schema='public' AND table_name='survey_tool_policies'),'profileApprovals',(SELECT count(*) FROM assessment_management_events WHERE action='COGNITIVE_PROFILE_APPROVED'),'profilePolicies',(SELECT count(*) FROM survey_tool_policies WHERE resource_key LIKE 'cognitive-profile:%'),'users',(SELECT count(*) FROM users),'grants',(SELECT count(*) FROM material_grants),'tasks',(SELECT count(*) FROM composite_assessments),'configs',(SELECT count(*) FROM cognitive_test_configs),'profileArtifacts',(SELECT count(*) FROM assessment_public_templates WHERE template_kind='COGNITIVE_PROFILE_CONFIGURATION')); ROLLBACK;",
+    "exitCode": 0,
+    "result": {
+      "policyColumns": [
+        "resource_key",
+        "fingerprint",
+        "decision",
+        "paused",
+        "version",
+        "reason",
+        "reviewed_by",
+        "updated_at",
+        "product"
+      ],
+      "profileApprovals": 0,
+      "profilePolicies": 0,
+      "users": 6,
+      "grants": 4,
+      "tasks": 13,
+      "configs": 1,
+      "profileArtifacts": 2
+    },
+    "stderr": ""
+  }
+}

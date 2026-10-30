@@ -1,3 +1,4 @@
+import {readTrainingCognitiveTaskBinding} from '../assessment-authorization/training-cognitive-profile-use'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import type { prepareTeacherPublishedAssignment } from '../cognitive/assignment.service'
 
@@ -20,6 +21,8 @@ export const freezeTrainingFlowAssignment = (prepared: PreparedAssignment) => {
   }
   const course = data.courseSnapshot as { id: string; title: string; courseCode: string } | null
   if (!course) throw new Error('Prepared training-flow assignment course snapshot is missing')
+  const pin=readTrainingCognitiveTaskBinding(course)
+  const name=(course as Record<string,unknown>).selectedCognitiveConfigurationName
   const snapshot = { data: {
     courseId: data.courseId,
     configId: data.configId,
@@ -32,7 +35,7 @@ export const freezeTrainingFlowAssignment = (prepared: PreparedAssignment) => {
     required: data.required,
     maxAttempts: data.maxAttempts,
     quotaSourceAssignmentId: data.quotaSourceAssignmentId,
-    courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode },
+    courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode,...(pin?{selectedCognitiveProfile:pin,selectedCognitiveConfigurationName:typeof name==='string'?name:null}:{}) },
     profile: data.profile,
     profileDefinitionVersion: data.profileDefinitionVersion,
     resolvedConfigSnapshotEncrypted: data.resolvedConfigSnapshotEncrypted,

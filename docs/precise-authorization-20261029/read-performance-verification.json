@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "candidateHead": "baad15031f6cca352ec2e8fd7f407bd246a78ae3",
+  "main": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+  "recordedAt": "2026-10-29T23:45:39.760413+00:00",
+  "sourceRunner": "server-version/backend/scripts/precise-authorization-read-performance.ts",
+  "runnerSha256": "868a9cce67328787e5e2cfacee3732887ef60b6376685f9b6fd6912cfc37d22e",
+  "results": {
+    "read-performance-main-directory-a1": {
+      "n": 30,
+      "p50Ms": 16.82280400000036,
+      "p95Ms": 21.191827000000103,
+      "medianAbsoluteDeviationMs": 1.666627999999946,
+      "queryCounts": [
+        20
+      ],
+      "responseBytes": [
+        963
+      ],
+      "medianSqlDurationMs": 4.0,
+      "tablesUnchanged": true,
+      "writesObserved": 0
+    },
+    "read-performance-candidate-directory-b1": {
+      "n": 30,
+      "p50Ms": 20.03907849999996,
+      "p95Ms": 23.394381999999496,
+      "medianAbsoluteDeviationMs": 1.2062639999999192,
+      "queryCounts": [
+        20
+      ],
+      "responseBytes": [
+        1755
+      ],
+      "medianSqlDurationMs": 5.0,
+      "tablesUnchanged": true,
+      "writesObserved": 0
+    },
+    "read-performance-candidate-directory-b2": {
+      "n": 30,
+      "p50Ms": 19.96715999999992,
+      "p95Ms": 28.714786000000004,
+      "medianAbsoluteDeviationMs": 1.6800130000001445,
+      "queryCounts": [
+        20
+      ],
+      "responseBytes": [
+        1755
+      ],
+      "medianSqlDurationMs": 6.0,
+      "tablesUnchanged": true,
+      "writesObserved": 0
+    },
+    "read-performance-main-directory-a2": {
+      "n": 30,
+      "p50Ms": 13.727263999999877,
+      "p95Ms": 17.51720000000023,
+      "medianAbsoluteDeviationMs": 1.3292724999998882,
+      "queryCounts": [
+        20
+      ],
+      "responseBytes": [
+        963
+      ],
+      "medianSqlDurationMs": 4.0,
+      "tablesUnchanged": true,
+      "writesObserved": 0
+    },
+    "read-performance-candidate-report": {
+      "n": 30,
+      "p50Ms": 57.10918700000002,
+      "p95Ms": 90.52307900000051,
+      "medianAbsoluteDeviationMs": 6.339995999999701,
+      "queryCounts": [
+        30
+      ],
+      "responseBytes": [
+        3714
+      ],
+      "medianSqlDurationMs": 5.0,
+      "tablesUnchanged": true,
+      "writesObserved": 0
+    }
+  },
+  "directoryOrder": "A(main), B(candidate), B(candidate), A(main); 30 warm samples plus first and 3 warmups per process",
+  "unchangedProjectedDirectoryHash": "45e57bedba945f58559dd3d8b27f715d92d6db2a44517e3a120f910c505a0352",
+  "pilotMainReport": {
+    "status": 409,
+    "message": "CONTENT_TRAINING_FINAL_IDENTITY_MISMATCH",
+    "comparableBaseline": false,
+    "failureRetained": true,
+    "nextReadbackEqualsPilotBefore": true
+  },
+  "typeCheck": {
+    "firstExit": 2,
+    "firstReason": "Probe under scripts outside inherited src rootDir",
+    "secondExit": 2,
+    "secondReason": "Isolated config omitted explicit Node global types/typeRoots",
+    "finalExit": 0,
+    "dependencyInstall": false,
+    "businessReadsReplayedForTypeFix": false
+  },
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost55439",
+    "database": "precise_runtime_role_test_20261029",
+    "runtimeRole": "precise_task1_runtime",
+    "migrationRows": 255,
+    "mainMigrationRowsExpected": 253,
+    "concurrency": 1,
+    "fixtureSnapshotBytes": 3343,
+    "fixtureSnapshotHash": "1425989d9f946e93d7bb1b7520f08a43ea2bdcd44fec418f833c9982d13af422",
+    "productionAccessed": false
+  },
+  "raw": {
+    "file": "read-performance-raw.json",
+    "sha256": "e906edd8fba33b98b7e715fdc80c939eb2ad83f9e8b03594c741d48dafee228c"
+  },
+  "notQualified": [
+    "Main release boot against 255 migrations",
+    "Report p95 relative-to-main target (main cannot read this new typed FINAL)",
+    "Small/medium/large and batch recipient matrix",
+    "Grant save/draft/publish/START p50/p95",
+    "All-entry load/latency budget",
+    "Formal CI/PR/main merge/production"
+  ],
+  "evidenceLimit": "Post-execution inventory, no historical signature or CI admission. First observations use fresh Node processes with warm shared DB/Redis; not cold host startup. SQL durations are integer-millisecond Prisma events, not complete CPU attribution."
+}

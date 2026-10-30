@@ -10,7 +10,7 @@ it.each(['SCHOOL','TEACHER'] as const)('issues and restores one exact %s organiz
  const first=render(<AdminContentPermissions actorId={id(9)}/>);openComposer()
  fireEvent.change(screen.getByLabelText('产品授权范围'),{target:{value:product}})
  expect(screen.queryByLabelText('允许上述能力一层受限委派')).not.toBeInTheDocument()
- for(const [label,value] of [['目标本校产品管理员或心理老师 UUID',id(1)],['学校组织 UUID',id(2)],['精确资源 UUID（逗号或换行分隔）',id(3)],['生效时间（本地时间）','2098-10-20T06:00'],['到期时间（本地时间）','2098-10-21T06:00'],['内容授权原因','Explicit synthetic education source redistribution']])fireEvent.change(screen.getByLabelText(label),{target:{value}})
+ for(const [label,value] of [['目标正式入口管理员或原教育分发账号 UUID',id(1)],['学校组织 UUID',id(2)],['精确资源 UUID（逗号或换行分隔）',id(3)],['生效时间（本地时间）','2098-10-20T06:00'],['到期时间（本地时间）','2098-10-21T06:00'],['内容授权原因','Explicit synthetic education source redistribution']])fireEvent.change(screen.getByLabelText(label),{target:{value}})
  fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}));await screen.findByRole('alert')
  const request=mocks.post.mock.calls[0][1]
  expect(request.grant).toMatchObject({scope:{product,scopeKind:'ORGANIZATION',scopeId:id(2),resourceKind:'material',resourceKeys:[id(3)]},capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0})

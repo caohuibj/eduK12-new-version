@@ -1,3 +1,4 @@
+import {isSurveyCognitiveProfileRef} from './cognitive-profile.source'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
@@ -13,9 +14,10 @@ export async function publishSurveyMeasurementDraft(actorId:string,projectId:str
     if(!locks.length)throw new SurveyBuilderError(404,'研究工具不存在')
     const draft=await tx.surveyInstrumentDraft.findUniqueOrThrow({where:{id:draftId}})
     if(draft.revision!==revision||!['DRAFT','PUBLISHED'].includes(draft.status))throw new SurveyBuilderError(409,'研究工具草稿已变化')
-    if(draft.catalogGrantId&&draft.kind!=='SCALE')throw new SurveyBuilderError(403,'本入口仅支持目录量表的显式发布')
+    if(draft.catalogGrantId&&draft.kind!=='SCALE'&&draft.kind!=='COGNITIVE')throw new SurveyBuilderError(403,'本入口仅支持目录量表的显式发布')
     if(draft.kind==='FORM')throw new SurveyBuilderError(400,'普通表单不生成测量版本')
     const sources=await catalogSnapshotsForDrafts(tx,actorId,draft.catalogGrantId?[draft.catalogGrantId]:[])
+    if(draft.catalogGrantId&&draft.kind==='COGNITIVE'&&!isSurveyCognitiveProfileRef(sources.get(draft.catalogGrantId)!.ref))throw new SurveyBuilderError(403,'本入口只接收已批准的精确原生认知配置，旧目录协议保持原边界')
     const unit=draft.catalogGrantId?compileCatalogUnit(draft,sources.get(draft.catalogGrantId)!):compileFrozenResearchUnit(draft)
     const assets=await assertSurveyMediaOwned(tx,actorId,projectId,[{kind:unit.kind,definition:unit.displayDefinition,compiledDefinition:unit.compiledDefinition,sourceProvenance:unit.sourceProvenance}])
     const release=await publishSurveyMeasurementUnit(tx,unit,actorId,projectId)

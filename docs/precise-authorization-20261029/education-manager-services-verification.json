@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "base": "4832c9b64f84613c1edffd788d7809a4d635835a",
+  "main": "6142ddc74db9787f6606746610df58c73de256f5",
+  "scope": "Internal education manager source/recipient/history reads and exact own-use revoke; no route or browser yet",
+  "environment": {
+    "productionAccessed": false,
+    "node": "24.21.0",
+    "postgres": "16.15 local owner role; runtime role not qualified",
+    "readDatabase": "precise_education_test_20261029",
+    "revokeDatabase": "precise_education_manager_revoke_test_20261029"
+  },
+  "results": {
+    "memberUnit": 12,
+    "readPG": 4,
+    "revokePG": 4,
+    "typesExitCode": 0
+  },
+  "evidence": [
+    {
+      "file": "education-manager-member-unit.json",
+      "sha256": "01efd0c9eb22ff6b0336e91d45ab47fd89ca7fd17765b1ee1be360400d23dbbc"
+    },
+    {
+      "file": "education-manager-member-unit-status.json",
+      "sha256": "39567a35b9dc397d6b975810490374f696eaa26ede7b503d9d50dc14c4bdda57"
+    },
+    {
+      "file": "education-manager-read.json",
+      "sha256": "b7ef2586bbb6398ead9f4e248424044063a82278bedb8c3266a79cdfb6855d05"
+    },
+    {
+      "file": "education-manager-read-status.json",
+      "sha256": "c837981ba6336295f8c7d9e76ed384791da7fdc6c5a0e19a4f63e94f4c91f161"
+    },
+    {
+      "file": "education-manager-revoke.json",
+      "sha256": "4ec2640ac4c12848f3cd636c0247942dbcd1553cd978d9bf5a9eafbb702fbd41"
+    },
+    {
+      "file": "education-manager-revoke-status.json",
+      "sha256": "54fec2c74ea327252b6ec90bd804fd75e5c7e5ecb8758cc996e26dbd0e8bc7b7"
+    },
+    {
+      "file": "education-manager-single-actor-sql-equivalence.json",
+      "sha256": "c9ba9170e32b2e406ce2d4ed354e6194caf7484a646168e39388ac6bddaad827"
+    },
+    {
+      "file": "education-manager-read-types-status.json",
+      "sha256": "b9e64e549524d4b32eb4a849663f74cf8c73343188126933ab4bdb51a8cfb063"
+    },
+    {
+      "file": "education-manager-types-final-status.json",
+      "sha256": "0e858143cee78373618dcd9390c3a8142443ac800ccbff19efead11a65971672"
+    }
+  ],
+  "sharedInterface": "Existing single-actor resolveEducationProductMemberScope/listEducationProductMemberships signatures and permission SQL retained; new listEducationAuthoringMemberCandidates is a read-only, organization-scoped batch hint. No Bundle engine changes. Missing actor never selects batch mode.",
+  "reuseBoundary": "Eight virtual Prisma calls compare original/current whitespace-normalized SQL and bound values for the existing nonempty actor paths (six unique query variants). Original eight-actor fixture only read. Revokes/concurrency/withdrawal execute in an independent clone. Earlier task/content/score evidence not replayed.",
+  "failureRetained": "Initial scoped tsc found unknown result type in the new source-root query. Explicit array header type fixes it, emitted runtime unchanged. Final types exit0.",
+  "notExecuted": [
+    "New manager HTTP routes and current-password/key enforcement",
+    "Manager UI",
+    "Four-entry scale completion",
+    "Migration dry-run/performance baseline",
+    "Formal CI",
+    "Production"
+  ],
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/access.test.ts",
+      "sha256": "4ee91e456468e844192181d317f15e97a87cbc749733a6879ac546fcc91a8848"
+    },
+    {
+      "path": "server-version/backend/src/modules/organization/educationProductAccess.ts",
+      "sha256": "6f1a738ec1e225f434da7b8c99b619c74ec0152d478a7d3ea4146d8ed707bb69"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-management.postgres.integration.test.ts",
+      "sha256": "175922210640956a97f5dcce1b57f6585f8291df899d3ad9229ce83308894575"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-authorization/education-standard-revoke.postgres.integration.test.ts",
+      "sha256": "6c1acb484de7fa5e8e1975bc5916d08ebaf10b8f1a67210a9dd79351f8633383"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-management.ts",
+      "sha256": "3467de09fc61c2335e88dd0b2fb35359c54bf0a20809d4ca4a7e1e498ecddb20"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/education-standard-revoke.ts",
+      "sha256": "0789f4d65255512a1a75c04bb9948b5f5c9b7901fbbcc52fa853d858fba77030"
+    }
+  ]
+}

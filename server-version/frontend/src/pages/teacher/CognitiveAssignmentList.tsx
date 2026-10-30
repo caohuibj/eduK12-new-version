@@ -1,3 +1,4 @@
+import type {StandardConfigurationPointer} from '../../api/standardConfigurationGrants'
 import { isTrainingHost } from '../../training/context'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import React, { useEffect, useState } from 'react'
@@ -19,6 +20,8 @@ type ConfigOption = {
   engineVersion?: string
   scoringVersion?: string
   accessPolicy?: 'OPEN' | 'GRANT'
+  authorizationMode?:'PRECISE';available?:boolean;unavailableReason?:string|null;fixedProfile?:'experience'|'standard'|'research'|null
+  configurationName?:string|null;selectedBinding?:StandardConfigurationPointer|null
 }
 type TestCatalogRow = {
   testType: string
@@ -76,7 +79,9 @@ const CognitiveAssignmentList: React.FC = () => {
       && test.scoringVersion === selectedConfig.scoringVersion
     )
     : undefined
-  const catalogMismatch = Boolean(selectedConfig) && !selectedTest
+  const precise=selectedConfig?.authorizationMode==='PRECISE'
+  const preciseReady=Boolean(precise&&selectedConfig?.available===true&&selectedConfig.fixedProfile&&selectedConfig.configurationName&&selectedConfig.selectedBinding)
+  const catalogMismatch = Boolean(selectedConfig) && !precise && !selectedTest
 
   const load = async () => {
     try {
@@ -126,6 +131,7 @@ const CognitiveAssignmentList: React.FC = () => {
 
   const create = async () => {
     try {
+      if(precise&&!preciseReady)throw Error(selectedConfig?.unavailableReason||'固定配置不可用，请管理员核对')
       setSaving(true)
       setError(null)
       const response = await cognitiveApi.createAssignment({
@@ -134,7 +140,7 @@ const CognitiveAssignmentList: React.FC = () => {
         configId: form.configId,
         instruction: form.instruction || undefined,
         maxAttempts: Number(form.maxAttempts) || 1,
-        profile: form.profile,
+        ...(precise?{selectedBinding:selectedConfig!.selectedBinding!}:{profile:form.profile}),
       })
       if (response.code !== 0 || !response.data) throw new Error(response.message || '创建失败')
       navigate(`/cognitive-assignments/${response.data.id}`)
@@ -209,12 +215,12 @@ const CognitiveAssignmentList: React.FC = () => {
                 <option value="">选择任务类型</option>
                 {configs.map((config) => (
                   <option key={config.id} value={config.id}>
-                    {config.name} · {config.testType} {config.configVersion}{config.accessPolicy ? ` · ${config.accessPolicy}` : ''}
+                    {config.name}{config.authorizationMode==='PRECISE'?` · ${config.configurationName||'管理员固定配置'}${config.available?'':'（暂不可用）'}`:` · ${config.testType} ${config.configVersion}${config.accessPolicy ? ` · ${config.accessPolicy}` : ''}`}
                   </option>
                 ))}
               </select>
             </label>
-            {isAdmin && selectedConfig && (
+            {isAdmin && selectedConfig && !precise && (
               <fieldset className="md:col-span-2 flex flex-wrap items-center gap-3 text-sm text-gray-700">
                 <legend className="sr-only">访问策略</legend>
                 <span aria-hidden="true">访问策略</span>
@@ -241,7 +247,7 @@ const CognitiveAssignmentList: React.FC = () => {
                 </button>
               </fieldset>
             )}
-            <label className="text-sm text-gray-700">
+            {precise?<div className="text-sm text-gray-700"><p>管理员指定配置：{selectedConfig?.configurationName||'尚未明确'}</p><p>{selectedConfig?.fixedProfile==='experience'?'体验报告':selectedConfig?.fixedProfile==='research'?'科研报告':'正式报告'}，内容和报告随授权固定。</p>{!preciseReady&&<p role="alert">{selectedConfig?.unavailableReason||'请联系管理员核对固定配置。'}</p>}</div>:<label className="text-sm text-gray-700">
               测验档位
               <select
                 className="mt-1 w-full border rounded px-3 py-2"
@@ -255,12 +261,12 @@ const CognitiveAssignmentList: React.FC = () => {
                   </option>
                 ))}
               </select>
-            </label>
+            </label>}
             <label className="text-sm text-gray-700">
               最大次数
               <input type="number" min={1} className="mt-1 w-full border rounded px-3 py-2" value={form.maxAttempts} onChange={(e) => setForm({ ...form, maxAttempts: Number(e.target.value) })} />
             </label>
-            {form.profile === 'experience' && (
+            {(precise?selectedConfig?.fixedProfile:form.profile) === 'experience' && (
               <p className="text-xs text-amber-600 md:col-span-2">体验版，结果仅供体验。</p>
             )}
             <label className="md:col-span-2 text-sm text-gray-700">
@@ -275,7 +281,7 @@ const CognitiveAssignmentList: React.FC = () => {
             <p className="text-xs text-red-600 mt-3">任务配置与 Catalog 版本不一致，无法选择 Profile。请重新选择匹配 engineVersion / scoringVersion 的任务类型。</p>
           )}
           <div className="mt-4 flex flex-wrap gap-2">
-            <button onClick={() => void create()} disabled={saving || !form.title || !form.courseId || !form.configId || !selectedTest} className="hui-button hui-button--primary">{saving ? '保存中...' : '保存草稿'}</button>
+            <button onClick={() => void create()} disabled={saving || !form.title || !form.courseId || !form.configId || (precise?!preciseReady:!selectedTest)} className="hui-button hui-button--primary">{saving ? '保存中...' : '保存草稿'}</button>
             <button type="button" onClick={() => setShowForm(false)} className="hui-button hui-button--secondary">取消</button>
           </div>
         </section>

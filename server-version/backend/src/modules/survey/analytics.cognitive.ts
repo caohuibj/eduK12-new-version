@@ -1,3 +1,4 @@
+import {reactionTrialSchema} from '../cognitive/schemas/reaction.trial'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import type {TrialEnvelope} from '../cognitive/v2/types'
 import type {GonogoTrial} from '../cognitive/schemas/gonogo.trial'
@@ -98,8 +99,9 @@ export function prepareCognitiveProjection(frozen:ResearchFrozenUnit){
       ||child.raw.trials.length!==result.audit.trialCount)invalid('认知权威试次来源缺失或 epoch 不一致')
     const childCompletedAt=new Date(child.completedAt).toISOString()
     for(const trial of child.raw.trials){
-      const payload=trial.payload as GonogoTrial
-      if(!payload||!['go','nogo'].includes(payload.trialType)||typeof payload.responded!=='boolean'
+      const reaction=definition.schemaVersion===2&&definition.sessionSnapshot.testType==='reaction'?reactionTrialSchema.parse(trial.payload):null
+      const payload=reaction?{trialType:'reaction' as const,responded:reaction.rtMs!==null,rtMs:reaction.rtMs,interrupted:reaction.interrupted}:trial.payload as GonogoTrial
+      if(!payload||!(reaction?payload.trialType==='reaction':['go','nogo'].includes(payload.trialType))||typeof payload.responded!=='boolean'
         ||(payload.rtMs!==null&&(!Number.isFinite(payload.rtMs)||payload.rtMs<0))
         ||payload.responded!==(payload.rtMs!==null))invalid('认知冻结试次响应或时长无效')
       yield {...meta,sourceVerified:true,instrumentKey,
@@ -110,8 +112,8 @@ export function prepareCognitiveProjection(frozen:ResearchFrozenUnit){
         randomSeed:child.randomSeed,randomizationVersion:definition.sessionSnapshot.protocol.randomizationAlgorithmVersion,
         restartCount:result.restartCount,childCompletedAt,
         phase:trial.phase,trialIndex:trial.trialIndex,condition:trial.condition??null,
-        stimulusCode:payload.trialType,responded:payload.responded,response:payload.responded?'RESPONDED':null,
-        rtMs:payload.rtMs,rtMissingReason:payload.rtMs!==null?null:payload.trialType==='nogo'?'NO_GO_WITHHELD':'GO_OMISSION',
+        stimulusCode:reaction?'':payload.trialType,responded:payload.responded,response:payload.responded?'RESPONDED':null,
+        rtMs:payload.rtMs,rtMissingReason:payload.rtMs!==null?null:reaction?'SHOWN_MISSING':payload.trialType==='nogo'?'NO_GO_WITHHELD':'GO_OMISSION',
         startedAtPerfMs:trial.startedAtPerfMs,endedAtPerfMs:trial.endedAtPerfMs,durationMs:trial.durationMs,
         timeout:trial.flags.timeout,premature:trial.flags.premature,interrupted:payload.interrupted,
         qualityEvents:[...trial.qualityEvents],qualityStatus:result.quality.state,

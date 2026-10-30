@@ -50,3 +50,8 @@ describe('searchable assessment tool picker', () => {
     expect(screen.getByRole('button', { name: '下一页工具' })).toBeDisabled()
   })
 })
+
+it('keeps an unavailable fixed configuration visible with its business reason and prevents selection',()=>{
+ const select=vi.fn();render(<AssessmentToolPicker label="量表" value="" options={[{id:'fixed',name:'注意力 · 教学简报',disabled:true,unavailableReason:'配置名称冲突，请管理员调整'}]} onChange={select}/>)
+ fireEvent.click(screen.getByRole('button',{name:/选择量表/}));const card=screen.getByRole('button',{name:/选择 注意力 · 教学简报.*暂不可用/});expect(card).toBeDisabled();expect(screen.getByText('配置名称冲突，请管理员调整')).toBeVisible();fireEvent.click(card);expect(select).not.toHaveBeenCalled()
+})

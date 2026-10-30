@@ -4,7 +4,7 @@ import { sessionFetch } from '../../api/client'
 import { usePageEditorGuard } from '../../components/shared-ui/usePageEditorGuard'
 
 type Choice = { releaseId: string; entryKey: string; version: string; metricKey: string; referenceKind: string; scope: 'PRIVATE' | 'PLATFORM'; population: { description: string }; limitations: string[] }
-type Unit = { itemId: string; family: string; measurementReleaseId: string; choices: Choice[]; reports: Array<{ releaseId: string; version: string; title: string | null; audience: string }> }
+type Unit = { itemId: string; family: string; measurementReleaseId: string; fixedConfiguration?: { name: string | null }; choices: Choice[]; reports: Array<{ releaseId: string; version: string; title: string | null; audience: string }> }
 type Risk = { dirty: boolean; pending: boolean; busy: boolean }
 type Detail = { id: string; revision: number; trainingReferenceSelectionDraft?: ReferenceSelection | null; trainingReportSelectionDraft?: ReportSelection | null; [key: string]: unknown }
 type Props = { actorId: string; detail: Detail; disabled?: boolean; recoveryDisabled?: boolean; onSaved: (detail: Detail) => void; onRiskChange: (risk: Risk) => void }
@@ -29,6 +29,9 @@ function validUnits(value: unknown): value is { schemaVersion: 1; units: Unit[] 
     if (!record(unit) || typeof unit.itemId !== 'string' || ids.has(unit.itemId) || typeof unit.family !== 'string' || typeof unit.measurementReleaseId !== 'string'
       || !Array.isArray(unit.choices) || !Array.isArray(unit.reports)) return false
     ids.add(unit.itemId)
+    if (unit.fixedConfiguration !== undefined && (!record(unit.fixedConfiguration)
+      || !(unit.fixedConfiguration.name === null || typeof unit.fixedConfiguration.name === 'string' && unit.fixedConfiguration.name.trim().length > 0)
+      || unit.choices.length > 0 || unit.reports.length > 0)) return false
     return unit.choices.every((choice: unknown) => record(choice) && ['releaseId', 'entryKey', 'version', 'metricKey', 'referenceKind'].every(key => typeof choice[key] === 'string')
       && ['PRIVATE', 'PLATFORM'].includes(choice.scope) && record(choice.population) && typeof choice.population.description === 'string'
       && Array.isArray(choice.limitations) && choice.limitations.every((text: unknown) => typeof text === 'string'))
@@ -168,6 +171,7 @@ function SelectionWorkspace({ actorId, detail, disabled = false, recoveryDisable
     {error && !pending && <button type="button" className="btn-secondary" disabled={disabled || busy} onClick={reload}>放弃选择修改并读取当前设置</button>}
     {opened && <fieldset disabled={disabled || busy || !!pending} className="space-y-4"><legend className="sr-only">版本选择</legend>
       {units.map(unit => {
+        if (unit.fixedConfiguration) return <div key={unit.itemId} className="border-t pt-3"><h3>{unit.fixedConfiguration.name || '管理员固定量表配置'}</h3><p>内容、参数和报告已由管理员固定。需要其他用途时，请管理员分配相应配置。</p></div>
         const selectedReport = report?.units.find(value => value.itemId === unit.itemId)?.reportReleaseId ?? ''
         return <div key={unit.itemId} className="border-t pt-3"><h3>{unit.family} · {unit.itemId}</h3>
           <label>教师／研究者报告<select className="input block w-full" aria-label={'报告 ' + unit.itemId} value={selectedReport} onChange={event => pickReport(unit.itemId, event.target.value)}>

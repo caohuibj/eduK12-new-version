@@ -1,0 +1,683 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-29T22:00:24.588670+00:00",
+  "records": [
+    {
+      "name": "t2-audit-unit",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-t2-audit.py",
+          "training",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/selected-reference-audit.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/t2-audit-unit.json"
+        ],
+        "startedAt": "2026-10-29T21:56:04.861559+00:00",
+        "finishedAt": "2026-10-29T21:56:06.356368+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/t2-audit-unit.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 3,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793310965312,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "T2 exact reference audit"
+                ],
+                "fullName": "T2 exact reference audit ignores reorder and empty legacy projections, while retaining deterministic removed/added identities",
+                "status": "passed",
+                "title": "ignores reorder and empty legacy projections, while retaining deterministic removed/added identities",
+                "duration": 8.174762999999984,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "T2 exact reference audit"
+                ],
+                "fullName": "T2 exact reference audit fails closed on duplicated slots, malformed provided pointers and undeclared body fields",
+                "status": "passed",
+                "title": "fails closed on duplicated slots, malformed provided pointers and undeclared body fields",
+                "duration": 2.87394699999993,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "T2 exact reference audit"
+                ],
+                "fullName": "T2 exact reference audit rejects exact scale selection on every other unit type before any author mutation",
+                "status": "passed",
+                "title": "rejects exact scale selection on every other unit type before any author mutation",
+                "duration": 4.227921000000038,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793310966291,
+            "endTime": 1793310966306.228,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/selected-reference-audit.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "t2-audit-types",
+      "status": {
+        "command": [
+          "node",
+          "/workspace/eduK12-new-version/server-version/backend/node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/t2-audit-types.json"
+        ],
+        "startedAt": "2026-10-29T21:56:04.874047+00:00",
+        "finishedAt": "2026-10-29T21:56:28.818975+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "name": "t2-audit-training",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_T2_TRAINING=1",
+          "PRECISE_T2_EVIDENCE=/workspace/materials-load-20261029/evidence/t2-audit-training-requests.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-t2-audit.py",
+          "training",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-t2-audit.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/t2-audit-training.json"
+        ],
+        "startedAt": "2026-10-29T21:56:30.815335+00:00",
+        "finishedAt": "2026-10-29T21:56:41.670381+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/t2-audit-training.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793310991142,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training explicit draft binding changes keep original identities"
+                ],
+                "fullName": "Training explicit draft binding changes keep original identities records removal of stale revision five and explicit addition of current revision seven; ordinary edits do not manufacture replacements",
+                "status": "passed",
+                "title": "records removal of stale revision five and explicit addition of current revision seven; ordinary edits do not manufacture replacements",
+                "duration": 397.3130689999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training explicit draft binding changes keep original identities"
+                ],
+                "fullName": "Training explicit draft binding changes keep original identities commits one source-change event for concurrent deletion and preserves every other task and source grant",
+                "status": "passed",
+                "title": "commits one source-change event for concurrent deletion and preserves every other task and source grant",
+                "duration": 161.14496300000064,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793311000940,
+            "endTime": 1793311001498.145,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-t2-audit.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "t2-audit-survey",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_T2_SURVEY=1",
+          "PERF_ISOLATED_TEST_MODE=1",
+          "PERF_SQL_EVENT_COUNT=1",
+          "PRECISE_T2_EVIDENCE=/workspace/materials-load-20261029/evidence/t2-audit-survey-observations.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-t2-audit.py",
+          "survey",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/survey-t2-audit.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/t2-audit-survey.json"
+        ],
+        "startedAt": "2026-10-29T21:56:30.809260+00:00",
+        "finishedAt": "2026-10-29T21:56:39.956172+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/t2-audit-survey.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793310991132,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Survey wave changes retain exact original and new T1 identities"
+                ],
+                "fullName": "Survey wave changes retain exact original and new T1 identities replaces an old revoked imported source using exact original headers and records both pointers without report bodies",
+                "status": "passed",
+                "title": "replaces an old revoked imported source using exact original headers and records both pointers without report bodies",
+                "duration": 182.50226199999997,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Survey wave changes retain exact original and new T1 identities"
+                ],
+                "fullName": "Survey wave changes retain exact original and new T1 identities audits initial selection once, skips reorder reads and commits only one concurrent wave edit",
+                "status": "passed",
+                "title": "audits initial selection once, skips reorder reads and commits only one concurrent wave edit",
+                "duration": 154.5371209999994,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793310999418,
+            "endTime": 1793310999755.537,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/survey-t2-audit.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "t2-audit-copy",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_T2_TRAINING_COPY=1",
+          "PRECISE_T2_EVIDENCE=/workspace/materials-load-20261029/evidence/t2-audit-copy-observations.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-t2-audit.py",
+          "training",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/t2-audit-copy.json"
+        ],
+        "startedAt": "2026-10-29T21:58:33.836604+00:00",
+        "finishedAt": "2026-10-29T21:58:41.667919+00:00",
+        "exitCode": 1
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/t2-audit-copy.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793311114139,
+        "success": false,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training copies retain the original precise use revision"
+                ],
+                "fullName": "Training copies retain the original precise use revision rejects copying an old T2 use into the newer revision even when the same combination is currently granted",
+                "status": "failed",
+                "title": "rejects copying an old T2 use into the newer revision even when the same combination is currently granted",
+                "duration": 64.15360099999998,
+                "failureMessages": [
+                  "Error: expected Error: 该精确组合的 Training 使用授权不可用 { …(1) } to match object { statusCode: 409 }\n    at _Assertion.__VITEST_REJECTS__ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1607:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1696:22)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts:29:70\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training copies retain the original precise use revision"
+                ],
+                "fullName": "Training copies retain the original precise use revision copies a still-valid selection with a new container/slot reference and audits it once on original request recovery",
+                "status": "failed",
+                "title": "copies a still-valid selection with a new container/slot reference and audits it once on original request recovery",
+                "duration": 0.8475459999999657,
+                "failureMessages": [
+                  "Error: Negative identity check incomplete; dependent copy forbidden\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts:35:30\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+                ],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793311121433,
+            "endTime": 1793311121498.8477,
+            "status": "failed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "t2-audit-types-final",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/t2-audit-types.json"
+        ],
+        "startedAt": "2026-10-29T21:58:45.471361+00:00",
+        "finishedAt": "2026-10-29T21:59:05.599145+00:00",
+        "exitCode": 2
+      },
+      "log": "src/modules/questionnaire-product/service.ts(767,77): error TS2345: Argument of type '{ status: CompositeAssessmentStatus; publishedAt: Date | null; name: string; code: string; description: string | null; revision: number; id: string; ... 38 more ...; reportPackageSnapshotEncrypted: string | null; }' is not assignable to parameter of type '{ id: string; createdBy: string; }'.\n  Types of property 'createdBy' are incompatible.\n    Type 'string | null' is not assignable to type 'string'.\n      Type 'null' is not assignable to type 'string'.\n"
+    },
+    {
+      "name": "t2-audit-copy-v2",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_T2_TRAINING_COPY=1",
+          "PRECISE_T2_EVIDENCE=/workspace/materials-load-20261029/evidence/t2-audit-copy-observations-v2.json",
+          "python3",
+          "/workspace/materials-load-20261029/run-t2-audit.py",
+          "training",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/t2-audit-copy-v2.json"
+        ],
+        "startedAt": "2026-10-29T21:59:34.836964+00:00",
+        "finishedAt": "2026-10-29T21:59:47.399659+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/t2-audit-copy-v2.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793311175210,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Training copies retain the original precise use revision"
+                ],
+                "fullName": "Training copies retain the original precise use revision rejects copying an old T2 use into the newer revision even when the same combination is currently granted",
+                "status": "passed",
+                "title": "rejects copying an old T2 use into the newer revision even when the same combination is currently granted",
+                "duration": 110.14240000000063,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Training copies retain the original precise use revision"
+                ],
+                "fullName": "Training copies retain the original precise use revision copies a still-valid selection with a new container/slot reference and audits it once on original request recovery",
+                "status": "passed",
+                "title": "copies a still-valid selection with a new container/slot reference and audits it once on original request recovery",
+                "duration": 292.63472999999976,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793311186801,
+            "endTime": 1793311187203.6348,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/training-t2-copy.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "t2-audit-types-final-v2",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/t2-audit-types.json"
+        ],
+        "startedAt": "2026-10-29T21:59:34.822700+00:00",
+        "finishedAt": "2026-10-29T21:59:59.878867+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    }
+  ],
+  "observations": {
+    "t2-audit-training-requests": {
+      "productionAccessed": false,
+      "requests": [
+        {
+          "method": "POST",
+          "path": "345ff60b-25be-49d5-bcb1-c78c1942a930/items/61a5bc65-d16a-4d36-8bf2-5838805673b7/remove",
+          "status": 403
+        },
+        {
+          "method": "POST",
+          "path": "345ff60b-25be-49d5-bcb1-c78c1942a930/items/61a5bc65-d16a-4d36-8bf2-5838805673b7/remove",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "345ff60b-25be-49d5-bcb1-c78c1942a930/items",
+          "status": 200
+        },
+        {
+          "method": "PUT",
+          "path": "345ff60b-25be-49d5-bcb1-c78c1942a930",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "345ff60b-25be-49d5-bcb1-c78c1942a930/reorder",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "345ff60b-25be-49d5-bcb1-c78c1942a930/items/8d115603-ab70-435d-a232-c038b848194c/remove",
+          "status": 409
+        },
+        {
+          "method": "POST",
+          "path": "345ff60b-25be-49d5-bcb1-c78c1942a930/items/8d115603-ab70-435d-a232-c038b848194c/remove",
+          "status": 409
+        },
+        {
+          "method": "POST",
+          "path": "345ff60b-25be-49d5-bcb1-c78c1942a930/items/8d115603-ab70-435d-a232-c038b848194c/remove",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "345ff60b-25be-49d5-bcb1-c78c1942a930/items",
+          "status": 200
+        }
+      ],
+      "observations": [
+        {
+          "oldOriginalRevision": 5,
+          "newSelectedRevision": 7,
+          "crossOwnerDenied": true,
+          "staleEditDenied": true,
+          "ordinaryEditAndReorderAuditUnchanged": true,
+          "originalRemovalAndAddition": [
+            {
+              "added": [],
+              "ownerId": "23f0e14d-a573-48d7-a437-a7540d254806",
+              "removed": [
+                {
+                  "kind": "STANDARD_COMBINATION",
+                  "slotId": "61a5bc65-d16a-4d36-8bf2-5838805673b7",
+                  "sourceId": "f1325458-3d65-4989-b3ef-769f867eeea5",
+                  "sourceHash": "deec45923838f7f94072cf25daf026d5e526b3eaa16bfbcabbb4025a740e52b0",
+                  "referenceHash": "8310ec15f2be491c0c0e202ae6d71643bf098a5e4064e32a7141b55c520ed13f",
+                  "selectedBinding": {
+                    "bindingHash": "501571e82e681e8297159a583f286ee45bcbe0f65108231e6eee28e1f59316c0",
+                    "authorizationId": "3556d111-ec36-4dde-8f2e-de5ef4ae9f6b",
+                    "configurationHash": "9a30d47cccc1feb416f6cd8cfebb0dda6e60388f0c4e0f068ac894958dbc4405",
+                    "authorizationRevision": 5
+                  }
+                }
+              ],
+              "changeHash": "a61f6db35b9b69867987924d39b464da4a3ae5fb83e85494905c942c5a10685f",
+              "toRevision": 3,
+              "fromRevision": 2,
+              "schemaVersion": 1
+            },
+            {
+              "added": [
+                {
+                  "kind": "STANDARD_COMBINATION",
+                  "slotId": "8d115603-ab70-435d-a232-c038b848194c",
+                  "sourceId": "60fbd117-c2a4-4b93-ab88-9ef422241990",
+                  "sourceHash": "443739503fe51561ad2a11c38d4dd229ceba7a24596f2288d2e49cd70ea1fbc5",
+                  "referenceHash": "9175a3f933324f86323e315af9d5fd56f11230967459ed8a7c94906cd9f3ec39",
+                  "selectedBinding": {
+                    "bindingHash": "6f0eb0c360aa83ccc0564a9483029c490776b4210b6fb9ea7885a07f3159ed0c",
+                    "authorizationId": "b559c930-122a-4183-9d56-89f3cb5f6376",
+                    "configurationHash": "10909c5ee50c2e8a6fdc0dbae45f17796fb4c671ddf5dcc5d484673c51b68bc4",
+                    "authorizationRevision": 7
+                  }
+                }
+              ],
+              "ownerId": "23f0e14d-a573-48d7-a437-a7540d254806",
+              "removed": [],
+              "changeHash": "e1c361a76797b3bb2f30f06b9428c27bb27558966e66232c7df36d70e6f468e4",
+              "toRevision": 4,
+              "fromRevision": 3,
+              "schemaVersion": 1
+            }
+          ]
+        },
+        {
+          "concurrentOneSuccessOneConflict": true,
+          "events": 4,
+          "physicalGrantRows": 4,
+          "otherElevenTasksUnchanged": true,
+          "originalT1AndSourcesUnchanged": true
+        }
+      ]
+    },
+    "t2-audit-survey-observations": {
+      "productionAccessed": false,
+      "scope": "Real PostgreSQL research project/import/measurement/wave services. No participant/FINAL or authenticated Survey HTTP replay.",
+      "observations": [
+        {
+          "oldRevokedPointer": {
+            "bindingHash": "58d76ee44f260a0df7aac5ee5647aaefc2a7caff2464cae2580dec03cf747eee",
+            "authorizationId": "9b95de14-9638-4387-ae2a-e403421d6fe3",
+            "configurationHash": "24476a25f83b463c9c481f6959a44e7fac86c42c2039ab64f5a7d2b9971e9746",
+            "authorizationRevision": 1
+          },
+          "newPointer": {
+            "bindingHash": "bfeb2f2f1a3fcd0b579b5805addc3533412f5137052813de4e97086f7c709ad0",
+            "authorizationId": "4aa0d47c-68c3-4028-b19d-ddd714d35b73",
+            "configurationHash": "7dfb3934f35999ae1654352169fe2b6725662c940c4b1ad9ea5df6a0796fbe6a",
+            "authorizationRevision": 1
+          },
+          "changedHeaderQueries": 1,
+          "ordinaryEditHeaderQueries": 0,
+          "unchangedBodyHeadersOnly": true,
+          "staleEditDenied": true
+        },
+        {
+          "createOnce": true,
+          "replayNoAuditOrHeaderRead": true,
+          "reorderNoSourceEventOrHeaderRead": true,
+          "concurrentOneSuccessOneConflict": true,
+          "oldGrantsAndFivePublishedSnapshotsUnchanged": true,
+          "newImportedDrafts": 1,
+          "newWave": 1
+        }
+      ]
+    },
+    "t2-audit-copy-observations": {
+      "productionAccessed": false,
+      "scope": "Existing Training copy service and real PostgreSQL transaction. No HTTP or participant scoring replay.",
+      "observations": []
+    },
+    "t2-audit-copy-observations-v2": {
+      "productionAccessed": false,
+      "scope": "Existing Training copy service and real PostgreSQL transaction. No HTTP or participant scoring replay.",
+      "observations": [
+        {
+          "originalUseRevision": 5,
+          "currentPhysicalUseRevision": 7,
+          "copyDenied": true,
+          "transactionRolledBack": true
+        },
+        {
+          "copiedExactRevision": 7,
+          "newReferenceHash": true,
+          "originalRequestRecoverySameDraft": true,
+          "oneCopyEvent": true,
+          "retainedOriginalTwelveTasksAndGrants": true
+        }
+      ]
+    }
+  },
+  "readbackBeforeCopyRetry": {
+    "method": "docker local-socket exec psql read-only counts after initial negative-assertion failure",
+    "database": "precise_training_t2_audit_test_20261029",
+    "taskRows": 12,
+    "copyEvents": 0,
+    "sourceChangeEvents": 4,
+    "materialGrants": 4,
+    "note": "Original psql output 12|0|4|4 observed before retry. No fixture reset or target recreation."
+  }
+}
