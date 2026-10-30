@@ -13,3 +13,9 @@
 自然提交点已无冲突对齐 main `55fab18e9933e58dcb800b20156f5b7e48858536`。当前产品提交 `08ccad064`，main 合入检查点 `f51d2275e065333ede10636605171404cca5e17d`；backend tree `60e3a0336b424f0ca3f665ff427251a4ca0c75d6` 的一次 tsc --noEmit 实际 exit0。frontend tree `6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103` 与 PR418 相同。合入仅改变已有 CI 绑定文件，未变更这批业务输入，没有重跑已完成用例。
 
 后续 Draft 以 PR418 的 `feat/group-report-teacher-subgroups-20261030` 为审阅 base，故完整差异也列有同步 main 的既有控制变动；不是新建或修改 CI 路线。本批尚未激活正式 CI，也未将本地无签名结果声称为正式接纳。
+
+## mainfa 与集中review修订同步
+
+已无冲突沿 School10bdaac26 → Teacher da00b2af9 → 子群 ef2554926 对齐个人纵向main fa038041c47b275d30ccb8b8b01ab019615906e0，并继承两项必要修复：Teacher POST成功先交付报告、目录GET失败只读重试；School仅列真实受众GROUP父/叶合同可用来源，私有组合当前INDIVIDUAL_ONLY不升格为群体授权。未复制个人/纵向权限或新增私有GROUP接口。
+
+本批Bundle消费者代码未改，原PG/绑定/认知-SJT补验不重跑。新合并leaf组件整树的类型结果尚未执行；旧60e3/6fbb结果只代表原tree，不称为当前正式资格。School自己的最新类型与固定候选准备位于上游PR414，仍禁用、未正式CI。新leaf Draft的具体head/base已获用户明确授权，仅创建审阅，不Ready/合并/部署。Notion迁移期间记录保留Git，不写旧Qiang目标。

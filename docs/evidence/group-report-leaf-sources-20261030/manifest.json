@@ -93,5 +93,23 @@
       "bytes": 185,
       "sha256": "f441343e884d9d4da7f189a333937344acc1e0b536f111f1549bdd0ec4392c1d"
     }
+  },
+  "mainfaIntegration": {
+    "main": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "checkpoint": "9628a654f64e01c07095a77ab5bc408be8c8ddc4",
+    "teacherSubgroupBase": "ef2554926777363e5389fd281d17b15d832b0dd7",
+    "componentTrees": {
+      "backend": "4743d62a2e8de078e53e3b4a4b7acf7e571515e0",
+      "frontend": "7b00ad00d1f02666df497b268f9b27a28d3ff7aa"
+    },
+    "inheritedReviewFixes": [
+      "Teacher POST-success/GET-failure retained report with read-only retry, one new case passed on PR418.",
+      "School GROUP catalog/leaf selection respects existing parent/leaf contract; unsupported private composition GROUP not advertised, two new cases passed on PR414."
+    ],
+    "oldBundleChecksReexecuted": false,
+    "currentWholeComponentTypes": "NOTRUN for these new combined leaf trees; earlier60e3/6fbb receipts retain original-tree attribution. School base current component compilers are separate.",
+    "formalCiActivated": false,
+    "draftCreation": "Specific branch/base authorization received from user; retry only once at this natural checkpoint.",
+    "notion": "Progress kept in Git/local during Hui migration; no Qiang writes."
   }
 }
