@@ -40,7 +40,7 @@
     "School Form/other runtime adapters",
     "Old V1 no-leaf limitation remains recorded, no unrelated migration",
     "Group longitudinal waits existing personal interface",
-    "PR408 new-main formal qualification remains separate; do not merge"
+    "Exact qualification configuration and official admission/CodeQL/gate still NOTRUN for PR418; do not claim old CI as current."
   ],
   "ciExecuted": false,
   "merged": false,
@@ -167,5 +167,16 @@
       "sha256": "fe57a2dd1599373571295794a15e0b415e1f2b6962f6ddaa406903eba2e433c8",
       "bytes": 405078
     }
+  },
+  "main55Integration": {
+    "main": "55fab18e9933e58dcb800b20156f5b7e48858536",
+    "mergeCheckpoint": "addbcdea8810ff17f6ff09cffac154e9966eac8d",
+    "schoolDependency": "1612d7a29",
+    "readerDependency": "e0b40d5e5bf60e21764de35ccb316345a56b6e76",
+    "backendTreeUnchanged": "08e1af56b33962b0f9ec22c9db3973a164a7b7a2",
+    "frontendTreeUnchanged": "6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103",
+    "testsAndTypesReexecuted": false,
+    "priorCurrentComponentEvidenceRetained": true,
+    "formalCiActivated": false
   }
 }

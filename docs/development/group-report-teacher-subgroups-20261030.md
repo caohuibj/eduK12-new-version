@@ -19,3 +19,7 @@
 仍限现有原生Teacher Form。其他个人工具INDIVIDUAL_ONLY合同不绕过，其他来源接线与群体纵向待后续；旧无leaf V1限制照实记录，不扩大成无关迁移。本批仅Draft，不激活正式CI、不合并、不部署、不访问真实用户或生产。
 
 此前409目标写入拒绝已获得用户明确新授权，原拒绝动作未执行；随后成功向同一页追加既有PR414修复/验证与旧V1限制记录，未修改旧正文或分享状态。
+
+## main55 依赖同步
+
+已沿 School1612d7a29 → Reader e0b40d5e5 → Subgroup addbcdea881 的依赖关系无冲突对齐 main `55fab18e9933e58dcb800b20156f5b7e48858536`。Teacher 子群 backend tree `08e1af56b33962b0f9ec22c9db3973a164a7b7a2` 与 frontend tree `6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103` 均与原已验证组件完全相同，继续复用现有类型/PG/浏览器结果，未重复执行。前文 PR408 等待状态为历史；现已由 DOT 合并，不修改其分支或被拒绝的文档动作。PR418保持Draft，自己的正式资格尚未激活。

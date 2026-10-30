@@ -1,10 +1,10 @@
 {
-  "status": "IN_PROGRESS_NOT_MERGE_READY",
-  "base": "296c941419d76b360405c2c487d10514cd5c530e",
-  "productHead": "95baa41c600b1f6e8ac930a83da04578c3614894",
+  "status": "PREPARED_NOT_MERGE_READY",
+  "base": "55fab18e9933e58dcb800b20156f5b7e48858536",
+  "productHead": "199d2807fd634e6fa54fd09163233d4722fd9778",
   "componentTrees": {
-    "backend": "315616d1b8fead0cbbd340822ef8828498007cb9",
-    "frontend": "83917ae150cafbbe825a269d4c56a0e08a98e0a8"
+    "backend": "b0ab5f0b0fad5b14d203499deea50640264c2901",
+    "frontend": "7db01e8ff09cd4f5865e99fbb0438f2f4ff6caea"
   },
   "localTypes": [
     {
@@ -26,6 +26,22 @@
       "componentTree": "315616d1b8fead0cbbd340822ef8828498007cb9",
       "exitCode": 0,
       "replaysPriorCases": false
+    },
+    {
+      "component": "backend",
+      "report": "current-backend-types.json",
+      "componentTree": "b0ab5f0b0fad5b14d203499deea50640264c2901",
+      "exitCode": 0,
+      "sourceCheckpoint": "199d2807fd634e6fa54fd09163233d4722fd9778",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "frontend",
+      "report": "current-frontend-types.json",
+      "componentTree": "7db01e8ff09cd4f5865e99fbb0438f2f4ff6caea",
+      "exitCode": 0,
+      "sourceCheckpoint": "199d2807fd634e6fa54fd09163233d4722fd9778",
+      "originalExecutionSigned": false
     }
   ],
   "distinctUnitAndMockHttpCases": 37,
@@ -66,11 +82,10 @@
     "backend types before later source edits retained as earlier checkpoints only"
   ],
   "remaining": [
-    "V2 School PG service completed; old no-leaf V1 whole-Run floor scope remains unresolved before full disclosure finding closure",
-    "Teacher actual product entry and product-admin adaptation",
-    "School Form choices and unsupported standalone/Bundle runtime adapters",
-    "group longitudinal awaits stable personal contract",
-    "Notion 409 review-page append denied by automatic review: explicit target authorization pending; no write performed, no reroute"
+    "Exact PR414 qualification configuration/control review and official selected admission/CodeQL/gate results remain NOTRUN.",
+    "School Form and additional runtime sources remain future batches; no claim of all sources complete.",
+    "Legacy no-leaf V1 lacks frozen leaf identity: recorded compatibility limit, no unrelated migration.",
+    "Group longitudinal waits stable personal contract."
   ],
   "reports": {
     "backend-delta.json": {
@@ -204,6 +219,34 @@
       "numPassedTests": 0,
       "numFailedTests": 1,
       "numPendingTests": 0
+    },
+    "current-backend-types.json": {
+      "sha256": "62a9bfa1fa2a3da32534572464b3ced2730d97e3bb9e95ff24a5476478782cff",
+      "bytes": 492
+    },
+    "current-backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-frontend-types.json": {
+      "sha256": "843346e130fa53092e33320006675537e733e79a3df497029213ae99f3bf3017",
+      "bytes": 528
+    },
+    "current-frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "qualification-case-inventory.json": {
+      "sha256": "9244ebf57781fad7469ba4f1257b919f127a7fcc49eb84b96119ff9365923a7b",
+      "bytes": 14235
+    },
+    "main55-qualification-plan.json": {
+      "sha256": "31a3b2b4562570af88a057dcac89f609174fdee071b8ee9aa1e03ec457bb721e",
+      "bytes": 2763
+    },
+    "main55-source-diff.raw": {
+      "sha256": "aa293be63e2d11f893d5dfbadfabc70ef8e978d681a8cabbfd2759dcec9f5ac7",
+      "bytes": 14595
     }
   },
   "ciExecuted": false,
@@ -233,6 +276,33 @@
     "after": "leaf-floor-review-fix.json",
     "cases": 1,
     "invariant": "max leaf/parent/request/spec; same floor for V2 generation, old snapshot metric/cell reads, and School differencing",
-    "v1Risk": "Old unselected whole-Run V1 lacks leaf identity. Existing parent-only path can flatten a child metric without its stronger contract. Do not claim all GROUP paths fixed; migration/legacy read compatibility scope pending. School subgroup without leaf is still rejected."
+    "v1Risk": "Old unselected whole-Run V1 lacks leaf identity. Existing parent-only path can flatten a child metric without its stronger contract. Do not claim all GROUP paths fixed; migration/legacy read compatibility scope pending. School subgroup without leaf is still rejected.",
+    "currentScopeDecision": "V2 fix accepted by parent after a7969866 review; retain old V1 limitation accurately without expanding into unrelated migration."
+  },
+  "historicalManifestCheckpoint": {
+    "status": "IN_PROGRESS_NOT_MERGE_READY",
+    "base": "296c941419d76b360405c2c487d10514cd5c530e",
+    "productHead": "95baa41c600b1f6e8ac930a83da04578c3614894",
+    "componentTrees": {
+      "backend": "315616d1b8fead0cbbd340822ef8828498007cb9",
+      "frontend": "83917ae150cafbbe825a269d4c56a0e08a98e0a8"
+    },
+    "remaining": [
+      "V2 School PG service completed; old no-leaf V1 whole-Run floor scope remains unresolved before full disclosure finding closure",
+      "Teacher actual product entry and product-admin adaptation",
+      "School Form choices and unsupported standalone/Bundle runtime adapters",
+      "group longitudinal awaits stable personal contract",
+      "Notion 409 review-page append denied by automatic review: explicit target authorization pending; no write performed, no reroute"
+    ]
+  },
+  "qualificationPreparation": {
+    "plan": "main55-qualification-plan.json",
+    "deduplicatedCases": "qualification-case-inventory.json",
+    "distinctNamedPassed": 39,
+    "unitAndMockHttp": 37,
+    "retainedPg": 2,
+    "businessChecksReexecuted": false,
+    "formalActivation": false,
+    "remainingControlWork": "Extend the existing exact onboarding candidate configuration for PR414; no new workflow or broad fallback."
   }
 }
