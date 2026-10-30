@@ -6,7 +6,7 @@
   },
   "catalog": {
     "schemaVersion": 1,
-    "catalogManifestVersion": 1,
+    "catalogManifestVersion": 2,
     "catalogStatus": "CANDIDATE",
     "scientificMaturity": "PILOT",
     "identity": {
@@ -28,7 +28,10 @@
         "BAT_form:SECONDARY",
         "rights:original_chinese_questionnaire_public_redistribution_scope_unresolved",
         "scoring:not_installed",
-        "report:not_installed"
+        "report:not_installed",
+        "translation_editorial:user_approved_2026_10_30",
+        "private_draft_candidate:bat_secondary10_2020_zh_cn",
+        "private_source_sha256:36d38939ab47b571575707205ddd144ed475517776253d20dbdc7eed8738456c"
       ]
     },
     "population": {
@@ -87,7 +90,7 @@
     "cognitiveDebriefStatus": "NOT_ESTABLISHED",
     "localEvidenceRefs": [],
     "reviewStatus": "PENDING",
-    "notes": "Original selection psychological 5 plus psychosomatic 5; one overall construct; not core23 or short12; gaps PUBLIC_REDISTRIBUTION_SCOPE_NOT_ESTABLISHED. Do not overwrite BAT23 work English, BAT12 work English, or BAT-S10 English candidates."
+    "notes": "Original selection psychological 5 plus psychosomatic 5; one overall construct; not core23 or short12; gaps PUBLIC_REDISTRIBUTION_SCOPE_NOT_ESTABLISHED. Do not overwrite BAT23 work English, BAT12 work English, or BAT-S10 English candidates. User reviewed existing Simplified Chinese text on 2026-10-30, editorial wording only. Private C/S1.0.0 Pnone R1.0.0 draft under key bat_secondary10_2020_zh_cn is NOT an installed distinct authorized tool; reconcile source locale/alias key to existing canonical bat_secondary10_zh_hans BEFORE release. No original item text in public Git."
   },
   "educationApplicability": {
     "schemaVersion": 1,
@@ -114,12 +117,15 @@
         "Only source metadata, 10 items; no executable C, scoring S, parameter P or personal report R.",
         "Original item selection clue: psychological 5 plus psychosomatic 5; one overall construct; not core23 or short12.",
         "Original work vs general and English vs Simplified Chinese variants are distinct. Unresolved item9 and general short-form crosswalk issues cannot be repaired speculatively.",
-        "The BAT author site permits free use without altering the instrument, but no new adapted editable version or third-party PDF is redistributed here. No verified China K12 norms or thresholds."
+        "The BAT author site permits free use without altering the instrument, but no new adapted editable version or third-party PDF is redistributed here. No verified China K12 norms or thresholds.",
+        "User 2026-10-30 approved Chinese wording; private C/S1.0.0 Pnone R1.0.0 draft SHA256 36d38939ab47b571575707205ddd144ed475517776253d20dbdc7eed8738456c is not real scorer/CI or permission. Preserve this canonical catalog identity instead of registering a duplicate Simplified Chinese BAT-S10."
       ],
       "disclaimer": "目录候选；不诊断、不计分、不公开施测。"
     },
     "blockers": [
-      "PUBLIC_REDISTRIBUTION_SCOPE_NOT_ESTABLISHED"
+      "PUBLIC_REDISTRIBUTION_SCOPE_NOT_ESTABLISHED",
+      "PRIVATE_DRAFT_CANONICAL_IDENTITY_RECONCILIATION_REQUIRED",
+      "USER_EDITORIAL_APPROVAL_NOT_RIGHTS_OR_PSYCHOMETRIC_APPROVAL"
     ]
   }
 }
