@@ -560,11 +560,11 @@
       "schemaVersion": 1,
       "pr": 404,
       "enabled": true,
-      "base": "8cf07bfd35702222e279cbfeee2f64d73a938b55",
-      "product": "78899e7fefc1ea6ca14ca4d144f6a37bb275472e",
-      "controlCheckpoint": "0e2731f62fe2f45ae01e21cfb5679fdf21eb0cfd",
+      "base": "b85e3466819266ffb8cd844b39d87aa566fb90e6",
+      "product": "f831f3db3190e4cc684ea4d8a568690e3b57809e",
+      "controlCheckpoint": "7fd77d417cb91e2e1f7c2a1353e9167e89db0798",
       "components": {
-        "backend": "b81911415277e35b673dc95300720043ac8ac796",
+        "backend": "3aec4bd4f19888eb9f02ea8cbd2f470a03de6365",
         "frontend": "dbbeb1ec1230710d5c9108e1f4be7dd42768efdd"
       },
       "controlBefore": {
@@ -739,7 +739,7 @@
         },
         "docs/evidence/group-report-20261030/qualification/README.md": {
           "before": null,
-          "after": "c32cfcf2369c1dca73c8bd1d3c53138cb10608c3"
+          "after": "92e8d7afb52d08ec6d63f5a3f3854e5aceca8289"
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.exit": {
           "before": null,
@@ -747,7 +747,7 @@
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.json": {
           "before": null,
-          "after": "14422874d03067ece0e0433096bd6e04a234310a"
+          "after": "37c14835dc32ac30d015e1ce45f06a362f48cad9"
         },
         "docs/evidence/group-report-20261030/qualification/backend-types.log": {
           "before": null,
@@ -910,7 +910,7 @@
           "after": "28a9ce5d85c814eb367fe6f7316a09cd15be9684"
         }
       },
-      "activationNote": "Scoped inline-classifier repair after preserved Draft41022894812/Ready41022969851. Same application trees, original evidence and three required jobs; no application checks or restore replay. Actual inline and CLI will be previewed on a clearly marked local synthetic merge before a new CI event."
+      "activationNote": "One bounded mainb85 repair after preserved source/merge drift run41032121655. No unchanged test/native/frontend replay. Native exact-input proof and all three required jobs remain. If main advances again stop qualification restarts for DOT sequencing; Azure ZIP403 unchanged."
     },
     "task1": {
       "schemaVersion": 1,

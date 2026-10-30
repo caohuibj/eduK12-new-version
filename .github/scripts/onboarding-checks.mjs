@@ -11,6 +11,20 @@ import {changedEntries} from './content-scope.mjs';
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 function safePath(path){assert(typeof path==='string'&&!path.startsWith('/')&&!path.includes('\\')&&path.split('/').every(p=>p&&p!=='.'&&p!=='..'));return path;}
+/** Preserve the original native receipt's base. Only identical complete Prisma
+ * inputs on both sides admit it after an unrelated main update. */
+export function verifyGroupReportNativeBaseReuse(value,plan,proof,originalCandidate,treeAt){
+ if(value.base===plan.base){assert(!proof);return {reusedAcrossBase:false};}
+ assert(proof&&proof.schemaVersion===1,'Native base changed without exact-input reuse proof');
+ assert.equal(proof.originalBase,value.base);assert.equal(proof.currentBase,plan.base);
+ assert.equal(proof.originalCandidate,originalCandidate);assert.equal(proof.currentCandidate,plan.product);
+ for(const commit of [value.base,plan.base,originalCandidate,plan.product])assert.match(commit,/^[a-f0-9]{40}$/);
+ const baseTree=treeAt(value.base),candidateTree=treeAt(originalCandidate);
+ assert.equal(treeAt(plan.base),baseTree,'Native baseline Prisma inputs changed');
+ assert.equal(treeAt(plan.product),candidateTree,'Native candidate Prisma inputs changed');
+ assert.equal(proof.basePrismaTree,baseTree);assert.equal(proof.candidatePrismaTree,candidateTree);
+ return {reusedAcrossBase:true,originalBase:value.base,currentBase:plan.base,basePrismaTree:baseTree,candidatePrismaTree:candidateTree,nativeExecutedThisRun:false};
+}
 export function verifyOriginalReport(report,review,{allowDuplicateFiltered=false}={}){
   const cases=report.testResults.flatMap(s=>s.assertionResults.map(c=>({fullName:c.fullName,status:c.status})));
   for(const c of cases)assert(typeof c.fullName==='string'&&c.fullName&&['passed','failed','pending','skipped'].includes(c.status));
@@ -428,9 +442,14 @@ function admit(){
     assert.equal(review.groupReportObservations.length,2);
     for(const record of review.groupReportObservations){
       const value=readOriginal(record);assert.equal(value.passed,true);assert(record.sourceAssociationBasis&&record.limitations?.length);
+      let nativeBaseReuse;
       if(record.kind==='browser'){assert.equal(value.actualReactComponents,true);assert(value.checks.includes('all metrics printed'));assert.equal(value.synthetic,true);}
-      else {assert.equal(record.kind,'native');assert.equal(value.base,p.base);assert.equal(value.encryptedArtifactRead,true);assert.equal(value.immutableTriggerVerified,true);assert.deepEqual(value.addedMigrations,['20261030160000_reporting_task_artifacts']);assert.equal(value.sourceSchema,value.restoreSchema);assert.equal(value.retainedNativeRestoreContinued,true);assert.equal(value.nativeRestorePerformedThisInvocation,false);assert.equal(value.dumpUploaded,false);}
-      observations.push({kind:record.kind,originalSHA256:record.sha256,ciExecuted:false,sourceAssociationBasis:record.sourceAssociationBasis,limitations:record.limitations});
+      else {assert.equal(record.kind,'native');nativeBaseReuse=verifyGroupReportNativeBaseReuse(value,p,review.nativeBaseReuse,
+        review.reports.find(report=>report.id==='native-continuation')?.originalSourceAssociation,commit=>{
+          try{return git('rev-parse',commit+':server-version/backend/prisma');}
+          catch{git('fetch','--no-tags','--depth=1','origin',commit);return git('rev-parse',commit+':server-version/backend/prisma');}
+        });assert.equal(value.encryptedArtifactRead,true);assert.equal(value.immutableTriggerVerified,true);assert.deepEqual(value.addedMigrations,['20261030160000_reporting_task_artifacts']);assert.equal(value.sourceSchema,value.restoreSchema);assert.equal(value.retainedNativeRestoreContinued,true);assert.equal(value.nativeRestorePerformedThisInvocation,false);assert.equal(value.dumpUploaded,false);}
+      observations.push({kind:record.kind,originalSHA256:record.sha256,ciExecuted:false,sourceAssociationBasis:record.sourceAssociationBasis,limitations:record.limitations,...(nativeBaseReuse?{nativeBaseReuse}:{})});
     }
   }else assert(!review.groupReportObservations);
 
