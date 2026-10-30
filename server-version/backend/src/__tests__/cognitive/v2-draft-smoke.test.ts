@@ -70,6 +70,7 @@ const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: un
     case 'cogest': return { phase: 'test', payload: { itemId: 'ce-01', responseIndex: 0, rtMs: 300, interrupted: false } }
     case 'maze': return { phase: 'test', payload: { mazeIndex: 0, moves: [1, 2, 1, 2], completionTimeMs: 5000, completed: true, interrupted: false } }
     case 'auditoryrt': return { phase: 'test', payload: { trialIndex: 0, foreperiodMs: 2100, rtMs: 250, interrupted: false, audioLatencyMs: 12 } }
+    case 'auditorynback': return { phase: 'test', payload: { trialIndex: 0, toneIndex: 2, responded: true, rtMs: 560, interrupted: false, audioLatencyMs: 12 } }
     default: throw new Error(`No cognitive smoke payload for ${testType}`)
   }
 }

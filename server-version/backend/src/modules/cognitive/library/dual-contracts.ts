@@ -377,6 +377,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['前瞻期调度（seed 均匀抖动 + frozen config 上下限）', '纯音参数（frozen config）'],
     serverDerivedFacts: ['有效窗口与预期/漏失判定', 'metrics（medianRtMs/rtCv）', 'quality flags'],
   },
+  auditorynback: {
+    testType: 'auditorynback',
+    clientObservedFacts: ['逐试次是否按键与 raw RT', 'interrupted', 'audioLatencyMs 留痕'],
+    runtimeReconstructableFacts: ['音序列（服务端按 seed 重建；客户端回显仅审计）', 'n 水平/音集/节奏（frozen config）'],
+    serverDerivedFacts: ['命中/误报判定', 'metrics（Hautus d′/hitRate/falseAlarmRate）', 'quality flags（含 stimulusEchoMismatch）'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -662,6 +668,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'auditoryrt',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 rtMs/foreperiodMs/audioLatencyMs'],
     futureCaptureFacts: ['音频输出延迟自动校准事实', '真实 input modality（事件级区分 key/pointer）', 'device provenance'],
+  },
+  auditorynback: {
+    testType: 'auditorynback',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 responded/rtMs/toneIndex 回显'],
+    futureCaptureFacts: ['音频输出延迟自动校准事实', '反应标准（criterion）逐块漂移', '真实 input modality（事件级区分 key/pointer）', 'device provenance'],
   },
 }
 
