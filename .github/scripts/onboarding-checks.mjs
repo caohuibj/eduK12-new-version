@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {execFileSync,spawnSync} from 'node:child_process';
-import {readFileSync,writeFileSync,mkdirSync,readdirSync,statSync,appendFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,readdirSync,statSync,appendFileSync,cpSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {onboardingPlan,binding} from './onboarding-scope.mjs';
 import {verifyPr374Observations} from './pr374-evidence.mjs';
@@ -149,6 +149,8 @@ function plan(){
   assert.equal(process.env.GITHUB_ACTIONS,'true');assert.equal(process.env.CI,'true');
   const head=git('rev-parse','HEAD');assert.equal(head,process.env.GITHUB_SHA);
   const value=JSON.parse(process.env.PLAN);assert.equal(value.head,head);
+  assert.match(value.base,/^[a-f0-9]{40}$/);
+  try{git('cat-file','-e',value.base+'^{commit}');}catch{git('fetch','--no-tags','--depth=1','origin',value.base);}
   assert.deepEqual(onboardingPlan(changedEntries(value.base,head),value.base,head),value);
   assert.equal(value.draft,false);assert.equal(value.postMerge,false);
   return value;
@@ -242,6 +244,53 @@ function qualifyTask1Builds(p){
  const files=[],walk=(path,relative='')=>{for(const name of readdirSync(path)){const absolute=path+'/'+name,key=relative+name;if(statSync(absolute).isDirectory())walk(absolute,key+'/');else{const bytes=readFileSync(absolute);files.push({path:key,bytes:bytes.length,sha256:hash(bytes)});}}};
  walk('onboarding-evidence/frontend-dist');assert(files.some(f=>f.path==='index.html'));frontend.files=files.sort((a,b)=>a.path.localeCompare(b.path));
  writeFileSync('onboarding-evidence/task1-builds.json',JSON.stringify({backend,frontend,productionDeploymentQualified:false},null,2)+'\n');
+}
+
+// The first formal run completed both exact component builds before its
+// independent shallow SAST selector failed. Keep original receipts/bytes.
+const task1BuildOrigin={run:41008927360,job:123910360471,artifact:12956348062,source:'c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf',merge:'e2a4d48986a4d8172520e1b77f89712e5a66d78d',size:29332601,sha256:'a27b508bc0801fc78e5ffabc94bc8c462fb89bb1c9bb77704614636b6237947d',components:{backend:'44013860f1c6ead94f1c4b63491f0f122b01abaa',frontend:'44ac407e011dd17be8636b439b440a4d152b3304'}};
+export function verifyTask1BuildMetadata(run,job,artifact,components,now=Date.now()){
+ const o=task1BuildOrigin;assert.deepEqual(components,o.components);
+ assert.equal(run.id,o.run);assert.equal(run.head_sha,o.source);assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.event,'pull_request');assert.equal(run.run_attempt,1);assert.equal(run.status,'completed');assert.equal(run.conclusion,'failure');assert.equal(run.head_branch,'task1-scale-exact-authorization-20261029');
+ assert.equal(job.id,o.job);assert.equal(job.run_id,o.run);assert.equal(job.run_attempt,1);assert.equal(job.head_sha,o.source);assert.equal(job.name,'reviewed onboarding evidence admission');assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
+ for(const name of ['admit reviewed results and qualify only missing compiler inputs','compile each missing Task1 component once and retain those exact artifacts','Run actions/upload-artifact@v4'])assert(job.steps.some(s=>s.name===name&&s.status==='completed'&&s.conclusion==='success'));
+ assert.equal(artifact.id,o.artifact);assert.equal(artifact.name,'onboarding-admission-'+o.merge);assert.equal(artifact.workflow_run.id,o.run);assert.equal(artifact.workflow_run.head_sha,o.source);assert.equal(artifact.expired,false);assert.equal(artifact.size_in_bytes,o.size);assert.equal(artifact.digest,'sha256:'+o.sha256);
+ const age=now-Date.parse(artifact.created_at);assert(Number.isFinite(age)&&age>=0&&age<86400000);return o;
+}
+export function verifyTask1BuildFiles(receipt,readBytes){
+ const o=task1BuildOrigin;
+ for(const component of ['backend','frontend']){
+  const r=receipt[component];assert.equal(r.component,component);assert.equal(r.componentTree,o.components[component]);assert.equal(r.source,o.source);assert.equal(r.mergePreview,o.merge);assert.equal(r.node,'v24.21.0');assert.equal(r.exitCode,0);assert.equal(r.ciExecuted,true);assert.equal(r.testsExecuted,false);
+  assert.equal(hash(readBytes('task1-'+component+'-'+(component==='backend'?'compile':'build')+'.log')),r.logSHA256);
+ }
+ assert.deepEqual(receipt.backend.argv,['node','node_modules/typescript/bin/tsc']);assert.deepEqual(receipt.frontend.argv,['node','node_modules/vite/bin/vite.js','build','--outDir','../../onboarding-evidence/frontend-dist']);assert.deepEqual(receipt.frontend.flags,{VITE_COGNITIVE_MODULE_ENABLED:'true'});
+ const archive=readBytes('backend-dist.tgz');assert.equal(archive.length,receipt.backend.artifact.bytes);assert.equal(hash(archive),receipt.backend.artifact.sha256);
+ const files=receipt.frontend.files;assert(Array.isArray(files)&&files.length);assert(files.some(f=>f.path==='index.html'));assert.equal(new Set(files.map(f=>f.path)).size,files.length);
+ for(const f of files){safePath(f.path);const bytes=readBytes('frontend-dist/'+f.path);assert.equal(bytes.length,f.bytes);assert.equal(hash(bytes),f.sha256);}
+ return {components:o.components,source:o.source,merge:o.merge,compiledThisRun:false,frontendFiles:files.length,backendSHA256:receipt.backend.artifact.sha256};
+}
+async function reuseTask1Builds(p){
+ assert.equal(p.pr,'task1');assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');const o=task1BuildOrigin;
+ const api=async path=>{const r=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version'+path,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(60000)});assert.equal(r.status,200);return r.json();};
+ const [run,job,artifact]=await Promise.all([api('/actions/runs/'+o.run),api('/actions/jobs/'+o.job),api('/actions/artifacts/'+o.artifact)]);verifyTask1BuildMetadata(run,job,artifact,p.components);
+ git('fetch','--no-tags','--depth=1','origin',o.source);for(const c of ['backend','frontend'])assert.equal(git('rev-parse',o.source+':server-version/'+c),p.components[c]);
+ const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/actions/artifacts/'+o.artifact+'/zip',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN},redirect:'manual',signal:AbortSignal.timeout(60000)});assert.equal(response.status,302);
+ const url=new URL(response.headers.get('location'));assert.equal(url.protocol,'https:');assert(/(^|\.)(blob\.core\.windows\.net|githubusercontent\.com|s3\.amazonaws\.com)$/.test(url.hostname));
+ const download=await fetch(url,{signal:AbortSignal.timeout(60000)});assert.equal(download.status,200);const bytes=Buffer.from(await download.arrayBuffer());assert.equal(bytes.length,o.size);assert.equal(hash(bytes),o.sha256);
+ mkdirSync('onboarding-evidence',{recursive:true});writeFileSync('task1-original-build-artifact.zip',bytes);
+ execFileSync('python3',['-c',`import zipfile,pathlib,stat
+z=zipfile.ZipFile('task1-original-build-artifact.zip'); rows=z.infolist()
+assert len(rows)<5000 and sum(r.file_size for r in rows)<512*1024*1024
+assert len({r.filename for r in rows})==len(rows)
+for r in rows:
+ p=pathlib.PurePosixPath(r.filename); assert not p.is_absolute() and '..' not in p.parts and '\\\\' not in r.filename
+ assert stat.S_IFMT(r.external_attr>>16) in (0,stat.S_IFREG,stat.S_IFDIR)
+z.extractall('task1-original-builds')`]);
+ const receipt=JSON.parse(readFileSync('task1-original-builds/task1-builds.json'));const verified=verifyTask1BuildFiles(receipt,path=>readFileSync('task1-original-builds/'+safePath(path)));
+ // Keep binaries in the one original official artifact. New qualification
+ // retains original receipts plus the authenticated immutable artifact pointer.
+ for(const name of ['task1-backend-artifact.json','task1-backend-compile.json','task1-backend-compile.log','task1-frontend-build.json','task1-frontend-build.log','task1-builds.json'])cpSync('task1-original-builds/'+name,'onboarding-evidence/'+name,{recursive:true});
+ writeFileSync('onboarding-evidence/build-reuse.json',JSON.stringify({origin:o,originalParentConclusion:run.conclusion,originalJobConclusion:job.conclusion,currentSource:p,verified,buildExecutedThisRun:false},null,2)+'\n');appendFileSync(process.env.GITHUB_OUTPUT,'reused=true\n');
 }
 
 // PR393 reuses reviewed tests, but its combined main backend has no exact-tree
@@ -365,6 +414,7 @@ function admit(){
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   if(process.argv[2]==='task1-build')qualifyTask1Builds(plan());
+  else if(process.argv[2]==='task1-build-reuse')await reuseTask1Builds(plan());
   else if(process.argv[2]==='task1-sast-config'){
     const p=plan(),config=task1SastConfig(p);appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify(config)+'\n');
   }

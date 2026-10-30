@@ -110,3 +110,11 @@ PRECISE 项均不可选。尚无本轮真实故障，留作后续按工具/分�
 ## 最终 main 目录增量对齐
 
 Draft PR #401 创建后只读发现 main 前移至 `5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb`（PR398）。正常合并产品 checkpoint `d38e1e74897cb56120b69fed0d9f170e5de3b3d8`；增量仅3个非可执行 COPSOQ 目录 source/index 与文档，未改接口、计分器、报告消费者、schema、锁或控制。后端tree因正常目录新增而变化，前端tree相同。上述双R原执行保持原main407输入/身份，不改标成新执行。目录项没有 executable，不参与本次CFQ/3材料注册；不重跑seed、FINAL、类型或旧链。候选完整source/component/control改绑后，仅补一次实际Git元数据检查，仍disabled。此前1000dc95审阅包保持其不可变身份，其应用原件/控制逻辑不变；最终base/head另给出。
+
+## 首轮正式CI与最小续验
+
+已由DOT独立接受54da候选，marker-only c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf激活，PR401 Ready。正式run41008927360/attempt1，merge e2a4d48986a4d8172520e1b77f89712e5a66d78d；scope成功，onboarding job123910360471成功，67个实际历史case/类型/6R原件接纳与当前backend tsc/frontend Vite各一次完成。CodeQL job123910359451在输入选择时因浅克隆缺base、changedEntries先于immutable fetch失败，SAST尚未执行；后续缺SARIF上传不是第二个业务故障。首次正式失败完整保留。
+
+修复仅控制：重算diff前补取缺失的精确base，不用moving main；真实depth1隔离Git运行实际task1-sast-config成功选226路径。原官方产物12956348062（29332601 bytes，sha256 a27b508bc0801fc78e5ffabc94bc8c462fb89bb1c9bb77704614636b6237947d）已回读；正常成功job、原source/merge、两个组件tree、原Node/argv/flags/log、backend tgz及frontend清单逐项验证，负例拒绝错误source/job/过期/digest和变动产物。新job只依既有family下载/接纳原件；不再安装依赖/构建，binary继续指向原官方artifact。新证据记current consumer、original source，不重标为新build。actionlint当前workflow exit0。没有应用源码、锁、schema或组件tree改动，不重跑任何应用/计分/PG/native链。
+
+下一轮仅当前source重算、原成功build接纳、缺失CodeQL及原稳定gate。激活前依仓库要求先向同一Notion清单追加原失败/修复/下一轮范围，保持累计一次正式失败，不换SHA清零。

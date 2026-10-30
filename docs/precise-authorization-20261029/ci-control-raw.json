@@ -259,5 +259,749 @@
       "sourceAssociationBasis": "Unsigned local control execution, original command/time/exit and log retained. No application test/build/DB execution; later metadata-only binding check is separate.",
       "name": "NODE_SYNTAX"
     }
-  ]
+  ],
+  "formalFirstRun": {
+    "run": {
+      "id": 41008927360,
+      "name": "CI",
+      "node_id": "WFR_kwLOT8OOO88AAAAJjFKSgA",
+      "head_branch": "task1-scale-exact-authorization-20261029",
+      "head_sha": "c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf",
+      "path": ".github/workflows/ci.yml",
+      "display_title": "Bind exact scale report combinations and cognitive profiles across four entries",
+      "run_number": 3098,
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "workflow_id": 337766120,
+      "check_suite_id": 111163715632,
+      "check_suite_node_id": "CS_kwDOT8OOO88AAAAZ4d-wMA",
+      "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs/41008927360",
+      "html_url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/41008927360",
+      "pull_requests": [
+        {
+          "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/pulls/401",
+          "id": 5079900520,
+          "number": 401,
+          "head": {
+            "ref": "task1-scale-exact-authorization-20261029",
+            "sha": "c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf",
+            "repo": {
+              "id": 1338215995,
+              "url": "https://api.github.com/repos/caohuibj/eduK12-new-version",
+              "name": "eduK12-new-version"
+            }
+          },
+          "base": {
+            "ref": "main",
+            "sha": "5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb",
+            "repo": {
+              "id": 1338215995,
+              "url": "https://api.github.com/repos/caohuibj/eduK12-new-version",
+              "name": "eduK12-new-version"
+            }
+          }
+        }
+      ],
+      "created_at": "2026-10-30T05:31:43Z",
+      "updated_at": "2026-10-30T05:34:38Z",
+      "actor": {
+        "login": "caohuibj",
+        "id": 112140007,
+        "node_id": "U_kgDOBq8e5w",
+        "avatar_url": "https://avatars.githubusercontent.com/u/112140007?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/caohuibj",
+        "html_url": "https://github.com/caohuibj",
+        "followers_url": "https://api.github.com/users/caohuibj/followers",
+        "following_url": "https://api.github.com/users/caohuibj/following{/other_user}",
+        "gists_url": "https://api.github.com/users/caohuibj/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/caohuibj/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/caohuibj/subscriptions",
+        "organizations_url": "https://api.github.com/users/caohuibj/orgs",
+        "repos_url": "https://api.github.com/users/caohuibj/repos",
+        "events_url": "https://api.github.com/users/caohuibj/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/caohuibj/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "run_attempt": 1,
+      "referenced_workflows": [
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-survey-assessment.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-shared-asset-storage.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-backend-security-efficiency.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ops-prelaunch.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-release-tools.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-training-workspace.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-training-workspace-integrated.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-access-efficiency.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-participant-capacity.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-ui.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-media.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-assessment-capacity.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-training-assessment.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-scale-library-governance.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-homepage-copy.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-maintenance.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-teacher-home.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-survey-experience.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-survey-candidate.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/perf-phase0-smoke.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-frontend.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-survey-mac-ui.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-backend.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/scale-onboarding-boundary.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-training-appearance.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-frontend-build.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-images.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-reviewed-candidate.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-school-teacher-visual.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-training-manual-ui.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-training-mac-qualification.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-survey-workspace.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-training-entry.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-training-student.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-training-followup.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-survey-cloud.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-exact-candidate.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-backend-browser-build.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-participant-access.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-backend-regression.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-browser.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-survey-home.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-scoped-release.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-survey-manual-ui.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-shared-authoring.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-admin-authenticator.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-composite-csv-memory.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-campus.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-teacher-survey.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        },
+        {
+          "path": "caohuibj/eduK12-new-version/.github/workflows/ci-school-teacher.yml@e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "sha": "e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+          "ref": "refs/pull/401/merge"
+        }
+      ],
+      "run_started_at": "2026-10-30T05:31:43Z",
+      "triggering_actor": {
+        "login": "caohuibj",
+        "id": 112140007,
+        "node_id": "U_kgDOBq8e5w",
+        "avatar_url": "https://avatars.githubusercontent.com/u/112140007?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/caohuibj",
+        "html_url": "https://github.com/caohuibj",
+        "followers_url": "https://api.github.com/users/caohuibj/followers",
+        "following_url": "https://api.github.com/users/caohuibj/following{/other_user}",
+        "gists_url": "https://api.github.com/users/caohuibj/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/caohuibj/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/caohuibj/subscriptions",
+        "organizations_url": "https://api.github.com/users/caohuibj/orgs",
+        "repos_url": "https://api.github.com/users/caohuibj/repos",
+        "events_url": "https://api.github.com/users/caohuibj/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/caohuibj/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "jobs_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs/41008927360/jobs",
+      "logs_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs/41008927360/logs",
+      "check_suite_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/check-suites/111163715632",
+      "artifacts_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs/41008927360/artifacts",
+      "cancel_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs/41008927360/cancel",
+      "rerun_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs/41008927360/rerun",
+      "previous_attempt_url": null,
+      "workflow_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/workflows/337766120",
+      "head_commit": {
+        "id": "c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf",
+        "tree_id": "30849e6c4820d3c06a150a6d0693f8e870abc88d",
+        "message": "Activate reviewed exact Task1 qualification for PR401",
+        "timestamp": "2026-10-30T05:31:35Z",
+        "author": {
+          "name": "Qiang Zeng",
+          "email": "qzengwill@gmail.com"
+        },
+        "committer": {
+          "name": "Qiang Zeng",
+          "email": "qzengwill@gmail.com"
+        }
+      },
+      "repository": {
+        "id": 1338215995,
+        "node_id": "R_kgDOT8OOOw",
+        "name": "eduK12-new-version",
+        "full_name": "caohuibj/eduK12-new-version",
+        "private": false,
+        "owner": {
+          "login": "caohuibj",
+          "id": 112140007,
+          "node_id": "U_kgDOBq8e5w",
+          "avatar_url": "https://avatars.githubusercontent.com/u/112140007?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/caohuibj",
+          "html_url": "https://github.com/caohuibj",
+          "followers_url": "https://api.github.com/users/caohuibj/followers",
+          "following_url": "https://api.github.com/users/caohuibj/following{/other_user}",
+          "gists_url": "https://api.github.com/users/caohuibj/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/caohuibj/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/caohuibj/subscriptions",
+          "organizations_url": "https://api.github.com/users/caohuibj/orgs",
+          "repos_url": "https://api.github.com/users/caohuibj/repos",
+          "events_url": "https://api.github.com/users/caohuibj/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/caohuibj/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/caohuibj/eduK12-new-version",
+        "description": null,
+        "fork": false,
+        "url": "https://api.github.com/repos/caohuibj/eduK12-new-version",
+        "forks_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/forks",
+        "keys_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/teams",
+        "hooks_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/hooks",
+        "issue_events_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/events",
+        "assignees_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/tags",
+        "blobs_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/languages",
+        "stargazers_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/stargazers",
+        "contributors_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/contributors",
+        "subscribers_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/subscribers",
+        "subscription_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/subscription",
+        "commits_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/merges",
+        "archive_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/downloads",
+        "issues_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/labels{/name}",
+        "releases_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/deployments"
+      },
+      "head_repository": {
+        "id": 1338215995,
+        "node_id": "R_kgDOT8OOOw",
+        "name": "eduK12-new-version",
+        "full_name": "caohuibj/eduK12-new-version",
+        "private": false,
+        "owner": {
+          "login": "caohuibj",
+          "id": 112140007,
+          "node_id": "U_kgDOBq8e5w",
+          "avatar_url": "https://avatars.githubusercontent.com/u/112140007?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/caohuibj",
+          "html_url": "https://github.com/caohuibj",
+          "followers_url": "https://api.github.com/users/caohuibj/followers",
+          "following_url": "https://api.github.com/users/caohuibj/following{/other_user}",
+          "gists_url": "https://api.github.com/users/caohuibj/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/caohuibj/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/caohuibj/subscriptions",
+          "organizations_url": "https://api.github.com/users/caohuibj/orgs",
+          "repos_url": "https://api.github.com/users/caohuibj/repos",
+          "events_url": "https://api.github.com/users/caohuibj/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/caohuibj/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/caohuibj/eduK12-new-version",
+        "description": null,
+        "fork": false,
+        "url": "https://api.github.com/repos/caohuibj/eduK12-new-version",
+        "forks_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/forks",
+        "keys_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/teams",
+        "hooks_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/hooks",
+        "issue_events_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/events",
+        "assignees_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/tags",
+        "blobs_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/languages",
+        "stargazers_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/stargazers",
+        "contributors_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/contributors",
+        "subscribers_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/subscribers",
+        "subscription_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/subscription",
+        "commits_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/merges",
+        "archive_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/downloads",
+        "issues_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/labels{/name}",
+        "releases_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/deployments"
+      }
+    },
+    "successfulBuildJob": {
+      "id": 123910360471,
+      "run_id": 41008927360,
+      "workflow_name": "CI",
+      "head_branch": "task1-scale-exact-authorization-20261029",
+      "run_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs/41008927360",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOT8OOO88AAAAc2aINlw",
+      "head_sha": "c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf",
+      "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/jobs/123910360471",
+      "html_url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/41008927360/job/123910360471",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-30T05:32:29Z",
+      "started_at": "2026-10-30T05:32:32Z",
+      "completed_at": "2026-10-30T05:34:15Z",
+      "name": "reviewed onboarding evidence admission",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-30T05:32:33Z",
+          "completed_at": "2026-10-30T05:32:34Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-30T05:32:34Z",
+          "completed_at": "2026-10-30T05:32:41Z"
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-30T05:32:41Z",
+          "completed_at": "2026-10-30T05:32:46Z"
+        },
+        {
+          "name": "prepare only missing PR393 backend compiler dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 4,
+          "started_at": "2026-10-30T05:32:46Z",
+          "completed_at": "2026-10-30T05:32:46Z"
+        },
+        {
+          "name": "install only Task1 missing compilation dependencies once",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-30T05:32:46Z",
+          "completed_at": "2026-10-30T05:33:04Z"
+        },
+        {
+          "name": "admit reviewed results and qualify only missing compiler inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-30T05:33:04Z",
+          "completed_at": "2026-10-30T05:33:06Z"
+        },
+        {
+          "name": "compile each missing Task1 component once and retain those exact artifacts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-30T05:33:06Z",
+          "completed_at": "2026-10-30T05:34:10Z"
+        },
+        {
+          "name": "install only missing reviewed browser consumer dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-10-30T05:34:10Z",
+          "completed_at": "2026-10-30T05:34:10Z"
+        },
+        {
+          "name": "qualify missing shared education editor browser interactions",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-10-30T05:34:10Z",
+          "completed_at": "2026-10-30T05:34:10Z"
+        },
+        {
+          "name": "qualify missing recorded-response UI consumers with active browser sandbox",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10,
+          "started_at": "2026-10-30T05:34:10Z",
+          "completed_at": "2026-10-30T05:34:10Z"
+        },
+        {
+          "name": "qualify observer displays and warning contrast with active browser sandbox",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-10-30T05:34:10Z",
+          "completed_at": "2026-10-30T05:34:10Z"
+        },
+        {
+          "name": "build once and verify bounded four-entry compiled loading consumers",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 12,
+          "started_at": "2026-10-30T05:34:10Z",
+          "completed_at": "2026-10-30T05:34:10Z"
+        },
+        {
+          "name": "verify active sandbox then build once for the single PR381 compiled editor",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 13,
+          "started_at": "2026-10-30T05:34:10Z",
+          "completed_at": "2026-10-30T05:34:10Z"
+        },
+        {
+          "name": "reuse official build and finish missing postlogin consumers",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14,
+          "started_at": "2026-10-30T05:34:10Z",
+          "completed_at": "2026-10-30T05:34:10Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-30T05:34:10Z",
+          "completed_at": "2026-10-30T05:34:13Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-10-30T05:34:13Z",
+          "completed_at": "2026-10-30T05:34:13Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-10-30T05:34:13Z",
+          "completed_at": "2026-10-30T05:34:13Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-10-30T05:34:13Z",
+          "completed_at": "2026-10-30T05:34:13Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/check-runs/123910360471",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000011670,
+      "runner_name": "GitHub Actions 1000011670",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    "artifact": {
+      "id": 12956348062,
+      "node_id": "MDg6QXJ0aWZhY3QxMjk1NjM0ODA2Mg==",
+      "name": "onboarding-admission-e2a4d48986a4d8172520e1b77f89712e5a66d78d",
+      "size_in_bytes": 29332601,
+      "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/artifacts/12956348062",
+      "archive_download_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/artifacts/12956348062/zip",
+      "expired": false,
+      "digest": "sha256:a27b508bc0801fc78e5ffabc94bc8c462fb89bb1c9bb77704614636b6237947d",
+      "created_at": "2026-10-30T05:34:12Z",
+      "updated_at": "2026-10-30T05:34:12Z",
+      "expires_at": "2026-11-13T05:34:10Z",
+      "workflow_run": {
+        "id": 41008927360,
+        "repository_id": 1338215995,
+        "head_repository_id": 1338215995,
+        "head_branch": "task1-scale-exact-authorization-20261029",
+        "head_sha": "c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf"
+      }
+    },
+    "codeqlFirstErrorLog": "﻿2026-10-30T05:32:33.1779970Z Current runner version: '2.338.0'\n2026-10-30T05:32:33.1803623Z ##[group]Runner Image Provisioner\n2026-10-30T05:32:33.1804450Z Hosted Compute Agent\n2026-10-30T05:32:33.1805445Z Version: 20261021.618\n2026-10-30T05:32:33.1806098Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e\n2026-10-30T05:32:33.1806903Z Build Date: 2026-10-21T00:45:21Z\n2026-10-30T05:32:33.1807620Z Worker ID: {ee623077-7880-4b65-833e-b963694dbc05}\n2026-10-30T05:32:33.1808347Z Region: northcentralus\n2026-10-30T05:32:33.1809031Z Cloud: Azure\n2026-10-30T05:32:33.1809579Z ##[endgroup]\n2026-10-30T05:32:33.1811482Z ##[group]Operating System\n2026-10-30T05:32:33.1812168Z Ubuntu\n2026-10-30T05:32:33.1812705Z 24.04.5\n2026-10-30T05:32:33.1813273Z LTS\n2026-10-30T05:32:33.1813794Z ##[endgroup]\n2026-10-30T05:32:33.1814376Z ##[group]Runner Image\n2026-10-30T05:32:33.1815291Z Image: ubuntu-24.04\n2026-10-30T05:32:33.1815884Z Version: 20261025.353.1\n2026-10-30T05:32:33.1817263Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md\n2026-10-30T05:32:33.1818926Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353\n2026-10-30T05:32:33.1819994Z ##[endgroup]\n2026-10-30T05:32:33.1821315Z ##[group]GITHUB_TOKEN Permissions\n2026-10-30T05:32:33.1823302Z Actions: read\n2026-10-30T05:32:33.1823958Z Contents: read\n2026-10-30T05:32:33.1824612Z Metadata: read\n2026-10-30T05:32:33.1825413Z SecurityEvents: write\n2026-10-30T05:32:33.1826003Z ##[endgroup]\n2026-10-30T05:32:33.1828095Z Secret source: Actions\n2026-10-30T05:32:33.1829088Z Cache mode: write\n2026-10-30T05:32:33.1829878Z Prepare workflow directory\n2026-10-30T05:32:33.2381331Z Prepare all required actions\n2026-10-30T05:32:33.2451827Z Getting action download info\n2026-10-30T05:32:33.5018460Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)\n2026-10-30T05:32:33.6170682Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)\n2026-10-30T05:32:33.6999971Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)\n2026-10-30T05:32:33.8051720Z Download action repository 'github/codeql-action@v3' (SHA:4bfa242aa49c5f7c6770b98670d354a7dfac05f8)\n2026-10-30T05:32:34.3819428Z Complete job name: codeql (javascript/typescript SAST)\n2026-10-30T05:32:34.4958616Z ##[group]Run actions/checkout@v4\n2026-10-30T05:32:34.4959483Z with:\n2026-10-30T05:32:34.4959900Z   fetch-depth: 1\n2026-10-30T05:32:34.4960376Z   repository: caohuibj/eduK12-new-version\n2026-10-30T05:32:34.4964452Z   token: ***\n2026-10-30T05:32:34.4965083Z   ssh-strict: true\n2026-10-30T05:32:34.4965505Z   ssh-user: git\n2026-10-30T05:32:34.4965936Z   persist-credentials: true\n2026-10-30T05:32:34.4966404Z   clean: true\n2026-10-30T05:32:34.4966844Z   sparse-checkout-cone-mode: true\n2026-10-30T05:32:34.4967359Z   fetch-tags: false\n2026-10-30T05:32:34.4967792Z   show-progress: true\n2026-10-30T05:32:34.4968220Z   lfs: false\n2026-10-30T05:32:34.4968619Z   submodules: false\n2026-10-30T05:32:34.4969076Z   set-safe-directory: true\n2026-10-30T05:32:34.4969571Z   allow-unsafe-pr-checkout: false\n2026-10-30T05:32:34.4970325Z env:\n2026-10-30T05:32:34.4970810Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org\n2026-10-30T05:32:34.4971459Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always\n2026-10-30T05:32:34.4972041Z ##[endgroup]\n2026-10-30T05:32:34.7617312Z Syncing repository: caohuibj/eduK12-new-version\n2026-10-30T05:32:34.7620887Z ##[group]Getting Git version info\n2026-10-30T05:32:34.7622893Z Working directory is '/home/runner/work/eduK12-new-version/eduK12-new-version'\n2026-10-30T05:32:34.7625396Z [command]/usr/bin/git version\n2026-10-30T05:32:34.7696815Z git version 2.56.0\n2026-10-30T05:32:34.7725562Z ##[endgroup]\n2026-10-30T05:32:34.7746884Z Temporarily overriding HOME='/home/runner/work/_temp/be1b19e8-f0f3-4235-8948-04795a2a6256' before making global git config changes\n2026-10-30T05:32:34.7752816Z Adding repository directory to the temporary git global config as a safe directory\n2026-10-30T05:32:34.7758323Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version\n2026-10-30T05:32:34.7824186Z Deleting the contents of '/home/runner/work/eduK12-new-version/eduK12-new-version'\n2026-10-30T05:32:34.7828105Z ##[group]Initializing the repository\n2026-10-30T05:32:34.7830036Z [command]/usr/bin/git init /home/runner/work/eduK12-new-version/eduK12-new-version\n2026-10-30T05:32:34.7930916Z hint: Using 'master' as the name for the initial branch. This default branch name\n2026-10-30T05:32:34.7933807Z hint: will change to \"main\" in Git 3.0. To configure the initial branch name\n2026-10-30T05:32:34.7936660Z hint: to use in all of your new repositories, which will suppress this warning,\n2026-10-30T05:32:34.7938841Z hint: call:\n2026-10-30T05:32:34.7939715Z hint:\n2026-10-30T05:32:34.7941230Z hint: \tgit config --global init.defaultBranch <name>\n2026-10-30T05:32:34.7943463Z hint:\n2026-10-30T05:32:34.7945725Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and\n2026-10-30T05:32:34.7948230Z hint: 'development'. The just-created branch can be renamed via this command:\n2026-10-30T05:32:34.7950164Z hint:\n2026-10-30T05:32:34.7951015Z hint: \tgit branch -m <name>\n2026-10-30T05:32:34.7952018Z hint:\n2026-10-30T05:32:34.7953455Z hint: Disable this message with \"git config set advice.defaultBranchName false\"\n2026-10-30T05:32:34.7956908Z Initialized empty Git repository in /home/runner/work/eduK12-new-version/eduK12-new-version/.git/\n2026-10-30T05:32:34.7961032Z [command]/usr/bin/git remote add origin https://github.com/caohuibj/eduK12-new-version\n2026-10-30T05:32:34.8009245Z ##[endgroup]\n2026-10-30T05:32:34.8011747Z ##[group]Disabling automatic garbage collection\n2026-10-30T05:32:34.8013776Z [command]/usr/bin/git config --local gc.auto 0\n2026-10-30T05:32:34.8052463Z ##[endgroup]\n2026-10-30T05:32:34.8055463Z ##[group]Setting up auth\n2026-10-30T05:32:34.8063784Z [command]/usr/bin/git config --local --name-only --get-regexp core\\.sshCommand\n2026-10-30T05:32:34.8109255Z [command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'core\\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\"\n2026-10-30T05:32:34.8504123Z [command]/usr/bin/git config --local --name-only --get-regexp http\\.https\\:\\/\\/github\\.com\\/\\.extraheader\n2026-10-30T05:32:34.8560705Z [command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'http\\.https\\:\\/\\/github\\.com\\/\\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\"\n2026-10-30T05:32:34.8811167Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\\.gitdir:\n2026-10-30T05:32:34.8857227Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url\n2026-10-30T05:32:34.9094439Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***\n2026-10-30T05:32:34.9144173Z ##[endgroup]\n2026-10-30T05:32:34.9146148Z ##[group]Fetching the repository\n2026-10-30T05:32:34.9158089Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +e2a4d48986a4d8172520e1b77f89712e5a66d78d:refs/remotes/pull/401/merge\n2026-10-30T05:32:38.4094283Z From https://github.com/caohuibj/eduK12-new-version\n2026-10-30T05:32:38.4096625Z  * [new ref]         e2a4d48986a4d8172520e1b77f89712e5a66d78d -> pull/401/merge\n2026-10-30T05:32:38.4100085Z ##[endgroup]\n2026-10-30T05:32:38.4100575Z ##[group]Determining the checkout info\n2026-10-30T05:32:38.4103206Z ##[endgroup]\n2026-10-30T05:32:38.4109387Z [command]/usr/bin/git sparse-checkout disable\n2026-10-30T05:32:38.4180121Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig\n2026-10-30T05:32:38.4219375Z ##[group]Checking out the ref\n2026-10-30T05:32:38.4223781Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/401/merge\n2026-10-30T05:32:39.3472912Z Note: switching to 'refs/remotes/pull/401/merge'.\n2026-10-30T05:32:39.3474055Z \n2026-10-30T05:32:39.3474440Z You are in 'detached HEAD' state. You can look around, make experimental\n2026-10-30T05:32:39.3475661Z changes and commit them, and you can discard any commits you make in this\n2026-10-30T05:32:39.3476539Z state without impacting any branches by switching back to a branch.\n2026-10-30T05:32:39.3477088Z \n2026-10-30T05:32:39.3477461Z If you want to create a new branch to retain commits you create, you may\n2026-10-30T05:32:39.3478230Z do so (now or later) by using -c with the switch command. Example:\n2026-10-30T05:32:39.3478684Z \n2026-10-30T05:32:39.3478858Z   git switch -c <new-branch-name>\n2026-10-30T05:32:39.3479159Z \n2026-10-30T05:32:39.3479337Z Or undo this operation with:\n2026-10-30T05:32:39.3479613Z \n2026-10-30T05:32:39.3479755Z   git switch -\n2026-10-30T05:32:39.3480039Z \n2026-10-30T05:32:39.3480525Z Turn off this advice by setting config variable advice.detachedHead to false\n2026-10-30T05:32:39.3481073Z \n2026-10-30T05:32:39.3481720Z HEAD is now at e2a4d48 Merge c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf into 5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb\n2026-10-30T05:32:39.3518010Z ##[endgroup]\n2026-10-30T05:32:39.3572519Z [command]/usr/bin/git log -1 --format=%H\n2026-10-30T05:32:39.3607182Z e2a4d48986a4d8172520e1b77f89712e5a66d78d\n2026-10-30T05:32:39.3868447Z ##[group]Run actions/setup-node@v4\n2026-10-30T05:32:39.3868753Z with:\n2026-10-30T05:32:39.3868969Z   node-version: 24.21.0\n2026-10-30T05:32:39.3869191Z   always-auth: false\n2026-10-30T05:32:39.3869404Z   check-latest: false\n2026-10-30T05:32:39.3871940Z   token: ***\n2026-10-30T05:32:39.3872138Z env:\n2026-10-30T05:32:39.3872403Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org\n2026-10-30T05:32:39.3872739Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always\n2026-10-30T05:32:39.3873010Z ##[endgroup]\n2026-10-30T05:32:39.5280874Z Attempting to download 24.21.0...\n2026-10-30T05:32:39.5441604Z (node:2333) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n2026-10-30T05:32:39.5442808Z (Use `node --trace-deprecation ...` to show where the warning was created)\n2026-10-30T05:32:40.1836755Z Acquiring 24.21.0 - x64 from https://github.com/actions/node-versions/releases/download/24.21.0-34304089047/node-24.21.0-linux-x64.tar.gz\n2026-10-30T05:32:40.5313075Z Extracting ...\n2026-10-30T05:32:40.5454140Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/1a44db79-d4fd-4850-80f8-8dd92425e62b -f /home/runner/work/_temp/35729dc4-94b6-4ad5-a06f-2c6a68817d4c\n2026-10-30T05:32:41.7882235Z Adding to the cache ...\n2026-10-30T05:32:43.5323999Z ##[group]Environment details\n2026-10-30T05:32:43.8012303Z node: v24.21.0\n2026-10-30T05:32:43.8013061Z npm: 11.19.0\n2026-10-30T05:32:43.8022486Z yarn: 1.22.22\n2026-10-30T05:32:43.8023438Z ##[endgroup]\n2026-10-30T05:32:43.8244169Z ##[group]Run node \"$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs\"\n2026-10-30T05:32:43.8245561Z \u001b[36;1mnode \"$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs\"\u001b[0m\n2026-10-30T05:32:43.8270563Z shell: /usr/bin/bash -e {0}\n2026-10-30T05:32:43.8270830Z env:\n2026-10-30T05:32:43.8271090Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org\n2026-10-30T05:32:43.8271455Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always\n2026-10-30T05:32:43.8271726Z ##[endgroup]\n2026-10-30T05:32:43.8651025Z {\"environment\":\"github-hosted\",\"os\":\"linux\",\"freeBytes\":91079196672,\"memoryBytes\":16760344576,\"light\":false,\"frontend\":false,\"control\":false,\"runner\":\"GitHub Actions 1000011669\",\"cpus\":\"X64\"}\n2026-10-30T05:32:43.8971983Z ##[group]Run node .github/scripts/onboarding-checks.mjs task1-sast-config\n2026-10-30T05:32:43.8972573Z \u001b[36;1mnode .github/scripts/onboarding-checks.mjs task1-sast-config\u001b[0m\n2026-10-30T05:32:43.8992579Z shell: /usr/bin/bash -e {0}\n2026-10-30T05:32:43.8992826Z env:\n2026-10-30T05:32:43.8993075Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org\n2026-10-30T05:32:43.8993416Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always\n2026-10-30T05:32:43.8993677Z   CI: true\n2026-10-30T05:32:43.8995907Z   PLAN: {\"schema\":1,\"route\":\"onboarding-structure\",\"base\":\"5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb\",\"head\":\"e2a4d48986a4d8172520e1b77f89712e5a66d78d\",\"sourceHead\":\"c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf\",\"tree\":\"30849e6c4820d3c06a150a6d0693f8e870abc88d\",\"product\":\"d38e1e74897cb56120b69fed0d9f170e5de3b3d8\",\"components\":{\"backend\":\"44013860f1c6ead94f1c4b63491f0f122b01abaa\",\"frontend\":\"44ac407e011dd17be8636b439b440a4d152b3304\"},\"controlCheckpoint\":\"5317bac6d6ce1947659d6844089c8176f74a8521\",\"pr\":\"task1\",\"postMerge\":false,\"draft\":false}\n2026-10-30T05:32:43.8997863Z   CI_EVENT: pull_request\n2026-10-30T05:32:43.8998146Z   CI_HEAD_REF: task1-scale-exact-authorization-20261029\n2026-10-30T05:32:43.8998518Z   CI_SOURCE_HEAD: c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf\n2026-10-30T05:32:43.8998830Z   CI_IS_DRAFT: false\n2026-10-30T05:32:43.8999070Z   CI_PR_REPOSITORY: caohuibj/eduK12-new-version\n2026-10-30T05:32:43.8999360Z   CI_PR_NUMBER: 401\n2026-10-30T05:32:43.8999565Z ##[endgroup]\n2026-10-30T05:32:43.9919245Z fatal: bad object 5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb\n2026-10-30T05:32:43.9927801Z node:internal/errors:986\n2026-10-30T05:32:43.9928523Z   const err = new Error(message);\n2026-10-30T05:32:43.9929579Z               ^\n2026-10-30T05:32:43.9929836Z \n2026-10-30T05:32:43.9931143Z Error: Command failed: git diff --no-ext-diff --no-textconv --no-renames --raw --abbrev=40 -z 5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb e2a4d48986a4d8172520e1b77f89712e5a66d78d --\n2026-10-30T05:32:43.9932138Z fatal: bad object 5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb\n2026-10-30T05:32:43.9932389Z \n2026-10-30T05:32:43.9932578Z     at genericNodeError (node:internal/errors:986:15)\n2026-10-30T05:32:43.9932980Z     at wrappedFn (node:internal/errors:540:14)\n2026-10-30T05:32:43.9933375Z     at checkExecSyncError (node:child_process:942:11)\n2026-10-30T05:32:43.9933765Z     at execFileSync (node:child_process:978:15)\n2026-10-30T05:32:43.9934454Z     at changedEntries (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/content-scope.mjs:309:30)\n2026-10-30T05:32:43.9935752Z     at plan (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/onboarding-checks.mjs:152:35)\n2026-10-30T05:32:43.9936622Z     at file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/onboarding-checks.mjs:369:13 {\n2026-10-30T05:32:43.9937151Z   status: 128,\n2026-10-30T05:32:43.9937367Z   signal: null,\n2026-10-30T05:32:43.9937568Z   output: [\n2026-10-30T05:32:43.9937759Z     null,\n2026-10-30T05:32:43.9937956Z     '',\n2026-10-30T05:32:43.9938283Z     'fatal: bad object 5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb\\n'\n2026-10-30T05:32:43.9938642Z   ],\n2026-10-30T05:32:43.9938836Z   pid: 2385,\n2026-10-30T05:32:43.9939036Z   stdout: '',\n2026-10-30T05:32:43.9939386Z   stderr: 'fatal: bad object 5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb\\n'\n2026-10-30T05:32:43.9939748Z }\n2026-10-30T05:32:43.9939852Z \n2026-10-30T05:32:43.9939938Z Node.js v24.21.0\n2026-10-30T05:32:43.9983181Z ##[error]Process completed with exit code 1.\n2026-10-30T05:32:44.0165341Z ##[group]Run actions/upload-artifact@v4\n2026-10-30T05:32:44.0165653Z with:\n2026-10-30T05:32:44.0165937Z   name: onboarding-sast-e2a4d48986a4d8172520e1b77f89712e5a66d78d\n2026-10-30T05:32:44.0166295Z   if-no-files-found: error\n2026-10-30T05:32:44.0166526Z   retention-days: 14\n2026-10-30T05:32:44.0166737Z   compression-level: 6\n2026-10-30T05:32:44.0166955Z   overwrite: false\n2026-10-30T05:32:44.0167164Z   include-hidden-files: false\n2026-10-30T05:32:44.0167396Z env:\n2026-10-30T05:32:44.0167623Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org\n2026-10-30T05:32:44.0167951Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always\n2026-10-30T05:32:44.0168213Z ##[endgroup]\n2026-10-30T05:32:44.1853535Z (node:2386) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n2026-10-30T05:32:44.1855711Z (Use `node --trace-deprecation ...` to show where the warning was created)\n2026-10-30T05:32:44.1875249Z ##[error]Input required and not supplied: path\n2026-10-30T05:32:44.2261362Z Post job cleanup.\n2026-10-30T05:32:44.3280343Z [command]/usr/bin/git version\n2026-10-30T05:32:44.3325312Z git version 2.56.0\n2026-10-30T05:32:44.3421781Z Temporarily overriding HOME='/home/runner/work/_temp/4f45a7ac-4eeb-443a-92a5-f100a37fb2c8' before making global git config changes\n2026-10-30T05:32:44.3423426Z Adding repository directory to the temporary git global config as a safe directory\n2026-10-30T05:32:44.3436013Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version\n2026-10-30T05:32:44.3457020Z [command]/usr/bin/git config --local --name-only --get-regexp core\\.sshCommand\n2026-10-30T05:32:44.3497754Z [command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'core\\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\"\n2026-10-30T05:32:44.3812077Z [command]/usr/bin/git config --local --name-only --get-regexp http\\.https\\:\\/\\/github\\.com\\/\\.extraheader\n2026-10-30T05:32:44.3823475Z http.https://github.com/.extraheader\n2026-10-30T05:32:44.3836743Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader\n2026-10-30T05:32:44.3883669Z [command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'http\\.https\\:\\/\\/github\\.com\\/\\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\"\n2026-10-30T05:32:44.4247388Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\\.gitdir:\n2026-10-30T05:32:44.4304636Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url\n2026-10-30T05:32:44.4788522Z Cleaning up orphan processes\n2026-10-30T05:32:44.5207465Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/\n\n",
+    "firstError": "Shallow checkout lacks immutable base before changedEntries; SAST never initialized. Missing SAST upload path is downstream of that selector failure.",
+    "originalScope": "Official completed admission and both exact component builds are successful despite parent failure. No application producer rerun permitted without new affected inputs."
+  },
+  "targetedRecoveryChecks": [
+    {
+      "id": "task1-official-build-reuse-local-validation",
+      "status": {
+        "command": [
+          "env",
+          "PATH=/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+          "node",
+          "--input-type=module",
+          "-e",
+          "import {readFileSync} from \"node:fs\";import assert from \"node:assert/strict\";import {verifyTask1BuildMetadata,verifyTask1BuildFiles} from \"./.github/scripts/onboarding-checks.mjs\";const root=\"/workspace/materials-load-20261029/\";const m=JSON.parse(readFileSync(root+\"official-task1-build-metadata.json\"));const components={backend:\"44013860f1c6ead94f1c4b63491f0f122b01abaa\",frontend:\"44ac407e011dd17be8636b439b440a4d152b3304\"};verifyTask1BuildMetadata(m.run,m.job,m.artifact,components);for(const mutate of [x=>x.job.conclusion=\"failure\",x=>x.artifact.expired=true,x=>x.artifact.digest=\"sha256:\"+\"0\".repeat(64),x=>x.run.head_sha=\"a\".repeat(40)]){const bad=structuredClone(m);mutate(bad);assert.throws(()=>verifyTask1BuildMetadata(bad.run,bad.job,bad.artifact,components));}const receipt=JSON.parse(readFileSync(root+\"official-task1-build-validation/task1-builds.json\"));const read=p=>readFileSync(root+\"official-task1-build-validation/\"+p);const verified=verifyTask1BuildFiles(receipt,read);assert.throws(()=>verifyTask1BuildFiles(receipt,p=>p===\"backend-dist.tgz\"?Buffer.from(\"altered\"):read(p)));console.log(JSON.stringify({passed:true,scope:\"Actual official metadata/archive/receipt hashes and direct rejection mutations; no compiler/app tests executed\",verified}));"
+        ],
+        "startedAt": "2026-10-30T05:38:07.879054+00:00",
+        "finishedAt": "2026-10-30T05:38:08.057805+00:00",
+        "exitCode": 0
+      },
+      "log": "{\"passed\":true,\"scope\":\"Actual official metadata/archive/receipt hashes and direct rejection mutations; no compiler/app tests executed\",\"verified\":{\"components\":{\"backend\":\"44013860f1c6ead94f1c4b63491f0f122b01abaa\",\"frontend\":\"44ac407e011dd17be8636b439b440a4d152b3304\"},\"source\":\"c1bd47c4e4030b3ddfba17aa07f8ee6d3241d9cf\",\"merge\":\"e2a4d48986a4d8172520e1b77f89712e5a66d78d\",\"compiledThisRun\":false,\"frontendFiles\":817,\"backendSHA256\":\"adcdbf126ad7c1adefdba8a4de9e620327587daeeacaeb3b4d5d134a253b5cca\"}}\n"
+    },
+    {
+      "id": "task1-shallow-sast-direct-continuation",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/check-task1-shallow-sast.py"
+        ],
+        "startedAt": "2026-10-30T05:38:27.613020+00:00",
+        "finishedAt": "2026-10-30T05:38:38.880515+00:00",
+        "exitCode": 0
+      },
+      "log": "{\"passed\": true, \"initiallyShallowMissingBase\": true, \"actualCLI\": \"task1-sast-config\", \"selectedPaths\": 226, \"scope\": \"Real shallow Git fixture and WIP control overlay, not CI or application execution\"}\n"
+    },
+    {
+      "id": "task1-ci-recovery-actionlint",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/actionlint-task1/actionlint",
+          "-shellcheck=",
+          "-pyflakes=",
+          ".github/workflows/ci.yml"
+        ],
+        "startedAt": "2026-10-30T05:38:29.251799+00:00",
+        "finishedAt": "2026-10-30T05:38:29.333541+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    }
+  ],
+  "targetedRecoveryNote": "New control only: fetch missing immutable base before diff; authenticate/read exactly the original successful official build artifact using existing family download/reuse pattern. No new permission or CI system. Actionlint syntax check only for changed workflow. Current source/component trees remain identical; binaries stay in original official artifact."
 }
