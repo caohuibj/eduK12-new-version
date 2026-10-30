@@ -114,7 +114,7 @@ HSE 指令为过去六个月；CBI 为当前工作感受，未指定相同固定
 
 上述逐来源 `source.subjectKey` 已接通，仍逐项检查原 runtime/measurement/scoring/localization/item 身份；旧包不新增字段，缺省沿原 domain。另修复 `verifyPackageFixtures` 对每个 SCALE 都解引用核心 binding 的假设：固定独立工具没有核心 binding 时不生成虚假的核心身份，既有核心分支输出不变。独立 CBI 在未来包中只占固定必做 slot，不映射进 Profile evidence。
 
-- 新 `profile-subject-identity.test.ts` 首轮 2 FAIL：夹具从原 Value 工具继承了 1–7 转换范围，HSE control 实际为 1–5，原身份检查正确拒绝。只修该夹具范围；相同两例复验 2 PASS。未放松范围或身份断言。
+- 新 `profile-subject-identity.test.ts` 首轮 2 FAIL：夹具从原 Value 工具继承了 1–6 转换范围，HSE control 实际为 1–5，原身份检查正确拒绝。只修该夹具范围；相同两例复验 2 PASS。未放松范围或身份断言。
 - 新 `profile-independent-tool.test.ts` 1 PASS：原合成核心附加固定 CBI 独立 slot 后可预览，核心 missing/invalid 仍弃权，CBI 不进入画像文本。没有运行 CBI 计分或注册这个合成夹具。
 - 前一成人切片的六个未变断言继续复用；新增可选 subjectKey 无默认值，旧 JSON 不增加字段；fixture 的核心分支仍选择原身份对象。前一后端类型成功只对应成人切片，**最终组合后端类型尚待正式检查**，不冒称新的组合已通过。
 
@@ -144,3 +144,5 @@ HSE 指令为过去六个月；CBI 为当前工作感受，未指定相同固定
 | jdr-browser-r2 | PASS，真实cookie登录、4条原量尺图和文字表、两条本人建议、键盘详情、刷新同hash、390px无横向溢出 | 云端开发Vite/API环境；不是最终生产镜像验收，未截图归档 |
 
 首个 FINAL 的独立耗时/CPU读数未在失败断言前保存，不能补造或为获取数字再次计分。本次只读续验为单样本：报告重开约24ms；完整响应约字节数及SQL计数见原 jdr-lifecycle-result.json，非性能优化或跨环境基准。资料索引、Project工作流、权限及状态均按实际完成区分；没有部署、真实用户授权或额外PDF/图片存储。
+
+记录勘误：早先说明将旧数学 Value 的量尺上限误写为7；实际冻结配置是1–6，HSE是1–5。原测试始终读取真实配置，修复仅将新HSE夹具范围设为1–5；原附件中的旧叙述保留为历史记录，不改写原日志。

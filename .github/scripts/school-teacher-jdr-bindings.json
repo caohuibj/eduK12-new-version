@@ -42,10 +42,6 @@
       "before": null,
       "after": "09f1b070c0fa435c3cc17088210a86805583f70c"
     },
-    "docs/bundle-declarative-onboarding/teacher-jdr-implementation.md": {
-      "before": null,
-      "after": "d6f1f500c4ae8db8534631b246ab2b7e31159831"
-    },
     "server-version/backend/src/__tests__/bundle-onboarding/profile-adult-applicability.test.ts": {
       "before": null,
       "after": "e22c65825cf219775ccc800f4dd8d33c9e4108b5"
@@ -227,6 +223,10 @@
     "docs/bundle-declarative-onboarding/teacher-jdr-ci-plan.md": {
       "before": null,
       "after": "5c01a1523080f89fc29b9795c277b00b795210ea"
+    },
+    "docs/bundle-declarative-onboarding/teacher-jdr-implementation.md": {
+      "before": null,
+      "after": "5af84642399ba3e391be9e3b2a9f225d7e038df4"
     },
     "docs/release/README.md": {
       "before": "cd7858296514a91a892fdb44e03e1715a1625414",
