@@ -15,7 +15,7 @@ vi.mock('../utils/exportJobs', () => ({
   clearExportIntentKey: mocks.clear, assertExportDownload: (response: { ok: boolean }) => { if (!response.ok) throw new Error('下载失败') },
   ExportJobFailedError: class extends Error {},
 }))
-import TrainingCourseAnalysis from './TrainingCourseAnalysis'
+import {TrainingLongitudinalAnalysis as TrainingCourseAnalysis} from './TrainingCourseAnalysis'
 
 const render = (ui: ReactElement) => rtlRender(ui, { wrapper: MemoryRouter })
 const metric = { itemId: 'item-1', metricKey: 'total', label: '总分' }

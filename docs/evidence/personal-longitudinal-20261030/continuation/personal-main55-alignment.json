@@ -1,0 +1,35 @@
+{
+  "recordedAt": "2026-10-30T12:11:15.569536+00:00",
+  "oldLocalCandidate": "4a98a54a7cf82ed4592906a744079693ba904040",
+  "main": "55fab18e9933e58dcb800b20156f5b7e48858536",
+  "merge": "Actual git merge --no-commit succeeded, no conflicts",
+  "oldBasePrisma": "1ad68f7381709a5bf4a336e38afd2775cc4d52f1",
+  "newBasePrisma": "1ad68f7381709a5bf4a336e38afd2775cc4d52f1",
+  "oldCandidatePrisma": "ba21974eef50397589e9fec671eab73d188dffba",
+  "originalQualifiedCandidatePrisma": "ba21974eef50397589e9fec671eab73d188dffba",
+  "locks": {
+    "server-version/backend/package.json": {
+      "before": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "main": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
+    },
+    "server-version/backend/package-lock.json": {
+      "before": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "main": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+    },
+    "server-version/frontend/package.json": {
+      "before": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+      "main": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+    },
+    "server-version/frontend/package-lock.json": {
+      "before": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "main": "38d624d2dd610673f9392a89af7290682862e2b0"
+    }
+  },
+  "reuse": "Native migration/restore and exact backend audit originals remain; images/application SAST execute for changed production source. Old16/2PG/10nonce not replayed.",
+  "notion": {
+    "target": "404d27635a388186ac80de3593da05a5",
+    "requestedConnection": "link_6ae487749ba88191982b4dcc83ac39b8",
+    "verifiedConnectionSelected": false,
+    "result": "404 object_not_found, same integration1f8d872b; current tool metadata does not expose selector. Record later, not a CI gate under latest user direction."
+  }
+}

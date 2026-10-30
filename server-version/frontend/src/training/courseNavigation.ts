@@ -1,15 +1,16 @@
 import { internalReturnTo } from '../components/app-shell/access'
 
-// Temporarily closed to trainers; retain the implementation for a later opening.
+// Single task reports are open; the existing multi-wave analysis remains closed.
 export const COURSE_ANALYSIS_ENABLED = false
+export const COURSE_GROUP_REPORT_ENABLED = true
 export const COURSE_SECTIONS = [
   ['assignments', '学习'], ['checkins', '打卡'], ['assessments', '测评'],
-  ['analysis', '信息统计'], ['management', '课程管理'],
+  ['analysis', '群体报告'], ['management', '课程管理'],
 ] as const
 export type CourseSection = typeof COURSE_SECTIONS[number][0]
 const validId = (id: string | null | undefined) => id && /^[A-Za-z0-9_-]{1,100}$/.test(id) ? id : null
 export const resolveCourseSection = (section: string | null): CourseSection => {
-  if (section === 'analysis' && !COURSE_ANALYSIS_ENABLED) return 'assessments'
+  if (section === 'analysis' && !COURSE_ANALYSIS_ENABLED && !COURSE_GROUP_REPORT_ENABLED) return 'assessments'
   return COURSE_SECTIONS.some(([value]) => value === section) ? section as CourseSection : 'assignments'
 }
 

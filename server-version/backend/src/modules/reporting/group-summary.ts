@@ -38,11 +38,11 @@ export interface TaskGroupProjection {
   sourceLabel: string
   cutoff: string
   populationLabel: string
-  completedN: number
+  completedN: number | null
   countUnit: 'RESPONSE' | 'PERSON'
   assignedN: number | null
   tool: { key: string; title: string; kind: GroupToolKind }
-  metrics: GroupMetricSummary[]
+  metrics: Array<Omit<GroupMetricSummary, 'validN' | 'missingN'> & {validN: number | null; missingN: number | null; state?: 'present' | 'suppressed'; distributionSuppressed?: boolean}>
   limitations: string[]
 }
 

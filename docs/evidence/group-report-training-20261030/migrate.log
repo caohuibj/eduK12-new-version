@@ -1,0 +1,32 @@
+Prisma schema loaded from server-version/backend/prisma/schema.prisma
+Datasource "db": PostgreSQL database "eduk12_group_report_test_20261030", schema "public" at "127.0.0.1:55432"
+
+261 migrations found in prisma/migrations
+
+Applying migration `20261029150000_standard_combination_education_admission`
+Applying migration `20261029151000_standard_use_revision_evidence_index`
+Applying migration `20261030001000_cognitive_profile_public_template`
+Applying migration `20261030002000_cognitive_profile_entry_admission`
+Applying migration `20261030003000_training_cognitive_profile_use_index`
+Applying migration `20261030004000_survey_cognitive_frozen_trial_budget`
+Applying migration `20261030005000_education_cognitive_profile_binding_guard`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20261029150000_standard_combination_education_admission/
+    └─ migration.sql
+  └─ 20261029151000_standard_use_revision_evidence_index/
+    └─ migration.sql
+  └─ 20261030001000_cognitive_profile_public_template/
+    └─ migration.sql
+  └─ 20261030002000_cognitive_profile_entry_admission/
+    └─ migration.sql
+  └─ 20261030003000_training_cognitive_profile_use_index/
+    └─ migration.sql
+  └─ 20261030004000_survey_cognitive_frozen_trial_budget/
+    └─ migration.sql
+  └─ 20261030005000_education_cognitive_profile_binding_guard/
+    └─ migration.sql
+      
+All migrations have been successfully applied.

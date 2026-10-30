@@ -92,6 +92,10 @@ router.get('/:id/questionnaires', authenticate, requireTeacher, courseQuestionna
 router.get('/:id/training-assessments', authenticate, requireTeacher, courseTrainingAssessments)
 
 // Analysis has its own source-level authorization; course shares never grant raw data.
+router.get('/:id/training-group-reports', authenticate, requireTeacher, trainingAnalysisController.groupIndex)
+router.get('/:id/training-group-reports/sources/:taskId', authenticate, requireTeacher, trainingAnalysisController.groupTools)
+router.post('/:id/training-group-reports', authenticate, requireTeacher, trainingAnalysisController.groupGenerate)
+router.get('/:id/training-group-reports/:taskId/:artifactId', authenticate, requireTeacher, trainingAnalysisController.groupRead)
 router.get('/:id/training-analysis/sources', authenticate, requireTeacher, trainingAnalysisController.sources)
 router.post('/:id/training-analysis', authenticate, requireTeacher, trainingAnalysisController.analyze)
 router.post('/:id/training-analysis/quality/list', authenticate, requireTeacher, trainingAnalysisController.qualityList)
