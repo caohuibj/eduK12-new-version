@@ -33,7 +33,7 @@ import { listQuestionnaireScaleResources } from './scale-resources'
 import {prepareTrainingStandardItemSource,verifyStoredTrainingStandardItem,decodeTrainingStandardItemSource} from '../composite/training-standard-combination'
 import {trainingReferenceAudit} from '../composite/training-reference-audit'
 import {selectedReferenceChanges,type SelectedReferenceAudit} from '../assessment-authorization/selected-reference-audit'
-import {listTrainingStandardCombinationChoices} from '../measurement-content/standard-combination-use'
+import {listTrainingStandardCombinationChoicePage} from '../measurement-content/standard-combination-use'
 import { situationalReleaseKey, listSituationalResourceSummaries } from '../situational/situational-release.service'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../cognitive/profile-freeze'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
@@ -640,20 +640,26 @@ export async function available(userId: string) {
 }
 export async function resources(actor: Actor) {
   author(actor)
-  const [scales, cognitive, courseRows, situational,standardCombinations] = await Promise.all([
+  const [scales, cognitive, courseRows, situational,standardPage] = await Promise.all([
     listQuestionnaireScaleResources(actor),
     isCognitiveNewAdmissionEnabled() ? prisma.cognitiveAssignment.findMany({ where: { status: 'PUBLISHED', listedStandalone: true, config: { status: 'PUBLISHED' }, ...(actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }) }, include: { config: true }, orderBy: { title: 'asc' } }) : Promise.resolve([]),
     prisma.course.findMany({ where: { isLibrary: false, ...(actor.role === 'ADMIN' ? {} : { creatorId: actor.userId }) }, select: { id: true, title: true, courseType: true } }),
     listSituationalResourceSummaries(actor.userId),
-    actor.role==='TEACHER'?listTrainingStandardCombinationChoices(actor.userId):Promise.resolve([]),
+    actor.role==='TEACHER'?listTrainingStandardCombinationChoicePage(actor.userId):Promise.resolve({list:[],nextCursor:null}),
   ])
   for (const row of cognitive.filter(v => isCognitiveProductEligible(v.config.testType))) assertCognitiveCatalogConfiguration(row.config)
   return {
     scales, cognitive: cognitive.filter(v => isCognitiveProductEligible(v.config.testType)).map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
     situational,
-    standardCombinations,
+    standardCombinations:standardPage.list,
+    standardCombinationsNextCursor:standardPage.nextCursor,
     courses: courseRows,
   }
+}
+
+export async function standardCombinationChoices(actor:Actor,raw:unknown){
+  author(actor)
+  return actor.role==='TEACHER'?listTrainingStandardCombinationChoicePage(actor.userId,raw):{list:[],nextCursor:null}
 }
 
 /** Copy definitions only; no attempts, responses, tokens or report ciphertext. */
