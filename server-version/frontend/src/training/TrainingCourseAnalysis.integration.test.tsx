@@ -6,7 +6,7 @@ vi.mock('../api/trainingAnalysis',()=>({trainingAnalysisApi:m}))
 vi.mock('../api/client',()=>({sessionFetch:vi.fn()}))
 vi.mock('./TrainingReferenceStudio',()=>({TrainingReferenceStudio:({actorId,courseId,onRiskChange}:any)=><section aria-label="参考构建入口"><span>{actorId}:{courseId}</span><button onClick={()=>onRiskChange(true)}>模拟参考修改未保存</button><button onClick={()=>onRiskChange(false)}>模拟参考修改已确认</button></section>}))
 vi.mock('./FormalReferenceStudio',()=>({default:({actorId}:any)=><section aria-label="正式参考入口">{actorId}</section>,FormalReferenceSubmission:()=>null}))
-import TrainingCourseAnalysis from './TrainingCourseAnalysis'
+import {TrainingLongitudinalAnalysis as TrainingCourseAnalysis} from './TrainingCourseAnalysis'
 it('retains both reference entry points and main scientific locks around the guided selectors',async()=>{
  m.sources.mockResolvedValue({list:[{taskId:'task',taskName:'合成测评',publication:'2026-10-01T00:00:00.000Z',configDigest:'config',variantKey:null,metrics:[{itemId:'item',metricKey:'score',label:'得分'}]}],canQuality:false,canExport:false})
  render(<MemoryRouter><TrainingCourseAnalysis courseId="course" actorId="teacher"/></MemoryRouter>)
