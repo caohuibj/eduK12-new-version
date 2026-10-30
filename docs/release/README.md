@@ -1981,3 +1981,102 @@ same explicit pin after validating the normal merge parents and exact tree.
 Keep the manual source proof distinct from the eligible merge-preview consumer.
 The final source commit must not carry skip-ci, because GitHub otherwise leaves
 its PR checks pending. No protection, credential, query or finding policy changes.
+
+## Personal longitudinal bounded Ready qualification (PR399 first slice)
+
+`feat/personal-longitudinal-survey-20261030` uses the existing CI workflow with
+base `8cf07bfd35702222e279cbfeee2f64d73a938b55`, reviewed source a62c9a5763 and
+explicit application/dependency/original-reporter pins. Full raw diff and modes
+must match; unknown paths or changed main stop rather than select whole-platform
+fallback. This is not a new workflow for stacked PR406/409.
+
+Draft classification grants no Ready qualification. Ready requires scope,
+personal-tracking, the unchanged production-image build/HIGH-CRITICAL scan and
+CodeQL jobs, with stable-gate plan recomputation. Original 31 local application
+cases plus targeted repair/consumer originals retain their exact failed/filtered
+rows and local unsigned provenance; admission verifies immutable Git source and
+report bytes and does not claim CI reexecution. Missing exact-main nonempty
+upgrade/native restore, source guards, locked audits, actual frontend types/lint,
+production artifacts/scans and SAST execute in their selected existing CI jobs.
+SQL fixture data is synthetic; no production, physical timing, all-four-entry,
+merge, deployment, or full disaster-recovery qualification is implied.
+
+The PR399 base was subsequently advanced to
+`1d95bf5d9c104dcc9d0ffa344858cb39a70212bd` after the real GitHub preview included
+a newly merged BAT/COPSOQ catalog commit against an older event base. Only that
+base pin changed; all24 reviewed Survey application/test/schema blobs and locked
+inputs remain fixed. The original failed preview/refusal is retained. Main drift
+continues to stop qualification rather than broadening or starting full CI.
+
+For the PR399 CLI-only recovery, the successful image build/scans from official
+run41028537466/job123972544793 may be admitted only with exact source/head and
+required successful step metadata, age<24h, identical entire server-version tree,
+unchanged reusable image workflow and build script. The personal qualification
+job verifies that receipt before native checks; skipped/failed/stale/missing or
+changed inputs refuse. The original failed overall run stays failed. This is
+qualification evidence, not a deployable image archive or production permission.
+The existing image workflow is not changed; current SAST still runs for changed
+qualification controls.
+
+After final catalog PR410, PR399 freezes base8bd86e4059125b9ee868d4777795e513d36cba71.
+The source171f image success is historical only: backend production inputs now
+differ, so it cannot qualify the new tree. Existing compound image checks remain
+required for those changed inputs; current native/audit/types/SAST still execute.
+The optional old-image receipt must not bypass its exact-tree refusal.
+
+For the8bd IO-only recovery, official image job123983441024/run41031885906 and
+its successful backend audit step in job123983441600 may be authenticated only
+against the exact571a source/input pins and <24h metadata. The original native
+job/run failure stays failed. Changed or missing producer inputs, failed/skipped
+steps, stale receipts and unreadable official metadata refuse admission. Only
+unchanged image/audit checks are retained; fresh native/schema/frontend and
+changed-control SAST outcomes remain mandatory.
+
+PR399 subsequently aligns with main31845e3a14dd5edf6e03c90e7f71c014bcf0aa06.
+Changed group/catalog production tree invalidates the571a image qualification
+for this new tree; successful original remains historical. Locked backend audit
+inputs remain exact and reusable. Full native database dump/restore compares
+opaque old facts plus DDL for the three changed Survey tables, indexes,
+constraints and triggers. The existing group native evidence documents unrelated
+PostgreSQL16.15 CHECK-expression reserialization; no platform-wide textual DDL
+equality claim is made.
+
+PR399's af8 run41037266506 produced successful official images and full selected
+application SAST for unchanged main31845 production inputs. A fixture-only
+continuation authenticates those exact original jobs and24h metadata. Current
+SAST still executes for changed personal-tracking-ready.mjs controls; original
+findings are retained without disposition changes. Native old-row fixture
+explicitly confirms linkage and uses a valid synthetic research code, honoring
+existing database guards. Local rollback-only fixture validation is not claimed
+as official migration/restore qualification.
+
+PR399 official qualification job124005165894/run41038456712 succeeded for e658
+main31845 inputs. Later control-only continuation authenticates that whole
+successful native/frontend producer with its required steps,24h metadata,
+unchanged full production tree/base/native function bytes and original job/tool
+inputs. Its failed sibling SAST adapter remains failed and is repaired separately.
+GitHub job.head_sha may carry the pinned PR source rather than checkout preview;
+only those two exact original identities are accepted. Current changed controls
+still receive actual SAST. No skipped producer is treated as a new execution.
+
+
+PR399 subsequently aligns with main2fccefaf838fe24c3d2ec3a63b32d016dbe18866
+(PR405 JD-R/Profile inputs). Original main318 image/application SAST receipts
+remain historical because production inputs changed; the existing jobs execute
+for the new candidate. The original complete native/frontend successful producer
+may admit only native migration/restore when base and candidate full Prisma
+trees, backend package/lock blobs, native source and original job/tool commands
+are identical. This native-only receipt explicitly does not admit frontend;
+current frontend installation/audit/types/lint execute. Required original job
+identity/success/steps/24h remain unchanged. No application journey is replayed,
+no new workflow is added, and old failed runs remain failed.
+
+PR399 main28 continuation retains run41050414835's successful image and full
+selected SAST producers for the unchanged production tree. Native-only reuse
+skips DB replay, while locked backend install/Prisma generation still runs as
+a prerequisite for actual frontend type consumers importing backend definitions.
+Current SAST authenticates the original full extraction, then scans only changed
+JavaScript/TypeScript controls since it; no changed controls means authenticated
+whole selected-extraction reuse. Failed frontend job124044901601 remains failed.
+Its redirected logs returned403; job metadata and check annotations provide the
+independent diagnostic evidence, with no alternative log download.

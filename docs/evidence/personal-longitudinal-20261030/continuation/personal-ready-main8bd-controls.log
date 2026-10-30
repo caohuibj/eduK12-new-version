@@ -1,0 +1,10 @@
+✔ Ready requires actual native/image/SAST success; Draft never qualifies (264.038604ms)
+✔ image reuse refuses failed, skipped or expired original producer steps (227.861296ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 617.029161

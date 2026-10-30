@@ -23,6 +23,24 @@ export interface LongitudinalTrendModel {
   hasSuppressedValues: boolean
 }
 
+export interface PersonalChangesMetric {
+  id:string;label:string;unit:string;
+  points:Array<{ordinal:number;observedAt:string|null;value:number|null;missingReason:string|null}>;
+  adjacent:Array<{fromOrdinal:number;toOrdinal:number;delta:number|null;comparability:{level:string;allowedOperations:string[]}}>;
+  baseline:Array<{fromOrdinal:number;toOrdinal:number;delta:number|null;intermediateMissing:boolean}>;
+}
+/** The personal endpoint has already selected complete parents and projected
+ * exact, disclosed values. Never bridge a missing wave or derive a delta here. */
+export function toPersonalChangesTrend(metric:PersonalChangesMetric):LongitudinalTrendModel {
+  const points=metric.points.map(p=>({label:'T'+p.ordinal,value:finite(p.value)?p.value:null}))
+  const segments=metric.points.slice(1).map((point,i)=>{
+    const pair=metric.adjacent.find(p=>p.fromOrdinal===metric.points[i].ordinal&&p.toOrdinal===point.ordinal)
+    return segmentFrom({fromIndex:i,toIndex:i+1,valueAvailable:points[i].value!==null&&points[i+1].value!==null,
+      comparability:pair?.comparability,delta:pair?.delta??undefined})
+  })
+  return {metricId:metric.id,points,segments,state:stateFrom(points,segments,false),hasSuppressedValues:false}
+}
+
 type WaveLabel = (ordinal: number, waveKey?: string) => string
 
 const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)

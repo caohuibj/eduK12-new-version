@@ -1,0 +1,7 @@
+{
+  "status": "PASSED",
+  "mode": "read-only schema output capacity preflight; no migration/data dump/restore executed",
+  "bytes": 979455,
+  "sha256": "cc4f6b81d9bc1a1771fc76cda68bec097c047a5e49678ac069f85cf4a93b6438",
+  "contentsPublished": false
+}

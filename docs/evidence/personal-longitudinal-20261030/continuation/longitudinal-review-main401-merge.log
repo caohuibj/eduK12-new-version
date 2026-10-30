@@ -1,0 +1,6 @@
+Auto-merging .github/workflows/ci.yml
+Auto-merging server-version/backend/src/modules/survey/measurement.result.ts
+Auto-merging server-version/backend/src/modules/survey/publication.service.ts
+CONFLICT (content): Merge conflict in server-version/backend/src/modules/survey/publication.service.ts
+Auto-merging server-version/backend/src/modules/survey/waves.service.ts
+Automatic merge failed; fix conflicts and then commit the result.
