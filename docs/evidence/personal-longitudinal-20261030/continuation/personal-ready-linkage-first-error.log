@@ -1,0 +1,33 @@
+2026-10-30T09:59:16.7139695Z ERROR:  Linked Wave requires explicit linkage disclosure confirmation
+2026-10-30T09:59:16.7140116Z CONTEXT:  PL/pgSQL function survey_linkage_disclosure_gate() line 6 at RAISE
+2026-10-30T09:59:16.7271202Z node:internal/errors:986
+2026-10-30T09:59:16.7271430Z   const err = new Error(message);
+2026-10-30T09:59:16.7271585Z               ^
+2026-10-30T09:59:16.7271666Z 
+2026-10-30T09:59:16.7272095Z Error: Command failed: docker exec -i 2369baa9a0f16b37ba3208bd1319101fd179c74a662f396b0a585002078b434d psql -XAt -v ON_ERROR_STOP=1 -U ptool -d personal_tracking_upgrade_test
+2026-10-30T09:59:16.7272625Z ERROR:  Linked Wave requires explicit linkage disclosure confirmation
+2026-10-30T09:59:16.7272931Z CONTEXT:  PL/pgSQL function survey_linkage_disclosure_gate() line 6 at RAISE
+2026-10-30T09:59:16.7273113Z 
+2026-10-30T09:59:16.7273213Z     at genericNodeError (node:internal/errors:986:15)
+2026-10-30T09:59:16.7273567Z     at wrappedFn (node:internal/errors:540:14)
+2026-10-30T09:59:16.7273777Z     at checkExecSyncError (node:child_process:942:11)
+2026-10-30T09:59:16.7273980Z     at execFileSync (node:child_process:978:15)
+2026-10-30T09:59:16.7274343Z     at sql (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/personal-tracking-ready.mjs:82:30)
+2026-10-30T09:59:16.7274855Z     at nativeDatabase (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/personal-tracking-ready.mjs:93:3)
+2026-10-30T09:59:16.7275370Z     at async file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/personal-tracking-ready.mjs:121:122 {
+2026-10-30T09:59:16.7275676Z   status: 3,
+2026-10-30T09:59:16.7275797Z   signal: null,
+2026-10-30T09:59:16.7275912Z   output: [
+2026-10-30T09:59:16.7276021Z     null,
+2026-10-30T09:59:16.7276150Z     'INSERT 0 1\nINSERT 0 1\n',
+2026-10-30T09:59:16.7276380Z     'ERROR:  Linked Wave requires explicit linkage disclosure confirmation\n' +
+2026-10-30T09:59:16.7276690Z       'CONTEXT:  PL/pgSQL function survey_linkage_disclosure_gate() line 6 at RAISE\n'
+2026-10-30T09:59:16.7276905Z   ],
+2026-10-30T09:59:16.7277010Z   pid: 2929,
+2026-10-30T09:59:16.7277147Z   stdout: 'INSERT 0 1\nINSERT 0 1\n',
+2026-10-30T09:59:16.7277391Z   stderr: 'ERROR:  Linked Wave requires explicit linkage disclosure confirmation\n' +
+2026-10-30T09:59:16.7277699Z     'CONTEXT:  PL/pgSQL function survey_linkage_disclosure_gate() line 6 at RAISE\n'
+2026-10-30T09:59:16.7277945Z }
+2026-10-30T09:59:16.7278006Z 
+2026-10-30T09:59:16.7278057Z Node.js v24.21.0
+2026-10-30T09:59:16.7343375Z ##[error]Process completed with exit code 1.

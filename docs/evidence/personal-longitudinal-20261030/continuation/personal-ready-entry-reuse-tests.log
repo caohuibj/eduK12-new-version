@@ -1,0 +1,11 @@
+✔ Ready requires actual native/image/SAST success; Draft never qualifies (220.215074ms)
+✔ actual entrypoint child resolves original admission without a top-level-await cycle (141.534548ms)
+✔ image reuse refuses failed, skipped or expired original producer steps (221.165202ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 697.991648

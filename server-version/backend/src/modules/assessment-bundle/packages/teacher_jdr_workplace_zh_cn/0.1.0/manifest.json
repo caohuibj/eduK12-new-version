@@ -1,0 +1,141 @@
+{
+  "packageSchemaVersion": 2,
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "teacher_jdr_workplace_zh_cn",
+    "bundleVersion": "0.1.0",
+    "status": "DRAFT",
+    "category": "scale_self",
+    "name": "教师工作要求与资源画像｜理论试验版",
+    "description": "固定四项HSE核心与独立CBI工作反馈；预设理论参照，不是经验类别或职业诊断。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "STUDENT_COURSE"
+    ],
+    "population": {
+      "subjectPopulation": "adult",
+      "subjectMinAgeYears": 18
+    },
+    "slots": [
+      {
+        "slotKey": "context",
+        "unitType": "FORM",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "teacher_jdr_workplace_zh_cn_context",
+        "instrumentVersion": "0.1.0",
+        "respondentType": "SELF"
+      },
+      {
+        "slotKey": "demands",
+        "unitType": "SCALE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "hse_demands_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "demands"
+        ]
+      },
+      {
+        "slotKey": "control",
+        "unitType": "SCALE",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "hse_control_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "control"
+        ]
+      },
+      {
+        "slotKey": "manager",
+        "unitType": "SCALE",
+        "position": 3,
+        "required": true,
+        "instrumentKey": "hse_managerial_support_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "managerial_support"
+        ]
+      },
+      {
+        "slotKey": "peer",
+        "unitType": "SCALE",
+        "position": 4,
+        "required": true,
+        "instrumentKey": "hse_peer_support_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "peer_support"
+        ]
+      },
+      {
+        "slotKey": "burnout",
+        "unitType": "SCALE",
+        "position": 5,
+        "required": true,
+        "instrumentKey": "cbi_work_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "work_related_burnout"
+        ]
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.1.0"
+    },
+    "contextDefinitionKey": "teacher_jdr_workplace_zh_cn_context",
+    "contextDefinitionVersion": "0.1.0",
+    "reportDefinitionKey": "teacher_jdr_workplace_zh_cn_report",
+    "reportDefinitionVersion": "0.1.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "hse_demands_zh_cn",
+        "hse_control_zh_cn",
+        "hse_managerial_support_zh_cn",
+        "hse_peer_support_zh_cn",
+        "cbi_work_zh_cn"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "理论试验画像，预设四个参照及几何参数尚未经教师样本校准；不是LPA类别、常模、概率、诊断或绩效评价。",
+      "只覆盖这些工作要求与资源，不代表原八域研究设计已经完成；不推断情绪要求、行政负担或离职。",
+      "HSE指令为过去六个月；原分数越高条件越有利，需求仅在Bundle坐标反射。范围归一不是量表等值。",
+      "CBI工作结果仅显示其独立报告，不进入画像、解释修饰或建议；其时间窗与HSE不同。",
+      "综合解释仅向获准的作答教师本人开放；不自动开放学校管理者或研究者读取个人画像。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json",
+    "profile": "profile.json"
+  },
+  "cognitiveDependencies": []
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "evidenceKey": "demands",
+    "slotKey": "demands",
+    "selector": "demands",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "workplace.demands",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "control",
+    "slotKey": "control",
+    "selector": "control",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "workplace.control",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "manager",
+    "slotKey": "manager",
+    "selector": "managerial_support",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "workplace.managerial_support",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "peer",
+    "slotKey": "peer",
+    "selector": "peer_support",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "workplace.peer_support",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "adult",
+    "slotKey": "context",
+    "selector": "adult_confirmed",
+    "valueType": "boolean",
+    "unit": "context",
+    "construct": "context.adult",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "teaching",
+    "slotKey": "context",
+    "selector": "teaching_confirmed",
+    "valueType": "boolean",
+    "unit": "context",
+    "construct": "context.teaching",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

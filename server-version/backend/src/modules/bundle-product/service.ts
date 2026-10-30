@@ -1,7 +1,7 @@
 import {readInstance,type BundleBindings} from './instance'
 export {readInstance} from './instance'
 export type {BundleBindings} from './instance'
-import { profileGradeForm } from '../assessment-bundle/profile/admission'
+import { profileContextForm } from '../assessment-bundle/profile/admission'
 import { assertPackageAdmission } from '../bundle-product/package-release'
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
 import type { EffectiveScaleDisclosureSnapshot } from '../scale/projection/types'
@@ -100,14 +100,16 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       const bindings: BundleBindings = { schemaVersion: 1, slots: [], context: [] }
       let position = 0
       for (const field of entry.contextDefinition?.fields ?? []) {
-        const gradeForm=profileGradeForm(entry.declarativePackage,field)
+        const profileForm=profileContextForm(entry.declarativePackage,field)
         const boolean = field.valueType === 'boolean'
         const choices = boolean ? ['true', 'false'] : field.enumValues
-        const item = await tx.compositeAssessmentItem.create({ data: {
-          compositeAssessmentId: row.id, type: 'FORM', required: field.required, position: position++,
+        const form=profileForm??{
           formType: choices ? 'single_choice' : 'text_input', formLabel: field.contextKey === 'subject_age_years' ? '年龄（周岁）' : field.contextKey,
           formOptions: choices ? choices.map(value => ({ label: value, value })) : Prisma.JsonNull,
-          ...(gradeForm??{}),
+        }
+        const item = await tx.compositeAssessmentItem.create({ data: {
+          compositeAssessmentId: row.id, type: 'FORM', required: field.required, position: position++,
+          ...form,
         } })
         bindings.context.push({ contextKey: field.contextKey, valueType: field.valueType, itemId: item.id })
       }

@@ -1,10 +1,17 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata} from './onboarding-checks.mjs';
+import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
+import {verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
+test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/measurement-content/standard-combination-use.ts',frontend='server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx';
+ f.b.pr='choice-page';f.b.source=Object.fromEntries([backend,frontend].map(path=>[path,{before:null,after:blob}]));f.entries=[backend,frontend,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'9002',CI_HEAD_REF:BRANCHES['choice-page']};
+ const call=(b=f.b,entries=f.entries,env=f.env)=>onboardingPlan(entries,base,head,f.read,env,b),p=call();assert.equal(p.pr,'choice-page');assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert(task1SastConfig(p,f.b).paths.includes(frontend));
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'choice-page'},{CI_PR_NUMBER:'0'},{CI_FORCE_FULL:'true'}])assert.throws(()=>call(f.b,f.entries,{...f.env,...patch}));
+ assert.throws(()=>call({...f.b,enabled:false}));const unknown='server-version/backend/src/unrelated.ts';assert.throws(()=>call({...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}},[...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}]));
+});
 function fixture(){
  const file='server-version/backend/src/modules/cognitive/onboarding/install.ts';
  const b={pr:366,enabled:true,base,product:h('f'),controlCheckpoint:h('1'),source:{[file]:{before:null,after:blob}},controlBefore:Object.fromEntries(CONTROLS.map(path=>[path,null])),components:{backend:h('2'),frontend:h('3')}};
@@ -330,4 +337,37 @@ test('PR395 SAST continuation requires the exact official successful scan despit
  for(const result of ['failure','skipped','cancelled'])assert.throws(()=>verifyPr395SastMetadata(run,{...job,conclusion:result},artifact,now));
  assert.throws(()=>verifyPr395SastMetadata(run,job,{...artifact,digest:'sha256:'+'0'.repeat(64)},now));assert.throws(()=>verifyPr395SastMetadata(run,job,{...artifact,expired:true},now));assert.throws(()=>verifyPr395SastMetadata(run,job,artifact,now+86400000));
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/onboarding-checks.mjs sast-reuse'));assert(yaml.includes('pr395-original-sast-${{ github.sha }}'));assert(yaml.includes(".pr == 395 && 'paths: [.github/scripts/onboarding-checks.mjs, .github/scripts/onboarding-controls.test.mjs, .github/scripts/pr395-browser.mjs]'"));
+});
+
+test('group-report qualification uses the existing exact family and rejects scope or identity drift',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/reporting/group-summary.ts',frontend='server-version/frontend/src/survey/SurveyGroupReports.tsx',controls=[...CONTROLS,...GROUP_REPORT_CONTROLS].sort();
+ f.b={...f.b,pr:404,source:Object.fromEntries([backend,frontend].map(path=>[path,{before:null,after:blob}])),controlBefore:Object.fromEntries(controls.map(path=>[path,null]))};
+ f.entries=[backend,frontend,...controls].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'404',CI_HEAD_REF:BRANCHES[404]};
+ const call=(b=f.b,entries=f.entries,env=f.env)=>onboardingPlan(entries,base,head,f.read,env,b),p=call();assert.equal(p.pr,404);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');
+ const sast=task1SastConfig(p,f.b);for(const file of [backend,frontend,'.github/scripts/content-scope.mjs','.github/scripts/group-report-draft.mjs'])assert(sast.paths.includes(file));
+ const workflow=readFileSync('.github/workflows/ci.yml','utf8'),inline=workflow.slice(workflow.indexOf('name: select dependency-free documentation or tooling classification'),workflow.indexOf('- name: install pinned release classification tools'));assert(inline.includes('const onboarding=onboardingPlan('));assert(inline.indexOf('const onboarding=')<inline.indexOf('const groupDraft='));assert(inline.includes('const groupDraft=onboarding?null:'));assert(inline.includes('CI_PR_REPOSITORY:'));
+ const classifier=readFileSync('.github/scripts/content-scope.mjs','utf8');assert(classifier.indexOf('const onboarding=onboardingPlan(')<classifier.indexOf('const groupDraft=groupReportDraftPlan('));
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'408'},{CI_EVENT:'workflow_dispatch'},{CI_FORCE_FULL:'true'}])assert.throws(()=>call(f.b,f.entries,{...f.env,...patch}));
+ assert.throws(()=>call({...f.b,enabled:false}));const unknown='server-version/backend/src/unrelated.ts';assert.throws(()=>call({...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}},[...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}]));
+ assert.throws(()=>call(f.b,f.entries.map(e=>e.file===backend?{...e,newMode:'120000'}:e)));
+});
+test('group-report qualification keeps admission and SAST mandatory and rejects Draft or incomplete outcomes',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/reporting/group-summary.ts',controls=[...CONTROLS,...GROUP_REPORT_CONTROLS].sort();
+ f.b={...f.b,pr:404,source:{[file]:{before:null,after:blob}},controlBefore:Object.fromEntries(controls.map(path=>[path,null]))};f.entries=[file,...controls].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'404',CI_HEAD_REF:BRANCHES[404]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b),outputs=Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)]));const needs={scope:{result:'success',outputs},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','onboarding-structure','codeql']);assert.deepEqual(failedChecks(needs,false),[]);assert(failedChecks(needs,true).length);
+ for(const name of ['onboarding-structure','codeql'])for(const result of ['skipped','failure','cancelled',undefined])assert(failedChecks({...needs,[name]:{result}},false).length);
+});
+
+test('group-report qualification reuses native evidence only for identical baseline and candidate Prisma inputs',()=>{
+ const oldBase=h('1'),newBase=h('2'),oldProduct=h('3'),newProduct=h('4'),baseTree=h('5'),candidateTree=h('6');
+ const value={base:oldBase},plan={base:newBase,product:newProduct},proof={schemaVersion:1,originalBase:oldBase,currentBase:newBase,originalCandidate:oldProduct,currentCandidate:newProduct,basePrismaTree:baseTree,candidatePrismaTree:candidateTree};
+ const trees={[oldBase]:baseTree,[newBase]:baseTree,[oldProduct]:candidateTree,[newProduct]:candidateTree};
+ const read=commit=>trees[commit];
+ assert.equal(verifyGroupReportNativeBaseReuse(value,plan,proof,oldProduct,read).nativeExecutedThisRun,false);
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,undefined,oldProduct,read));
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,proof,oldProduct,c=>c===newBase?h('7'):read(c)));
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,proof,oldProduct,c=>c===newProduct?h('8'):read(c)));
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,{...proof,originalBase:newBase},oldProduct,read));
+ assert.throws(()=>verifyGroupReportNativeBaseReuse(value,plan,proof,h('9'),read));
 });

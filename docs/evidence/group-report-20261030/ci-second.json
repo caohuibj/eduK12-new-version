@@ -1,0 +1,16 @@
+{
+  "runId": "41013064887",
+  "attempt": 1,
+  "source": "f84424dacf7907a84a089a50f01ccd97efd9b15e",
+  "eventBase": "dfd506347cfa2c684a75812936f32d48bdce34d4",
+  "actualMerge": "62046f52f6a0acd3710a935f2f6230ba60b7051d",
+  "actualMergeFirstParent": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+  "scopeJob": "123923078052",
+  "gateJob": "123923163462",
+  "applicationChecks": "NOTRUN",
+  "newControlContracts": "NOTRUN",
+  "publicationRun": "41013064804",
+  "publicationState": "SUCCESS",
+  "targetFailureRounds": 2,
+  "rootCause": "Event base differs from actual refreshed GitHub merge first parent; upstream onboarding path was incorrectly included in event-base raw diff"
+}

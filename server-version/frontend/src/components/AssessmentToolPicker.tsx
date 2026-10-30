@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react'
+import { useId, useRef, useState,type ReactNode } from 'react'
 import { Check, ChevronLeft, ChevronRight, Search, X } from 'lucide-react'
 import ModalSurface from './shared-ui/ModalSurface'
 import './assessment-tool-picker.css'
@@ -20,12 +20,13 @@ export interface AssessmentToolOption {
 
 /** Choices are supplied by an already-authorized catalog. Selecting a card
  * changes only editor selection; the existing add/publish endpoints recheck use. */
-export default function AssessmentToolPicker({ options, value, onChange, label, disabled = false }: {
+export default function AssessmentToolPicker({ options, value, onChange, label, disabled = false, more }: {
   options: readonly AssessmentToolOption[]
   value: string
   onChange: (id: string) => void
   label: string
   disabled?: boolean
+  more?: ReactNode
 }) {
   const [open, setOpen] = useState(false)
   const titleId = useId()
@@ -36,13 +37,14 @@ export default function AssessmentToolPicker({ options, value, onChange, label, 
       <span><strong>{selected?.name || `选择${label}`}</strong><small>{selected ? '点击重新选择' : '从可用工具中检索并选择'}</small></span><Search size={19} aria-hidden="true" />
     </button>
     {selected && <p className="assessment-tool-version">{[selected.version || selected.instrumentVersion || selected.configVersion, selected.profile].filter(Boolean).join(' · ')}</p>}
-    {open && !disabled && <ToolDialog key={label} options={options} value={value} label={label} titleId={titleId} onClose={() => setOpen(false)} onSelect={id => { onChange(id); setOpen(false) }} />}
+    {open && !disabled && <ToolDialog key={label} options={options} value={value} label={label} titleId={titleId} more={more} onClose={() => setOpen(false)} onSelect={id => { onChange(id); setOpen(false) }} />}
   </div>
 }
 
-function ToolDialog({ options, value, label, titleId, onClose, onSelect }: {
+function ToolDialog({ options, value, label, titleId, onClose, onSelect, more }: {
   options: readonly AssessmentToolOption[]; value: string; label: string; titleId: string
   onClose: () => void; onSelect: (id: string) => void
+  more?: ReactNode
 }) {
   const searchRef = useRef<HTMLInputElement>(null)
   const [search, setSearch] = useState('')
@@ -66,6 +68,7 @@ function ToolDialog({ options, value, label, titleId, onClose, onSelect }: {
         </button>
       })}</div>
       {!filtered.length && <div className="assessment-tool-empty">{query ? '没有找到匹配的工具，请更换关键词。' : '暂无可选工具。请先确认工具已发布且当前账号有使用权限。'}</div>}
+      {more}
       <footer><span>第 {currentPage} / {totalPages} 页</span><div><button type="button" aria-label="上一页工具" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}><ChevronLeft size={16} />上一页</button><button type="button" aria-label="下一页工具" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>下一页<ChevronRight size={16} /></button></div></footer>
     </section>
   </ModalSurface>

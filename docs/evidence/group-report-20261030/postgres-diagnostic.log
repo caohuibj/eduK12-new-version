@@ -1,0 +1,34 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL
+GROUP_REPORT_COMPARISON {}
+
+ ❯ src/__tests__/survey/group-report.postgres.integration.test.ts (2 tests | 2 skipped) 87ms
+     ↓ generates the real Form report, then reopens without FINAL decryption or regeneration
+     ↓ creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL
+Error: 知情同意信息至少需要 20 字
+ ❯ stop src/modules/survey/publication.service.ts:86:43
+     84|   runtimeStatus:'SURVEY_FINAL_V1'
+     85| }
+     86| const stop=(message:string):never=>{throw new SurveyWaveError(409,mess…
+       |                                           ^
+     87|
+     88| /** One publication rule for read-only preflight and locked freeze. Ca…
+ ❯ src/modules/survey/publication.service.ts:200:42
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/runtime/library.js:130:8000
+ ❯ src/__tests__/survey/group-report.postgres.integration.test.ts:53:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  05:52:42
+   Duration  6.23s (transform 4.31s, setup 0ms, import 6.03s, tests 87ms, environment 0ms)
+
+JSON report written to /tmp/group-report-postgres-diagnostic.json

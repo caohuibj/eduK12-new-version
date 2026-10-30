@@ -6,15 +6,18 @@ import {readFileSync} from 'node:fs';
 import {readNativeEvidenceBytes,verifyNativeEvidence} from './school-teacher-native-evidence.mjs';
 export const NATIVE_BRANCH='feat/bundle-evc-profile-20261029';
 export const PACKAGE_BRANCH='feat/education-package-runtime-20261029';
+export const JDR_BRANCH='feat/teacher-jdr-bundle-20261030';
+export const JDR_MARKER='.github/scripts/school-teacher-jdr-bindings.json';
 export const PACKAGE_MARKER='.github/scripts/school-teacher-package-bindings.json';
-export const isNativeBranch=branch=>[NATIVE_BRANCH,PACKAGE_BRANCH].includes(branch);
-const markerFor=b=>b.branch===PACKAGE_BRANCH?PACKAGE_MARKER:NATIVE_MARKER;
+export const isNativeBranch=branch=>[NATIVE_BRANCH,PACKAGE_BRANCH,JDR_BRANCH].includes(branch);
+const markerFor=b=>b.branch===JDR_BRANCH?JDR_MARKER:b.branch===PACKAGE_BRANCH?PACKAGE_MARKER:NATIVE_MARKER;
 export const NATIVE_MARKER='.github/scripts/school-teacher-native-bindings.json';
 export const NATIVE_JOBS=['admission','frontend','backend-self','native-evidence','native-runtime','security'];
+export const JDR_AUDIT={run:41031648227,head:'e73d3745d52656ed6557129caeb67c2376a998de',checkout:'aa2beaaf961a696a6eac1d1c54069664a0a03fd4',job:123982828487,artifact:12966606166,digest:'116e885203ccc038ae57ac1b45cf32286ce5c06639022d19528498f4ce4f34f7',bytes:2089};
 const hash=x=>createHash('sha256').update(x).digest('hex');
 const sha=x=>typeof x==='string'&&/^[a-f0-9]{40}$/.test(x);
-export const nativeBinding=(branch=NATIVE_BRANCH)=>{assert(isNativeBranch(branch),'Unknown native branch');return JSON.parse(readFileSync(new URL(branch===PACKAGE_BRANCH?'./school-teacher-package-bindings.json':'./school-teacher-native-bindings.json',import.meta.url)))};
-export function nativeSastConfig(paths,b=paths.some(p=>p.includes('school-teacher-package'))?nativeBinding(PACKAGE_BRANCH):null){
+export const nativeBinding=(branch=NATIVE_BRANCH)=>{assert(isNativeBranch(branch),'Unknown native branch');return JSON.parse(readFileSync(new URL(branch===JDR_BRANCH?'./school-teacher-jdr-bindings.json':branch===PACKAGE_BRANCH?'./school-teacher-package-bindings.json':'./school-teacher-native-bindings.json',import.meta.url)))};
+export function nativeSastConfig(paths,b=null){
  const python=new Set(['.github/scripts/school-teacher-native-runtime.py','.github/scripts/school-teacher-native-runtime.test.py','.github/scripts/exact-candidate-runtime.py']);
  assert([...python].every(p=>paths.includes(p)),'Native Python extractor inputs missing');
  const reusedApplicationScan=b?.execution.sastContinuation===40980640181;
@@ -33,7 +36,24 @@ export function requireNativeQualification(b){
  assert.deepEqual(b.execution.auditComponents,['frontend','backend']);}
  assert.equal(b.execution.historicalOfficialReuse,false,'Historical School producer identities forbidden');
  assert.deepEqual(b.execution.runtime,{node:'node:24.21.0-bookworm-slim',nginx:'nginx:1.31.6-alpine3.24-slim',trivy:'0.70.0',severity:['CRITICAL','HIGH'],ignoreUnfixed:true});
+ if(b.execution.officialAuditReuse!==undefined){assert.equal(b.branch,JDR_BRANCH);assert.equal(b.execution.officialAuditReuse,JDR_AUDIT.run);}
  return true;
+}
+export function verifyJdrAuditReuse(b,run,job,read,now=Date.now()){
+ assert.equal(b.branch,JDR_BRANCH);assert.equal(b.execution.officialAuditReuse,JDR_AUDIT.run);
+ assert.equal(run.id,JDR_AUDIT.run);assert.equal(run.head_sha,JDR_AUDIT.head);assert.equal(run.head_branch,JDR_BRANCH);
+ assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.event,'pull_request');assert.equal(run.run_attempt,1);assert.equal(run.status,'completed');assert.equal(run.conclusion,'success');
+ assert.equal(job.id,JDR_AUDIT.job);assert.equal(job.run_id,run.id);assert.equal(job.head_sha,run.head_sha);assert.equal(job.name,'school-teacher / security');assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
+ assert(job.steps.some(s=>s.name==='verify the fixed official HIGH CRITICAL audits or execute fresh inputs'&&s.conclusion==='success'));
+ const age=now-Date.parse(job.completed_at);assert(Number.isFinite(age)&&age>=0&&age<=86400000,'Official audit outside existing 24-hour reuse window');
+ const inputs=['.github/workflows/ci-school-teacher.yml','.npmrc',...['frontend','backend'].flatMap(k=>['package.json','package-lock.json','.npmrc'].map(p=>'server-version/'+k+'/'+p))];
+ assert.equal(read('diff','--name-only',JDR_AUDIT.head,'HEAD','--',...inputs),'','Audit dependencies or execution inputs changed');
+ const old=read('show',JDR_AUDIT.head+':.github/scripts/school-teacher-checks.mjs'),current=read('show','HEAD:.github/scripts/school-teacher-checks.mjs');
+ for(const [start,end]of [['const auditSeverities=','export function requireReviewedCase'],['export function auditComponents(','export function verifyExecutionInputs'],['export function verifyCompletedAudit(','export function verifySastDelta']]){
+  const part=s=>{const a=s.indexOf(start),z=s.indexOf(end,a);assert(a>=0&&z>a,'Audit policy boundaries missing');return s.slice(a,z)};
+  assert.equal(part(current),part(old),'Audit command, threshold or receipt policy changed');
+ }
+ return {originalRun:run.id,originalJob:job.id,originalHead:run.head_sha,originalCheckout:JDR_AUDIT.checkout,originalJobConclusion:job.conclusion,inputsUnchanged:true,auditExecuted:false};
 }
 export function validateNativeBoundary(b,o,{draftPreflight=false}={}){
  assert.equal(b.candidate,'native-bundle');assert(isNativeBranch(b.branch),'Unknown native branch');
@@ -61,15 +81,15 @@ export function validateNativeBoundary(b,o,{draftPreflight=false}={}){
  assert(Object.keys(b.protectedInputs).length>10,'Runtime/config closure missing');
  assert.deepEqual(o.protectedInputs,b.protectedInputs,'Locked dependency/schema/runtime/control dependency drift');
  return {schema:1,route:'school-teacher',candidate:'native-bundle',base:b.base,head:o.checkoutHead,sourceHead:o.sourceHead,sourceTree:o.sourceTree,
-  product:b.productHead,productTree:b.productTree,...(b.branch===PACKAGE_BRANCH?{publicPackage:true,...(b.execution.officialContinuation===40977943858?{continuation:'package-browser-only'}:{})}:{}),components:{frontend:b.frontendTree,backend:b.backendTree},...(o.event==='push'?{postMerge:true}:{}),...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
+  product:b.productHead,productTree:b.productTree,...(b.branch===JDR_BRANCH?{jdrDemo:true}:{}),...(b.branch===PACKAGE_BRANCH?{publicPackage:true,...(b.execution.officialContinuation===40977943858?{continuation:'package-browser-only'}:{})}:{}),components:{frontend:b.frontendTree,backend:b.backendTree},...(o.event==='push'?{postMerge:true}:{}),...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
   inputsSha256:hash(JSON.stringify({source:b.source,controls:b.controls,protectedInputs:b.protectedInputs,execution:b.execution}))};
 }
 export function nativePlan(entries,base,head,read,env,b){
  const branch=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
- const markers=[NATIVE_MARKER,PACKAGE_MARKER].filter(p=>entries.some(e=>e.file===p)),known=isNativeBranch(branch);
+ const markers=[NATIVE_MARKER,PACKAGE_MARKER,JDR_MARKER].filter(p=>entries.some(e=>e.file===p)),known=isNativeBranch(branch);
  assert(markers.length<=1,'Mixed native candidate markers');
  const marker=markers.length===1;
- b??=nativeBinding(known?branch:markers[0]===PACKAGE_MARKER?PACKAGE_BRANCH:NATIVE_BRANCH);
+ b??=nativeBinding(known?branch:markers[0]===JDR_MARKER?JDR_BRANCH:markers[0]===PACKAGE_MARKER?PACKAGE_BRANCH:NATIVE_BRANCH);
  if(!known&&!marker)return null;
  assert.notEqual(env.CI_EVENT,'workflow_dispatch','Native manual/full/probe fallback forbidden');
  assert(branch===b.branch||branch==='main'&&env.CI_EVENT==='push','Native marker on wrong branch');
@@ -99,7 +119,7 @@ export async function nativeOfficialApi(path,env=process.env){
 }
 export async function observeNativeMain(plan,api=nativeOfficialApi){
  assert.equal(plan.candidate,'native-bundle');assert.equal(plan.postMerge,true);assert.notEqual(plan.preflightOnly,true);assert.deepEqual(plan.requiredJobs,NATIVE_JOBS);
- const prNumber=plan.publicPackage?392:388,branch=plan.publicPackage?PACKAGE_BRANCH:NATIVE_BRANCH;
+ const prNumber=plan.jdrDemo?405:plan.publicPackage?392:388,branch=plan.jdrDemo?JDR_BRANCH:plan.publicPackage?PACKAGE_BRANCH:NATIVE_BRANCH;
  const pr=await api('/pulls/'+prNumber);
  assert.equal(pr.number,prNumber);assert.equal(pr.merged,true);assert.equal(pr.state,'closed');assert.equal(pr.draft,false);
  assert.equal(pr.head.ref,branch);assert.equal(pr.head.repo.full_name,'caohuibj/eduK12-new-version');assert.equal(pr.head.sha,plan.sourceHead);

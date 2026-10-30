@@ -1,0 +1,21 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL > creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries
+prisma:error 
+Invalid `prisma.$executeRaw()` invocation:
+
+
+Raw query failed. Code: `P0001`. Message: `ERROR: reporting snapshot rows are immutable`
+
+stdout | src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL
+GROUP_REPORT_COMPARISON {}
+
+ ✓ src/__tests__/survey/group-report.postgres.integration.test.ts (2 tests | 1 skipped) 362ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 1 skipped (2)
+   Start at  05:56:13
+   Duration  6.57s (transform 4.36s, setup 0ms, import 6.09s, tests 362ms, environment 0ms)
+
+JSON report written to /tmp/group-report-postgres-boundary-repair.json
