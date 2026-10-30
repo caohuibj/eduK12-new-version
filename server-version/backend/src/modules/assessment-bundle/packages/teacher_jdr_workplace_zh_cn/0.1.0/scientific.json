@@ -1,0 +1,20 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "18岁及以上、目前在中小学有实际教学职责的教师自述工作环境；固定工具理论试验，不是原33题研究量表或经验LPA分类。",
+  "references": [
+    {
+      "id": "jdr_theory",
+      "citation": "Bakker & Demerouti (2017), Job Demands–Resources theory. https://doi.org/10.1037/ocp0000056 — supports the framework, not this project’s centers or thresholds.",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "project_design",
+      "citation": "Project-defined fixed-tool theory experiment, approved 2026-10-30 (Sentinel_3463f35a75fc8191b757c8c1110fceb4); exact design/source record: docs/bundle-declarative-onboarding/teacher-jdr-design-reference.json. Parameters are geometric choices, not empirical validation.",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    }
+  ]
+}

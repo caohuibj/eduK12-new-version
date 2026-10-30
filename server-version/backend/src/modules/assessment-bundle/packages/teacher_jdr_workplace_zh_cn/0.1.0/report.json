@@ -1,0 +1,49 @@
+{
+  "key": "teacher_jdr_workplace_zh_cn_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "profileInterpretationContent": "BUNDLE_OWNED_SELF",
+  "profileActionContent": "BUNDLE_OWNED",
+  "profileStateExplanations": {
+    "INSUFFICIENT": "本次用于组合分析的核心信息还不完整，暂不形成综合画像。您仍可查看已获准展示的单项结果。",
+    "INVALID": "本次部分核心结果未满足计算或质量条件，暂不形成综合画像。这不代表您的工作能力较低；您仍可查看已获准展示的单项结果。",
+    "NOT_APPLICABLE": "本版本面向已满18岁、目前在中小学有实际教学职责的教师。按本次填写的信息，暂不形成综合画像。",
+    "UNCLASSIFIED": "工作中的要求和资源可以有多种组合，现有四种理论参照还不足以概括这次结果。这不意味着异常；可以先分别查看已获准展示的单项结果。",
+    "MIXED": "本次结果与不止一种理论参照较接近，暂不选定单一画像。可以结合已获准展示的单项结果理解近期工作体验。",
+    "BOUNDARY": "本次结果处在预设理论参照的边界附近，暂不足以清楚归入其中一种。可以先分别查看已获准展示的单项结果。"
+  },
+  "blocks": [
+    {
+      "blockId": "core",
+      "kind": "conclusions",
+      "title": "本次工作要求与资源",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "evidence",
+      "kind": "evidence",
+      "title": "四项原量尺依据",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "scope",
+      "kind": "limitations",
+      "title": "理解本次结果的边界",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": []
+    }
+  ],
+  "states": {
+    "missing": "本次用于组合分析的核心信息还不完整，暂不形成综合画像。您仍可查看已获准展示的单项结果。",
+    "limited": "本次用于组合分析的核心信息还不完整，暂不形成综合画像。您仍可查看已获准展示的单项结果。",
+    "unavailable": "本次部分核心结果未满足计算或质量条件，暂不形成综合画像。这不代表您的工作能力较低；您仍可查看已获准展示的单项结果。"
+  }
+}
