@@ -50,3 +50,29 @@ commit/WIP 审阅，未签名，不宣称原运行已与完整 Git tree 或 node
 三项结果要求。准备阶段将执行实际 inline 脚本和 CLI 在一个明确标注的本地合成 merge
 checkout（同源树、真实base/source父提交）中产生的计划；不冒称 GitHub 真实检查通过。
 当前失败尚未归因前没有继续重试或放大全量。修复及下一检查清单先写回既有 Notion，再激活。
+
+## Main catalog alignment after user merge authorization
+
+User approved PR404 merge; main subsequently moved to `8bd86e4059125b9ee868d4777795e513d36cba71` (PR403/410). Merge checkpoint `a63874d06020c95ab73dc5806f79ad3700597c30` contains 106 upstream-only files: 102 catalog files, one generated registry, three documents. Survey/reporting/frontend, locked dependencies and complete Prisma inputs are unchanged from qualified `7c7c4021af5cfe5646c428e43908a347c5531f72`.
+
+Current backend component tree is `6209f9ffc617411a6b8d27b25596351fb3873910`; the new typed catalog registry changes that compiler input, so only backend types ran once, actual exit0. Frontend tree and its original compiler receipt are unchanged. Survey cases, database migration/native restore and browser journeys were not repeated.
+
+The original native receipt remains byte-for-byte with its real base `8cf07bfd35702222e279cbfeee2f64d73a938b55`. Existing admission now permits a base change only after complete baseline Prisma trees and complete candidate Prisma trees match their original immutable commits. Its local negative control passed once, including changed baseline/candidate schema, missing proof and wrong provenance refusals. Original two binding/Ready fixtures already passed in formal run41024022582 and are not repeated; the existing scope/admission/SAST/Ready gate still process actual new candidate inputs. No new job, workflow or deployment gate is added.
+
+The Azure artifact ZIP403 from the original formal run remains unresolved and is not retried. Official metadata/jobs were observed; ZIP bytes and SARIF content were not read. Current formal result remains pending until a new actual run succeeds.
+
+School/Teacher work is isolated on `feat/group-report-school-teacher-20261030` checkpoint `d84ee65fa`, not present here. That checkpoint is explicitly in progress with frozen School privacy options still to integrate, and is not offered for merge.
+
+Actual local native-base control output (tool exit0; local, not CI execution):
+
+```text
+✔ group-report qualification reuses native evidence only for identical baseline and candidate Prisma inputs (2.808416ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 109.022596
+```
