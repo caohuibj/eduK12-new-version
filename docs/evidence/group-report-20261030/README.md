@@ -20,3 +20,11 @@
 PR404 / source `83f5e9a0a069d386d2ae230402f179c1ea69053a` 的 CI `41012289991` 在 `classify changed content` job `123920641090` 的 lightweight 分类 step 拒绝：实际 base 已是 `dfd506347cfa2c684a75812936f32d48bdce34d4`，原精确 pin 为 `5a39fd7b...`。这是新 main 被正确拒绝，不是应用失败；三个新控制合同也未执行。`merge gate` job `123920739968` 为下游 failure。独立 publication `41012289643` 成功。原记录见 `ci-first.*`。
 
 新 main 是 PR400/402 的纯量表素材和目录，无 reporting/Survey/schema/锁变化。安全 merge 后仅更新 Draft 精确 base；原应用源码与受影响消费者输入未变，不重跑单元、类型、PG、浏览器或构建。下次仅执行尚未运行的新控制合同、当前 scope/gate，继续保持 Draft；CI-019/020 的来源/消费者绑定检查适用。正式资格仍 NOTRUN。
+
+## 宽 Form P2 与真实 merge 父提交修复
+
+`wide-form-first.*` 保留唯一新增宽表 case 的初始 5 秒 runner 超时；`wide-form-repair.*` 仅该 case 1 PASS / 8 filtered（7.55 秒，含冷动态导入（约3.7–4.8秒））。实际调用生产 raw 正向投影，500字段中374自由文本在行预算前排除；126可统计字段按198 FINAL/页，31页纳入完整6000，超过旧30页仍正确。统计函数不变，按列/指标索引消除二次全扫描；只给这个大边界15秒框架预算，生产25k行和6000 FINAL限额未放松。未重跑原81或浏览器。
+
+`ci-second.*`：run41013064887/sourcef84424，scope123923078052/gate123923163462 FAILURE，publication41013064804 SUCCESS。事件 base dfd5063 与实际 merge62046f5的第一父1cc077（PR401）不同；scope错误地把上游 onboarding 算入本PR。应用与三个新控制合同仍 NOTRUN。修复从实际 merge 父/source身份重算，未把 onboarding 加入白名单。`merge-parent-diagnostic.json` 是真实原失败Git对象的本地修复诊断，52路径、不含上游文件；不是新CI通过。累计两次正式分类失败，未全量CI或盲重试。
+
+最新 main1cc077 已正常整合。上游 cognitive parser 扩展是独立 PR401 的已合并实现；本组目录沿用其相同公开接口，不复制未定版个人纵向。旧类型/应用原件不被改称新merge资格。P2后的当前backend类型若执行，单列 `p2-backend-types.log`。

@@ -82,12 +82,40 @@
       "runId": "41012289991",
       "state": "FAILURE",
       "reason": "precise base correctly rejected moved main; no application/new control contracts ran"
+    },
+    "wideFormP2": {
+      "first": "FAIL: 5000ms case budget including cold import",
+      "continuation": "PASS: only new wide case; 8 old cases filtered",
+      "fields": 500,
+      "statisticalFields": 126,
+      "pageSize": 198,
+      "pages": 31,
+      "finalN": 6000,
+      "caseBudgetMs": 15000,
+      "durationMs": 7550,
+      "productionLimitsUnchanged": true
+    },
+    "p2BackendTypes": {
+      "exitCode": 0,
+      "source": "P2 integrated with main1cc077; original old type logs unchanged"
+    },
+    "secondDraftCi": {
+      "runId": "41013064887",
+      "state": "FAILURE",
+      "application": "NOTRUN",
+      "newControlContracts": "NOTRUN",
+      "source": "f84424dacf7907a84a089a50f01ccd97efd9b15e",
+      "rootCause": "Actual checkout base1cc077 differs from event base dfd5063"
     }
   },
   "files": {
     "README.md": {
-      "bytes": 4183,
-      "sha256": "846f4e89de010e54e71ae16383caa4d627e62b3b0ba649eb2029003bab72cb92"
+      "bytes": 5655,
+      "sha256": "4b01ebdc8b054345af55aef85de58547be8822ece34defc8c48e015f2de6e82c"
+    },
+    "actionlint-current.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "actionlint.log": {
       "bytes": 0,
@@ -125,6 +153,18 @@
       "bytes": 515,
       "sha256": "bcf5599e75424fe535f0e83a1ced2ebc703ab2778f76a45bdefe5109131faada"
     },
+    "ci-second-failed.log": {
+      "bytes": 8422,
+      "sha256": "09fcb13c3473561901772e1f9e13c477b529ad4c1d6679a063f05c5b1a37632c"
+    },
+    "ci-second-scope.log": {
+      "bytes": 32685,
+      "sha256": "d904b0ac018fc810eb523ed8475c5da5d93bccf0f67c4d32c013cc656deba381"
+    },
+    "ci-second.json": {
+      "bytes": 675,
+      "sha256": "22961bd9ff1f4b839d8252f4c415eebeaa04e2a2d4bf043d41bc15a529ed99f9"
+    },
     "frontend-lint.log": {
       "bytes": 695,
       "sha256": "a69a7191f18f3f3d30d7f166e8bedd7c158d380ef79fea5ddc44d69900086bef"
@@ -156,6 +196,14 @@
     "group-report.txt": {
       "bytes": 1089,
       "sha256": "9065d63ec89638268360a644bd31a475aeac64cfefa0ab972e2f5bc84fa7b3fc"
+    },
+    "merge-parent-diagnostic.json": {
+      "bytes": 414,
+      "sha256": "c923560f9373d1341f9d7884fdc801a8a611a8215a4ebbd466eaae3b86c6356a"
+    },
+    "p2-backend-types.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "postgres-boundary-repair.json": {
       "bytes": 1568,
@@ -200,6 +248,22 @@
     "postgres-setup-repair.log": {
       "bytes": 1680,
       "sha256": "a82005accd5b55d1672df9dbcfacc2a9b334400bb9390f344c33dd686cd30142"
+    },
+    "wide-form-first.json": {
+      "bytes": 5098,
+      "sha256": "3d62c58f359ef0da63998a5f107adb3ef312f2cd95960177192d26804c20de5f"
+    },
+    "wide-form-first.log": {
+      "bytes": 2184,
+      "sha256": "78ed89fe46295f841e5414439bb61b9dadce51175e45d1c21ecf37502c1ca18e"
+    },
+    "wide-form-repair.json": {
+      "bytes": 3766,
+      "sha256": "47008cdef79adbb4dcd588f68fa1ee6fe3c0665c7a7c479b9edc8f2f581aa1d2"
+    },
+    "wide-form-repair.log": {
+      "bytes": 522,
+      "sha256": "5de6e881ad5a9b0fbf7c2e8f44697b4c889bf3f6a693598dbaf01dd65cbbf1aa"
     }
   },
   "checkedWorkingSourceFiles": {
@@ -220,5 +284,6 @@
     "server-version/frontend/src/survey/SurveyGroupReports.test.tsx": "8aaa80c22bd7894f33e9277132501011c185f880355a2adf96d01fd4a3f69b71",
     "server-version/frontend/src/survey/SurveyGroupReports.tsx": "2fb81cb4eb0c9a5dcdc339b58e746bcdd384d0577685b437d42ddb7680d95bc4"
   },
-  "integratedMain": "dfd506347cfa2c684a75812936f32d48bdce34d4"
+  "integratedMain": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+  "p2ProductCommit": "be1c10330901c03741b2e9356a50b8f6bc7e5a6a"
 }
