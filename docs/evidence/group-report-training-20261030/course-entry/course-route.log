@@ -1,0 +1,12 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend
+
+ ✓ src/training/TrainingCoursePages.test.tsx (19 tests | 18 skipped) 379ms
+     ✓ opens single group reports through the real course tabs and direct analysis route without opening old comparison  377ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 18 skipped (19)
+   Start at  07:29:46
+   Duration  1.45s (transform 503ms, setup 145ms, import 370ms, tests 379ms, environment 402ms)
+
+JSON report written to /tmp/training-group-course-route.json

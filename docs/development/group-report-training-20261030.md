@@ -96,3 +96,25 @@ publication 的 pull_request base 列表不包含这个分支。因此正式 CI/
 后续仍需：独立与固定 Bundle 的合法叶来源、School/Teacher 单次及单维子群、稳定个人
 Longitudinal 接口后的预配置群体趋势/相邻配对。默认各轮当时人群等产品决策不改变。
 未 APPROVE/merge/deploy，无生产或真实用户写入。
+
+## PR408 真实课程入口修订
+
+DOT 对 `69da22cf` 的 review 指出：原 COURSE_ANALYSIS_ENABLED=false 在课程导航与
+TrainingTrainerCourse 两处阻断入口；先前组件/独立报告夹具通过不能证明真实课程页可达。
+本次明确修正这个缺口，没有将原证据改写成实际入口验证。
+
+增加 COURSE_GROUP_REPORT_ENABLED=true，课程“群体报告”页签和原 analysis 深链仅开放单次报告；
+COURSE_ANALYSIS_ENABLED 仍为 false，包装器不提供旧“前后测比较”按钮，也不挂载旧分析。
+课程 owner 判断、真实 API 授权及其他功能开关没有扩展。
+
+只选择一条真实 TrainingTrainerCourse 路由旅程：从课程测评页签进入单次报告，再重载
+`/courses/:courseId/detail?section=analysis` 并读取快照；断言旧 comparison 入口不可见且不请求
+training-analysis。Vitest **1 PASS / 18 filtered**，不重跑 174 项。
+Chromium 使用真实课程页面、BrowserRouter、课程页签和 flags，通过同一导航/深链/快照旅程，
+保留实际 URL、请求轨迹与截图。HTTP 响应及 owner 为合成数据；不冒称重新验证了真实登录或授权。
+frontend app types、四个受影响源文件 lint 均 exit 0。
+
+两个浏览器 setup 失败（esbuild 同步 API 不支持插件、课程 CSS 需 WebP loader）保留，
+修对应构建入口后首次产出本次课程夹具；没有重跑旧全屏/打印/174 项。
+证据位于 `docs/evidence/group-report-training-20261030/course-entry/`。
+PR404 的 main/正式资格工作仍在其独立分支进行，本修订不混入该候选。

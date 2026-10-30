@@ -1,11 +1,13 @@
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http'), assert = require('node:assert/strict')
 const {chromium} = require('../backend/node_modules/playwright-core'), esbuild = require('../frontend/node_modules/esbuild')
+async function main() {
 const output = process.argv[2]
 if (!output) throw Error('Usage: node training-group-report-browser.cjs <evidence-directory>')
 fs.mkdirSync(output, {recursive: true})
-const bundle = path.join(output, 'training-group-fixture.js')
-esbuild.buildSync({entryPoints: [path.join(__dirname, 'training-group-report-fixture.tsx')], outfile: bundle, bundle: true, jsx: 'automatic', minify: true,
-  nodePaths: [path.join(__dirname, '../frontend/node_modules')], define: {'process.env.NODE_ENV': '"production"'}})
+const courseEntry = process.argv.includes('--course-entry')
+const bundle = path.join(output, courseEntry ? 'training-course-fixture.js' : 'training-group-fixture.js')
+await esbuild.build({entryPoints: [path.join(__dirname, courseEntry ? 'training-group-course-fixture.tsx' : 'training-group-report-fixture.tsx')], outfile: bundle, bundle: true, jsx: 'automatic', minify: true, loader: {'.webp':'dataurl'},
+  nodePaths: [path.join(__dirname, '../frontend/node_modules')], plugins: courseEntry ? [{name:'synthetic-course-owner',setup(build){build.onResolve({filter:/contexts\/AuthContext$/},()=>({path:'course-owner',namespace:'synthetic'}));build.onLoad({filter:/.*/,namespace:'synthetic'},()=>({contents:`export const useAuth=()=>({user:{id:'owner',role:'TEACHER'}});export const AuthProvider=({children})=>children;`,loader:'js'}))}}] : [], define: {'process.env.NODE_ENV': '"production"', 'import.meta.env': '{"DEV":false,"PROD":true}'}})
 const artifact = {artifactId: 'old', generatedAt: '2026-10-30T00:00:00Z', projection: {schemaVersion: 1, descriptionVersion: 'group-descriptive-v1',
   title: '学习体验 · 群体报告', sourceLabel: '合成课程任务 · 发布 2026-10-30', cutoff: '2026-10-30T00:00:00Z', populationLabel: '本任务全部合格已完成作答', completedN: 6, countUnit: 'PERSON', assignedN: null,
   tool: {key: 'FORM:section', title: '学习体验', kind: 'FORM'}, metrics: [
@@ -20,7 +22,9 @@ const server = http.createServer(async (req,res) => {
   const url = req.url.split('?')[0], base = '/api/courses/course/training-group-reports'
   calls.push({method:req.method,path:url})
   let data
-  if (url === base && req.method === 'GET') data = {tasks: [{id:'task',name:'合成课程任务'}], artifacts: versions.map(row => ({taskId:'task',artifactId:row.artifactId,generatedAt:row.generatedAt}))}
+  if (courseEntry && url === '/api/courses/course') data = {id:'course',title:'合成群体课程',creatorId:'owner',courseCode:'GROUP6',status:'PUBLISHED',studentCount:6}
+  else if (courseEntry && url.startsWith('/api/courses/course/training-assessments')) data = {list:[],total:0}
+  else if (url === base && req.method === 'GET') data = {tasks: [{id:'task',name:'合成课程任务'}], artifacts: versions.map(row => ({taskId:'task',artifactId:row.artifactId,generatedAt:row.generatedAt}))}
   else if (url === base + '/sources/task') data = {tools:[tool]}
   else if (url === base && req.method === 'POST') {
     let raw = ''; for await (const chunk of req) raw += chunk
@@ -29,13 +33,29 @@ const server = http.createServer(async (req,res) => {
   } else data = versions.find(row => url === `${base}/task/${row.artifactId}`)
   res.setHeader('Content-Type','application/json'); res.statusCode = data ? 200 : 404; res.end(JSON.stringify({code:data?0:404,data:data??null,message:data?'ok':'Unexpected fixture request'}))
 })
-;(async()=>{
+await (async()=>{
   await new Promise(resolve => server.listen(0,'127.0.0.1',resolve))
   const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']})
   try {
     const page = await browser.newPage({viewport:{width:1440,height:1000}}), errors=[]
     page.on('pageerror',error=>errors.push(String(error)))
-    await page.goto(`http://127.0.0.1:${server.address().port}`)
+    const origin = `http://127.0.0.1:${server.address().port}`
+    await page.goto(origin + (courseEntry ? '/courses/course/detail?section=assessments' : ''))
+    if (courseEntry) {
+      await page.getByRole('heading',{name:'合成群体课程',exact:true}).waitFor()
+      await page.getByRole('button',{name:'群体报告',exact:true}).click()
+      await page.getByRole('region',{name:'Training 单次群体报告'}).waitFor()
+      assert.equal(new URL(page.url()).searchParams.get('section'),'analysis')
+      assert.equal(await page.getByRole('button',{name:'前后测比较',exact:true}).count(),0)
+      await page.reload(); await page.getByRole('region',{name:'Training 单次群体报告'}).waitFor()
+      assert.equal(await page.getByRole('button',{name:'群体报告',exact:true}).getAttribute('aria-pressed'),'true')
+      await page.getByRole('button',{name:'打开群体报告'}).click(); await page.getByRole('article',{name:'群体报告阅读'}).waitFor()
+      assert.equal(calls.some(row=>row.path.includes('/training-analysis')),false)
+      assert.equal(calls.some(row=>row.method==='POST'),false); assert.deepEqual(errors,[])
+      await page.screenshot({path:path.join(output,'training-course-entry.png'),fullPage:true})
+      fs.writeFileSync(path.join(output,'course-entry.json'),JSON.stringify({passed:true,syntheticBackendAndOwner:true,actualCoursePageRouterTabsAndFlags:true,url:page.url(),calls,checks:['actual course assessment tab to group report','direct analysis URL after reload','snapshot read','old multi-wave entry remains closed','no page errors']},null,2))
+      console.log('Training actual course route to single report passed'); return
+    }
     await page.getByRole('button',{name:'打开群体报告'}).click(); await page.getByRole('article',{name:'群体报告阅读'}).waitFor()
     assert.equal(calls.some(row=>row.path.includes('/sources/')),false)
     await page.getByRole('button',{name:'选择工具与版本'}).click(); await page.getByLabel('群体报告工具').waitFor()
@@ -52,3 +72,6 @@ const server = http.createServer(async (req,res) => {
     console.log('Training group-report browser contract passed')
   } finally {await browser.close(); await new Promise(resolve=>server.close(resolve))}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1})
+
+}
+main().catch(error=>{console.error(error);process.exitCode=1})

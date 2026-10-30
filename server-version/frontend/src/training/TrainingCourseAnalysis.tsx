@@ -1,3 +1,4 @@
+import { COURSE_ANALYSIS_ENABLED } from './courseNavigation'
 import { TrainingGroupReports } from './TrainingGroupReports'
 import { Link } from 'react-router-dom'
 import {TrainingReferenceStudio,type TrainingReferenceReady} from './TrainingReferenceStudio'
@@ -315,6 +316,7 @@ export function TrainingLongitudinalAnalysis({ courseId,actorId }: { courseId: s
 
 export default function TrainingCourseAnalysis(props: {courseId: string; actorId?: string}) {
   const [view, setView] = useState<'single' | 'comparison'>('single')
+  if (!COURSE_ANALYSIS_ENABLED) return <TrainingGroupReports key={`${props.actorId}:${props.courseId}`} courseId={props.courseId} />
   return <><nav aria-label="课程报告方式"><button type="button" aria-pressed={view === 'single'} onClick={() => setView('single')}>单次群体报告</button><button type="button" aria-pressed={view === 'comparison'} onClick={() => setView('comparison')}>前后测比较</button></nav>
     {view === 'single' ? <TrainingGroupReports key={`${props.actorId}:${props.courseId}`} courseId={props.courseId} /> : <TrainingLongitudinalAnalysis {...props} />}</>
 }
