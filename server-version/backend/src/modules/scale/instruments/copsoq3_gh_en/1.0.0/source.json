@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_gh_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III GH：自评健康（英文Long目录／暂不可施测）",
+      "abbreviation": "COPSOQ3-GH",
+      "instrumentFamily": "COPSOQ III international English Long GH — source metadata; not the China-adapted version"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "自评健康；COPSOQ III国际英文Long第GH尺度2项。该记录仅供源头分类及后续研究追索，JD-R方向作编辑标签OUTCOME，不表示个人诊断、官方中国研究删减版或工具已施测。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "copsoq3_gh_en",
+        "source:COPSOQ_III_2018_international_English_Long",
+        "source_scale:GH",
+        "jdr_editorial_role:OUTCOME",
+        "population:working_adults",
+        "population:teacher_interest_not_validated",
+        "availability:catalog_only",
+        "rights:country_member_contact_pending",
+        "rights:executable_adaptation_scope_unresolved",
+        "scoring:not_installed",
+        "response_types_source_code:7,8"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "国际原量表面向工作人群；中国2025研究为医疗人员样本，不是中国K12教师常模或最终国家版。18岁以上为本项目研究目录范围。"
+    },
+    "administration": {
+      "itemCount": 2,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "现仅标记国际英文Long版题组；中国适用版指导语/回忆窗口未确定，不可据此施测",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "只登记原国际English Long尺度GH、2项和响应类型代码：7,8。代码不是选项内容或授权的独立电子施测表。",
+        "GH2 S1 starred; Chinese type8 omits3 and uses 0–10 while English uses 0–100; don't repair.",
+        "本记录无题文、精确作答标签、反向、缺失算法及可执行评分；不得将特殊类别4/5M或1R/2R静默转0–100。",
+        "CORE/MIDDLE/LONG只按官方国际来源；不推断2025中国医疗研究最终保留的正式中国教师题集。",
+        "目录估计作答时长不是实际测量。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅供溯源、版本与来源风险核查；不是当前项目的授权可施测量表。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "COPSOQ International Network (2018), official English COPSOQ III Long scale source; no original items reproduced and no new translation.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Source type 7,8; GH2 S1 starred; Chinese type8 omits3 and uses 0–10 while English uses 0–100; don't repair.. China national/version selection and usage terms unresolved. Metadata version is not an instrument scoring version."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "COPSOQ III international English Long GH: 自评健康",
+      "citation": "COPSOQ International Network (2018), COPSOQ III Guidelines and Questionnaire, Annex 1. Chinese medical personnel supplement S1 (2025) is a separate version, not selected as a final China teacher form.",
+      "url": "https://www.copsoq-network.org/licence-guidelines-and-questionnaire",
+      "publicationYear": 2018
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "自评健康"
+      ],
+      "limitations": [
+        "This is source metadata only. No executable questionnaire, items, response options, scoring formula, reference policy, personal report, clinical threshold, or permission action is installed.",
+        "Original response code types 7,8. GH2 S1 starred; Chinese type8 omits3 and uses 0–10 while English uses 0–100; don't repair.",
+        "Original international material may be redistributed under COPSOQ guidelines, but country/language coordination, full-versus-short selections, adapted executable extracts, license compliance and applicability to Chinese K12 teachers remain unresolved. Do not claim author endorsement, China teacher norms, or an implemented short form.",
+        "No score, norms or Chinese K12 cutoffs."
+      ],
+      "disclaimer": "CATALOG_ONLY；未提供题文、计分、报告或用户施测配置。"
+    },
+    "blockers": [
+      "COUNTRY_LANGUAGE_TEAM_COORDINATION_PENDING",
+      "EXECUTABLE_ITEM_EXTRACTION_AND_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "ITEM_RESPONSE_AND_SCORING_NOT_PREPARED",
+      "ORIGINAL_CROSS_VERSION_ALIGNMENT_UNRESOLVED"
+    ]
+  }
+}
