@@ -354,7 +354,7 @@ z.extractall('task1-original-builds')`]);
  writeFileSync('onboarding-evidence/build-reuse.json',JSON.stringify({origin:o,originalParentConclusion:run.conclusion,originalJobConclusion:job.conclusion,currentSource:p,verified,reusedComponents:backendReused?['backend','frontend']:['frontend'],backendRecompileRequired:!backendReused,buildExecutedThisRun:false},null,2)+'\n');appendFileSync(process.env.GITHUB_OUTPUT,'reused='+backendReused+'\nbackend-reused='+backendReused+'\nfrontend-reused=true\n');
 }
 
-// PR393 reuses reviewed tests, but its combined main backend has no exact-tree
+// PR393 and PR421 reuse reviewed tests; their combined main backend has no exact-tree
 // compiler result. Execute only that missing check here, never npm run build
 // (which invokes unrelated onboarding/scoring suites). Failure logs survive.
 function qualifyPr393BackendTypes(p,review){

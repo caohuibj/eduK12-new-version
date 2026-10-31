@@ -2712,8 +2712,8 @@
           ],
           "historicalTestDifference": {
             "path": "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
-            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'\u666e\u901a\u95ee\u5377'})).toBeEnabled())",
-            "afterAwait": "await waitFor(()=>expect(screen.queryByText('\u6b63\u5728\u8bfb\u53d6\u6216\u4fdd\u5b58\uff0c\u8bf7\u7a0d\u5019\u2026')).not.toBeInTheDocument())",
+            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'普通问卷'})).toBeEnabled())",
+            "afterAwait": "await waitFor(()=>expect(screen.queryByText('正在读取或保存，请稍候…')).not.toBeInTheDocument())",
             "affectsSelectedCases": false,
             "failedCaseQualifiedBy": "school-recheck"
           }
@@ -3226,7 +3226,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "task group leaf statistics keeps zero, signed values and per-metric missing denominators, using existing statistics",
@@ -3253,11 +3253,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
@@ -3273,11 +3273,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
               "status": "passed"
             },
             {
@@ -3293,11 +3293,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
               "status": "passed"
             },
             {
@@ -4160,7 +4160,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -4600,7 +4600,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -5001,7 +5001,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -5232,7 +5232,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
@@ -5480,7 +5480,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "exact main task artifact migration and native backup upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows",
@@ -10039,7 +10039,7 @@
               "status": "passed"
             },
             {
-              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
+              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
               "status": "passed"
             },
             {
@@ -10053,7 +10053,7 @@
           ],
           "selectedCases": [
             "Reviewed nonempty reports register against the original independent C/P axes 'cfq7_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
-            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
+            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes 'bps9_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes rejects stale C/P bindings, reused R versions and empty report variants without changing the source"
           ],
@@ -13347,7 +13347,7 @@
           },
           "cases": [
             {
-              "fullName": "exposes normal resource and spec draft \u2192 review \u2192 publication with explicit scope",
+              "fullName": "exposes normal resource and spec draft → review → publication with explicit scope",
               "status": "skipped"
             },
             {
@@ -13969,7 +13969,7 @@
     },
     "421": {
       "schemaVersion": 1,
-      "product": "0d3a14c4ff78e8b10d6ddebd62d3e6bc0c6c101c",
+      "product": "7003c0e44ec8d8bf2d94f9ae8149d3f596aaf579",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -13991,8 +13991,16 @@
           "server-version/backend/src/__tests__/integration/integration-env.ts": "cf82ccecf79cecc5f4e80c0c1847ae8c4696de60",
           "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts": "8447cbd6d099b676c187b180d6fbed946ecdc22c",
           "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
-          "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
-          "server-version/backend/prisma": "eeeafc08104fd303620a5a8fbf069b6599c4c87f"
+          "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+        },
+        "prismaDeltaReview": {
+          "originalTree": "eeeafc08104fd303620a5a8fbf069b6599c4c87f",
+          "currentTree": "bbb7e492f175e540333c49680418fb99139077f8",
+          "paths": [
+            "server-version/backend/prisma/migrations/20261030233000_teacher_self_group_scale_license/migration.sql",
+            "server-version/backend/prisma/migrations/20261030234500_education_library_self_group_identity/migration.sql"
+          ],
+          "basis": "Only new Teacher license and education-library resource guard functions; no Cognitive quota/assignment/session/composite-parent/plan tables, columns, indexes or guards changed. Original real quota row contract does not create released education resources or Teacher licenses. Retain original unsigned PG outcomes without replay; current merged backend compiler runs once in CI."
         }
       },
       "reports": [
@@ -14005,20 +14013,80 @@
             "server-version/backend"
           ],
           "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030233000_teacher_self_group_scale_license/migration.sql",
+            "server-version/backend/prisma/migrations/20261030234500_education_library_self_group_identity/migration.sql",
+            "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts",
+            "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/self-group-personal-license.test.ts",
+            "server-version/backend/src/__tests__/integration/librarySelfGroupScale.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherFormGroupSubgroups.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherSelfGroupScale.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
             "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
             "server-version/backend/src/__tests__/training-analysis/group-bundle-leaves.test.ts",
             "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+            "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
             "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
             "server-version/backend/src/modules/huiteacher/disclosureOverlap.service.ts",
             "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
             "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
             "server-version/backend/src/modules/huiteacher/privacyReleaseV2.service.ts",
+            "server-version/backend/src/modules/huiteacher/run.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleLicense.service.ts",
+            "server-version/backend/src/modules/huiteacher/scalePersonalReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts",
+            "server-version/backend/src/modules/organization/access.ts",
+            "server-version/backend/src/modules/organization/organization.routes.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/authorization.ts",
             "server-version/backend/src/modules/reporting/cohort.ts",
+            "server-version/backend/src/modules/reporting/content.controller.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts",
+            "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/engine.ts",
+            "server-version/backend/src/modules/reporting/fixedPopulationPrivacy.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/respondentSummary.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts",
+            "server-version/backend/src/modules/reporting/types.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-catalog.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-group-resources.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-resources.ts",
             "server-version/backend/src/modules/scale/scale-access.ts",
             "server-version/backend/src/modules/scale/scale-restart.service.ts",
             "server-version/backend/src/modules/scale/scale-start.controller.ts",
@@ -14026,7 +14094,7 @@
             "server-version/backend/src/modules/training-analysis/group-source.ts",
             "server-version/backend/src/modules/training-analysis/source.ts"
           ],
-          "sourceAssociationBasis": "Original actual isolated PostgreSQL reporter produced at frozen PR421 source; exact runtime/test imports, locked dependencies and complete Prisma tree compared equal to this aligned candidate.",
+          "sourceAssociationBasis": "Original isolated PostgreSQL reporter at frozen 5a547d0; actual quota runtime/test imports and locked tools remain identical. Later two unrelated Teacher/library trigger migrations were reviewed explicitly, not claimed whole-Prisma equal.",
           "deltaRationale": "Unchanged quota row contract; current integration compiled once by existing missing-check helper. No FINAL or full journey replay.",
           "cases": [
             {
