@@ -12086,7 +12086,7 @@
     },
     "421": {
       "schemaVersion": 1,
-      "product": "3a91432faa2da098aa454d54f9313b7a0d98a1e0",
+      "product": "0d3a14c4ff78e8b10d6ddebd62d3e6bc0c6c101c",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -12124,7 +12124,10 @@
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherFormGroupSubgroups.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
             "server-version/backend/src/__tests__/training-analysis/group-bundle-leaves.test.ts",
             "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts",
             "server-version/backend/src/modules/composite/composite.service.ts",
@@ -12133,6 +12136,9 @@
             "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
             "server-version/backend/src/modules/huiteacher/privacyReleaseV2.service.ts",
             "server-version/backend/src/modules/reporting/cohort.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts",
+            "server-version/backend/src/modules/scale/scale-restart.service.ts",
+            "server-version/backend/src/modules/scale/scale-start.controller.ts",
             "server-version/backend/src/modules/training-analysis/group-report.service.ts",
             "server-version/backend/src/modules/training-analysis/group-source.ts",
             "server-version/backend/src/modules/training-analysis/source.ts"
