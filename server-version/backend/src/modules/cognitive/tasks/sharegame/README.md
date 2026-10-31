@@ -15,3 +15,5 @@
 验证：Node24.21.0，9个后端schema/scorer/identity检查、8个前端DOM/序列检查、1个真实冻结报告builder与1个双profile绑定检查通过。浏览器实际查看390×844与1280×800，实走练习→明确零→下一轮超时，输出choice/0与timeout/null且无页面异常、无横向溢出。浏览器使用2轮、50ms fixation、1500ms timeout合成配置以有界验证交互；不是生产时延或标准20秒计时精度证明。
 
 边界：未连接DB、HTTP持久化FINAL、安装、发布或四入口真实用户流程。局部FINAL预算/连续性、schema、真实scorer及冻结报告builder已测；公共注册/生成及完整候选验收由icarmatrix集成负责人执行。未改公共generated或全局types；V2 task-package、seeds.orders、presentation、semantics和fixture已给齐。原1.0.0公共trial/scorer/types继续保留，不得用2.0.0 schema解读旧事件。前端本地types仅作本工具运行，不需修改共享types。
+
+集成补充：v2专业说明与逐指标公式显式使用有效choice分母；真实零计入有效轮次，timeout/omitted排除，全未答为null。未更改renderer、trial、scorer或旧版说明。公共生成输出仍待四项到齐后统一生成。

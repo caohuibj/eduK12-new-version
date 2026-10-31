@@ -175,6 +175,15 @@ if(v2.reportReading){
  v2.reportReading.summaryByProfile={}
  v2.reportReading.processMetricKeys=['plannedRounds','answeredRounds','timeoutRounds','omittedRounds','zeroChoiceCount','answeredEndowment']
  v2.reportReading.nextStep='先查看有效轮次与未答数，再理解本次选择。可在安静环境另开一次体验；不据此判断品德或人格。'
+ const professional=v2.reportReading.professional
+ if(professional){
+  professional.procedure='每轮点数随配置冻结，从五个档位中明确选择分给同伴的份额。choice包含真实零；timeout/omitted不参与偏好指标分母。给出比例为有效选择给出总额/有效选择点数总额；覆盖率为有效选择轮数/计划轮数。'
+  professional.metricNotes.givingRate={definition:'有效choice的given总和 / 有效choice的endowment总和；真实零包含在分母，超时与未答排除。全未答为null。',readingHint:'先看覆盖率与有效轮数；不作人格或品德评价。'}
+  professional.metricNotes.generousRate={definition:'有效choice中给出比例≥0.5的轮数 / 有效choice轮数；全未答为null。',readingHint:'未答不补零，不与不同有效覆盖率直接比较。'}
+  professional.metricNotes.givingRateSd={definition:'有效choice的各轮给出比例总体标准差；一轮为0，全未答为null。',readingHint:'有效轮次少时，不据此推断稳定偏好。'}
+  professional.metricNotes.medianDecisionMs={definition:'仅有效choice的rtMs中位数；全未答为null。',readingHint:'超时与未答不进入决策用时。'}
+ }
+
 }
 for(const key of ['givingRate','generousRate','equalSplitCount','givingRateSd','medianDecisionMs']){
  v2.metrics[key]={...v2.metrics[key],explanation:'仅依据有效选择轮次计算；未答、超时不进入分母或决策用时。',singleExplanation:'仅依据有效选择轮次计算；未答不补零。'}
