@@ -1,4 +1,5 @@
 import {test} from 'node:test';
+import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
@@ -641,4 +642,25 @@ test('PR444 exact qualifier preserves required component scope and rejects unkno
  const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,444);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.filter(path=>/\.(?:[cm]?js|tsx?)$/.test(path)).sort());
  for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
  const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+test('PR447 exact public-result scope and SAST reject identity, activation, unknown paths and backend drift',()=>{
+ const f=fixture(),paths=['server-version/frontend/src/pages/public/PublicQuestionnaireResult.tsx','server-version/frontend/src/pages/public/__tests__/PublicQuestionnaireResult.race.test.tsx'];
+ f.b.pr=447;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'447',CI_HEAD_REF:BRANCHES[447]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,447);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'445'},{CI_FORCE_FULL:'true'},{CI_EVENT:'workflow_dispatch'}])assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...patch},f.b));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,f.env,{...f.b,enabled:false}));
+ const unknown='server-version/frontend/src/pages/public/PublicQuestionnaire.tsx';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,f.read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/backend'?h('9'):f.read(cmd,a,...r),f.env,f.b));
+});
+test('PR447 retained evidence admits ten actual passes and fresh aligned types while refusing drift and filtered selections',()=>{
+ const r=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['447'],original=r.reports[0],report=decodeOriginal(original,readFileSync(original.path));
+ assert.equal(verifyOriginalReport(report,original).length,10);assert.equal(report.numPendingTests,2);
+ const filtered=original.cases.find(c=>['pending','skipped'].includes(c.status)).fullName;
+ assert.throws(()=>verifyOriginalReport(report,{...original,selectedCases:[filtered]}));assert.throws(()=>decodeOriginal(original,Buffer.from('{}')));
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+ for(const proof of [r.originalExecutionAssociation.candidate,r.originalExecutionAssociation.lint]){const receipt=decodeOriginal(proof,readFileSync(proof.path));assert.equal(receipt.exitCode,0);for(const[path,digest]of Object.entries(receipt.inputs))assert.equal(hash(readFileSync(path)),digest);}
+ const record=r.types[0],receipt=decodeOriginal(record,readFileSync(record.path));assert.equal(verifyTypeReceipt(receipt,record,readFileSync,record.componentTree).originalExitCode,0);
+ assert.throws(()=>verifyTypeReceipt(receipt,record,readFileSync,h('9')));assert.throws(()=>verifyTypeReceipt({...receipt,exitCode:1},record,readFileSync,record.componentTree));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('437,444,447,439'));
 });

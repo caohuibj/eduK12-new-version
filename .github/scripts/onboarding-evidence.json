@@ -17075,6 +17075,145 @@
           "log": "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/frontend-types.log"
         }
       ]
+    },
+    "447": {
+      "schemaVersion": 1,
+      "product": "7292af17b3a7fa8251f100b2068a7c6e85fe1c2d",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "independentDOTReviewPending": true,
+      "environment": {
+        "kind": "Retained PR447 unsigned React/jsdom originals plus one fresh aligned frontend app compiler",
+        "limitations": [
+          "Ten distinct passed original cases and two filtered authenticated cases remain unchanged; original two-failure baseline retained. No application case/lint rerun or original signing.",
+          "All explicitly hashed candidate/lint inputs equal current bytes. Unrelated main frontend deltas are listed below and outside the public result import closure; whole app compiler actually refreshed once on Node24.21.0.",
+          "Original PR447 environment-reuse.json references PR445 inventory only. No445 application receipt or product is admitted; original frontend follow-redirects1.16.1 lock match and sibling backend1.16.1 versus1.16.2 limit remain historical disclosures.",
+          "Fresh compiler uses existing official Node24.21.0 and installed dependencies; selected lock/compiler hashes are not a complete installed-byte attestation. Backend equals current main and is not compiled or executed.",
+          "React/jsdom synthetic fetch/capability fixtures are not live server authorization, native browser, SQL/load/capacity, FINAL, database, build/image, CI or deployment qualification."
+        ]
+      },
+      "reports": [
+        {
+          "id": "pr447-public-result-original10",
+          "path": "docs/performance/public-report-isolation-20261031/candidate.json",
+          "sha256": "653d80e2d331d960e71216ea1adf4e9e9483b985e4e8f6fcea65d47f398d3b7f",
+          "originalSourceAssociation": "03a9cea29c634a36ce6a113c1d13facc693b908c",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.mutation-race.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.race.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionTeacherGroup.test.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+            "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx",
+            "server-version/frontend/src/modules/cognitive/__tests__/api.test.ts",
+            "server-version/frontend/src/modules/cognitive/api.ts",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 10,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "Questionnaire Scale report UI matrix renders the shared DTO without aggregate/overall semantics in authenticated and public pages",
+              "status": "passed"
+            },
+            {
+              "fullName": "Questionnaire Scale report UI matrix clears the previous authenticated report when the next record cannot be read",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Questionnaire Scale report UI matrix ignores a late authenticated report after switching records",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Questionnaire Scale report UI matrix does not leave a missing public session id in an infinite loading state",
+              "status": "passed"
+            },
+            {
+              "fullName": "Questionnaire Scale report UI matrix fails closed with an actionable entry path when the public resume capability is missing",
+              "status": "passed"
+            },
+            {
+              "fullName": "ignores an old report success after the session changes",
+              "status": "passed"
+            },
+            {
+              "fullName": "ignores an old report success after the token changes",
+              "status": "passed"
+            },
+            {
+              "fullName": "ignores an old report failure after the session changes",
+              "status": "passed"
+            },
+            {
+              "fullName": "ignores an old report failure after the token changes",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps the current report loading when the previous read settles first",
+              "status": "passed"
+            },
+            {
+              "fullName": "does not issue a new read without the current resume capability",
+              "status": "passed"
+            },
+            {
+              "fullName": "retains an explicit same-session retry using only the current bearer GET",
+              "status": "passed"
+            }
+          ],
+          "sourceAssociationBasis": "candidate-execution.json retains actual argv/time/exit0 and source/test/config/lock hashes on original basef941e745. The published03a9cea tree is the later immutable equal-product comparison anchor, not a signed execution head. All its nine recorded input hashes match current product.",
+          "deltaRationale": "The17 listed frontend changes belong to main form manager, composition/School/teacher Group/Long paths, Cognitive course API tests and Training loader. Public result, actual capability client/resume/error helper, report DTO/cards/primitives, product UI, existing selected consumer, test setup and frontend package/lock/config are unchanged. None of those changed entry modules is imported by selected public-result cases; preserve10 original passes/2filtered without replay. Whole-component compiler updated separately."
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/public-report-isolation-20261031/qualification/frontend-types.json",
+          "sha256": "a9feebe25ba65158afa32a0dfdf3cb88d5c0c2b479a4bde188d049f65c64327b",
+          "component": "frontend",
+          "componentTree": "9a545fadae5b6d2f7a6177d7b521e12f70e54348",
+          "exitField": "exitCode",
+          "log": "docs/performance/public-report-isolation-20261031/qualification/frontend-types.log"
+        }
+      ],
+      "originalExecutionAssociation": {
+        "candidate": {
+          "path": "docs/performance/public-report-isolation-20261031/candidate-execution.json",
+          "sha256": "434b64c78a3c7658ed2c2395afbb7c836d9429cbb001e0aa2fce9758ce672b04"
+        },
+        "lint": {
+          "path": "docs/performance/public-report-isolation-20261031/changed-lint-execution.json",
+          "sha256": "4d9438b538e1e526d5459a658fdfd9d9f32eb678959f7b51c1729f69c3c52bb5"
+        },
+        "sourceHashes": {
+          "server-version/frontend/src/pages/public/PublicQuestionnaireResult.tsx": "e75d807fcf71b663a5e572e52e245219bca301978955e356878cdd1ee3c58127",
+          "server-version/frontend/src/pages/public/__tests__/PublicQuestionnaireResult.race.test.tsx": "2228c8fe2a65ddbbedf954ada833f6c36678a2e242ac10f8dc6734a80bdc66a3",
+          "server-version/frontend/src/modules/reporting/__tests__/QuestionnaireResult.test.tsx": "e53755510b21d4b5fcdda7dc783f1eaed9ff0c11bc9117d96f31bfc2236a0428",
+          "server-version/frontend/src/api/publicCapabilityClient.ts": "a9dee09e8dc48849a2cbd93be2092be929b8f25a27172a77ad649059c5e63c34",
+          "server-version/frontend/src/utils/questionnaireResume.ts": "eec19f1cda2ccfb00d5249e4f1cae4e43e10ec9e22fb1cacaf3e98d473d18c53",
+          "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+          "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+          "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+          "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+        },
+        "limits": "Static scoped reviewer association; generic admission freezes original blobs/case identities and reviewed delta. Old app type receipt remains historical, not current proof."
+      }
     }
   }
 }
