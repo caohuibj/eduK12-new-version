@@ -31,19 +31,22 @@ import { catalog as task28 } from '../tasks/gamblingdeck/governance'
 import { catalog as task29 } from '../tasks/symbolmatch/governance'
 import { catalog as task30 } from '../tasks/runningspan/governance'
 import { catalog as task31 } from '../tasks/sentencecheck/governance'
-import { catalog as task32 } from '../tasks/seqlearn/governance'
-import { catalog as task33 } from '../tasks/timecopy/governance'
-import { catalog as task34 } from '../tasks/letternumseries/governance'
-import { catalog as task35 } from '../tasks/semanticfluency/governance'
-import { catalog as task36 } from '../tasks/icarmatrix/governance'
-import { catalog as task37 } from '../tasks/cancellation/governance'
-import { catalog as task38 } from '../tasks/trustgame/governance'
-import { catalog as task39 } from '../tasks/ufov/governance'
-import { catalog as task40 } from '../tasks/pursuitrotor/governance'
-import { catalog as task41 } from '../tasks/visualwm/governance'
-import { catalog as task42 } from '../tasks/maze/governance'
-import { catalog as task43 } from '../tasks/auditoryrt/governance'
-import { catalog as task44 } from '../tasks/auditorynback/governance'
+import { catalog as task32 } from '../tasks/lineangle/governance'
+import { catalog as task33 } from '../tasks/seqlearn/governance'
+import { catalog as task34 } from '../tasks/timecopy/governance'
+import { catalog as task35 } from '../tasks/sharegame/governance'
+import { catalog as task36 } from '../tasks/letternumseries/governance'
+import { catalog as task37 } from '../tasks/semanticfluency/governance'
+import { catalog as task38 } from '../tasks/icarmatrix/governance'
+import { catalog as task39 } from '../tasks/cancellation/governance'
+import { catalog as task40 } from '../tasks/trustgame/governance'
+import { catalog as task41 } from '../tasks/embeddedfigures/governance'
+import { catalog as task42 } from '../tasks/ufov/governance'
+import { catalog as task43 } from '../tasks/pursuitrotor/governance'
+import { catalog as task44 } from '../tasks/visualwm/governance'
+import { catalog as task45 } from '../tasks/maze/governance'
+import { catalog as task46 } from '../tasks/auditoryrt/governance'
+import { catalog as task47 } from '../tasks/auditorynback/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -77,17 +80,20 @@ export const cognitiveCatalog = {
   'symbolmatch': task29,
   'runningspan': task30,
   'sentencecheck': task31,
-  'seqlearn': task32,
-  'timecopy': task33,
-  'letternumseries': task34,
-  'semanticfluency': task35,
-  'icarmatrix': task36,
-  'cancellation': task37,
-  'trustgame': task38,
-  'ufov': task39,
-  'pursuitrotor': task40,
-  'visualwm': task41,
-  'maze': task42,
-  'auditoryrt': task43,
-  'auditorynback': task44,
+  'lineangle': task32,
+  'seqlearn': task33,
+  'timecopy': task34,
+  'sharegame': task35,
+  'letternumseries': task36,
+  'semanticfluency': task37,
+  'icarmatrix': task38,
+  'cancellation': task39,
+  'trustgame': task40,
+  'embeddedfigures': task41,
+  'ufov': task42,
+  'pursuitrotor': task43,
+  'visualwm': task44,
+  'maze': task45,
+  'auditoryrt': task46,
+  'auditorynback': task47,
 }

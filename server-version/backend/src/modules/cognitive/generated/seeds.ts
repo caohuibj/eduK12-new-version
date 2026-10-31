@@ -32,19 +32,22 @@ import { seeds as task29 } from '../tasks/gamblingdeck/seeds'
 import { seeds as task30 } from '../tasks/symbolmatch/seeds'
 import { seeds as task31 } from '../tasks/runningspan/seeds'
 import { seeds as task32 } from '../tasks/sentencecheck/seeds'
-import { seeds as task33 } from '../tasks/seqlearn/seeds'
-import { seeds as task34 } from '../tasks/timecopy/seeds'
-import { seeds as task35 } from '../tasks/letternumseries/seeds'
-import { seeds as task36 } from '../tasks/semanticfluency/seeds'
-import { seeds as task37 } from '../tasks/icarmatrix/seeds'
-import { seeds as task38 } from '../tasks/cancellation/seeds'
-import { seeds as task39 } from '../tasks/trustgame/seeds'
-import { seeds as task40 } from '../tasks/ufov/seeds'
-import { seeds as task41 } from '../tasks/pursuitrotor/seeds'
-import { seeds as task42 } from '../tasks/visualwm/seeds'
-import { seeds as task43 } from '../tasks/maze/seeds'
-import { seeds as task44 } from '../tasks/auditoryrt/seeds'
-import { seeds as task45 } from '../tasks/auditorynback/seeds'
+import { seeds as task33 } from '../tasks/lineangle/seeds'
+import { seeds as task34 } from '../tasks/seqlearn/seeds'
+import { seeds as task35 } from '../tasks/timecopy/seeds'
+import { seeds as task36 } from '../tasks/sharegame/seeds'
+import { seeds as task37 } from '../tasks/letternumseries/seeds'
+import { seeds as task38 } from '../tasks/semanticfluency/seeds'
+import { seeds as task39 } from '../tasks/icarmatrix/seeds'
+import { seeds as task40 } from '../tasks/cancellation/seeds'
+import { seeds as task41 } from '../tasks/trustgame/seeds'
+import { seeds as task42 } from '../tasks/embeddedfigures/seeds'
+import { seeds as task43 } from '../tasks/ufov/seeds'
+import { seeds as task44 } from '../tasks/pursuitrotor/seeds'
+import { seeds as task45 } from '../tasks/visualwm/seeds'
+import { seeds as task46 } from '../tasks/maze/seeds'
+import { seeds as task47 } from '../tasks/auditoryrt/seeds'
+import { seeds as task48 } from '../tasks/auditorynback/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -83,9 +86,11 @@ export const cognitiveSeeds = [
   task31[0],
   task32[0],
   task33[0],
+  task33[1],
   task34[0],
   task35[0],
   task36[0],
+  task36[1],
   task37[0],
   task38[0],
   task39[0],
@@ -95,9 +100,12 @@ export const cognitiveSeeds = [
   task43[0],
   task44[0],
   task45[0],
-  task37[1],
-  task37[2],
-  task37[3],
-  task37[4],
+  task46[0],
+  task47[0],
+  task48[0],
+  task39[1],
+  task39[2],
+  task39[3],
+  task39[4],
   task21[1],
 ]

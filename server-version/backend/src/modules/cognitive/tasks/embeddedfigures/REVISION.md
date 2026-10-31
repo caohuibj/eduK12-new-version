@@ -31,3 +31,5 @@ V1生成器、scorer、配置/试次schema及原fixture逐字节保留，并有�
 ## 给 icarmatrix 集成者
 
 合并本局部分支到叠放477的四项共同候选；本task-package声明两个历史/新identity和两套前端entry，新增fixture为1.1.0-1.1.0。按现有流程统一生成 backend/frontend manifests；本分支未修改任何公共generated、全局types、注册、双profile库或CI控制。不要把V1与V2身份折叠，亦不要覆盖旧报告。由母DOT统一检查新增来源与双profile/报告绑定后，按实际完整差异选择已有正式资格；仅本地PASS不等于CI或发布通过。
+
+集成补充：新版前端报告定义显式设showProductIndex=false，与后端冻结报告保持一致，避免兼容展示缺省出现产品指数。旧版定义不变。

@@ -183,6 +183,16 @@
       "scoringVersion": "1.0.0"
     },
     {
+      "testType": "lineangle",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "lineangle",
+      "engineVersion": "2.0.0",
+      "scoringVersion": "2.0.0"
+    },
+    {
       "testType": "seqlearn",
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.0"
@@ -191,6 +201,16 @@
       "testType": "timecopy",
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "sharegame",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "sharegame",
+      "engineVersion": "2.0.0",
+      "scoringVersion": "2.0.0"
     },
     {
       "testType": "letternumseries",
@@ -216,6 +236,16 @@
       "testType": "trustgame",
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "embeddedfigures",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "embeddedfigures",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
     },
     {
       "testType": "ufov",
@@ -397,12 +427,28 @@
       "engineVersion": "1.0.1"
     },
     {
+      "testType": "lineangle",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "lineangle",
+      "engineVersion": "2.0.0"
+    },
+    {
       "testType": "seqlearn",
       "engineVersion": "1.0.1"
     },
     {
       "testType": "timecopy",
       "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "sharegame",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "sharegame",
+      "engineVersion": "2.0.0"
     },
     {
       "testType": "letternumseries",
@@ -431,6 +477,14 @@
     {
       "testType": "trustgame",
       "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "embeddedfigures",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "embeddedfigures",
+      "engineVersion": "1.1.0"
     },
     {
       "testType": "ufov",

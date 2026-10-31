@@ -28,4 +28,4 @@ export const embeddedfiguresRegistryEntry: CognitiveFrontendRegistryEntry = {
 
 const EmbeddedfiguresV2Task=deferredCognitiveRunner(()=>import('./EmbeddedfiguresTask').then(module=>module.EmbeddedfiguresTask))
 export const embeddedfiguresV2RegistryEntry:CognitiveFrontendRegistryEntry={...embeddedfiguresRegistryEntry,engineVersion:'1.1.0',scoringVersion:'1.1.0',RunnerComponent:EmbeddedfiguresV2Task,prepareRunner:EmbeddedfiguresV2Task.prepare,
- reportDefinition:{title:'本次嵌入图形匹配',headlineMetric:'accuracy',summaryMetrics:['medianRtMs','errorCount','timeoutCount'],practicalTips:['从一个角开始沿边确认整个轮廓。','准确率、用时与漏答一起看；一次体验不代表稳定能力。'],disclaimer:'自编七选择任务，不提供诊断、常模、IQ或能力等级。'}}
+ reportDefinition:{title:'本次嵌入图形匹配',showProductIndex:false,headlineMetric:'accuracy',summaryMetrics:['medianRtMs','errorCount','timeoutCount'],practicalTips:['从一个角开始沿边确认整个轮廓。','准确率、用时与漏答一起看；一次体验不代表稳定能力。'],disclaimer:'自编七选择任务，不提供诊断、常模、IQ或能力等级。'}}
