@@ -26,9 +26,12 @@ import {assertSchoolCompositionGroupIdentity} from '../education-tools/school-pr
 
 type Tx=Prisma.TransactionClient
 export const schoolSelfGroupAssignmentSql=(track:Prisma.Sql,assignment:Prisma.Sql)=>Prisma.sql`(
- ${assignment}.analysis_mode='COHORT_AGGREGATE' AND ${assignment}.subject_role='STUDENT' AND ${assignment}.respondent_role='STUDENT'
+ ${assignment}.analysis_mode='COHORT_AGGREGATE'
+ AND ((${assignment}.subject_role='STUDENT' AND ${assignment}.respondent_role='STUDENT'
+   AND ${track}.resource_key LIKE 'education-composition:SCHOOL:%:STUDENT:SELF:1.0.0')
+  OR (${assignment}.subject_role='TEACHER' AND ${assignment}.respondent_role='TEACHER'
+   AND ${track}.resource_key LIKE 'education-composition:TEACHER:%:TEACHER:SELF:1.0.0'))
  AND ${assignment}.subject_user_id=${assignment}.respondent_user_id AND ${assignment}.relationship_kind='SELF' AND ${assignment}.perspective='SELF_REPORT'
- AND ${track}.resource_key LIKE 'education-composition:SCHOOL:%:STUDENT:SELF:1.0.0'
  AND ${track}.frozen_resource_policy->>'analysisMode'='COHORT_AGGREGATE'
  AND ${track}.frozen_resource_policy#>>'{resultDisclosure,policyKey}'='EDUCATION_SELF_GROUP_V2'
  AND ${assignment}.minimum_respondents=(${track}.frozen_resource_policy->>'minimumRespondents')::integer
