@@ -15239,11 +15239,19 @@
           "id": "teacher-form-history-integrated/postgres.json",
           "path": "docs/evidence/teacher-form-group-history-20261031/integrated/postgres.json",
           "sha256": "2fd1643a4f4953989f1d5543923e61d4c3e9d38de77b2ea8217fae0443c868ee",
-          "originalSourceAssociation": "543348730d271605753e00aa1ba301d11d30cbaf",
+          "originalSourceAssociation": "6ae85828c9b18b6a1178e771f58c92aa531e4f08",
           "sourceRoots": [
             "server-version/backend"
           ],
-          "reviewedSourceDelta": [],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts",
+            "server-version/backend/src/modules/composite/composite.controller.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/services/studentTasks.ts"
+          ],
           "sourceAssociationBasis": "Unsigned original stage, retained with its saved source association. The two React cases are reused because this pointer component and runtime imports are unchanged. The PostgreSQL case executed the identical test/source bytes saved in 6ae85828c; the preceding engine-missing failure remains archived, not relabeled as successful.",
           "deltaRationale": "Intervening main changes concern separate report/School/longitudinal and dependency inputs. The Form directory service and UI only add the reviewed seek/append path. Current integrated backend/frontend types each passed once. No original React case, native FINAL or application suite was replayed.",
           "summary": {
