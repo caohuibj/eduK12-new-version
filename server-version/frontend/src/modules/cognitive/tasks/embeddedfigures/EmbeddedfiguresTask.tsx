@@ -55,7 +55,7 @@ export const EmbeddedfiguresTask=({taskContext,trialIndex,onTrialComplete,onTask
   if(phase!=='formal'||pending.current)return
   const elapsed=started.current===null?config.timeoutMs:Math.max(0,performance.now()-started.current)
   const timedOut=choice===null||elapsed>=config.timeoutMs
-  const payload={itemIndex:trialIndex,clickedShapeId:timedOut?null:choice,rtMs:timedOut?null:Math.round(elapsed),interrupted:interrupted.current}
+  const payload={itemIndex:trialIndex,clickedShapeId:timedOut?null:choice,rtMs:timedOut?null:Math.floor(elapsed),interrupted:interrupted.current}
   pending.current=payload;setStep('feedback');void persist(payload)
  },[step,practice,item.targetId,phase,config.timeoutMs,trialIndex,persist])
  useEffect(()=>{

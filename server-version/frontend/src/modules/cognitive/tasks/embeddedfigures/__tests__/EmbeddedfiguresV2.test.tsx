@@ -66,4 +66,14 @@ describe('corrected embedded figures runner',()=>{
   expect(screen.getByRole('status')).toHaveTextContent('已完成，正在准备本次结果')
   expect(save).toHaveBeenCalledTimes(1);expect(complete).toHaveBeenCalledTimes(2)
  })
+ it('keeps accepted integer RT below the deadline and treats the deadline itself as timeout',async()=>{
+  for(const elapsed of [14999.9,15000]){
+   const save=vi.fn().mockResolvedValue(undefined)
+   const view=render(<EmbeddedfiguresTask taskContext={context as CognitiveTaskProps['taskContext']} trialIndex={0} onTrialComplete={save}/>);await formal()
+   now+=elapsed;fireEvent.click(choice(embeddedfiguresItemV2('fixture',0).targetId));await act(async()=>{})
+   expect(save).toHaveBeenCalledTimes(1)
+   expect(save.mock.calls[0][0]).toMatchObject(elapsed<15000?{clickedShapeId:embeddedfiguresItemV2('fixture',0).targetId,rtMs:14999}:{clickedShapeId:null,rtMs:null})
+   view.unmount()
+  }
+ })
 })
