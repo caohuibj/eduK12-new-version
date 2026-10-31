@@ -1,0 +1,161 @@
+{
+  "kind": "RECORDED_LOCAL_SYNTHETIC_OBSERVATIONS_UNSIGNED",
+  "base": "d420e90e46036b4518a0f729cb3e1ef4b9ca3306",
+  "branch": "perf/questionnaire-target-availability-20261031",
+  "node": "v24.21.0",
+  "timezone": "UTC",
+  "backendCommand": "TZ=UTC QUESTIONNAIRE_AVAILABLE_MEASURE_OUTPUT=<metrics> node node_modules/vitest/vitest.mjs run src/__tests__/questionnaire/available-target.test.ts --maxWorkers=2 --reporter=json --outputFile=<report>",
+  "frontendCommand": "TZ=UTC node node_modules/vitest/vitest.mjs run src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx --maxWorkers=2 --reporter=json --outputFile=<report>",
+  "reports": [
+    {
+      "path": "docs/performance/questionnaire-target-20261031/backend-baseline.json.gz",
+      "originalJSONSHA256": "c851ac71671570c345752c17d47decfe2160a7c9680ff9b434d11a69d0dfd78a",
+      "gzipSHA256": "78a52215dbe5eaa441cd77342737289cca2769579ff7bf1f68a34f53e7f2ccb3",
+      "exitCode": 1,
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 6,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "keeps the default catalog and identical target DTO while narrowing questionnaire and attempt rows",
+          "status": "failed"
+        },
+        {
+          "fullName": "keeps not-joined outside target availability",
+          "status": "failed"
+        },
+        {
+          "fullName": "keeps draft outside target availability",
+          "status": "failed"
+        },
+        {
+          "fullName": "keeps general outside target availability",
+          "status": "failed"
+        },
+        {
+          "fullName": "keeps private outside target availability",
+          "status": "failed"
+        },
+        {
+          "fullName": "keeps missing outside target availability",
+          "status": "failed"
+        }
+      ]
+    },
+    {
+      "path": "docs/performance/questionnaire-target-20261031/frontend-baseline.json.gz",
+      "originalJSONSHA256": "2387e7f2d9ed996c3a6db6abbe52dd78735d3227ffafff1ff653d88192bf82df",
+      "gzipSHA256": "31d322000c3a669eae5a91bdf194fd41c868d0a22224012ac787dc57d0fd32c8",
+      "exitCode": 1,
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 3,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "opens only the target questionnaire with unchanged active-with-completed dispatch",
+          "status": "failed"
+        },
+        {
+          "fullName": "opens only the target questionnaire with unchanged completed dispatch",
+          "status": "failed"
+        },
+        {
+          "fullName": "opens only the target questionnaire with unchanged unstarted dispatch",
+          "status": "failed"
+        }
+      ]
+    },
+    {
+      "path": "docs/performance/questionnaire-target-20261031/backend-fixed.json.gz",
+      "originalJSONSHA256": "59fc728d5b3665b1866be1f3843c0519a8faa78b3d3f9500ac7a7102be1efdfa",
+      "gzipSHA256": "abc9a24c4d364b8b9bbd8f21ef05ae752203fcfcc02315f922b73869dfd1f7f7",
+      "exitCode": 0,
+      "summary": {
+        "success": true,
+        "numPassedTests": 6,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "keeps the default catalog and identical target DTO while narrowing questionnaire and attempt rows",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps not-joined outside target availability",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps draft outside target availability",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps general outside target availability",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps private outside target availability",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps missing outside target availability",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "path": "docs/performance/questionnaire-target-20261031/frontend-fixed.json.gz",
+      "originalJSONSHA256": "e2584822b82ddb43e173acfafbf0dd774d6de2d5849ead133f14df13b9e0551f",
+      "gzipSHA256": "18189e9b10a1b76a790cfbc4858e11aef4a31aa2cda93ccb6307bb139ca5e0d1",
+      "exitCode": 0,
+      "summary": {
+        "success": true,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "opens only the target questionnaire with unchanged active-with-completed dispatch",
+          "status": "passed"
+        },
+        {
+          "fullName": "opens only the target questionnaire with unchanged completed dispatch",
+          "status": "passed"
+        },
+        {
+          "fullName": "opens only the target questionnaire with unchanged unstarted dispatch",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "currentSourceSHA256": {
+    "server-version/backend/src/controllers/questionnaireController.ts": "0b8890c1455a0b05894dec4e1d0d85b8884132bfc0668516ab4c33a80c98a533",
+    "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": "67303f18c15e060a99d8ae5851d79f90db946c50cb76caa6d13ab15749223d43",
+    "server-version/backend/src/__tests__/questionnaire/available-target.test.ts": "23409a7caade2f6e4f9207a99d83b85b34954e379972b2dd857e3ed8e65392d9",
+    "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx": "5ff8d11512b5b82788263f79a3b48b27dfe8a7aed88a78d4a19deaedc0c0392b",
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+  },
+  "fixtureSHA256": "ddcbf9cdbb1f9f868775bf85372cb3669a5ed48ff1ea8562e0cbf1d3e4c9ee1e",
+  "scope": "Actual controller with a Prisma fixture adapter; actual React/jsdom entry with synthetic available/start replies and a stub child runner. Body bytes are serialized controller JSON and deterministic gzip1, not network transfer. Row counts describe fixture records selected by the real where/attempt scope, not PostgreSQL execution metrics.",
+  "notExecuted": [
+    "existing platform/business suites",
+    "real database/auth/attempt lifecycle",
+    "compiler/build/browser",
+    "CI/upload/push/PR/merge/deployment"
+  ],
+  "publicationBoundary": "Independent local branch only; published PR432 remains exactly ef838daaea54c379b2b6c29fbf32d10b063d17ba and is not amended."
+}
