@@ -748,6 +748,8 @@ export const scaleController = {
         status: 'PUBLISHED'
       }
 
+      if (req.query.courseId) where.courseScales = { some: { courseId: req.query.courseId as string } }
+
       if (userRole === UserRole.STUDENT) {
         // 获取学生所在的所有课程ID
         const courseStudents = await prisma.courseStudent.findMany({

@@ -932,7 +932,13 @@ export const questionnaireController = {
       const questionnaire = await courseQuestionnaire(req.params.id)
       if (!questionnaire) return notFound(res, '问卷不存在')
       if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
-      return success(res, { list: await formSectionService.listQuestionnaireFormSections(req.params.id) })
+      const list = await formSectionService.listQuestionnaireFormSections(req.params.id)
+      // Reuse the repaired section snapshot; default callers keep the original DTO.
+      if (req.query?.include === 'units') {
+        const units = await formSectionService.listQuestionnaireContentUnits(req.params.id, list)
+        return success(res, { list, units })
+      }
+      return success(res, { list })
     } catch (err) {
       logger.error('获取表单区段列表错误', err)
       return error(res, '获取表单区段列表失败')

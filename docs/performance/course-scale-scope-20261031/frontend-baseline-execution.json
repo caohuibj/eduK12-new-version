@@ -1,0 +1,52 @@
+{
+  "kind": "ACTUAL_UNSIGNED_LOCAL_PROCESS_RECORD",
+  "name": "frontend-baseline",
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/training/courseAssessments.test.ts",
+    "--reporter=json",
+    "--outputFile=/tmp/course-scale-scope-20261031/frontend-baseline.json",
+    "--testNamePattern=uses enrolled course scopes"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+  "startedAt": "2026-10-31T03:40:07.951770+00:00",
+  "endedAt": "2026-10-31T03:40:09.246166+00:00",
+  "elapsedSeconds": 1.2944110150001507,
+  "exitCode": 1,
+  "head": "c63382d0eb6629c7bacbd853b8feb92e0257d46b",
+  "tree": "5b03c6b181926ef95a6108404f7d3e2393733345",
+  "sourceAssociation": "Uncommitted source bytes hashed below; HEAD identifies base only, not execution authentication.",
+  "node": "v24.21.0",
+  "before": {
+    "server-version/backend/src/controllers/scaleController.ts": "78d11ae279150cfa50daebb1aee98d1f6a17c41eead119378966f4b48af943ef",
+    "server-version/backend/src/__tests__/scale/available-course.test.ts": "92fdff5331757184d497e50757da1c8d31a92ea4c37350addeffbc0bfd152aed",
+    "server-version/frontend/src/training/courseAssessments.ts": "dd59500daf31ae2a78559d17af55b7af05977a9f4d8d94fe552a3375c60f2868",
+    "server-version/frontend/src/training/courseAssessments.test.ts": "36516ca04b5cc0c0cd6e9aec69c013541fd565d02de40f388783a34240aedfd8",
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/tsconfig.json": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808"
+  },
+  "after": {
+    "server-version/backend/src/controllers/scaleController.ts": "78d11ae279150cfa50daebb1aee98d1f6a17c41eead119378966f4b48af943ef",
+    "server-version/backend/src/__tests__/scale/available-course.test.ts": "92fdff5331757184d497e50757da1c8d31a92ea4c37350addeffbc0bfd152aed",
+    "server-version/frontend/src/training/courseAssessments.ts": "dd59500daf31ae2a78559d17af55b7af05977a9f4d8d94fe552a3375c60f2868",
+    "server-version/frontend/src/training/courseAssessments.test.ts": "36516ca04b5cc0c0cd6e9aec69c013541fd565d02de40f388783a34240aedfd8",
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/tsconfig.json": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808"
+  },
+  "logSHA256": "5a3721c42c5c97a0ad3185eb2b8270dfeb432ca2193a1b19146589a5d9503e22",
+  "jsonSHA256": "daa21c2e4902c3fa58fa7c5ca3ab4d3eded0561aadc0ec650978e609e7e6b409"
+}

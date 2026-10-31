@@ -106,8 +106,8 @@ export const cognitiveApi = {
     apiClient.delete<any>(`/cognitive/assignments/${id}/public-tokens/${tokenId}`),
   exportData: (id: string, body: { detail: 'summary' | 'full' | 'research'; format: 'csv' | 'sav' | 'zip' | 'xlsx' }, requestKey?: string) =>
     apiClient.post<{ artifacts: import('../../utils/exportJobs').ExportArtifactRef[] }>(`/cognitive/assignments/${id}/export`, body, { headers: { 'X-Export-Request-Key': requestKey } }),
-  getMyAssignments: () =>
-    apiClient.get<CognitiveAssignmentSummary[]>('/cognitive/assignments/my'),
+  getMyAssignments: (courseId?: string) =>
+    apiClient.get<CognitiveAssignmentSummary[]>('/cognitive/assignments/my' + (courseId ? '?courseId=' + encodeURIComponent(courseId) : '')),
   getAssignment: (id: string) =>
     apiClient.get<CognitiveAssignmentSummary>(`/cognitive/assignments/${id}`),
   getHistory: (page = 1, pageSize = 20) =>

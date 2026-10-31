@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/training/courseAssessments.test.ts",
+    "--testNamePattern=uses enrolled course scopes",
+    "--reporter=json",
+    "--outputFile=/workspace/scratch/5a77e8bdc1ae/dot-course-cognitive-436/docs/performance/cognitive-course-scope-20261031/final-qualification/combined-loader.json"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-31T05:06:40.323840+00:00",
+  "endedAt": "2026-10-31T05:06:41.334625+00:00",
+  "elapsedSeconds": 1.010790297998028,
+  "head": "7865d827acb9b83609bde38b996db005f2f42038",
+  "inputs": {
+    "server-version/frontend/src/training/courseAssessments.ts": "c1e105e67e164308c2bc87a07104a82a77ad46d69bb06761e31b878b6e0a2a90",
+    "server-version/frontend/src/training/courseAssessments.test.ts": "a78cd6b1ab4950e7dc49aa2b481e7ad4cc2c64427353d625bfa63623c7599207",
+    "server-version/frontend/src/modules/cognitive/api.ts": "199fbe49dfff025c6e71730dcb0d9a509899bc71b0c88661cf312f094d51ee51",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  }
+}
