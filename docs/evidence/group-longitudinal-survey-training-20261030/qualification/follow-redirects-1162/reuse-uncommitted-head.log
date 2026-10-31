@@ -1,0 +1,36 @@
+✖ group single patched HTTP dependency preserves native and frontend qualification while rejecting other drift (56.432966ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 178.951666
+
+✖ failing tests:
+
+test at .github/scripts/personal-tracking-ready.test.mjs:163:1
+✖ group single patched HTTP dependency preserves native and frontend qualification while rejecting other drift (56.432966ms)
+  AssertionError [ERR_ASSERTION]: Only the approved backend lock patch can reuse this qualification
+  + actual - expected
+  
+    [
+  +   ''
+  -   'server-version/backend/package-lock.json',
+  -   'server-version/backend/package.json'
+    ]
+  
+      at verifyOriginalQualification (file:///workspace/eduK12-group-longitudinal-ready/.github/scripts/personal-tracking-ready.mjs:173:10)
+      at TestContext.<anonymous> (file:///workspace/eduK12-group-longitudinal-ready/.github/scripts/personal-tracking-ready.test.mjs:171:23)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ '' ],
+    expected: [ 'server-version/backend/package-lock.json', 'server-version/backend/package.json' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

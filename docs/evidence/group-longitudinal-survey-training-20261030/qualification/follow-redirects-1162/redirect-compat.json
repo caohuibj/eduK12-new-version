@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "node": "v24.19.0",
+  "axios": "1.20.0",
+  "followRedirects": "1.16.2",
+  "actualLoopbackHTTP": true,
+  "syntheticOnly": true,
+  "cases": [
+    "cross-realm sensitive header removed across origins",
+    "same-origin redirect retains declared custom header",
+    "Axios1.20 redirect compatibility"
+  ],
+  "backendOrFinalTestsReplayed": false
+}

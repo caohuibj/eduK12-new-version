@@ -64,7 +64,7 @@ export function groupLongitudinalReadyPlan(entries,base,head,{event,branch,draft
  }
  for(const [key,component]of [['backendAuditReuse','backend'],['frontendAuditReuse','frontend']])if(binding[key])for(const file of ['package.json','package-lock.json'])assert.equal(git('rev-parse',head+':server-version/'+component+'/'+file),git('rev-parse',binding[key].sourceHead+':server-version/'+component+'/'+file),'Original audit locked input changed');
  const runtime=entries.filter(e=>/\.(?:[cm]?js|[cm]?ts|jsx|tsx)$/.test(e.file)).map(e=>e.file);
- return {schemaVersion:1,route:'personal-tracking',slice:'group',...(binding.backendAuditReuse?{backendAuditReuse:binding.backendAuditReuse}:{}),...(binding.frontendAuditReuse?{frontendAuditReuse:binding.frontendAuditReuse}:{}),branch,base,head,tree:git('rev-parse',head+'^{tree}'),
+ return {schemaVersion:1,route:'personal-tracking',slice:'group',...(binding.qualificationReuse?{qualificationReuse:binding.qualificationReuse}:{}),...(binding.backendAuditReuse?{backendAuditReuse:binding.backendAuditReuse}:{}),...(binding.frontendAuditReuse?{frontendAuditReuse:binding.frontendAuditReuse}:{}),branch,base,head,tree:git('rev-parse',head+'^{tree}'),
   draft:draft===true,reviewedCandidate:binding.reviewedCandidate,
   sastPaths:[...new Set([...runtime,'.github/scripts/personal-tracking-ready.mjs'])],
   frontendLintPaths:runtime.filter(p=>p.startsWith('server-version/frontend/src/')).map(p=>p.slice('server-version/frontend/'.length)),
@@ -146,14 +146,37 @@ export async function verifyOriginalApplicationSast(plan,fetcher=fetch,now=Date.
 }
 function nativeSourceInput(source){return source.slice(source.indexOf('\nexport function prepareMainSchema('),source.lastIndexOf("\nif(process.argv[1]"));}
 function qualificationJobInput(workflow){return workflow.slice(workflow.indexOf('  personal-tracking:\n'),workflow.indexOf('  merge-gate:\n')).split('\n').filter(line=>!line.includes("if: ${{ !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').qualificationReuse")).join('\n');}
+/** The single approved lock patch is outside Prisma/native tools. All other
+ * package bytes, application source and schema must remain identical. */
+export function verifyFollowRedirectsPatchOnly(beforePackage,beforeLock,afterPackage,afterLock){
+ assert.equal(beforePackage.overrides['follow-redirects'],'1.16.1');
+ assert.equal(afterPackage.overrides['follow-redirects'],'1.16.2');
+ const manifest=structuredClone(afterPackage);manifest.overrides['follow-redirects']='1.16.1';assert.deepEqual(manifest,beforePackage,'Unrelated backend manifest changed');
+ const key='node_modules/follow-redirects',old=beforeLock.packages[key],next=afterLock.packages[key];
+ assert.equal(old.version,'1.16.1');assert.equal(next.version,'1.16.2');
+ assert.equal(next.resolved,'https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.2.tgz');
+ assert.equal(next.integrity,'sha512-/kVP2U8z596Ia0gwFrwyIeo74ta5aVmSeU1FfAUMAmcEP5EP7zydmag3SLiN64NaRKef3lxsq7i/g7ltJQDGow==');
+ const record={...next,version:old.version,resolved:old.resolved,integrity:old.integrity};assert.deepEqual(record,old,'Unexpected package metadata delta');
+ const lock=structuredClone(afterLock);lock.packages[key]=old;assert.deepEqual(lock,beforeLock,'Other locked input changed');
+ const refs=name=>Object.entries(afterLock.packages).filter(([,v])=>['dependencies','optionalDependencies','peerDependencies'].some(k=>Object.hasOwn(v[k]??{},name))).map(([path])=>path).sort();
+ assert.deepEqual(refs('follow-redirects'),['node_modules/axios']);assert.deepEqual(refs('axios'),[''],'Native tools must not depend on the patched library');
+ return {name:'follow-redirects',from:'1.16.1',to:'1.16.2',prismaDependencyGraphUnchanged:true};
+}
 export async function verifyOriginalQualification(plan,fetcher=fetch,now=Date.now()){
  const proof=plan.qualificationReuse;assert(proof&&JSON.stringify(proof)===JSON.stringify(binding.qualificationReuse));assert(process.env.GH_TOKEN);
  assert.equal(git('rev-parse',proof.sourceHead+':server-version'),proof.serverVersionTree);
- if(!proof.nativeOnly)assert.equal(git('rev-parse','HEAD:server-version'),proof.serverVersionTree);
- for(const path of ['server-version/backend/prisma','server-version/backend/package.json','server-version/backend/package-lock.json'])assert.equal(git('rev-parse','HEAD:'+path),git('rev-parse',proof.sourceHead+':'+path),'Original native schema/tool input changed: '+path);
+ if(!proof.nativeOnly&&!proof.followRedirectsPatchOnly)assert.equal(git('rev-parse','HEAD:server-version'),proof.serverVersionTree);
+ const nativeInputs=proof.followRedirectsPatchOnly?['server-version/backend/prisma']:['server-version/backend/prisma','server-version/backend/package.json','server-version/backend/package-lock.json'];
+ for(const path of nativeInputs)assert.equal(git('rev-parse','HEAD:'+path),git('rev-parse',proof.sourceHead+':'+path),'Original native schema/tool input changed: '+path);
+ if(proof.followRedirectsPatchOnly){
+  assert.equal(binding.slice,'group');assert.equal(proof.nativeOnly,false);
+  assert.deepEqual(git('diff','--name-only',proof.sourceHead,'HEAD','--','server-version').split('\n'),['server-version/backend/package-lock.json','server-version/backend/package.json'],'Only the approved backend lock patch can reuse this qualification');
+  const originalJson=path=>JSON.parse(execFileSync('git',['show',proof.sourceHead+':'+path],{encoding:'utf8'}));
+  verifyFollowRedirectsPatchOnly(originalJson('server-version/backend/package.json'),originalJson('server-version/backend/package-lock.json'),JSON.parse(readFileSync('server-version/backend/package.json')),JSON.parse(readFileSync('server-version/backend/package-lock.json')));
+ }
  const original=execFileSync('git',['show',proof.sourceHead+':.github/scripts/personal-tracking-ready.mjs'],{encoding:'utf8'}),current=readFileSync(new URL(import.meta.url),'utf8');
  assert.equal(nativeSourceInput(current),nativeSourceInput(original),'Native qualification code changed');
- const originalBinding=JSON.parse(execFileSync('git',['show',proof.sourceHead+':.github/scripts/personal-tracking-ready.json'],{encoding:'utf8'}));
+ const originalBinding=binding.slice==='group'?JSON.parse(execFileSync('git',['show',proof.sourceHead+':.github/scripts/group-longitudinal-ready.json'],{encoding:'utf8'})).candidates[binding.branch]:JSON.parse(execFileSync('git',['show',proof.sourceHead+':.github/scripts/personal-tracking-ready.json'],{encoding:'utf8'}));
  const baselineSchema=git('rev-parse',binding.base+':server-version/backend/prisma');
  if(proof.candidateAsBaseline){assert.equal(proof.nativeOnly,true,'Candidate state admits native-only evidence');assert.equal(baselineSchema,git('rev-parse',proof.sourceHead+':server-version/backend/prisma'),'Qualified candidate state differs from current base; no-migration reuse refused');}
  else assert.equal(baselineSchema,git('rev-parse',originalBinding.base+':server-version/backend/prisma'),'Original native main schema changed');
@@ -161,7 +184,7 @@ export async function verifyOriginalQualification(plan,fetcher=fetch,now=Date.no
  const response=await fetcher('https://api.github.com/repos/'+binding.repository+'/actions/jobs/'+proof.jobId,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok,'Official successful qualification metadata inaccessible: '+response.status);const job=await response.json();
  assert.equal(job.id,proof.jobId);assert.equal(job.run_id,proof.runId);assert([proof.sourceHead,proof.executionHead].includes(job.head_sha));assert.equal(job.name,'personal tracking / original evidence and native migration');assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
  const age=now-Date.parse(job.completed_at);assert(Number.isFinite(age)&&age>=-300000&&age<=proof.maximumAgeHours*3600000,'Original qualification expired');
- for(const name of ['admit exact original local reporters without application replay','install locked native migration tools','real nonempty main upgrade and native dump restore',...(proof.nativeOnly?[]:['install frontend tools and audit locked inputs','actual frontend app types and affected source lint'])])assert.equal(job.steps.find(s=>s.name===name)?.conclusion,'success','Original qualification step missing or failed: '+name);
+ for(const name of ['admit exact original local reporters without application replay','install locked native migration tools','real nonempty main upgrade and native dump restore',...(proof.nativeOnly?[]:[binding.slice==='group'?'install frontend tools':'install frontend tools and audit locked inputs','actual frontend app types and affected source lint'])])assert.equal(job.steps.find(s=>s.name===name)?.conclusion,'success','Original qualification step missing or failed: '+name);
  return {status:proof.nativeOnly?'ADMITTED_NATIVE_QUALIFICATION_ONLY':'ADMITTED_COMPLETE_NATIVE_FRONTEND_QUALIFICATION',runId:proof.runId,jobId:proof.jobId,sourceHead:proof.sourceHead,executionHead:proof.executionHead,reexecuted:false,base:binding.base,originalServerVersionTree:proof.serverVersionTree,nativeSchemaTree:git('rev-parse','HEAD:server-version/backend/prisma'),candidateAsBaseline:proof.candidateAsBaseline===true,frontendAdmitted:!proof.nativeOnly};
 }
 export function prepareMainSchema(temporary){
