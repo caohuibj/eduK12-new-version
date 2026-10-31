@@ -25,6 +25,12 @@ has_flag <- function(flag) !is.na(match(flag, args))
 
 simulate_mode <- has_flag("--simulate")
 input_path <- arg_value("--input")
+status_arg <- arg_value("--status")
+if (simulate_mode && !is.na(input_path)) stop("Choose exactly one of --simulate and --input")
+if (!simulate_mode && (is.na(input_path) || !file.exists(input_path))) stop("A readable --input response matrix is required")
+if (!is.na(status_arg) && (simulate_mode || status_arg != "PILOT_CALIBRATED")) {
+  stop("Calibration output may only be PILOT_CALIBRATED; VALIDATED requires independent evidence review")
+}
 seed <- { v <- arg_value("--seed"); if (is.na(v)) 20261031L else as.integer(v) }
 n_persons <- { v <- arg_value("--persons"); if (is.na(v)) 1000L else as.integer(v) }
 n_items <- { v <- arg_value("--items"); if (is.na(v)) 20L else as.integer(v) }
@@ -34,6 +40,7 @@ out_path <- { v <- arg_value("--out"); if (is.na(v)) {
 } else v }
 calibration_version <- { v <- arg_value("--calibration-version"); if (is.na(v)) "cal-matgen-v0.1.0-sim" else v }
 script_dir <- dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))
+if (file.exists(out_path)) stop("Refusing to overwrite an existing calibration snapshot; choose a new --out path")
 
 # ---- 模式一：参数恢复仿真 ----
 run_simulation <- function() {
@@ -94,12 +101,36 @@ run_simulation <- function() {
 # ---- 模式二：真实/试测数据标定 ----
 run_calibration <- function() {
   payload <- fromJSON(input_path, simplifyVector = FALSE)
-  stopifnot(payload$schemaVersion == 1L)
-  item_ids <- unlist(payload$itemIds)
-  # persons × items 的 0/1 矩阵（NA 允许，mirt 按缺失处理）
-  resp <- as.data.frame(matrix(unlist(payload$responses), nrow = length(payload$personIds), byrow = TRUE))
+  if (!identical(payload$schemaVersion, 1L) || !identical(payload$dataOrigin, "real") ||
+      !identical(payload$testType, "icarmatrix") || !identical(payload$engineVersion, "2.0.0") ||
+      !identical(payload$scoringVersion, "1.0.0") ||
+      !identical(payload$stimulusSetVersion, "matgen-bank-v1.0.0") ||
+      is.null(payload$configVersion) || is.null(payload$matrixType) ||
+      is.null(payload$sampleDescription) || !nzchar(payload$sampleDescription)) {
+    stop("Invalid or mixed frozen real-origin matrix research input")
+  }
+  person_ids <- unlist(payload$personIds, use.names = FALSE)
+  item_ids <- unlist(payload$itemIds, use.names = FALSE)
+  if (length(person_ids) == 0L || length(item_ids) < 2L ||
+      anyDuplicated(person_ids) || anyDuplicated(item_ids) ||
+      length(payload$responses) != length(person_ids)) stop("Invalid respondent/item identities or row count")
+  # Preserve JSON null as NA; unlist() silently DROPS nulls and shifts later answers.
+  response_matrix <- matrix(NA_integer_, nrow = length(person_ids), ncol = length(item_ids))
+  for (i in seq_along(person_ids)) {
+    row <- payload$responses[[i]]
+    if (length(row) != length(item_ids)) stop(sprintf("Row %d has inconsistent item count", i))
+    for (j in seq_along(item_ids)) {
+      value <- row[[j]]
+      if (is.null(value)) next
+      if (length(value) != 1L || !is.numeric(value) || !(value %in% c(0, 1))) {
+        stop(sprintf("Response %d/%d must be 0, 1 or null", i, j))
+      }
+      response_matrix[i, j] <- as.integer(value)
+    }
+  }
+  if (any(colSums(!is.na(response_matrix)) < 5L)) stop("At least five observed responses per item required for a preliminary fit")
+  resp <- as.data.frame(response_matrix)
   names(resp) <- item_ids
-  storage.mode(resp) <- "integer"
   fit <- mirt(data = resp, model = 1, itemtype = "2PL", SE = TRUE, verbose = FALSE)
   coef_list <- coef(fit, IRTpars = TRUE, simplify = TRUE)$items
   # CTT 项目统计
@@ -120,14 +151,14 @@ run_calibration <- function() {
     snapshot = list(
       schemaVersion = 1L,
       calibrationVersion = calibration_version,
-      status = { v <- arg_value("--status"); if (is.na(v)) "PILOT_CALIBRATED" else v },
+      status = "PILOT_CALIBRATED",
       model = "2PL",
       estimation = paste0("mirt ", as.character(packageVersion("mirt")), " (MMLE), offline"),
       sample = list(n = nrow(resp), itemCount = ncol(resp), population = payload$sampleDescription %||% "unspecified"),
       items = items,
       diagnostics = list(
-        m2 = tryCatch({ m2(fit) }, error = function(e) NULL),
-        note = "DIF/local-dependence checks per roadmap B2 are required before status can advance to VALIDATED."
+        m2 = tryCatch({ M2(fit) }, error = function(e) list(error = conditionMessage(e))),
+        note = "Preliminary fit only. DIF, local dependence, sampling and independent review are still required before VALIDATED."
       ),
       generatedAtUtc = format(as.POSIXct(Sys.time(), tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ"),
       provenance = paste0("Calibrated from item-level research dataset (dataOrigin=", payload$dataOrigin, "); raw responses are never overwritten.")

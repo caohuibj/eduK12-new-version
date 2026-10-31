@@ -36,6 +36,20 @@ describe('IRT calibration snapshot (roadmap v2.0 PR5)', () => {
       }),
     ).not.toThrow() // schema 层不做状态判定；引用许可由 isCalibrationReferenceAllowed 消费方把关
     expect(isCalibrationReferenceAllowed({ ...snapshot, status: 'PILOT_CALIBRATED', provenance: 'real sample' })).toBe(true)
+    expect(isCalibrationReferenceAllowed({ ...snapshot, status: 'VALIDATED', provenance: 'real sample' })).toBe(false)
+    expect(isCalibrationReferenceAllowed({
+      ...snapshot, status: 'VALIDATED', provenance: 'real sample', evidenceReviewRef: 'scientific-review/pilot1',
+    })).toBe(true)
+  })
+
+  it('requires independent evidence identity before declaring VALIDATED', () => {
+    const base = JSON.parse(readFileSync(SNAPSHOT_PATH, 'utf8'))
+    base.items = base.items.map(({ trueA: _a, trueB: _b, ...item }: Record<string, unknown>) => item)
+    base.status = 'VALIDATED'
+    base.provenance = 'real pilot data'
+    expect(calibrationSnapshotSchema.safeParse(base).success).toBe(false)
+    base.evidenceReviewRef = 'scientific-review/pilot1'
+    expect(calibrationSnapshotSchema.safeParse(base).success).toBe(true)
   })
 
   it('rejects true-parameter leakage into non-simulation snapshots', () => {

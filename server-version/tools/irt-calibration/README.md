@@ -10,13 +10,21 @@
 
 ```bash
 # 参数恢复仿真（无真实数据时的管线验证；快照 status=SIMULATION_ONLY）
-Rscript calibrate-matrix.R --simulate --persons 1000 --items 20 --seed 20261031
+Rscript calibrate-matrix.R --simulate --persons 1000 --items 20 --seed 20261031 --out ./calibration-snapshot-new-sim.json
 
 # 真实/试测数据标定（输入为 response-matrix interchange JSON，由 PR4 数据集转换器产出）
-Rscript calibrate-matrix.R --input response-matrix.json --calibration-version cal-matgen-v1.0.0-pilot1 --status PILOT_CALIBRATED
+# Convert an authorized, frozen, one-wave research export to one response matrix.
+cd ../../backend
+npx tsx src/scripts/convert-cognitive-research-matrix.ts --input research-trials.json --out response-matrix.json --config-version 1.0.0-adolescent --matrix-type 3x3 --sample-description "pilot school sample"
+cd ../tools/irt-calibration
+Rscript calibrate-matrix.R --input response-matrix.json --calibration-version cal-matgen-v1.0.0-pilot1 --out ./cal-matgen-v1.0.0-pilot1.json
 ```
 
 依赖：R ≥ 4.x，`install.packages(c("mirt", "jsonlite"))`。
+
+标定输入必须来自同一冻结 configVersion + stimulusSetVersion + matrixType，且一个被试仅保留一次施测。转换默认将超时、快速猜测和中断标记为缺失；超时能否计为错误需由科研方案明确指定。
+
+空题未施测在 JSON 中保留为 `null`，R 中转换为 NA，绝不通过 `unlist()` 丢失占位。脚本只产生 `PILOT_CALIBRATED`，不接受命令行设为 `VALIDATED`，也不覆盖已有输出文件。
 
 ## 证据纪律
 

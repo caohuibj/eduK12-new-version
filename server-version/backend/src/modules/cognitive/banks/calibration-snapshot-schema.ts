@@ -44,6 +44,7 @@ export const calibrationSnapshotSchema = z
       .strict(),
     items: z.array(calibrationItemSchema).min(1),
     diagnostics: z.record(z.string(), z.unknown()),
+    evidenceReviewRef: z.string().min(1).optional(),
     generatedAtUtc: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/),
     provenance: z.string().min(1),
   })
@@ -51,6 +52,10 @@ export const calibrationSnapshotSchema = z
   .refine(
     (snapshot) => snapshot.status !== 'SIMULATION_ONLY' || snapshot.provenance.includes('SIMULATION ONLY'),
     { message: 'SIMULATION_ONLY snapshots must carry an explicit simulation provenance', path: ['provenance'] },
+  )
+  .refine(
+    (snapshot) => snapshot.status !== 'VALIDATED' || Boolean(snapshot.evidenceReviewRef),
+    { message: 'VALIDATED snapshot requires an independent evidenceReviewRef', path: ['evidenceReviewRef'] },
   )
   .refine(
     (snapshot) => snapshot.status === 'SIMULATION_ONLY' || snapshot.items.every((item) => item.trueA === undefined && item.trueB === undefined),
@@ -62,4 +67,5 @@ export type CalibrationSnapshot = z.infer<typeof calibrationSnapshotSchema>
 
 /** bank-meta.calibrationRef 是否允许引用该快照（roadmap：仿真快照不得进入题库引用）。 */
 export const isCalibrationReferenceAllowed = (snapshot: CalibrationSnapshot): boolean =>
-  snapshot.status !== 'SIMULATION_ONLY'
+  snapshot.status === 'PILOT_CALIBRATED' ||
+  (snapshot.status === 'VALIDATED' && Boolean(snapshot.evidenceReviewRef))
