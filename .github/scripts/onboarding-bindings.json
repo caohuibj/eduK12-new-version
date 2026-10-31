@@ -8434,6 +8434,127 @@
         "frontend": "109c8f913f4458247495cb8e9a77d1d63b3cf9b8"
       }
     },
+    "445": {
+      "schemaVersion": 1,
+      "pr": 445,
+      "enabled": true,
+      "base": "194bb91f9af4feb62d9ed384813e7abf0643c2e8",
+      "product": "0afb7006a5f2c8c6e16245fa1cd864e01644cbdd",
+      "controlCheckpoint": "81f9b63e9393d5f1027110211505f05e33a238e8",
+      "source": {
+        "docs/performance/report-read-recovery-20261031/README.md": {
+          "before": null,
+          "after": "70a7706ffa3f4fde815f751d9c3b26bfaee4acae"
+        },
+        "docs/performance/report-read-recovery-20261031/baseline-execution.json": {
+          "before": null,
+          "after": "8ef23cc10548339e29fc63c05a8ac2a0056e36ae"
+        },
+        "docs/performance/report-read-recovery-20261031/baseline.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/report-read-recovery-20261031/baseline.json": {
+          "before": null,
+          "after": "e162d46e62d831550b8faff67982578af178be68"
+        },
+        "docs/performance/report-read-recovery-20261031/baseline.log": {
+          "before": null,
+          "after": "255f991f8b9cee4b9c514bdf1d27d2de3fb03885"
+        },
+        "docs/performance/report-read-recovery-20261031/candidate-execution.json": {
+          "before": null,
+          "after": "cc2ba65a0fb9660a1ca189ee638660c6c6f9a57b"
+        },
+        "docs/performance/report-read-recovery-20261031/candidate.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/report-read-recovery-20261031/candidate.json": {
+          "before": null,
+          "after": "63e992dffd7a54fc4261d0914aeadaa317b8e60d"
+        },
+        "docs/performance/report-read-recovery-20261031/candidate.log": {
+          "before": null,
+          "after": "5a4083d7e3d9fa8bb037e4ddd552c44c583ac343"
+        },
+        "docs/performance/report-read-recovery-20261031/changed-lint-execution.json": {
+          "before": null,
+          "after": "eb584b560f459ae9c24b0308716587467be24236"
+        },
+        "docs/performance/report-read-recovery-20261031/changed-lint.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/report-read-recovery-20261031/changed-lint.log": {
+          "before": null,
+          "after": "db7147f9587aa2b47e9a70ff658aea2bb2fe6958"
+        },
+        "docs/performance/report-read-recovery-20261031/environment.json": {
+          "before": null,
+          "after": "3f52b85345eed7464349d310e9f8ddb18a58cfae"
+        },
+        "docs/performance/report-read-recovery-20261031/frontend-types-execution.json": {
+          "before": null,
+          "after": "2b38a52dfb3615340c8a6ff2fb94cba1f332f3f8"
+        },
+        "docs/performance/report-read-recovery-20261031/frontend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/report-read-recovery-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/report-read-recovery-20261031/qualification-main194/frontend-types.json": {
+          "before": null,
+          "after": "0990970939284819d427645fa3f5ce7de397bad1"
+        },
+        "docs/performance/report-read-recovery-20261031/qualification-main194/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/report-read-recovery-20261031/qualification-main194/source-and-reuse.json": {
+          "before": null,
+          "after": "13b45641d40da1c2422344b4df7e7216873db754"
+        },
+        "server-version/frontend/src/pages/student/QuestionnaireResult.tsx": {
+          "before": "aac6b7c8e41d7b1115d32315fddfda612dba3793",
+          "after": "c2c667f1e739a1e1ea2589a5a113fe1ca5e7c8bc"
+        },
+        "server-version/frontend/src/pages/student/ScaleResult.tsx": {
+          "before": "4ff02fa221f12760a23ebe4ee54c86f64ac5839b",
+          "after": "24e7c77c50ea23980d3a2b86cfd5b2e6c4e6c350"
+        },
+        "server-version/frontend/src/pages/student/__tests__/ReportReadRecovery.test.tsx": {
+          "before": null,
+          "after": "89dd821a3cfb649b15922e8f91780a9c4de83886"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "2d413c192f69545be782ba0f76445f5b33e9c58d",
+        ".github/scripts/onboarding-checks.mjs": "ac2e7730b3c218f8baa1040374963ad68decec3f",
+        ".github/scripts/onboarding-controls.test.mjs": "89cf2580885db6e6d2b76fbdbb45da1e1f2a2d44",
+        ".github/scripts/onboarding-evidence.json": "6852b95d5241650630531decef2bb7c660e45585",
+        ".github/scripts/onboarding-scope.mjs": "93e8378a9b266427e141ca57ce880276170b2c92",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "ac65636f91e312d266518ce26ec55a148986dba6"
+      },
+      "components": {
+        "backend": "aabc532ab1fbb807da0fc194eaeed2a5f9c54134",
+        "frontend": "aaacedc9b62bb21e801b3a0d66507636646f3a88"
+      }
+    },
     "447": {
       "schemaVersion": 1,
       "pr": 447,

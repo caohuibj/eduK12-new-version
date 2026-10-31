@@ -6,6 +6,24 @@ import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboarding
 import {verifyQuestionnaire442Evidence,verifySchool439Evidence,verifyTrainingStandaloneCognitiveObservation,verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,decodeOriginal,verifyCloudComponentTypeReceipt,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
+test('PR445 admits thirteen unchanged original cases and current Node24.21 types through the existing disabled route',async()=>{
+ const {createHash}=await import('node:crypto');const digest=b=>createHash('sha256').update(b).digest('hex');
+ const cfg=JSON.parse(readFileSync('.github/scripts/onboarding-bindings.json')).candidates['445'];
+ const r=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['445'];
+ assert.equal(typeof cfg.enabled,'boolean');assert.equal(cfg.pr,445);assert.equal(r.product,cfg.product);
+ assert.throws(()=>onboardingPlan([],cfg.base,head,()=>{throw Error('No Git read before activation');},{CI_HEAD_REF:BRANCHES[445],CI_PR_NUMBER:'445'},{...cfg,enabled:false}),/pending independent activation/);
+ assert(allowedSourcePath('server-version/frontend/src/pages/student/ScaleResult.tsx','445'));
+ assert(!allowedSourcePath('server-version/backend/src/modules/scale/scale-workflow.service.ts','445'));
+ const original=r.reports[0],bytes=readFileSync(original.path);assert.equal(digest(bytes),original.sha256);assert.equal(verifyOriginalReport(JSON.parse(bytes),original).length,13);
+ const proofBytes=readFileSync(r.reuseProof.path);assert.equal(digest(proofBytes),r.reuseProof.sha256);const proof=JSON.parse(proofBytes);assert.equal(Object.keys(proof.originalInputSHA256).length,12);
+ for(const [path,hash]of Object.entries(proof.originalInputSHA256))assert.equal(digest(readFileSync(path)),hash);
+ assert.equal(digest(readFileSync(r.originalLint.path)),r.originalLint.sha256);assert.equal(readFileSync(r.originalLint.exitPath,'utf8').trim(),'0');
+ const red=readFileSync(r.retainedBaseline.path);assert.equal(digest(red),r.retainedBaseline.sha256);assert.equal(JSON.parse(red).numFailedTests,2);
+ const t=r.types[0],raw=readFileSync(t.path),receipt=JSON.parse(raw);assert.equal(digest(raw),t.sha256);assert.equal(receipt.node,'v24.21.0');assert.deepEqual(receipt.before,receipt.after);
+ assert.equal(verifyTypeReceipt(receipt,t,readFileSync,cfg.components.frontend).component,'frontend');
+ assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+ const step=readFileSync('.github/workflows/ci.yml','utf8').split('- name: select exact Task1 changed application and control SAST inputs')[1].split('- name: authenticate original PR395')[0];assert(JSON.parse(step.match(/fromJSON\('([^']+)'\)/)[1]).includes(445));
+});
 test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
  const f=fixture(),backend='server-version/backend/src/modules/measurement-content/standard-combination-use.ts',frontend='server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx';
  f.b.pr='choice-page';f.b.source=Object.fromEntries([backend,frontend].map(path=>[path,{before:null,after:blob}]));f.entries=[backend,frontend,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'9002',CI_HEAD_REF:BRANCHES['choice-page']};
