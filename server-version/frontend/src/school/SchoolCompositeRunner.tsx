@@ -68,6 +68,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
       if(needsAdmissionConsent){
         await api(prefix+'/consent/accept','POST',{})
       }
+      if(currentIdentity.current!==identity)return
       const result=await api<{
         state:'STARTED'|'IN_PROGRESS';runtimeBindingKind?:string;runtimeBindingRef?:string
       }>(prefix+'/start','POST',{})
