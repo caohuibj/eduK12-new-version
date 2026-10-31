@@ -1,0 +1,9 @@
+
+/workspace/dot-cloud-group-ui-20261031/server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx
+  26:22  warning  The ref value 'request.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'request.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+
+/workspace/dot-cloud-group-ui-20261031/server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx
+  20:20  warning  The ref value 'token.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'token.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+
+✖ 2 problems (0 errors, 2 warnings)
+

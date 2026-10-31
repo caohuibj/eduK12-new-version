@@ -8493,6 +8493,143 @@
           "after": "a407d68f8154cf0072dc8355ab6ed6d971ea7a1f"
         }
       }
+    },
+    "449": {
+      "schemaVersion": 1,
+      "pr": 449,
+      "enabled": true,
+      "base": "25cad994ec20b32b53ed8735c732143376536da0",
+      "product": "4edc87f8f0c58d6d754f9428b12ff09c1c57e206",
+      "controlCheckpoint": "ed0e5526f5087a3c9c67eaa9364d5b4425de163b",
+      "source": {
+        "docs/performance/teacher-group-ui-recovery-20261031/README.md": {
+          "before": null,
+          "after": "8ff071ce02a4a28bd276922187b2cbeb699d63e6"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/SHA256SUMS": {
+          "before": null,
+          "after": "f979e8f07a179b1862a710f12d0f1685e5c2a919"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/candidate-source.json": {
+          "before": null,
+          "after": "f9c401b252363efc29493087948d66ed3f451766"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/candidate.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/candidate.json": {
+          "before": null,
+          "after": "ea192b6bbc4fbdb69e3fda9239473b782bf51771"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/candidate.log": {
+          "before": null,
+          "after": "6d4fa03df2c635aa499a9079db739afacc3979ee"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/environment-missing-backend-dependencies/frontend-types.json": {
+          "before": null,
+          "after": "7315ce47762c3d870e600ff5e16f1f41c5409a03"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/environment-missing-backend-dependencies/frontend-types.log": {
+          "before": null,
+          "after": "f44e3fd5dfff861d74299436ccd1f069bafcd0f9"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/frontend-types.json": {
+          "before": null,
+          "after": "2adfec40fced6cb4789ca5af77dcb64f87cdd34a"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/lint.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/lint.log": {
+          "before": null,
+          "after": "8ac241257fb896f25a1b22279b22147b606c1e2b"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/parent-original/command.txt": {
+          "before": null,
+          "after": "e2eb4744fbca01047ece8c9ced0780611aab7b8e"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/parent-original/exit-code.txt": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/parent-original/result.txt": {
+          "before": null,
+          "after": "81f09678c2b19b6303dd39e3c6d87dc7153a8768"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/parent-original/source.sha256": {
+          "before": null,
+          "after": "ef2432575c9a60683827da3db312698b6f7f2919"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/parent-original/src/huiteacher/DotCrossPrUi.review.test.tsx": {
+          "before": null,
+          "after": "1b92a4a84e99f3096e489f668c065479c00104ce"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/parent-original/vitest.config.ts": {
+          "before": null,
+          "after": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types.json": {
+          "before": null,
+          "after": "2d89f403faa48029dd8908bd9ef0d64c4268dcfe"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/source-and-reuse.json": {
+          "before": null,
+          "after": "9af9c807e4d0a855e3fd2fbe4e3444d1bedab541"
+        },
+        "server-version/frontend/src/huiteacher/DotCrossPrUi.review.test.tsx": {
+          "before": null,
+          "after": "1b19113296471f882eea91aa5b485a61ec729797"
+        },
+        "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx": {
+          "before": "fa9ac57474918380cf51d64937729c10210534a0",
+          "after": "61ee659815b9cf06120d637f1972d4ff82d8c8de"
+        },
+        "server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx": {
+          "before": "37f798c0aa2d9ef5227cc9787fda6faca338aba4",
+          "after": "8d888dcd1cf26cfd0aa8c47aa0ad6e0798ef92a7"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types-node24.21.json": {
+          "before": null,
+          "after": "71e0b4ce3beb22a0898e809044c60a800679c677"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types-node24.21.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "da9aa232c0f00cf4bc9c695f5d2759c0c3481d1f",
+        ".github/scripts/onboarding-checks.mjs": "a3633b1aac4e5271d7dd85d17ef0df67ae7bbf76",
+        ".github/scripts/onboarding-controls.test.mjs": "71dfb39422a69cc6f4243aa649d7bec3bd017c57",
+        ".github/scripts/onboarding-evidence.json": "dfb65bd925af2dd38fb4836a22fe479e0e519d14",
+        ".github/scripts/onboarding-scope.mjs": "948528dfe5b30d6b4b026e4fb37b4b1ffe07aaa4",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "f320cfd7a084636b4ef759bf439cdf11fee18e13"
+      },
+      "components": {
+        "backend": "aabc532ab1fbb807da0fc194eaeed2a5f9c54134",
+        "frontend": "109c8f913f4458247495cb8e9a77d1d63b3cf9b8"
+      }
     }
   }
 }
