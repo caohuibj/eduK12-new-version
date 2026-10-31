@@ -5,13 +5,13 @@
     "engineVersion": "1.1.0",
     "scoringVersion": "1.1.0"
   },
-  "provenance": "Project-original G3; computed locally from committed 36-item form, cross-checked accuracy=1/0, median=500/null, timeout=0/36; not live administration",
+  "provenance": "Unpublished revision after rejection of arithmetic-only bank. Twenty candidate items only; not a 30/36-item profile or clinical validation.",
   "cases": [
     {
       "name": "all-correct",
       "input": {
         "config": {
-          "totalTrials": 36,
+          "totalTrials": 20,
           "stimulusSetVersion": "cogest-zh-v1.1.0",
           "fixationMs": 400,
           "timeoutMs": 15000,
@@ -25,7 +25,7 @@
           {
             "trialIndex": 0,
             "payload": {
-              "itemId": "ce11-01",
+              "itemId": "ce11-r01",
               "responseIndex": 0,
               "rtMs": 500,
               "interrupted": false
@@ -34,7 +34,7 @@
           {
             "trialIndex": 1,
             "payload": {
-              "itemId": "ce11-02",
+              "itemId": "ce11-r02",
               "responseIndex": 3,
               "rtMs": 500,
               "interrupted": false
@@ -43,8 +43,8 @@
           {
             "trialIndex": 2,
             "payload": {
-              "itemId": "ce11-03",
-              "responseIndex": 3,
+              "itemId": "ce11-r03",
+              "responseIndex": 2,
               "rtMs": 500,
               "interrupted": false
             }
@@ -52,7 +52,7 @@
           {
             "trialIndex": 3,
             "payload": {
-              "itemId": "ce11-04",
+              "itemId": "ce11-r04",
               "responseIndex": 1,
               "rtMs": 500,
               "interrupted": false
@@ -61,7 +61,7 @@
           {
             "trialIndex": 4,
             "payload": {
-              "itemId": "ce11-05",
+              "itemId": "ce11-r05",
               "responseIndex": 1,
               "rtMs": 500,
               "interrupted": false
@@ -70,7 +70,7 @@
           {
             "trialIndex": 5,
             "payload": {
-              "itemId": "ce11-06",
+              "itemId": "ce11-r06",
               "responseIndex": 0,
               "rtMs": 500,
               "interrupted": false
@@ -79,7 +79,7 @@
           {
             "trialIndex": 6,
             "payload": {
-              "itemId": "ce11-07",
+              "itemId": "ce11-r07",
               "responseIndex": 3,
               "rtMs": 500,
               "interrupted": false
@@ -88,7 +88,7 @@
           {
             "trialIndex": 7,
             "payload": {
-              "itemId": "ce11-08",
+              "itemId": "ce11-r08",
               "responseIndex": 1,
               "rtMs": 500,
               "interrupted": false
@@ -97,8 +97,8 @@
           {
             "trialIndex": 8,
             "payload": {
-              "itemId": "ce11-09",
-              "responseIndex": 1,
+              "itemId": "ce11-r09",
+              "responseIndex": 0,
               "rtMs": 500,
               "interrupted": false
             }
@@ -106,8 +106,8 @@
           {
             "trialIndex": 9,
             "payload": {
-              "itemId": "ce11-10",
-              "responseIndex": 0,
+              "itemId": "ce11-r10",
+              "responseIndex": 3,
               "rtMs": 500,
               "interrupted": false
             }
@@ -115,7 +115,7 @@
           {
             "trialIndex": 10,
             "payload": {
-              "itemId": "ce11-11",
+              "itemId": "ce11-r11",
               "responseIndex": 3,
               "rtMs": 500,
               "interrupted": false
@@ -124,8 +124,8 @@
           {
             "trialIndex": 11,
             "payload": {
-              "itemId": "ce11-12",
-              "responseIndex": 1,
+              "itemId": "ce11-r12",
+              "responseIndex": 2,
               "rtMs": 500,
               "interrupted": false
             }
@@ -133,7 +133,7 @@
           {
             "trialIndex": 12,
             "payload": {
-              "itemId": "ce11-13",
+              "itemId": "ce11-r13",
               "responseIndex": 1,
               "rtMs": 500,
               "interrupted": false
@@ -142,7 +142,7 @@
           {
             "trialIndex": 13,
             "payload": {
-              "itemId": "ce11-14",
+              "itemId": "ce11-r14",
               "responseIndex": 0,
               "rtMs": 500,
               "interrupted": false
@@ -151,7 +151,7 @@
           {
             "trialIndex": 14,
             "payload": {
-              "itemId": "ce11-15",
+              "itemId": "ce11-r15",
               "responseIndex": 3,
               "rtMs": 500,
               "interrupted": false
@@ -160,8 +160,8 @@
           {
             "trialIndex": 15,
             "payload": {
-              "itemId": "ce11-16",
-              "responseIndex": 2,
+              "itemId": "ce11-r16",
+              "responseIndex": 1,
               "rtMs": 500,
               "interrupted": false
             }
@@ -169,7 +169,7 @@
           {
             "trialIndex": 16,
             "payload": {
-              "itemId": "ce11-17",
+              "itemId": "ce11-r17",
               "responseIndex": 1,
               "rtMs": 500,
               "interrupted": false
@@ -178,7 +178,7 @@
           {
             "trialIndex": 17,
             "payload": {
-              "itemId": "ce11-18",
+              "itemId": "ce11-r18",
               "responseIndex": 0,
               "rtMs": 500,
               "interrupted": false
@@ -187,8 +187,8 @@
           {
             "trialIndex": 18,
             "payload": {
-              "itemId": "ce11-19",
-              "responseIndex": 2,
+              "itemId": "ce11-r19",
+              "responseIndex": 3,
               "rtMs": 500,
               "interrupted": false
             }
@@ -196,151 +196,7 @@
           {
             "trialIndex": 19,
             "payload": {
-              "itemId": "ce11-20",
-              "responseIndex": 1,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 20,
-            "payload": {
-              "itemId": "ce11-21",
-              "responseIndex": 1,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 21,
-            "payload": {
-              "itemId": "ce11-22",
-              "responseIndex": 0,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 22,
-            "payload": {
-              "itemId": "ce11-23",
-              "responseIndex": 3,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 23,
-            "payload": {
-              "itemId": "ce11-24",
-              "responseIndex": 2,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 24,
-            "payload": {
-              "itemId": "ce11-25",
-              "responseIndex": 1,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 25,
-            "payload": {
-              "itemId": "ce11-26",
-              "responseIndex": 3,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 26,
-            "payload": {
-              "itemId": "ce11-27",
-              "responseIndex": 3,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 27,
-            "payload": {
-              "itemId": "ce11-28",
-              "responseIndex": 2,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 28,
-            "payload": {
-              "itemId": "ce11-29",
-              "responseIndex": 1,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 29,
-            "payload": {
-              "itemId": "ce11-30",
-              "responseIndex": 3,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 30,
-            "payload": {
-              "itemId": "ce11-31",
-              "responseIndex": 2,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 31,
-            "payload": {
-              "itemId": "ce11-32",
-              "responseIndex": 2,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 32,
-            "payload": {
-              "itemId": "ce11-33",
-              "responseIndex": 0,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 33,
-            "payload": {
-              "itemId": "ce11-34",
-              "responseIndex": 0,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 34,
-            "payload": {
-              "itemId": "ce11-35",
-              "responseIndex": 2,
-              "rtMs": 500,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 35,
-            "payload": {
-              "itemId": "ce11-36",
+              "itemId": "ce11-r20",
               "responseIndex": 2,
               "rtMs": 500,
               "interrupted": false
@@ -355,7 +211,7 @@
           "medianRtMs": 500,
           "errorCount": 0,
           "timeoutCount": 0,
-          "validRtCount": 36
+          "validRtCount": 20
         },
         "qualityFlags": {
           "interpretable": true,
@@ -369,7 +225,7 @@
       "name": "all-timeout",
       "input": {
         "config": {
-          "totalTrials": 36,
+          "totalTrials": 20,
           "stimulusSetVersion": "cogest-zh-v1.1.0",
           "fixationMs": 400,
           "timeoutMs": 15000,
@@ -383,7 +239,7 @@
           {
             "trialIndex": 0,
             "payload": {
-              "itemId": "ce11-01",
+              "itemId": "ce11-r01",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -392,7 +248,7 @@
           {
             "trialIndex": 1,
             "payload": {
-              "itemId": "ce11-02",
+              "itemId": "ce11-r02",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -401,7 +257,7 @@
           {
             "trialIndex": 2,
             "payload": {
-              "itemId": "ce11-03",
+              "itemId": "ce11-r03",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -410,7 +266,7 @@
           {
             "trialIndex": 3,
             "payload": {
-              "itemId": "ce11-04",
+              "itemId": "ce11-r04",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -419,7 +275,7 @@
           {
             "trialIndex": 4,
             "payload": {
-              "itemId": "ce11-05",
+              "itemId": "ce11-r05",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -428,7 +284,7 @@
           {
             "trialIndex": 5,
             "payload": {
-              "itemId": "ce11-06",
+              "itemId": "ce11-r06",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -437,7 +293,7 @@
           {
             "trialIndex": 6,
             "payload": {
-              "itemId": "ce11-07",
+              "itemId": "ce11-r07",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -446,7 +302,7 @@
           {
             "trialIndex": 7,
             "payload": {
-              "itemId": "ce11-08",
+              "itemId": "ce11-r08",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -455,7 +311,7 @@
           {
             "trialIndex": 8,
             "payload": {
-              "itemId": "ce11-09",
+              "itemId": "ce11-r09",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -464,7 +320,7 @@
           {
             "trialIndex": 9,
             "payload": {
-              "itemId": "ce11-10",
+              "itemId": "ce11-r10",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -473,7 +329,7 @@
           {
             "trialIndex": 10,
             "payload": {
-              "itemId": "ce11-11",
+              "itemId": "ce11-r11",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -482,7 +338,7 @@
           {
             "trialIndex": 11,
             "payload": {
-              "itemId": "ce11-12",
+              "itemId": "ce11-r12",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -491,7 +347,7 @@
           {
             "trialIndex": 12,
             "payload": {
-              "itemId": "ce11-13",
+              "itemId": "ce11-r13",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -500,7 +356,7 @@
           {
             "trialIndex": 13,
             "payload": {
-              "itemId": "ce11-14",
+              "itemId": "ce11-r14",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -509,7 +365,7 @@
           {
             "trialIndex": 14,
             "payload": {
-              "itemId": "ce11-15",
+              "itemId": "ce11-r15",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -518,7 +374,7 @@
           {
             "trialIndex": 15,
             "payload": {
-              "itemId": "ce11-16",
+              "itemId": "ce11-r16",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -527,7 +383,7 @@
           {
             "trialIndex": 16,
             "payload": {
-              "itemId": "ce11-17",
+              "itemId": "ce11-r17",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -536,7 +392,7 @@
           {
             "trialIndex": 17,
             "payload": {
-              "itemId": "ce11-18",
+              "itemId": "ce11-r18",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -545,7 +401,7 @@
           {
             "trialIndex": 18,
             "payload": {
-              "itemId": "ce11-19",
+              "itemId": "ce11-r19",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -554,151 +410,7 @@
           {
             "trialIndex": 19,
             "payload": {
-              "itemId": "ce11-20",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 20,
-            "payload": {
-              "itemId": "ce11-21",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 21,
-            "payload": {
-              "itemId": "ce11-22",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 22,
-            "payload": {
-              "itemId": "ce11-23",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 23,
-            "payload": {
-              "itemId": "ce11-24",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 24,
-            "payload": {
-              "itemId": "ce11-25",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 25,
-            "payload": {
-              "itemId": "ce11-26",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 26,
-            "payload": {
-              "itemId": "ce11-27",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 27,
-            "payload": {
-              "itemId": "ce11-28",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 28,
-            "payload": {
-              "itemId": "ce11-29",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 29,
-            "payload": {
-              "itemId": "ce11-30",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 30,
-            "payload": {
-              "itemId": "ce11-31",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 31,
-            "payload": {
-              "itemId": "ce11-32",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 32,
-            "payload": {
-              "itemId": "ce11-33",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 33,
-            "payload": {
-              "itemId": "ce11-34",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 34,
-            "payload": {
-              "itemId": "ce11-35",
-              "responseIndex": null,
-              "rtMs": null,
-              "interrupted": false
-            }
-          },
-          {
-            "trialIndex": 35,
-            "payload": {
-              "itemId": "ce11-36",
+              "itemId": "ce11-r20",
               "responseIndex": null,
               "rtMs": null,
               "interrupted": false
@@ -712,7 +424,7 @@
           "accuracy": 0,
           "medianRtMs": null,
           "errorCount": 0,
-          "timeoutCount": 36,
+          "timeoutCount": 20,
           "validRtCount": 0
         },
         "qualityFlags": {

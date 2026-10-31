@@ -96,7 +96,7 @@ export const CogestTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
 
   const item = phase === 'practice' ? COGEST_PRACTICE_ITEM : currentTrial
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="认知估计" description={<p>每题给出若干逻辑条件，请从四个选项中选出能从条件推导出的结论。</p>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="认知估计" description={<p>根据日常经验判断现实数量的大致量级，选择最合理的选项。旧题库仅保留历史，不推荐新建任务。</p>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   const OptionButtons: React.FC<{ show: boolean }> = ({ show }) => show ? (

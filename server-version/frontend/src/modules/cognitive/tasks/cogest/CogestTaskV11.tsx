@@ -104,7 +104,7 @@ export const CogestTaskV11: React.FC<CognitiveTaskProps> = ({ taskContext, trial
 
   const item = phase === 'practice' ? COGEST_PRACTICE_ITEM : currentTrial
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="认知估计" description={<p>根据生活情境和题内给定的近似线索，估计数量、时间、长度或容量，选择最接近的值。无需计算器；这是内部线索辅助估算练习，不是标准临床认知估算测验。</p>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。本次正式{totalTrials}题，每题最多{timeoutMs / 1000}秒，超时计为漏答；尽量准确，不必追求抢答。完整时长受作答速度和说明练习用时影响。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="认知估计" description={<p>根据日常经验，判断现实物体的大小、质量、容量或时间的合理数量级，选择最合理的区间。不要求精确记忆或使用计算器；这是内部估算任务，不是标准临床测验。</p>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。本次正式{totalTrials}题，每题最多{timeoutMs / 1000}秒，超时计为漏答；尽量准确，不必追求抢答。完整时长受作答速度和说明练习用时影响。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   const OptionButtons: React.FC<{ show: boolean }> = ({ show }) => show ? (

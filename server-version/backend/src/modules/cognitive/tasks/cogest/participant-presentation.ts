@@ -7,12 +7,12 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     testType: "cogest",
     engineVersion: "1.0.0",
     scoringVersion: "1.0.0",
-    title: "认知估计",
+    title: "认知估算",
     metrics: {
       "accuracy": {
-        "label": "总体正确率",
-        "explanation": "总体正确率：正式作答中选对答案的比例。",
-        "singleExplanation": "总体正确率：正式作答中选对答案的比例。"
+        "label": "合理量级选中率",
+        "explanation": "合理量级选中率：正式作答中选对答案的比例。",
+        "singleExplanation": "合理量级选中率：正式作答中选对答案的比例。"
       },
       "medianRtMs": {
         "label": "正确作答中位用时",
@@ -33,20 +33,20 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     hiddenMetrics: [],
     suppressTips: false,
     protocols: {},
-    practicalTips: ["把题目给出的条件一条条列出来，再逐步推导。", "用代入法：把每个选项放进条件里验证是否矛盾。"],
+    practicalTips: ["先想想现实中的物体和场景，再判断数量是否合理。", "检查估计是否明显偏大或偏小，不要求精确背数。"],
     singleHiddenMetrics: [],
-    disclaimer: "结果只描述本次逻辑推断的表现，不是语言能力、智力或年龄常模判断。",
+    disclaimer: "结果只描述本次现实数量估算的表现，不是语言能力、智力或年龄常模判断。",
     reportReading: {
       version: "1.0.0",
-      title: "词与词之间的“关系”，你抓得住吗？",
+      title: "现实中的数量，大致有多大？",
       introduction: "从这次作答出发，读懂一个与你有关的认知过程。",
       summary: {
-        template: "这一次，你的类比推理正确率是 {accuracy}；正确判断的典型用时是 {medianRtMs}。",
+        template: "这一次，你的估算题目标量级选中率是 {accuracy}；正确判断的典型用时是 {medianRtMs}。",
         metricKeys: ["accuracy", "medianRtMs"]
       },
       summaryByProfile: {
         experience: {
-          template: "这次简短体验中，你的类比推理正确率是 {accuracy}；正式版会给出更稳的用时记录。",
+          template: "这次简短体验中，你的估算题目标量级选中率是 {accuracy}；短任务记录较少，不能据此推断稳定能力。",
           metricKeys: ["accuracy"]
         }
       },
@@ -80,23 +80,23 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       illustration: "rules",
       popular: {
         conceptTitle: "先弄懂，这个任务在看什么",
-        concept: "每题给出若干逻辑条件（比如“甲比乙高，乙比丙高”），你要从条件出发推出结论。这个任务看的是你从已知信息出发做数量推理的本领。",
-        takeaway: "先理条件，再推结论。",
+        concept: "根据日常经验判断现实数量的合理量级。它混合一般知识与估算策略，不是纯粹的估算能力测量。",
+        takeaway: "先联系现实，再核查数量级。",
         exampleTitle: "走出任务：生活里的一个例子",
-        example: "做计划排优先级、根据线索找答案、判断谁对谁错，都用到了逻辑推理。它只是推理能力的一小部分，不代表你的智力或学业水平。",
+        example: "判断物体多重、空间多大，需要结合经验检查数量是否合理；本任务不提供智力、诊断或同龄人排名。",
         scene: "rules",
         frames: [
           {
             "title": "读前对",
-            "text": "把条件一条条列清楚。"
+            "text": "先确认在估计哪一种现实数量。"
           },
           {
             "title": "套关系",
-            "text": "从条件出发逐步推导。"
+            "text": "结合现实经验判断量级。"
           },
           {
             "title": "选答案",
-            "text": "四个选项里只有一个不与条件矛盾。"
+            "text": "排除明显偏离现实量级的选项。"
           }
         ],
         boundary: "这是理解概念的场景示例，不是职业资格、考试排名或同龄人比较。",
@@ -111,16 +111,16 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           },
           "errorCount": {
             "label": "选错了几次",
-            "explanation": "选择错误关系的次数；与用时一起看。"
+            "explanation": "未选中项目预期量级选项的题数；与超时分开看。"
           }
         }
       },
       professional: {
-        construct: "认知估计（关系推理）",
-        procedure: "题目集 cogest-zh-v1.0.0 冻结于 config；逐题呈现逻辑推断题与四个选项，服务端按题库权威推导正确性；RT 统计限正确且 rtMs ≥ validRtFloorMs。",
-        interpretation: "正确率与用时同读；题库覆盖排序、条件、三段论等多种题型，分题型分析属研究用途，本报告不输出。",
+        construct: "现实数量合理性判断",
+        procedure: "题目集 cogest-zh-v1.0.0 冻结于 config；逐题呈现现实数量估算题与四个选项，按冻结题库预期选项计分；RT 统计限正确且 rtMs ≥ validRtFloorMs。",
+        interpretation: "选中预期量级选项的比例与用时同读；一般知识和生活经验会影响表现，不能作临床常模或能力排名。",
         confounders: [
-          "阅读理解能力是必要的但不是充分的，核心是逻辑推导。",
+          "一般知识、文化和生活经验会影响估算，不能解释为纯估算能力。",
           "作答中断、超时和有效反应数影响解释边界。",
           "本报告不提供经过验证的人口常模、诊断、语言能力或智力等级结论。"
         ],
@@ -171,11 +171,11 @@ participantPresentations.push({
   "testType": "cogest",
   "engineVersion": "1.1.0",
   "scoringVersion": "1.1.0",
-  "title": "线索辅助认知估算",
+  "title": "认知估算",
   "metrics": {
     "accuracy": {
-      "label": "本次正式题正确率",
-      "explanation": "答对正式题数除以全部已呈现正式题数；超时计入分母，不将有效零正确率当缺失。"
+      "label": "本次合理量级选中率",
+      "explanation": "选中项目预设量级选项的题数除以已呈现正式题数；超时计入分母，0保留；不是人群常模。"
     },
     "medianRtMs": {
       "label": "正确且未中断作答的典型用时",
@@ -194,16 +194,16 @@ participantPresentations.push({
   "experienceHeadline": "accuracy",
   "hiddenMetrics": [],
   "singleHiddenMetrics": [],
-  "disclaimer": "内部原创材料，未标定难度，无常模、诊断或能力排名。重复施测可能受练习影响。",
+  "disclaimer": "内部估算候选题；区间是粗粒度量级选项，不是临床容许范围或人口常模。当前20题不足以支撑原30/36题协议，尚不可纳入；一般知识和生活经验影响表现。",
   "suppressTips": false,
   "practicalTips": [
-    "先确定单位，再用近似数量检查选项是否合理。"
+    "结合日常经验，检查选项是否明显偏大或偏小。"
   ],
   "protocols": {},
   "reportReading": {
     "version": "1.1.0",
-    "title": "线索辅助认知估算：回看这次作答",
-    "introduction": "根据生活情境中的近似线索估计数量级和单位。",
+    "title": "认知估算：回看这次作答",
+    "introduction": "根据日常经验估计现实数量的合理量级。",
     "summary": {
       "template": "这次正式题的正确率为 {accuracy}；超时未答 {timeoutCount} 题。",
       "metricKeys": [
@@ -227,7 +227,7 @@ participantPresentations.push({
         "insufficientValidRt"
       ]
     },
-    "nextStep": "先确定单位，再用近似数量检查选项是否合理。 内部原创材料，未标定难度，无常模、诊断或能力排名。重复施测可能受练习影响。",
+    "nextStep": "结合日常经验，检查选项是否明显偏大或偏小。 内部估算候选题；区间是粗粒度量级选项，不是临床容许范围或人口常模。当前20题不足以支撑原30/36题协议，尚不可纳入；一般知识和生活经验影响表现。",
     "chart": {
       "kind": "metrics",
       "metricKeys": [

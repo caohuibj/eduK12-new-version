@@ -24,5 +24,5 @@ export const executionEntries = [
     ...cogestRegistryMeta,
     recommendedForCreate: false,
   },
-  { testType: 'cogest', engineVersion: '1.1.0', scoringVersion: '1.1.0', configSchema: cogestConfigV11Schema, trialSchema: cogestTrialSchema, finalSubmission: cogestFinalSubmission, score: scoreCogestV11, ...cogestRegistryMetaV11 },
+  { testType: 'cogest', engineVersion: '1.1.0', scoringVersion: '1.1.0', configSchema: cogestConfigV11Schema, trialSchema: cogestTrialSchema, finalSubmission: cogestFinalSubmission, score: scoreCogestV11, ...cogestRegistryMetaV11, recommendedForCreate: false },
 ].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]
