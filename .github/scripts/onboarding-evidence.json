@@ -15101,6 +15101,191 @@
           "exitField": "exitCode"
         }
       ]
+    },
+    "438": {
+      "schemaVersion": 1,
+      "product": "543348730d271605753e00aa1ba301d11d30cbaf",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Three admitted cases: two original unsigned React cases and one fresh isolated PostgreSQL cursor/read case. This is not a cross-entrypoint or real browser acceptance suite.",
+          "The 105 equal-time rows are synthetic metadata pointers to an existing released Form projection, not newly submitted answers or regenerated reports. Prior engine-missing attempt failed before any DB query and remains archived.",
+          "Both current component types passed once; metadata-only qualification will not replay prior app/FINAL journeys. Dependency setup corrected/restored the old shared symlink environment without tracked changes."
+        ]
+      },
+      "reports": [
+        {
+          "id": "teacher-form-history-frontend.json",
+          "path": "docs/evidence/teacher-form-group-history-20261031/frontend.json",
+          "sha256": "b4247d14314644e7ee88c6795bd0011d6c08ca4c618961b67017153c6462434f",
+          "originalSourceAssociation": "c0591a4f3d3efb27ba139323c39f229ea8d84e89",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.group.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.test.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/components/education-tools/privateToolClient.ts",
+            "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.history.test.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.test.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx",
+            "server-version/frontend/src/modules/reporting/group-history.ts",
+            "server-version/frontend/src/modules/reporting/group-longitudinal-ui.css",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
+            "server-version/frontend/src/school/SchoolGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx",
+            "server-version/frontend/src/school/SchoolGroupReports.test.tsx",
+            "server-version/frontend/src/school/SchoolGroupReports.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx",
+            "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.tsx",
+            "server-version/frontend/src/survey/SurveyGroupReports.tsx",
+            "server-version/frontend/src/training/TrainingGroupReports.tsx",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original stage, retained with its saved source association. The two React cases are reused because this pointer component and runtime imports are unchanged. The PostgreSQL case executed the identical test/source bytes saved in 6ae85828c; the preceding engine-missing failure remains archived, not relabeled as successful.",
+          "deltaRationale": "Intervening main changes concern separate report/School/longitudinal and dependency inputs. The Form directory service and UI only add the reviewed seek/append path. Current integrated backend/frontend types each passed once. No original React case, native FINAL or application suite was replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "reads a Form version beyond the first hundred using its exact cursor without regenerating or changing the selected report",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "teacher-form-history-source-switch.json",
+          "path": "docs/evidence/teacher-form-group-history-20261031/source-switch.json",
+          "sha256": "e2dbd892c6a5b863468bda6743c6150c05abe53095734b449d78592a639e3992",
+          "originalSourceAssociation": "67b4de5ed2382a689f4c18939e39d21389d6e8c6",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.group.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.test.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/components/education-tools/privateToolClient.ts",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.test.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx",
+            "server-version/frontend/src/modules/reporting/group-history.ts",
+            "server-version/frontend/src/modules/reporting/group-longitudinal-ui.css",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
+            "server-version/frontend/src/school/SchoolGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx",
+            "server-version/frontend/src/school/SchoolGroupReports.test.tsx",
+            "server-version/frontend/src/school/SchoolGroupReports.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx",
+            "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.tsx",
+            "server-version/frontend/src/survey/SurveyGroupReports.tsx",
+            "server-version/frontend/src/training/TrainingGroupReports.tsx",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original stage, retained with its saved source association. The two React cases are reused because this pointer component and runtime imports are unchanged. The PostgreSQL case executed the identical test/source bytes saved in 6ae85828c; the preceding engine-missing failure remains archived, not relabeled as successful.",
+          "deltaRationale": "Intervening main changes concern separate report/School/longitudinal and dependency inputs. The Form directory service and UI only add the reviewed seek/append path. Current integrated backend/frontend types each passed once. No original React case, native FINAL or application suite was replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "reads a Form version beyond the first hundred using its exact cursor without regenerating or changing the selected report",
+              "status": "skipped"
+            },
+            {
+              "fullName": "keeps the new Form source after an older-page response from the previous source arrives",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "teacher-form-history-integrated/postgres.json",
+          "path": "docs/evidence/teacher-form-group-history-20261031/integrated/postgres.json",
+          "sha256": "2fd1643a4f4953989f1d5543923e61d4c3e9d38de77b2ea8217fae0443c868ee",
+          "originalSourceAssociation": "6ae85828c9b18b6a1178e771f58c92aa531e4f08",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts",
+            "server-version/backend/src/modules/composite/composite.controller.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/services/studentTasks.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original stage, retained with its saved source association. The two React cases are reused because this pointer component and runtime imports are unchanged. The PostgreSQL case executed the identical test/source bytes saved in 6ae85828c; the preceding engine-missing failure remains archived, not relabeled as successful.",
+          "deltaRationale": "Intervening main changes concern separate report/School/longitudinal and dependency inputs. The Form directory service and UI only add the reviewed seek/append path. Current integrated backend/frontend types each passed once. No original React case, native FINAL or application suite was replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "pages immutable Form pointers with equal microsecond timestamps without rereading FINALs",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-form-group-history-20261031/main437/backend-types.json",
+          "sha256": "9c4e9d303f41905406a02c67edb407626b1aa56f73e9dccbfadad5a4cbf36191",
+          "component": "backend",
+          "componentTree": "9940cf26dec648ef1d7b7c4688ce285c3cc9c2b6",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-form-group-history-20261031/main437/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/teacher-form-group-history-20261031/main437/frontend-types.json",
+          "sha256": "6b94be1ab72789ae2ae0bdb3409ca8b3d2c5cd240f42ab86b3c7dec755f35cd6",
+          "component": "frontend",
+          "componentTree": "b63667c1ad041a74c903b55e37d03b3a122b6afe",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-form-group-history-20261031/main437/frontend-types.log"
+        }
+      ]
     }
   }
 }

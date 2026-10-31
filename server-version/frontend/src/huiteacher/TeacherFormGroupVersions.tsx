@@ -1,7 +1,7 @@
 import {useEffect,useRef,useState} from 'react'
 import type {TeacherFormGroupProjection} from './TeacherFormGroupReport'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
-type Index={versioned:boolean;truncated:boolean;versions:Array<{versionId:string;releasedAt:string;populationLabel:string}>;groups:{options:Array<{kind:'CLASSES'|'LABELS';id:string;name:string;dimensionId:string|null;dimensionName:string|null}>;limitations:string[]}}
+type Index={versioned:boolean;truncated:boolean;nextCursor?:{releasedAt:string;versionId:string}|null;versions:Array<{versionId:string;releasedAt:string;populationLabel:string}>;groups:{options:Array<{kind:'CLASSES'|'LABELS';id:string;name:string;dimensionId:string|null;dimensionName:string|null}>;limitations:string[]}}
 
 /** Product adapter only: the existing native Form service owns all statistics. */
 export function TeacherFormGroupVersions({api,endpoint,onReport}:{api:Api;endpoint:string;onReport:(report:TeacherFormGroupProjection|null)=>void}){
@@ -43,12 +43,22 @@ export function TeacherFormGroupVersions({api,endpoint,onReport}:{api:Api;endpoi
  }
  async function refreshDirectory(token:number){
   setDirectoryError('')
-  try{const result=await api<Index>(endpoint+'/versions');if(token===request.current)setIndex(result)}
+  try{const result=await api<Index>(endpoint+'/versions');if(token===request.current)setIndex(previous=>previous?{...result,versions:[...new Map([...result.versions,...previous.versions].map(row=>[row.versionId,row])).values()],nextCursor:previous.nextCursor}:result)}
   catch(e){if(token===request.current)setDirectoryError(e instanceof Error?e.message:'版本目录暂不可读取')}
  }
  async function retryDirectory(){
   const token=++request.current;setBusy(true)
   try{await refreshDirectory(token)}finally{if(token===request.current)setBusy(false)}
+ }
+ async function older(){
+  if(!index?.nextCursor)return
+  const token=++request.current;setBusy(true);setError('')
+  try{
+   const query=new URLSearchParams({beforeAt:index.nextCursor.releasedAt,beforeId:index.nextCursor.versionId})
+   const result=await api<Index>(endpoint+'/versions?'+query)
+   if(token===request.current)setIndex(previous=>previous?{...previous,versions:[...new Map([...previous.versions,...result.versions].map(row=>[row.versionId,row])).values()],nextCursor:result.nextCursor,truncated:result.truncated}:result)
+  }catch(e){if(token===request.current)setError(e instanceof Error?e.message:'更早版本暂不可读取')}
+  finally{if(token===request.current)setBusy(false)}
  }
  const dimensions=[...new Map(index?.groups.options.filter(row=>row.kind==='LABELS').map(row=>[row.dimensionId!,row.dimensionName!])??[])]
  const options=index?.groups.options.filter(row=>dimension==='CLASSES'?row.kind==='CLASSES':row.kind==='LABELS'&&row.dimensionId===dimension)??[]
@@ -59,7 +69,7 @@ export function TeacherFormGroupVersions({api,endpoint,onReport}:{api:Api;endpoi
    {index.versions.length>0&&<label className="ht-field"><span>已生成版本</span><select disabled={busy} value={version} onChange={e=>void read(e.target.value)}>
     {index.versions.map(row=><option key={row.versionId} value={row.versionId}>{new Date(row.releasedAt).toLocaleString('zh-CN')} · {row.populationLabel}</option>)}
    </select></label>}
-   {index.truncated&&<p>当前显示最近100个版本；既有版本仍保留。</p>}
+   {index.nextCursor&&<button type="button" disabled={busy} onClick={()=>void older()}>更早 Form 报告版本</button>}
    {index.versioned&&<><label className="ht-field"><span>报告人群</span><select disabled={busy} value={dimension} onChange={e=>{setDimension(e.target.value);setIds([])}}>
     <option value="ALL">全部合格参与教师</option>
     {index.groups.options.some(row=>row.kind==='CLASSES')&&<option value="CLASSES">任教班级</option>}

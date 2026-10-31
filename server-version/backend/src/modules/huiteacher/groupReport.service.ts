@@ -553,19 +553,24 @@ async function readTeacherFormGroupReportStage(input:{
 
 
 /** Picker and old-version reads never freeze a cohort or revisit FINAL data. */
-export async function listTeacherFormGroupVersions(input:FormReportKey){
+export type TeacherFormVersionCursor={releasedAt:string;versionId:string}
+export async function listTeacherFormGroupVersions(input:FormReportKey,before?:TeacherFormVersionCursor){
   const scoped=await prisma.$transaction(tx=>teacherFormReportingScope(tx,input))
   const {source,frozen}=scoped
-  const versions=await prisma.$queryRaw<Array<{versionId:string;releasedAt:Date;populationLabel:string}>>`
-    SELECT id AS "versionId",released_at AS "releasedAt",COALESCE(report_projection->>'populationLabel','全部合格参与教师') AS "populationLabel"
+  const versions=await prisma.$queryRaw<Array<{versionId:string;releasedAt:Date;populationLabel:string;cursorAt:string}>>(Prisma.sql`
+    SELECT id AS "versionId",released_at AS "releasedAt",COALESCE(report_projection->>'populationLabel','全部合格参与教师') AS "populationLabel",
+      to_char(released_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "cursorAt"
     FROM education_report_release_records WHERE organization_id=${input.organizationId} AND source_run_id=${source.runId}
       AND report_kind='TEACHER_ADULT_FORM_GROUP' AND policy_snapshot_id=${frozen?.policySnapshotId??''}
       AND report_projection->>'eventId'=${input.eventId} AND report_projection->>'formId'=${input.formId}
       AND report_projection->>'definitionDigest'=${source.definitionDigest}
+      ${before?Prisma.sql`AND (released_at,id)<(${before.releasedAt}::timestamptz,${before.versionId})`:Prisma.empty}
     ORDER BY released_at DESC,id DESC LIMIT 101
-  `
+  `)
   const groups=frozen?await listEducationGroupSelections({organizationId:input.organizationId,runId:source.runId,trackId:source.trackId,product:'TEACHER'}):{options:[],limitations:['该历史任务没有冻结的 Teacher V2 隐私策略；沿用原历史报告，不新增子群快照。']}
-  return {versioned:!!frozen,groups,versions:versions.slice(0,100).map(row=>({...row,releasedAt:row.releasedAt.toISOString()})),truncated:versions.length>100}
+  const page=versions.slice(0,100),last=page[page.length-1]
+  return {versioned:!!frozen,groups,versions:page.map(({cursorAt:_cursor,...row})=>({...row,releasedAt:row.releasedAt.toISOString()})),truncated:versions.length>100,
+    nextCursor:versions.length>100?{releasedAt:last.cursorAt,versionId:last.versionId}:null}
 }
 export async function readTeacherFormGroupVersion(input:FormReportKey&{versionId:string}){
  return prisma.$transaction(async tx=>{
