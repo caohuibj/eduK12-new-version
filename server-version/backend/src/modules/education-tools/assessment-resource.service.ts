@@ -275,7 +275,7 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
     ||new Set(input.groupUnits.map(unit=>unit.itemId)).size!==input.groupUnits.length
     ||input.groupUnits.some(unit=>!selected.snapshot.units.some(value=>value.itemId===unit.itemId)))fail('EDUCATION_GROUP_EXPLICIT_LEAVES_REQUIRED',400)
    selected.snapshot=trainingContentSnapshotSchema.parse({...selected.snapshot,units:selected.snapshot.units.map(unit=>({...unit,source:{...unit.source,
-    educationBinding:unit.source.educationBinding?{...unit.source.educationBinding,resourceVersion:adapterVersion}:undefined}}))})
+    ...(unit.source.educationBinding?{educationBinding:{...unit.source.educationBinding,resourceVersion:adapterVersion}}:{})}}))})
   }else if(input.groupUnits)fail('EDUCATION_GROUP_EXPLICIT_MODE_REQUIRED',400)
   const assets=educationAssessmentAssets(runtime,selected.releases.values())
   await assertEducationAssessmentAssets(tx,assets)

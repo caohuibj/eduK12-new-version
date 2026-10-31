@@ -1,0 +1,26 @@
+{
+  "applicationCasesReplayed": 0,
+  "compilerLocation": "required official backend Docker build includes tsc; not rerun in admission",
+  "initialRelevantControls": {
+    "passed": 7,
+    "failed": 0
+  },
+  "expandedControls": {
+    "passed": 44,
+    "failed": 1,
+    "failure": "historical PR381 receipt schema SHA differs from current main; verifyPr381CommandRecords body and current schema unchanged by quota controls; not relabeled as a pass"
+  },
+  "targetedAfterControlChanges": {
+    "passed": 2,
+    "failed": 0
+  },
+  "actionlint": 0,
+  "shellSyntax": 0,
+  "sourceDiffWhitespace": 0,
+  "formalCIStarted": false,
+  "sha256": {
+    "control-final.log": "e6d7af73ece6256ebe89938766e9ed79f04fb28a395d1d1d9bb38e8ffe32c245",
+    "quota-delta-final.log": "47fe9a652c9ab62da83889613403615c3f5e6056b16d861be6e2b62d102191c3",
+    "control-first.log": "1b7d2f752e0ad82826dc9d0265a04989dc0a844cfc924136e42c00d5c4fe7913"
+  }
+}

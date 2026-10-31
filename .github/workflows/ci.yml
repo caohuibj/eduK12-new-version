@@ -1449,7 +1449,7 @@ jobs:
           JS
       - name: select exact Task1 changed application and control SAST inputs
         id: task1-codeql-config
-        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404,408,414,415,418,419,420,422,423,424,426,432,434,428,429]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
+        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404,408,414,415,418,419,420,421,422,423,424,426,432,434,428,429,430]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
         env:
           CI: 'true'
           PLAN: ${{ needs.scope.outputs.onboarding_plan }}
@@ -2534,8 +2534,8 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 24.21.0
-    - name: prepare only missing PR393 backend compiler dependencies
-      if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 393
+    - name: prepare only missing backend compiler dependencies
+      if: contains(fromJSON('[393,421]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
       working-directory: server-version/backend
       env:
         NPM_CONFIG_REGISTRY: https://registry.npmjs.org
