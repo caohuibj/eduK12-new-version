@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { fireEvent, render, screen, act } from '@testing-library/react'
 import { IcarmatrixV2Task } from '../IcarmatrixV2Task'
 import { generateIcarmatrixV2Plan, ICARMATRIX_V2_BANK, icarmatrixV2OptionOrder } from '../generator-v2'
+import { PRACTICE_MATRIX_ITEMS } from '../practice-items'
 
 const config = {
   totalTrials: 2,
@@ -38,7 +39,7 @@ afterEach(() => {
 })
 
 const practiceCorrectDisplay = (): number => {
-  const practiceItem = ICARMATRIX_V2_BANK.find((item) => item.matrixType === '3x3')!
+  const practiceItem = PRACTICE_MATRIX_ITEMS['3x3']
   const order = icarmatrixV2OptionOrder(`${'seed-1'}:practice`, 0, practiceItem.responses.length)
   return order.indexOf(0)
 }
@@ -55,6 +56,33 @@ const enterFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) => {
 }
 
 describe('IcarmatrixV2Task', () => {
+  it('never shares practice figures with scored-bank SVGs', () => {
+    const realSvgs = new Set(ICARMATRIX_V2_BANK.flatMap((item) =>
+      [...item.cells, ...item.responses.map((response) => response.svg)]))
+    expect(PRACTICE_MATRIX_ITEMS['2x2'].cells).toHaveLength(3)
+    expect(PRACTICE_MATRIX_ITEMS['3x3'].cells).toHaveLength(8)
+    for (const practice of Object.values(PRACTICE_MATRIX_ITEMS)) {
+      for (const svg of [...practice.cells, ...practice.responses.map((response) => response.svg)]) {
+        expect(realSvgs.has(svg)).toBe(false)
+      }
+    }
+  })
+
+  it('preserves the original trial payload on a failed-save retry', async () => {
+    const onTrialComplete = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(undefined)
+    await enterFormal(onTrialComplete)
+    currentTime += 1800
+    fireEvent.click(screen.getByLabelText('选项 1'))
+    await act(async () => { vi.advanceTimersByTime(0) })
+    expect(screen.getByText('重试提交')).toBeTruthy()
+    currentTime += 10000
+    fireEvent.click(screen.getByText('重试提交'))
+    await act(async () => { vi.advanceTimersByTime(0) })
+    expect(onTrialComplete).toHaveBeenCalledTimes(2)
+    expect(onTrialComplete.mock.calls[0][0]).toEqual(onTrialComplete.mock.calls[1][0])
+    expect(onTrialComplete.mock.calls[1][0].rtMs).toBe(1800)
+  })
+
   it('renders bank SVGs and submits the correct option with echoed bankItemId', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     const onTaskComplete = vi.fn().mockResolvedValue(undefined)
@@ -72,7 +100,7 @@ describe('IcarmatrixV2Task', () => {
     const order = icarmatrixV2OptionOrder('seed-1', 0, bankItem.responses.length)
     const correctDisplay = order.indexOf(0)
     currentTime += 2500
-    fireEvent.pointerDown(screen.getByLabelText(`选项 ${correctDisplay + 1}`))
+    fireEvent.click(screen.getByLabelText(`选项 ${correctDisplay + 1}`))
     await act(async () => { vi.advanceTimersByTime(0) })
     expect(onTrialComplete).toHaveBeenCalledTimes(1)
     expect(onTrialComplete.mock.calls[0][0]).toMatchObject({
