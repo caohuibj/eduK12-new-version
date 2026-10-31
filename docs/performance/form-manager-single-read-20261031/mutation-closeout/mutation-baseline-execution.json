@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/components/__tests__/FormSectionManager.mutation-race.test.tsx",
+    "--maxWorkers=1",
+    "--testNamePattern=previous resource save",
+    "--reporter=json",
+    "--outputFile=/workspace/dot-cloud-final-20261031/docs/performance/optimization-final-20261031/mutation-baseline.json"
+  ],
+  "exitCode": 1,
+  "startedAt": "2026-10-31T10:16:43.825433+00:00",
+  "endedAt": "2026-10-31T10:16:45.118205+00:00",
+  "seconds": 1.292849187000229,
+  "base": "555f705dd272f0ee9c7ac0d80770010d2d6e9675",
+  "scope": "Combined optimization product; only new mutation-after-resource-switch cases selected",
+  "inputs": {
+    "server-version/frontend/src/components/FormSectionManager.tsx": "719b53012bd30fc118fd3a05ea320330f45519129f04ccb8782e0022b35f32c5",
+    "server-version/frontend/src/components/__tests__/FormSectionManager.mutation-race.test.tsx": "a2b405642f75a2041fb4bd787aba825e5d0a4ceac96159e24660c290a07d3b62",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+  }
+}

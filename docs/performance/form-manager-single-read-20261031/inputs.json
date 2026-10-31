@@ -1,0 +1,23 @@
+{
+  "base": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+  "productTree": "bbd989df8f226c50b25c2307e00d6d09a6694831",
+  "hashes": {
+    "server-version/backend/src/__tests__/questionnaire/form-sections-units.test.ts": "57c04d89d4fe4211c19789cce890ae767697594c412ede0a61ee32f043dbce85",
+    "server-version/backend/src/controllers/generalQuestionnaireController.ts": "93d35eaa86a1644ed8257a6ff41e56c8dbc5687a512015643d34596397a40411",
+    "server-version/backend/src/controllers/questionnaireController.ts": "d13548fed85c362fecc2dd3312c5ec32a064e0ecf1e1d7ab9b7fa3aad630d8bc",
+    "server-version/frontend/src/components/FormSectionManager.tsx": "719b53012bd30fc118fd3a05ea320330f45519129f04ccb8782e0022b35f32c5",
+    "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": "93b2b79306195c69f8ed3d657efbb371fedcbcf3ad7fb2a876f1d1522102125b",
+    "server-version/frontend/src/components/__tests__/FormSectionManager.race.test.tsx": "eeccf569cc71c95eb8803216d61b0f27523c97e480d3e08ad3023a22b2d6b5da",
+    "server-version/frontend/src/components/__tests__/FormSectionManager.test.tsx": "fd6c0e67e2d7a402544a8c8c75f80200fcf79e992fb38468c23ef69c30c4bb9e",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/backend/src/services/questionnaire-form-section.service.ts": "624ec1c973e5f45c13a333cb7becd836b9c3756934b5b845bd024c79f4c16a11",
+    "server-version/backend/src/modules/assessment-runtime/form-section-definition.ts": "520c0731bf4e652f769cf3ab3b20911618ff6b00757f112ad397da8a061e65df",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+  },
+  "note": "Final selected input hashes, not a contemporaneous full execution-environment manifest. Original first frontend unit and race tests were main and ed6196d84a versions respectively; appended tests have separate execution records."
+}

@@ -1,0 +1,241 @@
+{
+  "kind": "LOCAL_ORIGINAL_CASE_SELECTION_NOT_CI_ADMISSION",
+  "base": "15e58e0e2d186d041293b3f2e139bc243946d3f3",
+  "product": "bdc558512e01a7c061e253069463a51f8ba204b4",
+  "distinctCases": 6,
+  "reports": [
+    {
+      "path": "docs/performance/cognitive-course-scope-20261031/backend-baseline.json.gz",
+      "gzipSHA256": "5f756830e94b1f7e6d498302fedcd8d9fa79edc76c8e2aff5629edabee513dee",
+      "originalSHA256": "e712854d697dad76ea870335d1568217bb661cefad8362cf789c6cfd0c653958",
+      "originalBytes": 3190,
+      "id": "backend-baseline",
+      "originalSourceAssociation": "15e58e0e2d186d041293b3f2e139bc243946d3f3",
+      "associationKind": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous authentication.",
+      "summary": {
+        "success": false,
+        "numPassedTests": 1,
+        "numFailedTests": 3,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "keeps default published standalone non-library metadata and session ownership",
+          "status": "passed"
+        },
+        {
+          "fullName": "narrows memberships, assignment and session rows while returning the original course projection",
+          "status": "failed"
+        },
+        {
+          "fullName": "retains closed-admission frozen resume, completed feedback and paused unfrozen sessions in course scope",
+          "status": "failed"
+        },
+        {
+          "fullName": "does not read assignments for an inactive, foreign or missing course membership",
+          "status": "failed"
+        }
+      ],
+      "selectedCases": [
+        "keeps default published standalone non-library metadata and session ownership"
+      ],
+      "allowPartialFailure": true,
+      "failureContinuations": [
+        {
+          "caseName": "narrows memberships, assignment and session rows while returning the original course projection",
+          "reportId": "backend-candidate"
+        },
+        {
+          "caseName": "retains closed-admission frozen resume, completed feedback and paused unfrozen sessions in course scope",
+          "reportId": "backend-candidate"
+        },
+        {
+          "caseName": "does not read assignments for an inactive, foreign or missing course membership",
+          "reportId": "backend-candidate"
+        }
+      ]
+    },
+    {
+      "path": "docs/performance/cognitive-course-scope-20261031/backend-candidate.json.gz",
+      "gzipSHA256": "5e040def26310914b83edd40e27f8474bcb6bb6428cbfc5f82c66e0af3cbeaf1",
+      "originalSHA256": "21fe531f1e43b0b3c29c04c324e0e901206a49218f915872e283fc1ef0b4bfba",
+      "originalBytes": 1929,
+      "id": "backend-candidate",
+      "originalSourceAssociation": "bdc558512e01a7c061e253069463a51f8ba204b4",
+      "associationKind": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous authentication.",
+      "summary": {
+        "success": true,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 1
+      },
+      "cases": [
+        {
+          "fullName": "keeps default published standalone non-library metadata and session ownership",
+          "status": "skipped"
+        },
+        {
+          "fullName": "narrows memberships, assignment and session rows while returning the original course projection",
+          "status": "passed"
+        },
+        {
+          "fullName": "retains closed-admission frozen resume, completed feedback and paused unfrozen sessions in course scope",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not read assignments for an inactive, foreign or missing course membership",
+          "status": "passed"
+        }
+      ],
+      "selectedCases": [
+        "narrows memberships, assignment and session rows while returning the original course projection",
+        "retains closed-admission frozen resume, completed feedback and paused unfrozen sessions in course scope",
+        "does not read assignments for an inactive, foreign or missing course membership"
+      ]
+    },
+    {
+      "path": "docs/performance/cognitive-course-scope-20261031/frontend-candidate.json.gz",
+      "gzipSHA256": "cded4f038580fe692e60735d5b2884f130b40b1c03548bf9a66091acc0d1d6be",
+      "originalSHA256": "08c1f66e8e70c01f2fdf38a14231fee6e784977fb72ca0a2d91b035ad18c4b3f",
+      "originalBytes": 8003,
+      "id": "frontend-candidate",
+      "originalSourceAssociation": "bdc558512e01a7c061e253069463a51f8ba204b4",
+      "associationKind": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous authentication.",
+      "summary": {
+        "success": true,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 23
+      },
+      "cases": [
+        {
+          "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+          "status": "passed"
+        },
+        {
+          "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
+          "status": "skipped"
+        },
+        {
+          "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
+          "status": "skipped"
+        },
+        {
+          "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
+          "status": "skipped"
+        },
+        {
+          "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
+          "status": "skipped"
+        },
+        {
+          "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper uses the shared apiClient for all endpoints (no separate auth client)",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper GET /cognitive/assignments/my",
+          "status": "passed"
+        },
+        {
+          "fullName": "cognitive api wrapper GET /cognitive/assignments/:id",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper GET /cognitive/history",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper POST /cognitive/sessions with { assignmentId }",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper GET /cognitive/sessions/:id",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper POST /cognitive/sessions/:id/restart with empty body",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper POST /cognitive/sessions/:id/trials with { trialIndex, payload }",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper POST /cognitive/sessions/:id/complete with empty body",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper PATCH /cognitive/assignments/:id for wrapper title and instruction",
+          "status": "skipped"
+        },
+        {
+          "fullName": "cognitive api wrapper PATCH /cognitive/configs/:id/access-policy",
+          "status": "skipped"
+        }
+      ],
+      "selectedCases": [
+        "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+        "cognitive api wrapper GET /cognitive/assignments/my"
+      ]
+    }
+  ],
+  "notes": [
+    "Baseline default case PASS is reused; candidate only ran the three previously failing backend cases and two frontend cases.",
+    "Retain all original failures/filtered cases; the baseline command did not pass overall.",
+    "The final helper includes the candidate selector added after baseline. Actual original argv, real exits, times and input hashes are retained in their own process records."
+  ],
+  "types": [
+    {
+      "path": "docs/performance/cognitive-course-scope-20261031/types/backend.json",
+      "sha256": "9a94bcd1cb4a3f8cfc2c8e3fc8790e622eceee1fe8a5ebc12e07a166fa75b915",
+      "component": "backend",
+      "componentTree": "3de7a9e6dc335dd1d1b8803dfa831d395a860856",
+      "exitCode": 0,
+      "log": "docs/performance/cognitive-course-scope-20261031/types/backend.log"
+    },
+    {
+      "path": "docs/performance/cognitive-course-scope-20261031/types/frontend.json",
+      "sha256": "3328e931ce10d721372f1751c7a7df114c4cf1c221282bf323c1b2bbabaa8a29",
+      "component": "frontend",
+      "componentTree": "a201de8fc25a253228b8423a409b82696d1fdad9",
+      "exitCode": 0,
+      "log": "docs/performance/cognitive-course-scope-20261031/types/frontend.log"
+    }
+  ]
+}

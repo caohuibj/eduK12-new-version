@@ -1,0 +1,183 @@
+{
+  "kind": "LOCAL_ORIGINAL_CASE_SELECTION_NOT_CI_ADMISSION",
+  "base": "c63382d0eb6629c7bacbd853b8feb92e0257d46b",
+  "product": "b1fc5493cf8a72dbe8a02f6f939cf42529624c35",
+  "distinctCases": 4,
+  "reports": [
+    {
+      "path": "docs/performance/course-scale-scope-20261031/backend-baseline.json.gz",
+      "gzipSHA256": "24226412e9c974f5da1c8706694371bc1679b1b29f2be748899bd7a4ce8a7426",
+      "originalSHA256": "cb5e4e6b6470639f39d62959c4cee946fc470e1c2ced25d489f44e0da9a5ffb4",
+      "originalBytes": 2448,
+      "originalSourceAssociation": "c63382d0eb6629c7bacbd853b8feb92e0257d46b",
+      "associationKind": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous Git authentication.",
+      "summary": {
+        "success": false,
+        "numPassedTests": 1,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "preserves the default catalog ordering, status and standalone attempt isolation",
+          "status": "passed"
+        },
+        {
+          "fullName": "returns identical course rows while narrowing the catalog and attempt query",
+          "status": "failed"
+        },
+        {
+          "fullName": "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses",
+          "status": "failed"
+        }
+      ],
+      "selectedCases": [
+        "preserves the default catalog ordering, status and standalone attempt isolation"
+      ],
+      "id": "backend-baseline",
+      "allowPartialFailure": true,
+      "failureContinuations": [
+        {
+          "caseName": "returns identical course rows while narrowing the catalog and attempt query",
+          "reportId": "backend-candidate"
+        },
+        {
+          "caseName": "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses",
+          "reportId": "backend-candidate"
+        }
+      ]
+    },
+    {
+      "path": "docs/performance/course-scale-scope-20261031/backend-candidate.json.gz",
+      "gzipSHA256": "1cf87b3792cc111dae38336f7b7df1c3a1ee60d112e4fce2859a3504e36dddde",
+      "originalSHA256": "5d7604518e83ac93e36e9bb850d90c2356c7c7ea724afbceb4f5aa05000af7c9",
+      "originalBytes": 1551,
+      "originalSourceAssociation": "b1fc5493cf8a72dbe8a02f6f939cf42529624c35",
+      "associationKind": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous Git authentication.",
+      "summary": {
+        "success": true,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 1
+      },
+      "cases": [
+        {
+          "fullName": "preserves the default catalog ordering, status and standalone attempt isolation",
+          "status": "skipped"
+        },
+        {
+          "fullName": "returns identical course rows while narrowing the catalog and attempt query",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses",
+          "status": "passed"
+        }
+      ],
+      "selectedCases": [
+        "returns identical course rows while narrowing the catalog and attempt query",
+        "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses"
+      ],
+      "id": "backend-candidate"
+    },
+    {
+      "path": "docs/performance/course-scale-scope-20261031/frontend-candidate.json.gz",
+      "gzipSHA256": "4a56ab101fe4c66795ed2a52977137d50e6786f15fe025ce982073fb33ddc751",
+      "originalSHA256": "26a4295a31d2c35e9630a1d03cc1c9e3d670eb6fe491c68d63439e7c68feb001",
+      "originalBytes": 5086,
+      "originalSourceAssociation": "b1fc5493cf8a72dbe8a02f6f939cf42529624c35",
+      "associationKind": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous Git authentication.",
+      "summary": {
+        "success": true,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 13
+      },
+      "cases": [
+        {
+          "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+          "status": "passed"
+        },
+        {
+          "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
+          "status": "skipped"
+        },
+        {
+          "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
+          "status": "skipped"
+        },
+        {
+          "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
+          "status": "skipped"
+        },
+        {
+          "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
+          "status": "skipped"
+        },
+        {
+          "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
+          "status": "skipped"
+        },
+        {
+          "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
+          "status": "skipped"
+        }
+      ],
+      "selectedCases": [
+        "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging"
+      ],
+      "id": "frontend-candidate"
+    }
+  ],
+  "notes": [
+    "One default-catalog case passed on baseline and is reused; candidate only ran the two previously failing backend cases and one frontend case.",
+    "Baseline failures and filtered/superseded results remain in original reporters; baseline invocation was not wholly successful.",
+    "Final helper script includes the candidate-only selector added after baseline; actual original argv/exit/time/input hashes are in each execution record. No signature/CI qualification is claimed."
+  ],
+  "types": [
+    {
+      "path": "docs/performance/course-scale-scope-20261031/types/backend.json",
+      "sha256": "4d15115224af0f4c2127ff5d1c103dccc75d93b7d17824663c81bb8fef17eeaa",
+      "component": "backend",
+      "componentTree": "330c17fd6fd0e042620360bb3ce40e2ff8c83e36",
+      "exitCode": 0,
+      "log": "docs/performance/course-scale-scope-20261031/types/backend.log"
+    },
+    {
+      "path": "docs/performance/course-scale-scope-20261031/types/frontend.json",
+      "sha256": "290141eaafa6ecc966fb4a35102ab68e044fe71643e9e3f0a66d4fca35dc33c0",
+      "component": "frontend",
+      "componentTree": "9b73f2033be496cbb22ee6a1fe21dc773336b5da",
+      "exitCode": 0,
+      "log": "docs/performance/course-scale-scope-20261031/types/frontend.log"
+    }
+  ]
+}

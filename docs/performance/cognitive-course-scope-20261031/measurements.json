@@ -1,0 +1,55 @@
+{
+  "kind": "SYNTHETIC_ACTUAL_CONTROLLER_SERVICE_WITH_PRISMA_MOCKS",
+  "fixtureSHA256": "4472cbaeb0dd2b1301e542698b75cdfe96f7fdb8b500dde5b5841c9641d8b075",
+  "freeze": {
+    "data": "4 eligible memberships, 16 visible tasks, 5 excluded tasks, fixed UTC dates; target 4 tasks with new/frozen-active/completed/unfrozen-active states; foreign/composite child sessions excluded",
+    "runtime": "Node v24.21.0, unchanged locked Vitest; actual commands and input hashes retained",
+    "compression": "JSON.stringify actual controller response body, gzip level1; excludes headers/TLS/browser/network/cache conditions",
+    "database": "2 Prisma method calls normally; existing no-membership early return now avoids assignment query for unrelated/inactive courses. Actual SQL not executed."
+  },
+  "observations": [
+    {
+      "enabled": true,
+      "before": {
+        "membershipRows": 4,
+        "assignmentRows": 16,
+        "sessionRows": 12,
+        "rawBodyBytes": 8775,
+        "gzipBodyBytes": 870
+      },
+      "after": {
+        "membershipRows": 1,
+        "assignmentRows": 4,
+        "sessionRows": 3,
+        "rawBodyBytes": 2221,
+        "gzipBodyBytes": 498
+      },
+      "defaultBodyIdentical": true,
+      "targetProjectionIdentical": true
+    },
+    {
+      "enabled": false,
+      "before": {
+        "membershipRows": 4,
+        "assignmentRows": 16,
+        "sessionRows": 12,
+        "rawBodyBytes": 6526,
+        "gzipBodyBytes": 778
+      },
+      "after": {
+        "membershipRows": 1,
+        "assignmentRows": 4,
+        "sessionRows": 3,
+        "rawBodyBytes": 1660,
+        "gzipBodyBytes": 469
+      },
+      "defaultBodyIdentical": true,
+      "targetProjectionIdentical": true
+    }
+  ],
+  "limits": [
+    "No SQL duration/count, CPU, RSS, latency, p95, concurrency or production benefit claim.",
+    "No real login, session creation, quota, submit, scoring or report generation executed.",
+    "No new admission flag or permission cache; existing current membership and metadata mapping preserved."
+  ]
+}

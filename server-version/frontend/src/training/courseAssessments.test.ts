@@ -75,6 +75,8 @@ describe('course-scope measurement projection', () => {
     expect(result.items.some(item => item.name === '外部任务' || item.name === '另一门课')).toBe(false)
     expect(result.items.some(item => item.name === '全站公开但未布置')).toBe(false)
     expect(result.items.find(item => item.key === 'composite:delivered')?.href).toBe('/student/composite/delivered')
+    expect(myCognitive).toHaveBeenCalledWith(course)
+    expect(get).toHaveBeenCalledWith('/scales/available', { params: { courseId: course } })
     expect(myCognitive).toHaveBeenCalledTimes(1)
     expect(get).toHaveBeenCalledWith('/composite-assessments/available', { params: { courseId: course } })
     expect(get).toHaveBeenCalledWith('/courses/my/tasks?page=1&pageSize=100&courseId=' + encodeURIComponent(course))

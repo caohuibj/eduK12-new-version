@@ -1,0 +1,62 @@
+[
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/backend-baseline.json.gz",
+    "gzipSHA256": "5f756830e94b1f7e6d498302fedcd8d9fa79edc76c8e2aff5629edabee513dee",
+    "originalSHA256": "e712854d697dad76ea870335d1568217bb661cefad8362cf789c6cfd0c653958",
+    "originalBytes": 3190
+  },
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/backend-baseline.log.gz",
+    "gzipSHA256": "b78799a3a9b8965835c73c69a66f75addf9cc787fcd4b701903f2642876166e0",
+    "originalSHA256": "7a04e990b492b5adbc8e6dfdf644f2a548f2853ac0c1faf9e59cc3521f6707aa",
+    "originalBytes": 82
+  },
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/backend-baseline.ndjson.gz",
+    "gzipSHA256": "396cdb49f06b28fe5a21c2e8a348252a7b229590fd1ef9cd0846fa1576e97d68",
+    "originalSHA256": "bc772b7b4dea528ea1d85efb3a0f09b4cc33b0955de552cbb72dd9919d4a7117",
+    "originalBytes": 49693
+  },
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/frontend-baseline.json.gz",
+    "gzipSHA256": "74faad257bb50663ee0eb285af0c03d7eee03705cc345299364b500df2302dee",
+    "originalSHA256": "e00b06cd0cf51acfdc290bb2943ae9df7c794e8d39d63ecd340e66e4ad3041c6",
+    "originalBytes": 9309
+  },
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/frontend-baseline.log.gz",
+    "gzipSHA256": "5074660a9ad784305d8cea6b47a66b719455840e9515aec8eff62b37c3a09cc7",
+    "originalSHA256": "0d00d9a19da1aed8da7c5549bac91f8838d7d091a65b98ee265be97b6aadcd9c",
+    "originalBytes": 83
+  },
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/backend-candidate.json.gz",
+    "gzipSHA256": "5e040def26310914b83edd40e27f8474bcb6bb6428cbfc5f82c66e0af3cbeaf1",
+    "originalSHA256": "21fe531f1e43b0b3c29c04c324e0e901206a49218f915872e283fc1ef0b4bfba",
+    "originalBytes": 1929
+  },
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/backend-candidate.log.gz",
+    "gzipSHA256": "50b7ec5432add5b4c2da2b4214ff2e8346ca0d2d6832a1b4c54fc1fb611069ba",
+    "originalSHA256": "667e7e557bcc1700be9fd555265f05ee84b72a520f75be1d583e0d899efc2bf8",
+    "originalBytes": 83
+  },
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/backend-candidate.ndjson.gz",
+    "gzipSHA256": "0820e33fe2f82c4bd03e67c28229b15c97bb2201bdb571804848c0c8a88e86d5",
+    "originalSHA256": "7c81971925458a14fa93ad27d92f4fb81bf0aeaabf183d26631832181996395a",
+    "originalBytes": 21128
+  },
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/frontend-candidate.json.gz",
+    "gzipSHA256": "cded4f038580fe692e60735d5b2884f130b40b1c03548bf9a66091acc0d1d6be",
+    "originalSHA256": "08c1f66e8e70c01f2fdf38a14231fee6e784977fb72ca0a2d91b035ad18c4b3f",
+    "originalBytes": 8003
+  },
+  {
+    "path": "docs/performance/cognitive-course-scope-20261031/frontend-candidate.log.gz",
+    "gzipSHA256": "df875609b878e646b46ad9f7d11d1eb9f4e40c5cd856a7876d330f6aef0c5cf2",
+    "originalSHA256": "02a60b70b32df4bdc490a898a8d3c6e4c5866bdcb6c627c6383b299e7f831e42",
+    "originalBytes": 84
+  }
+]

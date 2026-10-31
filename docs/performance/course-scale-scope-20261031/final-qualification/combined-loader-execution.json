@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/training/courseAssessments.test.ts",
+    "--testNamePattern=uses enrolled course scopes",
+    "--reporter=json",
+    "--outputFile=/workspace/scratch/5a77e8bdc1ae/dot-course-scale-435/docs/performance/course-scale-scope-20261031/final-qualification/combined-loader.json"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-31T08:51:26.428288+00:00",
+  "endedAt": "2026-10-31T08:51:27.683894+00:00",
+  "elapsedSeconds": 1.2556150490054279,
+  "head": "528269c2a2f419bc7adb85ef0301340aa8b3b8f0",
+  "inputs": {
+    "server-version/frontend/src/training/courseAssessments.ts": "334e43aa64644be42b0238ebf3cae79787e2d91b8f21ad0cf2f9de130eb7dd68",
+    "server-version/frontend/src/training/courseAssessments.test.ts": "c0c9e6ab62731249f27735500d96788e978c04b11c2ed056fd0655823e9aae74",
+    "server-version/frontend/src/modules/composite/api.ts": "fca5b57b26d83d09544fa72dc1ce07a8b7d19d987ee79f312cfb55b3a584b056",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  }
+}

@@ -279,9 +279,9 @@ export const listTeacherAssignments = async (
 }
 
 /** 学生分发列表（D3 §12）：只回 PUBLISHED + 课程成员 ACTIVE/APPROVED；不按时间隐藏过期。 */
-export const listStudentAssignments = async (userId: string) => {
+export const listStudentAssignments = async (userId: string, courseId?: string) => {
   const memberships = await prisma.courseStudent.findMany({
-    where: { studentId: userId, status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] } },
+    where: { studentId: userId, status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] }, ...(courseId ? { courseId } : {}) },
     select: { courseId: true },
   })
   const courseIds = memberships.map((m) => m.courseId)

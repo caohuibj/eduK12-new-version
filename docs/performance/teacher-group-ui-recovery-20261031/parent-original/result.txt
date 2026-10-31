@@ -1,0 +1,59 @@
+
+ RUN  v4.1.11 /tmp/dot-cross-pr-ui-555f
+
+ ❯ src/huiteacher/DotCrossPrUi.review.test.tsx (3 tests | 3 failed) 122ms
+   × Form first directory transient failure has an in-place GET recovery action (no POST/remount) 34ms
+   × Form single saved version transient read failure has an in-place read-only recovery action 64ms
+   × Two actual private-composition leaf DTOs with equal version have distinguishable option text 23ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/huiteacher/DotCrossPrUi.review.test.tsx > Form first directory transient failure has an in-place GET recovery action (no POST/remount)
+AssertionError: Directory recovered but component offers no action to issue its next GET: expected [] to not have a length of +0
+ ❯ src/huiteacher/DotCrossPrUi.review.test.tsx:21:108
+     19|  expect(await calls('/report/versions')).toEqual(page);calls.mockClear…
+     20|  expect(screen.queryByRole('status')).toBeNull()
+     21|  expect(readOnlyActions(), 'Directory recovered but component offers n…
+       |                                                                                                            ^
+     22| })
+     23| it('Form single saved version transient read failure has an in-place r…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/huiteacher/DotCrossPrUi.review.test.tsx > Form single saved version transient read failure has an in-place read-only recovery action
+AssertionError: Saved GET recovered; only generate POST remains, with no selectable alternate version: expected [] to not have a length of +0
+ ❯ src/huiteacher/DotCrossPrUi.review.test.tsx:31:121
+     29|  // Native select already displays its sole option; no alternate selec…
+     30|  expect((screen.getByLabelText('已生成版本') as HTMLSelectElement).value).t…
+     31|  expect(readOnlyActions(), 'Saved GET recovered; only generate POST re…
+       |                                                                                                                         ^
+     32| })
+     33| it('Two actual private-composition leaf DTOs with equal version have d…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/huiteacher/DotCrossPrUi.review.test.tsx > Two actual private-composition leaf DTOs with equal version have distinguishable option text
+AssertionError: [{"value":"track:scale:scale-A:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","text":"同一私有组合 · 1.0.0"},{"value":"track:scale:scale-B:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","text":"同一私有组合 · 1.0.0"}]: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ src/huiteacher/DotCrossPrUi.review.test.tsx:42:148
+     40|  const options=[...(screen.getByLabelText('已批准群体用途的工具') as HTMLSelectE…
+     41|  expect(options).toHaveLength(2);expect(new Set(options.map(option=>op…
+     42|  expect(new Set(options.map(option=>option.textContent)).size,JSON.str…
+       |                                                                                                                                                    ^
+     43| })
+     44|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  19:16:40
+   Duration  706ms (transform 95ms, setup 102ms, import 89ms, tests 122ms, environment 265ms)
+

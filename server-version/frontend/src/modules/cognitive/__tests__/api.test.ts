@@ -30,6 +30,8 @@ describe('cognitive api wrapper', () => {
   it('GET /cognitive/assignments/my', async () => {
     await cognitiveApi.getMyAssignments()
     expect(mockClient.get).toHaveBeenCalledWith('/cognitive/assignments/my')
+    await cognitiveApi.getMyAssignments('course /1')
+    expect(mockClient.get).toHaveBeenLastCalledWith('/cognitive/assignments/my?courseId=course%20%2F1')
   })
 
   it('GET /cognitive/assignments/:id', async () => {
