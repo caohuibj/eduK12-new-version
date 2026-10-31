@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "designVersion": "matgen-forms-v1.1.0",
+  "stimulusSetVersion": "matgen-bank-v1.0.0",
+  "matrixType": "2x2",
+  "formCount": 3,
+  "anchorItemIds": [
+    "matgen-child-rotate-identity-012",
+    "matgen-child-rotate-rotate-011",
+    "matgen-child-shade-shade-014",
+    "matgen-child-size-size-016"
+  ],
+  "forms": [
+    {
+      "formId": "form-A",
+      "itemIds": [
+        "matgen-child-identity-rotate-013",
+        "matgen-child-size-identity-017"
+      ],
+      "ruleCoverage": {
+        "rotate": 3,
+        "identity": 3,
+        "shade": 1,
+        "size": 2
+      }
+    },
+    {
+      "formId": "form-B",
+      "itemIds": [
+        "matgen-child-shade-identity-015"
+      ],
+      "ruleCoverage": {
+        "rotate": 2,
+        "identity": 2,
+        "shade": 2,
+        "size": 1
+      }
+    },
+    {
+      "formId": "form-C",
+      "itemIds": [
+        "matgen-child-rotate-shade-018"
+      ],
+      "ruleCoverage": {
+        "rotate": 3,
+        "identity": 1,
+        "shade": 2,
+        "size": 1
+      }
+    }
+  ],
+  "balancingBasis": "content-only"
+}

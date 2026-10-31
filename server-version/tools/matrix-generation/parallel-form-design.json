@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "designVersion": "matgen-forms-v1.0.0",
+  "designVersion": "matgen-forms-v1.1.0",
   "stimulusSetVersion": "matgen-bank-v1.0.0",
+  "matrixType": "3x3",
   "formCount": 3,
   "anchorItemIds": [
-    "matgen-child-size-size-016",
     "matgen-std-rotate-rotate-006",
     "matgen-std-shade-shade-004",
     "matgen-std-shape-identity-002",
@@ -14,47 +14,40 @@
     {
       "formId": "form-A",
       "itemIds": [
-        "matgen-child-identity-rotate-013",
-        "matgen-child-rotate-rotate-011",
-        "matgen-child-shade-identity-015",
-        "matgen-child-size-identity-017",
-        "matgen-std-shade-rotate-009"
+        "matgen-std-shade-identity-005",
+        "matgen-std-shape-rotate-010"
       ],
       "ruleCoverage": {
-        "identity": 3,
-        "rotate": 3,
+        "rotate": 2,
         "shade": 2,
-        "size": 1
+        "shape": 3,
+        "identity": 2
       }
     },
     {
       "formId": "form-B",
       "itemIds": [
-        "matgen-child-rotate-shade-018",
-        "matgen-child-shade-shade-014",
-        "matgen-std-identity-rotate-008",
-        "matgen-std-identity-shape-003"
+        "matgen-std-rotate-identity-007",
+        "matgen-std-shade-rotate-009"
       ],
       "ruleCoverage": {
-        "rotate": 2,
+        "rotate": 3,
         "shade": 2,
-        "identity": 2,
-        "shape": 1
+        "shape": 2,
+        "identity": 2
       }
     },
     {
       "formId": "form-C",
       "itemIds": [
-        "matgen-child-rotate-identity-012",
-        "matgen-std-rotate-identity-007",
-        "matgen-std-shade-identity-005",
-        "matgen-std-shape-rotate-010"
+        "matgen-std-identity-rotate-008",
+        "matgen-std-identity-shape-003"
       ],
       "ruleCoverage": {
-        "rotate": 3,
-        "identity": 3,
+        "rotate": 2,
         "shade": 1,
-        "shape": 1
+        "shape": 3,
+        "identity": 3
       }
     }
   ],
