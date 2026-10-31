@@ -16,6 +16,7 @@ import {
   buildResearchTrialDataset,
   classifyTrialQuality,
   extractValidRtFloorMs,
+  extractFrozenResearchBankFacts,
   researchParticipantId,
   summarizeTrialQuality,
 } from '../../modules/cognitive/research-trial-dataset'
@@ -40,7 +41,7 @@ const baseSession = {
   engineVersion: '2.0.0',
   scoringVersion: '1.0.0',
   randomSeed: 'seed-1',
-  configSnapshotEncrypted: encryptCognitivePayload({ totalTrials: 8, matrixType: '3x3', validRtFloorMs: 500 }),
+  configSnapshotEncrypted: encryptCognitivePayload({ totalTrials: 8, matrixType: '3x3', stimulusSetVersion: 'matgen-bank-v1.0.0', validRtFloorMs: 500 }),
   startedAt: new Date('2026-10-31T10:00:00.000Z'),
   finishedAt: new Date('2026-10-31T10:05:00.000Z'),
   scoreEncrypted: encryptCognitivePayload(50),
@@ -80,6 +81,10 @@ describe('trial quality classification (roadmap v2.0 PR4)', () => {
     expect(extractValidRtFloorMs({})).toBeNull()
     expect(extractValidRtFloorMs({ validRtFloorMs: -1 })).toBeNull()
     expect(extractValidRtFloorMs(null)).toBeNull()
+    expect(extractFrozenResearchBankFacts({ stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3' }))
+      .toEqual({ stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3' })
+    expect(extractFrozenResearchBankFacts(null))
+      .toEqual({ stimulusSetVersion: null, matrixType: null })
   })
 })
 
@@ -89,7 +94,7 @@ describe('research trial dataset builder (roadmap v2.0 PR4)', () => {
       {
         id: 'session-1', userId: 'student-1', anonymousCode: null, attemptNo: 1,
         testType: 'icarmatrix', engineVersion: '2.0.0', scoringVersion: '1.0.0',
-        configVersion: '1.0.0-adolescent', randomSeed: 'seed-1', validRtFloorMs: 500,
+        configVersion: '1.0.0-adolescent', stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3', randomSeed: 'seed-1', validRtFloorMs: 500,
         trials: [
           { trialIndex: 1, payload: { trialIndex: 1, responseIndex: null, rtMs: null, interrupted: false } },
           { trialIndex: 0, payload: { trialIndex: 0, responseIndex: 2, rtMs: 4200, interrupted: false } },
@@ -101,14 +106,24 @@ describe('research trial dataset builder (roadmap v2.0 PR4)', () => {
     expect(dataset.rows.map((row) => row.trialIndex)).toEqual([0, 1])
     expect(dataset.identities).toEqual([{ testType: 'icarmatrix', engineVersion: '2.0.0', scoringVersion: '1.0.0', configVersion: '1.0.0-adolescent', rows: 2 }])
     expect(dataset.qualitySummary).toMatchObject({ rowCount: 2, completeCount: 1, timeoutCount: 1, completeRate: 0.5, timeoutRate: 0.5 })
-    expect(dataset.rows[0]).toMatchObject({ participantId: 'Ustudent-', randomSeed: 'seed-1', trialQuality: 'complete' })
+    expect(dataset.rows[0]).toMatchObject({
+      randomSeed: 'seed-1', trialQuality: 'complete',
+      stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3',
+    })
+    expect(dataset.rows[0].participantId).toMatch(/^U[a-f0-9]{32}$/)
   })
 
   it('keeps participant pseudonyms stable under the export anonymization convention', () => {
-    expect(researchParticipantId({ anonymousCode: 'PUB-7', userId: 'u1' }, true)).toBe('PUB-7')
-    expect(researchParticipantId({ anonymousCode: null, userId: 'student-1' }, true)).toBe('Ustudent-')
-    expect(researchParticipantId({ anonymousCode: null, userId: 'student-1' }, false)).toBe('student-1')
-    expect(researchParticipantId({ anonymousCode: null, userId: null }, true)).toBe('ANONYMOUS')
+    expect(researchParticipantId({ id: 's1', anonymousCode: 'PUB-7', userId: 'u1' }, true)).toBe('PUB-7')
+    const a = researchParticipantId({ id: 's1', anonymousCode: null, userId: 'student-1' }, true)
+    const b = researchParticipantId({ id: 's2', anonymousCode: null, userId: 'student-2' }, true)
+    expect(a).toMatch(/^U[a-f0-9]{32}$/)
+    expect(b).not.toBe(a)
+    expect(researchParticipantId({ id: 'other-session', anonymousCode: null, userId: 'student-1' }, true)).toBe(a)
+    expect(researchParticipantId({ id: 's1', anonymousCode: null, userId: 'student-1' }, false)).toBe('student-1')
+    expect(researchParticipantId({ id: 's1', anonymousCode: null, userId: null }, true)).not.toBe(
+      researchParticipantId({ id: 's2', anonymousCode: null, userId: null }, true)
+    )
   })
 
   it('summarizes rates as null on empty datasets', () => {
@@ -129,6 +144,7 @@ describe('assignment-scoped trial dataset export (roadmap v2.0 PR4)', () => {
     })
     expect(dataset.rows[0].payload).toMatchObject({ bankItemId: 'matgen-std-rotate-rotate-006' })
     expect(dataset.rows[2].trialQuality).toBe('rapid_guess')
+    expect(dataset.rows[0]).toMatchObject({ stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3' })
     const query = mockPrisma.cognitiveSession.findMany.mock.calls[0][0]
     expect(query.include).toHaveProperty('trials')
     expect(query.include).toHaveProperty('rawSubmissions')

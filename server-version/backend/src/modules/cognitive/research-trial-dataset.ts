@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 /**
  * COG-Intelligence Roadmap v2.0 PR4 — 逐试次研究数据集与试次质量分类。
  *
@@ -8,8 +10,8 @@
  *    绝不与本导出混流；校准样本边界由阶段二 calibrationVersion 声明。
  *  - 试次质量分类只依赖 payload observable facts 与 frozen config 阈值，
  *    不改写 payload；未完成/异常试次留痕不删除。
- *  - 参与者标识沿用 export.service 的匿名约定（anonymousCode 优先，
- *    其次 U+userId 前缀，公开匿名记 ANONYMOUS）。
+ *  - 参与者标识：匿名码优先；账户 ID 使用完整 ID 的域分隔摘要，
+ *    未绑定任何 ID 的参与者按会话分别编码，禁止截取前八位造成碰撞。
  */
 
 export type CognitiveTrialQualityClass = 'complete' | 'timeout' | 'interrupted' | 'rapid_guess'
@@ -21,6 +23,8 @@ export interface ResearchTrialRow {
   engineVersion: string
   scoringVersion: string
   configVersion: string
+  stimulusSetVersion: string | null
+  matrixType: '2x2' | '3x3' | null
   attemptNo: number
   randomSeed: string
   trialIndex: number
@@ -60,17 +64,25 @@ export interface ResearchTrialSessionInput {
   engineVersion: string
   scoringVersion: string
   configVersion: string
+  stimulusSetVersion?: string | null
+  matrixType?: '2x2' | '3x3' | null
   randomSeed: string
   /** 有效 RT 下限来自该会话解密的 frozen config snapshot；缺失时 null（不判 rapid_guess）。 */
   validRtFloorMs: number | null
   trials: Array<{ trialIndex: number; payload: unknown }>
 }
 
+// Stable pseudonyms, not full anonymization; the research export is access controlled.
+const scopedPseudonym = (prefix: 'U' | 'S', identity: string): string =>
+  prefix + createHash('sha256').update(`cognitive-research-v2:${prefix}:${identity}`).digest('hex').slice(0, 32)
+
 export const researchParticipantId = (
-  session: Pick<ResearchTrialSessionInput, 'anonymousCode' | 'userId'>,
+  session: Pick<ResearchTrialSessionInput, 'id' | 'anonymousCode' | 'userId'>,
   anonymize: boolean,
 ): string => session.anonymousCode
-  ?? (session.userId ? (anonymize ? `U${session.userId.substring(0, 8)}` : session.userId) : 'ANONYMOUS')
+  ?? (session.userId
+    ? (anonymize ? scopedPseudonym('U', session.userId) : session.userId)
+    : scopedPseudonym('S', session.id))
 
 /** 试次质量分类：只读 observable facts；阈值来自 frozen config（无则不判 rapid_guess）。 */
 export const classifyTrialQuality = (
@@ -116,6 +128,21 @@ export const summarizeTrialQuality = (rows: ResearchTrialRow[]): ResearchTrialQu
   }
 }
 
+/** Read immutable bank identity from the session's frozen config. */
+export const extractFrozenResearchBankFacts = (snapshot: unknown): {
+  stimulusSetVersion: string | null
+  matrixType: '2x2' | '3x3' | null
+} => {
+  if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) {
+    return { stimulusSetVersion: null, matrixType: null }
+  }
+  const frozen = snapshot as Record<string, unknown>
+  return {
+    stimulusSetVersion: typeof frozen.stimulusSetVersion === 'string' ? frozen.stimulusSetVersion : null,
+    matrixType: frozen.matrixType === '2x2' || frozen.matrixType === '3x3' ? frozen.matrixType : null,
+  }
+}
+
 /** 从解密后的 config snapshot 提取有效 RT 下限（任务间字段同名约定；缺失则 null）。 */
 export const extractValidRtFloorMs = (configSnapshot: unknown): number | null => {
   if (configSnapshot === null || typeof configSnapshot !== 'object') return null
@@ -141,6 +168,8 @@ export const buildResearchTrialDataset = (
         engineVersion: session.engineVersion,
         scoringVersion: session.scoringVersion,
         configVersion: session.configVersion,
+        stimulusSetVersion: session.stimulusSetVersion ?? null,
+        matrixType: session.matrixType ?? null,
         attemptNo: session.attemptNo,
         randomSeed: session.randomSeed,
         trialIndex: trial.trialIndex,

@@ -4,7 +4,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { prisma } from '../../config/database'
 import { decryptCognitivePayload } from './cognitive.security'
-import { buildResearchTrialDataset, extractValidRtFloorMs, type ResearchTrialDataset } from './research-trial-dataset'
+import { buildResearchTrialDataset, extractFrozenResearchBankFacts, extractValidRtFloorMs, type ResearchTrialDataset } from './research-trial-dataset'
 import { saveToFile, SavVariable, VariableMeasure, VariableType } from 'sav-writer'
 import { v4 as uuidv4 } from 'uuid'
 import {
@@ -748,6 +748,7 @@ export const getCognitiveResearchTrialDataset = async (
         configVersion: session.configVersion,
         randomSeed: raw.randomSeed ?? '',
         validRtFloorMs: extractValidRtFloorMs(configSnapshot),
+        ...extractFrozenResearchBankFacts(configSnapshot),
         trials: session.trials,
       }
     }),
