@@ -16,6 +16,7 @@ import { assertTrainingVariantReportScope } from '../../modules/composite/compac
 import { buildCompositeExportProjectionBinding, compositeExportFileNameMatchesProjection, bindCompositeExportFileName } from '../../modules/composite/composite-export-projection'
 import { UserRole } from '@prisma/client'
 import fs from 'node:fs/promises'
+import {writeFileSync} from 'node:fs'
 
 beforeEach(() => {
   vi.clearAllMocks(); process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
@@ -48,6 +49,54 @@ function fixture() {
   db.compositeAssessment.findUnique.mockResolvedValue(template); db.assessmentUnitSnapshot.findMany.mockResolvedValue(snapshots)
   return {template, snapshots}
 }
+
+async function teacherBatchFixture() {
+  const {template}=fixture()
+  template.createdBy='teacher-batch'
+  const {encryptCompositeCollectionReport}=await import('../../modules/composite/composite-report-cache')
+  const jobs=[]
+  for(const attempt of template.attempts){
+    Object.assign(attempt,{compositeAssessmentId:template.id,assignmentRef:null,asyncReportEpoch:1,
+      aggregateInputHash:'e'.repeat(64),contextSnapshotHash:null,scaleAssessments:[],cognitiveSessions:[],situationalAttempts:[],formAnswers:[],formSectionAttempts:[]})
+    const scope=await resolveTrainingAttemptScope({...attempt,compositeAssessment:template})
+    const binding={attemptId:attempt.id,attemptEpoch:1,slotSetHash:attempt.frozenActiveSlotSetHash,contextHash:null,aggregateInputHash:attempt.aggregateInputHash}
+    jobs.push({...binding,status:'READY',reportEncrypted:encryptCompositeCollectionReport({id:attempt.id,assessmentId:template.id,name:'Synthetic variant report',
+      trainingVariant:trainingVariantProvenance(scope),unitReports:[],backgroundValues:[...scope.itemIds].map(itemId=>({itemId,label:itemId,value:0}))},binding),
+      wholeAnswersEncrypted:'UNUSED_ANSWER_CIPHER',wholeValidationEncrypted:'UNUSED_DELIVERY_CIPHER'})
+  }
+  db.compositeAssessmentAttempt.findMany.mockResolvedValue(template.attempts)
+  db.compositeReportJob.findMany.mockImplementation(async ({select}:any)=>jobs.map(job=>select?Object.fromEntries(Object.entries(job).filter(([key])=>select[key])):job))
+  return {template,jobs}
+}
+
+describe('teacher variant batch report job projection',()=>{
+  it('reads saved reports with only the frozen job binding and report ciphertext',async()=>{
+    vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED','true')
+    try{
+      const f=await teacherBatchFixture()
+      const {getTrainingVariantReportsForTeacher}=await import('../../modules/composite/composite.service')
+      const result=await getTrainingVariantReportsForTeacher('teacher-batch',UserRole.TEACHER,f.template.id)
+      const query=db.compositeReportJob.findMany.mock.calls[0][0]
+      if(process.env.VARIANT_QUERY_OUTPUT)writeFileSync(process.env.VARIANT_QUERY_OUTPUT,JSON.stringify({query,jobs:f.jobs,reports:result},null,2)+'\n')
+      expect(result.reports.map(report=>report.id)).toEqual(['attempt-0','attempt-1'])
+      expect(result.reports.map(report=>report.trainingVariant?.variantKey)).toEqual(['group_0','group_1'])
+      expect(db.compositeReportJob.findMany).toHaveBeenCalledTimes(1)
+      expect(query).toEqual({where:{attemptId:{in:['attempt-0','attempt-1']}},select:{attemptId:true,attemptEpoch:true,status:true,
+        slotSetHash:true,contextHash:true,aggregateInputHash:true,reportEncrypted:true}})
+    }finally{vi.unstubAllEnvs()}
+  })
+  it('keeps owner and exact frozen-version refusals before publishing saved reports',async()=>{
+    vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED','true')
+    try{
+      const f=await teacherBatchFixture()
+      const {getTrainingVariantReportsForTeacher}=await import('../../modules/composite/composite.service')
+      await expect(getTrainingVariantReportsForTeacher('other-teacher',UserRole.TEACHER,f.template.id)).rejects.toMatchObject({statusCode:403})
+      expect(db.compositeReportJob.findMany).not.toHaveBeenCalled()
+      f.jobs[0].slotSetHash='drifted'
+      await expect(getTrainingVariantReportsForTeacher('teacher-batch',UserRole.TEACHER,f.template.id)).rejects.toMatchObject({code:'STALE_ATTEMPT'})
+    }finally{vi.unstubAllEnvs()}
+  })
+})
 describe('weighted variant export scope', () => {
   it('exports only selected canonical form facts; other-group values are null with NOT_SHOWN and independent strata', async () => {
     const {template} = fixture()

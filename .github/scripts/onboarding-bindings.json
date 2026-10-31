@@ -8896,6 +8896,148 @@
           "after": "cfe4aac4bec8595ab0b16dfb9118f92a1f68e531"
         }
       }
+    },
+    "450": {
+      "schemaVersion": 1,
+      "pr": 450,
+      "enabled": true,
+      "base": "a58a16dcdd3998e5262e89a677ff716b8a15b6e7",
+      "product": "2738fdf9a440101016d8b4b9541288916125402a",
+      "controlCheckpoint": "7b544c714297274d8e35f809b821ed950a073af8",
+      "components": {
+        "backend": "b1db0d6e6ff86ca1a23e02b8138347de178b07fa",
+        "frontend": "6a16f663bd2f59897acbe91546eea3291ffa1bf2"
+      },
+      "controlBefore": {
+        ".github/scripts/onboarding-bindings.json": "d34a80c158447633950ec6a8e47a4dd0f93b9856",
+        ".github/scripts/onboarding-checks.mjs": "034c833367407c2e2bc1312a544211f6aa8f192d",
+        ".github/scripts/onboarding-controls.test.mjs": "18b0435efc7281fee6e238868778dcf2ac3479aa",
+        ".github/scripts/onboarding-evidence.json": "7a3ab8f59840d12849e4ebf23a9a412ee956abe0",
+        ".github/scripts/onboarding-scope.mjs": "d2ae3e654071564b969d501c27f85cedaa7e8004",
+        ".github/workflows/ci.yml": "d2de1cf31683fb5c748a9146f869c92efce4eb27"
+      },
+      "source": {
+        "docs/performance/variant-report-job-projection-20261031/README.md": {
+          "before": null,
+          "after": "76393aa2b919c6ca97fa833a607139d00acc265f"
+        },
+        "docs/performance/variant-report-job-projection-20261031/binding.json": {
+          "before": null,
+          "after": "eae10147be929ee40c561f076a75d0e4cbaef012"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline-query.json.gz": {
+          "before": null,
+          "after": "1a27a4f2d4c6ba94b03934951152020c699ed59c"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline-r2.json.gz": {
+          "before": null,
+          "after": "84aceaf77d1a40d386356b6d8cb7fe31f4030ac5"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline-r2.log.gz": {
+          "before": null,
+          "after": "bfec14d0efed24969c80a7ab86c8c3a4fb267eb4"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline.json.gz": {
+          "before": null,
+          "after": "cd1a36de4b0c8e44125460a49d5e8a4170b1f762"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline.log.gz": {
+          "before": null,
+          "after": "7b9fd0a9722465218150ed3c9dd1fe3d9f74bf16"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/candidate-query.json.gz": {
+          "before": null,
+          "after": "cbb3ea8997cb9e5db3e9556a3e9c79bb498ddcde"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/candidate.json.gz": {
+          "before": null,
+          "after": "4dba3fc4af5b3f1cd9b5c0da0b4c05051f745d91"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/candidate.log.gz": {
+          "before": null,
+          "after": "6b68c4fab2d3e6601e66713cd12cb116ad3c3068"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-execution.json.gz": {
+          "before": null,
+          "after": "30ac19d9d121b1be488a46c071fda69d3966d30e"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-migrate.log.gz": {
+          "before": null,
+          "after": "6ee02fdafacec0c3d41fcbd196f9b36e42b3b2df"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-probe.log.gz": {
+          "before": null,
+          "after": "d4a3b0fa646ce695928e2071bedebe6858340475"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-result.json.gz": {
+          "before": null,
+          "after": "b9d67f9ba01bbb859e96efd37b98f5a3656aab37"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-start.log.gz": {
+          "before": null,
+          "after": "473af2db167e293f97a216821f8462ccc3b0bb91"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-stop.log.gz": {
+          "before": null,
+          "after": "f883feadb5500be31de326061aa71b8e98b7d1d7"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/types.json.gz": {
+          "before": null,
+          "after": "8f40941085245a77ef08a0980e98525ebf7794f8"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/types.log.gz": {
+          "before": null,
+          "after": "d4b9926df0b7defceb6caf0b474c4a190c5ca8f0"
+        },
+        "docs/performance/variant-report-job-projection-20261031/ownership.json": {
+          "before": null,
+          "after": "9099f83c2caab42c4a9657d70baf7b4a240ffc4c"
+        },
+        "docs/performance/variant-report-job-projection-20261031/probe.mts": {
+          "before": null,
+          "after": "40b5de5bf92caf4242095b3bcfb6540e5e919546"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/README.md": {
+          "before": null,
+          "after": "89a4d1cee6296246251a78948c89fcf6ee208ba3"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/backend-types.json": {
+          "before": null,
+          "after": "127b73d7de482e98c5b1b04cf6f2dc368c4307f5"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/control.log": {
+          "before": null,
+          "after": "3a26f07309774317fe53fb8708beb37a1e2e58bb"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/existing-consumer.json": {
+          "before": null,
+          "after": "7523aca3db544bc7d2c9d56a4546159364838e54"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/source-and-reuse.json": {
+          "before": null,
+          "after": "10b8cf6b65201cf4abcc3f1fce3f5217e45cad6b"
+        },
+        "docs/performance/variant-report-job-projection-20261031/run-probe.py": {
+          "before": null,
+          "after": "410a5336849765c18f4155da341b4e367e8abe4e"
+        },
+        "server-version/backend/src/__tests__/composite/training-variant-export.test.ts": {
+          "before": "a1af4c0f75fb23192c7aaff5c3294af17c7ceda1",
+          "after": "13b5e300a75d161e509025e9334c3aaaa4c30559"
+        },
+        "server-version/backend/src/modules/composite/composite.service.ts": {
+          "before": "eb7b347ce78457f43ea66f5a0c426f105cf68f75",
+          "after": "9274db0799c0e22a4739e9d13908386fdbd8a8ea"
+        }
+      }
     }
   }
 }
