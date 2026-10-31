@@ -1,0 +1,53 @@
+{
+  "node": {
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "packages": {
+    "vitest": {
+      "version": "4.1.11",
+      "packageJsonSha256": "a28126d97bcaf567da5bed69443b7f3bcd9a7a8c38c8b66e554686b6bb2c10e0"
+    },
+    "typescript": {
+      "version": "5.9.3",
+      "packageJsonSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6"
+    },
+    "@prisma/client": {
+      "version": "5.22.0",
+      "packageJsonSha256": "2efa3f7c0f05cf2bd4b681b71dd0e7a197006a3c29f2acdb5f88d5e7bc9bb2e3"
+    },
+    "follow-redirects": {
+      "version": "1.16.1",
+      "packageJsonSha256": "3b63e57223c63eff7b1c9ecdcd6615af8c6fcbaa9d436e949f02acf2b6dbe588"
+    },
+    "tsx": {
+      "version": "4.23.12",
+      "packageJsonSha256": "96aee9fd252d0cc31f3c01468250961f5b338c797bc208700d7db926450c7659"
+    }
+  },
+  "postgres": "16.15-bookworm cached official image; isolated --network=none --cpus=1 --memory=512m; no production",
+  "typescriptInputSummary": {
+    "reconstruction": "post-run from unchanged tracked non-test source, not full trace of compiler IO",
+    "trackedSourceCount": 2225,
+    "pathHashMapSha256": "aa2b1fe86cf0e47639744be64e234b4b74120d3b9e58928a04e9304374e2f1a2",
+    "tsconfigSha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "lockSha256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591"
+  },
+  "typesInvocation": {
+    "command": [
+      "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit"
+    ],
+    "cwd": "/workspace/eduk12-b-opt/server-version/backend",
+    "startUtc": "2026-10-31T14:12:51.623256+00:00",
+    "head": "dddc4d3a317b50b07631d789397910e1100f1c62",
+    "backendTree": "87a9b01e3ff153018c7cb195d5ce7a88ab69b95f",
+    "exitCode": 0,
+    "durationSeconds": 41.245,
+    "endUtc": "2026-10-31T14:13:32.873353+00:00",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "secretsOrEnvironmentDumpIncluded": false,
+  "freshInstallOrFullByteBoundDependencies": false
+}
