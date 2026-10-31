@@ -1,3 +1,5 @@
+import {trainingGroupLongitudinalCatalog,generateTrainingGroupLongitudinal,readTrainingGroupLongitudinal} from '../modules/training-analysis/group-longitudinal.service'
+import {groupLongitudinalRequestSchema} from '../modules/reporting/group-longitudinal'
 import type { Request, Response } from 'express'
 import { generateTrainingGroupReport, listTrainingGroupReports, readTrainingGroupReport, trainingGroupTools } from '../modules/training-analysis/group-report.service'
 import { z } from 'zod'
@@ -30,6 +32,9 @@ async function reproduce(req:Request) {
 export const trainingAnalysisController={
   groupIndex: async(req:Request,res:Response)=>{try{return success(res,await listTrainingGroupReports({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id}))}catch(err){return respondError(res,err)}},
   groupTools: async(req:Request,res:Response)=>{try{return success(res,await trainingGroupTools({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id,taskId:req.params.taskId}))}catch(err){return respondError(res,err)}},
+  groupLongCatalog:async(req:Request,res:Response)=>{try{return success(res,await trainingGroupLongitudinalCatalog({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id,taskId:req.params.taskId}))}catch(err){return respondError(res,err)}},
+  groupLongGenerate:async(req:Request,res:Response)=>{try{return success(res,await generateTrainingGroupLongitudinal({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id,taskId:req.params.taskId,...groupLongitudinalRequestSchema.parse(req.body)}))}catch(err){return respondError(res,err)}},
+  groupLongRead:async(req:Request,res:Response)=>{try{return success(res,await readTrainingGroupLongitudinal({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id,taskId:req.params.taskId,artifactId:req.params.artifactId}))}catch(err){return respondError(res,err)}},
   groupGenerate: async(req:Request,res:Response)=>{try{return success(res,await generateTrainingGroupReport({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id,selection:req.body}))}catch(err){return respondError(res,err)}},
   groupRead: async(req:Request,res:Response)=>{try{return success(res,await readTrainingGroupReport({actor:{userId:req.user!.userId,role:req.user!.role},courseId:req.params.id,taskId:req.params.taskId,artifactId:req.params.artifactId}))}catch(err){return respondError(res,err)}},
   sources:async(req:Request,res:Response)=>{try{return success(res,await discoverTrainingCourseSources(actor(req),req.params.id))}catch(err){return respondError(res,err)}},

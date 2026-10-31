@@ -385,6 +385,8 @@ type SurveyDictionaryInput={actorUserId:string;projectId:string;waveId:string;in
 export interface SurveyItemDictionary {
   waveId:string
   tools?:NonNullable<SurveySourceProjection['groupTools']>
+  /** Internal group consumers only; never a participant disclosure grant. */
+  longitudinal?:ResearchFrozenPublication['longitudinal']
   source:'FROZEN_CODEBOOK'
   variables:Pick<ResearchRawCodebook,'instrumentKey'|'itemKey'|'prompt'|'responseType'|
     'kind'|'columnKey'|'definitionDigest'>[]
@@ -400,6 +402,7 @@ export async function loadSurveyItemDictionary(input:SurveyDictionaryInput):Prom
   const originalSignature=signature(first)
   const variables:SurveyItemDictionary['variables']=[]
   const tools:NonNullable<SurveyItemDictionary['tools']>=[]
+  let longitudinal:SurveyItemDictionary['longitudinal']
   if(first.publication){
     const publication=first.publication
     const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
@@ -413,6 +416,7 @@ export async function loadSurveyItemDictionary(input:SurveyDictionaryInput):Prom
     if(input.includeGroupTools){
       if(frozenVariantConfiguration(snapshot.flow,snapshot.waveId))invalid('A/B问卷子版本不可合并统计；请按冻结子版本分层分析')
       tools.push(...snapshot.units.map(groupTool))
+      longitudinal=snapshot.longitudinal
     }
     // Resolve collisions against the complete schema, including text fields
     // excluded from this endpoint. These IDs must match every export page.
@@ -431,7 +435,7 @@ export async function loadSurveyItemDictionary(input:SurveyDictionaryInput):Prom
   const current=await readSurveyDictionaryMaterial(input)
   if(originalSignature!==signature(current))
     invalid('研究来源在计算期间变化，请重新开始')
-  return {waveId:input.waveId,source:'FROZEN_CODEBOOK',variables,...(input.includeGroupTools?{tools}:{})}
+  return {waveId:input.waveId,source:'FROZEN_CODEBOOK',variables,...(input.includeGroupTools?{tools,longitudinal}:{})}
 }
 
 async function readSurveyDictionaryMaterial(input:SurveyDictionaryInput){

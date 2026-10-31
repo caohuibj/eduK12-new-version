@@ -10,7 +10,7 @@ vi.mock('../../modules/survey/builder.service', () => ({ authorizedProject: m.au
 vi.mock('../../modules/survey/analytics.source', () => ({ loadSurveySource: m.source, loadSurveyItemDictionary: m.dictionary }))
 vi.mock('../../modules/reporting/task-artifact', () => ({ saveTaskGroupArtifact: m.save, readTaskGroupArtifact: m.read,
   listTaskGroupArtifacts: m.list, publicTaskGroupArtifact: (value: unknown) => value }))
-import { generateSurveyGroupReport, readSurveyGroupReport, surveyGroupCatalog, surveyGroupFacts } from '../../modules/survey/group-report.service'
+import { prepareSurveyGroupReport, generateSurveyGroupReport, readSurveyGroupReport, surveyGroupCatalog, surveyGroupFacts } from '../../modules/survey/group-report.service'
 
 const scope = { actorUserId: 'owner', projectId: 'project', waveId: 'wave' }
 const measurement = (instrumentKey: string) => ({ instrumentKey, scoreKey: 'total', scoringDigest: 'score-c', responseSignature: 'content-c', respondentType: 'self', unit: 'score' })
@@ -26,7 +26,7 @@ function source(): SurveySourceProjection {
 }
 beforeEach(() => {
   vi.resetAllMocks(); m.transaction.mockImplementation(fn => fn(m.tx)); m.tx.surveyWave.findFirst.mockResolvedValue({ title: '本轮', publicationId: 'pub' })
-  m.tx.surveyProject.findUnique.mockResolvedValue({ revision: 7 }); m.tx.surveyWaveFinal.findMany.mockResolvedValue([{ id: 'f1', resultsHash: 'h1' }, { id: 'f2', resultsHash: 'h2' }])
+  m.tx.surveyProject.findUnique.mockResolvedValue({ revision: 7 }); m.tx.surveyWaveFinal.findMany.mockResolvedValue([{ id: 'f1', waveId:'wave', resultsHash: 'h1' }, { id: 'f2', waveId:'wave', resultsHash: 'h2' }])
   m.source.mockResolvedValue(source()); m.dictionary.mockResolvedValue({ tools: source().groupTools }); m.list.mockResolvedValue([])
   m.save.mockImplementation(async (_db, artifact) => artifact)
 })
@@ -56,7 +56,7 @@ describe('Survey task group artifacts', () => {
     m.read.mockResolvedValue(artifact)
     expect(await readSurveyGroupReport({ ...scope, artifactId: 'artifact' })).toBe(artifact)
     expect(m.source).not.toHaveBeenCalled(); expect(m.authorize).toHaveBeenCalledTimes(2)
-    expect(m.tx.surveyWaveFinal.findMany.mock.calls[0][0]).toMatchObject({ select: { id: true, resultsHash: true }, where: { id: { in: ['f1', 'f2'] } } })
+    expect(m.tx.surveyWaveFinal.findMany.mock.calls[0][0]).toMatchObject({ select: { id: true, waveId:true, resultsHash: true }, where: { id: { in: ['f1', 'f2'] } } })
   })
   it('generates one frozen snapshot and does not request raw cognitive trials', async () => {
     await generateSurveyGroupReport({ ...scope, instrumentKey: 'cognitive' })
@@ -70,6 +70,20 @@ describe('Survey task group artifacts', () => {
     await expect(readSurveyGroupReport({ ...scope, artifactId: 'artifact' })).rejects.toMatchObject({ statusCode: 409 })
     m.authorize.mockRejectedValue(new Error('no access')); await expect(readSurveyGroupReport({ ...scope, artifactId: 'artifact' })).rejects.toThrow('no access')
     expect(m.read).toHaveBeenCalledTimes(1)
+  })
+  it('resolves the current leaf by stable metric ID and retains a null newest parent without reviving its older value',async()=>{
+    const loaded=source()
+    loaded.groupTools!.find(t=>t.instrumentKey==='scale')!.instrumentKey='current-A'
+    for(const row of loaded.scoreColumns)if(row.measurement.instrumentKey==='scale')row.measurement.instrumentKey='current-A'
+    for(const row of loaded.scores)if(row.measurement.instrumentKey==='scale'){
+      row.measurement.instrumentKey='current-A'
+      if(row.attemptId==='p2'){row.value=null;row.missingReason='NOT_CALCULABLE'}
+    }
+    m.source.mockResolvedValue(loaded);m.dictionary.mockResolvedValue({tools:loaded.groupTools,longitudinal:{planId:'plan',metrics:[{metricId:'stable-metric',instrumentKey:'current-A'}]}})
+    const group=await prepareSurveyGroupReport({...scope,instrumentKey:'old-A',trackedMetricIds:['stable-metric'],retainedParentIds:new Set(['p2'])})
+    expect(m.source.mock.calls[0][0].selectScore).toEqual({instrumentKey:'current-A'})
+    expect(group.projection.metrics[0]).toMatchObject({mean:null,validN:0,missingN:1})
+    expect(group.sourceBindings.parents).toEqual([loaded.groupParents![1]])
   })
   it('rejects incompatible measurement identities instead of pooling them', () => {
     const input = source(); input.scores[0].measurement = { ...input.scores[0].measurement, scoringDigest: canonicalHash('other C') }

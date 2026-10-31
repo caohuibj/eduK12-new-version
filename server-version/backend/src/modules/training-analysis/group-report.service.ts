@@ -45,9 +45,9 @@ export async function trainingGroupTools(input: Scope & {taskId: string}) {
   }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead})
 }
 
-export async function generateTrainingGroupReport(input: Scope & {selection: unknown}) {
-  const selection = inputSchema.parse(input.selection)
-  return prisma.$transaction(async tx => {
+export type TrainingPreparedGroup={source:ReturnType<typeof sourceOf>;selector:unknown;sourceBindings:TrainingGroupBindings;projection:TaskGroupProjection;generatedBy:string;definitions:GroupMetricDefinition[];populationKeys:string[]|null}
+async function computeTrainingGroupReport(tx:Prisma.TransactionClient,input:Scope,selection:z.infer<typeof inputSchema>):Promise<TrainingPreparedGroup>{
+
     const catalog = await listTrainingAnalysisSources(tx, input.actor, input.courseId, {authorityLock: 'SHARE', taskId: selection.taskId, group: true, groupKey: selection.toolKey})
     const tool = catalog.tools.find(tool => tool.key === selection.toolKey && tool.source.publication === selection.publication
       && tool.source.configDigest === selection.configDigest && tool.source.variantKey === selection.variantKey && tool.source.materialGroupKey === selection.materialGroupKey)
@@ -87,16 +87,20 @@ export async function generateTrainingGroupReport(input: Scope & {selection: unk
     const {qualityHash} = await readTrainingAnalysisQuality(tx, input.courseId, sources)
     const includedIds = new Set(parents.map(row => row.attemptId))
     const governance = headers.researchGovernance.filter(row => includedIds.has(row.attemptId)).map(({attemptEpoch: _epoch, ...row}) => row)
-    return saveTaskGroupArtifact(tx, {source: sourceOf(input.courseId, selection.taskId), selector: {kind: 'ALL', ...selection}, sourceBindings: {parents: parents.map(({stableIdentity: _identity, ...parent}) => parent), snapshots, sources, qualityHash, governanceHash: canonicalHash(governance)}, projection, generatedBy: input.actor.userId})
-  }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 60000})
+    return {source:sourceOf(input.courseId,selection.taskId),selector:{kind:'ALL',...selection},sourceBindings:{parents:parents.map(({stableIdentity:_identity,...parent})=>parent),snapshots,sources,qualityHash,governanceHash:canonicalHash(governance)},projection,generatedBy:input.actor.userId,definitions:metricDefinitions,populationKeys:parents.every(p=>p.stableIdentity!==null)?parents.map(p=>p.stableIdentity!):null}
 }
 
-export async function readTrainingGroupReport(input: Scope & {taskId: string; artifactId: string}) {
-  return prisma.$transaction(async tx => {
-    await assertTrainingGroupAccess(tx, input.actor, input.courseId, input.taskId)
-    const artifact = await readTaskGroupArtifact(tx, sourceOf(input.courseId, input.taskId), input.artifactId)
-    if (!artifact) return fail(404, '群体报告不存在')
-    const bindings = artifact.sourceBindings as {parents: TrainingGroupSource['parents']; snapshots: TrainingGroupSource['snapshots']; sources: TrainingAnalysisManifestAttemptV1[]; qualityHash: string; governanceHash: string}
+
+export async function prepareTrainingGroupReport(input:Scope&{selection:unknown}){
+ const selection=inputSchema.parse(input.selection)
+ return prisma.$transaction(tx=>computeTrainingGroupReport(tx,input,selection),{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,timeout:60000})
+}
+export async function generateTrainingGroupReport(input:Scope&{selection:unknown}){
+ const selection=inputSchema.parse(input.selection)
+ return prisma.$transaction(async tx=>saveTaskGroupArtifact(tx,await computeTrainingGroupReport(tx,input,selection)),{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,timeout:60000})
+}
+export type TrainingGroupBindings={parents:Array<Pick<TrainingGroupSource['parents'][number],'attemptId'|'attemptEpoch'>>;snapshots:TrainingGroupSource['snapshots'];sources:TrainingAnalysisManifestAttemptV1[];qualityHash:string;governanceHash:string}
+export async function assertTrainingGroupBindingsCurrent(tx:Prisma.TransactionClient,input:Scope&{taskId:string},bindings:TrainingGroupBindings){
     const ids = bindings.parents.map(parent => parent.attemptId)
     // Current source membership plus original immutable slot pointers, never raw
     // result decryption or newest-FINAL discovery when reading an old version.
@@ -116,6 +120,15 @@ export async function readTrainingGroupReport(input: Scope & {taskId: string; ar
     const {researchGovernance} = await trainingParticipantIdentities(tx, input.actor, parents)
     const governanceHash = canonicalHash(researchGovernance.map(({attemptEpoch: _epoch, ...row}) => row))
     if (qualityHash !== bindings.qualityHash || governanceHash !== bindings.governanceHash) return stale()
+}
+
+export async function readTrainingGroupReport(input: Scope & {taskId: string; artifactId: string}) {
+  return prisma.$transaction(async tx => {
+    await assertTrainingGroupAccess(tx, input.actor, input.courseId, input.taskId)
+    const artifact = await readTaskGroupArtifact(tx, sourceOf(input.courseId, input.taskId), input.artifactId)
+    if (!artifact) return fail(404, '群体报告不存在')
+    const bindings = artifact.sourceBindings as {parents: TrainingGroupSource['parents']; snapshots: TrainingGroupSource['snapshots']; sources: TrainingAnalysisManifestAttemptV1[]; qualityHash: string; governanceHash: string}
+    await assertTrainingGroupBindingsCurrent(tx,input,bindings)
     return publicTaskGroupArtifact(artifact)
   }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead})
 }
