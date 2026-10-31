@@ -14,3 +14,4 @@ release-package/
 release-evidence/
 release-*.json
 server-version/scripts/release/__pycache__/
+.worktree-main/
