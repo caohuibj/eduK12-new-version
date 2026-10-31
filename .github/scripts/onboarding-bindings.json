@@ -5398,7 +5398,7 @@
       "enabled": true,
       "base": "3bb4c9ad2385d5c3d043663cc303336817763f08",
       "product": "10d8bfffbb4144628bfc34bba8c2988cbf0e55bb",
-      "controlCheckpoint": "495caf87bb6d204a6f8463724bec61919bf8e5f4",
+      "controlCheckpoint": "9f4cc80b128f2e57c9ca6e4e11b9440134545fc0",
       "source": {
         "docs/evidence/library-self-group-release-20261031/README.md": {
           "before": null,
@@ -5542,7 +5542,7 @@
         },
         "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/README.md": {
           "before": null,
-          "after": "e04a31ae1d4a862fa148b371a402de66ffe7eec3"
+          "after": "accc3428ac5caf9414187b1e620d6b27c9f9a84a"
         },
         "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/backend-types.json": {
           "before": null,
@@ -5551,6 +5551,10 @@
         "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/backend-types.log": {
           "before": null,
           "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/control-merge-repair.log": {
+          "before": null,
+          "after": "8cfbb745b948295ba48067e04d3c2d4802679b8c"
         },
         "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/frontend-types.json": {
           "before": null,
