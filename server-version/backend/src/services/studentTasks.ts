@@ -29,7 +29,7 @@ export async function listStudentTasks(userId: string, options: { page: number; 
   const courseIds = [...courses.keys()]
   // The caller-selected course never creates an entitlement. Push the
   // membership intersection into simple SQL predicates where possible;
-  // global Composite eligibility still uses its original runtime service.
+  // Composite eligibility uses the same scope in its original runtime service.
   const scopedCourseIds = options.courseId
     ? courseIds.filter(id => id === options.courseId)
     : courseIds
@@ -52,7 +52,7 @@ export async function listStudentTasks(userId: string, options: { page: number; 
       select: { id: true, name: true, courseQuestionnaires: { where: { courseId: { in: scopedCourseIds } }, select: { courseId: true } },
         assessments: { where: { userId }, select: { id: true, status: true, completedAt: true } } },
     }),
-    listAvailableForStudent(userId, now.getTime()),
+    listAvailableForStudent(userId, now.getTime(), options.courseId),
   ])
   const deliveries = composites.length ? await prisma.questionnaireCourseDelivery.findMany({
     where: { compositeId: { in: composites.map(item => item.id) }, courseId: { in: scopedCourseIds } },

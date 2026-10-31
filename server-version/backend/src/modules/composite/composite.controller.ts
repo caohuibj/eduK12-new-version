@@ -407,7 +407,8 @@ export const compositeController = {
   async available(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      return success(res, { list: await service.listAvailableForStudent(req.user.userId) })
+      const courseId = z.string().trim().min(1).max(100).optional().parse(req.query.courseId)
+      return success(res, { list: await service.listAvailableForStudent(req.user.userId, undefined, courseId) })
     } catch (err) { return handleError(res, err) }
   },
 
