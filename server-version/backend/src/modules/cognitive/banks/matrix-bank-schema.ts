@@ -8,9 +8,25 @@ import { z } from 'zod'
  * 题库授权元数据由 PR1 的 banks/bank-meta.ts 承载（消费方合并声明）。
  */
 
+/** The offline generator currently emits this closed vocabulary of SVG primitives. */
+const safeMatrixSvgTags = new Set(['svg', 'g', 'defs', 'style', 'rect', 'clipPath', 'polygon'])
+export const isSafeMatrixSvg = (svg: string): boolean => {
+  if (!svg.startsWith('<svg') || !svg.trimEnd().endsWith('</svg>') || svg.includes('>NA<')) return false
+  if (/<\s*!\s*(?:DOCTYPE|ENTITY)/i.test(svg) || /<\s*\?/i.test(svg)
+      || /\b(?:on[a-z]+|href|xlink:href)\s*=/i.test(svg)
+      || /\b(?:javascript|data|https?):/i.test(svg) || /@import\b/i.test(svg)) return false
+  const tags = [...svg.matchAll(/<\/?([a-z][a-z\d:-]*)\b/gi)].map((match) => match[1])
+  if (tags.length < 2 || tags.some((tag) => !safeMatrixSvgTags.has(tag))) return false
+  // Inline svglite clipPath references use url(#local-id); external resource URLs are never allowed.
+  for (const match of svg.matchAll(/\burl\s*\(\s*(['"]?)([^)'"]+)\1\s*\)/gi)) {
+    if (!match[2].startsWith('#') || match[2].length <= 1) return false
+  }
+  return true
+}
+
 export const matrixCellSvgSchema = z.string().refine(
-  (value) => value.startsWith('<svg') && value.includes('</svg>') && !value.includes('>NA<'),
-  { message: 'malformed cell svg' },
+  isSafeMatrixSvg,
+  { message: 'unsafe or malformed matrix SVG asset' },
 )
 
 export const matrixResponseSchema = z.object({

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import path from 'node:path'
-import { matrixBankFileSchema } from '../../modules/cognitive/banks/matrix-bank-schema'
+import { isSafeMatrixSvg, matrixBankFileSchema } from '../../modules/cognitive/banks/matrix-bank-schema'
 
 /**
  * COG-Intelligence Roadmap v2.0 PR2 — matRiks 生成题库的质量检查。
@@ -13,6 +13,19 @@ const BANK_PATH = path.resolve('src/modules/cognitive/banks/bank-matgen.json')
 
 describe('matRiks generated matrix bank (roadmap v2.0 PR2)', () => {
   const bank = matrixBankFileSchema.parse(JSON.parse(readFileSync(BANK_PATH, 'utf8')))
+
+  it('admits frozen local SVG graphics but rejects embedded execution and external assets', () => {
+    const benign = bank.items[0].cells[0]
+    expect(isSafeMatrixSvg(benign)).toBe(true)
+    for (const unsafe of [
+      '<svg><script>alert(1)</script></svg>',
+      '<svg onload="alert(1)"></svg>',
+      '<svg><foreignObject><div>HTML</div></foreignObject></svg>',
+      '<svg><g clip-path="url(https://example.invalid/x)"></g></svg>',
+      '<svg><style>@import "https://example.invalid/s.css"</style></svg>',
+      '<svg><image href="https://example.invalid/img"></image></svg>',
+    ]) expect(isSafeMatrixSvg(unsafe)).toBe(false)
+  })
 
   it('pins the frozen bank and keeps the frontend/backend byte-identical', () => {
     const backend = readFileSync(BANK_PATH)
