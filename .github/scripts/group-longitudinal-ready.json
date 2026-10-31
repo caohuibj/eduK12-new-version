@@ -367,7 +367,7 @@
         },
         ".github/workflows/ci.yml": {
           "before": "c20618d7d34bbd189a44cebf6205f630016e2ac0",
-          "after": "fde0303796433f0126bae4fc2ab457a3ad3361a3"
+          "after": "84d95686d025d1a6073472f00742e741a8cf1ad7"
         },
         "docs/development/group-longitudinal-draft-route-20261031.md": {
           "before": null,
@@ -444,6 +444,18 @@
         "docs/evidence/group-longitudinal-survey-training-20261030/qualification/plan.txt": {
           "before": null,
           "after": "d129afa7a5c83650eda71488973dc41af6297c54"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/scope-continuation/first-failure.json": {
+          "before": null,
+          "after": "940493e113131b45e2776bb5cbfc0e687331c146"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/scope-continuation/fixed-check.json": {
+          "before": null,
+          "after": "629baca400cac5ed6dfe66b7fd0a13b47246d382"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/scope-continuation/original-ready-classifier.log": {
+          "before": null,
+          "after": "62ddce8023842884cc932a95df1b1e881d8e302a"
         },
         "docs/evidence/group-longitudinal-survey-training-20261030/survey-contract-continuation.json": {
           "before": null,
