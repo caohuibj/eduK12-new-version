@@ -31,7 +31,7 @@ describe('learning motivation report/reference presentation revision', () => {
       expect(canonicalHash(facts), source.identity.instrumentKey).toBe(previous.referenceFactsHash)
       expect(source.identity.instrumentVersion).toBe('1.0.0')
       expect(executable.definition.scoring.scoringVersion).toBe('1.0.0')
-      expect(executable.definition.report.reportVersion).toBe('1.1.0')
+      expect(executable.definition.report.reportVersion).toBe(source.identity.instrumentKey === 'teacher_subject_liking_chemistry_zh_cn' ? '1.1.1' : '1.1.0')
       expect(executable.references.every(ref => ref.referenceVersion === 'wave1-20261001-v2')).toBe(true)
       expect(executable.definition.referencePolicy.type).toBe('declared')
       if (executable.definition.referencePolicy.type === 'declared') {
