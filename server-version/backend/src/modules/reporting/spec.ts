@@ -212,6 +212,9 @@ const toRecord = (row: SpecRow): ReportingAnalysisSpecRecord => {
   return { ...row, definition }
 }
 
+export { toRecord as reportingSpecRecord }
+export type { SpecRow as ReportingSpecRow }
+
 const readSpecForUpdate = async (tx: Tx, specId: string): Promise<SpecRow> => {
   const rows = await tx.$queryRaw<SpecRow[]>`
     SELECT "id", "spec_key" AS "specKey", "version", "status", "definition", "spec_hash" AS "specHash",

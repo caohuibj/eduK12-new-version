@@ -1,0 +1,292 @@
+{
+  "kind": "FIXED_LOCAL_CASE_SELECTION_NOT_CI_ADMISSION",
+  "productHead": "926b6b8ede703762ae174fee876ae0a8c59fe8f9",
+  "distinctCases": 14,
+  "reports": [
+    {
+      "path": "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-fixed.json.gz",
+      "gzipSHA256": "fc1728655c3997562c47bd837cc6524ef3424e0efd1fba98f81249eb73d7c90a",
+      "originalJSONSHA256": "4d4118bbff0ea9ce339c9448280df822a04e7b3600587f93d35ffb03110eea72",
+      "originalSourceAssociation": "61440918cdada213e7da08e16bfb753a9fca3e2c",
+      "associationKind": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+      "originalSummary": {
+        "success": true,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 7
+      },
+      "originalCases": [
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement keeps Scale provenance out of form-section submit payloads",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement flushes the last text edit before sealing the FORM_SECTION payload",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement sends one top-level provenance object on authenticated Scale final submit",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement uses the same top-level provenance contract on public Scale final submit",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement captures once when the current Scale has no server provenance",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement restores draft provenance without fresh capture and preserves capturedAt",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement replays the identical sealed Scale body after an ambiguous submit failure",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps sealed Form answers locked while allowing navigation and identical retry",
+          "status": "passed"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Form when progress reload fails",
+          "status": "passed"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Scale when progress reload fails",
+          "status": "passed"
+        }
+      ],
+      "selectedCases": [
+        "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps sealed Form answers locked while allowing navigation and identical retry"
+      ],
+      "continuationNote": "The two original accepted cases are retained in this reporter but superseded by the extended repair reporter."
+    },
+    {
+      "path": "docs/performance/access-followup-20261031/questionnaire-review-repair/fixed.json.gz",
+      "gzipSHA256": "7ae3052dffd2b6c039d80fe6045f46b848df7ddc401e100be14c9a6d122eb9b8",
+      "originalJSONSHA256": "98ea8de785c0e6a6449b10a1594abb073d23609677703f7be364c3ad25947a74",
+      "originalSourceAssociation": "926b6b8ede703762ae174fee876ae0a8c59fe8f9",
+      "associationKind": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+      "originalSummary": {
+        "success": true,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 8
+      },
+      "originalCases": [
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement keeps Scale provenance out of form-section submit payloads",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement flushes the last text edit before sealing the FORM_SECTION payload",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement sends one top-level provenance object on authenticated Scale final submit",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement uses the same top-level provenance contract on public Scale final submit",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement captures once when the current Scale has no server provenance",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement restores draft provenance without fresh capture and preserves capturedAt",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement replays the identical sealed Scale body after an ambiguous submit failure",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps sealed Form answers locked while allowing navigation and identical retry",
+          "status": "skipped"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps Form answers disabled when draft identity conflicts before metadata loads",
+          "status": "passed"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Form when progress reload fails",
+          "status": "passed"
+        },
+        {
+          "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Scale when progress reload fails",
+          "status": "passed"
+        }
+      ],
+      "selectedCases": [
+        "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps Form answers disabled when draft identity conflicts before metadata loads",
+        "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Form when progress reload fails",
+        "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Scale when progress reload fails"
+      ],
+      "continuationNote": "Original statuses and filters retained."
+    },
+    {
+      "path": "docs/performance/access-followup-20261031/spec-discovery/discovery-fixed.json.gz",
+      "gzipSHA256": "cae0bbbefda5f1d92b1e7e8677a50f41ba1f4f186a1e577795b65bcbce8ef57f",
+      "originalJSONSHA256": "dad25cd4a284285f45efab5beca26a907046c668b40dc14644e71d16094e4566",
+      "originalSourceAssociation": "7cdc9fbce8f21c835ff93f75fa209cb65dd4c681",
+      "associationKind": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+      "originalSummary": {
+        "success": true,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "originalCases": [
+        {
+          "fullName": "returns the same published spec page with two reads for 1 records",
+          "status": "passed"
+        },
+        {
+          "fullName": "returns the same published spec page with two reads for 4 records",
+          "status": "passed"
+        }
+      ],
+      "selectedCases": [
+        "returns the same published spec page with two reads for 1 records",
+        "returns the same published spec page with two reads for 4 records"
+      ],
+      "continuationNote": "Original statuses and filters retained."
+    },
+    {
+      "path": "docs/performance/access-followup-20261031/content-units/content-controller-fixed.json.gz",
+      "gzipSHA256": "2be1aa4258751ea20c4fab68b8b3fa5a21b3187439de7d078cfbb9d74a91ec0c",
+      "originalJSONSHA256": "f2802b2be616a73c10e75d9d2e68f1f29803f37371c9c1bbd993c3247ca76d20",
+      "originalSourceAssociation": "01be5cee34e9f0d38b3372d3f7591afd8b4bc57e",
+      "associationKind": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+      "originalSummary": {
+        "success": true,
+        "numPassedTests": 6,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "originalCases": [
+        {
+          "fullName": "GENERAL units-only content skips both discarded payload reads after authorization",
+          "status": "passed"
+        },
+        {
+          "fullName": "COURSE units-only content skips both discarded payload reads after authorization",
+          "status": "passed"
+        },
+        {
+          "fullName": "GENERAL default content preserves full sorted list, definitions and total",
+          "status": "passed"
+        },
+        {
+          "fullName": "COURSE default content preserves full sorted list, definitions and total",
+          "status": "passed"
+        },
+        {
+          "fullName": "GENERAL units-only content still refuses a non-manager before reading content",
+          "status": "passed"
+        },
+        {
+          "fullName": "COURSE units-only content still refuses a non-manager before reading content",
+          "status": "passed"
+        }
+      ],
+      "selectedCases": [
+        "GENERAL units-only content skips both discarded payload reads after authorization",
+        "COURSE units-only content skips both discarded payload reads after authorization",
+        "GENERAL default content preserves full sorted list, definitions and total",
+        "COURSE default content preserves full sorted list, definitions and total",
+        "GENERAL units-only content still refuses a non-manager before reading content",
+        "COURSE units-only content still refuses a non-manager before reading content"
+      ],
+      "continuationNote": "Original statuses and filters retained."
+    },
+    {
+      "path": "docs/performance/access-followup-20261031/content-units/manager-fixed.json.gz",
+      "gzipSHA256": "0bc576c2f61b2a733d151820ebe1bf35693161804598e1d1961dd8491f10ca0a",
+      "originalJSONSHA256": "ff989a4c37645d6a0720135b8196d3a186fc429d0885d6c2c1d67b8af85eaae6",
+      "originalSourceAssociation": "01be5cee34e9f0d38b3372d3f7591afd8b4bc57e",
+      "associationKind": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+      "originalSummary": {
+        "success": true,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 10
+      },
+      "originalCases": [
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /general-questionnaires/q",
+          "status": "passed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /questionnaires/q",
+          "status": "passed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /composite-assessments/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures the real ordinary editor basic, content and cached tab revisit",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /general-questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /composite-assessments/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses the refreshed section list for newly available fields",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP derives membership when nested field DTOs omit their enclosing section IDs",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps a failed /form-sections distinguishable from an empty section list",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps a failed /content distinguishable from an empty section list",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps published/read-only section management non-mutating",
+          "status": "skipped"
+        }
+      ],
+      "selectedCases": [
+        "canonical section field source over synthetic HTTP measures initial shared manager at /general-questionnaires/q",
+        "canonical section field source over synthetic HTTP measures initial shared manager at /questionnaires/q"
+      ],
+      "continuationNote": "Original statuses and filters retained."
+    }
+  ],
+  "reuseBoundary": "DOT reviewed bounded runtime/test deltas; component-wide claims do not follow from case selection. Prior13 reporters keep their original identities. No backend auth/DB or compiled-browser qualification is inferred.",
+  "types": [
+    {
+      "path": "docs/performance/access-followup-20261031/types/backend.json",
+      "receiptSHA256": "a352bb826b1f67d4b89f1372a30ba05af5ebb5aa024e159f58dc31da225501a6",
+      "component": "backend",
+      "exitCode": 0,
+      "componentTree": "741c7d10e8c0f056a83baf09a318a5c85206f8a1"
+    },
+    {
+      "path": "docs/performance/access-followup-20261031/types/frontend.json",
+      "receiptSHA256": "f1cecf89d0ae8bfd5a26f39f4b90be00bb1c3e8a6e67ad3970a2fce6d8b6a173",
+      "component": "frontend",
+      "exitCode": 0,
+      "componentTree": "6bac0de97553862cdc4d4bbf418aae2c60319a66"
+    }
+  ]
+}

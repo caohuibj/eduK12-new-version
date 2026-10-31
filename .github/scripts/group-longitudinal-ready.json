@@ -1,0 +1,2178 @@
+{
+  "schemaVersion": 1,
+  "candidates": {
+    "feat/group-longitudinal-survey-training-20261030": {
+      "schemaVersion": 1,
+      "slice": "group",
+      "branch": "feat/group-longitudinal-survey-training-20261030",
+      "base": "ec23e64d9c6c041226902d130b2a9f0a68f4434f",
+      "reviewedCandidate": "dc6f41beda4f6abe72162de5731a861ae531a0e8",
+      "originalSource": "e232fe68b8e162b6a6551af1cdfd46384f47fc9f",
+      "originalReportPrefix": "docs/evidence/group-longitudinal-survey-training-20261030/",
+      "originalCaseCount": 22,
+      "reviewBasis": "Original 22 distinct successful cases and all failed/filtered rows retained. Shared main Training native dispatch is preserved; longitudinal composite preparation and historical bindings retain original behavior. Backend compiled once by existing image producer; actual missing frontend qualification and native incremental schema/dump/restore run once in existing longitudinal job. No application/FINAL replay or new workflow. The only application delta since official successful qualification is the approved follow-redirects1.16.1→1.16.2 override/locked artifact. All other package records, native schema/tools and frontend source remain exact. Reuse original successful native/frontend qualification; new backend audit/build/scans and changed control SAST remain required.",
+      "reports": [
+        {
+          "id": "contracts-first",
+          "file": "docs/evidence/group-longitudinal-survey-training-20261030/contracts-first.json",
+          "sha256": "815deb551b15193d0b854c0f5ec019d82ba12e886e73567cb8f1829b662cecbe",
+          "review": {
+            "cases": [
+              {
+                "fullName": "published plan group longitudinal generation and immutable read, real HTTP/PG Survey reuses frozen leaf facts, stores separate versions, and enforces current manager/inclusion scope",
+                "status": "failed"
+              },
+              {
+                "fullName": "published plan group longitudinal generation and immutable read, real HTTP/PG Training uses each published wave population, preserves the version and rejects other managers/participants",
+                "status": "failed"
+              },
+              {
+                "fullName": "frozen leaf group longitudinal assembly reuses disclosed wave statistics isolates same-named leaf totals and keeps raw comparison when only P/R provenance changes",
+                "status": "passed"
+              },
+              {
+                "fullName": "frozen leaf group longitudinal assembly reuses disclosed wave statistics preserves null and zero, signed baseline change, and breaks adjacency through missing rounds",
+                "status": "passed"
+              },
+              {
+                "fullName": "frozen leaf group longitudinal assembly reuses disclosed wave statistics retains disclosure suppression and never turns hidden counts or means into zero",
+                "status": "passed"
+              },
+              {
+                "fullName": "frozen leaf group longitudinal assembly reuses disclosed wave statistics requires actual Cognitive protocol and consistent units; category codes stay categorical",
+                "status": "passed"
+              },
+              {
+                "fullName": "Training policy over common group math keeps the existing five-person floor, hides small complements and choice cells in the public projection",
+                "status": "passed"
+              },
+              {
+                "fullName": "Training policy over common group math selects latest completed parents independently of an unfinished redo and does not link anonymous codes",
+                "status": "passed"
+              },
+              {
+                "fullName": "Training policy over common group math expands matrix rows using frozen keys and excludes free text",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts selects cognitive before metric extraction, so repeated total keys remain isolated",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts selects sjt before metric extraction, so repeated total keys remain isolated",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts adapts only real Form numbers and choice frequencies; excludes text and keeps missing null",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts catalog and saved reads never load/decrypt participant sources; read checks original pointers and authority",
+                "status": "failed"
+              },
+              {
+                "fullName": "Survey task group artifacts generates one frozen snapshot and does not request raw cognitive trials",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts rejects changed sample eligibility and cross-project authority before disclosing stored aggregate",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts rejects incompatible measurement identities instead of pooling them",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": false,
+              "numPassedTests": 15,
+              "numFailedTests": 3,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "frozen leaf group longitudinal assembly reuses disclosed wave statistics isolates same-named leaf totals and keeps raw comparison when only P/R provenance changes",
+              "frozen leaf group longitudinal assembly reuses disclosed wave statistics preserves null and zero, signed baseline change, and breaks adjacency through missing rounds",
+              "frozen leaf group longitudinal assembly reuses disclosed wave statistics retains disclosure suppression and never turns hidden counts or means into zero",
+              "frozen leaf group longitudinal assembly reuses disclosed wave statistics requires actual Cognitive protocol and consistent units; category codes stay categorical",
+              "Training policy over common group math keeps the existing five-person floor, hides small complements and choice cells in the public projection",
+              "Training policy over common group math selects latest completed parents independently of an unfinished redo and does not link anonymous codes",
+              "Training policy over common group math expands matrix rows using frozen keys and excludes free text",
+              "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
+              "Survey task group artifacts selects cognitive before metric extraction, so repeated total keys remain isolated",
+              "Survey task group artifacts selects sjt before metric extraction, so repeated total keys remain isolated",
+              "Survey task group artifacts adapts only real Form numbers and choice frequencies; excludes text and keeps missing null",
+              "Survey task group artifacts generates one frozen snapshot and does not request raw cognitive trials",
+              "Survey task group artifacts rejects changed sample eligibility and cross-project authority before disclosing stored aggregate",
+              "Survey task group artifacts rejects incompatible measurement identities instead of pooling them",
+              "Survey task group artifacts pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages"
+            ],
+            "allowPartialFailure": true,
+            "failureContinuations": [
+              {
+                "caseName": "published plan group longitudinal generation and immutable read, real HTTP/PG Survey reuses frozen leaf facts, stores separate versions, and enforces current manager/inclusion scope",
+                "reportId": "survey-contract-continuation"
+              },
+              {
+                "caseName": "published plan group longitudinal generation and immutable read, real HTTP/PG Training uses each published wave population, preserves the version and rejects other managers/participants",
+                "reportId": "contracts-continuation"
+              },
+              {
+                "caseName": "Survey task group artifacts catalog and saved reads never load/decrypt participant sources; read checks original pointers and authority",
+                "reportId": "contracts-continuation"
+              }
+            ]
+          }
+        },
+        {
+          "id": "contracts-continuation",
+          "file": "docs/evidence/group-longitudinal-survey-training-20261030/contracts-continuation.json",
+          "sha256": "c7155ed3bc0483f0de706471370a008d26bf6abbe05b96962deccf7ca9651021",
+          "review": {
+            "cases": [
+              {
+                "fullName": "published plan group longitudinal generation and immutable read, real HTTP/PG Survey reuses frozen leaf facts, stores separate versions, and enforces current manager/inclusion scope",
+                "status": "failed"
+              },
+              {
+                "fullName": "published plan group longitudinal generation and immutable read, real HTTP/PG Training uses each published wave population, preserves the version and rejects other managers/participants",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts selects cognitive before metric extraction, so repeated total keys remain isolated",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts selects sjt before metric extraction, so repeated total keys remain isolated",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts adapts only real Form numbers and choice frequencies; excludes text and keeps missing null",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts catalog and saved reads never load/decrypt participant sources; read checks original pointers and authority",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts generates one frozen snapshot and does not request raw cognitive trials",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts rejects changed sample eligibility and cross-project authority before disclosing stored aggregate",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts rejects incompatible measurement identities instead of pooling them",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": false,
+              "numPassedTests": 2,
+              "numFailedTests": 1,
+              "numPendingTests": 8
+            },
+            "selectedCases": [
+              "published plan group longitudinal generation and immutable read, real HTTP/PG Training uses each published wave population, preserves the version and rejects other managers/participants",
+              "Survey task group artifacts catalog and saved reads never load/decrypt participant sources; read checks original pointers and authority"
+            ],
+            "allowPartialFailure": true,
+            "failureContinuations": [
+              {
+                "caseName": "published plan group longitudinal generation and immutable read, real HTTP/PG Survey reuses frozen leaf facts, stores separate versions, and enforces current manager/inclusion scope",
+                "reportId": "survey-contract-continuation"
+              }
+            ]
+          }
+        },
+        {
+          "id": "survey-contract-continuation",
+          "file": "docs/evidence/group-longitudinal-survey-training-20261030/survey-contract-continuation.json",
+          "sha256": "88453659dbdcbf9b3ea6a40cb1c477eccf1ff0545d5e0a6cf381d6a462f8f8f4",
+          "review": {
+            "cases": [
+              {
+                "fullName": "published plan group longitudinal generation and immutable read, real HTTP/PG Survey reuses frozen leaf facts, stores separate versions, and enforces current manager/inclusion scope",
+                "status": "passed"
+              },
+              {
+                "fullName": "published plan group longitudinal generation and immutable read, real HTTP/PG Training uses each published wave population, preserves the version and rejects other managers/participants",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 1
+            },
+            "selectedCases": [
+              "published plan group longitudinal generation and immutable read, real HTTP/PG Survey reuses frozen leaf facts, stores separate versions, and enforces current manager/inclusion scope"
+            ]
+          }
+        },
+        {
+          "id": "survey-published-scope",
+          "file": "docs/evidence/group-longitudinal-survey-training-20261030/survey-published-scope.json",
+          "sha256": "d33e3fb6425c0bd67b6e25df12e363317acc6f9fee39bb52400417f76b75092d",
+          "review": {
+            "cases": [
+              {
+                "fullName": "published plan group longitudinal generation and immutable read, real HTTP/PG Survey reuses frozen leaf facts, stores separate versions, and enforces current manager/inclusion scope",
+                "status": "skipped"
+              },
+              {
+                "fullName": "published plan group longitudinal generation and immutable read, real HTTP/PG excludes a frozen but unopened Survey draft wave from the published plan catalog",
+                "status": "passed"
+              },
+              {
+                "fullName": "published plan group longitudinal generation and immutable read, real HTTP/PG Training uses each published wave population, preserves the version and rejects other managers/participants",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 2
+            },
+            "selectedCases": [
+              "published plan group longitudinal generation and immutable read, real HTTP/PG excludes a frozen but unopened Survey draft wave from the published plan catalog"
+            ]
+          }
+        },
+        {
+          "id": "survey-current-leaf",
+          "file": "docs/evidence/group-longitudinal-survey-training-20261030/survey-current-leaf.json",
+          "sha256": "aee483c04e7171cc5c1fea71d7bb6f084f6a4e93cf5d58ed9751b82bfd4262dd",
+          "review": {
+            "cases": [
+              {
+                "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts selects cognitive before metric extraction, so repeated total keys remain isolated",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts selects sjt before metric extraction, so repeated total keys remain isolated",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts adapts only real Form numbers and choice frequencies; excludes text and keeps missing null",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts catalog and saved reads never load/decrypt participant sources; read checks original pointers and authority",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts generates one frozen snapshot and does not request raw cognitive trials",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts rejects changed sample eligibility and cross-project authority before disclosing stored aggregate",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts resolves the current leaf by stable metric ID and retains a null newest parent without reviving its older value",
+                "status": "passed"
+              },
+              {
+                "fullName": "Survey task group artifacts rejects incompatible measurement identities instead of pooling them",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Survey task group artifacts pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 9
+            },
+            "selectedCases": [
+              "Survey task group artifacts resolves the current leaf by stable metric ID and retains a null newest parent without reviving its older value"
+            ]
+          }
+        },
+        {
+          "id": "frontend-panel-first",
+          "file": "docs/evidence/group-longitudinal-survey-training-20261030/frontend-panel-first.json",
+          "sha256": "b16e777bf5cfc2955e53df866307afd9ffcbea494e24ff07763ab7baf310220e",
+          "review": {
+            "cases": [
+              {
+                "fullName": "group longitudinal manager panel scope generates explicitly and clears a stored report on a failed permission read",
+                "status": "passed"
+              },
+              {
+                "fullName": "group longitudinal manager panel scope ignores a late response after switching to another source",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 2,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "group longitudinal manager panel scope generates explicitly and clears a stored report on a failed permission read",
+              "group longitudinal manager panel scope ignores a late response after switching to another source"
+            ]
+          }
+        }
+      ],
+      "historicalFailures": [],
+      "addedMigrations": [
+        "20261030200000_group_longitudinal_artifact_kind"
+      ],
+      "markerBefore": null,
+      "files": {
+        ".github/scripts/group-report-draft.mjs": {
+          "before": "30c894d96b7b184148a85afd690cdae5c67e7c9a",
+          "after": "d8999f4ec534dc4473bf8a4293991e81fa10516e"
+        },
+        ".github/scripts/group-report-draft.test.mjs": {
+          "before": "65bb3112b91c312ff8d9041dc6779ae12c49bc8b",
+          "after": "16e69d6ddc631460613fe4a4f4ea967c62db1389"
+        },
+        ".github/scripts/personal-tracking-ready.mjs": {
+          "before": "18746a447f27681b659e228eec2ad95708ad8373",
+          "after": "2b89e153c9067be86ea40d21afaea10e1cd17ce8"
+        },
+        ".github/scripts/personal-tracking-ready.test.mjs": {
+          "before": "7af51c8684eec401735e895f0d3272b9e89483d7",
+          "after": "fd9bdfaeaea3a72aaacda2bca96aaf40b4b34976"
+        },
+        ".github/workflows/ci.yml": {
+          "before": "c20618d7d34bbd189a44cebf6205f630016e2ac0",
+          "after": "84d95686d025d1a6073472f00742e741a8cf1ad7"
+        },
+        "docs/development/group-longitudinal-draft-route-20261031.md": {
+          "before": null,
+          "after": "09bbdfe2b4872add1930829fcdc221275cd3d517"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/README.md": {
+          "before": null,
+          "after": "b9205a6c1c1b02e708651e5c3ad76483c39c33b9"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/backend-types-candidate.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/contracts-continuation.json": {
+          "before": null,
+          "after": "fb33ee0a06fd6845da88a33a4202088ffdb17bd0"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/contracts-first.json": {
+          "before": null,
+          "after": "c92370c2a46ffbf332558cee131e3deeee02d34a"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/frontend-cognitive-types-candidate.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/frontend-lint-continuation.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/frontend-lint.log.gz": {
+          "before": null,
+          "after": "ae20c635e2f2064e0b466a5339638d8162601c62"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/frontend-panel-first.json": {
+          "before": null,
+          "after": "de6d2f44b01667290d89e30b40b9f2f099fecef4"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/frontend-types-candidate.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/frontend-types-first.log": {
+          "before": null,
+          "after": "cc188af4696851548bc926866d11f91784bd66bd"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-group-longitudinal-1280.png": {
+          "before": null,
+          "after": "737b02a8d026cf4250c1c1d8148129586b097036"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-group-longitudinal-390.png": {
+          "before": null,
+          "after": "0f36f7031d989613c3e8019abd2b13f3a9ccd6ba"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-result.json": {
+          "before": null,
+          "after": "d9f136f1d143b9e3e1eb8481f3d81fc31050b14e"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/manifest.json": {
+          "before": null,
+          "after": "2bfea6339f210699a21c8a8f0c22ef15cae30991"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/presentation-report-1280.png": {
+          "before": null,
+          "after": "bd470f8b39a0858a2a5f25fc5be2da52b0c7e11e"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/presentation-report-390.png": {
+          "before": null,
+          "after": "4a72ac143bfd6c6f12ea72905a802774d448d779"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/presentation-result.json": {
+          "before": null,
+          "after": "ec107ae7238aee327279fe6c369453d9905ecb66"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/README.md": {
+          "before": null,
+          "after": "868118a55fc2312cf6d8821d1336429bf2b69bea"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/original-qualification-job.json": {
+          "before": null,
+          "after": "9c6df49910094bb66bd85a8ebf66dd1c0790087a"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/redirect-compat.cjs": {
+          "before": null,
+          "after": "dea0ea3b3de7f33b880daaf1bd532ce85661d6bb"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/redirect-compat.json": {
+          "before": null,
+          "after": "ca70a19cc7e25def85eee5fc2755d4f95110a9a8"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/reuse-final.log": {
+          "before": null,
+          "after": "2c7d3b5071469f3239d62ea4b39df41ac8d46e9a"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/reuse-uncommitted-head.log": {
+          "before": null,
+          "after": "e194b29106e9a8c281633bdc834db54df98b711f"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/source-proof.json": {
+          "before": null,
+          "after": "a93e9765f97e5034cc558c2e7f794a42515af79b"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/plan.txt": {
+          "before": null,
+          "after": "d129afa7a5c83650eda71488973dc41af6297c54"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/scope-continuation/first-failure.json": {
+          "before": null,
+          "after": "940493e113131b45e2776bb5cbfc0e687331c146"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/scope-continuation/fixed-check.json": {
+          "before": null,
+          "after": "629baca400cac5ed6dfe66b7fd0a13b47246d382"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/scope-continuation/original-ready-classifier.log": {
+          "before": null,
+          "after": "62ddce8023842884cc932a95df1b1e881d8e302a"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/survey-contract-continuation.json": {
+          "before": null,
+          "after": "08a418a45cce86cac341df6b647237ce1a0d3cb3"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/survey-current-leaf.json": {
+          "before": null,
+          "after": "ffa06d1ca7bbe6ce831e4e961adf77a7e55fe4ff"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/survey-evidence.json": {
+          "before": null,
+          "after": "7293842e7dde5af1ff206de7468651e152514c6d"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/survey-published-scope.json": {
+          "before": null,
+          "after": "6306f8a479c8f563093f303ba0d20c96ac1ec73c"
+        },
+        "server-version/backend/package-lock.json": {
+          "before": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+          "after": "a9d8032f6511c4b1a12c31cc72e6a95aab79d491"
+        },
+        "server-version/backend/package.json": {
+          "before": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+          "after": "a92f9ed1cace1a8f609d952d41cd723b74e6f6fb"
+        },
+        "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql": {
+          "before": null,
+          "after": "59352ec4969131d728bc76589edc17ef28556579"
+        },
+        "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts": {
+          "before": null,
+          "after": "e214064e9cac8f09ebadb404b9bab839ff97260e"
+        },
+        "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts": {
+          "before": null,
+          "after": "58c611779c004bf31bb8814e2398aed2bb0d6539"
+        },
+        "server-version/backend/src/__tests__/survey/group-report.test.ts": {
+          "before": "4e33288a9ce1d8e11853cddc5fb1a66db39a3e29",
+          "after": "261d99bc00dcf1715d5895f4dff2ba9a76b94ba4"
+        },
+        "server-version/backend/src/controllers/trainingAnalysisController.ts": {
+          "before": "d05ffa6b7398bf494b9a2729681f133b3bad4093",
+          "after": "9c1b934d3916c6882b975aebc87af9ddaf0a877f"
+        },
+        "server-version/backend/src/modules/reporting/group-longitudinal.ts": {
+          "before": null,
+          "after": "b85c5d993d64621f33fe57b737d8d5a843e36448"
+        },
+        "server-version/backend/src/modules/reporting/task-artifact.ts": {
+          "before": "6a6edab4db26798576e32b1859d85bba1755a2c2",
+          "after": "f8c3b9f6a2852b53c3180ba7aba0d09d08397b35"
+        },
+        "server-version/backend/src/modules/survey/analytics.routes.ts": {
+          "before": "7de53a1878516d5dd0b16bd28aecc0b7b72b05fe",
+          "after": "26da001d595c55fc24c90825630fecf79ce1bfcb"
+        },
+        "server-version/backend/src/modules/survey/analytics.source.ts": {
+          "before": "f40689ffc3f2039f3a695c6aa867f1d5e914273a",
+          "after": "612685aca52671aee8220b8bdfc1c09ee5de9730"
+        },
+        "server-version/backend/src/modules/survey/group-longitudinal.service.ts": {
+          "before": null,
+          "after": "25d202a47dd8d4e0bb09a2882139d1651e4ce2b9"
+        },
+        "server-version/backend/src/modules/survey/group-report.service.ts": {
+          "before": "d5c6ed222ff170d6299fa22cc4f4b70633dab0eb",
+          "after": "780e4ae9964788a2e102aade78013c186191d78e"
+        },
+        "server-version/backend/src/modules/training-analysis/group-longitudinal.service.ts": {
+          "before": null,
+          "after": "91d168bdb40f4ff19d44946ce77426be77855cd1"
+        },
+        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
+          "before": "bcc0125d00c180d2f45d354ad047a07d2c7bacbe",
+          "after": "86d35aad2bfbed86c9ab2bda34fdb5506f63081a"
+        },
+        "server-version/backend/src/routes/courses.ts": {
+          "before": "327d832b59d4624db8a507731cef85f06b488226",
+          "after": "39c902c576dd6eee3b9de360bb7f7b4751aa4d6e"
+        },
+        "server-version/e2e/group-longitudinal-visual.cjs": {
+          "before": null,
+          "after": "aa299f448574ce57550903da66e94a3f669ee3bb"
+        },
+        "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.test.tsx": {
+          "before": null,
+          "after": "3aaf04c53ce03e95e738764452ecf5534b3369f5"
+        },
+        "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx": {
+          "before": null,
+          "after": "29ca07bd7e5e6bf1c9033580d9843496f78e75d6"
+        },
+        "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx": {
+          "before": null,
+          "after": "3c83af920132257416e31bf97ab8a2c6e103558e"
+        },
+        "server-version/frontend/src/modules/reporting/group-longitudinal-ui.css": {
+          "before": null,
+          "after": "42c060789fd46c0317c88b038854c26430c2f773"
+        },
+        "server-version/frontend/src/survey/SurveyGroupReports.tsx": {
+          "before": "28a9ce5d85c814eb367fe6f7316a09cd15be9684",
+          "after": "1e3661172405c82983e941a2ef67dbd777cb4316"
+        },
+        "server-version/frontend/src/training/TrainingGroupReports.tsx": {
+          "before": "a634a314bd3e3bff87e9005c55ee9d2ec5e9d0fd",
+          "after": "8b0fbd43f4f890e12656138c88a8648feae7bb30"
+        }
+      },
+      "components": {
+        "backend": "bf7795d3b3a9f44b8ef2f0353228120cc5d3529b",
+        "frontend": "d25f54554d3f42109e01bf383ed4058aff057838"
+      },
+      "repository": "caohuibj/eduK12-new-version",
+      "frontendAuditReuse": {
+        "sourceHead": "e34438dc35ac2f21b2ae48ec291e20c80d9903f8",
+        "executionHead": "7ca965681cc92ff669d36d2495660ef263b6977a",
+        "runId": 41053670118,
+        "jobId": 124055865989,
+        "step": "install frontend tools and audit locked inputs",
+        "maximumAgeHours": 24
+      },
+      "originalLocalSource": "863ae60a19eb4021c754d7d786695d7ce62479ea",
+      "originalSourceTransportBasis": "Remote e232 source tree c6673022 matches original local863 tree exactly; original unsigned execution/metadata is not reissued as a remote run.",
+      "qualificationReuse": {
+        "runId": 41167481038,
+        "jobId": 124438146565,
+        "sourceHead": "4e28e5a7cc8e83f3006b10f200ef2570548347d6",
+        "executionHead": "9001165b8ef30bd34a25b326acae08751e291267",
+        "serverVersionTree": "acf982ea2675599e1cfe228e5b3b95d0cc9c375b",
+        "maximumAgeHours": 24,
+        "nativeOnly": false,
+        "followRedirectsPatchOnly": true
+      }
+    },
+    "feat/school-group-longitudinal-complete-20261031": {
+      "schemaVersion": 1,
+      "slice": "group",
+      "branch": "feat/school-group-longitudinal-complete-20261031",
+      "base": "b1d981b144b1d9b57b93cf75746b0283b5290e4a",
+      "reviewedCandidate": "aefc3a64593b475840873b2af9ea346ce6224a14",
+      "originalSource": "a0de78bce608168565514784886cb30a19c28585",
+      "originalReportPrefix": "docs/evidence/",
+      "originalCaseCount": 20,
+      "reviewBasis": "School original 15 layered observations plus five actual new contracts: native personal two-wave source, retained same-FINAL group snapshots, hidden-count disclosure, one-parent three-slot composition delta, and pointer/authority history PostgreSQL. Original 20 FINALs executed once; qualification does not replay them. Composition is not a new two-wave proof. Shared owner transaction and leaf ceilings are preserved. Existing native job covers only the two new School schema/guard migrations after #427; current compiler/frontend/image/SAST eligibility remains required. Backend follow-redirects patch is inherited from parent. Reuse its new successful locked backend audit only after the exact official result exists; School new schema/guard qualification still must run.",
+      "reports": [
+        {
+          "id": "group-longitudinal-school-20261030--adapter-contract",
+          "file": "docs/evidence/group-longitudinal-school-20261030/adapter-contract.json",
+          "sha256": "6649f7e0e2f3a2049ee04af27409cd8dba61bd637c5dea1da84af3d4b838efb5",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores",
+                "status": "failed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back",
+                "status": "failed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots rejects a cross-slot same-named score before source access",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": false,
+              "numPassedTests": 1,
+              "numFailedTests": 2,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "School plan thin adapter delegates disclosure and reuses group snapshots rejects a cross-slot same-named score before source access"
+            ],
+            "allowPartialFailure": true,
+            "failureContinuations": [
+              {
+                "caseName": "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores",
+                "reportId": "group-longitudinal-school-20261030--selected-slot"
+              },
+              {
+                "caseName": "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back",
+                "reportId": "group-longitudinal-school-20261030--selected-slot"
+              }
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--cognitive-protocol",
+          "file": "docs/evidence/group-longitudinal-school-20261030/cognitive-protocol.json",
+          "sha256": "40fa20259b3bcafea26f4937dcefccc74721772c4733ed709734e82eef1066f8",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots uses the actual Cognitive protocol when compiled publication identities differ",
+                "status": "passed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots keeps NONE/INDIVIDUAL_ONLY sources unavailable instead of deriving GROUP access from the personal plan",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots rejects a cross-slot same-named score before source access",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 4
+            },
+            "selectedCases": [
+              "School plan thin adapter delegates disclosure and reuses group snapshots uses the actual Cognitive protocol when compiled publication identities differ"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--disclosure-final",
+          "file": "docs/evidence/group-longitudinal-school-20261030/disclosure-final.json",
+          "sha256": "25cadbc8db87ab34ddafcaef3ba91db105c3c7f72457d874d7ff4934aaa727ae",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back",
+                "status": "passed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots preserves the saved report through wording-only changes while retaining numeric permission checks",
+                "status": "passed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots keeps allowed outputs when another planned score is not disclosed, and retains per-wave suppression",
+                "status": "passed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots uses the actual Cognitive protocol when compiled publication identities differ",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots keeps NONE/INDIVIDUAL_ONLY sources unavailable instead of deriving GROUP access from the personal plan",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots rejects a cross-slot same-named score before source access",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 3,
+              "numFailedTests": 0,
+              "numPendingTests": 4
+            },
+            "selectedCases": [
+              "School plan thin adapter delegates disclosure and reuses group snapshots preserves the saved report through wording-only changes while retaining numeric permission checks"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--frontend-lazy-entry",
+          "file": "docs/evidence/group-longitudinal-school-20261030/frontend-lazy-entry.json",
+          "sha256": "fd95684044ea6dd8c8b81ea41ac3dbb1bf3b10ad92a8fcd97483c7572c4b4ea6",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School plan entry integrates existing paged source selection selects a page-two task and sends only its frozen plan, reusing the published GROUP spec and showing original population labels",
+                "status": "passed"
+              },
+              {
+                "fullName": "School plan entry integrates existing paged source selection keeps a task without a published plan unavailable and never posts or auto-opens a single report",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 2,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "School plan entry integrates existing paged source selection selects a page-two task and sends only its frozen plan, reusing the published GROUP spec and showing original population labels",
+              "School plan entry integrates existing paged source selection keeps a task without a published plan unavailable and never posts or auto-opens a single report"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--frontend-wrapper",
+          "file": "docs/evidence/group-longitudinal-school-20261030/frontend-wrapper.json",
+          "sha256": "dfd3efccf796092afa2c8b424719324bdadd83a19ac030b3d79b5e775732dd99",
+          "review": {
+            "cases": [
+              {
+                "fullName": "adds the existing School GROUP spec and frozen subgroup choice to the shared command",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "adds the existing School GROUP spec and frozen subgroup choice to the shared command"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--group-metric-subset",
+          "file": "docs/evidence/group-longitudinal-school-20261030/group-metric-subset.json",
+          "sha256": "05064c2e61396cd7c10f8d1ea2df7a521570bfe2e8c776a3293980b33fbb3753",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots keeps allowed outputs when another planned score is not disclosed, and retains per-wave suppression",
+                "status": "passed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots uses the actual Cognitive protocol when compiled publication identities differ",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots keeps NONE/INDIVIDUAL_ONLY sources unavailable instead of deriving GROUP access from the personal plan",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots rejects a cross-slot same-named score before source access",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 5
+            },
+            "selectedCases": [
+              "School plan thin adapter delegates disclosure and reuses group snapshots keeps allowed outputs when another planned score is not disclosed, and retains per-wave suppression"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--no-group-permission",
+          "file": "docs/evidence/group-longitudinal-school-20261030/no-group-permission.json",
+          "sha256": "1aa46d661834f369e2039cf89ebdb7c81651bd4c6eddf1a946383181efb6bc4e",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots keeps NONE/INDIVIDUAL_ONLY sources unavailable instead of deriving GROUP access from the personal plan",
+                "status": "passed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots rejects a cross-slot same-named score before source access",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 3
+            },
+            "selectedCases": [
+              "School plan thin adapter delegates disclosure and reuses group snapshots keeps NONE/INDIVIDUAL_ONLY sources unavailable instead of deriving GROUP access from the personal plan"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--pg-final",
+          "file": "docs/evidence/group-longitudinal-school-20261030/pg-final.json",
+          "sha256": "c320deb48d3178fd746e5a6f2ea98fbab72fd30267221ef0d658ae99da5c1a24",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School compound snapshot / metadata PG contract (not authentication or end-to-end) keeps School plan history isolated and accepts only the current latest completed bound parent",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "School compound snapshot / metadata PG contract (not authentication or end-to-end) keeps School plan history isolated and accepts only the current latest completed bound parent"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--root-routes-final",
+          "file": "docs/evidence/group-longitudinal-school-20261030/root-routes-final.json",
+          "sha256": "1c078d5096959405459aeeb9fc9c47bfc0998cb50379d88b24e4cb7df8da45a2",
+          "review": {
+            "cases": [
+              {
+                "fullName": "Huischool governed report HTTP surface routes paged group sources with a validated page to the current School actor",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface reports feature availability without leaking a parent report when disabled",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface never accepts a legacy/training credential as a campus session",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface remains closed while the reviewed parent portal feature is disabled",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface never exposes a child internal account alias in the SCHOOL parent DTO",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface passes authenticated SCHOOL parent identity to the existing per-grant read policy",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface denies revoked or absent grants without returning report content",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface withholds unreviewed campus student longitudinal numbers on list and deep links",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface does not show student feedback before class approval",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface allows an approved campus student to read only their own contracted FINAL summary",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface does not invoke a FINAL respondent result for a pending student",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface preserves an authority revocation when the source result is no longer readable",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface refuses consent mutation without matching SCHOOL CSRF",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface rejects caller-supplied parent identity and accepts only the fixed report binding",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface requires the live counselor relationship on every professional detail read",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface rejects officer disclosure grants without a recent CAMPUS TOTP step-up",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface rejects report publication without a recent CAMPUS TOTP step-up",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface preserves an officer source/permission denial on the school reporting endpoint",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface does not permit TRAINING or unauthenticated group reporting",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface denies school group generation without recent TOTP or matching CSRF",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface disallows arbitrary membership selection and subject-targeted filters in school aggregate POST",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface accepts only whole-source arguments in the authorized school report path",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface accepts a selected leaf with single-dimension class OR selection",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface reads an old group artifact only through fresh current school authorization",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface does not expose protected case discovery to an unauthenticated/training identity",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface requires SCHOOL step-up and exact CSRF for pseudonymous professional generation",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface rejects exact student IDs, arbitrary metrics or unauthorized audience in request",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface passes only a school-scoped subject reference to the authoritative professional generator",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface protects clinical longitudinal generation with school MFA and CSRF",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface rejects extraneous subjectUserId, age claims or browser-supplied scoring data",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface passes valid pseudonym-only longitudinal request to server-authoritative scope",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface requires recent SCHOOL MFA and CSRF for fixed-group longitudinal generation",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface prohibits direct subgroup selectors, memberIds and unvalidated longitudinal modes",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface routes longitudinal group catalog before the generic two-segment historical read",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface rejects the legacy arbitrary-Run longitudinal POST after the current manager check",
+                "status": "passed"
+              },
+              {
+                "fullName": "Huischool governed report HTTP surface mounts the published-plan command under the existing School auth, MFA and CSRF surface",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 2,
+              "numFailedTests": 0,
+              "numPendingTests": 34
+            },
+            "selectedCases": [
+              "Huischool governed report HTTP surface rejects the legacy arbitrary-Run longitudinal POST after the current manager check",
+              "Huischool governed report HTTP surface mounts the published-plan command under the existing School auth, MFA and CSRF surface"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--routes",
+          "file": "docs/evidence/group-longitudinal-school-20261030/routes.json",
+          "sha256": "2d26a4ed7146e3ec6c5eb0592276bd2de7d58c694291d0bc8f96bd86e618a07a",
+          "review": {
+            "cases": [
+              {
+                "fullName": "child handlers require the School auth context, catch synchronous validation and retain MFA/write budget",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "child handlers require the School auth context, catch synchronous validation and retain MFA/write budget"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--selected-slot-pg-final",
+          "file": "docs/evidence/group-longitudinal-school-20261030/selected-slot-pg-final.json",
+          "sha256": "adbd2d32481be03a1cc6f3fbf61f36420fe4a613bb75fb5f4fdc0eb2bce712d7",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School compound snapshot / metadata PG contract (not authentication or end-to-end) keeps School plan history isolated and accepts only the current latest completed bound parent",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School compound snapshot / metadata PG contract (not authentication or end-to-end) limits planned discovery to the selected slot while the stored Track contains another same-named metric",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 1
+            },
+            "selectedCases": [
+              "School compound snapshot / metadata PG contract (not authentication or end-to-end) limits planned discovery to the selected slot while the stored Track contains another same-named metric"
+            ]
+          }
+        },
+        {
+          "id": "group-longitudinal-school-20261030--selected-slot",
+          "file": "docs/evidence/group-longitudinal-school-20261030/selected-slot.json",
+          "sha256": "f4e28da6718818889028fa93b63833922a5603092050f7ee61b75951e86d6fac",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School compound snapshot / metadata PG contract (not authentication or end-to-end) keeps School plan history isolated and accepts only the current latest completed bound parent",
+                "status": "skipped"
+              },
+              {
+                "fullName": "School compound snapshot / metadata PG contract (not authentication or end-to-end) limits planned discovery to the selected slot while the stored Track contains another same-named metric",
+                "status": "failed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores",
+                "status": "passed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back",
+                "status": "passed"
+              },
+              {
+                "fullName": "School plan thin adapter delegates disclosure and reuses group snapshots rejects a cross-slot same-named score before source access",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": false,
+              "numPassedTests": 2,
+              "numFailedTests": 1,
+              "numPendingTests": 2
+            },
+            "selectedCases": [
+              "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores",
+              "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back"
+            ],
+            "allowPartialFailure": true,
+            "failureContinuations": [
+              {
+                "caseName": "School compound snapshot / metadata PG contract (not authentication or end-to-end) limits planned discovery to the selected slot while the stored Track contains another same-named metric",
+                "reportId": "group-longitudinal-school-20261030--selected-slot-pg-final"
+              }
+            ]
+          }
+        },
+        {
+          "id": "group-report-history-pagination-20261031--history-page-first",
+          "file": "docs/evidence/group-report-history-pagination-20261031/history-page-first.json",
+          "sha256": "d8589e185e57d7387e1db1bdf42e0d5907db8eb953a8b5ef1595c5f545bb399e",
+          "review": {
+            "cases": [
+              {
+                "fullName": "task group history / actual pointer SQL and Training task authority pages 26 same-time pointers exactly, preserves submillisecond cursors and reaches an authorized task outside the recent100",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "task group history / actual pointer SQL and Training task authority pages 26 same-time pointers exactly, preserves submillisecond cursors and reaches an authorized task outside the recent100"
+            ]
+          }
+        },
+        {
+          "id": "school-composition-group-delta-20261031--composition-delta-first",
+          "file": "docs/evidence/school-composition-group-delta-20261031/composition-delta-first.json",
+          "sha256": "ed8865674360df7790d2837c8e0a8ff594fb3fb8181e6a97f38b4416b7270341",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School GROUP ordinary composition / published-source delta only completes the existing one-person Scale/Form/Scale parent and keeps same-key block rights separate",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "School GROUP ordinary composition / published-source delta only completes the existing one-person Scale/Form/Scale parent and keeps same-key block rights separate"
+            ]
+          }
+        },
+        {
+          "id": "school-self-group-native-20261031--native-groups-json-fix",
+          "file": "docs/evidence/school-self-group-native-20261031/native-groups-json-fix.json",
+          "sha256": "27a4e072ac786ac2f04ebbb2aecf1bac2a30d3fbb06e3da385388fce6c30d827",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School same-FINAL GROUP snapshots / native checkpoint continuation generates real single-wave and plan snapshots from the two native FINAL waves with current manager/leaf rights",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "School same-FINAL GROUP snapshots / native checkpoint continuation generates real single-wave and plan snapshots from the two native FINAL waves with current manager/leaf rights"
+            ]
+          }
+        },
+        {
+          "id": "school-self-group-native-20261031--native-hidden-count-contract",
+          "file": "docs/evidence/school-self-group-native-20261031/native-hidden-count-contract.json",
+          "sha256": "f9bf8c22e4b86c2435ccf09a79fbcfaa66f2e65655fed9d5c0954e45de7c7263",
+          "review": {
+            "cases": [
+              {
+                "fullName": "frozen leaf group longitudinal assembly reuses disclosed wave statistics isolates same-named leaf totals and keeps raw comparison when only P/R provenance changes",
+                "status": "skipped"
+              },
+              {
+                "fullName": "frozen leaf group longitudinal assembly reuses disclosed wave statistics preserves null and zero, signed baseline change, and breaks adjacency through missing rounds",
+                "status": "skipped"
+              },
+              {
+                "fullName": "frozen leaf group longitudinal assembly reuses disclosed wave statistics retains disclosure suppression and never turns hidden counts or means into zero",
+                "status": "skipped"
+              },
+              {
+                "fullName": "frozen leaf group longitudinal assembly reuses disclosed wave statistics keeps explicitly disclosed means when source privacy independently hides counts",
+                "status": "passed"
+              },
+              {
+                "fullName": "frozen leaf group longitudinal assembly reuses disclosed wave statistics requires actual Cognitive protocol and consistent units; category codes stay categorical",
+                "status": "skipped"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 4
+            },
+            "selectedCases": [
+              "frozen leaf group longitudinal assembly reuses disclosed wave statistics keeps explicitly disclosed means when source privacy independently hides counts"
+            ]
+          }
+        },
+        {
+          "id": "school-self-group-native-20261031--native-personal-publish-fix",
+          "file": "docs/evidence/school-self-group-native-20261031/native-personal-publish-fix.json",
+          "sha256": "d0db4b78a0319154eb1d302b91cfd254fe56ad0fb29784302ffc04a4792b552f",
+          "review": {
+            "cases": [
+              {
+                "fullName": "School explicit SELF GROUP source / real native lifecycle publishes and completes two real ten-person waves, keeping authorized own feedback while raw cohort summaries stay hidden",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "School explicit SELF GROUP source / real native lifecycle publishes and completes two real ten-person waves, keeping authorized own feedback while raw cohort summaries stay hidden"
+            ]
+          }
+        }
+      ],
+      "historicalFailures": [],
+      "addedMigrations": [
+        "20261030210000_school_group_longitudinal_store",
+        "20261030223000_school_private_group_source_identity"
+      ],
+      "markerBefore": "66ca26e7542bba770551f69524d7d592b8e8a621",
+      "files": {
+        "docs/development/group-longitudinal-school-20261030.md": {
+          "before": null,
+          "after": "f10f4f83026046f5a6d1762676b05d3e5cc87531"
+        },
+        "docs/development/group-report-history-pagination-20261031.md": {
+          "before": null,
+          "after": "a20ac24f3d7fba4cb3bca6caffa9518247236dd6"
+        },
+        "docs/development/school-composition-group-delta-20261031.md": {
+          "before": null,
+          "after": "57598a0ebeb496241a57183d0bf9ea0bbaa9c6cd"
+        },
+        "docs/development/school-private-group-leaf-20261030.md": {
+          "before": null,
+          "after": "f713ac7c1b6eaa6741988ad97b52ec7efbb64655"
+        },
+        "docs/development/school-private-group-shared-hooks-20261030.patch": {
+          "before": null,
+          "after": "28196a6c332390c58cf4342f80b41a6379161a1e"
+        },
+        "docs/development/school-self-group-native-20261031.md": {
+          "before": null,
+          "after": "213053f2fdc4bf492918b4247a258495cd946048"
+        },
+        "docs/development/school-self-group-source-20261030.md": {
+          "before": null,
+          "after": "c36bd3a1d77a34d616ad5b03a32500a6e204d591"
+        },
+        "docs/development/school-self-group-v2-selection-20261030.md": {
+          "before": null,
+          "after": "32969a4815ee21d2a64d77f487b307f8d5001691"
+        },
+        "docs/development/school-shared-group-import-20261031.md": {
+          "before": null,
+          "after": "c4a05f2c4c7a3bdbb678b45d20b847a725519642"
+        },
+        "docs/development/school-shared-transaction-import-20261031.md": {
+          "before": null,
+          "after": "176782f8a690a5d5aa3a31c1c66ce07fdacd012a"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/adapter-contract.json": {
+          "before": null,
+          "after": "fe221b0509b57a9d821e7a9f70fa928387d956bd"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/adapter-first.json": {
+          "before": null,
+          "after": "f4bfd18618622d866d893d08940d29ec00c781e5"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/adapter-first.log.gz": {
+          "before": null,
+          "after": "6991eac006d8dc06d6fe0a3489775c9e2f2d856d"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/adapter-pg-continuation.json": {
+          "before": null,
+          "after": "4b4612a15e8a4c8ef5d406ca149c525d50ddcf50"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/backend-candidate-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/backend-receipted-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/backend-types-receipt.json": {
+          "before": null,
+          "after": "f4778c483ce1c92dec86ad0899fcb3288873953a"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/cognitive-protocol.json": {
+          "before": null,
+          "after": "79773a0e05f76c555bf69dc7b9a568dfb87bbc48"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/disclosure-final.json": {
+          "before": null,
+          "after": "007db6b7dfc9d983eeea1cd35afade6c2fede594"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/frontend-candidate-lint.log.gz": {
+          "before": null,
+          "after": "7b875aa3b7075282a56457c58433a5e680fd5bbf"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/frontend-candidate-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/frontend-entry.json": {
+          "before": null,
+          "after": "ee05dd33958454cb716c7e22d69e918d46f025f9"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/frontend-lazy-entry.json": {
+          "before": null,
+          "after": "05b6caa70e3ef52adf1dfb5a9a621cc26d288aff"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/frontend-test-lint.log.gz": {
+          "before": null,
+          "after": "646b96d02c96b8d0cd5a72746bdbc434e8cb05fd"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/frontend-wrapper.json": {
+          "before": null,
+          "after": "fe174eada7a662675a815432d0d68270b7d92de6"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/group-metric-subset.json": {
+          "before": null,
+          "after": "7d154ea8cecf814c777fa68c2c68e7438397b4f7"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/integration-contracts.json": {
+          "before": null,
+          "after": "0bef27756d9f7bbda49d814eaea3f7337c08e41a"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/manifest.json": {
+          "before": null,
+          "after": "cf0e57fb8a901da9d9bbbe19b5e10380db9f7d80"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/no-group-permission.json": {
+          "before": null,
+          "after": "3a5e63cfafd64f84d6d2b11f1454ad0116b55f96"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/pg-final.json": {
+          "before": null,
+          "after": "ff09adbda464dd82808ac629565fd832944b89fe"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/root-routes-final.json": {
+          "before": null,
+          "after": "2ff40118340ac4bb600ce7909bb70f8549a32697"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/routes.json": {
+          "before": null,
+          "after": "d6545528904fd276cc9a3deb482ee668ffffeb9e"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/selected-slot-pg-final.json": {
+          "before": null,
+          "after": "2d006d1fa28644500766df0ac696f0b465cfa1e8"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/selected-slot.json": {
+          "before": null,
+          "after": "d2620f64f6edacbcb88182014f6d65543f44f9e7"
+        },
+        "docs/evidence/group-longitudinal-school-20261030/types-first.log.gz": {
+          "before": null,
+          "after": "3aac66c05afdf04f30e0aa04c9748b16b09a2708"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-backend-increment.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-backend-increment.log": {
+          "before": null,
+          "after": "57c933798b8318176332ddc8a27cdd124daeaa2c"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-backend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-frontend-lint.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-frontend-lint.log": {
+          "before": null,
+          "after": "d3b3dc9ff83630a276365a8e39b2a8fcb6fa2726"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-frontend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-page-first.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-page-first.json": {
+          "before": null,
+          "after": "a705231e7a6c371042973e21a2fa959a3c26f904"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/history-page-first.log": {
+          "before": null,
+          "after": "fb1520cdb544bab4283345507edb9e6cccdc0bf6"
+        },
+        "docs/evidence/group-report-history-pagination-20261031/manifest.json": {
+          "before": null,
+          "after": "95c0f23da48c3315b8a663160fdc0477d41cd7e9"
+        },
+        "docs/evidence/school-composition-group-delta-20261031/composition-delta-first.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-composition-group-delta-20261031/composition-delta-first.json": {
+          "before": null,
+          "after": "68f4411e8c8377da8447840de26f44c545010f82"
+        },
+        "docs/evidence/school-composition-group-delta-20261031/composition-delta-first.log": {
+          "before": null,
+          "after": "d4e9b996f3e4e76913105c4a488741e705093ae4"
+        },
+        "docs/evidence/school-composition-group-delta-20261031/external-status-0011.json": {
+          "before": null,
+          "after": "e4bdbed86ffbc7d5ac4b5c25f6710e3dd1a65823"
+        },
+        "docs/evidence/school-composition-group-delta-20261031/manifest.json": {
+          "before": null,
+          "after": "0b11d078e78dc09e792c50268734263b764b5d2b"
+        },
+        "docs/evidence/school-group-longitudinal-qualification-20261031/README.md": {
+          "before": null,
+          "after": "c2ff02c25fb062300004b56400caf4677fc9477e"
+        },
+        "docs/evidence/school-group-longitudinal-qualification-20261031/browser-input-reuse.json": {
+          "before": null,
+          "after": "f67819df4b1c166966b519a75c8693017897653a"
+        },
+        "docs/evidence/school-group-longitudinal-qualification-20261031/browser-proof.json": {
+          "before": null,
+          "after": "9b658bea31df5a66909e4e1f52a34ce033b62985"
+        },
+        "docs/evidence/school-group-longitudinal-qualification-20261031/browser.json": {
+          "before": null,
+          "after": "a573249042c1e93489a588de0f1b39bd1fc48218"
+        },
+        "docs/evidence/school-group-longitudinal-qualification-20261031/browser.log": {
+          "before": null,
+          "after": "708166b804c3d2803d4df5df8c5d0b1dc0c16e03"
+        },
+        "docs/evidence/school-group-longitudinal-qualification-20261031/school-longitudinal-history-390.png": {
+          "before": null,
+          "after": "f919b96fcca465eeff6294872621adc8957c5bef"
+        },
+        "docs/evidence/school-private-group-leaf-20261030/leaf-backend-types-final.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-private-group-leaf-20261030/leaf-backend-types-final.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/school-private-group-leaf-20261030/leaf-contract.json": {
+          "before": null,
+          "after": "c8cee55129df5eb6057fcbb41e7a870befddb75c"
+        },
+        "docs/evidence/school-private-group-leaf-20261030/leaf-contract.log": {
+          "before": null,
+          "after": "22fad5d452cded588d2d0c58fb2c29d201949b12"
+        },
+        "docs/evidence/school-private-group-leaf-20261030/leaf-published-metadata.log": {
+          "before": null,
+          "after": "a3aec19fbe8c1aa5b39549e0070a54e189c25fc1"
+        },
+        "docs/evidence/school-private-group-leaf-20261030/manifest.json": {
+          "before": null,
+          "after": "66eb2bf4556341780b0e0a6e6f69afe498fe29a6"
+        },
+        "docs/evidence/school-private-group-leaf-20261030/school-shared-resolver-hooks.json": {
+          "before": null,
+          "after": "ef782e9ed28a33ab32ead22229c23b080d1cb1cb"
+        },
+        "docs/evidence/school-private-group-leaf-20261030/upload-status-2331.json": {
+          "before": null,
+          "after": "e3d356f632b093d0e444f76c3ae13270226fe2e3"
+        },
+        "docs/evidence/school-private-group-leaf-20261030/verify-school-leaf-metadata.ts": {
+          "before": null,
+          "after": "d1ea246c6f5f09de60ab0e7cd8c53b460a944617"
+        },
+        "docs/evidence/school-self-group-native-20261031/863-binary-inventory.json": {
+          "before": null,
+          "after": "d6f5922be47c95a5f5fc5719833ec1e3aee5b0db"
+        },
+        "docs/evidence/school-self-group-native-20261031/manifest.json": {
+          "before": null,
+          "after": "658b251c1e3c4c9c3467f6cd93715333d2105d91"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-catalog-diagnosis.log": {
+          "before": null,
+          "after": "34d61752d54102c1f86adaf331704338d447894c"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-count-fix.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-count-fix.json": {
+          "before": null,
+          "after": "eea69dcfa7dc3743a43656ce612117cc721d7b29"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-count-fix.log": {
+          "before": null,
+          "after": "f0c618290aa5984b7f980b0470c3aaa3e6359bcd"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-first.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-first.json": {
+          "before": null,
+          "after": "9625751f83f739cbce861e5a5bca8f2a3e5cd1a5"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-first.log": {
+          "before": null,
+          "after": "ca8367273fafbc55755a159655fa8b153067a71c"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-json-fix.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-json-fix.json": {
+          "before": null,
+          "after": "5ff6f62042386772c73837befca37a6c58ec96b4"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-json-fix.log": {
+          "before": null,
+          "after": "2de73e4131677f61f0bb4d1f62a13ea2d3f92b5d"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-unit-fix.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-unit-fix.json": {
+          "before": null,
+          "after": "4accdf843ec3758618b98869a53af2a0ab39770b"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-groups-unit-fix.log": {
+          "before": null,
+          "after": "c5aef4a876cab4b9ecf61eb2b63e2c831ef3a1e1"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-hidden-count-contract.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-hidden-count-contract.json": {
+          "before": null,
+          "after": "c1ce121e380acae681021246b1416d6622e803c2"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-hidden-count-contract.log": {
+          "before": null,
+          "after": "3aa3b9170e99cd952758e84f4e2d1bc85a3b4804"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-hooks-types-final.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-hooks-types-final.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-hooks-types-first.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-hooks-types-first.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-leaf-diagnosis-env-fix.log": {
+          "before": null,
+          "after": "4e942c9a64b48c4ff9f704ff0ede73837c8325c8"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-leaf-diagnosis.log": {
+          "before": null,
+          "after": "98d99b45c9c7974a9c2d601cf988d4de0e79838f"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-personal-first.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-personal-first.json": {
+          "before": null,
+          "after": "a4340b988d5c3ab9aafe5140a8576b0894183c75"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-personal-first.log": {
+          "before": null,
+          "after": "9c64122f5f8b6ce6d71a1bdbaceaaa3366ea93a5"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-personal-publish-fix.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-personal-publish-fix.json": {
+          "before": null,
+          "after": "8ec5b19b6e0539330bd912a0cb5babde04af57db"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-personal-publish-fix.log": {
+          "before": null,
+          "after": "f73a09f808570c142dfd8dd52833fa6b9786cd8f"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-personal-roster-fix.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-personal-roster-fix.json": {
+          "before": null,
+          "after": "8a8a9d98aee73da3bfeaeed34979279b134cd374"
+        },
+        "docs/evidence/school-self-group-native-20261031/native-personal-roster-fix.log": {
+          "before": null,
+          "after": "9b82b02552c7c2d65a6a3af40d41fc241a402b36"
+        },
+        "docs/evidence/school-self-group-source-20261030/manifest.json": {
+          "before": null,
+          "after": "792f58a0c6c35b732e9e2c62111a293f2b48e074"
+        },
+        "docs/evidence/school-self-group-source-20261030/shared-transfer.json": {
+          "before": null,
+          "after": "c1723bc72fe3a0763883b647ba114dd5e726e34f"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-backend-types-final.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-backend-types-final.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-backend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-contract.json": {
+          "before": null,
+          "after": "2bfebd266ce1c425520cd068acc4fee051dbf15a"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-contract.log": {
+          "before": null,
+          "after": "eeb6debbd0d5cc1428daededbe6eea35ded878b3"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-frontend-lint.log.gz": {
+          "before": null,
+          "after": "426551b6d6eb284b5889add6c995b8bdb3d6e09b"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-frontend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-picker.json": {
+          "before": null,
+          "after": "66bdfadc354cf869fb1c52d71979bfe54c4426f8"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-picker.log": {
+          "before": null,
+          "after": "70feeb799700f46030a81d0f070512e68b35697f"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-publication-pg-guard-continuation.json": {
+          "before": null,
+          "after": "630919c8ad00d1ad57e2121339b339560320275d"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-publication-pg-guard-continuation.log": {
+          "before": null,
+          "after": "ee526dfa0f5ae11b7351a7895a58110ac2403518"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-publication-pg-isolated.json": {
+          "before": null,
+          "after": "f77db8051e62b3d9cdc0efdb4cf28dbec0605ea4"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-publication-pg-isolated.log": {
+          "before": null,
+          "after": "1442453ad67b798ba45790306d25fbbcf1e3dbfb"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-publication-pg-key-continuation.json": {
+          "before": null,
+          "after": "ec7b9363918160a9c20c2fc75952ccc64c636536"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-publication-pg-key-continuation.log.gz": {
+          "before": null,
+          "after": "dcd224f9d27bfe982e82139a902d05db98305041"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-publication-pg.json": {
+          "before": null,
+          "after": "4d1def8965ad576d5525fc8536c7d10e87864357"
+        },
+        "docs/evidence/school-self-group-source-20261030/source-v2-publication-pg.log": {
+          "before": null,
+          "after": "fa88ef4face9912d2acc978b85cb4445dd5599f4"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/manifest.json": {
+          "before": null,
+          "after": "b8afbf8862ab51ef84e8692f7b537a7f8eb1c407"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-backend-types-continuation.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-backend-types-continuation.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-backend-types.exit": {
+          "before": null,
+          "after": "0cfbf08886fca9a91cb753ec8734c84fcbe52c9f"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-backend-types.log": {
+          "before": null,
+          "after": "fc023319cfc2950a648838e9b1fe48f70cd63ea4"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-contract-continuation.json": {
+          "before": null,
+          "after": "0cf9857b4792e8d7b6daf1af00a0ca6d58bb6721"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-contract.json": {
+          "before": null,
+          "after": "470a2e5e07f38e6e986146db4198c1e9a8d41df1"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-frontend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-lint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/school-self-group-v2-selection-20261030/private-selection-ui.json": {
+          "before": null,
+          "after": "13298940053dd57aa04c4e6621c59f59b2584ea8"
+        },
+        "docs/evidence/school-shared-group-import-20261031/manifest.json": {
+          "before": null,
+          "after": "5fa547459a518b7f985d8dd361a61ecb08829935"
+        },
+        "docs/evidence/school-shared-group-import-20261031/provenance.json": {
+          "before": null,
+          "after": "8488034c3fe4bc630f3e498f6e1ba6289c77fce1"
+        },
+        "docs/evidence/school-shared-group-import-20261031/semantic-increment.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-shared-group-import-20261031/semantic-increment.log": {
+          "before": null,
+          "after": "086e783c2599d01f05f37266841591d56c1e545e"
+        },
+        "docs/evidence/school-shared-transaction-import-20261031/manifest.json": {
+          "before": null,
+          "after": "7408a474d181db2587739e5d8d273390ebf3428b"
+        },
+        "docs/evidence/school-shared-transaction-import-20261031/provenance.json": {
+          "before": null,
+          "after": "8a94121b574824bbe08894f74fc2be3155110aee"
+        },
+        "docs/evidence/school-shared-transaction-import-20261031/semantic-increment.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/evidence/school-shared-transaction-import-20261031/semantic-increment.log": {
+          "before": null,
+          "after": "b0b99cfe8283ea37cf038ba01ca910c9770c5248"
+        },
+        "server-version/backend/prisma/migrations/20261030210000_school_group_longitudinal_store/migration.sql": {
+          "before": null,
+          "after": "82efa4bcd91b2946b668b0909069d5db55841a64"
+        },
+        "server-version/backend/prisma/migrations/20261030223000_school_private_group_source_identity/migration.sql": {
+          "before": null,
+          "after": "b31f6cba728a44d9a39c9c592d92a22b160cd7b7"
+        },
+        "server-version/backend/src/__tests__/campus/group-longitudinal-plan.postgres.integration.test.ts": {
+          "before": null,
+          "after": "56a18232f9288e6ed041013ff7d3d084a122f623"
+        },
+        "server-version/backend/src/__tests__/campus/group-longitudinal-plan.routes.test.ts": {
+          "before": null,
+          "after": "450bfa4acd49bcc2113511d72e470ddce348cf95"
+        },
+        "server-version/backend/src/__tests__/campus/group-longitudinal-plan.test.ts": {
+          "before": null,
+          "after": "60fa12ca0557b1ccafb6bd3fc71d7bca07c39022"
+        },
+        "server-version/backend/src/__tests__/campus/group-reports.test.ts": {
+          "before": "52674552b5aa0d2f07242f57202f9f38d30af289",
+          "after": "df7832cbadc7ba9bee7a682d2cf27a687ce56512"
+        },
+        "server-version/backend/src/__tests__/campus/report.routes.test.ts": {
+          "before": "3e06a4bd205d900866cbc6a4a3c9bee5bd1fbe5f",
+          "after": "188062f2f1e76ea505c63d3eac713e1ae61a7c89"
+        },
+        "server-version/backend/src/__tests__/campus/school-private-group-leaf.test.ts": {
+          "before": null,
+          "after": "07935c4b91eded0ef9dbc28486a2d0794f522b49"
+        },
+        "server-version/backend/src/__tests__/campus/school-private-group-selection.test.ts": {
+          "before": null,
+          "after": "1e0f5f9e632bbb146ed2f2a475ad4e1a2c7da719"
+        },
+        "server-version/backend/src/__tests__/campus/school-private-group-source.test.ts": {
+          "before": null,
+          "after": "b07dbe01bc7cdb9e7969ec96eab85558c8930c43"
+        },
+        "server-version/backend/src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts": {
+          "before": null,
+          "after": "02dee2d02a208e9ea904f274c4dc6cc1a074a3a2"
+        },
+        "server-version/backend/src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts": {
+          "before": null,
+          "after": "39c5dac3a70a0a6f7d97cce023a05c42d3b66673"
+        },
+        "server-version/backend/src/__tests__/integration/schoolSelfGroupNative.postgres.integration.test.ts": {
+          "before": null,
+          "after": "9f6091fced6ee58c70b76795fc5831645b1e29f0"
+        },
+        "server-version/backend/src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts": {
+          "before": null,
+          "after": "d30dd915a8b214b6c06860e60d3fd64ee62daff8"
+        },
+        "server-version/backend/src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts": {
+          "before": null,
+          "after": "4d8f61412dbf29e285317bb720827a8c982bae19"
+        },
+        "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts": {
+          "before": "58c611779c004bf31bb8814e2398aed2bb0d6539",
+          "after": "e5582c317ca65a70869bad576967bfbbe39995d5"
+        },
+        "server-version/backend/src/__tests__/survey/group-report.test.ts": {
+          "before": "261d99bc00dcf1715d5895f4dff2ba9a76b94ba4",
+          "after": "1d8f755ce0f8a93485c55d3c358b8406dd6ae9ac"
+        },
+        "server-version/backend/src/controllers/trainingAnalysisController.ts": {
+          "before": "9c1b934d3916c6882b975aebc87af9ddaf0a877f",
+          "after": "007c092654f62fdded7cf319b35403ed95fe54d2"
+        },
+        "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts": {
+          "before": "369688221834549763f4f1f3836ddb53ea4401da",
+          "after": "4fdf0edd8f92ce9535f578532ba974bdaabb6a88"
+        },
+        "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts": {
+          "before": "18d2b280ee6973cf7ed467ceea7055b2f5f3ba2b",
+          "after": "f7cad3da44abea42c73d974b5625e59e3ab65fae"
+        },
+        "server-version/backend/src/modules/assessment-run/educationPrivateScaleContext.ts": {
+          "before": "c067b5d1ab49cfc010d8ddcc98a7ccef46079739",
+          "after": "1771b70d4f5b2310ee6fb1ae5b6044a775522348"
+        },
+        "server-version/backend/src/modules/assessment-run/educationPrivateScaleIdentitySql.ts": {
+          "before": "2d57f2c1ab5bcd38ef222eba0957edc7d1710d57",
+          "after": "4373302a196d7f77936aff9bfc090c8bf5c2d8b6"
+        },
+        "server-version/backend/src/modules/assessment-run/educationScaleExecutionSource.ts": {
+          "before": "47625d96b4b2106b21bd42c88047a1eb16d94e51",
+          "after": "2981178d2282c44118f6856a925e49db128c3ae3"
+        },
+        "server-version/backend/src/modules/assessment-run/registeredResources.ts": {
+          "before": "2eba8aa5124d7004997dd23f3216070d8de4ad81",
+          "after": "92620c06f54e300b4a3b487d9c2de8fafe34db00"
+        },
+        "server-version/backend/src/modules/campus/group-longitudinal-plan.routes.ts": {
+          "before": null,
+          "after": "ed534e3f95f28b3990e2edccc64c09964c270649"
+        },
+        "server-version/backend/src/modules/campus/group-longitudinal-plan.service.ts": {
+          "before": null,
+          "after": "c0379396c2b1566ef205fd46f99b969f664cc61f"
+        },
+        "server-version/backend/src/modules/campus/group-reports.ts": {
+          "before": "713ae7473aa117370fd58c81f379caacc4d86f81",
+          "after": "ec38b20ce141b9aff8d1d7a09572c592b1767593"
+        },
+        "server-version/backend/src/modules/campus/report.routes.ts": {
+          "before": "f6c1ab4062b4eea8436f14138c30d460e2b7b02c",
+          "after": "ae0be6f55388ed6d23f962df5819f6fab050cac7"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts": {
+          "before": "aaecc14031bbfdff7c7e4997c36fa58e3f94f61b",
+          "after": "e6ca152d5b956467b3956e54c5838a920018b72e"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts": {
+          "before": "dc194dfd9b29cf2260f27e57deb805f0ede356ef",
+          "after": "bfc9826ca5feabd76139a86684cdaf2e4b44d3dd"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts": {
+          "before": "b404055e4545412cfbf13975aafd6cd0ae205557",
+          "after": "d312d518b5932120ff12ccff7a807c40921b1822"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.run-adapter.ts": {
+          "before": "78bde160a537a86307c18cd0d76ca7ab7de273c0",
+          "after": "c3fba6056f5b5fe460b324a225cc3eaa78385181"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.runtime-origin.ts": {
+          "before": "fd83509f9860b2223eacbd3fe407fe874614d957",
+          "after": "c9037b5b78b22191125874d20f6300d5ca9d8802"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts": {
+          "before": "2612c469f0f9089041ecbae4032a3a839e249a53",
+          "after": "6f783286908bdd532f6ca93d7d1aedb208f07d65"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.runtime-resources.ts": {
+          "before": "4b60e7bdf5b09019ccf9ef7359de17f5f0052495",
+          "after": "23b80b154593f4abc6824fb6f698a3fe8b72cb3a"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.service.ts": {
+          "before": "18f076d2061d58a1cd5cf0f478aaca0936463a4d",
+          "after": "aaba755e7f86ac974921fb0d573a341b1e525f60"
+        },
+        "server-version/backend/src/modules/education-tools/school-private-group-history.ts": {
+          "before": null,
+          "after": "8824f5e01b0177737c555c72a056fb130fce2f3b"
+        },
+        "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts": {
+          "before": null,
+          "after": "48ed9795ce910a200e8fa989575d784f65fceab1"
+        },
+        "server-version/backend/src/modules/education-tools/school-private-group-selection.ts": {
+          "before": null,
+          "after": "8aa1f68333be8917abc83ef558a26e929aa3a05e"
+        },
+        "server-version/backend/src/modules/education-tools/school-private-group-source.ts": {
+          "before": null,
+          "after": "bb71a5dfc72503e0187a1976917376af7cdb0bfe"
+        },
+        "server-version/backend/src/modules/reporting/education-ordinary-feedback.service.ts": {
+          "before": "5cb9b456d1c72c46d864ba4867181cccc0cbe566",
+          "after": "4f11f443e5209ec900bd64132805d24c6c7133d0"
+        },
+        "server-version/backend/src/modules/reporting/education-personal-tracking.ts": {
+          "before": "6639a339b89b210fbd95d0dfaff2e8bd022770e1",
+          "after": "0530fec31f8e2de399214d1607dbcb2ad81dc857"
+        },
+        "server-version/backend/src/modules/reporting/governedDisclosure.ts": {
+          "before": "4b78a1fa88db00dba6e34b43c8621877aac965c4",
+          "after": "9e1aca41b7f82c20e21d6a7f2e5a936847cb74b3"
+        },
+        "server-version/backend/src/modules/reporting/group-longitudinal.ts": {
+          "before": "b85c5d993d64621f33fe57b737d8d5a843e36448",
+          "after": "7e6c7c0a350e1f09b9240830ae32036a232dbc53"
+        },
+        "server-version/backend/src/modules/reporting/resultSource.ts": {
+          "before": "0ba73cb00eb45eebd8dab8441d17f1df4359d0f1",
+          "after": "c2276ceb6104edd3e4f61de5b353f564b41abfd4"
+        },
+        "server-version/backend/src/modules/reporting/task-artifact.ts": {
+          "before": "f8c3b9f6a2852b53c3180ba7aba0d09d08397b35",
+          "after": "71b7d3ad6f3664d89ced78b92b881e152f552620"
+        },
+        "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": {
+          "before": "864c2149e8a6cdb5df9992ce90bbe1adaa6596fc",
+          "after": "42ef6562fa58155a9ab3bb455e1d21a7d7a92b5d"
+        },
+        "server-version/backend/src/modules/survey/analytics.routes.ts": {
+          "before": "26da001d595c55fc24c90825630fecf79ce1bfcb",
+          "after": "2e4a4e738c2ea513f1bd9ad38097a84642590fea"
+        },
+        "server-version/backend/src/modules/survey/group-longitudinal.service.ts": {
+          "before": "25d202a47dd8d4e0bb09a2882139d1651e4ce2b9",
+          "after": "e7e45d3a0c8acec5c85fd5acc33b34cd11aefc0c"
+        },
+        "server-version/backend/src/modules/survey/group-report.service.ts": {
+          "before": "780e4ae9964788a2e102aade78013c186191d78e",
+          "after": "325ede31285685fd9d71bbc6f9e7fe513e77b878"
+        },
+        "server-version/backend/src/modules/training-analysis/group-longitudinal.service.ts": {
+          "before": "91d168bdb40f4ff19d44946ce77426be77855cd1",
+          "after": "008ef8e6bfa7711b2cdc04bdf0f877aaee6d69c4"
+        },
+        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
+          "before": "86d35aad2bfbed86c9ab2bda34fdb5506f63081a",
+          "after": "6203c62ee95dce7768693169e033498a7e56f5c0"
+        },
+        "server-version/backend/src/modules/training-analysis/source.ts": {
+          "before": "d93481f61741aa48f5b16637784eccfe621d2bce",
+          "after": "7f59090bbbde6ddcc2d65568dc0c6cfb305dcabf"
+        },
+        "server-version/backend/src/routes/courses.ts": {
+          "before": "39c902c576dd6eee3b9de360bb7f7b4751aa4d6e",
+          "after": "49f1d8cee0f21849feb83b34b5d7aaaa22b2078e"
+        },
+        "server-version/e2e/school-group-report-browser.cjs": {
+          "before": "910479f295b0847f2d1da27955aa4b1b068e8a65",
+          "after": "2dd966863c709113e909a793a14b7b6191ef215d"
+        },
+        "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx": {
+          "before": "0f1752b937dd3da786d4dbe6c9cc4701bb2fe26d",
+          "after": "b0027659dd955ec0a46929041e8fd0354683a2eb"
+        },
+        "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx": {
+          "before": "f4be5589bb68f753bcb33f1da99a30d47a9969fc",
+          "after": "a0d513e443be21d36d455a22ab7333a07751a671"
+        },
+        "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.group.test.tsx": {
+          "before": null,
+          "after": "0cb3f3e6e7b738b43cedbd534c701df11be1bec3"
+        },
+        "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.tsx": {
+          "before": "2f753cbae2b68207d824b7f6ad9d8f3add6cde8b",
+          "after": "fef1f102c2d28803c08d41202a6998d7e14e8ebb"
+        },
+        "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.test.tsx": {
+          "before": null,
+          "after": "73c1731417889afbe35318601e4dd2a8bcf84ba9"
+        },
+        "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx": {
+          "before": null,
+          "after": "8269e11f22e20a509357f9f31c840e178e3ca574"
+        },
+        "server-version/frontend/src/components/education-tools/educationCompositionClient.ts": {
+          "before": "3b916b7113b9ded279a923ebe850c0cf1da0072f",
+          "after": "77361f09189ae603b683a193c95ba7d72985e381"
+        },
+        "server-version/frontend/src/components/education-tools/privateToolClient.ts": {
+          "before": "5fab945e9ab1373a295f5d163a4328656a3631bc",
+          "after": "14fe75c9f2f00358a3b841ae9aae82bae453557c"
+        },
+        "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx": {
+          "before": "29ca07bd7e5e6bf1c9033580d9843496f78e75d6",
+          "after": "ae7f8d5cc18e7b63a3173eef8997f651691a541a"
+        },
+        "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx": {
+          "before": "3c83af920132257416e31bf97ab8a2c6e103558e",
+          "after": "8e533a47b9f26a68fe34504b383264c1620a0921"
+        },
+        "server-version/frontend/src/modules/reporting/group-history.ts": {
+          "before": null,
+          "after": "4d8d86b3d6e02df75d8e42b2d4c066fdd4d5fd16"
+        },
+        "server-version/frontend/src/school/SchoolGroupLongitudinal.test.tsx": {
+          "before": "cf1f7b752d65182b73b3315c20e7e8f303d3bad0",
+          "after": "5df3092ff5cc890501a5ac73078ee57163f8f0ce"
+        },
+        "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx": {
+          "before": "eb5c9674351936947e9a47634acc96c3dce94c08",
+          "after": "5660a45b9f8164a63592c79a5031cd2c6aa5630f"
+        },
+        "server-version/frontend/src/school/SchoolGroupReports.test.tsx": {
+          "before": "4d9fbd65ff0f49c87e9271dd8ffee26975c88d63",
+          "after": "72e7706a3c4d42c4625307c8dfda39aa959e406b"
+        },
+        "server-version/frontend/src/school/SchoolGroupReports.tsx": {
+          "before": "24f7d521a70de4e058f382a62623cd1039045d49",
+          "after": "2aa4a9636dd6fb953efb896912461ac0849a4b8d"
+        },
+        "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.test.tsx": {
+          "before": null,
+          "after": "4ccf1f03180baed085d1f83c8ebbbc88ca0fa876"
+        },
+        "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.tsx": {
+          "before": null,
+          "after": "4f6de6b6445c14677bd96ae873861c5ffb6081a1"
+        },
+        "server-version/frontend/src/survey/SurveyGroupReports.tsx": {
+          "before": "1e3661172405c82983e941a2ef67dbd777cb4316",
+          "after": "044240f8683e445ed00a4c2f65227771bf6d4e8d"
+        },
+        "server-version/frontend/src/training/TrainingGroupReports.tsx": {
+          "before": "8b0fbd43f4f890e12656138c88a8648feae7bb30",
+          "after": "aedb5dda7b42c253f488c7ba8e1c7be45ae45ffc"
+        }
+      },
+      "components": {
+        "backend": "4bf97a3cfac94c89d6124846bd76f3df6fb03538",
+        "frontend": "df92343538f98b3bf6f92476f51c0460fac0b832"
+      },
+      "repository": "caohuibj/eduK12-new-version",
+      "frontendAuditReuse": {
+        "sourceHead": "e34438dc35ac2f21b2ae48ec291e20c80d9903f8",
+        "executionHead": "7ca965681cc92ff669d36d2495660ef263b6977a",
+        "runId": 41053670118,
+        "jobId": 124055865989,
+        "step": "install frontend tools and audit locked inputs",
+        "maximumAgeHours": 24
+      },
+      "nativeProduct": "SCHOOL",
+      "backendAuditReuse": {
+        "runId": 41169063761,
+        "jobId": 124442932394,
+        "sourceHead": "385615d481cdf5114f421519e627a14658e44cba",
+        "executionHead": "dfa45d6a2a97539b3e4e6225756327bec83f4caf",
+        "step": "audit backend when no admitted exact-input success",
+        "maximumAgeHours": 24
+      }
+    }
+  }
+}

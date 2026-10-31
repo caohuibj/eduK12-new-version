@@ -1,0 +1,9 @@
+Reuse the existing personal-tracking qualification job, image producer, CodeQL and stable aggregate. No new workflow, statistical engine or application authorization.
+
+Original 22 distinct passed cases remain unsigned original evidence, with all failed/filtered rows and exact successful continuations retained. Native source dispatch in Training remains the main implementation; the composite longitudinal prepare/binding helper is retained. No 22/37 replay and no new FINAL.
+
+The actual missing check is the incremental reporting_task_artifacts kind/plan migration on nonempty exact main, plus one native dump/restore with old encrypted bytes and immutable/check/index preservation. It executes only in the existing longitudinal CI job. Existing native test for the original table creation is not passed off as this new migration.
+
+Current backend compiler is executed once by the existing production image producer. Current frontend app types and affected lint execute in the existing qualification job, since the combined frontend source tree changed and no supported exact-tree receipt exists. Existing lock audit reuse is bound to unchanged locks, original successful official step and maximum24h; audit alone is reused, not old component types.
+
+Selected CI remains scope, personal-tracking, docker, codeql and stable merge-gate. No full platform, cognition trials, browser replay or deployment. Final base pins are set after #421 and preceding Group merges; preparation is not formal success.
