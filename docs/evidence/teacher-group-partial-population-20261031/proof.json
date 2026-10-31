@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "productionAccessed": false,
+  "realFinalsRetained": 10,
+  "newFinalSubmissions": 0,
+  "deliberateIncompleteBoundaryRows": 10,
+  "smallComplementN11": "all numeric/count fields withheld",
+  "partialN20": {
+    "completedN": 10,
+    "validN": 10,
+    "missingN": 10,
+    "mean": 3,
+    "sdSample": 0
+  },
+  "oldSnapshotUnchanged": true,
+  "readCanonicalMaterializations": 0,
+  "artifactId": "22b27509-3436-4ab9-bb84-847d58891e7f",
+  "full20PersonPublicationReplayed": false
+}
