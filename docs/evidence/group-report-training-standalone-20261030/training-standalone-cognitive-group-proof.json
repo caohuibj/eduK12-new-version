@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "source": "native published standalone CognitiveAssignment",
+  "participantN": 5,
+  "rt": {
+    "key": "goMedianRtMs",
+    "unit": "ms",
+    "validN": 5,
+    "mean": 300
+  },
+  "zeroMetric": "commissionRate",
+  "sourcePickerDoesNotReadSessions": true,
+  "storedReadDoesNotDecryptResults": true,
+  "unfinishedRedoDoesNotChangeSnapshot": true,
+  "studentDenied": true,
+  "rawTrialsRescoredByReport": false,
+  "newSchema": false,
+  "productionAccessed": false
+}

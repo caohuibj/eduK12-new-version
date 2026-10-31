@@ -1,3 +1,4 @@
+import {SELF_GROUP_POLICY_KEY} from '../assessment-policy/self-group-contract'
 import {lockCompositionLibraryUses} from '../education-tools/library-source.use'
 import {educationCompositionPolicyBindingSchema} from '../education-tools/private-tool.composition-contracts'
 import {assertTeacherPersonalAssessmentPolicy} from './assessmentRunPolicy'
@@ -94,7 +95,8 @@ export async function addTeacherRunTrack(input:Key&{
   if(input.resource.family==='FORM'&&!teacherFormResourceId(input.resource))
     fail('HUITEACHER_FORM_REQUIRES_TEACHER_RELEASE',403)
   if(input.resource.family==='SCALE'&&(!(teacherScaleResource(input.resource)||input.resource.key.startsWith('library-scale:'))
-    ||input.requestedPolicy.analysisMode!=='INDIVIDUAL_ONLY'))
+    ||(input.requestedPolicy.analysisMode!=='INDIVIDUAL_ONLY'
+      &&!(policy.analysisMode==='COHORT_AGGREGATE'&&policy.resultDisclosure?.policyKey===SELF_GROUP_POLICY_KEY))))
     fail('HUITEACHER_PERSONAL_SCALE_RELEASE_REQUIRED',403)
   if(!['FORM','SCALE'].includes(input.resource.family))
     assertTeacherPersonalAssessmentPolicy(policy,input.requestedPolicy)
@@ -183,7 +185,7 @@ export async function listTeacherAvailableScales(input:Key&{cursor?:string}){
   await activeLink(input)
   const legacy=input.cursor?{list:[],truncated:false}:await listTeacherScaleCatalog(input)
   const catalog=await prisma.$transaction(tx=>listEducationLibraryResourcePage(tx,{product:'TEACHER',organizationId:input.organizationId,actorId:input.actorUserId,workflow:{kind:'EVENT',id:input.eventId},cursor:input.cursor}))
-  return {list:[...legacy.list,...catalog.entries.map(entry=>({id:entry.applicability.resourceKey,key:entry.applicability.resourceKey,version:entry.applicability.resourceVersion,title:entry.title,hash:canonicalHash(entry),visibilityPolicyKey:entry.applicability.visibilityPolicyKey,personalReportAvailable:entry.resultDisclosure?.audiences.RESPONDENT.mode==='INDIVIDUAL_SUMMARY'}))],truncated:legacy.truncated,nextCursor:catalog.nextCursor}
+  return {list:[...legacy.list,...catalog.entries.map(entry=>({id:entry.applicability.resourceKey,key:entry.applicability.resourceKey,version:entry.applicability.resourceVersion,title:entry.title,hash:canonicalHash(entry),visibilityPolicyKey:entry.applicability.visibilityPolicyKey,analysisMode:entry.applicability.analysisMode,minimumRespondents:entry.applicability.minimumRespondents,personalReportAvailable:entry.resultDisclosure?.audiences.RESPONDENT.mode==='INDIVIDUAL_SUMMARY'}))],truncated:legacy.truncated,nextCursor:catalog.nextCursor}
 }
 
 

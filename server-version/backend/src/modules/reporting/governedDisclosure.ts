@@ -1,3 +1,4 @@
+import {assertTeacherGroupAuthority,teacherScaleLeafContract} from '../huiteacher/groupReportAuthority'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -24,6 +25,7 @@ export async function reportingLeafDisclosureContract(leaf:ReportingLeafSourceV2
     const school=await loadSchoolPrivateGroupDisclosure(db??prisma,scope)
     if(school)return schoolPrivateGroupLeafDisclosure(school,leaf).contract
   }
+  if(scope){const contract=await teacherScaleLeafContract(scope,leaf);if(contract)return contract}
   const entry=await resolveHistoricalRelationalEntry({resourceKind:leaf.unitType,
     resourceKey:leaf.instrumentKey,resourceVersion:leaf.instrumentVersion})
   if(!entry||entry.releaseStatus!=='PUBLISHED'||!entry.resultDisclosure)return hidden()
@@ -54,9 +56,9 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
   const db=input.tx??prisma
   const directSource = artifact.analysisKind === 'GROUP' ? artifact.artifactPayload.source
     : artifact.analysisKind === 'PROTECTED_FEEDBACK' ? { runId: artifact.sourceRunId, trackId: artifact.sourceTrackId } : null
-  const tracks = await db.$queryRaw<Array<{ family: string; key: string; version: string; policy: any; hash: string; closedAt: Date | null; productDomain: string }>>`
+  const tracks = await db.$queryRaw<Array<{ runId:string; family: string; key: string; version: string; policy: any; hash: string; closedAt: Date | null; productDomain: string }>>`
     SELECT t.resource_family AS family,t.resource_key AS key,t.resource_version AS version,
-      t.frozen_resource_policy AS policy,t.resource_policy_hash AS hash,r.closed_at AS "closedAt",org.product_domain AS "productDomain"
+      t.run_id AS "runId",t.frozen_resource_policy AS policy,t.resource_policy_hash AS hash,r.closed_at AS "closedAt",org.product_domain AS "productDomain"
     FROM assessment_run_tracks t JOIN assessment_runs r ON r.id=t.run_id AND r.organization_id=t.organization_id
     JOIN organizations org ON org.id=r.organization_id
     WHERE t.organization_id=${artifact.organizationId}
@@ -76,11 +78,12 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
   }
   // A mixed legacy/governed series cannot use the legacy path to widen disclosure.
   else if (tracks.some(t => !t.policy?.resultDisclosure)) return hidden()
-  const context = await resolveOrganizationAccessContext({ organizationId: artifact.organizationId, principal },input.tx)
+  const context = await resolveOrganizationAccessContext({ organizationId: artifact.organizationId, principal,educationProduct:principal.product },input.tx)
   const legacyHistoricalAdmin=legacyParent&&principal.platformRole==='SYSTEM_ADMIN'
   if (!context?.membershipId || (context.organizationStatus !== 'ACTIVE'&&!legacyHistoricalAdmin)
     || context.explicitDenies.some(d => ['*', 'REPORT_READ'].includes(d))) return hidden()
-  const audience = reportingAudienceForContext(context)
+  if(principal.product==='HUITEACHER')await assertTeacherGroupAuthority({actorUserId:principal.userId,organizationId:artifact.organizationId,runIds:tracks.map(t=>t.runId??directSource?.runId??'')},db)
+  const audience = principal.product==='HUITEACHER'?'ORGANIZATION':reportingAudienceForContext(context)
   const spec = await getPublishedReportingSpec(artifact.specId,input.tx)
   let allowed = spec.definition.metricRules.map(r => r.metricId)
   for (const track of tracks) {

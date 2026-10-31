@@ -4,13 +4,15 @@ import {compositeBadRequest,compositeNotFound} from '../composite/composite.erro
 import {readTrainingTracking} from '../composite/personal-tracking'
 import {groupTrackingMetrics,projectGroupLongitudinal,type GroupLongitudinalWave} from '../reporting/group-longitudinal'
 import {listTaskGroupLongitudinalArtifactsPage,type TaskArtifactCursor,saveTaskGroupLongitudinalArtifact,readTaskGroupLongitudinalArtifact} from '../reporting/task-artifact'
-import {assertTrainingGroupAccess,listTrainingGroupPlanTasks,listTrainingAnalysisSources,type TrainingAnalysisActor} from './source'
+import {assertTrainingGroupAccess,assertTrainingGroupTaskHistoryAccess,listTrainingGroupPlanTasks,listTrainingAnalysisSources,type TrainingAnalysisActor} from './source'
+import {trainingCognitiveGroupAssignmentId,trainingScaleGroupId} from './group-source'
 import {prepareTrainingGroupReport,assertTrainingGroupBindingsCurrent,type TrainingGroupBindings} from './group-report.service'
 
 type Scope={actor:TrainingAnalysisActor;courseId:string;taskId:string}
 const missing=():never=>{throw compositeNotFound('纵向群体来源不可访问')}
 async function resolvePlan(tx:Prisma.TransactionClient,input:Scope){
- await assertTrainingGroupAccess(tx,input.actor,input.courseId,input.taskId)
+ await assertTrainingGroupTaskHistoryAccess(tx,input.actor,input.courseId,input.taskId)
+ if(trainingCognitiveGroupAssignmentId(input.taskId)!==null||trainingScaleGroupId(input.taskId)!==null)return null
  const task=await tx.compositeAssessment.findUnique({where:{id:input.taskId},select:{personalTrackingBaselineId:true}})
  if(!task?.personalTrackingBaselineId)return null
  await assertTrainingGroupAccess(tx,input.actor,input.courseId,task.personalTrackingBaselineId)

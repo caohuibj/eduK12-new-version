@@ -1,0 +1,2 @@
+src/modules/huiteacher/numericGroupReport.service.ts(111,67): error TS1109: Expression expected.
+src/modules/huiteacher/numericGroupReport.service.ts(111,115): error TS1005: ';' expected.

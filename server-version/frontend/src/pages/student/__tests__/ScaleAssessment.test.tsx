@@ -67,10 +67,10 @@ const assessment = {
 
 let assessmentForTest = assessment
 
-const renderPage = (id = `assessment-${Date.now()}-${Math.random()}`) => {
+const renderPage = (id = `assessment-${Date.now()}-${Math.random()}`, search = '') => {
   assessmentForTest = { ...assessment, id, answers: [] }
   return render(
-    <MemoryRouter initialEntries={['/student/scales/scale-1']}>
+    <MemoryRouter initialEntries={['/student/scales/scale-1' + search]}>
       <Routes>
         <Route path="/student/scales/:scaleId" element={<ScaleAssessment />} />
         <Route path="/student/scales/result/:assessmentId" element={<div>RESULT_PAGE</div>} />
@@ -206,6 +206,17 @@ describe('ScaleAssessment answer navigation', () => {
 
 
 describe('ScaleAssessment context preflight', () => {
+  it('carries the Training course hint through the actual start and required-context round trip', async () => {
+    training.enabled = true
+    mockPost.mockResolvedValueOnce({code: 0, data: {preflight: {kind: 'CONTEXT_REQUIRED', requiredContextKeys: ['birthYearMonth']}}})
+    renderPage(`course-origin-${Date.now()}`, '?courseId=course-1&courseSection=assessments')
+    const month = await screen.findByLabelText('出生年月')
+    expect(mockPost).toHaveBeenCalledWith('/scales/scale-1/assessments', {courseId: 'course-1'})
+    fireEvent.change(month, {target: {value: '2010-09'}})
+    await userEvent.click(screen.getByRole('button', {name: '确认并开始'}))
+    await screen.findByRole('heading', {name: '第一题内容'})
+    expect(mockPost).toHaveBeenLastCalledWith('/scales/scale-1/assessments', {courseId: 'course-1', context: {birthYearMonth: '2010-09'}})
+  })
   it('collects only required facts and does not display items before admission', async () => {
     mockPost.mockResolvedValueOnce({ code: 0, data: { preflight: { kind: 'CONTEXT_REQUIRED', requiredContextKeys: ['birthYearMonth'] } } })
     renderPage()

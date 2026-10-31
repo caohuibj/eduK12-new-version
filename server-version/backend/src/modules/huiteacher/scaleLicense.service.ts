@@ -1,3 +1,5 @@
+import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
+import type {RelationalProductEntryV1} from '../assessment-relational/product-registry'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -16,15 +18,15 @@ export class TeacherScaleLicenseError extends Error {
 const deny=(code:string,status=409):never=>{throw new TeacherScaleLicenseError(code,status)}
 type Db=Prisma.TransactionClient|typeof prisma
 export const teacherScaleResource=(ref:{family:string;key:string;version:string})=>
-  ref.family==='SCALE'&&/^teacher-scale:[a-f0-9-]{36}:INDIVIDUAL$/.test(ref.key)
+  ref.family==='SCALE'&&/^teacher-scale:[a-f0-9-]{36}:(?:INDIVIDUAL|GROUP)$/.test(ref.key)
 
 /** Check the exact independently reviewed resource, not just its label/key.
  * This does NOT change or expose any pre-existing Student scale package.
  */
 export async function releasedTeacherScaleEntry(db:Db,ref:{
   family:string;key:string;version:string
-}){
-  if(!teacherScaleResource(ref))deny('HUITEACHER_SCALE_IDENTITY_INVALID',403)
+},purpose:'PERSONAL'|'ORGANIZATION_RUN'='PERSONAL'){
+  if(!teacherScaleResource(ref)||ref.key.endsWith(':GROUP')&&purpose!=='ORGANIZATION_RUN')deny('HUITEACHER_SCALE_IDENTITY_INVALID',403)
   const rows=await db.$queryRaw<Array<{
     id:string;scaleId:string;definitionHash:string;resourceKey:string;
     status:string;entry:Record<string,any>;entryHash:string;
@@ -52,6 +54,7 @@ export async function releasedTeacherScaleEntry(db:Db,ref:{
     FOR SHARE OF r,scale
   `
   const r=rows[0]
+  const group=!!r&&ref.key.endsWith(':GROUP')&&isSelfGroupV2Entry(r.entry as unknown as RelationalProductEntryV1)
   if(!r||(r.entry&&'privateOrigin' in r.entry)||r.scaleStatus!=='PUBLISHED'||r.scaleHash!==r.definitionHash
     ||!r.reviewedByUserId||!r.reviewedAt||!r.publishedAt
     ||r.reviewedByUserId===r.createdByUserId
@@ -60,10 +63,10 @@ export async function releasedTeacherScaleEntry(db:Db,ref:{
     ||r.entry?.applicability?.resourceKind!=='SCALE'
     ||r.entry?.applicability?.resourceKey!==ref.key
     ||r.entry?.applicability?.resourceVersion!==ref.version
-    ||r.entry?.applicability?.analysisMode!=='INDIVIDUAL_ONLY'
+    ||(!group&&r.entry?.applicability?.analysisMode!=='INDIVIDUAL_ONLY')
     ||JSON.stringify(r.entry?.applicability?.subjectRoles)!=='["TEACHER"]'
     ||JSON.stringify(r.entry?.applicability?.respondentRoles)!=='["TEACHER"]'
-    ||r.entry?.resultDisclosure?.audiences?.ORGANIZATION?.mode!=='NONE')
+    ||(group?!r.entry?.resultDisclosure?.audiences?.ORGANIZATION?.mode?.includes('AGGREGATE'):r.entry?.resultDisclosure?.audiences?.ORGANIZATION?.mode!=='NONE'))
     deny('HUITEACHER_SCALE_RELEASE_INVALID',403)
   const checked=validateScaleDefinition(r.scaleDefinition,{
     instrumentClass:'CUSTOM_DESCRIPTIVE',forPublish:true,
@@ -105,7 +108,7 @@ export async function changeTeacherScaleLicense(input:{
     if(!row.length)deny('HUITEACHER_SCALE_NOT_FOUND',404)
     if(input.action==='GRANT')await releasedTeacherScaleEntry(tx,{
       family:'SCALE',key:row[0].resourceKey,version:row[0].resourceVersion,
-    })
+    },'ORGANIZATION_RUN')
     const key={organizationId:input.organizationId,resourceId:input.resourceId}
     const current=await tx.educationTeacherScaleLicense.findUnique({
       where:{organizationId_resourceId:key},
@@ -141,7 +144,7 @@ export async function assertTeacherScaleRunUse(db:Db,input:{
     family:string;key:string;version:string
   }
 }){
-  const entry=await releasedTeacherScaleEntry(db,input.resource)
+  const entry=await releasedTeacherScaleEntry(db,input.resource,'ORGANIZATION_RUN')
   const licenses=await db.$queryRaw<Array<{id:string}>>`
     SELECT license."resource_id" AS "id"
     FROM "education_teacher_scale_licenses" license
@@ -176,12 +179,16 @@ export async function listTeacherScaleCatalog(input:{
   })
   if(!current?.productAdmin)deny('HUITEACHER_SCALE_CATALOG_FORBIDDEN',403)
   const rows=await prisma.$queryRaw<Array<{
-    id:string;key:string;version:string;title:string;hash:string
+    id:string;key:string;version:string;title:string;hash:string;visibilityPolicyKey:string;analysisMode:string;minimumRespondents:number|null;personalReportAvailable:boolean
   }>>`
     SELECT resource."id",resource."resource_key" AS "key",
       resource."resource_version" AS "version",
       resource."entry"->>'title' AS "title",
-      resource."entry_hash" AS "hash"
+      resource."entry_hash" AS "hash",
+      resource."entry"->'applicability'->>'visibilityPolicyKey' AS "visibilityPolicyKey",
+      resource."entry"->'applicability'->>'analysisMode' AS "analysisMode",
+      (resource."entry"->'applicability'->>'minimumRespondents')::int AS "minimumRespondents",
+      (resource."entry"->'resultDisclosure'->'audiences'->'RESPONDENT'->>'mode'='INDIVIDUAL_SUMMARY') AS "personalReportAvailable"
     FROM "education_teacher_scale_licenses" license
     JOIN "education_product_entitlements" entitlement
       ON entitlement."organization_id"=license."organization_id"
@@ -190,7 +197,7 @@ export async function listTeacherScaleCatalog(input:{
     JOIN "registered_assessment_resources" resource
       ON resource."id"=license."resource_id"
       AND resource."status"='PUBLISHED'
-      AND resource."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+      AND (resource."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL' OR resource."resource_key" LIKE 'teacher-scale:%:GROUP')
       AND resource."reviewed_by_user_id" IS NOT NULL
       AND resource."reviewed_at" IS NOT NULL
       AND resource."published_at" IS NOT NULL

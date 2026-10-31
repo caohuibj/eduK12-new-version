@@ -458,7 +458,7 @@ export const resolveAuthoritativeRunResults = async (
     { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
   )
   if(prepared.schoolGroupSource&&!leaf)reportingFail('REPORT_LEAF_REQUIRED','select the frozen source leaf before aggregation',409)
-  const leafContract=leaf?(prepared.schoolGroupSource?schoolPrivateGroupLeafDisclosure(prepared.schoolGroupSource,leaf).contract:await reportingLeafDisclosureContract(leaf)):null
+  const leafContract=leaf?(prepared.schoolGroupSource?schoolPrivateGroupLeafDisclosure(prepared.schoolGroupSource,leaf).contract:await reportingLeafDisclosureContract(leaf,{organizationId:cohort.organizationId,runId:cohort.sourceRunId,trackId:cohort.sourceTrackId})):null
   prepared.resourceMinimumN=Math.max(prepared.resourceMinimumN??0,leafContract?.minimumRespondents??0)||null
   if (cohort.selector.kind === 'RUN_TRACK_SUBJECTS' && prepared.totalObservationCount !== cohort.members.length) {
     reportingFail('REPORT_RESULT_INTEGRITY', 'Run execution population no longer matches frozen cohort', 500)
@@ -559,7 +559,7 @@ export const listAuthoritativeRunLeafSources = async (input: {
   for(const [index,tool] of tools.entries()){
     try{
       const schoolLeaf=schoolGroupSource?schoolPrivateGroupLeafDisclosure(schoolGroupSource,tool.leaf,views[index].core):null
-      const contract=schoolLeaf?.contract??await reportingLeafDisclosureContract(tool.leaf),rule=contract.audiences[input.groupAudience]
+      const contract=schoolLeaf?.contract??await reportingLeafDisclosureContract(tool.leaf,input),rule=contract.audiences[input.groupAudience]
       const metrics=tool.metrics.filter(metric=>rule.metricKeys.includes(metric.key)).map(metric=>({...metric,unit:schoolLeaf?.metricUnits[metric.key]?.measurement??metric.unit}))
       if(rule.mode.includes('AGGREGATE')&&metrics.length)allowed.push({...tool,metrics})
     }catch(error){if(!(error instanceof ReportingError&&error.code==='REPORT_NOT_FOUND'))throw error}

@@ -47,8 +47,11 @@ type AccessRow = {
 export async function resolveOrganizationAccessContext(input: {
   principal: Pick<AuthenticatedPrincipal, 'userId' | 'platformRole'>
   organizationId: string
+  /** Internal product adapter only; default School semantics remain unchanged. */
+  educationProduct?: 'HUITEACHER'
 }, tx?: Prisma.TransactionClient): Promise<OrganizationAccessContext | null> {
   const db = tx ?? prisma
+  const educationProduct=input.educationProduct??'HUISCHOOL'
   // Read mutable authority in one PostgreSQL statement. Correlated arrays keep
   // grants independent, so multiple personas/denies cannot multiply rows.
   // Each invocation still reads current state, including inside a transaction.
@@ -57,7 +60,7 @@ export async function resolveOrganizationAccessContext(input: {
            u."account_domain" AS "viewerDomain",
            EXISTS (SELECT 1 FROM "education_product_entitlements" entitlement
              WHERE entitlement."organization_id"=o."id"
-               AND entitlement."product"='HUISCHOOL'
+               AND entitlement."product"=${educationProduct}
                AND entitlement."status"='ACTIVE') AS "huischoolEntitled",
            m."id" AS "membershipId", m."org_role" AS "orgRole",
            COALESCE(m."schoolProductAdmin", FALSE) AS "schoolProductAdmin",
@@ -77,7 +80,7 @@ export async function resolveOrganizationAccessContext(input: {
         EXISTS(SELECT 1 FROM "education_product_role_grants" product_admin
           WHERE product_admin."organization_id"=member."organization_id"
             AND product_admin."membership_id"=member."id"
-            AND product_admin."product"='HUISCHOOL'
+            AND product_admin."product"=${educationProduct}
             AND product_admin."role"='PRODUCT_ADMIN'
             AND product_admin."revoked_at" IS NULL) AS "schoolProductAdmin"
       FROM "organization_memberships" member
@@ -106,7 +109,7 @@ export async function resolveOrganizationAccessContext(input: {
     : null
   const explicitDenies = organization.explicitDenies
   if (organization.productDomain === 'SCHOOL' && explicitDenies.some(x =>
-    ['*', 'EDUCATION_ACCESS', 'HUISCHOOL_ACCESS'].includes(x))) return null
+    ['*', 'EDUCATION_ACCESS', educationProduct+'_ACCESS'].includes(x))) return null
   const basis: OrganizationAccessContext['basis'] = []
   if (input.principal.platformRole === 'SYSTEM_ADMIN') basis.push('SYSTEM_ADMIN')
   if (schoolOrgRole === 'ORG_ADMIN') basis.push('ORG_ADMIN')
