@@ -1,0 +1,50 @@
+{
+  "kind": "RECORDED_LOCAL_EXECUTION_UNSIGNED",
+  "component": "backend",
+  "head": "16c5f66860ff92fd91aa529d43de50d1d714bceb",
+  "tree": "b7ced4429c3e952b62734f3831a48a1de3e0c921",
+  "componentTree": "ba7101d00c071160007d5b016f591e297c5c2f1c",
+  "components": {
+    "backend": "ba7101d00c071160007d5b016f591e297c5c2f1c",
+    "frontend": "5ce2c28959f26d7ddeaba7aac8a63c15bb205415"
+  },
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.json",
+    "--noEmit"
+  ],
+  "workingDirectory": "/workspace/eduK12-new-version/server-version/backend",
+  "startedAt": "2026-10-31T03:03:31.957376+00:00",
+  "endedAt": "2026-10-31T03:04:10.785335+00:00",
+  "elapsedSeconds": 38.82798180100008,
+  "exitCode": 0,
+  "node": "v24.21.0",
+  "before": {
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/node_modules/typescript/package.json": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+    "server-version/backend/node_modules/typescript/lib/tsc.js": "2cffde0b8c6760dfb0b5b0382bbb7e00ba6a8b2d981b9205b256a700a481d983",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc",
+    "server-version/backend/node_modules/.prisma/client/schema.prisma": "6b32c4d0cd4127ec7c0df8f9b002d11bafa15381abbb57ae683a6191edc69498",
+    "server-version/backend/node_modules/.prisma/client/index.d.ts": "5d080b94f4556a0d93de84f1992172371ceda80949547ecc4308106f45bac73d"
+  },
+  "after": {
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/node_modules/typescript/package.json": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+    "server-version/backend/node_modules/typescript/lib/tsc.js": "2cffde0b8c6760dfb0b5b0382bbb7e00ba6a8b2d981b9205b256a700a481d983",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc",
+    "server-version/backend/node_modules/.prisma/client/schema.prisma": "6b32c4d0cd4127ec7c0df8f9b002d11bafa15381abbb57ae683a6191edc69498",
+    "server-version/backend/node_modules/.prisma/client/index.d.ts": "5d080b94f4556a0d93de84f1992172371ceda80949547ecc4308106f45bac73d"
+  },
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "limits": [
+    "No CI/build/DB/business test execution.",
+    "Backend tsconfig excludes test sources; frontend scope is app tsconfig, not separate cognitive project.",
+    "Installed dependency versions and selected compiler/generated inputs recorded; no complete node_modules byte attestation."
+  ]
+}

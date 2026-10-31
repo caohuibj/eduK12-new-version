@@ -12571,7 +12571,7 @@
     },
     "432": {
       "schemaVersion": 1,
-      "product": "b8e7dda2497fe21049e8de1f1e8adc17bcd91ea1",
+      "product": "16c5f66860ff92fd91aa529d43de50d1d714bceb",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -12600,6 +12600,9 @@
             "server-version/frontend/src/components/FormSectionManager.tsx",
             "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
             "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
             "server-version/frontend/src/pages/student/ScaleAssessment.tsx",
             "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx"
           ],
@@ -12668,6 +12671,9 @@
             "server-version/frontend"
           ],
           "reviewedSourceDelta": [
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
             "server-version/frontend/src/pages/student/ScaleAssessment.tsx",
             "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx"
           ],
@@ -12742,16 +12748,36 @@
             "server-version/backend"
           ],
           "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts",
+            "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts",
             "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts",
             "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
             "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts",
             "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
             "server-version/backend/src/controllers/generalQuestionnaireController.ts",
             "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+            "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts",
+            "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/respondentSummary.ts",
             "server-version/backend/src/modules/scale/scale-access.ts",
             "server-version/backend/src/modules/scale/scale-restart.service.ts",
             "server-version/backend/src/modules/scale/scale-start.controller.ts",
@@ -12793,13 +12819,33 @@
             "server-version/backend"
           ],
           "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts",
+            "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts",
             "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts",
             "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
             "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts",
             "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+            "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+            "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts",
+            "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/respondentSummary.ts",
             "server-version/backend/src/modules/scale/scale-access.ts",
             "server-version/backend/src/modules/scale/scale-restart.service.ts",
             "server-version/backend/src/modules/scale/scale-start.controller.ts",
@@ -12863,6 +12909,9 @@
           "reviewedSourceDelta": [
             "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
             "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
             "server-version/frontend/src/pages/student/ScaleAssessment.tsx",
             "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx"
           ],
@@ -12932,18 +12981,18 @@
       ],
       "types": [
         {
-          "path": "docs/performance/access-followup-20261031/final-qualification/backend-types.json",
-          "sha256": "e4bf5295ca8b8c8f1c1516ef304073e80f5bb9be66c1918545fe8f878026428f",
+          "path": "docs/performance/access-followup-20261031/final-qualification/main6627/backend-types.json",
+          "sha256": "f883ad01fa964dd72648ad026a53519157b79dd88f8cd5c1734cec55f1867d22",
           "component": "backend",
-          "componentTree": "fa7da22c1fe95b34f94b7891dc52c02021615cc7",
-          "log": "docs/performance/access-followup-20261031/final-qualification/backend-types.log"
+          "componentTree": "ba7101d00c071160007d5b016f591e297c5c2f1c",
+          "log": "docs/performance/access-followup-20261031/final-qualification/main6627/backend-types.log"
         },
         {
-          "path": "docs/performance/access-followup-20261031/final-qualification/frontend-types.json",
-          "sha256": "8024630907164afdf3f5fd22d23077fa9b70c1ffa1bfcb791ba9fbfab90261bc",
+          "path": "docs/performance/access-followup-20261031/final-qualification/main6627/frontend-types.json",
+          "sha256": "0e818c72bfecec6b7e9372cad67ecdcafc7462146f2376ce52698c0f21fa268d",
           "component": "frontend",
-          "componentTree": "b0dc4d14e64eaa62f5983e7f53e3b87f079f9fd9",
-          "log": "docs/performance/access-followup-20261031/final-qualification/frontend-types.log"
+          "componentTree": "5ce2c28959f26d7ddeaba7aac8a63c15bb205415",
+          "log": "docs/performance/access-followup-20261031/final-qualification/main6627/frontend-types.log"
         }
       ]
     }
