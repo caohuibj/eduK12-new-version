@@ -1,5 +1,5 @@
 /** Unpublished 1.1.0 revision: 36 source-anchored reality-estimation candidates.
- * HOLD: item/construct review pending; unchanged standard=30/research=36 now have candidate material.
+ * Limited item review GO: project-authored descriptive trial draft, not a standardized clinical test.
  * Item intervals are authored coarse magnitude choices, NOT clinical/population scoring ranges.
  */
 export const COGEST_STIMULUS_SET_VERSION = 'cogest-zh-v1.1.0'
@@ -1295,4 +1295,4 @@ export const COGEST_BANK: CogestItem[] = [
   }
 ]
 
-export const bankMeta = {stimulusSetVersion:'cogest-zh-v1.1.0',source:'Original project-authored question stems; linked primary factual anchors; pending item/construct review',license:'internal-generated',itemSetRole:'form' as const}
+export const bankMeta = {stimulusSetVersion:'cogest-zh-v1.1.0',source:'Original project-authored quantity estimates; limited item review permits trial draft; linked factual anchors are not psychometric validation',license:'internal-generated',itemSetRole:'form' as const}

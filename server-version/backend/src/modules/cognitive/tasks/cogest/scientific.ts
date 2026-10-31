@@ -14,4 +14,4 @@ export const scientificGovernance: CognitiveGovernanceV1[] = [
   }
 ]
 
-scientificGovernance.push({"schemaVersion": 1, "testType": "cogest", "engineVersion": "1.1.0", "scoringVersion": "1.1.0", "declaredMaturity": "PILOT", "claimScope": null, "protocolApplicability": "根据日常经验估计现实数量的合理量级", "knownLimitations": ["内部原创材料，未标定难度，无常模、诊断或能力排名。重复施测可能受练习影响。", "选择式估算混合一般知识、文化经验与合理性判断；不是标准临床测验。当前36题候选尚待题面/区间与构念独审，不据题数宣称可纳入。"], "evidence": []})
+scientificGovernance.push({"schemaVersion": 1, "testType": "cogest", "engineVersion": "1.1.0", "scoringVersion": "1.1.0", "declaredMaturity": "PILOT", "claimScope": null, "protocolApplicability": "根据日常经验估计现实数量的合理量级", "knownLimitations": ["内部原创材料，未标定难度，无常模、诊断或能力排名。重复施测可能受练习影响。", "选择式估算混合一般知识、文化经验与合理性判断；不是标准临床测验。36题经有限题面/区间审阅可用于项目自编描述性试测草稿；不据此宣称真实施测或心理效度通过。r27/r28/r35来源正文未由独审独立取得。"], "evidence": []})

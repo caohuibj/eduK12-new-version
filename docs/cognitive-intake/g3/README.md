@@ -1,6 +1,8 @@
-# 当前增量：36道估算候选，仍HOLD
+# 当前状态：cogest 36题有限审阅GO，可进入草稿安装准备
 
-20题独审原件固定在 `8b1882ccad2708ec15e2c750a8cb8826ee4f9bd5`。其后局部修订见 [20题独审反馈处理](cogest-base-review-fixes.md)；另追加16道现实估算题见 [新增16题完整题面/区间/一手依据/验证](cogest-add16-review.md)。当前18/30/36题量都有候选材料，但尚未独审准入，recommendedForCreate=false与DRAFT/HOLD保持。下面是20题阶段的历史记录，不代表当前仍有数量缺口，也不能据数量宣称cogest已通过。
+当前交付以本段和 [有限GO状态及消费者说明](cogest-draft-review-status.md) 为准。`461a5f28b1073d2244186e73604fca939ffb69a6` 的36题已获独立有限GO，可作为**项目自编、描述性数量级估算源码试测草稿**进入既有草稿安装准备；不足题量/构念偏移的旧HOLD已消除。新版目录推荐打开，旧版推荐关闭；仍是DRAFT、reference none，没有安装、发布、授权或真实施测。
+
+r27教育部旧页、r28专利、r35EPREL正文未由独审独立取得，不能称全部引用独审通过。极端干扰项、文化/生活经验、相近题族是解释边界，不另设标定门禁。逐题表仍见 [新增16题](cogest-add16-review.md) 与 [原20题修订](cogest-base-review-fixes.md)；下方是旧阶段记录，不能用其HOLD文案覆盖当前有限GO。
 
 ---
 

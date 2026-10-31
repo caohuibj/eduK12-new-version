@@ -18,13 +18,13 @@ export const cogestRegistryMetaV11 = {
       profile: 'standard' as const,
       estimatedMinutes: [5, 8],
       configPatch: { totalTrials: 30 },
-      reportCaveats: ['标准档仍要求30题；目前36题候选尚待独审，不自动开放。'],
+      reportCaveats: ['标准档30题；项目自编描述性数量级估算试测草稿，不提供临床或人群常模。'],
     },
     research: {
       profile: 'research' as const,
       estimatedMinutes: [7, 10],
       configPatch: { totalTrials: 36 },
-      reportCaveats: ['科研档仍要求36题；目前36题候选尚待独审，不自动开放，不以重复题补足。'],
+      reportCaveats: ['科研档36题；共用同一自编题池，不重复抽题；科研档命名不代表已完成心理测量验证。'],
     },
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.1.0',
@@ -51,5 +51,5 @@ export const cogestRegistryMetaV11 = {
     practicalTips: ['结合日常经验判断现实数量的合理量级。', '检查估计是否明显偏大或偏小；不作同龄人排名。'],
     disclaimer: '结果只描述本次数量级估算表现；一般知识、生活经验和文化背景会影响选择，不是临床、智商、年龄常模或客观能力排名。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }
