@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "approvedPolicyPointer": {
+    "resourceKey": "library-scale:3fcec672-7f67-4a47-b5d9-88e142cf38b9:TEACHER:TEACHER:SELF:GROUP",
+    "resourceVersion": "2.0.0",
+    "entryHash": "c679d29a16269e8a08055f85944af9075a012221442eb210493c5be0aff4f2aa"
+  },
+  "minimumN": 10,
+  "sameExactLibrarySnapshot": true,
+  "fullExistingGroupReader": true,
+  "wrongPointerRejected": true,
+  "newFinals": 0,
+  "groupReportGenerated": false,
+  "productionAccessed": false
+}

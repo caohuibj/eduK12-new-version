@@ -1,15 +1,17 @@
 import {useId} from 'react'
 
 export type SchoolGroupAudience='PROFESSIONAL'|'TEACHER'|'ORGANIZATION'
+type GroupPolicyPointer={resourceKey:string;resourceVersion:string;entryHash:string}
 export type SchoolPrivateGroupSelection={schemaVersion:1;minimumRespondents:number;leaves:Array<{
- blockId?:string;versionId:string;contentHash:string;audiences:Record<SchoolGroupAudience,string[]>
+ blockId?:string;versionId:string;contentHash:string;groupPolicy?:GroupPolicyPointer;audiences:Record<SchoolGroupAudience,string[]>
 }>}
-export type SchoolPrivateGroupChoice={blockId?:string;versionId:string;contentHash:string;title:string;minimumRespondents:number;
+export type SchoolPrivateGroupChoice={blockId?:string;versionId:string;contentHash:string;groupPolicy?:GroupPolicyPointer;title:string;minimumRespondents:number;
  metrics:Array<{key:string;label:string}>;audiences:Record<SchoolGroupAudience,string[]>}
 const audienceLabels={PROFESSIONAL:'心理专业人员',TEACHER:'教师',ORGANIZATION:'学校管理者'} as const
 const audienceKeys=['PROFESSIONAL','TEACHER','ORGANIZATION'] as const
-const sameLeaf=(a:{blockId?:string;versionId:string;contentHash:string},b:{blockId?:string;versionId:string;contentHash:string})=>
+const sameLeaf=(a:{blockId?:string;versionId:string;contentHash:string;groupPolicy?:GroupPolicyPointer},b:{blockId?:string;versionId:string;contentHash:string;groupPolicy?:GroupPolicyPointer})=>
  a.blockId===b.blockId&&a.versionId===b.versionId&&a.contentHash===b.contentHash
+ &&a.groupPolicy?.resourceKey===b.groupPolicy?.resourceKey&&a.groupPolicy?.resourceVersion===b.groupPolicy?.resourceVersion&&a.groupPolicy?.entryHash===b.groupPolicy?.entryHash
 
 /** A controlled publisher editor. Its choices must come from actual server
  * group ceilings; using the component never grants source or manager rights.
@@ -20,7 +22,7 @@ export function SchoolPrivateGroupDisclosure({choices,value,disabled=false,onCha
 }){
  const prefix=useId()
  const available=choices.filter(choice=>audienceKeys.some(audience=>choice.audiences[audience].some(key=>choice.metrics.some(metric=>metric.key===key))))
- const minimum=Math.max(10,...available.map(choice=>choice.minimumRespondents))
+ const minimum=Math.max(10,...(value?.leaves??[]).flatMap(leaf=>available.filter(choice=>sameLeaf(choice,leaf)).map(choice=>choice.minimumRespondents)))
  const stale=Boolean(value?.leaves.some(leaf=>!available.some(choice=>sameLeaf(choice,leaf)
   &&audienceKeys.every(audience=>leaf.audiences[audience].every(key=>choice.audiences[audience].includes(key))))))
  const select=(choice:SchoolPrivateGroupChoice,audience:SchoolGroupAudience,key:string,checked:boolean)=>{
@@ -28,9 +30,10 @@ export function SchoolPrivateGroupDisclosure({choices,value,disabled=false,onCha
   const prior=value.leaves.find(leaf=>sameLeaf(leaf,choice))
   const keys=prior?.audiences[audience]??[]
   const changed={blockId:choice.blockId,versionId:choice.versionId,contentHash:choice.contentHash,
+   ...(choice.groupPolicy?{groupPolicy:choice.groupPolicy}:{}),
    audiences:{PROFESSIONAL:prior?.audiences.PROFESSIONAL??[],TEACHER:prior?.audiences.TEACHER??[],ORGANIZATION:prior?.audiences.ORGANIZATION??[],
     [audience]:checked?[...keys,key]:keys.filter(item=>item!==key)}}
-  onChange({...value,leaves:[...value.leaves.filter(leaf=>!sameLeaf(leaf,choice)),changed]
+  onChange({...value,minimumRespondents:checked?Math.max(value.minimumRespondents,choice.minimumRespondents):value.minimumRespondents,leaves:[...value.leaves.filter(leaf=>!sameLeaf(leaf,choice)),changed]
    .filter(leaf=>audienceKeys.some(audience=>leaf.audiences[audience].length))})
  }
  return <fieldset disabled={disabled}>

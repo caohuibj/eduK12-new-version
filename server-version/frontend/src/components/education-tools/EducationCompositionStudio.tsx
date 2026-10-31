@@ -108,9 +108,9 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  }
  const block=preview?tool?.definition.blocks[previewIndex]:undefined
  const responseMode=tool?.definition.administration.responseMode??'SELF'
- const groupChoices=entry==='SCHOOL'&&responseMode==='SELF'?tool?.definition.blocks.flatMap(block=>{
+ const groupChoices=responseMode==='SELF'?tool?.definition.blocks.flatMap(block=>{
   const reference=references.find(reference=>reference.sourceProvider===block.source.provider&&reference.id===block.source.versionId&&reference.contentHash===block.source.contentHash)
-  return reference?.sourceProvider==='PRIVATE_VERSION'&&reference.kind==='SCALE'&&reference.groupChoice?[{...reference.groupChoice,blockId:block.blockId}]:[]
+  return reference&&'groupChoice' in reference&&reference.groupChoice?[{...reference.groupChoice,blockId:block.blockId}]:[]
  })??[]:[]
  const sourceViewActual=sourceView
  const targetKind=tool?.definition.administration.responseMode==='EXPERT_REPORT'?tool.definition.administration.targetKind:undefined
@@ -201,7 +201,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
       onChange={event=>change({definition:{...tool.definition,blocks:tool.definition.blocks.map((block,i)=>i===index?{...block,instruction:event.target.value}:block)}})}/></label>{responseMode==='SELF'&&tool.definition.blocks[index].source.kind!=='FORM'&&<label><input type="checkbox" disabled={busy} checked={tool.definition.blocks[index].longitudinal===true} onChange={event=>change({definition:{...tool.definition,blocks:tool.definition.blocks.map((block,i)=>i===index?{...block,longitudinal:event.target.checked}:block)}})}/>允许本工具已获准的本人数字指标用于纵向查看；具体追踪指标在任务发布时选择。</label>}</>}
      footer="量表反馈由固定版本和受众权限独立决定，表单仅采集信息。正式整包不能拆分或加入这里。"/>
    </div>
-   {entry==='SCHOOL'&&responseMode==='SELF'&&<SchoolPrivateGroupDisclosure choices={groupChoices} value={tool.definition.groupReporting??null} disabled={busy} onChange={groupReporting=>{
+   {responseMode==='SELF'&&<SchoolPrivateGroupDisclosure choices={groupChoices} value={tool.definition.groupReporting??null} disabled={busy} onChange={groupReporting=>{
     const definition={...tool.definition};delete definition.groupReporting
     change({definition:{...definition,...(groupReporting?{groupReporting}:{})}})
    }}/>}
