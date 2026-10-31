@@ -1,0 +1,6 @@
+
+/workspace/scratch/5a77e8bdc1ae/dot-questionnaire-open-retry-20261031/server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx
+  206:6  warning  React Hook useEffect has a missing dependency: 'startAssessment'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+
