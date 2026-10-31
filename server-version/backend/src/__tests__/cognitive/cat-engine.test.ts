@@ -87,6 +87,13 @@ describe('CAT engine (roadmap v2.0 PR7)', () => {
     const ruleTags = new Map(snapshot.items.map((item, index) => [item.itemId, ['shape', 'rotate', 'shade', 'size', 'identity'][index % 5]]))
     expect(() => buildCatPool(snapshot, ruleTags)).toThrow(/SIMULATION_ONLY/)
     expect(() => buildCatPool(snapshot, ruleTags, { allowSimulationPool: true })).not.toThrow()
+    const previousEnv = process.env.NODE_ENV
+    try {
+      process.env.NODE_ENV = 'production'
+      expect(() => buildCatPool(snapshot, ruleTags, { allowSimulationPool: true })).toThrow(/SIMULATION_ONLY/)
+    } finally {
+      process.env.NODE_ENV = previousEnv
+    }
     const pilot = {
       ...snapshot, status: 'PILOT_CALIBRATED' as const, provenance: 'real sample',
       items: snapshot.items.map(({ trueA: _a, trueB: _b, ...rest }) => rest),
@@ -117,6 +124,15 @@ describe('CAT engine (roadmap v2.0 PR7)', () => {
     expect(() => estimateCatTheta(new Map(pool.map((i) => [i.itemId, i])), [
       { itemId: 'unknown', correct: true },
     ])).toThrow(/unknown/)
+    // All items seemingly administered: still reject a tampered extra observation
+    // rather than silently signalling that the task is complete.
+    const exhausted = pool.map((item) => ({ itemId: item.itemId, correct: true }))
+    expect(() => selectNextCatItem(pool, [...exhausted, { itemId: 'unknown', correct: true }], {
+      ...config, maxItems: 20,
+    })).toThrow(/unknown/)
+    expect(() => selectNextCatItem(pool, [...exhausted, exhausted[0]], {
+      ...config, maxItems: 20,
+    })).toThrow(/duplicate/)
   })
 
   it('honors min/max item bounds and stop rules', () => {

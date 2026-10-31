@@ -150,11 +150,12 @@ export const selectNextCatItem = (
   if (pool.some((item) => !Number.isFinite(item.a) || item.a <= 0 || !Number.isFinite(item.b))) {
     throw new Error('Invalid IRT item parameters')
   }
+  // Validate the complete history before considering exhaustion or the stop rule:
+  // an unknown/repeated trial must never be mistaken for a successfully finished CAT.
+  const estimate = estimateCatTheta(new Map(pool.map((item) => [item.itemId, item])), history)
   const administeredIds = new Set(history.map((entry) => entry.itemId))
   const remaining = pool.filter((item) => !administeredIds.has(item.itemId))
-  if (remaining.length === 0) return null
-  const estimate = estimateCatTheta(new Map(pool.map((item) => [item.itemId, item])), history)
-  if (shouldStopCatSession(history, pool.length, estimate?.se ?? null, config)) return null
+  if (shouldStopCatSession(history, pool.length, estimate?.se ?? null, config) || remaining.length === 0) return null
   const theta = estimate?.theta ?? 0
 
   // 内容平衡：规则族配额 = ceil(已施测+1 / 规则族数)，超额族先排除；若全部超额则放松。
@@ -181,7 +182,8 @@ export const buildCatPool = (
   options: { allowSimulationPool?: boolean } = {},
 ): CatItem[] => {
   calibrationSnapshotSchema.parse(snapshot)
-  if (snapshot.status === 'SIMULATION_ONLY' && !options.allowSimulationPool) {
+  if (snapshot.status === 'SIMULATION_ONLY' &&
+      (!options.allowSimulationPool || process.env.NODE_ENV === 'production')) {
     throw new Error('CAT pool from a SIMULATION_ONLY calibration snapshot may only be used by the simulation harness')
   }
   return snapshot.items
