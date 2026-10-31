@@ -1,0 +1,34 @@
+{
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/student/__tests__/ReportReadRecovery.test.tsx",
+    "src/modules/reporting/__tests__/QuestionnaireResult.test.tsx",
+    "src/pages/student/__tests__/ScaleResult.report-shell.test.tsx",
+    "--maxWorkers=1",
+    "--testNamePattern=offers explicit|preserves an explicit denied|ignores a late.*retry|shared DTO|authenticated|completion facts|report read failure",
+    "--reporter=json",
+    "--outputFile=/workspace/dot-cloud-report-recovery-20261031/docs/performance/report-read-recovery-20261031/candidate.json"
+  ],
+  "startedAt": "2026-10-31T09:44:27.934642+00:00",
+  "endedAt": "2026-10-31T09:44:31.394989+00:00",
+  "seconds": 3.4603565539996453,
+  "exitCode": 0,
+  "base": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+  "inputs": {
+    "server-version/frontend/src/pages/student/QuestionnaireResult.tsx": "10b93ce0a2d4df3445d946b09a3dfcbddbd576ab4dde232cc751d0514d803eaa",
+    "server-version/frontend/src/pages/student/ScaleResult.tsx": "cb8a11e643079e91ff812f221e0798d18910bc8fd02d3da757cb2a08d6d958ad",
+    "server-version/frontend/src/pages/student/__tests__/ReportReadRecovery.test.tsx": "958bb136b7b7c8b4bc776070aee45c25ede4e17ca352ace04bf2b74cb6fa2635",
+    "server-version/frontend/src/modules/reporting/__tests__/QuestionnaireResult.test.tsx": "e53755510b21d4b5fcdda7dc783f1eaed9ff0c11bc9117d96f31bfc2236a0428",
+    "server-version/frontend/src/pages/student/__tests__/ScaleResult.report-shell.test.tsx": "59b8c9416f94e6aa38eb8de6a7b60783ed23ddc2cfab92ddb1174d96a02ca77f",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+    "server-version/frontend/src/utils/apiErrorMessage.ts": "10b443021c2b85317b7086e6c3d551f979c43beaccf1be8736685d542b3754d8",
+    "server-version/frontend/src/training/learnerNavigation.ts": "8ab3f44b7329e0488127a29028f7ab7aade3b0b0c74b4f3c1174cb56f4cf30ba",
+    "server-version/frontend/src/modules/reporting/ReportShell.tsx": "7c57e9351bed158457138298ec9a6656ebc8540ed3c5e0b38bc1dc84ed5f63cb"
+  },
+  "scope": "Changed report pages; original unmodified public-only cases filtered, no business lifecycle, auth/DB/CI qualification"
+}
