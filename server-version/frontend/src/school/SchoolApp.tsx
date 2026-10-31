@@ -177,6 +177,12 @@ export default function SchoolApp(){
   const [campusParentReportEnabled,setCampusParentReportEnabled]=useState(false)
   const [working,setWorking]=useState(false)
 
+  const recoverSession=(cause:unknown)=>{
+    if(!user||!(cause instanceof Error)||!('status' in cause)||cause.status!==401)return
+    setUser(null);setOrgs([]);setSchoolId('');setClassId('');setAccess(null)
+    setUnits([]);setSummary(null);setIssuedCodes([]);setScreen('login')
+    setError('登录状态已失效，请重新登录')
+  }
   const refresh=async()=>{
     try{
       const me=await api<CampusUser>('/auth/me')
@@ -216,23 +222,27 @@ export default function SchoolApp(){
     let live=true
     void api<{parentReportsEnabled:boolean}>('/reports/availability')
       .then(status=>{if(live)setCampusParentReportEnabled(status.parentReportsEnabled===true)})
-      .catch(()=>{if(live)setCampusParentReportEnabled(false)})
+      .catch(cause=>{if(live){setCampusParentReportEnabled(false);recoverSession(cause)}})
     return ()=>{live=false}
   },[user])
   useEffect(()=>{
     if(!user||user.mustChangePassword)return
+    let live=true
     void api<{list:CampusOrg[]}>('/organizations').then(data=>{
+      if(!live)return
       const list=data.list??[]
       setOrgs(list)
       if(list.length)setSchoolId(prev=>prev||list[0].id)
-    }).catch(()=>setOrgs([]))
+    }).catch(cause=>{if(live){setOrgs([]);recoverSession(cause)}})
     if(user.role==='STUDENT'){
       void api<{status:string;organizationId:string|null}>('/my-status').then(result=>{
+        if(!live)return
         setStudentStatus(result.status)
         if(result.organizationId)setSchoolId(old=>old||result.organizationId!)
       })
-        .catch(()=>setStudentStatus('暂时无法读取当前状态'))
+        .catch(cause=>{if(live){setStudentStatus('暂时无法读取当前状态');recoverSession(cause)}})
     }
+    return()=>{live=false}
   },[user])
   useEffect(()=>{
     if(!user||user.mustChangePassword||!schoolId)return
@@ -280,6 +290,8 @@ export default function SchoolApp(){
       if(result.mfaRequired){
         setMfaEnrolled(result.enrolled??true);setScreen('mfa');setMfaUri('');setMfaCode('')
         notify('账号密码已验证，请完成动态验证码验证')
+      }else if(result.user&&typeof result.user.mustChangePassword==='boolean'){
+        setUser(result.user);setScreen('workspace')
       }else{await refresh()}
     })
   }

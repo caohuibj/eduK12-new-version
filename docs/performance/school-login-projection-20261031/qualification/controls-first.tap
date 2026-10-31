@@ -1,0 +1,11 @@
+✔ PR439 exact mixed scope and SAST reject unknown source and incorrect activation identity (9.960811ms)
+✔ PR439 admits exactly 14 unique actually passed cases while retaining original failures and withdrawn contract (8.191331ms)
+✔ PR439 rejects withdrawn or filtered selections, changed original bytes, and component/input drift (12.865073ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 193.117114
