@@ -6182,24 +6182,21 @@
       "schemaVersion": 1,
       "pr": 421,
       "enabled": true,
-      "base": "112b944811160e8e2a018563b73e59f5ba542a5c",
-      "product": "0d3a14c4ff78e8b10d6ddebd62d3e6bc0c6c101c",
-      "controlCheckpoint": "126837d82bfca043a038cf5bbf00219ae58ef542",
+      "base": "e092be0d57a5a1df7519c23c8a5c2cf078b870c8",
+      "product": "7003c0e44ec8d8bf2d94f9ae8149d3f596aaf579",
+      "controlCheckpoint": "d875998e4457e6016f49a21f20d1a3945a2800f0",
       "components": {
-        "backend": "d32df43631795f6f646ac2dcf9cfc4fe131c04e2",
-        "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
+        "backend": "c687e555fecbf771dde5c2d5ee974388178f1884",
+        "frontend": "5b108c22d6006abddcfcabd71ce2de67ed886828"
       },
       "controlBefore": {
-        ".github/scripts/build-ci-images.sh": "2a4be34f89a3d14a4be099141107cd69008a7917",
-        ".github/scripts/ci-image-plan.mjs": "e16e07bbe7b31ef0c10b1e770fbb3b2def0f3a97",
-        ".github/scripts/ci-image-plan.test.mjs": "d23e550fc817e6204cf2b28398b6082e71f8169f",
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
         ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "5c32efae2ab0189e8146b503215188bc36027ba0",
-        ".github/scripts/onboarding-checks.mjs": "5e96d8b49c6732772b6d9546713523cbbd8b1275",
-        ".github/scripts/onboarding-controls.test.mjs": "cb606bdefaa175d7307aa3089f7f0ee6677135a4",
-        ".github/scripts/onboarding-evidence.json": "a7deae80cf47a0f000a2ef72c99513ea5708ddfb",
-        ".github/scripts/onboarding-scope.mjs": "ffb98bc26e2c8908960837861b9d62685d545520",
+        ".github/scripts/onboarding-bindings.json": "c8376996ebec0da90077db383d21e7d4783dd814",
+        ".github/scripts/onboarding-checks.mjs": "d303798d554fa77fac9101000e4e2c9158f27b8d",
+        ".github/scripts/onboarding-controls.test.mjs": "99bffd299fe472a47597b91e9cccf2197fa2a0f8",
+        ".github/scripts/onboarding-evidence.json": "8f14650ace52e6b01087007dbed18fe98ab20afc",
+        ".github/scripts/onboarding-scope.mjs": "5901bfcec762313b7e6fe44f2f4efb158b2885a9",
         ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
         ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
         ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
@@ -6209,8 +6206,7 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci-images.yml": "d54c52bbe80dbb91ba70b1092490ae8a7fd22de1",
-        ".github/workflows/ci.yml": "8b84efc626b9c08f5dba499620310b0112302d84"
+        ".github/workflows/ci.yml": "9787125036677b53161c78401afb22b959f2c198"
       },
       "source": {
         "docs/evidence/training-cognitive-wave-quota-20261030/README.md": {
@@ -6244,6 +6240,10 @@
         "docs/evidence/training-cognitive-wave-quota-20261030/qualification/control-proof.json": {
           "before": null,
           "after": "08235b524145a468b01a0be1a20cca046f2563a3"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/final-minimal-plan.txt": {
+          "before": null,
+          "after": "3e56b51eba729382f1724867d02c3fc27d8af687"
         },
         "docs/evidence/training-cognitive-wave-quota-20261030/qualification/plan.txt": {
           "before": null,
