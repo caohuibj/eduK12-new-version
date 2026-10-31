@@ -101,7 +101,9 @@ export function onboardingPlan(entries,base,head,read=git,env=process.env,b=bind
  };
  sha(sourceHead);assert.equal(object(sourceHead,'^{tree}'),read('rev-parse',head+'^{tree}'),'Source/merge tree drift');
  const controls=[404,419,422].includes(b.pr)?[...CONTROLS,...GROUP_REPORT_CONTROLS].sort():b.pr==='task1'?[...CONTROLS,...TASK1_CONTROLS].sort():CONTROLS;
- assert.deepEqual(Object.keys(b.controlBefore).sort(),controls);
+ // Historical records need not acquire snapshots for unrelated controls added
+ // later. The code-owned list still defines every permitted control path.
+ for(const path of Object.keys(b.controlBefore))assert(controls.includes(path),'Unknown control path');
  const changedControls=controls.filter(path=>read('ls-tree',base,'--',path)!==read('ls-tree',head,'--',path));
  const expected=[...Object.keys(b.source),...changedControls];assert.equal(new Set(expected).size,expected.length);
  assert.deepEqual(entries.map(e=>e.file).sort(),expected.sort(),'Complete change inventory drift');
