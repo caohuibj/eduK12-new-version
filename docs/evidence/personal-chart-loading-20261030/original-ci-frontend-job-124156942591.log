@@ -1,0 +1,744 @@
+﻿2026-10-30T15:41:46.7095015Z Current runner version: '2.338.0'
+2026-10-30T15:41:46.7122738Z ##[group]Runner Image Provisioner
+2026-10-30T15:41:46.7123762Z Hosted Compute Agent
+2026-10-30T15:41:46.7124398Z Version: 20261021.618
+2026-10-30T15:41:46.7125055Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-30T15:41:46.7125938Z Build Date: 2026-10-21T00:45:21Z
+2026-10-30T15:41:46.7126666Z Worker ID: {12ce0d64-65bf-4ddd-bc90-134b2e562b85}
+2026-10-30T15:41:46.7127445Z Region: northcentralus
+2026-10-30T15:41:46.7128141Z Cloud: Azure
+2026-10-30T15:41:46.7128711Z ##[endgroup]
+2026-10-30T15:41:46.7130659Z ##[group]Operating System
+2026-10-30T15:41:46.7131406Z Ubuntu
+2026-10-30T15:41:46.7132043Z 24.04.5
+2026-10-30T15:41:46.7132620Z LTS
+2026-10-30T15:41:46.7133196Z ##[endgroup]
+2026-10-30T15:41:46.7134072Z ##[group]Runner Image
+2026-10-30T15:41:46.7134730Z Image: ubuntu-24.04
+2026-10-30T15:41:46.7135338Z Version: 20261025.353.1
+2026-10-30T15:41:46.7136771Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-30T15:41:46.7138460Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+2026-10-30T15:41:46.7139489Z ##[endgroup]
+2026-10-30T15:41:46.7140964Z ##[group]GITHUB_TOKEN Permissions
+2026-10-30T15:41:46.7142947Z Actions: read
+2026-10-30T15:41:46.7143810Z Contents: read
+2026-10-30T15:41:46.7144457Z Metadata: read
+2026-10-30T15:41:46.7145075Z ##[endgroup]
+2026-10-30T15:41:46.7147272Z Secret source: Actions
+2026-10-30T15:41:46.7148242Z Cache mode: write
+2026-10-30T15:41:46.7149115Z Prepare workflow directory
+2026-10-30T15:41:46.7709049Z Prepare all required actions
+2026-10-30T15:41:46.7776547Z Getting action download info
+2026-10-30T15:41:46.9909155Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-30T15:41:47.0687830Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-30T15:41:47.2562277Z Uses: caohuibj/eduK12-new-version/.github/workflows/ci-frontend.yml@refs/pull/420/merge (35f6efdded0adb4f7e67ca177153ed9f9e9eaa22)
+2026-10-30T15:41:47.2566942Z ##[group] Inputs
+2026-10-30T15:41:47.2567841Z   survey_selection: false
+2026-10-30T15:41:47.2568391Z   runner_labels: ["ubuntu-24.04"]
+2026-10-30T15:41:47.2568943Z ##[endgroup]
+2026-10-30T15:41:47.2569616Z Complete job name: frontend (lint + types + full tests + build) / frontend checks
+2026-10-30T15:41:47.3467780Z ##[group]Run actions/checkout@v4
+2026-10-30T15:41:47.3468617Z with:
+2026-10-30T15:41:47.3469091Z   repository: caohuibj/eduK12-new-version
+2026-10-30T15:41:47.3473201Z   token: ***
+2026-10-30T15:41:47.3473659Z   ssh-strict: true
+2026-10-30T15:41:47.3474121Z   ssh-user: git
+2026-10-30T15:41:47.3474578Z   persist-credentials: true
+2026-10-30T15:41:47.3475069Z   clean: true
+2026-10-30T15:41:47.3475542Z   sparse-checkout-cone-mode: true
+2026-10-30T15:41:47.3476069Z   fetch-depth: 1
+2026-10-30T15:41:47.3476508Z   fetch-tags: false
+2026-10-30T15:41:47.3476949Z   show-progress: true
+2026-10-30T15:41:47.3477431Z   lfs: false
+2026-10-30T15:41:47.3477849Z   submodules: false
+2026-10-30T15:41:47.3478299Z   set-safe-directory: true
+2026-10-30T15:41:47.3478798Z   allow-unsafe-pr-checkout: false
+2026-10-30T15:41:47.3479491Z env:
+2026-10-30T15:41:47.3480108Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:41:47.3480763Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:41:47.3481373Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:41:47.3481960Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:41:47.3482503Z   TZ: UTC
+2026-10-30T15:41:47.3482904Z ##[endgroup]
+2026-10-30T15:41:47.5697517Z Syncing repository: caohuibj/eduK12-new-version
+2026-10-30T15:41:47.5700753Z ##[group]Getting Git version info
+2026-10-30T15:41:47.5702006Z Working directory is '/home/runner/work/eduK12-new-version/eduK12-new-version'
+2026-10-30T15:41:47.5703976Z [command]/usr/bin/git version
+2026-10-30T15:41:47.5763676Z git version 2.56.0
+2026-10-30T15:41:47.5785962Z ##[endgroup]
+2026-10-30T15:41:47.5802006Z Temporarily overriding HOME='/home/runner/work/_temp/26e9f3f0-ea08-4015-926c-68a8d73841dc' before making global git config changes
+2026-10-30T15:41:47.5804440Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-30T15:41:47.5811792Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version
+2026-10-30T15:41:47.5857248Z Deleting the contents of '/home/runner/work/eduK12-new-version/eduK12-new-version'
+2026-10-30T15:41:47.5862616Z ##[group]Initializing the repository
+2026-10-30T15:41:47.5880182Z [command]/usr/bin/git init /home/runner/work/eduK12-new-version/eduK12-new-version
+2026-10-30T15:41:47.5968461Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-30T15:41:47.5970597Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-30T15:41:47.5972395Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-30T15:41:47.5973856Z hint: call:
+2026-10-30T15:41:47.5974597Z hint:
+2026-10-30T15:41:47.5975534Z hint: 	git config --global init.defaultBranch <name>
+2026-10-30T15:41:47.5976669Z hint:
+2026-10-30T15:41:47.5977770Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-30T15:41:47.5979652Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-30T15:41:47.5981335Z hint:
+2026-10-30T15:41:47.5982161Z hint: 	git branch -m <name>
+2026-10-30T15:41:47.5983085Z hint:
+2026-10-30T15:41:47.5984303Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-30T15:41:47.5986400Z Initialized empty Git repository in /home/runner/work/eduK12-new-version/eduK12-new-version/.git/
+2026-10-30T15:41:47.5992675Z [command]/usr/bin/git remote add origin https://github.com/caohuibj/eduK12-new-version
+2026-10-30T15:41:47.6038776Z ##[endgroup]
+2026-10-30T15:41:47.6040420Z ##[group]Disabling automatic garbage collection
+2026-10-30T15:41:47.6051652Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-30T15:41:47.6089734Z ##[endgroup]
+2026-10-30T15:41:47.6091593Z ##[group]Setting up auth
+2026-10-30T15:41:47.6092922Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T15:41:47.6134571Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T15:41:47.6496152Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T15:41:47.6546056Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T15:41:47.6827200Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T15:41:47.6876327Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T15:41:47.7138005Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-30T15:41:47.7191982Z ##[endgroup]
+2026-10-30T15:41:47.7193882Z ##[group]Fetching the repository
+2026-10-30T15:41:47.7204669Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +35f6efdded0adb4f7e67ca177153ed9f9e9eaa22:refs/remotes/pull/420/merge
+2026-10-30T15:41:52.0646621Z From https://github.com/caohuibj/eduK12-new-version
+2026-10-30T15:41:52.0649292Z  * [new ref]         35f6efdded0adb4f7e67ca177153ed9f9e9eaa22 -> pull/420/merge
+2026-10-30T15:41:52.0654499Z ##[endgroup]
+2026-10-30T15:41:52.0656430Z ##[group]Determining the checkout info
+2026-10-30T15:41:52.0658406Z ##[endgroup]
+2026-10-30T15:41:52.0661912Z [command]/usr/bin/git sparse-checkout disable
+2026-10-30T15:41:52.0733666Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-30T15:41:52.0775488Z ##[group]Checking out the ref
+2026-10-30T15:41:52.0779147Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/420/merge
+2026-10-30T15:41:53.0961699Z Updating files:  94% (10335/10960)
+2026-10-30T15:41:53.1013277Z Updating files:  95% (10412/10960)
+2026-10-30T15:41:53.1073378Z Updating files:  96% (10522/10960)
+2026-10-30T15:41:53.1135353Z Updating files:  97% (10632/10960)
+2026-10-30T15:41:53.1212697Z Updating files:  98% (10741/10960)
+2026-10-30T15:41:53.1321866Z Updating files:  99% (10851/10960)
+2026-10-30T15:41:53.1322581Z Updating files: 100% (10960/10960)
+2026-10-30T15:41:53.1323041Z Updating files: 100% (10960/10960), done.
+2026-10-30T15:41:53.1446767Z Note: switching to 'refs/remotes/pull/420/merge'.
+2026-10-30T15:41:53.1447238Z 
+2026-10-30T15:41:53.1447584Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-30T15:41:53.1448391Z changes and commit them, and you can discard any commits you make in this
+2026-10-30T15:41:53.1449236Z state without impacting any branches by switching back to a branch.
+2026-10-30T15:41:53.1449687Z 
+2026-10-30T15:41:53.1450255Z If you want to create a new branch to retain commits you create, you may
+2026-10-30T15:41:53.1450992Z do so (now or later) by using -c with the switch command. Example:
+2026-10-30T15:41:53.1451396Z 
+2026-10-30T15:41:53.1451610Z   git switch -c <new-branch-name>
+2026-10-30T15:41:53.1451911Z 
+2026-10-30T15:41:53.1452103Z Or undo this operation with:
+2026-10-30T15:41:53.1452453Z 
+2026-10-30T15:41:53.1452626Z   git switch -
+2026-10-30T15:41:53.1452844Z 
+2026-10-30T15:41:53.1453188Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-30T15:41:53.1453821Z 
+2026-10-30T15:41:53.1454383Z HEAD is now at 35f6efd Merge b2f9d9755b425d981483acdcb48170874464133f into f6740969b31f1154e3ffc1a23dd2406bd06a3634
+2026-10-30T15:41:53.1503293Z ##[endgroup]
+2026-10-30T15:41:53.1571219Z [command]/usr/bin/git log -1 --format=%H
+2026-10-30T15:41:53.1611568Z 35f6efdded0adb4f7e67ca177153ed9f9e9eaa22
+2026-10-30T15:41:53.1907047Z ##[group]Run actions/setup-node@v4
+2026-10-30T15:41:53.1907505Z with:
+2026-10-30T15:41:53.1907819Z   node-version: 24.21.0
+2026-10-30T15:41:53.1908096Z   always-auth: false
+2026-10-30T15:41:53.1908325Z   check-latest: false
+2026-10-30T15:41:53.1910982Z   token: ***
+2026-10-30T15:41:53.1911199Z env:
+2026-10-30T15:41:53.1911456Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:41:53.1911801Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:41:53.1912094Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:41:53.1912386Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:41:53.1912661Z   TZ: UTC
+2026-10-30T15:41:53.1912856Z ##[endgroup]
+2026-10-30T15:41:53.3381922Z Attempting to download 24.21.0...
+2026-10-30T15:41:53.3516688Z (node:2309) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-30T15:41:53.3517541Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-30T15:41:54.0203440Z Acquiring 24.21.0 - x64 from https://github.com/actions/node-versions/releases/download/24.21.0-34304089047/node-24.21.0-linux-x64.tar.gz
+2026-10-30T15:41:54.4732902Z Extracting ...
+2026-10-30T15:41:54.4874530Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/0f08fcb9-a681-4052-8063-5e77981d99af -f /home/runner/work/_temp/0d7a7d0b-660b-463e-a260-9458e93f062a
+2026-10-30T15:41:55.8372708Z Adding to the cache ...
+2026-10-30T15:41:57.3187924Z ##[group]Environment details
+2026-10-30T15:41:57.5697785Z node: v24.21.0
+2026-10-30T15:41:57.5698192Z npm: 11.19.0
+2026-10-30T15:41:57.5698490Z yarn: 1.22.22
+2026-10-30T15:41:57.5699162Z ##[endgroup]
+2026-10-30T15:41:57.5933134Z ##[group]Run node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend
+2026-10-30T15:41:57.5933838Z [36;1mnode "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend[0m
+2026-10-30T15:41:57.5961855Z shell: /usr/bin/bash -e {0}
+2026-10-30T15:41:57.5962132Z env:
+2026-10-30T15:41:57.5962415Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:41:57.5962769Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:41:57.5963063Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:41:57.5963358Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:41:57.5963639Z   TZ: UTC
+2026-10-30T15:41:57.5963827Z ##[endgroup]
+2026-10-30T15:41:57.6356981Z {"environment":"github-hosted","os":"linux","freeBytes":91079294976,"memoryBytes":16760340480,"light":false,"frontend":true,"control":false,"runner":"GitHub Actions 1000012043","cpus":"X64"}
+2026-10-30T15:41:57.6424962Z ##[group]Run mkdir -p "$HOME/.npm"
+2026-10-30T15:41:57.6425303Z [36;1mmkdir -p "$HOME/.npm"[0m
+2026-10-30T15:41:57.6425622Z [36;1mecho "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"[0m
+2026-10-30T15:41:57.6447941Z shell: /usr/bin/bash -e {0}
+2026-10-30T15:41:57.6448204Z env:
+2026-10-30T15:41:57.6448468Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:41:57.6448828Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:41:57.6449123Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:41:57.6449425Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:41:57.6449696Z   TZ: UTC
+2026-10-30T15:41:57.6450135Z ##[endgroup]
+2026-10-30T15:41:57.6559809Z ##[group]Run npm ci
+2026-10-30T15:41:57.6560277Z [36;1mnpm ci[0m
+2026-10-30T15:41:57.6580177Z shell: /usr/bin/bash -e {0}
+2026-10-30T15:41:57.6580430Z env:
+2026-10-30T15:41:57.6580689Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:41:57.6581022Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:41:57.6581313Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:41:57.6581604Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:41:57.6581876Z   TZ: UTC
+2026-10-30T15:41:57.6582089Z   NPM_CONFIG_CACHE: /home/runner/.npm
+2026-10-30T15:41:57.6582352Z ##[endgroup]
+2026-10-30T15:41:59.0241273Z npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+2026-10-30T15:42:07.5743031Z 
+2026-10-30T15:42:07.5744058Z added 395 packages, and audited 396 packages in 10s
+2026-10-30T15:42:07.5744488Z 
+2026-10-30T15:42:07.5744737Z 81 packages are looking for funding
+2026-10-30T15:42:07.5745547Z   run `npm fund` for details
+2026-10-30T15:42:07.5854264Z 
+2026-10-30T15:42:07.5854937Z 5 moderate severity vulnerabilities
+2026-10-30T15:42:07.5855299Z 
+2026-10-30T15:42:07.5855639Z To address issues that do not require attention, run:
+2026-10-30T15:42:07.5856144Z   npm audit fix
+2026-10-30T15:42:07.5856339Z 
+2026-10-30T15:42:07.5856673Z To address all issues (including breaking changes), run:
+2026-10-30T15:42:07.5857197Z   npm audit fix --force
+2026-10-30T15:42:07.5857427Z 
+2026-10-30T15:42:07.5857621Z Run `npm audit` for details.
+2026-10-30T15:42:07.5866223Z npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+2026-10-30T15:42:07.5867360Z npm warn install-scripts   esbuild@0.25.12 (postinstall: node install.js)
+2026-10-30T15:42:07.5868097Z npm warn install-scripts
+2026-10-30T15:42:07.5869091Z npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+2026-10-30T15:42:07.6606501Z ##[group]Run npm ci --ignore-scripts
+2026-10-30T15:42:07.6606866Z [36;1mnpm ci --ignore-scripts[0m
+2026-10-30T15:42:07.6607133Z [36;1mnpx prisma generate[0m
+2026-10-30T15:42:07.6636496Z shell: /usr/bin/bash -e {0}
+2026-10-30T15:42:07.6636751Z env:
+2026-10-30T15:42:07.6637020Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:42:07.6637382Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:42:07.6637671Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:42:07.6637958Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:42:07.6638250Z   TZ: UTC
+2026-10-30T15:42:07.6638459Z   NPM_CONFIG_CACHE: /home/runner/.npm
+2026-10-30T15:42:07.6638729Z ##[endgroup]
+2026-10-30T15:42:09.2780328Z npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+2026-10-30T15:42:09.4254386Z npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+2026-10-30T15:42:09.5957014Z npm warn deprecated lodash.isequal@4.5.0: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
+2026-10-30T15:42:09.6688364Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2026-10-30T15:42:09.6963436Z npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2026-10-30T15:42:10.3536368Z npm warn deprecated fstream@1.0.12: This package is no longer supported.
+2026-10-30T15:42:12.2537689Z npm warn deprecated fluent-ffmpeg@2.1.3: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+2026-10-30T15:42:13.1759514Z 
+2026-10-30T15:42:13.1760566Z added 443 packages, and audited 444 packages in 5s
+2026-10-30T15:42:13.1761024Z 
+2026-10-30T15:42:13.1761312Z 67 packages are looking for funding
+2026-10-30T15:42:13.1761839Z   run `npm fund` for details
+2026-10-30T15:42:13.1834255Z 
+2026-10-30T15:42:13.1835088Z 4 moderate severity vulnerabilities
+2026-10-30T15:42:13.1835446Z 
+2026-10-30T15:42:13.1835697Z To address all issues, run:
+2026-10-30T15:42:13.1836149Z   npm audit fix
+2026-10-30T15:42:13.1836352Z 
+2026-10-30T15:42:13.1836551Z Run `npm audit` for details.
+2026-10-30T15:42:14.1323589Z Prisma schema loaded from prisma/schema.prisma
+2026-10-30T15:42:17.1901389Z 
+2026-10-30T15:42:17.1903186Z ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 1.82s
+2026-10-30T15:42:17.1903778Z 
+2026-10-30T15:42:17.1904349Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+2026-10-30T15:42:17.1904851Z 
+2026-10-30T15:42:17.1905676Z Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+2026-10-30T15:42:17.1906480Z 
+2026-10-30T15:42:17.4165270Z ##[group]Run npm run lint
+2026-10-30T15:42:17.4165565Z [36;1mnpm run lint[0m
+2026-10-30T15:42:17.4187526Z shell: /usr/bin/bash -e {0}
+2026-10-30T15:42:17.4187795Z env:
+2026-10-30T15:42:17.4188062Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:42:17.4188403Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:42:17.4188694Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:42:17.4188986Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:42:17.4189272Z   TZ: UTC
+2026-10-30T15:42:17.4189481Z   NPM_CONFIG_CACHE: /home/runner/.npm
+2026-10-30T15:42:17.4189743Z ##[endgroup]
+2026-10-30T15:42:17.5156809Z 
+2026-10-30T15:42:17.5157251Z > frontend@0.0.0 lint
+2026-10-30T15:42:17.5157643Z > eslint .
+2026-10-30T15:42:17.5157820Z 
+2026-10-30T15:42:37.2469531Z 
+2026-10-30T15:42:37.2470960Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/CheckinTokenManager.tsx
+2026-10-30T15:42:37.2497782Z ##[warning]   7:10  warning  'Link' is defined but never used. Allowed unused vars must match /^_/u                                          @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2507153Z ##[warning]   7:57  warning  'XCircle' is defined but never used. Allowed unused vars must match /^_/u                                       @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2509101Z ##[warning]   8:25  warning  'Input' is defined but never used. Allowed unused vars must match /^_/u                                         @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2511284Z ##[warning]  56:6   warning  React Hook useEffect has a missing dependency: 'fetchTokens'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2512258Z 
+2026-10-30T15:42:37.2512795Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/LocalDateTimeInput.tsx
+2026-10-30T15:42:37.2514699Z ##[warning]   4:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2516836Z ##[warning]  14:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2517869Z 
+2026-10-30T15:42:37.2518350Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/MediaRenderer.tsx
+2026-10-30T15:42:37.2519585Z ##[warning]  373:3  warning  'watermarkText' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2520766Z 
+2026-10-30T15:42:37.2521302Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/ScaleSelector/ScaleSelector.tsx
+2026-10-30T15:42:37.2522686Z ##[warning]  2:26  warning  'Input' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2524283Z ##[warning]  2:33  warning  'Empty' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2525914Z ##[warning]  3:10  warning  'SearchOutlined' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2526796Z 
+2026-10-30T15:42:37.2527345Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx
+2026-10-30T15:42:37.2528922Z ##[warning]  34:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2531261Z ##[warning]  35:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2532546Z 
+2026-10-30T15:42:37.2533172Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationAssessmentFeedback.tsx
+2026-10-30T15:42:37.2534819Z ##[warning]  11:136  warning  React Hook useCallback has an unnecessary dependency: 'entry'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2535808Z 
+2026-10-30T15:42:37.2536466Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx
+2026-10-30T15:42:37.2538873Z ##[warning]  57:73  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2540534Z 
+2026-10-30T15:42:37.2541182Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationAssessmentResourcePicker.tsx
+2026-10-30T15:42:37.2543539Z ##[warning]  31:42  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2544975Z 
+2026-10-30T15:42:37.2545578Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx
+2026-10-30T15:42:37.2547933Z ##[warning]   45:77  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2551067Z ##[warning]  130:3   warning  React Hook useMemo has a missing dependency: 'block'. Either include it or remove the dependency array                                                                                                                                                     react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2552207Z 
+2026-10-30T15:42:37.2552797Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationMaterialPicker.tsx
+2026-10-30T15:42:37.2554346Z ##[warning]  34:5  warning  React Hook useMemo has an unnecessary dependency: 'revision'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2555314Z 
+2026-10-30T15:42:37.2556078Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.test.tsx
+2026-10-30T15:42:37.2557911Z ##[warning]  1:45  warning  'waitFor' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2559267Z 
+2026-10-30T15:42:37.2560483Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.tsx
+2026-10-30T15:42:37.2563518Z ##[warning]  20:40  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2564946Z 
+2026-10-30T15:42:37.2565566Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationPrivateScaleSharing.tsx
+2026-10-30T15:42:37.2568174Z ##[warning]  27:78  warning  The ref value 'generation.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'generation.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2569571Z 
+2026-10-30T15:42:37.2570445Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx
+2026-10-30T15:42:37.2573244Z ##[warning]  31:122  warning  React Hook useCallback has a missing dependency: 'props'. Either include it or remove the dependency array. However, 'props' will change when *any* prop changes, so the preferred fix is to destructure the 'props' object outside of the useCallback call and refer to those specific props inside useCallback  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2574816Z 
+2026-10-30T15:42:37.2575449Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/education-tools/EducationPrivateVersionChooser.tsx
+2026-10-30T15:42:37.2577812Z ##[warning]  24:85  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2579150Z 
+2026-10-30T15:42:37.2579666Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/page-loading/deferredPage.tsx
+2026-10-30T15:42:37.2581592Z ##[warning]  5:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2582627Z 
+2026-10-30T15:42:37.2583237Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/scale-governance/EducationApplicabilityFields.tsx
+2026-10-30T15:42:37.2584902Z ##[warning]  6:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2586102Z 
+2026-10-30T15:42:37.2586734Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/scale-governance/EducationLibraryDistributionPicker.tsx
+2026-10-30T15:42:37.2588841Z ##[warning]  12:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                       react-refresh/only-export-components
+2026-10-30T15:42:37.2592163Z ##[warning]  41:46  warning  The ref value 'generation.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'generation.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2593535Z 
+2026-10-30T15:42:37.2594135Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/scale-governance/ScaleLibraryMediaPreview.tsx
+2026-10-30T15:42:37.2596649Z ##[warning]  8:89  warning  The ref value 'generation.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'generation.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2597995Z 
+2026-10-30T15:42:37.2598572Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/scale-governance/SubmissionMetadataFields.tsx
+2026-10-30T15:42:37.2600400Z ##[warning]  2:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2601446Z 
+2026-10-30T15:42:37.2602189Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/scale-governance/useScaleLibrarySubmission.ts
+2026-10-30T15:42:37.2604580Z ##[warning]  22:115  warning  The ref value 'generation.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'generation.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2605973Z 
+2026-10-30T15:42:37.2606415Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/contexts/AuthContext.tsx
+2026-10-30T15:42:37.2607975Z ##[warning]  332:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2608987Z 
+2026-10-30T15:42:37.2609467Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/contexts/CapabilitiesContext.tsx
+2026-10-30T15:42:37.2611213Z ##[warning]  96:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2613300Z ##[warning]  97:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2614306Z 
+2026-10-30T15:42:37.2614782Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/contexts/OrganizationContext.tsx
+2026-10-30T15:42:37.2616289Z ##[warning]  200:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2617296Z 
+2026-10-30T15:42:37.2617807Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/contexts/RelationalAvailabilityContext.tsx
+2026-10-30T15:42:37.2619511Z ##[warning]  30:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2620817Z 
+2026-10-30T15:42:37.2621260Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/hooks/useCursorList.ts
+2026-10-30T15:42:37.2623614Z ##[warning]  38:29  warning  The ref value 'sequence.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'sequence.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2624986Z 
+2026-10-30T15:42:37.2625446Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/huiteacher/HuiteacherApp.tsx
+2026-10-30T15:42:37.2626863Z ##[warning]  308:5  warning  React Hook useEffect has a missing dependency: 'org'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2627794Z 
+2026-10-30T15:42:37.2628328Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx
+2026-10-30T15:42:37.2630884Z ##[warning]  140:33  warning  The ref value 'scopeGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'scopeGeneration.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2632297Z 
+2026-10-30T15:42:37.2632832Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/huiteacher/HuiteacherMyPrivateFormTasks.tsx
+2026-10-30T15:42:37.2635368Z ##[warning]  83:40  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function          react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2638603Z ##[warning]  83:60  warning  The ref value 'listEpoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'listEpoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2640268Z 
+2026-10-30T15:42:37.2640799Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx
+2026-10-30T15:42:37.2643077Z ##[warning]  24:22  warning  The ref value 'request.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'request.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2644399Z 
+2026-10-30T15:42:37.2644963Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/assessment-core/form/FormChoiceExtras.tsx
+2026-10-30T15:42:37.2646771Z ##[warning]   6:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2648855Z ##[warning]  13:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2650044Z 
+2026-10-30T15:42:37.2650657Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts
+2026-10-30T15:42:37.2652414Z ##[warning]  174:6  warning  React Hook useCallback has an unnecessary dependency: 'options.aggregateOnly'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2653646Z 
+2026-10-30T15:42:37.2654297Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/EmotionrecognitionTask.tsx
+2026-10-30T15:42:37.2655989Z ##[warning]   83:6  warning  React Hook useEffect has a missing dependency: 'submitFormal'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2657883Z ##[warning]  154:6  warning  React Hook useEffect has a missing dependency: 'handleResponse'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2658829Z 
+2026-10-30T15:42:37.2659373Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/flanker/FlankerTask.tsx
+2026-10-30T15:42:37.2661012Z ##[warning]  10:3  warning  'CognitiveTaskTransition' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2661952Z 
+2026-10-30T15:42:37.2662567Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/lexicaldecision/LexicaldecisionTask.tsx
+2026-10-30T15:42:37.2664132Z ##[warning]   75:6  warning  React Hook useEffect has a missing dependency: 'submitFormal'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2666012Z ##[warning]  152:6  warning  React Hook useEffect has a missing dependency: 'handleResponse'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2666938Z 
+2026-10-30T15:42:37.2667474Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/matrix/MatrixTask.tsx
+2026-10-30T15:42:37.2668855Z ##[warning]  8:3  warning  'CognitiveTaskTransition' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2669756Z 
+2026-10-30T15:42:37.2670728Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/reaction/__tests__/ReactionTask.test.tsx
+2026-10-30T15:42:37.2672246Z ##[warning]  25:22  warning  'trialIndex' is assigned a value but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2673167Z 
+2026-10-30T15:42:37.2673675Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/sst/SstTask.tsx
+2026-10-30T15:42:37.2675060Z ##[warning]  9:3  warning  'CognitiveTaskTransition' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2675966Z 
+2026-10-30T15:42:37.2676517Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/wordlist/WordlistTask.tsx
+2026-10-30T15:42:37.2678078Z ##[warning]  102:6  warning  React Hook useEffect has a missing dependency: 'submitFormal'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2679042Z 
+2026-10-30T15:42:37.2679581Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/composite/CompositeAssessmentPage.tsx
+2026-10-30T15:42:37.2681439Z ##[warning]  359:6  warning  React Hook useEffect has missing dependencies: 'loadAttempt' and 'start'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2682520Z 
+2026-10-30T15:42:37.2683046Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/composite/CompositeReportPage.tsx
+2026-10-30T15:42:37.2685369Z ##[warning]  196:78  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2686860Z 
+2026-10-30T15:42:37.2687396Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/reporting/SituationalReportCard.tsx
+2026-10-30T15:42:37.2688808Z ##[warning]  81:9  warning  'interpretations' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2689711Z 
+2026-10-30T15:42:37.2690481Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/scale/TrainingTimingBoundary.tsx
+2026-10-30T15:42:37.2692173Z ##[warning]  10:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2693213Z 
+2026-10-30T15:42:37.2693727Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/situational/OnlineAuthorEditor.tsx
+2026-10-30T15:42:37.2695343Z ##[warning]  7:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2696361Z 
+2026-10-30T15:42:37.2696862Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/situational/OnlineImageField.tsx
+2026-10-30T15:42:37.2698376Z ##[warning]  11:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2700668Z ##[warning]  14:23  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2702768Z ##[warning]  51:5   warning  React Hook useMemo has a missing dependency: 'image'. Either include it or remove the dependency array                          react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2703767Z 
+2026-10-30T15:42:37.2704474Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/situational/SjtReleasePermissions.tsx
+2026-10-30T15:42:37.2706058Z ##[warning]  24:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2707093Z 
+2026-10-30T15:42:37.2707640Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/situational/pages/SituationalHistory.tsx
+2026-10-30T15:42:37.2708958Z ##[warning]  3:32  warning  'History' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2709816Z 
+2026-10-30T15:42:37.2710475Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx
+2026-10-30T15:42:37.2711961Z ##[warning]  125:5  warning  React Hook useMemo has a missing dependency: 'campus'. Either include it or remove the dependency array           react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2713835Z ##[warning]  147:6  warning  React Hook useMemo has a missing dependency: 'campus'. Either include it or remove the dependency array           react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2715684Z ##[warning]  274:6  warning  React Hook useEffect has a missing dependency: 'campus'. Either include it or remove the dependency array         react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2717540Z ##[warning]  356:6  warning  React Hook useEffect has a missing dependency: 'responseStage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2718466Z 
+2026-10-30T15:42:37.2718995Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/modules/situational/useAuthorCursorList.ts
+2026-10-30T15:42:37.2721599Z ##[warning]  41:31  warning  The ref value 'sequence.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'sequence.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2723202Z 
+2026-10-30T15:42:37.2723662Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/AssignmentList.tsx
+2026-10-30T15:42:37.2726140Z ##[warning]  182:58  warning  The ref value 'loadSequence.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadSequence.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2728976Z ##[warning]  190:6   warning  React Hook useEffect has a missing dependency: 'fetchCourses'. Either include it or remove the dependency array                                                                                                                                                          react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2732270Z ##[warning]  192:74  warning  The ref value 'loadSequence.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadSequence.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2735111Z ##[warning]  192:89  warning  React Hook useEffect has a missing dependency: 'fetchAssignments'. Either include it or remove the dependency array                                                                                                                                                      react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2736252Z 
+2026-10-30T15:42:37.2736686Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/CheckinList.tsx
+2026-10-30T15:42:37.2739124Z ##[warning]  153:58  warning  The ref value 'loadSequence.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadSequence.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2742213Z ##[warning]  161:6   warning  React Hook useEffect has a missing dependency: 'fetchCourses'. Either include it or remove the dependency array                                                                                                                                                          react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2745261Z ##[warning]  163:71  warning  The ref value 'loadSequence.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadSequence.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2748075Z ##[warning]  163:86  warning  React Hook useEffect has a missing dependency: 'fetchCheckins'. Either include it or remove the dependency array                                                                                                                                                         react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2749214Z 
+2026-10-30T15:42:37.2749642Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/CourseList.tsx
+2026-10-30T15:42:37.2750946Z ##[warning]   4:24   warning  'Trash2' is defined but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2752550Z ##[warning]   4:32   warning  'Edit' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2754114Z ##[warning]   4:55   warning  'UserCog' is defined but never used. Allowed unused vars must match /^_/u            @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2755827Z ##[warning]   4:64   warning  'Flag' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2757409Z ##[warning]   4:76   warning  'PauseCircle' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2758995Z ##[warning]   4:89   warning  'PlayCircle' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2760802Z ##[warning]   4:124  warning  'Share2' is defined but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2762401Z ##[warning]  20:9    warning  'navigate' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2763245Z 
+2026-10-30T15:42:37.2763702Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/CourseStudents.tsx
+2026-10-30T15:42:37.2765309Z ##[warning]  46:6  warning  React Hook useEffect has missing dependencies: 'fetchCourseDetail' and 'fetchStudents'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2766342Z 
+2026-10-30T15:42:37.2766792Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/DocumentLibrary.tsx
+2026-10-30T15:42:37.2768158Z ##[warning]   6:10  warning  'Plus' is defined but never used. Allowed unused vars must match /^_/u                                                                    @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2770216Z ##[warning]   6:24  warning  'FileText' is defined but never used. Allowed unused vars must match /^_/u                                                                @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2772110Z ##[warning]   6:34  warning  'Trash2' is defined but never used. Allowed unused vars must match /^_/u                                                                  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2774065Z ##[warning]   6:66  warning  'Eye' is defined but never used. Allowed unused vars must match /^_/u                                                                     @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2775909Z ##[warning]   6:98  warning  'RotateCcw' is defined but never used. Allowed unused vars must match /^_/u                                                               @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2777946Z ##[warning]  48:6   warning  React Hook useEffect has missing dependencies: 'fetchDocuments' and 'invalidateList'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2778974Z 
+2026-10-30T15:42:37.2779410Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/ImageLibrary.tsx
+2026-10-30T15:42:37.2780820Z ##[warning]   5:33  warning  'ImageIcon' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2782446Z ##[warning]  25:11  warning  'user' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2783302Z 
+2026-10-30T15:42:37.2783754Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/QuestionnaireEdit.tsx
+2026-10-30T15:42:37.2785207Z ##[warning]    9:16  warning  'Plus' is defined but never used. Allowed unused vars must match /^_/u                                                                                         @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2787135Z ##[warning]    9:43  warning  'Layers' is defined but never used. Allowed unused vars must match /^_/u                                                                                       @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2789350Z ##[warning]  143:6   warning  React Hook useEffect has missing dependencies: 'fetchContent', 'fetchQuestionnaire', and 'invalidateLoad'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2790756Z 
+2026-10-30T15:42:37.2791182Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/ScaleList.tsx
+2026-10-30T15:42:37.2793513Z ##[warning]  100:30  warning  The ref value 'listEpoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'listEpoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2794896Z 
+2026-10-30T15:42:37.2795355Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/TeacherCodeList.tsx
+2026-10-30T15:42:37.2797601Z ##[warning]  67:30  warning  The ref value 'requestId.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'requestId.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2798955Z 
+2026-10-30T15:42:37.2799387Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/VideoLibrary.tsx
+2026-10-30T15:42:37.2801024Z ##[warning]    5:10  warning  'Plus' is defined but never used. Allowed unused vars must match /^_/u                                                                 @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2802871Z ##[warning]    5:52  warning  'Edit' is defined but never used. Allowed unused vars must match /^_/u                                                                 @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2804745Z ##[warning]   51:10  warning  'uploadProgress' is assigned a value but never used. Allowed unused vars must match /^_/u                                              @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2806942Z ##[warning]   52:10  warning  'isUploading' is assigned a value but never used. Allowed unused vars must match /^_/u                                                 @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2808983Z ##[warning]   79:6   warning  React Hook useEffect has missing dependencies: 'fetchVideos' and 'invalidateList'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2811511Z ##[warning]  314:9   warning  'handleUpload' is assigned a value but never used. Allowed unused vars must match /^_/u                                                @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2812456Z 
+2026-10-30T15:42:37.2812948Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/admin/ReportingContent.tsx
+2026-10-30T15:42:37.2814605Z ##[warning]  11:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2816646Z ##[warning]  38:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array                         react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2817609Z 
+2026-10-30T15:42:37.2818206Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx
+2026-10-30T15:42:37.2819459Z ##[warning]  1:41  warning  'waitFor' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2820514Z 
+2026-10-30T15:42:37.2821018Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx
+2026-10-30T15:42:37.2823577Z ##[warning]  86:118  warning  The ref value 'lookupGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'lookupGeneration.current' to a variable inside the effect, and use that variable in the cleanup function                react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2827269Z ##[warning]  86:151  warning  The ref value 'catalogReadGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'catalogReadGeneration.current' to a variable inside the effect, and use that variable in the cleanup function      react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2830979Z ##[warning]  86:186  warning  The ref value 'catalogDetailGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'catalogDetailGeneration.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2832433Z 
+2026-10-30T15:42:37.2832948Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx
+2026-10-30T15:42:37.2834365Z ##[warning]  108:95  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2835292Z 
+2026-10-30T15:42:37.2835845Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx
+2026-10-30T15:42:37.2837329Z ##[warning]  17:668  warning  React Hook useEffect has a missing dependency: 'user'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2838252Z 
+2026-10-30T15:42:37.2838903Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/organization/__tests__/organization-acceptance-display.test.tsx
+2026-10-30T15:42:37.2840482Z ##[warning]  1:10  warning  'fireEvent' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2841360Z 
+2026-10-30T15:42:37.2842032Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/parent/ParentBatchPreparation.tsx
+2026-10-30T15:42:37.2844456Z ##[warning]  17:147  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2845806Z 
+2026-10-30T15:42:37.2846317Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/parent/ParentPublicationPage.tsx
+2026-10-30T15:42:37.2848559Z ##[warning]  50:13  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2849982Z 
+2026-10-30T15:42:37.2850455Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/public/PublicCheckin.tsx
+2026-10-30T15:42:37.2852058Z ##[warning]  306:6  warning  React Hook useEffect has a missing dependency: 'validateAndFetchCheckin'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2853070Z 
+2026-10-30T15:42:37.2853611Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/public/PublicQuestionnaireAssessment.tsx
+2026-10-30T15:42:37.2855086Z ##[warning]  235:6  warning  React Hook useEffect has a missing dependency: 'fetchAssessment'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2856054Z 
+2026-10-30T15:42:37.2856581Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/questionnaire/AssessmentManagement.tsx
+2026-10-30T15:42:37.2860321Z ##[warning]  16:686  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2862008Z 
+2026-10-30T15:42:37.2862572Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx
+2026-10-30T15:42:37.2865096Z ##[warning]  467:51  warning  The ref value 'choicePageEpoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'choicePageEpoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2866515Z 
+2026-10-30T15:42:37.2867003Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/student/ClassroomAnswer.tsx
+2026-10-30T15:42:37.2868271Z ##[warning]  261:57  warning  'index' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2869789Z ##[warning]  293:57  warning  'index' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2870914Z 
+2026-10-30T15:42:37.2871406Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/student/ClassroomJoin.tsx
+2026-10-30T15:42:37.2872854Z ##[warning]  58:6  warning  React Hook useEffect has a missing dependency: 'fetchClassroom'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2873817Z 
+2026-10-30T15:42:37.2874273Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/student/CourseDetail.tsx
+2026-10-30T15:42:37.2876280Z ##[warning]  93:6  warning  React Hook useEffect has missing dependencies: 'fetchAssignments', 'fetchCheckins', 'fetchComposites', 'fetchCourseDetail', and 'fetchQuestionnaires'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2877676Z 
+2026-10-30T15:42:37.2878203Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx
+2026-10-30T15:42:37.2879658Z ##[warning]  205:6  warning  React Hook useEffect has a missing dependency: 'startAssessment'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2880873Z 
+2026-10-30T15:42:37.2881318Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/student/ScaleResult.tsx
+2026-10-30T15:42:37.2882851Z ##[warning]  27:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2883879Z 
+2026-10-30T15:42:37.2884351Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/student/StudentProfile.tsx
+2026-10-30T15:42:37.2885759Z ##[warning]  32:6  warning  React Hook useEffect has a missing dependency: 'fetchUserInfo'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2886697Z 
+2026-10-30T15:42:37.2887197Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx
+2026-10-30T15:42:37.2889554Z ##[warning]  87:20  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2891015Z 
+2026-10-30T15:42:37.2891500Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/ClassroomControl.tsx
+2026-10-30T15:42:37.2892875Z ##[warning]   57:10  warning  'stats' is assigned a value but never used. Allowed unused vars must match /^_/u                                    @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2894961Z ##[warning]  106:6   warning  React Hook useCallback has an unnecessary dependency: 'navigate'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2896873Z ##[warning]  190:9   warning  'handleStartQuestion' is assigned a value but never used. Allowed unused vars must match /^_/u                      @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2898727Z ##[warning]  248:9   warning  'handleNextQuestion' is assigned a value but never used. Allowed unused vars must match /^_/u                       @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2899649Z 
+2026-10-30T15:42:37.2900333Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/ClassroomEdit.tsx
+2026-10-30T15:42:37.2901766Z ##[warning]  30:6  warning  React Hook useEffect has a missing dependency: 'fetchClassroom'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2902763Z 
+2026-10-30T15:42:37.2903289Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/ClassroomQuestionEdit.tsx
+2026-10-30T15:42:37.2904652Z ##[warning]  54:9  warning  'navigate' is assigned a value but never used. Allowed unused vars must match /^_/u                           @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2906505Z ##[warning]  66:6  warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2907456Z 
+2026-10-30T15:42:37.2907992Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/CognitiveAssignmentEdit.tsx
+2026-10-30T15:42:37.2909365Z ##[warning]  57:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2910467Z 
+2026-10-30T15:42:37.2911144Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/CognitiveAssignmentList.tsx
+2026-10-30T15:42:37.2912605Z ##[warning]  117:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array               react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2914551Z ##[warning]  130:6   warning  React Hook useEffect has a missing dependency: 'selectableCourses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2915503Z 
+2026-10-30T15:42:37.2916021Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/CompositeAssessmentEdit.tsx
+2026-10-30T15:42:37.2917372Z ##[warning]  111:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2918287Z 
+2026-10-30T15:42:37.2918804Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/CompositeAssessmentList.tsx
+2026-10-30T15:42:37.2920270Z ##[warning]    3:10  warning  'ClipboardList' is defined but never used. Allowed unused vars must match /^_/u                          @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2922045Z ##[warning]  114:36  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2922971Z 
+2026-10-30T15:42:37.2923521Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.tsx
+2026-10-30T15:42:37.2925182Z ##[warning]  144:6  warning  React Hook useEffect has missing dependencies: 'fetchQuestionnaire' and 'invalidateLoad'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2926235Z 
+2026-10-30T15:42:37.2926881Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/TeacherCourseDetail.tsx
+2026-10-30T15:42:37.2928790Z ##[warning]  64:6  warning  React Hook useEffect has missing dependencies: 'fetchAssignments', 'fetchCheckins', 'fetchCourseDetail', and 'fetchQuestionnaires'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2930086Z 
+2026-10-30T15:42:37.2930560Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/pages/teacher/TeacherProfile.tsx
+2026-10-30T15:42:37.2931959Z ##[warning]  29:6  warning  React Hook useEffect has a missing dependency: 'fetchUserInfo'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2932908Z 
+2026-10-30T15:42:37.2933377Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/school/SchoolActivityManager.tsx
+2026-10-30T15:42:37.2935925Z ##[warning]  174:28  warning  The ref value 'listRequest.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'listRequest.current' to a variable inside the effect, and use that variable in the cleanup function          react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2939267Z ##[warning]  174:77  warning  The ref value 'resourceRequest.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'resourceRequest.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2942702Z ##[warning]  174:98  warning  The ref value 'runRequest.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'runRequest.current' to a variable inside the effect, and use that variable in the cleanup function            react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2944102Z 
+2026-10-30T15:42:37.2944733Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/school/SchoolCompositeRunner.tsx
+2026-10-30T15:42:37.2946067Z ##[warning]  113:5  warning  React Hook useMemo has a missing dependency: 'state'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2947838Z ##[warning]  137:5  warning  React Hook useMemo has a missing dependency: 'state'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2948740Z 
+2026-10-30T15:42:37.2949208Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/school/SchoolGroupReports.tsx
+2026-10-30T15:42:37.2951659Z ##[warning]  45:25  warning  The ref value 'request.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'request.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2953005Z 
+2026-10-30T15:42:37.2953467Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/school/SchoolParentPortal.tsx
+2026-10-30T15:42:37.2955009Z ##[warning]  59:45  warning  React Hook useMemo has unnecessary dependencies: 'api', 'organizationId', and 'role'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2956038Z 
+2026-10-30T15:42:37.2956493Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/school/SchoolParentTasks.tsx
+2026-10-30T15:42:37.2957813Z ##[warning]  35:45  warning  React Hook useMemo has an unnecessary dependency: 'api'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2958732Z 
+2026-10-30T15:42:37.2959218Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/school/SchoolRelationships.test.tsx
+2026-10-30T15:42:37.2960507Z ##[warning]  75:52  warning  'payload' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.2961523Z 
+2026-10-30T15:42:37.2961981Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/school/SchoolTeacherTasks.tsx
+2026-10-30T15:42:37.2963433Z ##[warning]  43:45  warning  React Hook useMemo has unnecessary dependencies: 'api' and 'inboxPath'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2964410Z 
+2026-10-30T15:42:37.2964859Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/ExactToolVersions.tsx
+2026-10-30T15:42:37.2966462Z ##[warning]  2:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2967474Z 
+2026-10-30T15:42:37.2967925Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/FormChoiceExtras.tsx
+2026-10-30T15:42:37.2969400Z ##[warning]  2:28  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2971589Z ##[warning]  2:46  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2972636Z 
+2026-10-30T15:42:37.2973123Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/ResearchPackageCatalog.tsx
+2026-10-30T15:42:37.2975388Z ##[warning]  9:202  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2976707Z 
+2026-10-30T15:42:37.2977305Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/ResearchPreview.tsx
+2026-10-30T15:42:37.2979744Z ##[warning]  28:83  warning  React Hook useEffect has a missing dependency: 'initialAnswers'. Either include it or remove the dependency array. If 'setAnswers' needs the current value of 'initialAnswers', you can also switch to useReducer instead of useState and read 'initialAnswers' in the reducer  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2981430Z 
+2026-10-30T15:42:37.2981911Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/StoredPackageReports.tsx
+2026-10-30T15:42:37.2984140Z ##[warning]  7:116  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2985460Z 
+2026-10-30T15:42:37.2985965Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx
+2026-10-30T15:42:37.2987784Z ##[warning]  216:5  warning  React Hook useEffect has missing dependencies: 'loadQuality' and 'reload'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.2989181Z 
+2026-10-30T15:42:37.2989723Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyAppearance.tsx
+2026-10-30T15:42:37.2991654Z ##[warning]  19:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2993006Z 
+2026-10-30T15:42:37.2993546Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyCognitiveDeviceGate.tsx
+2026-10-30T15:42:37.2995372Z ##[warning]  3:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.2998011Z ##[warning]  7:23  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.3066770Z 
+2026-10-30T15:42:37.3067385Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyCognitiveUnit.tsx
+2026-10-30T15:42:37.3070310Z ##[warning]  43:83  warning  The ref value 'generation.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'generation.current' to a variable inside the effect, and use that variable in the cleanup function             react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3073328Z ##[warning]  54:77  warning  React Hook useMemo has a missing dependency: 'proof'. Either include it or remove the dependency array                                                                                                                                                                          react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3076443Z ##[warning]  97:5   warning  React Hook useEffect has missing dependencies: 'admit', 'existing', 'holdDraft', 'proof', and 'request'. Either include them or remove the dependency array. If 'request' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3077841Z 
+2026-10-30T15:42:37.3078359Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyCompositionEditor.tsx
+2026-10-30T15:42:37.3080765Z ##[warning]  32:5  warning  React Hook useEffect has a missing dependency: 'source'. Either include it or remove the dependency array. You can also replace multiple useState variables with useReducer if 'setResult' needs the current value of 'source'  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3082097Z 
+2026-10-30T15:42:37.3082804Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyGroupReports.tsx
+2026-10-30T15:42:37.3085071Z ##[warning]  13:137  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3086432Z 
+2026-10-30T15:42:37.3086990Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyMeasurement.extension.test.tsx
+2026-10-30T15:42:37.3088215Z ##[warning]  2:38  warning  'within' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+2026-10-30T15:42:37.3089075Z 
+2026-10-30T15:42:37.3089556Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyPersonalChanges.tsx
+2026-10-30T15:42:37.3092072Z ##[warning]  7:95  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3093405Z 
+2026-10-30T15:42:37.3093872Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveySituationalUnit.tsx
+2026-10-30T15:42:37.3096133Z ##[warning]  51:71  warning  The ref value 'generation.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'generation.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3097468Z 
+2026-10-30T15:42:37.3097956Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyStoredReportReader.tsx
+2026-10-30T15:42:37.3100534Z ##[warning]  33:125  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3101870Z 
+2026-10-30T15:42:37.3102331Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/SurveyWaveStudio.tsx
+2026-10-30T15:42:37.3104797Z ##[warning]  177:5  warning  React Hook useEffect has a missing dependency: 'editing?.publicationId'. Either include it or remove the dependency array. You can also replace multiple useState variables with useReducer if 'setContentSelections' needs the current value of 'editing.publicationId'  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3106236Z 
+2026-10-30T15:42:37.3106653Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/TaskForm.tsx
+2026-10-30T15:42:37.3108155Z ##[warning]  30:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+2026-10-30T15:42:37.3109189Z 
+2026-10-30T15:42:37.3109639Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/survey/WavePackagePicker.tsx
+2026-10-30T15:42:37.3112057Z ##[warning]  7:116  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3113388Z 
+2026-10-30T15:42:37.3113873Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/training/FormalReferenceStudio.tsx
+2026-10-30T15:42:37.3116431Z ##[warning]  142:96  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3117802Z 
+2026-10-30T15:42:37.3118275Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/training/TrainingGroupReports.tsx
+2026-10-30T15:42:37.3120762Z ##[warning]  22:172  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3122102Z 
+2026-10-30T15:42:37.3122669Z /home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/training/TrainingStandardConfigurationGrants.tsx
+2026-10-30T15:42:37.3124971Z ##[warning]  46:53  warning  The ref value 'epoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'epoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+2026-10-30T15:42:37.3126294Z 
+2026-10-30T15:42:37.3126717Z ✖ 178 problems (0 errors, 178 warnings)
+2026-10-30T15:42:37.3126925Z 
+2026-10-30T15:42:37.5715842Z ##[group]Run npm run typecheck
+2026-10-30T15:42:37.5716147Z [36;1mnpm run typecheck[0m
+2026-10-30T15:42:37.5737725Z shell: /usr/bin/bash -e {0}
+2026-10-30T15:42:37.5737989Z env:
+2026-10-30T15:42:37.5738256Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:42:37.5738617Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:42:37.5738918Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:42:37.5739211Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:42:37.5739504Z   TZ: UTC
+2026-10-30T15:42:37.5739713Z   NPM_CONFIG_CACHE: /home/runner/.npm
+2026-10-30T15:42:37.5740357Z ##[endgroup]
+2026-10-30T15:42:37.6703635Z 
+2026-10-30T15:42:37.6704350Z > frontend@0.0.0 pretypecheck
+2026-10-30T15:42:37.6704981Z > npm run inventory:product-ui:check && node ../e2e/validate-session-auth-gates.cjs
+2026-10-30T15:42:37.6705349Z 
+2026-10-30T15:42:37.7760478Z 
+2026-10-30T15:42:37.7761050Z > frontend@0.0.0 inventory:product-ui:check
+2026-10-30T15:42:37.7762037Z > node scripts/product-route-inventory.mjs --check
+2026-10-30T15:42:37.7762606Z 
+2026-10-30T15:42:38.0888340Z Product route inventory matches 158 routes.
+2026-10-30T15:42:38.3698644Z FE-11 browser gate contract: PASS (6 session gates, 2 syntax-only gates)
+2026-10-30T15:42:38.4561925Z ✔ the caller timeout reaches initial navigation and controls as well as login response (1.810704ms)
+2026-10-30T15:42:38.4567346Z ✔ failed navigation stops before credentials or login requests (0.551683ms)
+2026-10-30T15:42:38.4569089Z ✔ asset authorization guard counts protected API media but not built frontend chunks (0.255897ms)
+2026-10-30T15:42:38.4646489Z ℹ tests 3
+2026-10-30T15:42:38.4646857Z ℹ suites 0
+2026-10-30T15:42:38.4647201Z ℹ pass 3
+2026-10-30T15:42:38.4648079Z ℹ fail 0
+2026-10-30T15:42:38.4648319Z ℹ cancelled 0
+2026-10-30T15:42:38.4648569Z ℹ skipped 0
+2026-10-30T15:42:38.4648806Z ℹ todo 0
+2026-10-30T15:42:38.4649067Z ℹ duration_ms 63.534417
+2026-10-30T15:42:38.4744918Z 
+2026-10-30T15:42:38.4745421Z > frontend@0.0.0 typecheck
+2026-10-30T15:42:38.4746007Z > tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.cognitive.json --noEmit
+2026-10-30T15:42:38.4746363Z 
+2026-10-30T15:43:13.9999220Z ##[error]The operation was canceled.
+2026-10-30T15:43:14.0145640Z Post job cleanup.
+2026-10-30T15:43:14.1187568Z [command]/usr/bin/git version
+2026-10-30T15:43:14.1244716Z git version 2.56.0
+2026-10-30T15:43:14.1291653Z Temporarily overriding HOME='/home/runner/work/_temp/3727be68-7eac-4ae4-90bc-d0dc137a5a8c' before making global git config changes
+2026-10-30T15:43:14.1293284Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-30T15:43:14.1299092Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version
+2026-10-30T15:43:14.1387311Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T15:43:14.1427243Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T15:43:14.1908502Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T15:43:14.1913552Z http.https://github.com/.extraheader
+2026-10-30T15:43:14.1954490Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-30T15:43:14.2019182Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T15:43:14.2452833Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T15:43:14.2498962Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T15:43:14.2995476Z Cleaning up orphan processes
+2026-10-30T15:43:14.3310439Z Terminate orphan process: pid (2478) (npm run typecheck)
+2026-10-30T15:43:14.3339516Z Terminate orphan process: pid (2592) (sh)
+2026-10-30T15:43:14.3368584Z Terminate orphan process: pid (2593) (MainThread)
+2026-10-30T15:43:14.3434973Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

@@ -1,0 +1,987 @@
+{
+  "jobs": [
+    {
+      "id": 124156719111,
+      "name": "classify changed content",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "fetch the immutable reviewed personal tracking source",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 4
+        },
+        {
+          "name": "fetch the exact diff base without full history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "fetch the actual group report merge base",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6
+        },
+        {
+          "name": "fetch exact PR363 source without application execution",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7
+        },
+        {
+          "name": "fetch exact report-planning source for shallow tree comparison",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8
+        },
+        {
+          "name": "detect the fixed PR356 entry before any legacy classification",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "fetch exact two-candidate PR source for checkout-tree comparison",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10
+        },
+        {
+          "name": "fetch reviewed School Teacher product anchor without full history",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11
+        },
+        {
+          "name": "fetch the fixed reviewed candidate source for shallow classification",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 12
+        },
+        {
+          "name": "fetch exact Survey Mac reviewed source and frozen product",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 13
+        },
+        {
+          "name": "fetch exact Training follow-up product object",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14
+        },
+        {
+          "name": "fetch exact Training manual UI PR source for shallow checkout comparison",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 15
+        },
+        {
+          "name": "fetch exact Survey manual UI PR source for shallow checkout comparison",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 16
+        },
+        {
+          "name": "fetch exact Training entry PR source",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17
+        },
+        {
+          "name": "fetch exact Participant capacity PR source",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 18
+        },
+        {
+          "name": "fetch exact Survey assessment PR source",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19
+        },
+        {
+          "name": "fetch exact Training assessment PR source",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 20
+        },
+        {
+          "name": "fetch exact participant access PR source",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 21
+        },
+        {
+          "name": "fetch exact PR350 source for checkout tree comparison",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 22
+        },
+        {
+          "name": "fetch exact PR354 source for independent checkout comparison",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 23
+        },
+        {
+          "name": "select dependency-free documentation or tooling classification",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24
+        },
+        {
+          "name": "install pinned release classification tools",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25
+        },
+        {
+          "name": "Run if [ \"$PR356_ENTRY\" = \"true\" ]; then",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 26
+        },
+        {
+          "name": "retain PR356 source identity and complete selected input table",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 27
+        },
+        {
+          "name": "Survey Mac exact scope, refusal and aggregate contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 28
+        },
+        {
+          "name": "Authenticator route, strict evidence and no-skip aggregate contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 29
+        },
+        {
+          "name": "frozen Training workspace routing and strict merge contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 30
+        },
+        {
+          "name": "legacy routing contracts only for the legacy route",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31
+        },
+        {
+          "name": "frontend startup and paging scope and fail-closed contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 32
+        },
+        {
+          "name": "affected maintenance routing and merge contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 33
+        },
+        {
+          "name": "homepage copy boundary and affected routing contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 34
+        },
+        {
+          "name": "frozen assessment durability, routing and reuse refusal contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 35
+        },
+        {
+          "name": "frozen efficiency routing, prerequisite refusal and homepage preservation",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 36
+        },
+        {
+          "name": "frozen governance routing, isolation and strict evidence contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 37
+        },
+        {
+          "name": "frozen CSV memory routing and strict aggregate contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 38
+        },
+        {
+          "name": "bounded Survey Wave selection routing and no-skip gate contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 39
+        },
+        {
+          "name": "reviewed candidate boundary, refusal and stable merge contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 40
+        },
+        {
+          "name": "frozen Survey scope and fail-closed merge contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 41
+        },
+        {
+          "name": "frozen shared asset scope and fail-closed merge contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 42
+        },
+        {
+          "name": "frozen backend repair routing and fail-closed merge contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 43
+        },
+        {
+          "name": "Teacher exact patch routing and fail-closed merge contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 44
+        },
+        {
+          "name": "Survey exact patch routing and fail-closed merge contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 45
+        },
+        {
+          "name": "campus routing and fail-closed merge contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 46
+        },
+        {
+          "name": "exact scale authoring admission and routing control contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 47
+        },
+        {
+          "name": "group report Draft boundary contracts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 48
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 95
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 96
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 97
+        }
+      ]
+    },
+    {
+      "id": 124156720751,
+      "name": "PR356 / refuse unsupported activation parameters",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721125,
+      "name": "probe-frontend",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721127,
+      "name": "probe-ui-mac",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721267,
+      "name": "probe-cognitive",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721314,
+      "name": "probe-backend",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721441,
+      "name": "probe-backend-regression",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721463,
+      "name": "probe-maintenance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721517,
+      "name": "known-admin-functional-manual-refusal",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721577,
+      "name": "probe-ops",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721895,
+      "name": "probe-qa-ui",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156721916,
+      "name": "probe-images",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156722002,
+      "name": "probe-ui-hosted",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156722110,
+      "name": "probe-browser",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156722217,
+      "name": "probe-media",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156722800,
+      "name": "probe-perf",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156770714,
+      "name": "pr363-manual-refusal",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156776963,
+      "name": "known-survey-manual-refusal",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156777380,
+      "name": "exact-candidate-manual-refusal",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156785555,
+      "name": "known-training-functional-manual-refusal",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156799275,
+      "name": "probe-frontend-build",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156806069,
+      "name": "probe-browser-build",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156941773,
+      "name": "frontend artifacts / release consumers early / UI-lab artifact",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run node \"$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs\" --frontend",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run npm ci",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "build separately flagged UI lab",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "clean Mac dependencies and outputs after artifact upload",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17
+        }
+      ]
+    },
+    {
+      "id": 124156942109,
+      "name": "frontend artifacts / release consumers early / build",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run node \"$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs\" --frontend",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run npm ci",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "build production frontend",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "install pinned affected-entry browser tools",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7
+        },
+        {
+          "name": "rendered product entries and on-demand ScaleList paging",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "clean Mac dependencies and outputs after artifact upload",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        }
+      ]
+    },
+    {
+      "id": 124156942367,
+      "name": "docker (compose config + production builds) / production image build and scan",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "check CI disk headroom",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "verify runner capacity and clean application ports",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "configure runner-local Trivy cache",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "detect runner-local Trivy 0.70.0",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "install Trivy 0.70.0 once per runner",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "validate compose",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "assert prelaunch resource and HTTPS contract",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "assert API/worker isolation topology",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "validate monitoring compose",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "build production images",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "verify production Nginx static asset MIME and security headers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "install pinned browser for the changed Wave UI",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 15
+        },
+        {
+          "name": "Wave selection smoke on this production frontend image",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 16
+        },
+        {
+          "name": "scan backend image (high and critical)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17
+        },
+        {
+          "name": "scan frontend image (high and critical)",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "number": 18
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19
+        },
+        {
+          "name": "Post scan frontend image (high and critical)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35
+        },
+        {
+          "name": "Post install Trivy 0.70.0 once per runner",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 36
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 37
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 39
+        }
+      ]
+    },
+    {
+      "id": 124156942591,
+      "name": "frontend (lint + types + full tests + build) / frontend checks",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "verify runner capacity and clean application ports",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "configure runner-local npm cache",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "accept original locked audit and unchanged frontend unit evidence",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6
+        },
+        {
+          "name": "npm ci",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "prepare locked backend dependencies for shared contract types and tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "lint",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "lint changed Wave integration surfaces",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10
+        },
+        {
+          "name": "typecheck",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "number": 11
+        },
+        {
+          "name": "integrated application types without duplicate cognitive subset",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 12
+        },
+        {
+          "name": "dependency audit (high and critical)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 13
+        },
+        {
+          "name": "full frontend tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14
+        },
+        {
+          "name": "affected Wave selector and direct consumers",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 15
+        },
+        {
+          "name": "clean Mac dependencies and outputs after artifact upload",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 16
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 31
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 32
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 33
+        }
+      ]
+    },
+    {
+      "id": 124156942988,
+      "name": "backend regression (isolated job database)",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156943323,
+      "name": "Survey PR350 / bounded qualification",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156943628,
+      "name": "backend (migrate + build + performance gate)",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 124156943657,
+      "name": "presentation / frontend lint + typecheck + build",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 41082809728,
+      "logs_url": null,
+      "steps": null
+    }
+  ]
+}
