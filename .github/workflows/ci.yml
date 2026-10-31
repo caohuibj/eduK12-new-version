@@ -1204,6 +1204,7 @@ jobs:
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' || needs.scope.outputs.dependencies_frontend_only == 'true' }}
+      backend_only: ${{ needs.scope.outputs.scenario == 'backend' }}
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
 
   codeql:

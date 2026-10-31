@@ -2,20 +2,27 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runtimeRefreshPlan, verifyResolvedPlan } from './ci-image-plan.mjs';
 import { readFileSync } from 'node:fs';
-const fixture = frontendOnly => ({ target: Object.fromEntries((frontendOnly ? ['frontend'] : ['backend','worker','frontend']).map(name => [name, {
+import { execFileSync } from 'node:child_process';
+const selections=[
+  {frontendOnly:true,backendOnly:false,targets:['frontend'],scenario:'frontend'},
+  {frontendOnly:false,backendOnly:true,targets:['backend','worker'],scenario:'backend'},
+  {frontendOnly:false,backendOnly:false,targets:['backend','worker','frontend'],scenario:'platform'},
+];
+const fixture = (frontendOnly,backendOnly=false) => ({ target: Object.fromEntries(selections.find(mode=>mode.frontendOnly===frontendOnly&&mode.backendOnly===backendOnly).targets.map(name => [name, {
   context: `./${name === 'frontend' ? 'frontend' : 'backend'}`, dockerfile: 'Dockerfile',
   tags: [name === 'frontend' ? 'server-version-frontend' : 'server-version-backend:latest'],
   args: { VITE_COGNITIVE_MODULE_ENABLED: 'true' },
 }])) });
 const resolved = plan => { for (const target of Object.values(plan.target)) {target.pull = true; target.output = [{type:'docker'}];} return plan;};
 test('runtime refresh preserves source, tags and build arguments without mutating Compose input', () => {
-  for (const frontendOnly of [true,false]) {
-    const input = fixture(frontendOnly);
+  for (const {frontendOnly,backendOnly,targets} of selections) {
+    const input = fixture(frontendOnly,backendOnly);
     for (const [name,target] of Object.entries(input.target)) {
       if (name !== 'frontend') { target.context='/work/repo/server-version/backend'; target.dockerfile=target.context+'/Dockerfile'; }
     }
     const before = structuredClone(input);
-    const plan = runtimeRefreshPlan(input,frontendOnly);
+    const plan = runtimeRefreshPlan(input,frontendOnly,backendOnly);
+    assert.deepEqual(Object.keys(plan.target),targets);
     assert.deepEqual(input,before);
     for (const [name,target] of Object.entries(plan.target)) {
       assert.deepEqual(target['no-cache-filter'],['runtime']); assert.equal(target['no-cache'],false);
@@ -23,7 +30,7 @@ test('runtime refresh preserves source, tags and build arguments without mutatin
         : {...before.target[name].args, DEBIAN_MIRROR: 'deb.debian.org'});
       for (const key of ['context','dockerfile','tags']) assert.deepEqual(target[key],before.target[name][key]);
     }
-    verifyResolvedPlan(resolved(plan),frontendOnly);
+    verifyResolvedPlan(resolved(plan),frontendOnly,backendOnly);
   }
 });
 test('missing refresh, whole-image cache bypass, wrong tags or publishing cannot pass resolved validation', () => {
@@ -35,8 +42,34 @@ test('missing refresh, whole-image cache bypass, wrong tags or publishing cannot
 });
 test('UI route cannot secretly build backend; full route cannot omit a production target', () => {
   assert.throws(()=>runtimeRefreshPlan(fixture(false),true));
+  assert.throws(()=>runtimeRefreshPlan(fixture(false),false,true));
+  assert.throws(()=>runtimeRefreshPlan(fixture(true),true,true));
   const plan=fixture(false);delete plan.target.worker;
   assert.throws(()=>runtimeRefreshPlan(plan,false));
+});
+
+test('frontend backend and full selection reaches shell targets and only the matching runtime checks',()=>{
+  const script=readFileSync(new URL('./build-ci-images.sh',import.meta.url),'utf8');
+  const selection=script.match(/^case [\s\S]+?^esac/m)?.[0];assert(selection);
+  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const images=readFileSync(new URL('../workflows/ci-images.yml',import.meta.url),'utf8');
+  const docker=ci.split('\n  docker:\n')[1].split(/\n  [a-z][a-z0-9-]*:\n/)[0];
+  const step=name=>images.split('      - name: '+name+'\n')[1]?.split('\n      - ')[0];
+  const permits=(name,inputs)=>new Function('inputs','return ('+step(name).match(/^        if: (.+)$/m)[1]+')')(inputs);
+  for(const {frontendOnly,backendOnly,targets,scenario} of selections){
+    const actual=execFileSync('bash',['-c',selection+'\nprintf "%s\\n" "${images[@]}"'],{encoding:'utf8',env:{...process.env,FRONTEND_ONLY:String(frontendOnly),BACKEND_ONLY:String(backendOnly)}}).trim().split('\n');
+    assert.deepEqual(actual,targets);
+    const needs={scope:{outputs:{scenario,frontend:String(frontendOnly),dependencies_frontend_only:'false'}}};
+    for(const [input,expected] of [['frontend_only',frontendOnly],['backend_only',backendOnly]]){
+      const expression=docker.match(new RegExp(input+': \\$\\{\\{ (.+) \\}\\}'))[1];
+      assert.equal(new Function('needs','return ('+expression+')')(needs),expected,input+' '+scenario);
+    }
+    const inputs={frontend_only:frontendOnly,backend_only:backendOnly};
+    assert.equal(permits('scan backend image (high and critical)',inputs),targets.includes('backend'));
+    for(const name of ['scan frontend image (high and critical)','verify production Nginx static asset MIME and security headers'])assert.equal(permits(name,inputs),targets.includes('frontend'));
+  }
+  assert.match(step('scan backend image (high and critical)'),/severity: CRITICAL,HIGH/);
+  assert.match(images,/BACKEND_ONLY: \$\{\{ inputs.backend_only \}\}/);
 });
 
 test('Debian mirror applies to both API and worker and cannot disappear from the resolved build', () => {

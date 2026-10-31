@@ -51,6 +51,11 @@ test('unrelated documentation does not invalidate tooling evidence',()=>fixture(
  assert.equal(admit(signed,pub,base,git('rev-parse','HEAD')).checks[0].check,'release-tools');
 }));
 const regular=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
+test('image selection changes use the existing tools recipe without Docker execution',()=>fixture(({base,head})=>{
+ const commands=recipe('release-tools',base,head);
+ assert(commands.some(argv=>argv.includes('.github/scripts/ci-image-plan.test.mjs')));
+ assert(commands.every(argv=>argv[0]==='node'&&argv.includes('--test')));
+},'.github/scripts/ci-image-plan.mjs'));
 test('dependency routing controls use their existing bounded tools contract',()=>fixture(({base,head})=>{
  const commands=recipe('release-tools',base,head);
  assert(commands.some(argv=>argv.includes('.github/scripts/dependency-routing.test.mjs')));

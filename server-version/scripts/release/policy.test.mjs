@@ -40,6 +40,12 @@ test('registered development tools retain changed backend tests without admittin
  for(const file of ['server-version/backend/src/modules/cognitive/service.ts','server-version/backend/prisma/schema.prisma','docs/evidence/cli/run.ts','server-version/backend/src/__tests__/../runtime.test.ts'])assert.equal(toolingOnly([...files,regular(file)]),false,file);
  for(const newMode of ['120000','100755','000000'])assert.equal(toolingOnly([...files,{...regular(cli),newMode}]),false);
 });
+test('image tooling preserves the existing executable script without admitting chmod or new executables',()=>{
+ const script={...regular('.github/scripts/build-ci-images.sh'),oldMode:'100755',newMode:'100755'};
+ const files=[script,...['.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml'].map(regular)];
+ assert.equal(toolingOnly(files),true);
+ for(const extra of [{...script,newMode:'100644'},{...script,status:'A',oldMode:'000000'},{...script,newMode:'120000'},{...script,file:'.github/scripts/unknown-images.sh'}])assert.equal(toolingOnly([...files,extra]),false);
+});
 
 
 test('exact ingress bundle uses tools gate; unknown vhosts, app files, deletions and modes still escalate',()=>{
