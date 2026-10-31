@@ -1,0 +1,13 @@
+{
+  "product": "c7394094623ababb39d88ab779644452b51f5780",
+  "localProduct": "57a80c20494d9a023f676770d9f57a0c23e37844",
+  "completeTree": "27b8af0c9e746e50cd2bd41632e51fb7c08ce6f5",
+  "actualBase": "093d86e842da12d443301fd4a37d5d046ecb9185",
+  "compilerProducer": "b3c1b855da0db00d924db1f364d362ccc97a1d63",
+  "components": {
+    "backend": "7c990d88802f0bdf924195a30b2b8ebd631ffb47",
+    "frontend": "1bc73a4eaa881fbff76ebbe4fb4f8567c51aa430"
+  },
+  "selectedOriginalDistinct": 6,
+  "formalCI": "NOTRUN"
+}

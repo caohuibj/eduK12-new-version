@@ -128,7 +128,7 @@ export const cognitiveController = {
   async myAssignments(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      const data = await assignmentService.listStudentAssignments(req.user.userId)
+      const data = await assignmentService.listStudentAssignments(req.user.userId, req.query.courseId as string | undefined)
       return success(res, data)
     } catch (err) {
       return handleError(res, err)
