@@ -31,5 +31,8 @@
   "partial-native-repair.log": "a783a9261d09c1843e70f28ec045ae20249c56cfa449354ec6c160255106328a",
   "partial-native-final.json": "b26f0db64c01500ab4b34edb727c6ffb15347f273effaf85fb828654d7880cea",
   "partial-native-final.log": "cf3ce2b9ebf036b5ef2443bf4175e7ae108319f2d9f957a0ac182938fd23568f",
-  "partial-native-proof.json": "cad710dd9c5a3e0a4c354c039164fd22c9bd7f9a382a61d8ad63f460ba934f98"
+  "partial-native-proof.json": "cad710dd9c5a3e0a4c354c039164fd22c9bd7f9a382a61d8ad63f460ba934f98",
+  "private-native.json": "e4814d9af25fa8e21b0c2473de766368df686c86ce1198899686d47982cefbac",
+  "private-native.log": "07b8cb7c874c499adfc38d1ae2ef6bdf2a920303cfa74a94ec54b8c70316dcad",
+  "private-native-proof.json": "aa854b56a25cc15295e49b6fe5f3faa27591b80eed703bea6199965de9275d5f"
 }

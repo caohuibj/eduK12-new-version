@@ -85,3 +85,7 @@ Actual main `769141d5bc4954919b163a8d8d522530048fbfb6` was merged without confli
 ## Actual Group interface delivered and consumed
 
 Group #443 is merged as mainf941e745d1c4148bd2e692a1c6e75af847d93fa5 (producer head5f72668a2e35192086184408c8ee744f87814bea). The exact `allowPartialSourceMetrics` second argument is now used by this service. One new planned A/B→onlyA mock adapter boundary passes; the previous nine cases,20 FINALs and upstream producer proof were not repeated. Private education-composition source remains the only missing owner source delta; no native Form expansion is included. Keep final Ready qualification tied to that complete small source rather than prebuilding an incomplete backend.
+
+## Final source dependency delivered
+
+Group #446 merged as dc83843daabe2be21b1d1dcb8879df69d4c5630c. Actual private composition source interfaces were integrated without a collector change. One new real private two-wave plan/source boundary passes with only2 new source-specific FINALs and real small-N suppression; sufficient-N private source statistics reuse Group's prior positive proof. Original20 FINALs and old cases are not replayed. Intended implementation is complete; execute only the already planned current-source official qualification and merge. No native numeric Form, additional feature PR, paired/Profile or production action.

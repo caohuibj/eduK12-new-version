@@ -71,8 +71,7 @@
     "HTTP mount and event API base agree; strict body does not accept internal partial-source options; shared UI retains old history when config changes."
   ],
   "confirmedRemaining": [
-    "Private education-composition single-wave GROUP source is still Group-owned and pending.",
-    "Final bounded official qualification and merge remain pending; Draft scope is not Ready qualification."
+    "Existing final bounded official migration/restore, frontend types/lint, production build/scans and scoped SAST; normal merge after success. No remaining intended feature work."
   ],
   "formalDraftCI": {
     "run": 41172913061,
@@ -148,5 +147,16 @@
     "originalTwoWavePlanAndParentFactsUnchanged": true,
     "separateTwoMetricNullProof": "partial-adapter.json",
     "formalReadyQualification": false
+  },
+  "privateCompositionIntegration": {
+    "groupMerge": "dc83843daabe2be21b1d1dcb8879df69d4c5630c",
+    "realPGReport": "private-native.json",
+    "newSourceFinals": 2,
+    "oldFinalsReplayed": 0,
+    "actualPublishedWaves": 2,
+    "sourceRegistryResultMock": false,
+    "minimumN": 10,
+    "smallNSuppressed": true,
+    "savedCanonicalReads": 0
   }
 }
