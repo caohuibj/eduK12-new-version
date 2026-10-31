@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.app.json",
+    "--noEmit"
+  ],
+  "exitCode": 2,
+  "startedAt": "2026-10-30T22:19:39.389999+00:00",
+  "finishedAt": "2026-10-30T22:20:16.992846+00:00",
+  "node": "v24.22.1",
+  "componentTree": "8d7f9214106aa965d1379b75464136d7cc5b90e5",
+  "source": "f4fa39bdb98d3d6984538b45de5797a46b52bda5",
+  "logSHA256": "7188865d38d8ac4bb8f085db9cb926f9614ec378ae2b5583a3fb9e6b0931fdb0"
+}

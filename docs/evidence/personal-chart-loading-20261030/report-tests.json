@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/modules/reporting/__tests__/PersonalChangesReport.test.tsx",
+    "src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+    "--maxWorkers=2",
+    "--reporter=json",
+    "--outputFile=/workspace/scratch/5a77e8bdc1ae/dot-main-review-perf-20261030/docs/evidence/personal-chart-loading-20261030/report-tests-results.json"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-30T22:19:38.348028+00:00",
+  "finishedAt": "2026-10-30T22:19:39.381917+00:00",
+  "node": "v24.22.1",
+  "componentTree": "8d7f9214106aa965d1379b75464136d7cc5b90e5",
+  "source": "f4fa39bdb98d3d6984538b45de5797a46b52bda5",
+  "logSHA256": "fe86e3400281b8b85341d91e10de6d221c8751961e95483058635ce5c7f10f52"
+}
