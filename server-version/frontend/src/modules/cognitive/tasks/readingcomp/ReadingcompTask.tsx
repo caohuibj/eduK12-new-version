@@ -8,7 +8,7 @@ import { buildReadingcompItems, READINGCOMP_PRACTICE_ITEM } from './prng'
 type Phase = 'instruction' | 'practice' | 'formal'
 type SubPhase = 'fixation' | 'stimulus' | 'feedback'
 
-export const ReadingcompTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete }) => {
+export const ReadingcompTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete }) => {
   const config = taskContext.config as unknown as ReadingcompConfig
   const { totalTrials, fixationMs, timeoutMs } = config
   const [phase, setPhase] = useState<Phase>('instruction')
@@ -41,17 +41,14 @@ export const ReadingcompTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   const persistPending = useCallback(async () => {
     if (!pendingRef.current || submittingRef.current) return
     submittingRef.current = true; setRetry(false)
-    setFeedback('已记录，下一题准备中'); setSubPhase('feedback')
+    setFeedback('正在保存本题…'); setSubPhase('feedback')
     let accepted: boolean | void
     try { accepted = await onTrialComplete(pendingRef.current) }
     catch { accepted = false }
     finally { submittingRef.current = false }
     if (accepted === false) { setFeedback('提交失败，已保留首次答案与用时，请重试提交。'); setRetry(true); return }
-    if (trialIndex + 1 >= totalTrials) {
-      try { await onTaskComplete?.() }
-      catch { setFeedback('作答记录已保存，请返回任务页继续完成提交。') }
-    }
-  }, [onTrialComplete, trialIndex, totalTrials, onTaskComplete])
+    setFeedback('作答已保存')
+  }, [onTrialComplete])
 
   const submitFormal = useCallback((responseIndex: number | null) => {
     if (phase !== 'formal' || subPhase !== 'stimulus' || !currentTrial || pendingRef.current) return
@@ -95,6 +92,7 @@ export const ReadingcompTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
 
   const startPractice = () => { setPracticeChoice(null); setSubPhase('fixation'); setPhase('practice') }
   if (!items) return <div role="alert" className="card p-8">本次题库版本或题量不匹配，请返回任务页联系管理员；正式测验尚未开始。</div>
+  if (trialIndex >= totalTrials) return <div role="status" className="card p-6 text-center">正式作答已保存，请使用页面上的“完成测评”按钮确认提交。</div>
   if (phase === 'instruction') return <CognitiveTaskIntro title="阅读理解" description={<><p>每题同时给出一段短文、一个问题和四个选项。先读短文，再根据原文选出唯一最符合问题的答案；不需要用课外知识作答。</p><p className="mt-3">例如，短文说雨伞在门边的篮子里，问雨伞在哪里，就选择“门边的篮子里”。</p></>} hint={<><p>按键 1–4 或点击选项作答。先求准确，再保持稳定节奏；每题最多 {timeoutMs / 1000} 秒，正式共 {totalTrials} 题。练习无时限且不计分，答对后才能开始；正式不显示正确答案。</p></>} onAction={startPractice} />
   if (phase === 'formal' && !currentTrial) return <div className="card p-8">作答已记录，正在生成结果…</div>
   const item = phase === 'practice' ? READINGCOMP_PRACTICE_ITEM : currentTrial!

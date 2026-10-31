@@ -10,7 +10,7 @@ import { resolveRunner, registerCognitiveRunner } from '../registry'
 import { resolveCognitiveReadinessProfile } from '../core/readiness'
 const harness = vi.hoisted(() => ({ controller: { state: {} as RunnerState, start: vi.fn(), appendTrial: vi.fn(), complete: vi.fn(), reload: vi.fn(), restart: vi.fn() } }))
 vi.mock('../core/useCognitiveSession', () => ({ useCognitiveSession: () => harness.controller }))
-const cases = [ ['wordanalogy','1.1.0','1'], ['wordmeaning','1.1.0','2'], ['wordproblem','2.0.0','4'], ['logicdeduce','2.0.0','2'], ['seriescomplete','1.1.0','2'] ] as const
+const cases = [ ['wordanalogy','1.1.0','1'], ['wordmeaning','1.1.0','2'], ['wordproblem','2.0.0','4'], ['logicdeduce','2.0.0','2'], ['seriescomplete','1.1.0','2'], ['readingcomp','1.1.0','2'], ['proofread','1.1.0','4'] ] as const
 const tree = () => <MemoryRouter initialEntries={['/student/cognitive/sessions/bank-host']}><Routes><Route path="/student/cognitive/sessions/:sessionId" element={<CognitiveRunner/>}/><Route path="/student/cognitive/sessions/:sessionId/result" element={<div>RESULT_PAGE</div>}/></Routes></MemoryRouter>
 beforeEach(() => vi.clearAllMocks())
 afterEach(() => { cleanup(); vi.useRealTimers() })

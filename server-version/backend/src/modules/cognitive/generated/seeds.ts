@@ -45,10 +45,12 @@ import { seeds as task42 } from '../tasks/ufov/seeds'
 import { seeds as task43 } from '../tasks/logicdeduce/seeds'
 import { seeds as task44 } from '../tasks/seriescomplete/seeds'
 import { seeds as task45 } from '../tasks/pursuitrotor/seeds'
-import { seeds as task46 } from '../tasks/visualwm/seeds'
-import { seeds as task47 } from '../tasks/maze/seeds'
-import { seeds as task48 } from '../tasks/auditoryrt/seeds'
-import { seeds as task49 } from '../tasks/auditorynback/seeds'
+import { seeds as task46 } from '../tasks/readingcomp/seeds'
+import { seeds as task47 } from '../tasks/proofread/seeds'
+import { seeds as task48 } from '../tasks/visualwm/seeds'
+import { seeds as task49 } from '../tasks/maze/seeds'
+import { seeds as task50 } from '../tasks/auditoryrt/seeds'
+import { seeds as task51 } from '../tasks/auditorynback/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -90,6 +92,8 @@ export const cognitiveSeeds = [
   task34[0],
   task35[0],
   task43[0],
+  task47[0],
+  task46[0],
   task44[0],
   task36[0],
   task36[1],
@@ -101,11 +105,13 @@ export const cognitiveSeeds = [
   task41[0],
   task42[0],
   task45[0],
-  task46[0],
-  task47[0],
   task48[0],
   task49[0],
+  task50[0],
+  task51[0],
   task43[1],
+  task47[1],
+  task46[1],
   task44[1],
   task39[1],
   task21[1],

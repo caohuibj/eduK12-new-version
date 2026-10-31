@@ -11,6 +11,13 @@ const config = { totalTrials: 4, stimulusSetVersion: 'proofread-zh-v1.1.0', fixa
 const trials = () => bank.slice(0, 4).map((item, trialIndex) => ({ trialIndex, payload: { itemId: item.id, responseIndex: item.answer as number | null, rtMs: 500 as number | null, interrupted: false } }))
 
 describe('proofread audited scoring contract', () => {
+  it('recommends only the audited identity for new creation while retaining legacy scoring', () => {
+    expect(executionEntries[0].recommendedForCreate).toBe(false)
+    expect(executionEntries[1].recommendedForCreate).toBe(true)
+    expect(executionEntries[0].engineVersion).toBe('1.0.0')
+    expect(executionEntries[0].score).toBe(legacyScore)
+  })
+
   it('preserves frozen legacy fixtures and separates execution/report identities', () => {
     for (const entry of fixture.cases) {
       if ('expectedError' in entry) expect(() => legacyScore(entry.input as never)).toThrow(entry.expectedError)
@@ -51,6 +58,18 @@ describe('proofread audited scoring contract', () => {
     expect(schema.safeParse({ ...config, stimulusSetVersion: 'proofread-zh-v1.0.0' }).success).toBe(false)
     expect(schema.safeParse({ ...config, report: { reportVersion: '1.0.0', referenceMode: 'simulated' } }).success).toBe(false)
     expect(schema.safeParse({ ...config, validRtFloorMs: 15000 }).success).toBe(false)
+  })
+  it('uses unambiguous everyday objects in the two independently reviewed replacements', () => {
+    for (const [id, wrong, right, answer] of [['pf2-13','文具合','文具盒',3], ['pf2-33','窗连','窗帘',2]] as const) {
+      const item = bank.find(candidate => candidate.id === id)!
+      expect(item.answer).toBe(answer)
+      expect(item.options[answer]).toBe(wrong)
+      expect(item.stem).toContain(wrong)
+      expect(item.correctedStem).toContain(right)
+      expect(item.correction).toEqual({ fromText: wrong, toText: right })
+      expect(item.options.every(option => item.stem.includes(option))).toBe(true)
+      expect(item.stem).not.toMatch(/流连忘反|斩新/)
+    }
   })
   it('has editorial explanations and no copied analogy report text', () => {
     for (const item of bank) { expect(item.explanation.length).toBeGreaterThan(8); expect(new Set(item.options).size).toBe(4) }

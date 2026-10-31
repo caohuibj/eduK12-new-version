@@ -51,5 +51,5 @@ export const proofreadRegistryMeta = {
     practicalTips: ['仔细读句子的每个字，找出写错或用错的那个。', '不确定时把每个选项代回句子读一读，看哪个不通顺。'],
     disclaimer: '结果只描述本次文本校对的表现，不是语言能力、智力或年龄常模判断。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: true,
+  recommendedForCreate: false,
 }

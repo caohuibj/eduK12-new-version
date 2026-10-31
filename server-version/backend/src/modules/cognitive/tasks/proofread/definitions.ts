@@ -3,6 +3,7 @@ import { metric } from '../../task-primitives'
 
 export const proofreadRegistryMeta = {
   ...legacy,
+  recommendedForCreate: true,
   randomizationAlgorithmVersion: 'proofread-sequence-v1.1.0',
   profileDefinitionVersion: '1.1.0',
   profiles: {

@@ -69,7 +69,8 @@
       "src/modules/cognitive/tasks/proofread/__tests__/ProofreadTask.test.tsx",
       "src/modules/cognitive/tasks/proofread/__tests__/prng.test.ts",
       "src/modules/cognitive/tasks/proofread/__tests__/audited-bank.test.ts",
-      "src/modules/cognitive/tasks/proofread/__tests__/audited-runner.test.tsx"
+      "src/modules/cognitive/tasks/proofread/__tests__/audited-runner.test.tsx",
+      "src/modules/cognitive/__tests__/bank-intake-host.test.tsx"
     ]
   }
 }

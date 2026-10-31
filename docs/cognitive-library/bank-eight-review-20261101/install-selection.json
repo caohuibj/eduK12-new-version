@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "testType": "wordanalogy",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "wordmeaning",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "logicdeduce",
+      "configVersion": "2.0.0",
+      "engineVersion": "2.0.0",
+      "scoringVersion": "2.0.0"
+    },
+    {
+      "testType": "proofread",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "readingcomp",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "seriescomplete",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "wordproblem",
+      "configVersion": "2.0.0",
+      "engineVersion": "2.0.0",
+      "scoringVersion": "2.0.0"
+    }
+  ]
+}

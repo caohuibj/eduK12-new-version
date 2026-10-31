@@ -45,7 +45,7 @@ describe('proofread audited runner', () => {
     await act(async () => {})
     expect(submit).toHaveBeenCalledTimes(1)
     expect(submit.mock.calls[0][0]).toMatchObject({ responseIndex: 0, rtMs: 600 })
-    expect(finish).toHaveBeenCalledTimes(1)
+    expect(finish).not.toHaveBeenCalled()
   })
   it('keeps the exact first answer and RT across a failed submission retry', async () => {
     const submit = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true), finish = vi.fn()
@@ -57,7 +57,7 @@ describe('proofread audited runner', () => {
     fireEvent.click(screen.getByText('重试提交')); await act(async () => {})
     expect(submit).toHaveBeenCalledTimes(2)
     expect(submit.mock.calls[1][0]).toEqual(first)
-    expect(finish).toHaveBeenCalledTimes(1)
+    expect(finish).not.toHaveBeenCalled()
   })
   it('records an unanswered deadline as null and a delayed late click as timeout', async () => {
     const submit = vi.fn().mockResolvedValue(true)
@@ -75,7 +75,7 @@ describe('proofread audited runner', () => {
     await tick(1)
     expect(submit).toHaveBeenCalledTimes(1)
     expect(submit.mock.calls[0][0]).toMatchObject({ responseIndex: null, rtMs: null })
-    expect(finish).toHaveBeenCalledTimes(1)
+    expect(finish).not.toHaveBeenCalled()
   })
   it('records visibility interruption', async () => {
     const submit = vi.fn().mockResolvedValue(true)
@@ -98,7 +98,7 @@ describe('proofread audited runner', () => {
     expect(submit).toHaveBeenCalledTimes(count)
     expect(new Set(submit.mock.calls.map(call => call[0].itemId)).size).toBe(count)
     expect(submit.mock.calls.some(call => call[0].itemId === practice.id)).toBe(false)
-    expect(finish).toHaveBeenCalledTimes(1)
+    expect(finish).not.toHaveBeenCalled()
   })
   it('blocks a bank/version mismatch before practice', () => {
     render(<ProofreadTask taskContext={{ ...context, config: { ...config, totalTrials: 37 } }} trialIndex={0} onTrialComplete={vi.fn()} />)

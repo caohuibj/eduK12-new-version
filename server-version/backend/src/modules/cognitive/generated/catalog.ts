@@ -44,10 +44,12 @@ import { catalog as task41 } from '../tasks/ufov/governance'
 import { catalog as task42 } from '../tasks/logicdeduce/governance'
 import { catalog as task43 } from '../tasks/seriescomplete/governance'
 import { catalog as task44 } from '../tasks/pursuitrotor/governance'
-import { catalog as task45 } from '../tasks/visualwm/governance'
-import { catalog as task46 } from '../tasks/maze/governance'
-import { catalog as task47 } from '../tasks/auditoryrt/governance'
-import { catalog as task48 } from '../tasks/auditorynback/governance'
+import { catalog as task45 } from '../tasks/readingcomp/governance'
+import { catalog as task46 } from '../tasks/proofread/governance'
+import { catalog as task47 } from '../tasks/visualwm/governance'
+import { catalog as task48 } from '../tasks/maze/governance'
+import { catalog as task49 } from '../tasks/auditoryrt/governance'
+import { catalog as task50 } from '../tasks/auditorynback/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -94,8 +96,10 @@ export const cognitiveCatalog = {
   'logicdeduce': task42,
   'seriescomplete': task43,
   'pursuitrotor': task44,
-  'visualwm': task45,
-  'maze': task46,
-  'auditoryrt': task47,
-  'auditorynback': task48,
+  'readingcomp': task45,
+  'proofread': task46,
+  'visualwm': task47,
+  'maze': task48,
+  'auditoryrt': task49,
+  'auditorynback': task50,
 }
