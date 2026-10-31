@@ -615,3 +615,21 @@ test('PR437 exact mixed scope and SAST reject unknown source and incorrect activ
  assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,f.env,{...f.b,enabled:false}));
  const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,f.read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
 });
+
+test('PR435 course Scale qualifier binds both consumers and rejects unknown scope',()=>{
+ const f=fixture(),paths=['server-version/backend/src/controllers/scaleController.ts','server-version/frontend/src/training/courseAssessments.ts'];
+ f.b.pr=435;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'435',CI_HEAD_REF:BRANCHES[435]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,435);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'436'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+test('PR436 course Cognitive qualifier binds both consumers and rejects unknown scope',()=>{
+ const f=fixture(),paths=['server-version/backend/src/modules/cognitive/cognitive.controller.ts','server-version/frontend/src/training/courseAssessments.ts'];
+ f.b.pr=436;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'436',CI_HEAD_REF:BRANCHES[436]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,436);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});

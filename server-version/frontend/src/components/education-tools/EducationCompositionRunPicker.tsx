@@ -61,7 +61,7 @@ function RunPickerSession({api,entry,organizationId,actorKey,endpoint,expectedVe
     setChoice(value);setError('')
    }}/>}
   {choice&&<p>{choice.title} · 修订 {choice.sourceRevision} · {compositionAdministrationLabel(administration??undefined)}</p>}
-  {entry==='SCHOOL'&&choice?.groupReporting&&<p>此固定新版本已明确配置群体披露，汇总最少 {choice.groupReporting.minimumRespondents} 人；本人报告仍遵守原有指标与开放时机。加入批次不会增加角色访问权限。</p>}
+  {choice?.groupReporting&&<p>此固定新版本已明确配置群体披露，汇总最少 {choice.groupReporting.minimumRespondents} 人；本人报告仍遵守原有指标与开放时机。加入批次不会增加角色访问权限。</p>}
   {administration?.responseMode==='PARENT_REPORT'&&<p>受评对象为本批次学生，系统按当前有效亲子关系分配家长作答，并保留同意要求。作答不自动开放学生个人报告。</p>}
   {needsHomeroom&&<label><input type="checkbox" checked={homeroom} disabled={disabled||writing||needsReview} onChange={event=>setHomeroom(event.target.checked)}/>仅分配给受评学生的当前班主任</label>}
   {needsReview?<button type="button" disabled={writing} onClick={()=>void review()}>重新读取并核对任务</button>:

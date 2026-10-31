@@ -7192,6 +7192,845 @@
         "backend": "29b86b19038c196aa5b2728f5e33579a8ba56ee5",
         "frontend": "dfdc072b45a35f04261c807c72a89021f5c9aa1b"
       }
+    },
+    "446": {
+      "schemaVersion": 1,
+      "pr": 446,
+      "enabled": true,
+      "base": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+      "product": "fd1e53da167d2b728262891924b41ae20d02b14b",
+      "controlCheckpoint": "75d58dd50f0e72e90dd3dcb3b97b85a0466706d8",
+      "source": {
+        "docs/development/group-report-source-matrix-20261030.md": {
+          "before": "67455c38854545871385d4dd177861c688843764",
+          "after": "3857883e61d07c12ccb0e352c6eece6f56b3d005"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/README.md": {
+          "before": null,
+          "after": "25aa0d661bdb1461cc3afbd7f9ea79df11729e72"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types-before-budget.json": {
+          "before": null,
+          "after": "1cfee6475cbe0425329bfa6f4aa70265b7a9b7c3"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types-before-budget.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types-before-library.json": {
+          "before": null,
+          "after": "9b61aec10ec903e90be7aa6846738683596a27ba"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types-before-library.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types-first.json": {
+          "before": null,
+          "after": "cf6057b5f137ba60dcc2627861339b4b75af5f4e"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types-first.log": {
+          "before": null,
+          "after": "f3758f44d71d64ef6266ff3c10f2e51432c7c011"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types-parent-budget.json": {
+          "before": null,
+          "after": "9c9b21b6af1cce83993df4000fde88655121460f"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types-parent-budget.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types.json": {
+          "before": null,
+          "after": "6dbf5512538e6a48fe2b135661f9e2fbc8ecc60b"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/candidate-tree.json": {
+          "before": null,
+          "after": "25449b2cf70f4a9d806965e9c1268b2b4f2db926"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/disclosure-budget-first.json": {
+          "before": null,
+          "after": "d15897279133bc06db736a3408a7ffe11efe9b7f"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/disclosure-budget-first.log": {
+          "before": null,
+          "after": "d121e3c6f7b8b17e9b3ec6ef7e2e46d6b89d737d"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/disclosure-budget-unmodified-invocation.json": {
+          "before": null,
+          "after": "611bac5b13630fb956c9cade7eac494922786fc3"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/disclosure-budget-unmodified-invocation.log": {
+          "before": null,
+          "after": "d121e3c6f7b8b17e9b3ec6ef7e2e46d6b89d737d"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/disclosure-budget.json": {
+          "before": null,
+          "after": "5b52ccbf7d20f51156335f92c0366c3dcf71a4b0"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/disclosure-budget.log": {
+          "before": null,
+          "after": "1a2e1b4e59be181318a6618efe6dcdea50de4be9"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/frontend-original-native.json": {
+          "before": null,
+          "after": "6ad5112feed2504eee2497dad116c3709d973c9e"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/frontend-original-native.log": {
+          "before": null,
+          "after": "86ae4b00d03ba32fdf986442150ea0109f12a2e9"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/frontend-types-before-library.json": {
+          "before": null,
+          "after": "5918f117568ac1d5ab50f9b45da5558cfcf61007"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/frontend-types-before-library.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/frontend-types.json": {
+          "before": null,
+          "after": "17e9a52193db40034ee39163ddb84abd6b996d84"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/frontend.json": {
+          "before": null,
+          "after": "79f51e237bafffcfb0d17d27eb7b045c740a2612"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/frontend.log": {
+          "before": null,
+          "after": "86ae4b00d03ba32fdf986442150ea0109f12a2e9"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/internal-producer-postgres.json": {
+          "before": null,
+          "after": "ddb41c50a922425688709a9cbaf324c94c8a162d"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/internal-producer-postgres.log": {
+          "before": null,
+          "after": "ae8f990ee15ab862ea9564c7b4c5bf314ac77bde"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/internal-producer-proof.json": {
+          "before": null,
+          "after": "ea73d5c84aedb95cd78942f19735a7c3e5a60f73"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/library-policy-postgres-before-read-reuse.json": {
+          "before": null,
+          "after": "37c5f1654efeb475cfff73498e9b856b56898cab"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/library-policy-postgres-before-read-reuse.log": {
+          "before": null,
+          "after": "8b47dad38351ebbf32be482234def06785a41b31"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/library-policy-postgres.json": {
+          "before": null,
+          "after": "9f3281eadc0cc63a8074e6986d14cf42bb5b3244"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/library-policy-postgres.log": {
+          "before": null,
+          "after": "8b47dad38351ebbf32be482234def06785a41b31"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/library-policy-proof.json": {
+          "before": null,
+          "after": "961938f18c5d5e91635395844140822ab5d13d4e"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/library-unit-before-read-reuse.json": {
+          "before": null,
+          "after": "a37def06322fd214a907a62343fa29dac39d1416"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/library-unit-before-read-reuse.log": {
+          "before": null,
+          "after": "70ca3aa63d800d3695f121e9ceb69bb712f0fa90"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/library-unit.json": {
+          "before": null,
+          "after": "ec39b96845b75860f740f1803daf880bd5595059"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/library-unit.log": {
+          "before": null,
+          "after": "70ca3aa63d800d3695f121e9ceb69bb712f0fa90"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/own-feedback.json": {
+          "before": null,
+          "after": "288d3b44e4ee0bf07e74a0f87683a0228c491de1"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/postgres-first-own.json": {
+          "before": null,
+          "after": "79a05efbdc0eef397b32ed07a48d246884f47d43"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/postgres-first-own.log": {
+          "before": null,
+          "after": "df922a17090d8191609885c61e9aaaedbb71850b"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/postgres-fixture-parent-finalization.json": {
+          "before": null,
+          "after": "74939a43ef412d099521ee6fb0b7e31f8a25e140"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/postgres-fixture-parent-finalization.log": {
+          "before": null,
+          "after": "df922a17090d8191609885c61e9aaaedbb71850b"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/postgres.json": {
+          "before": null,
+          "after": "4ef46ed7693adc6c2f633f3bddfd4736ee3efd92"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/postgres.log": {
+          "before": null,
+          "after": "df922a17090d8191609885c61e9aaaedbb71850b"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/proof.json": {
+          "before": null,
+          "after": "1c3381c9bc5e8f2ccfea61e68a079bba849ecd20"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/raw-sha256.json": {
+          "before": null,
+          "after": "380681430f21aa028f8327c8f7b48b551b6f93b3"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/unit-initial.json": {
+          "before": null,
+          "after": "d07fd92ec77179bd9a9e9bda30463cd24de65721"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/unit-initial.log": {
+          "before": null,
+          "after": "8ee91531a6905b8869e84d05d433cbbbe5d331d3"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/unit.json": {
+          "before": null,
+          "after": "e9439e6ce32d434adf1de061b40157c25bdd6dbe"
+        },
+        "docs/evidence/teacher-private-composition-group-20261031/unit.log": {
+          "before": null,
+          "after": "8ee91531a6905b8869e84d05d433cbbbe5d331d3"
+        },
+        "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts": {
+          "before": "456dc2d702e1ff1042a5e76eb34f82d708d279c0",
+          "after": "380e64c34154b4a8ad2360cd035bfd84f999db84"
+        },
+        "server-version/backend/src/__tests__/huiteacher/private-composition-group.test.ts": {
+          "before": null,
+          "after": "3e7e4c6d4223a963efd179fd892469100c19cb3e"
+        },
+        "server-version/backend/src/__tests__/huiteacher/private-composition-library-group.test.ts": {
+          "before": null,
+          "after": "08399c1d49cea066193d12ffc165feb0f9c3bf39"
+        },
+        "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts": {
+          "before": null,
+          "after": "47b32407078ea28a7ad8999ce02f5984ecffea84"
+        },
+        "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts": {
+          "before": "4fdf0edd8f92ce9535f578532ba974bdaabb6a88",
+          "after": "be733fd3f4b6d1c54a71f4a08bbd8fdfedc37a72"
+        },
+        "server-version/backend/src/modules/assessment-run/registeredResources.ts": {
+          "before": "92620c06f54e300b4a3b487d9c2de8fafe34db00",
+          "after": "ade4f142274536ea0af0288f83da5f1d85a50d86"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts": {
+          "before": "e6ca152d5b956467b3956e54c5838a920018b72e",
+          "after": "8607d6c591b14cd4226b18c7d8c64b5260d07ca0"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts": {
+          "before": "bfc9826ca5feabd76139a86684cdaf2e4b44d3dd",
+          "after": "839bcfa0d5b22816525ffd97bed6a491968a9da9"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts": {
+          "before": "d312d518b5932120ff12ccff7a807c40921b1822",
+          "after": "143186aa80b8e939bc5160e3a8df8602d4bbda19"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.run-adapter.ts": {
+          "before": "c3fba6056f5b5fe460b324a225cc3eaa78385181",
+          "after": "0670e324adc6835b911c7043fab39ef1fef97fef"
+        },
+        "server-version/backend/src/modules/education-tools/private-tool.service.ts": {
+          "before": "aaba755e7f86ac974921fb0d573a341b1e525f60",
+          "after": "4438398665fd122787ed93e139d7f1a357612b5a"
+        },
+        "server-version/backend/src/modules/education-tools/school-private-group-history.ts": {
+          "before": "8824f5e01b0177737c555c72a056fb130fce2f3b",
+          "after": "06d20bd8af63bbcc4c78427f10a0866a4e9a66ab"
+        },
+        "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts": {
+          "before": "48ed9795ce910a200e8fa989575d784f65fceab1",
+          "after": "e4f90296b61fd089df6f80fa53b79a80257f02c0"
+        },
+        "server-version/backend/src/modules/education-tools/school-private-group-selection.ts": {
+          "before": "8aa1f68333be8917abc83ef558a26e929aa3a05e",
+          "after": "7399e80b16bbe3c0e03b26192c41a2cb77d692d1"
+        },
+        "server-version/backend/src/modules/education-tools/school-private-group-source.ts": {
+          "before": "bb71a5dfc72503e0187a1976917376af7cdb0bfe",
+          "after": "060805ffbcce8663c2810f2926c5234029a145f8"
+        },
+        "server-version/backend/src/modules/education-tools/teacher-composition-group-source.ts": {
+          "before": null,
+          "after": "3d902625f873c554a0750c00bb38e481da7328aa"
+        },
+        "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts": {
+          "before": "4da99570b7216369dca231ac490d78bcfd24d096",
+          "after": "931ffc9de587c7a5f3e51ad6bdefef379482fd84"
+        },
+        "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts": {
+          "before": "37f4b07c78a1888572c4b99ba7c73f65a954537f",
+          "after": "e74933f0398d1bec20dab48eaeb73c017a91721f"
+        },
+        "server-version/backend/src/modules/reporting/resultSource.ts": {
+          "before": "c2276ceb6104edd3e4f61de5b353f564b41abfd4",
+          "after": "e0bc7a9c6a25466eab1a4d850e3495cfd8fb2a37"
+        },
+        "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx": {
+          "before": "b0027659dd955ec0a46929041e8fd0354683a2eb",
+          "after": "961afdc32fbedb1d4ea9da570d7749cb31cfe75b"
+        },
+        "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx": {
+          "before": "a0d513e443be21d36d455a22ab7333a07751a671",
+          "after": "5b4e19cadbcb9a950c2f013f4bcf656e861b6ee8"
+        },
+        "server-version/frontend/src/components/education-tools/EducationCompositionTeacherGroup.test.tsx": {
+          "before": null,
+          "after": "080345e7613833814382ecffe0b6b5f5f296f3d2"
+        },
+        "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx": {
+          "before": "8269e11f22e20a509357f9f31c840e178e3ca574",
+          "after": "5dbe007473bd12ee100b1c4baddd0f46035327dc"
+        },
+        "server-version/frontend/src/components/education-tools/educationCompositionClient.ts": {
+          "before": "77361f09189ae603b683a193c95ba7d72985e381",
+          "after": "aa76c4b7559683bc98932adee4e5852bb07fc245"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "3ce7405872c806f5a610d14bda018cf1bb58b713",
+        ".github/scripts/onboarding-checks.mjs": "cc7166462dd9628ff5371cae3aaade12c9bdac9d",
+        ".github/scripts/onboarding-controls.test.mjs": "8eeee7b90d75eb34b746f020d1df1819f06a39a2",
+        ".github/scripts/onboarding-evidence.json": "c5c64355f72aba38ba893796e18d053e196191ef",
+        ".github/scripts/onboarding-scope.mjs": "fcbfcf1b0a9afbe091e0a506a081b953a47be2b2",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "4f58224d30c563d6da1f87e72ff19d0c0f94f241"
+      },
+      "components": {
+        "backend": "458a4d8ccaa6a79f083f0c4205f29fab36c2c931",
+        "frontend": "97b0f40bd6787dfed20097ec0519881c9afe42dd"
+      }
+    },
+    "435": {
+      "schemaVersion": 1,
+      "pr": 435,
+      "enabled": true,
+      "base": "555f705dd272f0ee9c7ac0d80770010d2d6e9675",
+      "product": "6f70016bd93392990dff07833029c1361538e691",
+      "controlCheckpoint": "cd5f5219615785c70b9c47d82c969e5aa5654d61",
+      "components": {
+        "backend": "5cbbc96236eb7787b0e31da27a2ed06ece2b2bf2",
+        "frontend": "4c7fb5a4a8c25475052fae1b567affb42d09487c"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "48e295822e845d0415740534b5552311c12e618c",
+        ".github/scripts/onboarding-checks.mjs": "5ab5e744ed62c1a7939ffa285ed8335e8f43f263",
+        ".github/scripts/onboarding-controls.test.mjs": "8eeee7b90d75eb34b746f020d1df1819f06a39a2",
+        ".github/scripts/onboarding-evidence.json": "630df9386423f3c4a6482c8c9d9b22c92a7ab12d",
+        ".github/scripts/onboarding-scope.mjs": "558c5618c28f6995607a394afc7e7efaf0d723eb",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "dadc0aa76b32da9e09be922da563ad2f8e9ac597"
+      },
+      "source": {
+        "docs/performance/course-scale-scope-20261031/README.md": {
+          "before": null,
+          "after": "0a83953281048582d3884c01e563ad91fac524e5"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline-execution.json": {
+          "before": null,
+          "after": "8339b37268e10e2ef2c8245458d85794196ed84f"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline.json.gz": {
+          "before": null,
+          "after": "831a62c74e4725ce1c1441b307074d0d14ec1a16"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline.log.gz": {
+          "before": null,
+          "after": "9066fe6f73ecaa40aeb22786df23e61c8b9ac544"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline.ndjson.gz": {
+          "before": null,
+          "after": "2366dfa2e54bd50d2f43fdb268487d0b06178d02"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate-execution.json": {
+          "before": null,
+          "after": "4f60b0b48fa076678d20b69dc25ebb086b0c00af"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate.json.gz": {
+          "before": null,
+          "after": "de7568cb0447ebd1ba900ba39e1611a850083d33"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate.log.gz": {
+          "before": null,
+          "after": "e21737cbd1193f207aefeafdf44b73e4f599726b"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate.ndjson.gz": {
+          "before": null,
+          "after": "e2ee11d9e3f6cbf231ceab0c79dc49d5896edfff"
+        },
+        "docs/performance/course-scale-scope-20261031/concurrent-pr-inventory.json": {
+          "before": null,
+          "after": "a1ede9dba48c37b34cb4bd626e1e9d8ffcafcfa8"
+        },
+        "docs/performance/course-scale-scope-20261031/environment.json": {
+          "before": null,
+          "after": "f8f4b56653f7614de1a1bf8afc0aca37a1a8f030"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/README.md": {
+          "before": null,
+          "after": "85b1a4b8ff05c3f725da15175b5a18976ae4415d"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.json": {
+          "before": null,
+          "after": "90c8c27cdccf3167392f4cc4707b06daedd9315d"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader-execution.json": {
+          "before": null,
+          "after": "b2a543e9c1179abcae15a741c65b5dfa66914977"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader.json": {
+          "before": null,
+          "after": "ff926788b6c99acd8911631df6f277830bc3a6b2"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader.log": {
+          "before": null,
+          "after": "ca11fd69b006dab6f37f77cacfc2674ce370b0c4"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/control.log": {
+          "before": null,
+          "after": "fb9c64ca49ca4e7698c6171b66c3670d04edb6b4"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.json": {
+          "before": null,
+          "after": "bd3d0d83bfa9c65d8ad915ee80cd0ed9f57d852d"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/backend-types.json": {
+          "before": null,
+          "after": "4c146d8ad1338cf120df46a576ce2dd294597381"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/frontend-types.json": {
+          "before": null,
+          "after": "a1149b2399c41abc44bc9cb9a59fa912c833f133"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/prisma-generate.log": {
+          "before": null,
+          "after": "6aba1933358004ae2ec91061951c59ab364c0047"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/run-types.py": {
+          "before": null,
+          "after": "7447e5110271a4f0e672699a197be5fb3172e83f"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-baseline-execution.json": {
+          "before": null,
+          "after": "e8449eeebfffc3174303f3f22cc78eddff080aa3"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-baseline.json.gz": {
+          "before": null,
+          "after": "51af745a8e9a5a2e442e0e264fc0066360fe6d1d"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-baseline.log.gz": {
+          "before": null,
+          "after": "14ad236f39f7933c83ff7ee972d6e16c622bca82"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-candidate-execution.json": {
+          "before": null,
+          "after": "995be24db44bb9f05617a5fcfce11b7247cc55f4"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-candidate.json.gz": {
+          "before": null,
+          "after": "44693a994a4d56a34ab9c191a9598300497c94b6"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-candidate.log.gz": {
+          "before": null,
+          "after": "88400bb356fc67da475363014d45b9055a617917"
+        },
+        "docs/performance/course-scale-scope-20261031/measurements.json": {
+          "before": null,
+          "after": "21b33092a801fbb0a3d834ac313cc8096624c59f"
+        },
+        "docs/performance/course-scale-scope-20261031/original-files.json": {
+          "before": null,
+          "after": "def71a381fcb0f5cfb4c6a428d6a68176adf15b6"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/README.md": {
+          "before": null,
+          "after": "98b919cd353f812b9a0ebc57493789e448130c1b"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/backend-types.json": {
+          "before": null,
+          "after": "371cfcdf50519e56d5784f53f07a71b5bbae0079"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/control.log": {
+          "before": null,
+          "after": "d23ec934b6a2bc09713cf3c454a1f2aeeb4efb0a"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/frontend-types.json": {
+          "before": null,
+          "after": "5160842ad7d91e87566826e1ffe1bb9098af45f5"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/source-and-reuse.json": {
+          "before": null,
+          "after": "91658ad69ba35c9e397b523177226eb3a17f1055"
+        },
+        "docs/performance/course-scale-scope-20261031/run-recorded-tests.py": {
+          "before": null,
+          "after": "609353e336be4c4e4011a5a776fc69b534c2d175"
+        },
+        "docs/performance/course-scale-scope-20261031/selected-evidence.json": {
+          "before": null,
+          "after": "8cf0ea4e5db46a0acb1c341710f78af5d6c49c26"
+        },
+        "docs/performance/course-scale-scope-20261031/types/backend.json": {
+          "before": null,
+          "after": "361d1d5b99ae53fd81e1b1256ff76a6b9f585b4a"
+        },
+        "docs/performance/course-scale-scope-20261031/types/backend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/types/frontend.json": {
+          "before": null,
+          "after": "af321f1cc3a60f86e87325e720e74c7b41d08d87"
+        },
+        "docs/performance/course-scale-scope-20261031/types/frontend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/types/run-typecheck.py": {
+          "before": null,
+          "after": "e4c1167b420860df0321b4fed958bd883dc0e80b"
+        },
+        "server-version/backend/src/__tests__/scale/available-course.test.ts": {
+          "before": null,
+          "after": "d01714398f65a6de15b48202be40933cb5b75681"
+        },
+        "server-version/backend/src/controllers/scaleController.ts": {
+          "before": "dd670ed292d383ee99212be449e5c464c38c503e",
+          "after": "3581dda4beb1e896c2202e805b1afcdc0a97b1c2"
+        },
+        "server-version/frontend/src/training/courseAssessments.test.ts": {
+          "before": "bee8e8e441aa7e197ba059af076b88ff990ac05d",
+          "after": "6cfe249badd2f7d18e84c03cd1899564b901f20c"
+        },
+        "server-version/frontend/src/training/courseAssessments.ts": {
+          "before": "f351e2f31c9728f237e5c8a72cb02a33a3e137a7",
+          "after": "4031e1c16be17a4a34b636fcfe8326202ca4a963"
+        }
+      }
+    },
+    "436": {
+      "schemaVersion": 1,
+      "pr": 436,
+      "enabled": true,
+      "base": "093d86e842da12d443301fd4a37d5d046ecb9185",
+      "product": "c7394094623ababb39d88ab779644452b51f5780",
+      "controlCheckpoint": "cca169aadc698d4b15656e9cda258af7f5107e4d",
+      "components": {
+        "backend": "7c990d88802f0bdf924195a30b2b8ebd631ffb47",
+        "frontend": "1bc73a4eaa881fbff76ebbe4fb4f8567c51aa430"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "8747311744f1480a977743b1b74b2e5ae624c652",
+        ".github/scripts/onboarding-checks.mjs": "2695cb606f93afe1758ccaa3f6c8311e37da2a05",
+        ".github/scripts/onboarding-controls.test.mjs": "1f3bd2a13bcfa19b69421eb7bde7da4ec137f2cd",
+        ".github/scripts/onboarding-evidence.json": "da6e78ada84ee3b22a9e2ee1b5e6ced0756d890e",
+        ".github/scripts/onboarding-scope.mjs": "f516e9ccc017b0d550fca3b059676fa32e7e4a07",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "1597a1da3f4d2539ca72e337c12d9fa1a37a88d3"
+      },
+      "source": {
+        "docs/performance/cognitive-course-scope-20261031/README.md": {
+          "before": null,
+          "after": "0655e6a34ff46432b2fc41f3f978ab66146ddc30"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-baseline-execution.json": {
+          "before": null,
+          "after": "a010a3a7e5c94d41172cb3a3ee61a61791cc9f05"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-baseline.json.gz": {
+          "before": null,
+          "after": "519b39bfbcb7e1f58eed3b3f77c231c9618a3738"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-baseline.log.gz": {
+          "before": null,
+          "after": "324c3327962ffdc8443e9b83ecc79dbe5db29f89"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-baseline.ndjson.gz": {
+          "before": null,
+          "after": "f468554e57a8b1bceded8142d5e7cfb820fafe15"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-candidate-execution.json": {
+          "before": null,
+          "after": "b4a3858025ebb252d7586182a9c590a23947a5e3"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-candidate.json.gz": {
+          "before": null,
+          "after": "f364abda423393ea5622f43800e4167281ca1e60"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-candidate.log.gz": {
+          "before": null,
+          "after": "f0465be6fe61347a45c79b667c3fc0918a8ef186"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-candidate.ndjson.gz": {
+          "before": null,
+          "after": "a7a01da39f92e4a8b87ed402eb9d2f65e87b8ca9"
+        },
+        "docs/performance/cognitive-course-scope-20261031/concurrent-pr-inventory.json": {
+          "before": null,
+          "after": "b74c1b439a6a6d05417163dc2573adf96aabfcf7"
+        },
+        "docs/performance/cognitive-course-scope-20261031/environment.json": {
+          "before": null,
+          "after": "3dffe891f0756249329ea4a96c6c5c326821b4ba"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/README.md": {
+          "before": null,
+          "after": "dc46bd0ae8fc9fec1ab7a27cc30fba22958b702b"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/backend-types-interrupted.json": {
+          "before": null,
+          "after": "c49be47e0ae8700ac81e8950edbea608a89578ce"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/backend-types-interrupted.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/backend-types.json": {
+          "before": null,
+          "after": "71e3b0da145a1154c016eb859d142ae6e6475624"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/combined-loader-execution.json": {
+          "before": null,
+          "after": "5d439b36bb02df1163f7e79c362735a9b4caced3"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/combined-loader.json": {
+          "before": null,
+          "after": "499a2927fac97b05bc7b65d08e020c0bbe1a021b"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/combined-loader.log": {
+          "before": null,
+          "after": "cd7c516abe8a14f184857869d3b77285eb408a5d"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/control.log": {
+          "before": null,
+          "after": "d4553dcc8ef87e61f3250ced4769be1bb2a847f0"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/frontend-types.json": {
+          "before": null,
+          "after": "45514a0cc9d8b7a27226b7462afe38b2bbcf52ef"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/run-types.py": {
+          "before": null,
+          "after": "f7a9bf3d2c21d07d0116766011f412e6d4322a85"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/triple-loader-execution.json": {
+          "before": null,
+          "after": "030ff6e29002f88990162d7b2fb201d918210c5a"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/triple-loader.json": {
+          "before": null,
+          "after": "6240ef3e869e8cf7fa9877df5588093e7f1cf2a9"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/triple-loader.log": {
+          "before": null,
+          "after": "ead9e6b476a7f70fa1798525e008841b44b5870c"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-baseline-execution.json": {
+          "before": null,
+          "after": "3a57917d937dc68e0eb4bcc706bb3313a446f09d"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-baseline.json.gz": {
+          "before": null,
+          "after": "a54b5f8195c7819b8495e11ee6495d8ff004ac94"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-baseline.log.gz": {
+          "before": null,
+          "after": "bb984ae4932a9ddb514ae1732da437681744ec44"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-candidate-execution.json": {
+          "before": null,
+          "after": "e8c8195b9aff0b22933d2a1ef5e0bbd58f800fa0"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-candidate.json.gz": {
+          "before": null,
+          "after": "f33afee11f55897f11a2849dd6da9d92aacf84f7"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-candidate.log.gz": {
+          "before": null,
+          "after": "2500681785be1450949d8775b24ecfcaf6cba3d0"
+        },
+        "docs/performance/cognitive-course-scope-20261031/measurements.json": {
+          "before": null,
+          "after": "b395ec742992c74cbfca4d5d9e446d35dc30f23a"
+        },
+        "docs/performance/cognitive-course-scope-20261031/original-files.json": {
+          "before": null,
+          "after": "fa18267287dbac3f4dc3838923c55de1a6749309"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/README.md": {
+          "before": null,
+          "after": "c23c05859e334161b26df6c316464ba1b80d7cb6"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/backend-types.json": {
+          "before": null,
+          "after": "90ceb468019f6611a28d9da9eeb07e7d176a890d"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/control.log": {
+          "before": null,
+          "after": "5ef35b7b3ab16df3d217567c16e7ba1280046987"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/frontend-types.json": {
+          "before": null,
+          "after": "5e2df6ca1f57e82c3c3d9df561bf8fa8590e75b9"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/source-and-reuse.json": {
+          "before": null,
+          "after": "d70959585eddfd8fa7dda15518bf7d3cf336d8eb"
+        },
+        "docs/performance/cognitive-course-scope-20261031/run-recorded-tests.py": {
+          "before": null,
+          "after": "dbcd6eb396233b27fe73ce84bcb08bf1313b5974"
+        },
+        "docs/performance/cognitive-course-scope-20261031/selected-evidence.json": {
+          "before": null,
+          "after": "bbf9f09aca7d9ba74f9877b2fce88c42dca7091a"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/backend.json": {
+          "before": null,
+          "after": "ed6401aa60ac86bb368ab14b7444f418b403c8de"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/backend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/frontend.json": {
+          "before": null,
+          "after": "deb6164444bc2236338d63cae1cd79868a850917"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/frontend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/run-typecheck.py": {
+          "before": null,
+          "after": "2c9b5730a64a3c12b2abe7767758444ed733f107"
+        },
+        "server-version/backend/src/__tests__/cognitive/assignment-course-scope.test.ts": {
+          "before": null,
+          "after": "07676867121e955026c25f85c1dcc3f36da49e10"
+        },
+        "server-version/backend/src/modules/cognitive/assignment.service.ts": {
+          "before": "997b34b1227b541886cfd21114ce7ce550fdf758",
+          "after": "7db7649ce01caa446f45c306ae11ee244c92a913"
+        },
+        "server-version/backend/src/modules/cognitive/cognitive.controller.ts": {
+          "before": "e3ef01da098b1d4786700c2b59f327c08c92f79f",
+          "after": "9286aa46960c2da068895f794c8697df0f29ab37"
+        },
+        "server-version/frontend/src/modules/cognitive/__tests__/api.test.ts": {
+          "before": "978a7915b93b98d13312db95cfec9453661806c7",
+          "after": "c90f782ecf00b56e27382e81efdba6653c783082"
+        },
+        "server-version/frontend/src/modules/cognitive/api.ts": {
+          "before": "da26af7129e7f09bea9f34142a67958d963dcbd1",
+          "after": "3d7d4c64b1769ebcb3951424076cc819d82b5a2d"
+        },
+        "server-version/frontend/src/training/courseAssessments.test.ts": {
+          "before": "6cfe249badd2f7d18e84c03cd1899564b901f20c",
+          "after": "d5abc8e32338e9574a4176dcb8cfd36315a448b5"
+        },
+        "server-version/frontend/src/training/courseAssessments.ts": {
+          "before": "4031e1c16be17a4a34b636fcfe8326202ca4a963",
+          "after": "f03774c77209ee32a37eea8df2971309d03fbe23"
+        }
+      }
     }
   }
 }
