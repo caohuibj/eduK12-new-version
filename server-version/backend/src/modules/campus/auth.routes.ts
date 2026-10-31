@@ -27,6 +27,10 @@ const changeSchema = z.object({
   newPassword: z.string().min(8).max(PASSWORD_MAX_LENGTH).refine(isValidPassword),
 }).strict()
 const DUMMY_HASH = '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2ZPql.a'
+const schoolUserProjection = (user: { id: string; role: string; mustChangePassword: boolean }, loginName: string) => ({
+  id: user.id, username: loginName, role: user.role, accountDomain: 'SCHOOL' as const,
+  mustChangePassword: user.mustChangePassword,
+})
 const router = Router()
 router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() })
 
@@ -80,7 +84,7 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
     })
     setSchoolSessionCookie(req, res, token)
     return success(res, {
-      user: { id: u.id, username: match.loginName, role: u.role, accountDomain: 'SCHOOL' },
+      user: schoolUserProjection(u, match.loginName),
     }, '登录成功')
   } catch (cause: any) {
     if (isBoundedAdmissionBusyError(cause)) res.setHeader('Retry-After', String(cause.retryAfterSeconds))
@@ -150,11 +154,9 @@ router.get('/me', authenticateSchool, async (req, res) => {
     where: { userId: req.user!.userId }, select: { loginName: true },
   })
   if (!account) return unauthorized(res, '校园账号不存在')
-  return success(res, {
-    id: req.user!.userId, username: account.loginName,
-    role: req.user!.role, accountDomain: 'SCHOOL',
-    mustChangePassword: req.user!.mustChangePassword,
-  })
+  return success(res, schoolUserProjection({
+    id: req.user!.userId, role: req.user!.role, mustChangePassword: req.user!.mustChangePassword,
+  }, account.loginName))
 })
 
 router.post('/logout', authenticateSchool, async (req, res) => {
