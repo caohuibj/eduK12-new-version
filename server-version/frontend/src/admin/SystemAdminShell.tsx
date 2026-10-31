@@ -1,7 +1,7 @@
 import {useEffect,useRef,useState,type ReactNode} from 'react'
 import {Link,useLocation} from 'react-router-dom'
 import {ShieldCheck,KeyRound,LibraryBig,ClipboardCheck,FileCheck,LogOut,Moon,Sun} from 'lucide-react'
-import {SYSTEM_HOME,SYSTEM_SURVEY_AUDIT} from './systemWorkspace'
+import {SYSTEM_HOME,SYSTEM_SURVEY_AUDIT,SYSTEM_COGNITIVE_INTAKE} from './systemWorkspace'
 import './system-admin.css'
 const themeKey='eduk12:system-admin:theme:v1'
 function initialTheme():'light'|'dark'{try{const saved=localStorage.getItem(themeKey);if(saved==='light'||saved==='dark')return saved}catch{/* Device preference is optional. */}return typeof window.matchMedia==='function'&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
@@ -12,6 +12,7 @@ export default function SystemAdminShell({children,username,loggingOut,onLogout}
  const links=[{path:'/admin/permissions',label:'管理授权',Icon:KeyRound,active:pathname==='/admin/permissions'||pathname===SYSTEM_HOME},
   {path:'/admin/scale-library-governance',label:'工具库治理',Icon:LibraryBig,active:['/admin/scale-library-governance'].includes(pathname)},
   {path:'/admin/reporting-content',label:'报告内容',Icon:FileCheck,active:pathname==='/admin/reporting-content'},
+  {path:SYSTEM_COGNITIVE_INTAKE,label:'认知入库',Icon:LibraryBig,active:pathname===SYSTEM_COGNITIVE_INTAKE},
   {path:SYSTEM_SURVEY_AUDIT,label:'数据审计',Icon:ClipboardCheck,active:[SYSTEM_SURVEY_AUDIT,'/admin/survey-system'].includes(pathname)}]
  return <div className="hui-app system-admin-shell" data-system-theme={theme}>
   <a className="system-skip" href="#hui-main">跳至主要内容</a>

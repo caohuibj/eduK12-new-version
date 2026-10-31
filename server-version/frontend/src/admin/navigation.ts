@@ -1,4 +1,4 @@
-import {SYSTEM_HOME,SYSTEM_SURVEY_AUDIT} from './systemWorkspace'
+import {SYSTEM_HOME,SYSTEM_SURVEY_AUDIT,SYSTEM_COGNITIVE_INTAKE} from './systemWorkspace'
 import type {User} from '../types'
 import type {NavigationItem} from '../components/app-shell/navigation'
 import {businessRoleLabel,entryLabels,entryPaths,hasAdminEntry,type AdminEntry} from './authority'
@@ -6,7 +6,7 @@ import {businessRoleLabel,entryLabels,entryPaths,hasAdminEntry,type AdminEntry} 
 export const isAdminWorkspacePath=(path:string)=>path.startsWith('/admin/')||['/users','/teacher-codes','/parent-accounts','/parent-tool-policies'].includes(path)
 export function adminNavigation(user:User|null):NavigationItem[]{
   if(!user)return []
-  if(user.platformRole==='SYSTEM_ADMIN')return [{path:SYSTEM_HOME,label:'系统工作台',section:'system'},{path:'/admin/permissions',label:'管理授权',section:'system'},{path:'/admin/scale-library-governance',label:'共享工具治理',section:'system'},{path:'/admin/reporting-content',label:'报告与内容审核',section:'system'},{path:SYSTEM_SURVEY_AUDIT,label:'数据审计',section:'system'}]
+  if(user.platformRole==='SYSTEM_ADMIN')return [{path:SYSTEM_HOME,label:'系统工作台',section:'system'},{path:'/admin/permissions',label:'管理授权',section:'system'},{path:'/admin/scale-library-governance',label:'共享工具治理',section:'system'},{path:'/admin/reporting-content',label:'报告与内容审核',section:'system'},{path:SYSTEM_COGNITIVE_INTAKE,label:'认知入库',section:'system'},{path:SYSTEM_SURVEY_AUDIT,label:'数据审计',section:'system'}]
   const items:NavigationItem[]=[{path:'/admin/entrances',label:'管理入口',section:'system'}]
   for(const entry of Object.keys(entryPaths) as AdminEntry[])
     if(hasAdminEntry(user,entry))items.push({path:entryPaths[entry],label:entryLabels[entry],section:'system'})
