@@ -5,7 +5,7 @@ import { mkdtempSync,mkdirSync,writeFileSync,rmSync,readFileSync } from 'node:fs
 import { join,dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { manifestDependencyOnly,dependencyScope,dependencyFile,imageMirrorOnly,frontendDependencyFilesOnly } from './dependency-scope.mjs';
-import { changedEntries,acceptanceFor,runnerPlan } from './content-scope.mjs';
+import { changedEntries,acceptanceFor,runnerPlan,frontendDependencyScope } from './content-scope.mjs';
 import { requiredChecks,failedChecks } from './merge-gate.mjs';
 const root='server-version/backend';
 const baseManifest={name:'fixture',version:'1.0.0',scripts:{test:'vitest run',build:'tsc'},engines:{node:'>=24.21.0 <25'},dependencies:{'proxy-addr':'^2.0.7'},devDependencies:{vitest:'^3.2.7'}};
@@ -126,6 +126,31 @@ test('frontend dependency selector never hides backend, runtime or control compa
   for(const file of ['server-version/backend/package-lock.json','server-version/backend/src/__tests__/api.test.ts','.github/workflows/ci.yml','server-version/frontend/src/api/client.ts','server-version/frontend/Dockerfile'])assert.equal(frontendDependencyFilesOnly([front,entry(file)]),false,file);
   assert.equal(frontendDependencyFilesOnly([]),false);
 });
+test('frontend version lock source and sibling tests use full frontend checks without narrow evidence',()=>fixture(({base,put,commit,git})=>{
+  const front='server-version/frontend/';
+  const next=lock(baseManifest);next.packages['node_modules/source-map-js'].version='1.2.2';
+  put(front+'package-lock.json',next);
+  put(front+'src/school/SchoolStudentTasks.tsx','frontend fixture');
+  put(front+'src/school/SchoolTaskReadStates.test.tsx','sibling test fixture');
+  put(front+'src/modules/cognitive/Example.test.tsx','existing engine test fixture');
+  commit();
+  const entries=changedEntries(base);
+  assert.equal(frontendDependencyScope(entries,{base}),true);
+  const cli=new URL('./content-scope.mjs',import.meta.url).pathname;
+  const env={...process.env,CI_EVENT:'pull_request',CI_PR_REPOSITORY:'example/repo',GITHUB_REPOSITORY:'example/repo',CI_BASE_SHA:base,CI_FORCE_FULL:'',GITHUB_OUTPUT:''};
+  const selected=JSON.parse(execFileSync(process.execPath,[cli],{env,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+  assert.equal(selected.scenario,'dependencies');assert.equal(selected.dependencies_frontend_only,true);assert.equal(selected.frontend_affected,false);
+  const outputs=Object.fromEntries(Object.entries(selected).map(([key,value])=>[key,String(value)]));
+  for(const draft of [true,false])assert.deepEqual(requiredChecks({scope:{outputs}},draft),['scope','frontend-build','frontend','docker','codeql']);
+  for(const file of ['server-version/backend/package-lock.json','server-version/backend/src/modules/campus/group-reports.ts','package-lock.json','.github/workflows/ci.yml',front+'src/api/client.ts',front+'src/modules/cognitive/runner.ts']){
+    assert.equal(frontendDependencyScope([...entries,{file,status:'A',oldMode:'000000',newMode:'100644'}],{base}),false,file);
+  }
+  assert.equal(frontendDependencyScope([{...entries[0],newMode:'120000'},...entries.slice(1)],{base}),false);
+  assert.equal(JSON.parse(execFileSync(process.execPath,[cli],{env:{...env,CI_FORCE_FULL:'true'},encoding:'utf8',stdio:['ignore','pipe','pipe']})).scenario,'platform');
+  const bad={...baseManifest,scripts:{...baseManifest.scripts,test:'echo skipped'}};
+  put(front+'package.json',bad);commit();
+  assert.equal(frontendDependencyScope(changedEntries(base),{base}),false,'script changes retain the original route');
+}));
 test('frontend dependency workflow dispatch agrees with the aggregate and frontend-only image target',()=>{
   const ci=source('ci');
   for(const draft of [true,false]){
