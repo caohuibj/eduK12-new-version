@@ -8302,8 +8302,8 @@
       "pr": 449,
       "enabled": false,
       "base": "25cad994ec20b32b53ed8735c732143376536da0",
-      "product": "de3b0204a525ebd929282cd78624d23977ed0266",
-      "controlCheckpoint": "1253164cd0dafc21ed8f96873671b1d85b182066",
+      "product": "4edc87f8f0c58d6d754f9428b12ff09c1c57e206",
+      "controlCheckpoint": "ed0e5526f5087a3c9c67eaa9364d5b4425de163b",
       "source": {
         "docs/performance/teacher-group-ui-recovery-20261031/README.md": {
           "before": null,
@@ -8400,6 +8400,14 @@
         "server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx": {
           "before": "37f798c0aa2d9ef5227cc9787fda6faca338aba4",
           "after": "8d888dcd1cf26cfd0aa8c47aa0ad6e0798ef92a7"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types-node24.21.json": {
+          "before": null,
+          "after": "71e0b4ce3beb22a0898e809044c60a800679c677"
+        },
+        "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types-node24.21.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
         }
       },
       "controlBefore": {
