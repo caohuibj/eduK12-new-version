@@ -16,6 +16,7 @@ import {readTeacherOrdinaryFeedback} from '../../modules/reporting/education-ord
 import {listTeacherNumericGroups,generateTeacherNumericGroup,readTeacherNumericGroup} from '../../modules/huiteacher/numericGroupReport.service'
 import {createPlatformReportingSpec,reviewPlatformReportingSpec,publishPlatformReportingSpec} from '../../modules/reporting/spec'
 import {setReportingPayloadMaterializationObserverForTests} from '../../modules/reporting/resultSource'
+import {readTeacherCompositionLibraryGroupChoices} from '../../modules/education-tools/teacher-composition-group-source'
 
 const url=integrationDatabaseUrl('TEACHER_PRIVATE_GROUP_DATABASE_URL')
 if(url)requireIsolatedReleaseDatabase(url)
@@ -94,3 +95,18 @@ it.skipIf(!url)('publishes a new Teacher private GROUP composition, retains own 
  writeFileSync(file,JSON.stringify({...checkpoint,artifactId:result.artifactId}))
  if(process.env.TEACHER_PRIVATE_GROUP_PROOF)writeFileSync(process.env.TEACHER_PRIVATE_GROUP_PROOF,JSON.stringify({passed:true,ownFeedbackBelowGroupN:true,completedParents:10,newFinalsThisContinuation:submittedFinals,groupValidN:10,mean:1,sdSample:0,readCanonicalMaterializations:materializations,historyPointer:true,sourceRegistryOrResultMock:false,productionAccessed:false},null,2))
 },90_000)
+
+it.skipIf(!url)('reuses the exact approved library GROUP policy through its existing historical identity reader without FINAL work',async()=>{
+ const saved=JSON.parse(readFileSync(process.env.TEACHER_PRIVATE_LIBRARY_GROUP_CHECKPOINT!,'utf8'))
+ const [row]=await db.$queryRaw<Array<{key:string;version:string;hash:string;entry:any}>>`SELECT resource_key AS key,resource_version AS version,entry_hash AS hash,entry FROM registered_assessment_resources WHERE id=${saved.groupId}`
+ expect(row).toBeDefined()
+ const origin=row.entry.libraryOrigin,groupPolicy={resourceKey:row.key,resourceVersion:row.version,entryHash:row.hash}
+ const choice=(await readTeacherCompositionLibraryGroupChoices(db,[{versionId:origin.entryId,contentHash:origin.approvedSnapshotHash,groupPolicy}],'HISTORY')).get(origin.entryId)!
+ expect(choice.groupPolicy).toEqual(groupPolicy)
+ expect(choice.minimumRespondents).toBeGreaterThanOrEqual(row.entry.resultDisclosure.minimumRespondents)
+ expect(choice.audiences.ORGANIZATION).toEqual(row.entry.resultDisclosure.audiences.ORGANIZATION.metricKeys)
+ expect(choice.audiences.TEACHER).toEqual([])
+ expect((await readTeacherCompositionLibraryGroupChoices(db,[{versionId:origin.entryId,contentHash:origin.approvedSnapshotHash,groupPolicy:{...groupPolicy,entryHash:'0'.repeat(64)}}],'HISTORY')).size).toBe(0)
+ if(process.env.TEACHER_PRIVATE_LIBRARY_GROUP_PROOF)writeFileSync(process.env.TEACHER_PRIVATE_LIBRARY_GROUP_PROOF,JSON.stringify({passed:true,approvedPolicyPointer:groupPolicy,minimumN:choice.minimumRespondents,
+  sameExactLibrarySnapshot:true,fullExistingGroupReader:true,wrongPointerRejected:true,newFinals:0,groupReportGenerated:false,productionAccessed:false},null,2))
+},30_000)

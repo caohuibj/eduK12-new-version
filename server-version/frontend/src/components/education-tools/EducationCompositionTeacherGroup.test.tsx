@@ -3,15 +3,17 @@ import {expect,it,vi} from 'vitest'
 import {EducationCompositionStudio} from './EducationCompositionStudio'
 import type {PrivateToolApi} from './privateToolClient'
 
-it('saves explicit Teacher SELF group choices for original Scale and native Cognitive/SJT without adding individual or staff audiences',async()=>{
+it('pins approved library policy alongside original/native choices and raises N only when that library source is selected',async()=>{
  const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,org=id(1),rootId=id(2),base=`/organizations/${org}/private-tools`
  const sources=[{provider:'PRIVATE_VERSION',kind:'SCALE',versionId:id(3),contentHash:'a'.repeat(64)},
   {provider:'COGNITIVE_CONFIG',kind:'COGNITIVE',versionId:id(4),contentHash:'b'.repeat(64),profile:'research'},
-  {provider:'SJT_RELEASE',kind:'SJT',versionId:id(5),contentHash:'c'.repeat(64)}]
+  {provider:'SJT_RELEASE',kind:'SJT',versionId:id(5),contentHash:'c'.repeat(64)},
+  {provider:'LIBRARY_SCALE',kind:'SCALE',versionId:id(6),contentHash:'e'.repeat(64)}]
+ const groupPolicy={resourceKey:'library-scale:'+id(6)+':TEACHER:TEACHER:SELF:GROUP',resourceVersion:'2.0.0',entryHash:'f'.repeat(64)}
  const blocks=sources.map((source,i)=>({blockId:id(10+i),instruction:'',source}))
- const references=sources.map((source,i)=>({id:source.versionId,toolId:source.versionId,title:['Original Scale','Native Cognitive','Native SJT'][i],sourceProvider:source.provider,kind:source.kind,contentHash:source.contentHash,sourceRevision:1,version:'1.0.0',
-  groupChoice:{versionId:source.versionId,contentHash:source.contentHash,title:['Original Scale','Native Cognitive','Native SJT'][i],minimumRespondents:10,
-   metrics:[{key:['total','rt','dimension'][i],label:['total','rt','dimension'][i]}],audiences:{PROFESSIONAL:[],TEACHER:[],ORGANIZATION:[['total','rt','dimension'][i]]}}}))
+ const references=sources.map((source,i)=>({id:source.versionId,toolId:source.versionId,title:['Original Scale','Native Cognitive','Native SJT','Approved library · 政策 2.0.0'][i],sourceProvider:source.provider,kind:source.kind,contentHash:source.contentHash,sourceRevision:1,version:'1.0.0',
+  groupChoice:{versionId:source.versionId,contentHash:source.contentHash,title:['Original Scale','Native Cognitive','Native SJT','Approved library · 政策 2.0.0'][i],minimumRespondents:i===3?20:10,...(i===3?{groupPolicy}:{}),
+   metrics:[{key:['total','rt','dimension','library_total'][i],label:['total','rt','dimension','library_total'][i]}],audiences:{PROFESSIONAL:[],TEACHER:[],ORGANIZATION:[['total','rt','dimension','library_total'][i]]}}}))
  const root={id:rootId,kind:'COMPOSITION',title:'Teacher fixed mixture',revision:1,contentHash:'d'.repeat(64),definition:{schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'TEACHER',responseMode:'SELF'},instruction:'',blocks},references}
  const api=vi.fn(async(path:string,method='GET',data?:any)=>{
   if(path===base+'?kind=COMPOSITION')return {list:[root],nextCursor:null}
@@ -26,11 +28,15 @@ it('saves explicit Teacher SELF group choices for original Scale and native Cogn
  const enable=await screen.findByRole('checkbox',{name:'为新来源版本明确选择群体披露'})
  await waitFor(()=>expect(enable).toBeEnabled());fireEvent.click(enable)
  for(const metric of ['total','rt','dimension'])fireEvent.click(screen.getByRole('checkbox',{name:'学校管理者 · '+metric}))
+ expect(screen.getByLabelText('汇总最少人数')).toHaveValue(10)
+ fireEvent.click(screen.getByRole('checkbox',{name:'学校管理者 · library_total'}))
+ expect(screen.getByLabelText('汇总最少人数')).toHaveValue(20)
  expect(screen.queryByRole('checkbox',{name:/心理专业人员 ·|教师 ·/})).toBeNull()
  fireEvent.click(screen.getByRole('button',{name:'保存问卷草稿'}))
  await screen.findByText('问卷草稿已保存。')
  const saved=api.mock.calls.find(([,method])=>method==='PUT')![2].definition
- expect(saved.groupReporting).toMatchObject({schemaVersion:1,minimumRespondents:10})
+ expect(saved.groupReporting).toMatchObject({schemaVersion:1,minimumRespondents:20})
+ expect(saved.groupReporting.leaves[3].groupPolicy).toEqual(groupPolicy)
  expect(saved.groupReporting.leaves.map((leaf:any)=>leaf.blockId)).toEqual(blocks.map(block=>block.blockId))
  expect(saved.groupReporting.leaves.every((leaf:any)=>!leaf.audiences.PROFESSIONAL.length&&!leaf.audiences.TEACHER.length)).toBe(true)
  expect(saved.blocks).toEqual(blocks)

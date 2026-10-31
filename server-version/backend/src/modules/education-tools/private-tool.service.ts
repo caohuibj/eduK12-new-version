@@ -1,5 +1,5 @@
 import {lockOwnedDraftLibraryUses} from './library-source.use'
-import {readTeacherCompositionNativeGroupChoices} from './teacher-composition-group-source'
+import {readTeacherCompositionNativeGroupChoices,readTeacherCompositionLibraryGroupChoices} from './teacher-composition-group-source'
 import {readSchoolPrivateGroupChoices} from './school-private-group-source'
 import {educationPublicScaleDisplay} from './public-source.scale-display'
 import {readEducationLibrarySourceSummaries} from './library-source.catalog'
@@ -102,10 +102,11 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   const publicHeaders=await readEducationPublicSourceHeaders(tx,visibleSources,false,c.entry)
   const nativeGroupChoices=c.entry==='TEACHER'&&definition.administration.responseMode==='SELF'?await readTeacherCompositionNativeGroupChoices(tx,[...publicHeaders.values()]):new Map()
   const libraryHeaders=await readEducationLibrarySourceSummaries(tx,c,definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source),definition.administration.responseMode,definition.administration.responseMode==='EXPERT_REPORT'?definition.administration.targetKind:undefined)
+  const libraryGroupChoices=c.entry==='TEACHER'&&definition.administration.responseMode==='SELF'?await readTeacherCompositionLibraryGroupChoices(tx,libraryHeaders.map(header=>({versionId:header.sourceId,contentHash:header.contentHash}))):new Map()
   return {...tool,references:[...references.map(ref=>({...ref,sourceProvider:'PRIVATE_VERSION' as const,...(groupChoices.has(ref.id)?{groupChoice:groupChoices.get(ref.id)}:{})})),
    ...[...publicHeaders.values()].map(header=>({id:header.id,kind:header.kind==='FORM'?'FORM' as const:header.kind==='STANDARD_SCALE'?'SCALE' as const:['COGNITIVE_CONFIG','COGNITIVE_PROFILE'].includes(header.kind)?'COGNITIVE' as const:'SJT' as const,title:header.title,contentHash:header.hash,version:header.versions.content,versions:header.versions,requiredContextKeys:educationPublicRequiredContextKeys(header),referenceContextKeys:header.referenceContextKeys,
     sourceProvider:header.kind==='FORM'?'PUBLIC_FORM' as const:header.kind==='COGNITIVE_PROFILE'?'COGNITIVE_CONFIG' as const:header.kind,...(nativeGroupChoices.has(header.key)?{groupChoice:nativeGroupChoices.get(header.key)}:{})})),
-   ...libraryHeaders.map(header=>({id:header.sourceId,kind:header.kind,title:header.title,contentHash:header.contentHash,version:header.versions.content,versions:header.versions,sourceProvider:'LIBRARY_SCALE' as const}))],...boundary}
+   ...libraryHeaders.map(header=>({id:header.sourceId,kind:header.kind,title:header.title,contentHash:header.contentHash,version:header.versions.content,versions:header.versions,sourceProvider:'LIBRARY_SCALE' as const,...(libraryGroupChoices.has(header.sourceId)?{groupChoice:libraryGroupChoices.get(header.sourceId)}:{})}))],...boundary}
  })
 }
 export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unknown){

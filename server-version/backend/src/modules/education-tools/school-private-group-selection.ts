@@ -7,10 +7,12 @@ import {privateToolFail} from './private-tool.contracts'
 // of each server-loaded, authorized exact source before freezing a V2 entry.
 const metricKeys=z.array(z.string().trim().min(1).max(240)).max(100)
 const audiences=z.object({PROFESSIONAL:metricKeys,TEACHER:metricKeys,ORGANIZATION:metricKeys}).strict()
+export const compositionGroupPolicyPointerSchema=z.object({resourceKey:z.string().min(1).max(240),resourceVersion:z.string().regex(/^2\.0\.\d+$/),entryHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
+export type CompositionGroupPolicyPointer=z.infer<typeof compositionGroupPolicyPointerSchema>
 export const schoolPrivateGroupSelectionSchema=z.object({
  schemaVersion:z.literal(1),minimumRespondents:z.number().int().min(10),
  leaves:z.array(z.object({blockId:z.string().guid().optional(),versionId:z.string().guid(),
-  contentHash:z.string().regex(/^[a-f0-9]{64}$/),audiences}).strict()).min(1).max(50),
+  contentHash:z.string().regex(/^[a-f0-9]{64}$/),groupPolicy:compositionGroupPolicyPointerSchema.optional(),audiences}).strict()).min(1).max(50),
 }).strict().superRefine((selection,ctx)=>{
  const keys=selection.leaves.map(leaf=>leaf.blockId??'standalone')
  if(new Set(keys).size!==keys.length||selection.leaves.length>1&&keys.includes('standalone'))
@@ -25,6 +27,7 @@ export const schoolPrivateGroupSelectionSchema=z.object({
 export type SchoolPrivateGroupSelection=z.infer<typeof schoolPrivateGroupSelectionSchema>
 export type SchoolPrivateGroupSourceCeiling={
  blockId?:string;versionId:string;contentHash:string;minimumRespondents:number
+ groupPolicy?:CompositionGroupPolicyPointer
  // These come from an explicit author-owned new source grant or the shared
  // source-owned aggregate ceiling, never from own/longitudinal numeric keys.
  audiences:SchoolPrivateGroupSelection['leaves'][number]['audiences']
@@ -47,7 +50,8 @@ export function parseSchoolPrivateGroupSelection(raw:unknown,context:{
   const source=sources.get(leaf.blockId??'standalone')
   if(!source)return fail()
   if(source.versionId!==leaf.versionId||source.contentHash!==leaf.contentHash
-   ||selected.minimumRespondents<source.minimumRespondents)fail()
+   ||selected.minimumRespondents<source.minimumRespondents||source.groupPolicy?.resourceKey!==leaf.groupPolicy?.resourceKey
+   ||source.groupPolicy?.resourceVersion!==leaf.groupPolicy?.resourceVersion||source.groupPolicy?.entryHash!==leaf.groupPolicy?.entryHash)fail()
   for(const audience of ['PROFESSIONAL','TEACHER','ORGANIZATION'] as const)
    if(leaf.audiences[audience].some(key=>!source.audiences[audience].includes(key)))fail()
  }

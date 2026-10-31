@@ -1,7 +1,7 @@
 import {Prisma} from '@prisma/client'
-import {teacherCompositionGroupChoice} from './teacher-composition-group-source'
+import {teacherCompositionGroupChoice,readTeacherCompositionLibraryGroupChoices} from './teacher-composition-group-source'
 import {assertSelfGroupV2Entry,buildSelfGroupCohortAnalysisPolicy,SELF_GROUP_POLICY_KEY} from '../assessment-policy/self-group-contract'
-import {parseSchoolPrivateGroupSelection} from './school-private-group-selection'
+import {parseSchoolPrivateGroupSelection,schoolPrivateGroupSelectionSchema} from './school-private-group-selection'
 import {schoolPrivateGroupDisclosure,schoolPrivateGroupParentAudiences,schoolPrivateScaleGroupChoice} from './school-private-group-source'
 import {isStudentComposition,studentCompositionRunPolicy,studentCompositionSubjectCeiling} from '../huiteacher/studentComposition.policy'
 import {z} from 'zod'
@@ -123,14 +123,17 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   if(!row.available)privateToolFail('PRIVATE_COMPOSITION_SOURCE_UNAVAILABLE')
   const variant=educationCompositionVariant(origin),none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
  const leaves=leafSummarySchema.parse(row.leaves)
- const groupReporting=row.groupReporting==null?null:parseSchoolPrivateGroupSelection(row.groupReporting,{entry:c.entry,
+ const selectedGroup=row.groupReporting==null?null:schoolPrivateGroupSelectionSchema.parse(row.groupReporting)
+ const libraryGroups=c.entry==='TEACHER'&&selectedGroup?await readTeacherCompositionLibraryGroupChoices(tx,leaves.filter(leaf=>leaf.sourceProvider==='LIBRARY_SCALE').map(leaf=>({
+  blockId:leaf.blockId,versionId:leaf.versionId,contentHash:leaf.contentHash,groupPolicy:selectedGroup.leaves.find(selected=>selected.blockId===leaf.blockId)?.groupPolicy})),options.historyGroup?'HISTORY':'NEW_USE'):new Map()
+ const groupReporting=selectedGroup?parseSchoolPrivateGroupSelection(selectedGroup,{entry:c.entry,
   administration:{population:origin.entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode:variant.responseMode},
   sources:leaves.flatMap(leaf=>{
-   const choice=c.entry==='TEACHER'?teacherCompositionGroupChoice({id:leaf.versionId,title:row.title,contentHash:leaf.contentHash},{provider:leaf.sourceProvider??'',kind:leaf.kind,metricKeys:leaf.metricKeys,license:leaf.groupAuthorLicense}):leaf.sourceProvider==='PRIVATE_VERSION'&&leaf.kind==='SCALE'&&leaf.groupAuthorLicense?
+   const choice=c.entry==='TEACHER'&&leaf.sourceProvider==='LIBRARY_SCALE'?libraryGroups.get(leaf.blockId):c.entry==='TEACHER'?teacherCompositionGroupChoice({id:leaf.versionId,title:row.title,contentHash:leaf.contentHash},{provider:leaf.sourceProvider??'',kind:leaf.kind,metricKeys:leaf.metricKeys,license:leaf.groupAuthorLicense}):leaf.sourceProvider==='PRIVATE_VERSION'&&leaf.kind==='SCALE'&&leaf.groupAuthorLicense?
     schoolPrivateScaleGroupChoice({id:leaf.versionId,entry:origin.entry,title:row.title,contentHash:leaf.contentHash},
      {license:leaf.groupAuthorLicense,scoring:{scores:leaf.metricKeys.map(key=>({key}))}}):null
    return choice?[{...choice,blockId:leaf.blockId}]:[]
-  })})
+  })}):null
  const student=isStudentComposition(origin)
  const binding=educationCompositionPolicyBindingSchema.parse({origin,manifestHash:row.manifestHash,
    unitReports:leaves.filter(leaf=>leaf.kind!=='FORM').map(leaf=>({blockId:leaf.blockId,versionId:leaf.versionId,
