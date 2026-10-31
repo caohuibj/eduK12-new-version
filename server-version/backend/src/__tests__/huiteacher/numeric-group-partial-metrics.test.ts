@@ -20,9 +20,14 @@ it('keeps allowed A when withheld B has a small contributor change, through the 
  const entry={applicability:{...policy,analysisMode:'COHORT_AGGREGATE',relationshipKinds:['SELF'],perspectives:['SELF_REPORT']},
   resultDisclosure:contract,cohortAnalysisPolicy:buildSelfGroupCohortAnalysisPolicy(contract)}
  mocks.resolve.mockResolvedValue(entry)
- mocks.db.$queryRaw.mockImplementation(async(strings:TemplateStringsArray)=>strings.join('').includes('resource_family')?
-  [{family:'SCALE',key:'teacher-scale:fixed:GROUP',version:'2.0.0',policy,hash:canonicalHash(policy)}]:
-  [{runId:'run',eventStatus:'OPEN',runStatus:'PUBLISHED',closedAt:null}])
+ let privateLeaf=false
+ const leafContract=structuredClone(contract)
+ mocks.db.$queryRaw.mockImplementation(async(strings:TemplateStringsArray)=>{
+  const frozen=privateLeaf?{...policy,educationComposition:{unitReports:[{blockId:'fixed-block',groupDisclosure:leafContract}]}}:policy
+  return strings.join('').includes('resource_family')?
+   [{family:privateLeaf?'BUNDLE':'SCALE',key:privateLeaf?'education-composition:TEACHER:source:TEACHER:SELF:1.0.0':'teacher-scale:fixed:GROUP',version:privateLeaf?'1.0.0':'2.0.0',policy:frozen,hash:canonicalHash(frozen),blockId:'fixed-block'}]:
+   [{runId:'run',eventStatus:'OPEN',runStatus:'PUBLISHED',closedAt:null}]
+ })
  mocks.spec.mockResolvedValue({definition:{analysisKind:'GROUP',minimumCohortN:10,minimumContributorN:10,
   metricRules:['A','B'].map(sourceMetricKey=>({metricId:sourceMetricKey,sourceMetricKey,minimumMetricN:10}))}})
  const leaf={slotKey:'scale:item',unitType:'SCALE' as const,instrumentKey:'same-C',instrumentVersion:'1.0.0',compiledRuntimeHash:'a'.repeat(64)}
@@ -50,7 +55,13 @@ it('keeps allowed A when withheld B has a small contributor change, through the 
  expect(result.projection.metrics).toEqual([expect.objectContaining({key:'A',mean:2,validN:20})])
  expect(JSON.stringify(result)).not.toContain('99')
  expect(mocks.read).toHaveBeenCalledWith(expect.objectContaining({artifactId:'saved'}))
+ // A sibling leaf keeps B in the parent union. This selected leaf still
+ // permits only A, so its withheld B must not consume a disclosure budget.
+ privateLeaf=true;contract.audiences.ORGANIZATION.metricKeys=['A','B']
+ entry.cohortAnalysisPolicy=buildSelfGroupCohortAnalysisPolicy(contract)
+ tx.$queryRaw.mockResolvedValueOnce([{hash:'e'.repeat(64)}]).mockResolvedValueOnce([{payload:previous,minimumN:10,metricRules:['A','B'].map(key=>({metricId:key,sourceMetricKey:key}))}])
+ expect((await generateTeacherNumericGroup(input,{allowPartialSourceMetrics:true})).projection.metrics).toEqual(result.projection.metrics)
  contract.audiences.ORGANIZATION.metricKeys=['unplanned']
  await expect(generateTeacherNumericGroup(input,{allowPartialSourceMetrics:true})).rejects.toMatchObject({code:'REPORT_SPEC_SCOPE'})
- expect(mocks.generate).toHaveBeenCalledTimes(1)
+ expect(mocks.generate).toHaveBeenCalledTimes(2)
 })

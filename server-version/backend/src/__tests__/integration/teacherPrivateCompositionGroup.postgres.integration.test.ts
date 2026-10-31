@@ -16,6 +16,7 @@ import {readTeacherOrdinaryFeedback} from '../../modules/reporting/education-ord
 import {listTeacherNumericGroups,generateTeacherNumericGroup,readTeacherNumericGroup} from '../../modules/huiteacher/numericGroupReport.service'
 import {createPlatformReportingSpec,reviewPlatformReportingSpec,publishPlatformReportingSpec} from '../../modules/reporting/spec'
 import {setReportingPayloadMaterializationObserverForTests} from '../../modules/reporting/resultSource'
+import {readReportingArtifactRecord} from '../../modules/reporting/artifact'
 import {readTeacherCompositionLibraryGroupChoices} from '../../modules/education-tools/teacher-composition-group-source'
 
 const url=integrationDatabaseUrl('TEACHER_PRIVATE_GROUP_DATABASE_URL')
@@ -109,4 +110,15 @@ it.skipIf(!url)('reuses the exact approved library GROUP policy through its exis
  expect((await readTeacherCompositionLibraryGroupChoices(db,[{versionId:origin.entryId,contentHash:origin.approvedSnapshotHash,groupPolicy:{...groupPolicy,entryHash:'0'.repeat(64)}}],'HISTORY')).size).toBe(0)
  if(process.env.TEACHER_PRIVATE_LIBRARY_GROUP_PROOF)writeFileSync(process.env.TEACHER_PRIVATE_LIBRARY_GROUP_PROOF,JSON.stringify({passed:true,approvedPolicyPointer:groupPolicy,minimumN:choice.minimumRespondents,
   sameExactLibrarySnapshot:true,fullExistingGroupReader:true,wrongPointerRejected:true,newFinals:0,groupReportGenerated:false,productionAccessed:false},null,2))
+},30_000)
+
+it.skipIf(!url)('uses the internal planned-metric producer on the retained private composition without publishing or submitting again',async()=>{
+ const saved=JSON.parse(readFileSync(process.env.TEACHER_PRIVATE_GROUP_CHECKPOINT!,'utf8'))
+ const artifact=await readReportingArtifactRecord(saved.artifactId)
+ if(artifact.analysisKind!=='GROUP'||artifact.artifactPayload.schemaVersion!==2)throw Error('Existing real private group artifact required')
+ const selected=artifact.artifactPayload.source
+ const result=await generateTeacherNumericGroup({...saved.scope,trackId:selected.trackId,leaf:selected.leaf,specId:artifact.specId,selection:{kind:'ALL'}},{allowPartialSourceMetrics:true})
+ expect(result.projection.metrics).toEqual([expect.objectContaining({key:'total',validN:10,mean:1,sdSample:0})])
+ if(process.env.TEACHER_PRIVATE_INTERNAL_PROOF)writeFileSync(process.env.TEACHER_PRIVATE_INTERNAL_PROOF,JSON.stringify({passed:true,internalOption:true,actualPrivateSlotMetadata:true,
+  realProducerAndRegistry:true,newFinals:0,newPublications:0,validN:10,mean:1,sdSample:0,artifactId:result.artifactId,productionAccessed:false},null,2))
 },30_000)
