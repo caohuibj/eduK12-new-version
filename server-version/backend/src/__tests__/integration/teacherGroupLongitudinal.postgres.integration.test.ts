@@ -18,9 +18,10 @@ import {readTeacherPersonalScaleReport} from '../../modules/huiteacher/scalePers
 import {readRespondentRunSummary} from '../../modules/reporting/respondentSummary'
 import {generateTeacherGroupLongitudinal,readTeacherGroupLongitudinal,teacherGroupLongitudinalCatalog} from '../../modules/huiteacher/groupLongitudinalReport.service'
 import {descriptiveReportingDefinition} from '../../modules/reporting/content.controller'
-import {createPlatformReportingSpec,reviewPlatformReportingSpec,publishPlatformReportingSpec} from '../../modules/reporting/spec'
+import {createPlatformReportingSpec,reviewPlatformReportingSpec,publishPlatformReportingSpec,getPublishedReportingSpec} from '../../modules/reporting/spec'
 import {readTeacherPersonalChanges} from '../../modules/reporting/teacher-personal-changes.service'
-import {setReportingPayloadMaterializationObserverForTests} from '../../modules/reporting/resultSource'
+import {setReportingPayloadMaterializationObserverForTests,listAuthoritativeRunLeafSources} from '../../modules/reporting/resultSource'
+import {generateTeacherNumericGroup} from '../../modules/huiteacher/numericGroupReport.service'
 import {SELF_GROUP_POLICY_KEY} from '../../modules/assessment-policy/self-group-contract'
 
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
@@ -130,6 +131,33 @@ suite('Teacher numeric group longitudinal native published plan',()=>{
   setReportingPayloadMaterializationObserverForTests(null);expect(materializations).toBe(0)
   await expect(readTeacherGroupLongitudinal({...f.scope,actorUserId:f.users[1],artifactId:generated.artifactId})).rejects.toMatchObject({statusCode:404})
   await writeFile(dir+'/proof.json',JSON.stringify({productionAccessed:false,originalFinals:20,finalsCreatedThisContinuation:0,means:[1,3],validN:[10,10],unit:'points',savedReadMaterializations:materializations,artifactId:generated.artifactId,scope:f.scope},null,2))
+ },60000)
+
+ ;(process.env.TEACHER_GROUP_LONGITUDINAL_PARTIAL_ONLY==='true'?it:it.skip)('uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric',async()=>{
+  const dir=process.env.TEACHER_GROUP_LONGITUDINAL_EVIDENCE_DIR??'/tmp/teacher-group-longitudinal-native'
+  const f=JSON.parse(await readFile(dir+'/fixture.json','utf8'))
+  const readFacts=()=>db.$queryRaw<Array<{id:string;epoch:number;completedAt:Date;savedAt:Date;inputHash:string|null;bindingHash:string|null}>>`SELECT p.id,p.attempt_epoch AS epoch,p.completed_at AS "completedAt",p.last_saved_at AS "savedAt",p.aggregate_input_hash AS "inputHash",p.training_content_binding_hash AS "bindingHash" FROM composite_assessment_attempts p JOIN assessment_run_executions e ON e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=p.id WHERE e.organization_id=${f.scope.organizationId} AND e.id=ANY(${f.completed}::text[]) ORDER BY p.id`
+  const before=await readFacts();expect(before).toHaveLength(20)
+  const readPlan=()=>db.$queryRaw`SELECT id,personal_tracking AS tracking FROM assessment_runs WHERE organization_id=${f.scope.organizationId} AND id=ANY(${[f.runId,f.next.runId]}::text[]) ORDER BY id`
+  const frozenPlan=await readPlan()
+  const old=await getPublishedReportingSpec(f.specId)
+  if(old.definition.analysisKind!=='GROUP')throw Error('retained GROUP spec required')
+  const wider={...old.definition,metricRules:[...old.definition.metricRules,{...old.definition.metricRules[0],metricId:'not-approved-B',sourceMetricKey:'not-approved-B'}]}
+  const actor={userId:old.createdByUserId,platformRole:'SYSTEM_ADMIN'}
+  const spec=await createPlatformReportingSpec({actor,specKey:'teacher-long-superset-'+randomUUID(),version:1,definition:wider})
+  await reviewPlatformReportingSpec({actor:await independentReviewer(actor),specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
+  const [track]=await db.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_run_tracks WHERE organization_id=${f.scope.organizationId} AND run_id=${f.runId}`
+  const [tool]=await listAuthoritativeRunLeafSources({organizationId:f.scope.organizationId,runId:f.runId,trackId:track.id,groupAudience:'ORGANIZATION'})
+  await expect(generateTeacherNumericGroup({...f.scope,trackId:track.id,leaf:tool.leaf,specId:spec.id,selection:{kind:'ALL'}})).rejects.toMatchObject({code:'REPORT_SPEC_SCOPE'})
+  const catalog=await teacherGroupLongitudinalCatalog(f.scope)
+  if(catalog.status!=='CONFIGURED')throw Error('retained actual plan required')
+  const result=await generateTeacherGroupLongitudinal({...f.scope,planId:catalog.planId,sourceKey:catalog.tools[0].key,throughWaveId:f.next.runId,specId:spec.id,selection:{kind:'ALL'}})
+  expect(result.projection.metrics).toHaveLength(1)
+  expect(result.projection.metrics[0].points.map(p=>p.mean)).toEqual([1,3]);expect(result.projection.metrics[0].points.map(p=>p.validN)).toEqual([10,10])
+  expect(JSON.stringify(result)).not.toContain('not-approved-B')
+  expect(await readTeacherGroupLongitudinal({...f.scope,eventId:f.next.eventId,artifactId:result.artifactId})).toEqual(result)
+  expect(await readFacts()).toEqual(before);expect(await readPlan()).toEqual(frozenPlan)
+  await writeFile(dir+'/partial-interface-proof.json',JSON.stringify({productionAccessed:false,originalFinals:20,newOrReplayedFinals:0,actualPublishedPlanUnchanged:true,plannedMetrics:1,reportSpecMetrics:2,visiblePlannedMetrics:1,unapprovedBExposed:false,ordinaryProducerStillStrict:true,means:[1,3],validN:[10,10],artifactId:result.artifactId},null,2))
  },60000)
 
 })

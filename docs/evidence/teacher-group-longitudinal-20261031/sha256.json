@@ -24,5 +24,12 @@
   "ui-first.log": "a3be2fae870a977c8c61849e022092dbb617ce537189b509f11562922459c2db",
   "adapter-first.json": "7cfe38648e284283a6d58653e80cd0ed73fbf2bc6192c9b7819d0d423359f6e5",
   "partial-adapter.json": "ebcb148cb95a97b6233fd8dad9b7d783751114680455655cef7d0b58a075f155",
-  "partial-adapter.log": "8cd3d9fdc02d593515b21216c4aa27a29a9aa454ed7ea0a59b061437c0124f63"
+  "partial-adapter.log": "8cd3d9fdc02d593515b21216c4aa27a29a9aa454ed7ea0a59b061437c0124f63",
+  "partial-native.json": "bf39c06d1c8713ff567d2c5123418448533d69331c9de5b394d7c1f84d824ad3",
+  "partial-native.log": "996035bfb5e1e6b704fba244861c0e6ce84ee2deea08e2afcfc0ef1f049bd218",
+  "partial-native-repair.json": "fd09c25ca9b0197620075a7083672a9ffe4c663dcb3e0f370ed33dabb48fa2ec",
+  "partial-native-repair.log": "a783a9261d09c1843e70f28ec045ae20249c56cfa449354ec6c160255106328a",
+  "partial-native-final.json": "b26f0db64c01500ab4b34edb727c6ffb15347f273effaf85fb828654d7880cea",
+  "partial-native-final.log": "cf3ce2b9ebf036b5ef2443bf4175e7ae108319f2d9f957a0ac182938fd23568f",
+  "partial-native-proof.json": "cad710dd9c5a3e0a4c354c039164fd22c9bd7f9a382a61d8ad63f460ba934f98"
 }

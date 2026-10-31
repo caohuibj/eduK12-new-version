@@ -137,5 +137,16 @@
     "previousCasesReexecuted": false,
     "finalsReexecuted": false,
     "report": "partial-adapter.json"
+  },
+  "partialNativeBoundary": {
+    "report": "partial-native-final.json",
+    "newCases": 1,
+    "newOrReplayedFinals": 0,
+    "actualPublishedPlanMetrics": 1,
+    "publishedSpecMetrics": 2,
+    "unapprovedMetricExposed": false,
+    "originalTwoWavePlanAndParentFactsUnchanged": true,
+    "separateTwoMetricNullProof": "partial-adapter.json",
+    "formalReadyQualification": false
   }
 }
