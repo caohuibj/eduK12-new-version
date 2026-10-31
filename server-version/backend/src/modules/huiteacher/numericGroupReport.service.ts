@@ -125,7 +125,7 @@ const countsVisible=(payload:ReportingGroupArtifactPayload,minimumN:number)=>{
 /** Existing small-change rule, now over immutable actual contributor sets,
  * including per-metric quality/missingness subsets instead of invitee lists. */
 export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number;payload:ReportingGroupArtifactPayload;metricRules:Array<{metricId:string;sourceMetricKey:string}>},db:Prisma.TransactionClient|typeof prisma=prisma){
- const metrics=disclosedMetrics(input.payload)
+ const metrics=disclosedMetrics(input.payload).filter(id=>input.metricRules.some(rule=>rule.metricId===id))
  if(!countsVisible(input.payload,input.minimumN)&&!metrics.length)return {comparedArtifacts:0,measurementHash:null}
  const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash',private_unit.value->'measurement'->>'measurementHash') AS hash
   FROM assessment_run_tracks t LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
@@ -222,7 +222,9 @@ export async function generateTeacherNumericGroup(input:TeacherNumericScope&{tra
  // shared leaf/source projection still narrows every generated and saved read.
  if(!permitted.length||!internal.allowPartialSourceMetrics&&permitted.length!==spec.definition.metricRules.length)reportingFail('REPORT_SPEC_SCOPE','方案指标超出该来源的组织群体上限',409)
  const minimumN=Math.max(run.minimumN,spec.definition.minimumCohortN,spec.definition.minimumContributorN)
- const metricRules=spec.definition.metricRules
+ // A withheld planned metric is not a new disclosure. Its private contributor
+ // changes must not consume the budget of the still-authorized trend metric.
+ const metricRules=internal.allowPartialSourceMetrics?permitted:spec.definition.metricRules
  const cohortSelector=await educationGroupSelector(input.organizationId,'TEACHER',input.selection)
  const generated=await prisma.$transaction(async tx=>{
   await lockTeacherDisclosure(tx,input.organizationId)
