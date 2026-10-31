@@ -56,9 +56,9 @@ suite('School explicitly configured new SELF longitudinal source',()=>{
  },120000)
  it('reads retained current SELF waves after source batching and rejects the Teacher entry for a student',async()=>{
   const state:State=JSON.parse(readFileSync(file,'utf8'))
-  const [third]=await db.$queryRaw<Array<{id:string}>>`SELECT e.id FROM assessment_runs r JOIN assessment_run_executions e ON e.run_id=r.id JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id WHERE r.organization_id=${state.organizationId} AND r.personal_tracking_baseline_id=${state.runId} AND r.personal_tracking_ordinal=3 AND subject.user_id=${state.studentId}`
-  const proof={actorUserId:state.studentId,executionId:third.id},report=await readSchoolPersonalChanges(proof)
-  expect(report.status).toBe('AVAILABLE');if(report.status==='AVAILABLE')expect(report.metrics[0].points.map(p=>p.value)).toEqual([1,2,1])
+  expect(state.t2ExecutionId).toBeDefined()
+  const proof={actorUserId:state.studentId,executionId:state.t2ExecutionId!},report=await readSchoolPersonalChanges(proof)
+  expect(report.status).toBe('AVAILABLE');if(report.status==='AVAILABLE')expect(report.metrics[0].points.map(p=>p.value)).toEqual([1,2])
   await expect(readTeacherPersonalChanges(proof)).rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
  })
 

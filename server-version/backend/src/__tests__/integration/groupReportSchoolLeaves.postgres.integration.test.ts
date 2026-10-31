@@ -1,6 +1,10 @@
 import {randomUUID} from 'node:crypto'
 import {readFileSync} from 'node:fs'
-import {afterAll,describe,expect,it} from 'vitest'
+import {afterAll,describe,expect,it,vi} from 'vitest'
+const registry=vi.hoisted(()=>({entry:vi.fn()}))
+// This fixture exercises actual cohort/member SQL; its synthetic leaf has an
+// explicit approved aggregate contract rather than relying on a missing entry.
+vi.mock('../../modules/assessment-run/registeredResources',()=>({resolveHistoricalRelationalEntry:registry.entry}))
 import {prisma} from '../../config/database'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
 import {buildReportingFixture} from './reporting-fixture'
@@ -8,6 +12,7 @@ import {freezeRunTrackCohort,readReportingCohort} from '../../modules/reporting/
 import {listAuthoritativeRunLeafSources,resolveAuthoritativeRunResults} from '../../modules/reporting/resultSource'
 import {educationGroupSelector,listEducationGroupSelections} from '../../modules/reporting/education-group-selection'
 import {assertCampusLeafGroupDifferencing} from '../../modules/campus/group-reports'
+import {validateResultDisclosureContract} from '../../modules/assessment-policy/result-disclosure'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')
 if(!url)throw Error('explicit isolated PostgreSQL required')
 requireIsolatedReleaseDatabase(url)
@@ -32,6 +37,13 @@ describe('School leaf source and historical subgroup in PostgreSQL',()=>{
   expect(catalog.options.map(row=>row.id).sort()).toEqual([classA,label].sort())
   const tools=await listAuthoritativeRunLeafSources(f)
   expect(tools).toHaveLength(1)
+  const contract=validateResultDisclosureContract({schemaVersion:1,policyKey:'synthetic-school-leaf',minimumRespondents:10,
+    audiences:Object.fromEntries(['RESPONDENT','SUBJECT','TEACHER','PARENT','PROFESSIONAL','ORGANIZATION','RESEARCH'].map(audience=>[
+      audience,{mode:audience==='ORGANIZATION'?'AGGREGATE_ONLY':'NONE',metricKeys:audience==='ORGANIZATION'?['score']:[],longitudinalMetricKeys:[]},
+    ]))})
+  registry.entry.mockImplementation(async ref=>ref.resourceKind===tools[0].leaf.unitType
+    &&ref.resourceKey===tools[0].leaf.instrumentKey&&ref.resourceVersion===tools[0].leaf.instrumentVersion
+    ?{releaseStatus:'PUBLISHED',resultDisclosure:contract}:null)
   const result=await resolveAuthoritativeRunResults(cohort,tools[0].leaf)
   expect(result.resolved).toHaveLength(10);expect(result.resolved.every(row=>row.metrics[0].value===1)).toBe(true)
   expect(result.resourceKey).toBe(tools[0].leaf.instrumentKey)

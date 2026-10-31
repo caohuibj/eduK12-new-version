@@ -1,0 +1,280 @@
+[
+  {
+    "case": "Work C Query Budget (real PostgreSQL) > scale admission loads the composite parent exactly once (load-once admission)",
+    "logical": [
+      {
+        "model": "Assessment",
+        "selectKeys": [
+          "id",
+          "userId",
+          "status",
+          "deliveryMode",
+          "runtimeGeneration",
+          "runtimeSnapshotEncrypted",
+          "compiledRuntimeHash",
+          "frozenAdmissionSnapshotEncrypted",
+          "frozenAdmissionSnapshotHash",
+          "attemptEpoch",
+          "startedAt",
+          "submissionId",
+          "submissionPayloadHash",
+          "answers",
+          "result",
+          "progress",
+          "completedAt",
+          "totalTime",
+          "questionnaireAssessmentId",
+          "compositeAttemptId",
+          "compositeItemId",
+          "compositeAttempt",
+          "scaleId",
+          "subjectUserId",
+          "respondentUserId",
+          "respondentType",
+          "scale"
+        ],
+        "callsites": [
+          "at /workspace/eduK12-group4-backend-failures-20261031/server-version/backend/src/config/database.ts:43:20"
+        ]
+      },
+      {
+        "model": "Assessment",
+        "selectKeys": [
+          "id",
+          "userId",
+          "status",
+          "deliveryMode",
+          "runtimeGeneration",
+          "runtimeSnapshotEncrypted",
+          "compiledRuntimeHash",
+          "frozenAdmissionSnapshotEncrypted",
+          "frozenAdmissionSnapshotHash",
+          "attemptEpoch",
+          "startedAt",
+          "submissionId",
+          "submissionPayloadHash",
+          "answers",
+          "result",
+          "progress",
+          "completedAt",
+          "totalTime",
+          "questionnaireAssessmentId",
+          "compositeAttemptId",
+          "compositeItemId",
+          "compositeAttempt",
+          "scaleId",
+          "subjectUserId",
+          "respondentUserId",
+          "respondentType",
+          "scale"
+        ],
+        "callsites": [
+          "at /workspace/eduK12-group4-backend-failures-20261031/server-version/backend/src/config/database.ts:43:20"
+        ]
+      },
+      {
+        "model": "CompositeAssessmentAttempt",
+        "selectKeys": [
+          "id",
+          "trainingContentBindingHash",
+          "trainingReferenceBindingHash",
+          "trainingFlowSnapshotEncrypted",
+          "trainingFlowSnapshotHash",
+          "trainingFlowPathEncrypted",
+          "trainingFlowPathHash",
+          "trainingVariantAllocationEncrypted",
+          "trainingVariantAllocationHash",
+          "compositeAssessment",
+          "userId",
+          "recoveryTokenHash",
+          "assignmentRef",
+          "trainingTimingSnapshot",
+          "runtimeGeneration",
+          "deliveryMode",
+          "attemptEpoch",
+          "contextSnapshotEncrypted",
+          "contextSnapshotHash",
+          "frozenActiveSlotSetEncrypted",
+          "frozenActiveSlotSetHash"
+        ],
+        "callsites": [
+          "at /workspace/eduK12-group4-backend-failures-20261031/server-version/backend/src/config/database.ts:43:20"
+        ]
+      }
+    ],
+    "sql": [
+      "SELECT \"public\".\"assessments\".\"id\", \"public\".\"assessments\".\"user_id\", \"public\".\"assessments\".\"status\"::text, \"public\".\"assessments\".\"delivery_mode\"::text, \"public\".\"assessments\".\"runtime_generation\"::text, \"public\".\"assessments\".\"runtime_snapshot_encrypted\", \"public\".\"assessments\".\"compiled_runtime_hash\", \"public\".\"assessments\".\"frozen_admission_snapshot_encrypted\", \"public\".\"assessments\".\"frozen_admission_snapshot_hash\", \"public\".\"assessments\".\"attempt_epoch\", \"public\".\"assessments\".\"started_at\", \"public\".\"assessments\".\"submission_id\", \"public\".\"assessments\".\"submission_payload_hash\", \"public\".\"assessments\".\"answers\", \"public\".\"assessments\".\"result\", \"public\".\"assessments\".\"progress\", \"public\".\"assessments\".\"completed_at\", \"public\".\"assessments\".\"total_time\", \"public\".\"assessments\".\"questionnaire_assessment_id\", \"public\".\"assessments\".\"composite_attempt_id\", \"public\".\"assessments\".\"composite_item_id\", \"public\".\"assessments\".\"scale_id\", \"public\".\"assessments\".\"subject_user_id\", \"public\".\"assessments\".\"respondent_user_id\", \"public\".\"assessments\".\"respondent_type\" FROM \"public\".\"assessments\" WHERE (\"public\".\"assessments\".\"id\" = $1 AND 1=1) LIMIT $2 OFFSET $3",
+      "SELECT \"public\".\"composite_assessment_attempts\".\"id\", \"public\".\"composite_assessment_attempts\".\"training_content_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_reference_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_hash\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_hash\", \"public\".\"composite_assessment_attempts\".\"composite_assessment_id\" FROM \"public\".\"composite_assessment_attempts\" WHERE \"public\".\"composite_assessment_attempts\".\"id\" IN ($1) OFFSET $2",
+      "SELECT \"id\" FROM \"assessments\" WHERE \"id\" = $1 FOR UPDATE",
+      "SELECT \"public\".\"assessments\".\"id\", \"public\".\"assessments\".\"user_id\", \"public\".\"assessments\".\"status\"::text, \"public\".\"assessments\".\"delivery_mode\"::text, \"public\".\"assessments\".\"runtime_generation\"::text, \"public\".\"assessments\".\"runtime_snapshot_encrypted\", \"public\".\"assessments\".\"compiled_runtime_hash\", \"public\".\"assessments\".\"frozen_admission_snapshot_encrypted\", \"public\".\"assessments\".\"frozen_admission_snapshot_hash\", \"public\".\"assessments\".\"attempt_epoch\", \"public\".\"assessments\".\"started_at\", \"public\".\"assessments\".\"submission_id\", \"public\".\"assessments\".\"submission_payload_hash\", \"public\".\"assessments\".\"answers\", \"public\".\"assessments\".\"result\", \"public\".\"assessments\".\"progress\", \"public\".\"assessments\".\"completed_at\", \"public\".\"assessments\".\"total_time\", \"public\".\"assessments\".\"questionnaire_assessment_id\", \"public\".\"assessments\".\"composite_attempt_id\", \"public\".\"assessments\".\"composite_item_id\", \"public\".\"assessments\".\"scale_id\", \"public\".\"assessments\".\"subject_user_id\", \"public\".\"assessments\".\"respondent_user_id\", \"public\".\"assessments\".\"respondent_type\" FROM \"public\".\"assessments\" WHERE (\"public\".\"assessments\".\"id\" = $1 AND 1=1) LIMIT $2 OFFSET $3",
+      "SELECT \"public\".\"composite_assessment_attempts\".\"id\", \"public\".\"composite_assessment_attempts\".\"training_content_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_reference_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_hash\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_hash\", \"public\".\"composite_assessment_attempts\".\"composite_assessment_id\" FROM \"public\".\"composite_assessment_attempts\" WHERE \"public\".\"composite_assessment_attempts\".\"id\" IN ($1) OFFSET $2",
+      "SELECT \"public\".\"composite_assessment_attempts\".\"id\", \"public\".\"composite_assessment_attempts\".\"training_content_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_reference_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_hash\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_hash\", \"public\".\"composite_assessment_attempts\".\"composite_assessment_id\", \"public\".\"composite_assessment_attempts\".\"user_id\", \"public\".\"composite_assessment_attempts\".\"recovery_token_hash\", \"public\".\"composite_assessment_attempts\".\"assignment_ref\", \"public\".\"composite_assessment_attempts\".\"training_timing_snapshot\", \"public\".\"composite_assessment_attempts\".\"runtime_generation\"::text, \"public\".\"composite_assessment_attempts\".\"delivery_mode\"::text, \"public\".\"composite_assessment_attempts\".\"attempt_epoch\", \"public\".\"composite_assessment_attempts\".\"context_snapshot_encrypted\", \"public\".\"composite_assessment_attempts\".\"context_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"frozen_active_slot_set_encrypted\", \"public\".\"composite_assessment_attempts\".\"frozen_active_slot_set_hash\" FROM \"public\".\"composite_assessment_attempts\" WHERE (\"public\".\"composite_assessment_attempts\".\"id\" = $1 AND 1=1) LIMIT $2 OFFSET $3",
+      "UPDATE \"public\".\"assessments\" SET \"frozen_admission_snapshot_encrypted\" = $1, \"frozen_admission_snapshot_hash\" = $2 WHERE (\"public\".\"assessments\".\"id\" = $3 AND \"public\".\"assessments\".\"frozen_admission_snapshot_hash\" IS NULL)"
+    ],
+    "scopeNote": "Measured admission SQL excerpt, ending at frozen-admission persistence. Later fixture preparation excluded; no parameter values or result rows."
+  },
+  {
+    "case": "Work C Query Budget (real PostgreSQL) > current-unit scale delivery reuses the loaded child (no re-read on unified attempt-state)",
+    "logical": [
+      {
+        "model": "CompositeAssessmentAttempt",
+        "selectKeys": [
+          "trainingContentBindingHash",
+          "trainingReferenceBindingHash",
+          "id",
+          "status",
+          "attemptEpoch",
+          "compositeAssessmentId",
+          "deliveryCourseId",
+          "accessTokenId",
+          "asyncReportEpoch",
+          "trainingFeedbackSnapshot",
+          "trainingFeedbackSnapshotHash",
+          "frozenActiveSlotSetHash",
+          "contextSnapshotHash",
+          "aggregateInputHash",
+          "compositeAssessment",
+          "participantKey",
+          "trainingVariantAllocationEncrypted",
+          "trainingFlowSnapshotEncrypted",
+          "trainingFlowSnapshotHash",
+          "trainingFlowPathEncrypted",
+          "trainingFlowPathHash",
+          "trainingVariantAllocationHash",
+          "taskSatisfaction",
+          "assignmentRef",
+          "userId",
+          "recoveryTokenHash",
+          "deliveryMode",
+          "runtimeGeneration",
+          "startedAt",
+          "lastSavedAt",
+          "completedAt",
+          "anonymousCode",
+          "contextSnapshotEncrypted",
+          "contextFrozenAt",
+          "trainingPersistenceSnapshot",
+          "trainingPersistenceSnapshotHash",
+          "trainingTimingSnapshot",
+          "frozenActiveSlotSetEncrypted",
+          "scaleAssessments",
+          "cognitiveSessions",
+          "situationalAttempts"
+        ],
+        "callsites": [
+          "at /workspace/eduK12-group4-backend-failures-20261031/server-version/backend/src/config/database.ts:43:20"
+        ]
+      },
+      {
+        "model": "Assessment",
+        "selectKeys": [
+          "id",
+          "userId",
+          "status",
+          "deliveryMode",
+          "runtimeGeneration",
+          "runtimeSnapshotEncrypted",
+          "compiledRuntimeHash",
+          "frozenAdmissionSnapshotEncrypted",
+          "frozenAdmissionSnapshotHash",
+          "attemptEpoch",
+          "startedAt",
+          "submissionId",
+          "submissionPayloadHash",
+          "answers",
+          "result",
+          "progress",
+          "completedAt",
+          "totalTime",
+          "questionnaireAssessmentId",
+          "compositeAttemptId",
+          "compositeItemId",
+          "compositeAttempt",
+          "scaleId",
+          "subjectUserId",
+          "respondentUserId",
+          "respondentType",
+          "scale"
+        ],
+        "callsites": [
+          "at /workspace/eduK12-group4-backend-failures-20261031/server-version/backend/src/config/database.ts:43:20"
+        ]
+      },
+      {
+        "model": "Assessment",
+        "selectKeys": [
+          "id",
+          "userId",
+          "status",
+          "deliveryMode",
+          "runtimeGeneration",
+          "runtimeSnapshotEncrypted",
+          "compiledRuntimeHash",
+          "frozenAdmissionSnapshotEncrypted",
+          "frozenAdmissionSnapshotHash",
+          "attemptEpoch",
+          "startedAt",
+          "submissionId",
+          "submissionPayloadHash",
+          "answers",
+          "result",
+          "progress",
+          "completedAt",
+          "totalTime",
+          "questionnaireAssessmentId",
+          "compositeAttemptId",
+          "compositeItemId",
+          "compositeAttempt",
+          "scaleId",
+          "subjectUserId",
+          "respondentUserId",
+          "respondentType",
+          "scale"
+        ],
+        "callsites": [
+          "at /workspace/eduK12-group4-backend-failures-20261031/server-version/backend/src/config/database.ts:43:20"
+        ]
+      },
+      {
+        "model": "CompositeAssessmentAttempt",
+        "selectKeys": [
+          "id",
+          "trainingContentBindingHash",
+          "trainingReferenceBindingHash",
+          "trainingFlowSnapshotEncrypted",
+          "trainingFlowSnapshotHash",
+          "trainingFlowPathEncrypted",
+          "trainingFlowPathHash",
+          "trainingVariantAllocationEncrypted",
+          "trainingVariantAllocationHash",
+          "compositeAssessment",
+          "userId",
+          "recoveryTokenHash",
+          "assignmentRef",
+          "trainingTimingSnapshot",
+          "runtimeGeneration",
+          "deliveryMode",
+          "attemptEpoch",
+          "contextSnapshotEncrypted",
+          "contextSnapshotHash",
+          "frozenActiveSlotSetEncrypted",
+          "frozenActiveSlotSetHash"
+        ],
+        "callsites": [
+          "at /workspace/eduK12-group4-backend-failures-20261031/server-version/backend/src/config/database.ts:43:20"
+        ]
+      }
+    ],
+    "sql": [
+      "SELECT \"public\".\"composite_assessment_attempts\".\"id\", \"public\".\"composite_assessment_attempts\".\"training_content_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_reference_binding_hash\", \"public\".\"composite_assessment_attempts\".\"status\"::text, \"public\".\"composite_assessment_attempts\".\"attempt_epoch\", \"public\".\"composite_assessment_attempts\".\"composite_assessment_id\", \"public\".\"composite_assessment_attempts\".\"delivery_course_id\", \"public\".\"composite_assessment_attempts\".\"access_token_id\", \"public\".\"composite_assessment_attempts\".\"async_report_epoch\", \"public\".\"composite_assessment_attempts\".\"training_feedback_snapshot\", \"public\".\"composite_assessment_attempts\".\"training_feedback_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"frozen_active_slot_set_hash\", \"public\".\"composite_assessment_attempts\".\"context_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"aggregate_input_hash\", \"public\".\"composite_assessment_attempts\".\"participant_key\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_hash\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_hash\", \"public\".\"composite_assessment_attempts\".\"task_satisfaction\", \"public\".\"composite_assessment_attempts\".\"assignment_ref\", \"public\".\"composite_assessment_attempts\".\"user_id\", \"public\".\"composite_assessment_attempts\".\"recovery_token_hash\", \"public\".\"composite_assessment_attempts\".\"delivery_mode\"::text, \"public\".\"composite_assessment_attempts\".\"runtime_generation\"::text, \"public\".\"composite_assessment_attempts\".\"started_at\", \"public\".\"composite_assessment_attempts\".\"last_saved_at\", \"public\".\"composite_assessment_attempts\".\"completed_at\", \"public\".\"composite_assessment_attempts\".\"anonymous_code\", \"public\".\"composite_assessment_attempts\".\"context_snapshot_encrypted\", \"public\".\"composite_assessment_attempts\".\"context_frozen_at\", \"public\".\"composite_assessment_attempts\".\"training_persistence_snapshot\", \"public\".\"composite_assessment_attempts\".\"training_persistence_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"training_timing_snapshot\", \"public\".\"composite_assessment_attempts\".\"frozen_active_slot_set_encrypted\" FROM \"public\".\"composite_assessment_attempts\" WHERE (\"public\".\"composite_assessment_attempts\".\"id\" = $1 AND 1=1) LIMIT $2 OFFSET $3",
+      "SELECT \"public\".\"assessments\".\"id\", \"public\".\"assessments\".\"composite_item_id\", \"public\".\"assessments\".\"composite_attempt_id\" FROM \"public\".\"assessments\" WHERE \"public\".\"assessments\".\"composite_attempt_id\" IN ($1) ORDER BY \"public\".\"assessments\".\"started_at\" ASC OFFSET $2",
+      "SELECT \"public\".\"assessments\".\"id\", \"public\".\"assessments\".\"user_id\", \"public\".\"assessments\".\"status\"::text, \"public\".\"assessments\".\"delivery_mode\"::text, \"public\".\"assessments\".\"runtime_generation\"::text, \"public\".\"assessments\".\"runtime_snapshot_encrypted\", \"public\".\"assessments\".\"compiled_runtime_hash\", \"public\".\"assessments\".\"frozen_admission_snapshot_encrypted\", \"public\".\"assessments\".\"frozen_admission_snapshot_hash\", \"public\".\"assessments\".\"attempt_epoch\", \"public\".\"assessments\".\"started_at\", \"public\".\"assessments\".\"submission_id\", \"public\".\"assessments\".\"submission_payload_hash\", \"public\".\"assessments\".\"answers\", \"public\".\"assessments\".\"result\", \"public\".\"assessments\".\"progress\", \"public\".\"assessments\".\"completed_at\", \"public\".\"assessments\".\"total_time\", \"public\".\"assessments\".\"questionnaire_assessment_id\", \"public\".\"assessments\".\"composite_attempt_id\", \"public\".\"assessments\".\"composite_item_id\", \"public\".\"assessments\".\"scale_id\", \"public\".\"assessments\".\"subject_user_id\", \"public\".\"assessments\".\"respondent_user_id\", \"public\".\"assessments\".\"respondent_type\" FROM \"public\".\"assessments\" WHERE (\"public\".\"assessments\".\"id\" = $1 AND 1=1) LIMIT $2 OFFSET $3",
+      "SELECT \"id\" FROM \"assessments\" WHERE \"id\" = $1 FOR UPDATE",
+      "SELECT \"public\".\"assessments\".\"id\", \"public\".\"assessments\".\"user_id\", \"public\".\"assessments\".\"status\"::text, \"public\".\"assessments\".\"delivery_mode\"::text, \"public\".\"assessments\".\"runtime_generation\"::text, \"public\".\"assessments\".\"runtime_snapshot_encrypted\", \"public\".\"assessments\".\"compiled_runtime_hash\", \"public\".\"assessments\".\"frozen_admission_snapshot_encrypted\", \"public\".\"assessments\".\"frozen_admission_snapshot_hash\", \"public\".\"assessments\".\"attempt_epoch\", \"public\".\"assessments\".\"started_at\", \"public\".\"assessments\".\"submission_id\", \"public\".\"assessments\".\"submission_payload_hash\", \"public\".\"assessments\".\"answers\", \"public\".\"assessments\".\"result\", \"public\".\"assessments\".\"progress\", \"public\".\"assessments\".\"completed_at\", \"public\".\"assessments\".\"total_time\", \"public\".\"assessments\".\"questionnaire_assessment_id\", \"public\".\"assessments\".\"composite_attempt_id\", \"public\".\"assessments\".\"composite_item_id\", \"public\".\"assessments\".\"scale_id\", \"public\".\"assessments\".\"subject_user_id\", \"public\".\"assessments\".\"respondent_user_id\", \"public\".\"assessments\".\"respondent_type\" FROM \"public\".\"assessments\" WHERE (\"public\".\"assessments\".\"id\" = $1 AND 1=1) LIMIT $2 OFFSET $3",
+      "SELECT \"public\".\"composite_assessment_attempts\".\"id\", \"public\".\"composite_assessment_attempts\".\"training_content_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_reference_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_hash\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_hash\", \"public\".\"composite_assessment_attempts\".\"composite_assessment_id\" FROM \"public\".\"composite_assessment_attempts\" WHERE \"public\".\"composite_assessment_attempts\".\"id\" IN ($1) OFFSET $2",
+      "SELECT \"public\".\"composite_assessment_attempts\".\"id\", \"public\".\"composite_assessment_attempts\".\"training_content_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_reference_binding_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_flow_path_hash\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_encrypted\", \"public\".\"composite_assessment_attempts\".\"training_variant_allocation_hash\", \"public\".\"composite_assessment_attempts\".\"composite_assessment_id\", \"public\".\"composite_assessment_attempts\".\"user_id\", \"public\".\"composite_assessment_attempts\".\"recovery_token_hash\", \"public\".\"composite_assessment_attempts\".\"assignment_ref\", \"public\".\"composite_assessment_attempts\".\"training_timing_snapshot\", \"public\".\"composite_assessment_attempts\".\"runtime_generation\"::text, \"public\".\"composite_assessment_attempts\".\"delivery_mode\"::text, \"public\".\"composite_assessment_attempts\".\"attempt_epoch\", \"public\".\"composite_assessment_attempts\".\"context_snapshot_encrypted\", \"public\".\"composite_assessment_attempts\".\"context_snapshot_hash\", \"public\".\"composite_assessment_attempts\".\"frozen_active_slot_set_encrypted\", \"public\".\"composite_assessment_attempts\".\"frozen_active_slot_set_hash\" FROM \"public\".\"composite_assessment_attempts\" WHERE (\"public\".\"composite_assessment_attempts\".\"id\" = $1 AND 1=1) LIMIT $2 OFFSET $3",
+      "UPDATE \"public\".\"assessments\" SET \"frozen_admission_snapshot_encrypted\" = $1, \"frozen_admission_snapshot_hash\" = $2 WHERE (\"public\".\"assessments\".\"id\" = $3 AND \"public\".\"assessments\".\"frozen_admission_snapshot_hash\" IS NULL)"
+    ],
+    "scopeNote": "Measured admission SQL excerpt, ending at frozen-admission persistence. Later fixture preparation excluded; no parameter values or result rows."
+  }
+]
