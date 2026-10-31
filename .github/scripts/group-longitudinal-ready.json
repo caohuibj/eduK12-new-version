@@ -2178,8 +2178,8 @@
       "schemaVersion": 1,
       "slice": "group",
       "branch": "feat/teacher-group-longitudinal-20261031",
-      "base": "f5fa29314eb731f0479b90ae962b731da8e08d34",
-      "reviewedCandidate": "de230c9464f57dd603ee7fc9b1a8915a03e6b875",
+      "base": "769141d5bc4954919b163a8d8d522530048fbfb6",
+      "reviewedCandidate": "10309fd6a6d016630ed61611636800232fafedc3",
       "originalSource": "de230c9464f57dd603ee7fc9b1a8915a03e6b875",
       "originalReportPrefix": "docs/evidence/teacher-group-longitudinal-20261031/",
       "originalCaseCount": 9,
@@ -2424,8 +2424,8 @@
       "repository": "caohuibj/eduK12-new-version",
       "markerBefore": "a34742f916bc9352814ae6dc9eac75824a32a255",
       "components": {
-        "backend": "3f67f5260693b530748e19537fa0f079da24edb0",
-        "frontend": "9a5eb898478486952884bae543334ec93bd7ab4c"
+        "backend": "610004d9d8cc6897a03787d9a3e03a6f7bf80089",
+        "frontend": "5ad55f44e78a414460a9200500c9614edef5a0e9"
       },
       "files": {
         ".github/scripts/personal-tracking-ready.mjs": {
@@ -2437,12 +2437,16 @@
           "after": "3ce55a9dcf6977997032e921638c4aa8c2303d18"
         },
         ".github/workflows/ci.yml": {
-          "before": "84d95686d025d1a6073472f00742e741a8cf1ad7",
-          "after": "0acca4ae2edb24ffdc154cdcbbeec3e928574c72"
+          "before": "a4fd8c93e6f61cd866c972aa3ff642e74669e651",
+          "after": "9dfeacf2155d16df4dd81fcd6b1c64e8d8c984e5"
         },
         "docs/development/teacher-group-longitudinal-20261031.md": {
           "before": null,
           "after": "aa41e5d246d056a4b7000b9bb31e077d97257a33"
+        },
+        "docs/development/teacher-group-longitudinal-owner-handoff-20261031.md": {
+          "before": null,
+          "after": "69310a0123807f30ae498040e0b9f0ef7b58c180"
         },
         "docs/evidence/teacher-group-longitudinal-20261031/README.md": {
           "before": null,
@@ -2539,6 +2543,10 @@
         "docs/evidence/teacher-group-longitudinal-20261031/sha256.json": {
           "before": null,
           "after": "576b185f9b8a47510b9caad8c6189ea0d9a32d26"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/static-review.json": {
+          "before": null,
+          "after": "6f2886f04818016d0a092c8587773299985b474f"
         },
         "docs/evidence/teacher-group-longitudinal-20261031/ui-first.json": {
           "before": null,
