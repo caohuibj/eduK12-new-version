@@ -2,6 +2,7 @@ import {useEffect,useRef,useState,lazy,Suspense} from 'react'
 import type {SchoolApi} from './SchoolRecovery'
 import {SchoolGeneralGroupV2} from './SchoolGeneralGroupV2'
 import {TaskGroupReport,type TaskGroupArtifact} from '../modules/reporting/TaskGroupReport'
+import {mergeGroupHistory,type GroupHistoryCursor,type GroupHistoryPage} from '../modules/reporting/group-history'
 
 const SchoolPlanGroupLongitudinal=lazy(()=>import('./SchoolPlanGroupLongitudinal').then(module=>({default:module.SchoolPlanGroupLongitudinal})))
 
@@ -10,7 +11,7 @@ type Leaf={slotKey:string;unitType:'SCALE'|'COGNITIVE'|'SITUATIONAL';instrumentK
 type Catalog={specs:Array<{specId:string;title:string;version:number;metricIds:string[]}>;sources:Source[];
   artifacts:Array<{artifactId:string;generatedAt:string}>;truncated:boolean;nextSourcePage?:number|null}
 type Tools={tools:Array<{leaf:Leaf;metrics:Array<{key:string;unit?:string}>}>;
-  groups:{options:Array<{kind:'CLASSES'|'LABELS';id:string;name:string;dimensionId:string|null;dimensionName:string|null}>;limitations:string[]}}
+  groups:{options:Array<{kind:'CLASSES'|'LABELS';id:string;name:string;dimensionId:string|null;dimensionName:string|null}>;limitations:string[]};artifacts?:GroupHistoryCursor[];nextCursor?:GroupHistoryCursor|null}
 const reason=(error:unknown)=>error instanceof Error?error.message:'当前报告不可访问'
 const leafKey=(leaf:Leaf)=>JSON.stringify(leaf)
 
@@ -24,6 +25,7 @@ export function SchoolGroupReports({api,organizationId,compact=false,longitudina
   const [dimension,setDimension]=useState('ALL')
   const [selected,setSelected]=useState<string[]>([])
   const [artifact,setArtifact]=useState<TaskGroupArtifact|null>(null)
+  const [historyCursor,setHistoryCursor]=useState<GroupHistoryCursor|null>(null)
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
   const [reload,setReload]=useState(0)
@@ -35,7 +37,7 @@ export function SchoolGroupReports({api,organizationId,compact=false,longitudina
   }
   useEffect(()=>{
     const token=++request.current
-    setCatalog(null);setTools(null);setArtifact(null);setSourceKey('');setSpecId('');setToolKey('');setDimension('ALL');setSelected([]);setError('');setBusy(true)
+    setCatalog(null);setTools(null);setArtifact(null);setHistoryCursor(null);setSourceKey('');setSpecId('');setToolKey('');setDimension('ALL');setSelected([]);setError('');setBusy(true)
     void api<Catalog>(`${base}/catalog?organizationId=${encodeURIComponent(organizationId)}`).then(async result=>{
       if(token!==request.current)return
       setCatalog(result)
@@ -63,7 +65,7 @@ export function SchoolGroupReports({api,organizationId,compact=false,longitudina
     {!catalog&&!busy&&error&&<button type="button" onClick={()=>setReload(value=>value+1)}>重新读取报告目录</button>}
     {busy&&<p role="status">正在处理报告…</p>}
     {catalog&&<>
-      <label className="hs-field"><span>测评来源</span><select disabled={busy} value={sourceKey} onChange={e=>{request.current++;setSourceKey(e.target.value);setTools(null);setToolKey('');setDimension('ALL');setSelected([])}}>
+      <label className="hs-field"><span>测评来源</span><select disabled={busy} value={sourceKey} onChange={e=>{request.current++;setSourceKey(e.target.value);setTools(null);setToolKey('');setDimension('ALL');setSelected([]);setArtifact(null);setHistoryCursor(null);setCatalog(current=>current?{...current,artifacts:[]}:current)}}>
         <option value="">选择任务</option>{catalog.sources.map(row=><option key={`${row.runId}:${row.trackId}`} value={`${row.runId}:${row.trackId}`}>{row.name} · {row.resource.key}</option>)}
       </select></label>
       {catalog.nextSourcePage&&<button type="button" disabled={busy} onClick={()=>void run(async token=>{
@@ -73,7 +75,7 @@ export function SchoolGroupReports({api,organizationId,compact=false,longitudina
       })}>加载更多测评来源</button>}
       <button type="button" disabled={busy||!source} onClick={()=>void run(async token=>{
         const result=await api<Tools>(`${base}/tools?${new URLSearchParams({organizationId,runId:source!.runId,trackId:source!.trackId})}`)
-        if(token===request.current){setTools(result);setToolKey('');setDimension('ALL');setSelected([])}
+        if(token===request.current){setTools(result);setToolKey('');setDimension('ALL');setSelected([]);setHistoryCursor(result.nextCursor??null);setCatalog(current=>current?{...current,artifacts:mergeGroupHistory([],result.artifacts??[])}:current)}
       })}>选择工具与人群</button>
       {(tools||longitudinalOnly)&&<>
         {!longitudinalOnly&&<label className="hs-field"><span>叶工具与固定版本</span><select disabled={busy} value={toolKey} onChange={e=>setToolKey(e.target.value)}>
@@ -100,6 +102,10 @@ export function SchoolGroupReports({api,organizationId,compact=false,longitudina
       {!longitudinalOnly&&(catalog.artifacts??[]).length>0&&<label className="hs-field"><span>已生成版本</span><select disabled={busy} value={artifact?.artifactId??''} onChange={e=>{if(e.target.value)void run(token=>read(e.target.value,token))}}>
         <option value="">选择报告</option>{catalog.artifacts.map(row=><option key={row.artifactId} value={row.artifactId}>{new Date(row.generatedAt).toLocaleString('zh-CN')} · {row.artifactId.slice(0,8)}</option>)}
       </select></label>}
+      {!longitudinalOnly&&source&&historyCursor&&<button type="button" disabled={busy} onClick={()=>void run(async token=>{
+        const page=await api<GroupHistoryPage>(`${base}/history?${new URLSearchParams({organizationId,runId:source.runId,trackId:source.trackId,beforeGeneratedAt:historyCursor.generatedAt,beforeArtifactId:historyCursor.artifactId})}`)
+        if(token===request.current){setHistoryCursor(page.nextCursor??null);setCatalog(current=>current?{...current,artifacts:mergeGroupHistory(current.artifacts,page.artifacts)}:current)}
+      })}>加载更早的群体版本</button>}
     </>}
     {longitudinalOnly&&source&&(dimension==='ALL'||selected.length>0)&&<Suspense fallback={<p role="status">正在读取纵向群体报告界面…</p>}><SchoolPlanGroupLongitudinal api={api} organizationId={organizationId} runId={source.runId} specId={specId} selection={dimension==='ALL'?{kind:'ALL'}:{kind:dimension==='CLASSES'?'CLASSES':'LABELS',ids:selected}}/></Suspense>}
     {!longitudinalOnly&&artifact&&<TaskGroupReport key={artifact.artifactId} artifact={artifact}/>}

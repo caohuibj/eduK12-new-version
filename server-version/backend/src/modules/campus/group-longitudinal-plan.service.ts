@@ -56,7 +56,7 @@ export function schoolPlanLeafBinding(tracking:EducationTracking,metrics:Tracked
  if(kind==='FORM'||metrics.some(m=>m.kind!==kind))return unavailable('此校园来源没有已批准的数值叶工具适配')
  return {trackId:binding.trackId,itemId:binding.itemId,slotKey:compositeItemSlotKey(binding.itemId,kind==='SJT'?'SITUATIONAL':kind),selected}
 }
-async function resolveLeaves(input:Scope,metrics:TrackedMetric[],waves:Wave[]){
+async function resolveLeaves(input:Scope,metrics:TrackedMetric[],waves:Wave[],headers:Header[]){
  const principal=await requireCampusGroupManager(input.actor,input.organizationId)
  const selected=waves.map(wave=>({wave,...schoolPlanLeafBinding(educationTrackingSchema.parse(wave.tracking),metrics)}))
  const tracks=await prisma.$queryRaw<Array<{id:string;runId:string;policy:unknown;policyHash:string}>>(Prisma.sql`SELECT id,run_id AS "runId",frozen_resource_policy AS policy,resource_policy_hash AS "policyHash"
@@ -76,6 +76,12 @@ async function resolveLeaves(input:Scope,metrics:TrackedMetric[],waves:Wave[]){
   const tools=await listAuthoritativeRunLeafSources({organizationId:input.organizationId,runId:s.wave.id,trackId:s.trackId,slotKey:s.slotKey,groupAudience:principal.groupAudience})
   const candidates=tools.filter(t=>t.leaf.slotKey===s.slotKey&&t.leaf.unitType===(metrics[0].kind==='SJT'?'SITUATIONAL':metrics[0].kind)
    &&metrics.some(m=>t.metrics.some(v=>v.key===m.scoreKey&&v.unit===m.unit)))
+  // Discovery verifies the frozen source even when there is no accepted result
+  // to advertise. Keep that empty round; do not turn a denied populated source
+  // into a missing round.
+  if(!tools.length&&!headers.some(h=>h.runId===s.wave.id&&h.trackId===s.trackId)){
+   resolved.push({...s,allowedMetricIds:[] as string[],leaf:null,protocol:null});continue
+  }
   if(candidates.length!==1)return unavailable('追踪叶工具缺少获准群体数值来源，或存在多个实际配置，不能混合')
   const allowedMetricIds=metrics.filter(m=>candidates[0].metrics.some(v=>v.key===m.scoreKey)).map(m=>m.id)
   if(metrics.some(m=>candidates[0].metrics.some(v=>v.key===m.scoreKey&&v.unit!==m.unit)))return unavailable('校园追踪数值单位变化')
@@ -101,7 +107,7 @@ export async function readSchoolPlanCompletedHeaders(organizationId:string,waves
  return headers
 }
 
-type WaveRef={runId:string;trackId:string;artifactId:string;snapshotHash:string;projectionHash:string;metricKeys:string[];leaf:ReportingLeafSourceV2}
+type WaveRef={runId:string;trackId:string}&({missing:true}|{missing?:false;artifactId:string;snapshotHash:string;projectionHash:string;metricKeys:string[];leaf:ReportingLeafSourceV2})
 /** Freeze the numeric disclosure, not the current template's wording. */
 export function schoolGroupNumericView(projection:TaskGroupProjection,keys:string[]){
  return {completedN:projection.completedN,countUnit:projection.countUnit,metrics:[...keys].sort().map(key=>{const m=projection.metrics.find(m=>m.key===key);return m?{key,type:m.type,unit:m.unit??null,state:m.state??'present',validN:m.validN??null,missingN:m.missingN??null,mean:m.mean??null,sdSample:m.sdSample??null}:{key,state:'suppressed'}})}
@@ -118,8 +124,9 @@ export async function generateSchoolPlanGroup(input:Scope&{planId:string;sourceK
  if(spec.definition.analysisKind!=='GROUP')return unavailable('沿用已有的获准单轮GROUP方案')
  assertReviewedCampusGroupSpec(spec.definition)
  const selectedWaves=waves.map(wave=>({wave,...schoolPlanLeafBinding(educationTrackingSchema.parse(wave.tracking),metrics)}))
- const before=await readSchoolPlanCompletedHeaders(input.organizationId,selectedWaves),leaves=await resolveLeaves(input,metrics,waves)
+ const before=await readSchoolPlanCompletedHeaders(input.organizationId,selectedWaves),leaves=await resolveLeaves(input,metrics,waves,before)
  const groupMetrics=metrics.filter(metric=>leaves.some(source=>source.allowedMetricIds.includes(metric.id)))
+ if(!groupMetrics.length)return unavailable('所选追踪工具暂无获准的群体数值')
  const metricKeys=Object.fromEntries(groupMetrics.map(m=>{
   const rules=spec.definition.analysisKind==='GROUP'?spec.definition.metricRules.filter(r=>r.sourceMetricKey===m.scoreKey):[]
   if(rules.length!==1)return unavailable('原群体方案未唯一覆盖此追踪分数')
@@ -127,6 +134,12 @@ export async function generateSchoolPlanGroup(input:Scope&{planId:string;sourceK
  }))
  const bindings:Bindings={waves:[],selection:input.selection??{kind:'ALL'},specId:input.specId},prepared:GroupLongitudinalWave[]=[]
  for(const source of leaves){
+  if(!source.leaf){
+   const projection:TaskGroupProjection={schemaVersion:1,descriptionVersion:'group-descriptive-v1',title:'学校群体报告',sourceLabel:source.wave.name,populationLabel:'本波次暂无完成结果',cutoff:new Date().toISOString(),completedN:null,assignedN:null,countUnit:'PERSON',tool:{key:input.sourceKey,title:metrics[0].label,kind:metrics[0].kind},metrics:[],limitations:['本波次尚无完成结果，数值及人数保持空值。']}
+   prepared.push({id:source.wave.id,ordinal:source.wave.ordinal,label:source.wave.name,projection,metricKeys,observedFrom:null,observedUntil:null,populationKeys:null})
+   bindings.waves.push({runId:source.wave.id,trackId:source.trackId,missing:true})
+   continue
+  }
   // Existing School code owns release lock, frozen subgroup, 24-hour delay,
   // GROUP source permission and small-difference checks. No nested lock here.
   const safe=await generateCampusGroupReport({...input,runId:source.wave.id,trackId:source.trackId,leaf:source.leaf,selection:bindings.selection})
@@ -162,6 +175,7 @@ export async function readSchoolPlanGroup(input:Scope&{artifactId:string}){
  const bindings=saved.sourceBindings as Bindings
  if(!bindings.waves.length||bindings.waves.some(ref=>!state.waves.some(w=>w.id===ref.runId)))return unavailable('校园群报快照不属于此计划')
  for(const ref of bindings.waves){
+  if(ref.missing===true)continue
   const current=await readCampusGroupReport({actor:input.actor,organizationId:input.organizationId,artifactId:ref.artifactId})
   const stored=await readReportingArtifactRecord(ref.artifactId)
   if(!('projection'in current)||stored.organizationId!==input.organizationId||stored.snapshotHash!==ref.snapshotHash||canonicalHash(schoolGroupNumericView(current.projection as TaskGroupProjection,ref.metricKeys))!==ref.projectionHash)return unavailable('原校园群报的披露范围或快照已变化')

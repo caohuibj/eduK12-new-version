@@ -8,6 +8,34 @@ const catalog={specs:[{specId:spec,title:'正式方案',version:1,metricIds:['sc
 const report={artifactId:'artifact',generatedAt:'2026-10-30T00:00:00Z',projection:{title:'学校群体报告',sourceLabel:'工具甲',cutoff:'2026-10-30T00:00:00Z',populationLabel:'冻结子群',completedN:10,countUnit:'PERSON',assignedN:10,tool:{key:'a',title:'甲',kind:'SCALE'},metrics:[{key:'score',label:'score',type:'NUMBER',unit:'score',validN:10,missingN:0,mean:0,sdSample:1,range:null,observedRange:null,qualityCounts:{},measurement:leaf,frequencies:[]}],limitations:['不作因果结论']}}
 const tools={tools:[{leaf,metrics:[{key:'score',unit:'score'}]}],groups:{options:[{kind:'CLASSES',id:'class-a',name:'一班',dimensionId:null,dimensionName:null}],limitations:['按任务发布时分组']}}
 describe('School group workbench',()=>{
+ it('uses the selected task history beyond the latest100, appends older versions and resets on source change',async()=>{
+  const recent=Array.from({length:100},(_,i)=>({artifactId:'recent-'+i,generatedAt:report.generatedAt}))
+  const pointer={artifactId:'old-source',generatedAt:'2026-01-01T00:00:00.123456Z'}
+  const older={artifactId:'older-source',generatedAt:'2025-01-01T00:00:00.123456Z'}
+  const api=vi.fn(async(path:string)=>{
+   if(path.includes('/catalog?'))return {...catalog,sources:[...catalog.sources,{...catalog.sources[0],runId:'run2',name:'任务乙'}],artifacts:recent}
+   if(path.includes('/tools?'))return {...tools,artifacts:[pointer],nextCursor:pointer}
+   if(path.includes('/history?'))return {artifacts:[pointer,older],nextCursor:null}
+   return {...report,artifactId:path.split('/').slice(-1)[0]}
+  })
+  render(<SchoolGroupReports api={api as SchoolApi} organizationId={org}/>)
+  await screen.findByRole('article',{name:'群体报告阅读'})
+  fireEvent.change(screen.getByLabelText('测评来源'),{target:{value:'run:track'}})
+  fireEvent.click(screen.getByRole('button',{name:'选择工具与人群'}))
+  await screen.findByRole('option',{name:/old-sour/})
+  expect(screen.queryByRole('option',{name:/recent-/})).not.toBeInTheDocument()
+  fireEvent.change(screen.getByLabelText('已生成版本'),{target:{value:pointer.artifactId}})
+  await waitFor(()=>expect(screen.getByLabelText('已生成版本')).toHaveValue(pointer.artifactId))
+  fireEvent.click(screen.getByRole('button',{name:'加载更早的群体版本'}))
+  await screen.findByRole('option',{name:/older-so/})
+  expect(screen.getAllByRole('option',{name:/old-sour/})).toHaveLength(1)
+  expect(screen.getByLabelText('已生成版本')).toHaveValue(pointer.artifactId)
+  expect(api).toHaveBeenCalledWith('/reports/groups/history?'+new URLSearchParams({organizationId:org,runId:run,trackId:track,beforeGeneratedAt:pointer.generatedAt,beforeArtifactId:pointer.artifactId}))
+  fireEvent.change(screen.getByLabelText('测评来源'),{target:{value:'run2:track'}})
+  expect(screen.queryByLabelText('已生成版本')).not.toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'加载更早的群体版本'})).not.toBeInTheDocument()
+  expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
+ })
  it('continues an empty filtered source page without reloading the catalog or reports',async()=>{
   const api=vi.fn(async(path:string)=>{
    if(path.includes('/catalog?'))return {...catalog,sources:[],nextSourcePage:2,truncated:true}
