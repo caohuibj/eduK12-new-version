@@ -14,6 +14,12 @@
       "scoringVersion": "1.1.0"
     },
     {
+      "testType": "cogest",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
       "testType": "logicdeduce",
       "configVersion": "2.0.0",
       "engineVersion": "2.0.0",

@@ -55,7 +55,9 @@ import { readingcompRegistryEntry as task52 } from '../tasks/readingcomp/reading
 import { proofreadLegacyRegistryEntry as task53 } from '../tasks/proofread/proofread.legacy-registry'
 import { proofreadRegistryEntry as task54 } from '../tasks/proofread/proofread.registry'
 import { visualwmRegistryEntry as task55 } from '../tasks/visualwm/visualwm.registry'
-import { mazeRegistryEntry as task56 } from '../tasks/maze/maze.registry'
-import { auditoryrtRegistryEntry as task57 } from '../tasks/auditoryrt/auditoryrt.registry'
-import { auditorynbackRegistryEntry as task58 } from '../tasks/auditorynback/auditorynback.registry'
-export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40, task41, task42, task43, task44, task45, task46, task47, task48, task49, task50, task51, task52, task53, task54, task55, task56, task57, task58]
+import { cogestRegistryEntry as task56 } from '../tasks/cogest/cogest.registry'
+import { cogestRegistryEntryV11 as task57 } from '../tasks/cogest/cogest.registry-v1.1'
+import { mazeRegistryEntry as task58 } from '../tasks/maze/maze.registry'
+import { auditoryrtRegistryEntry as task59 } from '../tasks/auditoryrt/auditoryrt.registry'
+import { auditorynbackRegistryEntry as task60 } from '../tasks/auditorynback/auditorynback.registry'
+export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40, task41, task42, task43, task44, task45, task46, task47, task48, task49, task50, task51, task52, task53, task54, task55, task56, task57, task58, task59, task60]

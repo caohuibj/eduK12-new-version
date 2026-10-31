@@ -273,6 +273,11 @@
       "scoringVersion": "1.0.0"
     },
     {
+      "testType": "cogest",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
       "testType": "maze",
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.1"
@@ -309,6 +314,11 @@
     },
     {
       "testType": "proofread",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "cogest",
       "engineVersion": "1.1.0",
       "scoringVersion": "1.1.0"
     },
@@ -542,6 +552,14 @@
     {
       "testType": "visualwm",
       "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "cogest",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "cogest",
+      "engineVersion": "1.1.0"
     },
     {
       "testType": "maze",

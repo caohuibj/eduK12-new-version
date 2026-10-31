@@ -48,9 +48,10 @@ import { executionEntries as task45 } from '../tasks/pursuitrotor/package'
 import { executionEntries as task46 } from '../tasks/readingcomp/package'
 import { executionEntries as task47 } from '../tasks/proofread/package'
 import { executionEntries as task48 } from '../tasks/visualwm/package'
-import { executionEntries as task49 } from '../tasks/maze/package'
-import { executionEntries as task50 } from '../tasks/auditoryrt/package'
-import { executionEntries as task51 } from '../tasks/auditorynback/package'
+import { executionEntries as task49 } from '../tasks/cogest/package'
+import { executionEntries as task50 } from '../tasks/maze/package'
+import { executionEntries as task51 } from '../tasks/auditoryrt/package'
+import { executionEntries as task52 } from '../tasks/auditorynback/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -109,10 +110,12 @@ export const cognitiveExecutionEntries = [
   task49[0],
   task50[0],
   task51[0],
+  task52[0],
   task39[1],
   task43[1],
   task44[1],
   task46[1],
   task47[1],
+  task49[1],
   task21[1],
 ]
