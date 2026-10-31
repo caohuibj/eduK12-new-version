@@ -1,5 +1,8 @@
 import { isBankPublicReleaseAllowed, type CognitiveBankLicense } from './bank-meta'
 import { COGNITIVE_BANK_REGISTRY } from './registry'
+import cognitiveManifest from '../generated/identities.json'
+
+const KNOWN_TASK_TYPES = new Set(cognitiveManifest.identities.map((entry) => entry.testType))
 
 /** One publication decision per frozen config, shared by CLI and release service. */
 export interface BankPublishInput {
@@ -46,7 +49,14 @@ export const collectBankPublishBlockers = async (
       continue
     }
     const banks = COGNITIVE_BANK_REGISTRY[testType]
-    if (!banks) continue // explicitly procedural tasks; registry alignment asserted in CI
+    if (!banks) {
+      // A procedural task may have no item bank; an unknown task must not be
+      // mistaken for one merely because it lacks a bank registry entry.
+      if (!KNOWN_TASK_TYPES.has(testType)) {
+        block('BANK_DECLARATION_INVALID', 'unknown cognitive task identity')
+      }
+      continue
+    }
     if (banks.length === 0) {
       block('BANK_DECLARATION_INVALID', 'empty compiled bank registration')
       continue

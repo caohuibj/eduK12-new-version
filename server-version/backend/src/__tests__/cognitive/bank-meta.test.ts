@@ -27,7 +27,10 @@ describe('cognitive bank meta (roadmap v2.0 PR1)', () => {
 
   it('gates public release to the allowlist and keeps research-restricted internal', () => {
     const meta = (license: (typeof PUBLIC_RELEASE_LICENSES)[number] | 'research-restricted') =>
-      cognitiveBankMetaSchema.parse({ stimulusSetVersion: 'x-v1.0.0', source: 's', license })
+      cognitiveBankMetaSchema.parse({
+        stimulusSetVersion: 'x-v1.0.0', source: 's', license,
+        ...(license === 'verified' ? { rightsEvidenceRef: 'reviewed-rights/approval-1' } : {}),
+      })
     expect(cognitiveBankMetaSchema.safeParse({ stimulusSetVersion: 'x-v1', source: 's', license: 'verified' }).success).toBe(false)
     expect(cognitiveBankMetaSchema.safeParse({ stimulusSetVersion: 'x-v1', source: 's', license: 'verified', rightsEvidenceRef: 'rights/approval-1' }).success).toBe(true)
     for (const license of PUBLIC_RELEASE_LICENSES) {
@@ -80,6 +83,8 @@ describe('cognitive bank meta (roadmap v2.0 PR1)', () => {
 
     const missing = await collectBankPublishBlockers([{ testType: 'nonexistent-task', config: {} }])
     expect(missing.map((entry) => entry.code)).toContain('BANK_DECLARATION_INVALID')
+    const procedural = await collectBankPublishBlockers([{ testType: 'reaction', config: {} }])
+    expect(procedural).toEqual([])
     const unversioned = await collectBankPublishBlockers([{ testType: 'wordanalogy', config: {} }])
     expect(unversioned.map((entry) => entry.code)).toContain('BANK_VERSION_MISMATCH')
   })
