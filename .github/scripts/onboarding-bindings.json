@@ -5396,9 +5396,9 @@
       "schemaVersion": 1,
       "pr": 428,
       "enabled": true,
-      "base": "f3c3b7def0ecb663a328c9effb7a7ae90753178b",
-      "product": "2c1ef5d3df1211635b04fac219cc993a5d68bfef",
-      "controlCheckpoint": "18726ca25d0b8ddb28ba105ead6acdf274ae3627",
+      "base": "3bb4c9ad2385d5c3d043663cc303336817763f08",
+      "product": "10d8bfffbb4144628bfc34bba8c2988cbf0e55bb",
+      "controlCheckpoint": "9f4cc80b128f2e57c9ca6e4e11b9440134545fc0",
       "source": {
         "docs/evidence/library-self-group-release-20261031/README.md": {
           "before": null,
@@ -5537,6 +5537,30 @@
           "after": "acfeab6ffb32e9b2cd376b7d0d5e01b1cb7f0fa1"
         },
         "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/README.md": {
+          "before": null,
+          "after": "accc3428ac5caf9414187b1e620d6b27c9f9a84a"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/backend-types.json": {
+          "before": null,
+          "after": "d864d8a4c9b7c85c29d131a98ff3de2140feb8ea"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/control-merge-repair.log": {
+          "before": null,
+          "after": "8cfbb745b948295ba48067e04d3c2d4802679b8c"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/frontend-types.json": {
+          "before": null,
+          "after": "093486372f8fc795ce641b8669b117f9a2fa4a25"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/frontend-types.log": {
           "before": null,
           "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
         },
@@ -5892,11 +5916,11 @@
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
         ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "02431fa1e8cea88af348adbf2fe2c3f0338b962a",
-        ".github/scripts/onboarding-checks.mjs": "c7d52cb988f1f0f409349c3e35e0ae40e260c3b8",
-        ".github/scripts/onboarding-controls.test.mjs": "a39ff9d41f0984de059cb73ca986f44a8fafb69e",
-        ".github/scripts/onboarding-evidence.json": "bd71e4dce21914f7c51fd20713f370a6d0698b05",
-        ".github/scripts/onboarding-scope.mjs": "be840fc9ee3fbec3f338a6cd5ab0fabdfdfc64a3",
+        ".github/scripts/onboarding-bindings.json": "c9fb39528d7e5033689df70e3b32abbb73920935",
+        ".github/scripts/onboarding-checks.mjs": "dcff76756e80ca62b1160e2e542b0eaf7d7c59f0",
+        ".github/scripts/onboarding-controls.test.mjs": "99bffd299fe472a47597b91e9cccf2197fa2a0f8",
+        ".github/scripts/onboarding-evidence.json": "f311ac97dcd89d2dade7d3d6ce63dc5fe6955b8c",
+        ".github/scripts/onboarding-scope.mjs": "8c4ec59b050591a542fb5c74860298e655adbb9e",
         ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
         ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
         ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
@@ -5906,11 +5930,252 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "1e8bfe293da8513f8c3a0dbd93dc195a533023ae"
+        ".github/workflows/ci.yml": "8117bec7529886f5e8712c22626572ad556a0c9d"
       },
       "components": {
-        "backend": "a904d85585fd635c7521f5f025eaa5a6660843e9",
-        "frontend": "1a014099924357f420821fc7c8aca1344ab472b0"
+        "backend": "aa12ceb3d8ac490c5f470c92fab76e6cbb5ef1a2",
+        "frontend": "f5ba5d4c1c50634071a9f130fe96e2628f860320"
+      }
+    },
+    "429": {
+      "schemaVersion": 1,
+      "pr": 429,
+      "enabled": true,
+      "base": "c63382d0eb6629c7bacbd853b8feb92e0257d46b",
+      "product": "80f40cf78ba7f1fff8b80658cbd0fd80214918bb",
+      "controlCheckpoint": "96f7d9de37d64064b3b95e57d890a512f59c7f59",
+      "source": {
+        "docs/evidence/teacher-group-partial-population-20261031/README.md": {
+          "before": null,
+          "after": "e02f93da41427450020107d5b87deeb466791fbe"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/alias-unit.json": {
+          "before": null,
+          "after": "daac3b53f4af93c73ee9be1ba625c1c77eda44d9"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/backend-types-first.json": {
+          "before": null,
+          "after": "d287501a72f780b5fa4c214c461950b243e73e37"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/backend-types-first.log": {
+          "before": null,
+          "after": "3298fe26a2325b85d3151575850a06e7bd4a4e15"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/backend-types-pre-alias.json": {
+          "before": null,
+          "after": "0dc14d73f1a29ad9d1fce7b22a0d7191b79c57c8"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/backend-types-pre-alias.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/backend-types-syntax.json": {
+          "before": null,
+          "after": "e62e479a0a199282fdb9b3aeeacb16469d2b970a"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/backend-types-syntax.log": {
+          "before": null,
+          "after": "ebb72b2d96e785b9b58e4e18b9101bfa817bbd4d"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/backend-types.json": {
+          "before": null,
+          "after": "bdd2c2d6fddb69b5763a296482ef06406cb1d8fb"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/candidate.json": {
+          "before": null,
+          "after": "22dc14619ec49e619b4cd2f99327c72a1e0bde34"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/comparable-alias-postgres.json": {
+          "before": null,
+          "after": "2e63453c6ff0167a31530d7a283e834d98a6bfaa"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/comparable-alias-postgres.log": {
+          "before": null,
+          "after": "83970bc69b6be8b306a13450fc823e29a28e6061"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/frontend-types.json": {
+          "before": null,
+          "after": "a9565ab370ef71bbe70b21fb4852680062f336ad"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/paging-unit.json": {
+          "before": null,
+          "after": "7cb97244fdbd513ec4720419e689d5c961fefbb4"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/paging-unit.log": {
+          "before": null,
+          "after": "e8f8f0ef10fd980c78686c8bf9aa1cdc20be0eea"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/pointer-read-proof.json": {
+          "before": null,
+          "after": "c380bf879e42b317ffdf4cd6bd1c1c1c60d04e0f"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/pointer-ui.json": {
+          "before": null,
+          "after": "7428252b0d2493248b8c9c94985d0068f2b5c268"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/pointer-ui.log": {
+          "before": null,
+          "after": "3e4ec966664d9df31166273879ed9a1f0c7d1b6d"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/postgres-first.json": {
+          "before": null,
+          "after": "2f3c05ec23b63411eced01305cbb9c5515211b43"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/postgres-first.log": {
+          "before": null,
+          "after": "b28c821e24443f88730096c02335d3134750469f"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/postgres-partial-success.json": {
+          "before": null,
+          "after": "94fc9592a14774481c63f459aa97f2eccb5ef22a"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/postgres-partial-success.log": {
+          "before": null,
+          "after": "b28c821e24443f88730096c02335d3134750469f"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/postgres.json": {
+          "before": null,
+          "after": "9e4f37fbcc39ddb423c78116ebe478a7f5c84a32"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/postgres.log": {
+          "before": null,
+          "after": "b28c821e24443f88730096c02335d3134750469f"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/proof.json": {
+          "before": null,
+          "after": "0b1f3ff341d33433d385d7b19de027b6e9e1e52f"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/raw-sha256.json": {
+          "before": null,
+          "after": "36a99bd43e63b787b3f97346bf2fdad6e6f3e01e"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/README.md": {
+          "before": null,
+          "after": "ae43f99bf3d7c47691a23e6e53d21db68a12b8a0"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/backend-types.json": {
+          "before": null,
+          "after": "1c4a3fef2efbc82875a04275950463f46d05434f"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/frontend-types.json": {
+          "before": null,
+          "after": "01064f97ac4b5f55d4a68fbd607b2e1efa36a09c"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/README.md": {
+          "before": null,
+          "after": "ff59e990a270395f5c7e3b1a2ad0bb679b1fd363"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/backend-types.json": {
+          "before": null,
+          "after": "5609c674338bde871ced4714b11e44fffd1005f4"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/frontend-types.json": {
+          "before": null,
+          "after": "f376e7fca876e8cb51b4c091a5b8cacef3504106"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/unit.json": {
+          "before": null,
+          "after": "088b1d2d4aadefd2ff85ea13d49d73f7934e51d9"
+        },
+        "docs/evidence/teacher-group-partial-population-20261031/unit.log": {
+          "before": null,
+          "after": "fa957330c13a783f3bbaf008e498a1bc4ce95762"
+        },
+        "docs/group-report-history-paging-handoff-20261031.md": {
+          "before": null,
+          "after": "4def53ca9ed141336986f54c0a52fb1b34584f10"
+        },
+        "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts": {
+          "before": "bd3367251ecdf4220643dbbf24a14165b796f4ff",
+          "after": "60ca8329b8894a22281d1a6032d43c296cae0515"
+        },
+        "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts": {
+          "before": "d1faea7afc4ca87ca9619e8d67af2f792ccd8ee4",
+          "after": "4ab7658b1a4f726cac4bee32e7a5d71c80a492df"
+        },
+        "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts": {
+          "before": null,
+          "after": "36874c0bb64a9c47e7c50f591d6332b89f152488"
+        },
+        "server-version/backend/src/modules/huiteacher/groupReport.routes.ts": {
+          "before": "ad1f4b6d6e9f126ce788aaac4235c18c242fc14b",
+          "after": "66a750af19b4a2b4188248f5a5b00b0fc85a6f8b"
+        },
+        "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts": {
+          "before": "5cd7d7573e8fec678b5feb89d175a798e78bfc78",
+          "after": "990fa9c1864c2fb1e2906049f272e12ce2607a54"
+        },
+        "server-version/backend/src/modules/reporting/engine.ts": {
+          "before": "6aabd0db80380e607994ca81802b4db3c2eaa139",
+          "after": "b24ff6d7d8ead1f49a66e1f2b32c8ce195ef53cc"
+        },
+        "server-version/backend/src/modules/reporting/service.ts": {
+          "before": "6679fae2bfcce38a98c24669fb5e35ea2aa6cb65",
+          "after": "10e958b45ffe8f5b8a429651d80a964b1ce19633"
+        },
+        "server-version/backend/src/modules/reporting/types.ts": {
+          "before": "22a008a4cb09b5807ee3e35bdfd0609eaa1eb73b",
+          "after": "7d003d6ac7cfaeaf71d8ed6365e20100acfef9d8"
+        },
+        "server-version/frontend/src/huiteacher/HuiteacherGroupReportReading.test.tsx": {
+          "before": "9acbc9d3f167ab30f7255f7470476ffd9875297e",
+          "after": "2eaaeeea87a3cc18ec4692f0fd8dc49e343d72a7"
+        },
+        "server-version/frontend/src/huiteacher/TeacherNumericGroupReports.pointer.test.tsx": {
+          "before": null,
+          "after": "5463fd374ee8b4e80be12ae153bdc30c3d6014b0"
+        },
+        "server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx": {
+          "before": "047608b8752ccea4c5c1eae27cd5cfa4d8baa9b6",
+          "after": "f67edde4970bfdfc1c780f2820f0c4047e7f319a"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "99b117b4d6f8c77c1ba8c05b783f7a95a86991d0",
+        ".github/scripts/onboarding-checks.mjs": "520d7d03924d4f1537cd676186e1ed71cd6ac77d",
+        ".github/scripts/onboarding-controls.test.mjs": "99bffd299fe472a47597b91e9cccf2197fa2a0f8",
+        ".github/scripts/onboarding-evidence.json": "3bbdf09e82bacbc352f81cc520e6a3acfee74f82",
+        ".github/scripts/onboarding-scope.mjs": "a016748f261f7d54a6788e4fc88010f64f031341",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "a5f9f54a43ceb928c48755ff7fcaff76e5eb6fbf"
+      },
+      "components": {
+        "backend": "dca39d39720e4317600fd4e9cc34d2de18a05272",
+        "frontend": "5b108c22d6006abddcfcabd71ce2de67ed886828"
       }
     }
   }
