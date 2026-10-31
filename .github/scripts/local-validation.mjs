@@ -1,6 +1,6 @@
 import {cognitiveIntakeToolingChanged} from './cognitive-intake-scope.mjs';
 import {scaleIntakeToolingChanged} from './scale-intake-scope.mjs';
-import {backendTestFile} from '../../server-version/scripts/release/policy.mjs';
+import {backendTestFile,imageBuildFile} from '../../server-version/scripts/release/policy.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -44,7 +44,7 @@ export function recipe(check,base,head) {
  if(check==='release-tools') {
   const files=git('diff','--name-only','--no-renames',base,head).split('\n');
   if(files.some(file=>file==='.github/scripts/dependency-scope.mjs'||file==='.github/scripts/dependency-routing.test.mjs'))commands.push(['node','--test','.github/scripts/dependency-routing.test.mjs']);
-  if(files.some(file=>['.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml'].includes(file))){
+  if(files.some(imageBuildFile)){
    commands.push(['node','--test','.github/scripts/ci-image-plan.test.mjs']);
    commands.push(['node','--test','--test-name-pattern=^frontend route builds only the frontend image','.github/scripts/content-workflows.test.mjs']);
   }
@@ -73,7 +73,7 @@ export function recipe(check,base,head) {
 }
 export function binding(check,base,head) {
  const paths=check==='documentation'?[script,'.github/scripts/documentation-check.mjs','.github/scripts/content-scope.mjs','server-version/scripts/release/policy.mjs',...git('diff','--name-only','--no-renames',base,head).split('\n')]:
-  check==='release-tools'?['.github/scripts','.github/workflows','.github/config','.github/release-tools','server-version/scripts/release','server-version/scripts/cognitive','server-version/ops/nginx','server-version/backend']:
+  check==='release-tools'?['.github/scripts','.github/workflows','.github/config','.github/release-tools','server-version/scripts/release','server-version/scripts/cognitive','server-version/ops/nginx','server-version/backend','server-version/frontend/Dockerfile']:
   ['server-version/frontend','server-version/backend','server-version/scripts/release','.github/scripts','.github/workflows','.github/release-tools'];
  const tree=git('ls-tree','-r',head,'--',...paths.filter(Boolean));
  const diff=check==='documentation'?git('diff','--no-ext-diff','--no-textconv','--no-renames','--raw','--abbrev=40',base,head):'';

@@ -330,6 +330,8 @@ GitHub 是唯一正式验证位置：前后端各编译一次，定向真实隔�
 
 C/平台镜像的可选地域源：现有镜像链 `ci.yml → ci-images.yml → build-ci-images.sh → ci-image-plan.mjs` 可由既有 reusable/manual workflow 的 `debian_mirror`、`npm_registry`、`alpine_mirror` 显式传入源。默认仍为 `deb.debian.org`、`https://registry.npmjs.org`、空 Alpine 前缀；只有被选择的镜像 target 消费对应参数，生成及执行前的 Bake 计划核对相同值，日志记录实际参数。其他检查/工具下载源不变，不扩散到 A/B 或专用候选 producer。
 
+纯镜像构建输入沿用 `release-tooling`：完整差异只允许既有镜像计划/脚本/workflow、前后端 Dockerfile 及对应说明和路由控制的普通修改。分类器从完整差异派生 `image_build`；Ready 必须通过原 `release-tools` 自检、Docker 三镜像构建与安全扫描、Compose 资源/HTTPS/API-worker 拓扑和 Nginx MIME/安全头烟测、CodeQL 及 merge gate。Dockerfile 仍计入组件指纹；末端只对这一完整构建范围接纳组件变化，不把它用于应用发布。混入应用源码、锁文件、schema、其他运行脚本或部署拓扑继续按原范围验证；Draft 不启动镜像构建。
+
 大陆节点可选 `debian_mirror=mirrors.tuna.tsinghua.edu.cn`（只填主机名）、`npm_registry=https://registry.npmmirror.com`、`alpine_mirror=https://mirrors.tuna.tsinghua.edu.cn/alpine`；前端只替换仓库前缀，保留基础镜像的版本路径与 apk 签名/安全更新。继续 `npm ci`、原锁文件/integrity、TLS、APT 签名、实际运行镜像扫描及正式来源记录。参数变化不得冒用旧产物资格；没有新增 producer、权限、自动切源或 CI 激活。先在实际非生产 Linux/amd64 builder 做一次必要的小可达性读取；生产上的可达记录不代表 builder 可达，也不授权构建或部署。
 
 除上述显式 C 镜像参数外，GitHub Debian 使用签名官方源，npm 固定 `https://registry.npmjs.org` 且 `replace-registry-host=always`，覆盖锁文件保留的历史镜像 URL；Docker npm 安装按显式 `NPM_REGISTRY` 替换历史 host。版本与 integrity 不变，保留 TLS、签名及镜像扫描阈值。前后端 Dockerfile 本次只增加该 npm host 选择设置，其他新增下载策略文件绑定完整前后 blob；未知 Dockerfile/依赖或 CI 编辑不能借此缩减门禁。

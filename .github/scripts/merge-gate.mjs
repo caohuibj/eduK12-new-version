@@ -146,7 +146,7 @@ export function requiredChecks(needs, draft) {
     let p; try { p = JSON.parse(scope.release_plan || '{}'); } catch { p = {}; }
     return ['scope','scoped-release', ...(p.required?.includes('sast') ? ['codeql'] : [])];
   }
-  if (scope.scenario === 'release-tooling') return ['scope','release-tools',...(!draft?['codeql']:[])];
+  if (scope.scenario === 'release-tooling') return ['scope','release-tools',...(!draft&&scope.image_build==='true'?['docker']:[]),...(!draft?['codeql']:[])];
   if (scope.scenario === 'backend') return ['scope',...(draft?['pr-light-backend']:['backend','backend-regression','docker','codeql'])];
   if (scope.cognitive_intake_light === 'true') return ['scope','content',...(!draft?['codeql']:[])];
   const dependencies = scope.scenario === 'dependencies';
@@ -485,6 +485,8 @@ export function failedChecks(needs, draft) {
     ||scope.frontend_affected==='true'&&(scope.scenario!=='frontend'||scope.frontend!=='true')))failed.push('scope');
   if(scope.dependencies_frontend_only!==undefined&&(!['true','false'].includes(scope.dependencies_frontend_only)
     ||scope.dependencies_frontend_only==='true'&&scope.scenario!=='dependencies'))failed.push('scope');
+  if(scope.image_build!==undefined&&(!['true','false'].includes(scope.image_build)
+    ||scope.image_build==='true'&&scope.scenario!=='release-tooling'))failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
   const scenarios = {backend:['false','false','false','false'], 'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
@@ -762,11 +764,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     } catch {failed.push('recomputed-cognitive-intake');}
   }
   if (['A','B'].includes(needs.scope?.outputs?.application_route) || needs.scope?.outputs?.scenario === 'release-tooling') {
-    const {plan,toolingOnly}=await import('../../server-version/scripts/release/policy.mjs');
+    const {plan,toolingOnly,imageBuildOnly}=await import('../../server-version/scripts/release/policy.mjs');
     const p=JSON.parse(needs.scope.outputs.release_plan);
     const actual=plan(p.base,p.head);
     if (JSON.stringify(actual) !== JSON.stringify(p)) failed.push('recomputed-plan');
-    if (needs.scope.outputs.scenario==='release-tooling' && (actual.route!=='C' || actual.changed.length || !toolingOnly(actual.changes))) failed.push('mixed-or-unknown-tooling');
+    if (needs.scope.outputs.scenario==='release-tooling' && (actual.route!=='C' || !toolingOnly(actual.changes)
+      ||String(imageBuildOnly(actual.changes))!==needs.scope.outputs.image_build
+      ||actual.changed.length&&!imageBuildOnly(actual.changes))) failed.push('mixed-or-unknown-tooling');
   }
   if (needs.scope?.outputs?.application_route === 'reviewed-candidate') {
     const {reviewedCandidatePlan} = await import('./reviewed-candidate-scope.mjs');
