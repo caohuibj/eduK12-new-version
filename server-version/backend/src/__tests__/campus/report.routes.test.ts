@@ -16,7 +16,7 @@ const state = vi.hoisted(() => ({
   participant: { list: vi.fn(), read: vi.fn() },
   professional: { list: vi.fn(), read: vi.fn() },
   respondentSummary: vi.fn(),
-  group: {catalog:vi.fn(),sources:vi.fn(),tools:vi.fn(),generate:vi.fn(),read:vi.fn()},
+  group: {catalog:vi.fn(),sources:vi.fn(),tools:vi.fn(),history:vi.fn(),generate:vi.fn(),read:vi.fn()},
   protectedStudio: {catalog:vi.fn(),generate:vi.fn()},
   longitudinal: {catalog:vi.fn(),sources:vi.fn(),generate:vi.fn()},
   groupManager:vi.fn(),
@@ -39,6 +39,7 @@ vi.mock('../../modules/campus/group-reports',()=>({
   listCampusGroupReportCatalog:state.group.catalog,
   listCampusGroupReportSources:state.group.sources,
   listCampusGroupReportTools:state.group.tools,
+  listCampusGroupReportHistory:state.group.history,
   generateCampusGroupReport:state.group.generate,
   readCampusGroupReport:state.group.read,
 }))
@@ -100,6 +101,18 @@ async function request(path: string, method = 'GET', body?: unknown, headers: Re
 }
 
 describe('Huischool governed report HTTP surface', () => {
+  it('pages School saved group history with a source-bound microsecond cursor using GET only',async()=>{
+    const beforeGeneratedAt='2026-10-31T00:00:00.123456Z'
+    state.group.history.mockResolvedValue({artifacts:[],nextCursor:null})
+    const q=new URLSearchParams({organizationId:CHILD,runId:ARTIFACT,trackId:LINK,beforeGeneratedAt,beforeArtifactId:CHILD})
+    const response=await request('/reports/groups/history?'+q,'GET',undefined,{'x-school-role':'ADMIN'})
+    expect(response.status).toBe(200)
+    expect(state.group.history).toHaveBeenCalledWith({actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),organizationId:CHILD,runId:ARTIFACT,trackId:LINK,before:{generatedAt:beforeGeneratedAt,artifactId:CHILD}})
+    expect(state.group.generate).not.toHaveBeenCalled()
+    q.delete('beforeArtifactId')
+    expect((await request('/reports/groups/history?'+q,'GET',undefined,{'x-school-role':'ADMIN'})).status).toBe(400)
+    expect(state.group.history).toHaveBeenCalledTimes(1)
+  })
   it('routes paged group sources with a validated page to the current School actor',async()=>{
     state.group.sources.mockResolvedValue({sources:[],nextSourcePage:null})
     const response=await request('/reports/groups/sources?organizationId='+CHILD+'&page=2','GET',undefined,{'x-school-role':'ADMIN'})

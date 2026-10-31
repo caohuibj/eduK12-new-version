@@ -19,6 +19,7 @@ import {readFrozenPrivacyForRun} from '../report-privacy/snapshot.service'
 import {ENHANCED} from '../report-privacy/registry'
 import {parseFrozenSchoolOptions} from './privacyV2'
 import {projectCampusGeneralGroupV2} from './generalGroupV2.projection'
+import type {TaskArtifactCursor,TaskArtifactPointer} from '../reporting/task-artifact'
 
 /** PR5 first tranche: INTERNAL school-only, whole frozen SELF/STUDENT Run.
  * This route never publishes peer/teacher ratings or longitudinal comparisons.
@@ -355,20 +356,33 @@ export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,
   })),artifacts,nextSourcePage:sources.nextPage,truncated:!!sources.truncated||specs.total>50}
 }
 
+async function campusGroupHistoryPage(input:{organizationId:string;runId:string;trackId:string;before?:TaskArtifactCursor}){
+  const rows=await prisma.$queryRaw<TaskArtifactPointer[]>(Prisma.sql`
+    SELECT a.id AS "artifactId",to_char(a.generated_at,'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "generatedAt"
+    FROM reporting_analysis_artifacts a
+    WHERE a.organization_id=${input.organizationId} AND a.analysis_kind='GROUP'
+      AND a.artifact_payload->'source'->>'runId'=${input.runId}
+      AND a.artifact_payload->'source'->>'trackId'=${input.trackId}
+      AND a.artifact_payload->>'schemaVersion'='2'
+      AND EXISTS(SELECT 1 FROM campus_activity_runs ar WHERE ar.organization_id=a.organization_id AND ar.run_id=${input.runId})
+      ${input.before?Prisma.sql`AND (a.generated_at,a.id)<(${input.before.generatedAt}::timestamp,${input.before.artifactId})`:Prisma.empty}
+    ORDER BY a.generated_at DESC,a.id DESC LIMIT 26`)
+  const artifacts=rows.slice(0,25)
+  return {artifacts,nextCursor:rows.length>25?artifacts[24]:null}
+}
+export async function listCampusGroupReportHistory(input:{actor:AuthenticatedPrincipal;organizationId:string;runId:string;trackId:string;before?:TaskArtifactCursor}){
+  await requireCampusGroupManager(input.actor,input.organizationId)
+  return campusGroupHistoryPage(input)
+}
 export async function listCampusGroupReportTools(input:{actor:AuthenticatedPrincipal;organizationId:string;runId:string;trackId:string}){
   const principal=await requireCampusGroupManager(input.actor,input.organizationId)
   await assertCampusWholeRunSource(input)
-  const [tools,groups,artifacts]=await Promise.all([
+  const [tools,groups,history]=await Promise.all([
     listAuthoritativeRunLeafSources({...input,groupAudience:principal.groupAudience}),listEducationGroupSelections({...input,product:'SCHOOL'}),
-    prisma.$queryRaw<Array<{artifactId:string;generatedAt:Date}>>`
-      SELECT id AS "artifactId",generated_at AS "generatedAt" FROM reporting_analysis_artifacts
-      WHERE organization_id=${input.organizationId} AND analysis_kind='GROUP'
-        AND artifact_payload->'source'->>'runId'=${input.runId} AND artifact_payload->'source'->>'trackId'=${input.trackId}
-        AND artifact_payload->>'schemaVersion'='2' ORDER BY generated_at DESC,id DESC LIMIT 100
-    `,
+    campusGroupHistoryPage(input),
   ])
   await requireCampusGroupManager(input.actor,input.organizationId)
-  return {tools,groups,artifacts}
+  return {tools,groups,...history}
 }
 
 export async function generateCampusGroupReport(input:{

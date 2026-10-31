@@ -14,7 +14,8 @@ import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
 import { readCampusStudentFeedback } from './student-feedback'
-import { listCampusGroupReportCatalog, listCampusGroupReportSources, listCampusGroupReportTools, generateCampusGroupReport, readCampusGroupReport, requireCampusGroupManager } from './group-reports'
+import { listCampusGroupReportCatalog, listCampusGroupReportSources, listCampusGroupReportTools, listCampusGroupReportHistory, generateCampusGroupReport, readCampusGroupReport, requireCampusGroupManager } from './group-reports'
+import {taskArtifactBefore} from '../reporting/task-artifact'
 import {educationGroupSelectionSchema,reportingLeafSourceSchema} from '../reporting/education-group-selection'
 import {listCampusGeneralGroupV2Catalog,publishCampusGeneralGroupV2,
   readCampusGeneralGroupV2} from './generalGroupV2.service'
@@ -103,6 +104,10 @@ router.get('/reports/groups/sources',guarded(req=>{
 router.get('/reports/groups/tools',guarded(req=>{
   const input=z.object({organizationId:id,runId:id,trackId:id}).strict().parse(req.query)
   return listCampusGroupReportTools({actor:req.user!,...input})
+}))
+router.get('/reports/groups/history',guarded(req=>{
+  const input=z.object({organizationId:id,runId:id,trackId:id,beforeGeneratedAt:z.string().optional(),beforeArtifactId:id.optional()}).strict().parse(req.query)
+  return listCampusGroupReportHistory({actor:req.user!,organizationId:input.organizationId,runId:input.runId,trackId:input.trackId,before:taskArtifactBefore(req.query)})
 }))
 router.post('/reports/groups', requireRecentSchoolMfa, mutationBudget, guarded(req => {
   const body=z.object({
