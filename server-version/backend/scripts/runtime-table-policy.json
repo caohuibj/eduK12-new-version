@@ -176,6 +176,7 @@
     "reporting_export_tickets": "RUNTIME_RW",
     "reporting_series": "RUNTIME_RW",
     "reporting_series_waves": "RUNTIME_RW",
+    "reporting_task_artifacts": "RUNTIME_RW",
     "safety_case_events": "RUNTIME_RW",
     "safety_cases": "RUNTIME_RW",
     "safety_policy_templates": "RUNTIME_RW",
