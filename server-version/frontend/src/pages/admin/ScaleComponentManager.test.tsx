@@ -16,6 +16,16 @@ beforeEach(()=>{vi.clearAllMocks();sessionStorage.clear();mocks.api.mockImplemen
 afterEach(()=>vi.restoreAllMocks())
 async function draftWorkspace(){fireEvent.click(screen.getByRole('tab',{name:'草稿与版本'}));return screen.findByRole('button',{name:'编辑／查看 仅报告草稿'})}
 describe('minimal system administrator component workspace',()=>{
+ it('filters pending intake drafts on the current page without creating a catalog draft',async()=>{
+  mocks.api.mockResolvedValue({list:[draft,{...draft,id:'other',toolKey:'unrelated',configurationName:'无关草稿'}],hasMore:false})
+  render(<ScaleComponentManager actorId="system" initialIntake={{target:{instrumentKey:'example',instrumentVersion:'1.0.0',name:'待审来源'},workspace:'drafts'}}/>)
+  expect(screen.getByRole('tab',{name:'草稿与版本'})).toHaveAttribute('aria-selected','true')
+  expect(await screen.findByRole('button',{name:'编辑／查看 仅报告草稿'})).toBeVisible()
+  expect(screen.queryByRole('button',{name:'编辑／查看 无关草稿'})).not.toBeInTheDocument()
+  expect(screen.getByText(/不会从目录自动创建草稿、补造计分或发布/)).toBeVisible()
+  expect(mocks.api).toHaveBeenCalledExactlyOnceWith('/component-drafts?page=1')
+  expect(mocks.upload).not.toHaveBeenCalled()
+ })
  it('keeps an independent R draft editable while preventing incomplete publication',async()=>{
   render(<ScaleComponentManager actorId="system"/>);fireEvent.click(await draftWorkspace())
   expect(await screen.findByLabelText('完整组分定义 JSON')).not.toBeVisible()

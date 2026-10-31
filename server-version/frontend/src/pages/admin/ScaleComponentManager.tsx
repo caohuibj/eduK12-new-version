@@ -1,6 +1,7 @@
 import {useEffect,useId,useMemo,useRef,useState,type KeyboardEvent} from 'react'
 import {ArrowRight,CheckCircle2,Download,FileSpreadsheet,FolderOpen,LockKeyhole,RefreshCw,Upload} from 'lucide-react'
 import {componentRequest as api,uploadComponentWorkbook,downloadComponentTemplate,componentDocument,componentContentPlaceholder,type ComponentDocument,type ComponentDraft,type ComponentPointer,type ComponentPreview,type ImportResult,type ComponentAxis} from '../../api/scaleComponentImport'
+import type {StandardOnboardingTarget} from '../../api/surveyStandard'
 import {ScaleDefinitionEditor} from '../ScaleDefinitionEditor'
 import type {ScaleDefinition} from '../scaleDefinitionEditorModel'
 import {ReportTemplateFields} from '../../modules/assessment-core/report/ReportTemplateFields'
@@ -17,10 +18,10 @@ const resultLabels:Record<string,string>={IMPORTED:'已保存草稿',EXISTING:'�
 const publicationLabels:Record<string,string>={APPROVED:'已批准，等待试运行',TRIAL_RUNNING:'正在试运行',TRIAL_FAILED:'试运行未通过',ONLINE:'已上线',WITHDRAWN:'已停止新增使用'}
 const message=(e:unknown)=>e instanceof Error?e.message:'操作未确认，请刷新核对'
 const simpleDefinition=(d:ScaleDefinition)=>{try{return typeof d.respondentType==='string'&&!!d.source&&!!d.license&&!!d.display&&Array.isArray(d.items)&&Array.isArray(d.responseSets)&&d.responseSets.length>0&&d.responseSets.every(set=>typeof set.key==='string'&&Array.isArray(set.options)&&set.options.length>=2)&&Array.isArray(d.report?.interpretations)&&Array.isArray(d.report.scoreOrder)&&Array.isArray(d.report.primaryScoreKeys)&&d.items.length<=200&&!('scorerKey'in d.scoring)&&d.scoring.defaultMissingPolicy.type==='complete_required'&&d.scoring.itemRules.every(i=>['identity','reverse'].includes(i.transform.type))&&d.scoring.scores.every(s=>s.source.type==='items'&&['sum','mean'].includes(s.source.aggregation))}catch{return false}}
-export default function ScaleComponentManager({actorId,initialCombination}:{actorId:string;initialCombination?:ComponentPointer|null}){
+export default function ScaleComponentManager({actorId,initialCombination,initialIntake}:{actorId:string;initialCombination?:ComponentPointer|null;initialIntake?:{target:StandardOnboardingTarget;workspace:'import'|'drafts'}|null}){
  const uid=useId(),editorHeading=useRef<HTMLHeadingElement>(null),importTab=useRef<HTMLButtonElement>(null),draftTab=useRef<HTMLButtonElement>(null)
- const [workspace,setWorkspace]=useState<'import'|'drafts'>(initialCombination?'drafts':'import')
- const [onlyIssues,setOnlyIssues]=useState(false),[filterText,setFilterText]=useState(''),[filterStatus,setFilterStatus]=useState<'all'|'draft'|'frozen'>('all')
+ const [workspace,setWorkspace]=useState<'import'|'drafts'>(initialCombination?'drafts':initialIntake?.workspace??'import')
+ const [onlyIssues,setOnlyIssues]=useState(false),[filterText,setFilterText]=useState(initialIntake?.target.instrumentKey??''),[filterStatus,setFilterStatus]=useState<'all'|'draft'|'frozen'>('all')
  const [advancedOpen,setAdvancedOpen]=useState(false),[advancedEdited,setAdvancedEdited]=useState(false),[listLoading,setListLoading]=useState(true),[busyLabel,setBusyLabel]=useState('')
  const storageKey='scale-component-import:'+actorId
  const [file,setFile]=useState<File|null>(null),[result,setResult]=useState<ImportResult|null>(null),[filePreviewed,setFilePreviewed]=useState(false)
@@ -101,6 +102,7 @@ export default function ScaleComponentManager({actorId,initialCombination}:{acto
  const isUnconfigured=(a:ComponentAxis)=>a==='PARAMETERS'?doc?.changedParts.PARAMETERS?.payload===null:a==='REPORT'?doc?.changedParts.REPORT?.payload===null:false
  return <section className="sys-panel scale-components" aria-busy={busy}>
   <header className="component-heading"><div><span className="component-eyebrow">系统管理员 · 量表版本</span><h2>导入量表，按版本发布</h2><p>先保存可编辑草稿，再核对组合并发布。新版本不会替换历史问卷、报告或授权。</p></div><FileSpreadsheet aria-hidden="true" size={34}/></header>
+  {initialIntake&&<aside className="component-message" aria-label="当前接入待办"><div><strong>{initialIntake.target.name} · {initialIntake.target.instrumentVersion}</strong><p>工具标识：{initialIntake.target.instrumentKey}</p><p>这里只导航到已有操作，不会从目录自动创建草稿、补造计分或发布。请按待办准备完整内容，下载模板填写后导入；已有草稿可在当前页按工具标识筛选后继续编辑。</p></div></aside>}
   <div className="component-tabs" role="tablist" aria-label="量表管理任务">
    <button ref={importTab} id={uid+'-import-tab'} role="tab" aria-selected={workspace==='import'} aria-controls={uid+'-import'} tabIndex={workspace==='import'?0:-1} disabled={busy} onKeyDown={moveTab} onClick={()=>setWorkspace('import')}><Upload size={16} aria-hidden="true"/>批量导入</button>
    <button ref={draftTab} id={uid+'-drafts-tab'} role="tab" aria-selected={workspace==='drafts'} aria-controls={uid+'-drafts'} tabIndex={workspace==='drafts'?0:-1} disabled={busy} onKeyDown={moveTab} onClick={()=>setWorkspace('drafts')}><FolderOpen size={16} aria-hidden="true"/>草稿与版本{dirty&&<span className="component-dot" aria-label="有未保存修改"/>}</button>
