@@ -119,7 +119,13 @@ describe('learning motivation report/reference presentation revision', () => {
     expect(report.interpretation).toContain('原作答选项')
     expect(report.interpretation).toContain('不等于对题目的绝对认同程度')
     expect(report.interpretation).toContain('即使相对偏低，均分仍可能偏向同意')
-    expect(report.interpretation).toContain('相对偏高也未必偏向同意')
+    if (witness.key === 'teacher_subject_liking_chemistry_zh_cn') {
+      // R1.1.1 removed a warning contradicted by both actual P stage ranges.
+      for (const set of executable.references) for (const entry of set.entries) {
+        for (const key of ['high', 'very_high']) expect(entry.governance!.bands.find(band => band.key === key)!.lower).toBeGreaterThan(3.5)
+      }
+      expect(report.interpretation).not.toContain('相对偏高也未必偏向同意')
+    } else expect(report.interpretation).toContain('相对偏高也未必偏向同意')
     expect(report.headline + report.interpretation).not.toContain(witness.oldClaim)
   })
 

@@ -85,7 +85,10 @@ suite('Teacher assessment runtime real PostgreSQL and canonical FINAL',()=>{
   const f=await teacherRuntimePgFixture(owner),cookie=teacherCookie(f.respondent)
   expect(requireSuccess<any>(await request('/my-assessment-tasks',cookie)).list.some((row:any)=>row.executionId===f.executionId)).toBe(true)
   await owner.user.update({where:{id:f.issuer.id},data:{isFrozen:true}})
-  expect((await request('/run-executions/'+f.executionId+'/start-assessment',cookie,'POST',{})).status).toBe(409)
+  // The issuer is also the distribution subject; its frozen grant is denied first.
+  const denied=await request('/run-executions/'+f.executionId+'/start-assessment',cookie,'POST',{})
+  expect(denied.status,JSON.stringify(denied.body)).toBe(403)
+  expect(denied.body).toMatchObject({code:'CONTENT_AUTHORITY_DENIED'})
   expect(await owner.compositeAssessmentAttempt.count({where:{compositeAssessmentId:f.runtimeId}})).toBe(0)
   await owner.user.update({where:{id:f.issuer.id},data:{isFrozen:false}})
   const running=await start(f)
