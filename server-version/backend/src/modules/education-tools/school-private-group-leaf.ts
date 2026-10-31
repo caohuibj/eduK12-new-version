@@ -74,7 +74,7 @@ export async function loadSchoolPrivateGroupDisclosure(tx:Prisma.TransactionClie
   if(!release||release.layer!=='MEASUREMENT'||release.family!==unit.family||release.status==='REVOKED'
    ||release.contentHash!==unit.measurement.contentHash)return hidden()
   let sourceDefinitionHash:string|undefined,instrumentKey:string,instrumentVersion:string
-  let runtimeUnits:Record<string,string>
+  let runtimeUnits:Record<string,string|undefined>
   if(unit.family==='SCALE'){
    if(!scale||scale.id!==unit.source.id||!scale.code||!scale.instrumentVersion||!scale.definitionHash)return hidden()
    const definition=scaleDefinitionSchema.parse(scale.definition);sourceDefinitionHash=canonicalHash(definition)
@@ -94,7 +94,7 @@ export async function loadSchoolPrivateGroupDisclosure(tx:Prisma.TransactionClie
    // the generic label "score". This exact label projection changes no number
    // and does not permit another physical unit or a cognitive protocol alias.
    if(unit.family==='SCALE'?metric.unit!=='points'||runtimeUnit!=='score':metric.unit!==runtimeUnit)return hidden()
-   metricUnits[metric.metricKey]={measurement:metric.unit,runtime:runtimeUnit}
+   metricUnits[metric.metricKey]={measurement:metric.unit,runtime:runtimeUnit!}
   }
   const unitType=unit.family==='SJT'?'SITUATIONAL':unit.family
   leaves.push({slotKey:(unitType==='SITUATIONAL'?'situational':unitType.toLowerCase())+':'+unit.itemId,unitType,instrumentKey,instrumentVersion,
