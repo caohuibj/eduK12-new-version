@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "apq42_parent_global_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "阿拉巴马教养问卷APQ父母Global 42题（简体中文研究工作稿）",
+      "abbreviation": "APQ42-PARENT-GLOBAL-ZH-WORKING",
+      "instrumentFamily": "Alabama Parenting Questionnaire Parent Global, not Child Global/Telephone/APQ9"
+    },
+    "construct": {
+      "primaryDomain": "PARENT_OBSERVATION",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "父母报告的五种教养行为维度：参与、积极教养、监督不足、管教不一致、体罚；其余7题为Other Discipline独立记录，不是第六维，也不生成42题总分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:parenting",
+        "domain:family_relationships",
+        "domain:parent_observation",
+        "construct:parenting_practices",
+        "construct:apq42_parent_global",
+        "construct:involvement",
+        "construct:positive_parenting",
+        "construct:poor_monitoring",
+        "construct:inconsistent_discipline",
+        "construct:corporal_punishment",
+        "construct:7_other_discipline_unscored",
+        "orientation:behavioral_parenting",
+        "orientation:not_therapy_specific",
+        "orientation:not_diagnostic",
+        "population:parent_caregiver",
+        "population:child_6_13_original_scope",
+        "population:parent_global_not_child_form",
+        "response:parent_report",
+        "response:42_items",
+        "response:fixed_original_order",
+        "response:five_point_frequency",
+        "response:five_scored_dimensions",
+        "response:no_reverse",
+        "response:no_total",
+        "response:complete_required_platform",
+        "use:research",
+        "use:parent_reflection",
+        "use:no_clinical_norm",
+        "use:no_selection",
+        "license:author_contact_required",
+        "license:copyrighted_original",
+        "license:translation_review_pending",
+        "license:electronic_format_review_pending",
+        "license:github_redistribution_pending",
+        "language_validation:en_original",
+        "language_validation:zh-CN_working",
+        "language_validation:expert_review_pending",
+        "language_validation:population_validation_pending",
+        "家长教养",
+        "父母报告",
+        "积极教养",
+        "亲子参与",
+        "监督不足",
+        "管教不一致",
+        "体罚",
+        "其他管教",
+        "五维",
+        "没有总分",
+        "未验证译本"
+      ]
+    },
+    "population": {
+      "minAge": 6,
+      "maxAge": 13,
+      "respondentTypes": [
+        "PARENT"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原版开发涉及小学年龄儿童与家长。本站保守限定被评价儿童6–13岁，由其家长填写；新译文未经中国家庭或其他年龄验证。"
+    },
+    "administration": {
+      "itemCount": 42,
+      "estimatedMinutes": 10,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "家庭通常的情况，原版无固定天数回顾窗",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "仅原作者Parent Global父母报告42题而不是儿童版、教师版或APQ9。",
+        "1 Never/2 Almost Never/3 Sometimes/4 Often/5 Always，不随机题序或选项。",
+        "五维按原题号求和，体罚第33、35、38题；第39题属Other Discipline，不用错误的网上39体罚键。",
+        "34/36/37/39/40/41/42是其他管教行为，不生成第六维、42题总分。",
+        "全维答完方计分是本站平台保守规则，非作者正式缺失阈值。",
+        "简体中文译文、电子实施格式、公开GitHub题文再分发由管理员核定。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "中文译文未经测量等值审查。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于理解日常教养实践，不做父母评级。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "apq-parent-global-1996",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原英语版小学年龄儿童家庭（非本站简体中文验证）",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "官方Parent Global42题原格式及五维题号与其他7题身份",
+        "rating": "UNKNOWN",
+        "citation": "Shelton, K. K., Frick, P. J., & Wootton, J. (1996). Assessment of parenting practices in families of elementary school-aged children. Journal of Clinical Child Psychology, 25(3), 317–329. https://doi.org/10.1207/s15374424jccp2503_8",
+        "doi": "10.1207/s15374424jccp2503_8",
+        "url": "https://faculty.lsu.edu/pfricklab/pdfs/alabamaparenting-pdfs/apg-parent-form.pdf"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "官方Parent Global PDF：https://faculty.lsu.edu/pfricklab/pdfs/alabamaparenting-pdfs/apg-parent-form.pdf；本站独立简体中文研究工作稿。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原作者要求英文原文不改动；当前翻译不是授权中文版，翻译权/研究电子化及格式审查待管理员处理。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "APQ original Parent Global 42; independent simplified Chinese draft",
+      "citation": "Shelton, K. K., Frick, P. J., & Wootton, J. (1996). Assessment of parenting practices in families of elementary school-aged children. Journal of Clinical Child Psychology, 25(3), 317–329. https://doi.org/10.1207/s15374424jccp2503_8",
+      "url": "https://faculty.lsu.edu/pfricklab/pdfs/alabamaparenting-pdfs/apg-parent-form.pdf",
+      "publicationYear": 1996
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "亲子参与",
+        "积极教养",
+        "监督不足",
+        "管教不一致",
+        "体罚"
+      ],
+      "limitations": [
+        "既有完整内容候选见 PR #379（333200ade0c6cb42130cbc052189ba9c64691a12）。本条仅登记已有目录与缺口，不复制题本、不替代原候选的审核或发布，不代表数据库已安装。",
+        "原作者LSU公开供研究者免费取得原始42题父母Global版，但要求指导语、原英语题文措辞及答案格式不变。本平台独立制作的简体中文研究译稿不属于已经核准的原版或正式汉化；原版电子呈现是否改变format、翻译/译者许可、对被试展示与导出、商业场景和公开GitHub完整题文再分发须由管理员逐项向作者确认。已取得题本不等于获得全部许可，不伪称已获许可或已被禁止。",
+        "五维分别求和且方向不同，不构造42题综合得分或第五之外的新维度。",
+        "原作者体罚第33、35、38题；七道Other Discipline 34、36、37、39、40、41、42不作为分维。",
+        "每个完整维度方算该维得分是平台规则，作者缺失规则未核实。",
+        "本站独立简体中文工作译稿没有常模、临床切点、百分位或测量等值审查。",
+        "原作者LSU公开供研究者免费取得原始42题父母Global版，但要求指导语、原英语题文措辞及答案格式不变。本平台独立制作的简体中文研究译稿不属于已经核准的原版或正式汉化；原版电子呈现是否改变format、翻译/译者许可、对被试展示与导出、商业场景和公开GitHub完整题文再分发须由管理员逐项向作者确认。已取得题本不等于获得全部许可，不伪称已获许可或已被禁止。"
+      ],
+      "disclaimer": "仅非正式简体中文研究工作译稿，非原作者核准的正式中文版；勿用于诊断、家长排名或重大决策。"
+    },
+    "blockers": [
+      "EXECUTABLE_NOT_REGISTERED",
+      "已有完整内容候选在 PR #379，尚未合入当前源码库；请沿原候选补齐可执行来源后入库。"
+    ]
+  }
+}

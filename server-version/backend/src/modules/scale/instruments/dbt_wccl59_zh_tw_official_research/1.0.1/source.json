@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "dbt_wccl59_zh_tw_official_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "辯證行為治療之應對技巧問卷DBT-WCCL 59（UW繁體中文原稿）",
+      "abbreviation": "DBT-WCCL59-ZH-TW-UW-DRAFT",
+      "instrumentFamily": "DBT Ways of Coping Checklist 59; Neacsiu et al. 2010; official UW-hosted Traditional Chinese"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "应对方式过程测量：DBT技能使用DSS38题、一般非建设性应对DCS1 15题、责怪他人DCS2 6题，各维原题均值0–3；不能将59题合成单一健康分数。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:emotion_regulation",
+        "domain:coping",
+        "domain:social_emotional",
+        "construct:dbt_wccl_59",
+        "construct:dialectical_behavior_therapy_coping",
+        "construct:dbt_skills_use",
+        "construct:general_dysfunctional_coping",
+        "construct:blaming_others",
+        "construct:three_subscale_means",
+        "construct:no_global_59_total",
+        "orientation:dbt_process",
+        "orientation:non_diagnostic",
+        "orientation:not_treatment_effectiveness",
+        "population:adult_clinical_research",
+        "population:self_report",
+        "population:zh_tw_validation_not_established",
+        "population:not_k12_validated",
+        "response:59_items",
+        "response:self_0_to_3",
+        "response:past_month",
+        "response:all_original_order",
+        "response:no_reverse",
+        "response:three_means",
+        "response:platform_complete_required",
+        "use:research_noncommercial",
+        "use:clinical_noncommercial",
+        "use:education_noncommercial",
+        "use:process_monitoring",
+        "use:not_selection",
+        "use:no_norm_bands",
+        "license:uw_noncommercial_research_clinical_education",
+        "license:commercial_forbidden",
+        "license:author_citation_required",
+        "license:github_redistribution_review_pending",
+        "license:author_contact_required",
+        "license:derivative_translation_review_pending",
+        "language_validation:original_en",
+        "language_validation:uw_hosted_zh-TW",
+        "language_validation:no_zh-CN_registered",
+        "language_validation:simplified_draft_pending",
+        "language_validation:target_validation_pending",
+        "DBT",
+        "应对方式",
+        "应对技能",
+        "非建设性应对",
+        "责怪他人",
+        "技能使用",
+        "繁体中文版",
+        "简体工作稿待审",
+        "非商业",
+        "过程测量",
+        "无临床阈值"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原成人临床与相关研究来源，与国内未成年学生、教师或当前繁体中文人群的通用常模和信效度不等同；平台保守18岁以上成年人自评。"
+    },
+    "administration": {
+      "itemCount": 59,
+      "estimatedMinutes": 12,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "过去一个月；评价有无使用而不是是否有效，0–3频率。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "维持UW官方Chinese（繁体）题本59题原序、指导语和0从不/1很少/2有时/3经常（至少每周4–5次）的原响应锚点。",
+        "所有59题均identity（无反向）；DSS38项、DCS115项、DCS26项分别做算术均值0–3，不给59题总分。",
+        "原官方SPSS中DSS MEAN.30/DCS1 MEAN.10/DCS2 MEAN.4，最少有效题数分别30/38、10/15、4/6；这不是本平台所实现的缺答策略。",
+        "本平台首版严格每个维度全部作答才形成其均值，是更保守的complete_required平台规则，不能谎称原作者阈值。",
+        "原作者SPSS还提供可选合并DCS MEAN.4语法，但当前正式三维包不生成第4个合并DCS或59题综合健康分。",
+        "不将繁体原版擅自声明已是简体标准译本；简体研究工作译稿另行译审登记。",
+        "非商业科研、临床与教学用途许可不自动等于公开GitHub全题文再分发许可。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原作者英文研究有心理测量证据，但本站在线繁体题文没有独立本地人群验证证明；且仅非商业。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "非商业反思，非DBT疗效认证或诊断。"
+        },
+        {
+          "use": "PROGRESS_MONITORING",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅非商业且在有专业支持时谨慎使用，不能自动借此作治疗效果的结论。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "dbt-wccl-neacsiu-2010-uw",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "2010英文原量表心理测量开发样本；不等于当前中文平台效度",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "官方UW英语和Chinese繁体59题与SPSS计分语法，DSS38/DCS115/DCS26。",
+        "rating": "UNKNOWN",
+        "citation": "Neacsiu, A. D., Rizvi, S. L., Vitaliano, P. P., Lynch, T. R., & Linehan, M. M. (2010). The Dialectical Behavior Therapy Ways of Coping Checklist (DBT-WCCL): Development and Psychometric Properties. Journal of Clinical Psychology, 66(6), 563–582. https://doi.org/10.1002/jclp.20685",
+        "doi": "10.1002/jclp.20685",
+        "url": "https://depts.washington.edu/uwbrtc/wp-content/uploads/Scoring-description-for-the-DBT-WCCL.pdf"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-TW",
+    "localizationVersion": "1.0.0",
+    "translationSource": "UW作者实验室公开提供的正式Chinese繁体题本：https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL-Chinese.pdf。译者身份及繁简许可需原作者核查，不冒称由本站新译。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "已获取UW官方繁体中文题本；无法据此声称繁体译本在当前中国内地成人样本具有信效度、临床切点或作者对网上重发的许可。独立简体中文工作译稿本包未生成，另待专家译审，不能隐式zh-TW→zh-CN。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "DBT-WCCL 59 official UW Traditional Chinese; original English, Neacsiu et al. (2010)",
+      "citation": "Neacsiu, A. D., Rizvi, S. L., Vitaliano, P. P., Lynch, T. R., & Linehan, M. M. (2010). The Dialectical Behavior Therapy Ways of Coping Checklist (DBT-WCCL): Development and Psychometric Properties. Journal of Clinical Psychology, 66(6), 563–582. https://doi.org/10.1002/jclp.20685",
+      "url": "https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL-Chinese.pdf",
+      "publicationYear": 2010
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "DBT技能使用（DSS）",
+        "一般非建設性應對（DCS1）",
+        "責怪他人相關應對（DCS2）"
+      ],
+      "limitations": [
+        "既有完整内容候选见 PR #379（333200ade0c6cb42130cbc052189ba9c64691a12）。本条仅登记已有目录与缺口，不复制题本、不替代原候选的审核或发布，不代表数据库已安装。",
+        "华盛顿大学Behavioral Research & Therapy Clinics作者资源页明确免费允许research、clinical、educational非商业用途，并禁止commercial use，使用时必须注明原论文。原站提供英文及“Chinese”繁体译本，并未据此明确授予完整题文在公开GitHub仓库二次再分发或商用平台软件随包发行的权利。本DRAFT先保存官方繁体题文与独立报告说明，是否容许公开复制、下载/导出、公开托管、中文版译者署名以及以后独立简体中文转换均由管理员复核或联系作者；不伪称另外获得了电子施测、翻译、商用或Github再分发授权。",
+        "量表是UW作者實驗室提供的官方繁體中文59題，不是未驗證的簡體中文版；不聲稱譯者身份已確定。",
+        "過去一個月自述使用頻率，三個獨立維度的均分各為 0–3：DSS 38 題、DCS1 15 題、DCS2 6 題；無反向題，也沒有 59 題健康總分。",
+        "原作者 SPSS 計分所需的最低有效題數為 DSS 30 題、DCS1 10 題、DCS2 4 題；本站要求該維度全部作答才計算，是較嚴格的技術選擇，不是原作者的缺答策略。",
+        "沒有中文常模、臨床標準分、百分位、療效認證或高低切點，也不應用於診斷、選拔或學校排名。",
+        "UW允許非商業研究/臨床/教育用途，禁止商業；公開GitHub再分發及新譯版不等於已獲得授權。",
+        "華盛頓大學 Behavioral Research & Therapy Clinics 作者資源頁明確免費允許非商業研究、臨床及教育用途，並禁止商業使用；使用時必須註明原論文。原站提供英文及「Chinese」繁體譯本，但這並不明確授予完整題文在公開 GitHub 儲存庫二次再分發或隨商業平台軟體發行的權利。本 DRAFT 保存官方繁體題文與獨立報告說明；是否允許公開複製、下載或匯出、公開託管、中文版譯者署名及日後轉為獨立簡體中文版，均由管理員複核或聯絡作者；不聲稱另已獲電子施測、翻譯、商業使用或 GitHub 再分發授權。"
+      ],
+      "disclaimer": "僅非商業研究準備的官方繁體題本DRAFT版本。不得將任何應對均值解釋為疾病診斷、治療成功或個人能力等級。"
+    },
+    "blockers": [
+      "EXECUTABLE_NOT_REGISTERED",
+      "已有完整内容候选在 PR #379，尚未合入当前源码库；请沿原候选补齐可执行来源后入库。"
+    ]
+  }
+}
