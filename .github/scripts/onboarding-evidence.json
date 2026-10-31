@@ -13173,7 +13173,7 @@
     },
     "428": {
       "schemaVersion": 1,
-      "product": "2c1ef5d3df1211635b04fac219cc993a5d68bfef",
+      "product": "10d8bfffbb4144628bfc34bba8c2988cbf0e55bb",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -13185,7 +13185,8 @@
           "Original/library N10, mean3/SD0, saved-read canonical0 are the sufficient-N cases; the older one-person read is not presented as sufficient-N aggregation.",
           "Two existing trigger migrations were applied only in the retained isolated test DB for original publisher/Run/FINAL cases; no production migration or new schema framework. Current full backend/frontend types include the reviewed transaction fix.",
           "Only existing scope/admission/CodeQL/gate execute; no new auth layer or platform/build/browser/FINAL replay.",
-          "Original successful formal41162868653 is tied to main6627; current main432 changes both components, so each integrated component compiled once. No original application or FINAL replay."
+          "Original successful formal41162868653 is tied to main6627; current main432 changes both components, so each integrated component compiled once. No original application or FINAL replay.",
+          "Main434 superseded the unpublished main432 alignment. Questionnaire-only input changes retain original Teacher cases; current whole component receipts bind this actual integration, not earlier trees."
         ]
       },
       "reports": [
@@ -13199,6 +13200,7 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
             "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
             "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
             "server-version/backend/src/controllers/generalQuestionnaireController.ts",
@@ -13210,7 +13212,7 @@
             "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
-          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13238,10 +13240,12 @@
             "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
             "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
             "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
-            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx"
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx"
           ],
           "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay.",
-          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13289,6 +13293,7 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
             "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
             "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
             "server-version/backend/src/controllers/generalQuestionnaireController.ts",
@@ -13300,7 +13305,7 @@
             "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
-          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13328,10 +13333,12 @@
             "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
             "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
             "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
-            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx"
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx"
           ],
           "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay.",
-          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13371,6 +13378,7 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
             "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
             "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
             "server-version/backend/src/controllers/generalQuestionnaireController.ts",
@@ -13382,7 +13390,7 @@
             "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
-          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13410,6 +13418,7 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
             "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
             "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
             "server-version/backend/src/controllers/generalQuestionnaireController.ts",
@@ -13421,7 +13430,7 @@
             "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
-          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 2,
@@ -13449,6 +13458,7 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
             "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
             "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
             "server-version/backend/src/controllers/generalQuestionnaireController.ts",
@@ -13460,7 +13470,7 @@
             "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
-          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13496,10 +13506,12 @@
             "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
             "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
             "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
-            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx"
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx"
           ],
           "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay.",
-          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13531,6 +13543,7 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
             "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
             "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
             "server-version/backend/src/controllers/generalQuestionnaireController.ts",
@@ -13542,7 +13555,7 @@
             "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
-          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13571,6 +13584,7 @@
             "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
             "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
             "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
             "server-version/backend/src/controllers/generalQuestionnaireController.ts",
@@ -13587,7 +13601,7 @@
             "server-version/backend/src/modules/reporting/types.ts"
           ],
           "sourceAssociationBasis": "Original real PG/Prisma expiry counterexample fromcf43248e. Current artifact persist helper, lock helper, canonical hash and test bytes exactly match; it reads retained stored Artifact metadata directly and never invokes native source/partial-population functions absent from this parent. Missing429/430 modules remain explicit in the full backend source delta. New outer wiring uses the same tx and compiles; no PG/FINAL replay.",
-          "deltaRationale": "Original real PG/Prisma expiry counterexample fromcf43248e. Current artifact persist helper, lock helper, canonical hash and test bytes exactly match; it reads retained stored Artifact metadata directly and never invokes native source/partial-population functions absent from this parent. Missing429/430 modules remain explicit in the full backend source delta. New outer wiring uses the same tx and compiles; no PG/FINAL replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh.",
+          "deltaRationale": "Original real PG/Prisma expiry counterexample fromcf43248e. Current artifact persist helper, lock helper, canonical hash and test bytes exactly match; it reads retained stored Artifact metadata directly and never invokes native source/partial-population functions absent from this parent. Missing429/430 modules remain explicit in the full backend source delta. New outer wiring uses the same tx and compiles; no PG/FINAL replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13604,20 +13618,20 @@
       ],
       "types": [
         {
-          "path": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/backend-types.json",
-          "sha256": "0950a77f420aba89b3b87140152cdee755c2e0dfcd846b9f413785d6134c5e02",
+          "path": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/backend-types.json",
+          "sha256": "993576c712db92efe6403131e06051a1706a6d6c2c45ad6c83f4329a72022c0a",
           "component": "backend",
-          "componentTree": "a904d85585fd635c7521f5f025eaa5a6660843e9",
+          "componentTree": "aa12ceb3d8ac490c5f470c92fab76e6cbb5ef1a2",
           "exitField": "exitCode",
-          "log": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/backend-types.log"
+          "log": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/backend-types.log"
         },
         {
-          "path": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/frontend-types.json",
-          "sha256": "3a829a897628b6dc1af43c222a28bdb2c6cc550a0c0b5781e9666420885dd0f0",
+          "path": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/frontend-types.json",
+          "sha256": "3837c8c284bd07376dc326a739f5e8023f4d85ec227aca2d9af3028b07180ee7",
           "component": "frontend",
-          "componentTree": "1a014099924357f420821fc7c8aca1344ab472b0",
+          "componentTree": "f5ba5d4c1c50634071a9f130fe96e2628f860320",
           "exitField": "exitCode",
-          "log": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/frontend-types.log"
+          "log": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/frontend-types.log"
         }
       ]
     },
