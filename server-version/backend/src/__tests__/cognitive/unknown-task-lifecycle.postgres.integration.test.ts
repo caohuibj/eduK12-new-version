@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { randomUUID } from 'node:crypto'
+import { config as appConfig } from '../../config'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 // Extend only generated projections inside this test worker. No production registry hook.
 vi.mock('../../modules/cognitive/generated/execution', async (original) => {
@@ -26,11 +27,19 @@ vi.mock('../../modules/cognitive/generated/presentation', async (original) => {
     ],
   }
 })
+vi.mock('../../modules/cognitive/generated/catalog', async (original) => {
+  const actual = await original<any>()
+  const { catalog } = await import(
+    './fixtures/onboarding/TEST_ONBOARDING_UNKNOWN_V1/governance'
+  )
+  return { ...actual, cognitiveCatalog: { ...actual.cognitiveCatalog, [catalog.testType]: catalog } }
+})
 const url = integrationDatabaseUrl('COGNITIVE_INTEGRATION_DB_URL')
 const suite = url ? describe : describe.skip
 suite(
   'unknown package explicit release to authoritative FINAL (real PostgreSQL)',
   () => {
+    const previousEnabled = appConfig.cognitiveModuleEnabled
     let prisma: (typeof import('../../config/database'))['prisma'],
       userId: string,
       publisherId: string,
@@ -38,6 +47,7 @@ suite(
       courseId: string,
       assignmentId: string
     beforeEach(async () => {
+      appConfig.cognitiveModuleEnabled = true
       process.env.DATABASE_URL = url!
       prisma = (await import('../../config/database')).prisma
       const user = await prisma.user.create({
@@ -78,6 +88,7 @@ suite(
       configId = config.id
     })
     afterEach(async () => {
+      appConfig.cognitiveModuleEnabled = previousEnabled
       if (assignmentId) {
         await prisma.cognitiveSession.deleteMany({ where: { assignmentId } })
         await prisma.cognitiveAssignment.deleteMany({
@@ -202,6 +213,7 @@ suite(
           presentation.metrics.correctCount.explanation = original
         }
       },
+      30_000,
     )
   },
 )

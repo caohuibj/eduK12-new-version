@@ -16,10 +16,11 @@ import teacherAuthRoutes from '../../modules/huiteacher/auth.routes'
 import expertRoutes from '../../modules/huiteacher/expertRegistration.routes'
 import observerRoutes from '../../modules/huiteacher/observer.routes'
 import fieldFormRoutes from '../../modules/huiteacher/fieldForm.routes'
+import fieldCompositionRoutes from '../../modules/huiteacher/fieldComposition.routes'
 import { huiteacherOriginGuard } from '../../modules/huiteacher/originGuard'
 import { issueHuiteacherExternalExpertInvite } from '../../modules/huiteacher/expertRegistration.service'
 import { createHuiteacherTarget, createHuiteacherEvent, transitionHuiteacherEvent } from '../../modules/huiteacher/evaluation.service'
-import { createHuiteacherForm, updateHuiteacherForm, publishHuiteacherForm } from '../../modules/huiteacher/forms.service'
+import * as privateTools from '../../modules/education-tools/private-tool.service'
 import { bindHuiteacherFieldForm } from '../../modules/huiteacher/fieldForm.service'
 import { readFormalHuiteacherObservations, revokeHuiteacherObserver } from '../../modules/huiteacher/observer.service'
 import { setupEducationLibraryRuntimeFixture } from './educationLibraryRuntimeFixture'
@@ -58,6 +59,7 @@ function client() {
     app.use('/api/huiteacher', huiteacherOriginGuard)
     app.use('/api/huiteacher/auth', teacherAuthRoutes)
     app.use('/api/huiteacher', expertRoutes, observerRoutes, fieldFormRoutes)
+    app.use('/api/huiteacher/field-assessments', fieldCompositionRoutes)
     app.use('/api/campus', activityRoutes, runRoutes, compositeRoutes, educationSchoolScaleReportRouter)
     app.use((err: any, _req: any, res: any, _next: any) => res.status(err.statusCode ?? 500).json({ code: err.code ?? 'ERROR', message: err.message }))
     server = app.listen(0, '127.0.0.1'); await new Promise<void>(resolve => server.once('listening', resolve))
@@ -118,11 +120,18 @@ function client() {
     const scope = { organizationId: school.id, actorUserId: manager.id }
     const target = await createHuiteacherTarget({ ...scope, kind: 'TEAM', name: 'Synthetic observation team' })
     const event = await createHuiteacherEvent({ ...scope, targetId: target.id, kind: 'CLASSROOM', title: 'Synthetic field event' })
-    const draft = await createHuiteacherForm({ ...scope, title: 'Synthetic classroom evidence' })
-    await updateHuiteacherForm({ ...scope, formId: draft.id, expectedRevision: draft.revision, title: 'Synthetic classroom evidence', definition: { schemaVersion: 2, pages: [{ pageKey: 'p1', title: '课堂观察', questions: [{ itemKey: 'q1', type: 'LIKERT', prompt: '课堂讨论证据', required: true, options: [{ optionKey: 'low', label: '不足' }, { optionKey: 'high', label: '充分' }], rows: [] }] }] } })
-    const updated = await prisma.huiteacherFormInstrument.findUniqueOrThrow({ where: { id: draft.id } })
-    await publishHuiteacherForm({ ...scope, formId: draft.id, expectedRevision: updated.revision })
-    await bindHuiteacherFieldForm({ ...scope, eventId: event.id, formId: draft.id })
+    const author = { entry: 'TEACHER' as const, organizationId: school.id, principal: { userId: manager.id, accountDomain: 'SCHOOL' as const } }
+    const fixed = async (kind: 'FORM' | 'COMPOSITION', title: string, definition: Record<string, unknown>) => {
+      const draft = await privateTools.createPrivateTool(author, { kind, title })
+      const saved = await privateTools.updatePrivateTool(author, draft.id, { expectedRevision: draft.revision, title, definition })
+      return privateTools.freezePrivateTool(author, draft.id, { expectedRevision: saved.revision, expectedContentHash: saved.contentHash })
+    }
+    const formVersion = await fixed('FORM', 'Synthetic classroom evidence', { schemaVersion: 2, pages: [{ pageKey: 'p1', title: '课堂观察', questions: [{ itemKey: 'q1', type: 'LIKERT', prompt: '课堂讨论证据', required: true, options: [{ optionKey: 'low', label: '不足' }, { optionKey: 'high', label: '充分' }], rows: [] }] }] })
+    const composition = await fixed('COMPOSITION', 'Synthetic fixed expert questionnaire', {
+      schemaVersion: 2, adapterVersion: '2.0.0', administration: { population: 'TEACHER', responseMode: 'EXPERT_REPORT', targetKind: 'TEAM' }, instruction: '观察真实团队',
+      blocks: [{ blockId: randomUUID(), instruction: '', source: { provider: 'PRIVATE_VERSION', kind: 'FORM', versionId: formVersion.id, contentHash: formVersion.contentHash } }],
+    })
+    await bindHuiteacherFieldForm({ ...scope, eventId: event.id, privateComposition: { versionId: composition.id, contentHash: composition.contentHash } })
     const invite = await issueHuiteacherExternalExpertInvite({ ...scope, eventId: event.id })
     const request = client(), username = 'expert_' + randomUUID().replaceAll('-', '').slice(0, 20), password = 'SyntheticPassword123'
     expect((await request('/api/huiteacher/auth/csrf')).status).toBe(200)
@@ -137,17 +146,33 @@ function client() {
     expect(invitations).toMatchObject({ status: 200, body: { code: 0 } })
     expect(JSON.stringify(invitations.body.data)).toContain(expert.observerGrantId)
     const formPath = `/api/huiteacher/field-invitations/${expert.observerGrantId}/form`
-    expect(await request(formPath)).toMatchObject({ status: 200, body: { code: 0, data: { formId: draft.id } } })
+    expect(await request(formPath)).toMatchObject({ status: 200, body: { code: 0, data: { assessmentRef: { origin: { versionId: composition.id } } } } })
+    const fieldPrefix = '/api/huiteacher/field-assessments'
+    const start = await request(`${fieldPrefix}/invitations/${expert.observerGrantId}/start`, 'POST', {})
+    expect(start, 'actual expert HTTP START').toMatchObject({ status: 200, body: { code: 0, data: { attemptId: expect.any(String) } } })
+    const attemptId = start.body.data.attemptId
+    const attemptPath = `${fieldPrefix}/assessment-composite-attempts/${attemptId}`
+    const read = await request(attemptPath)
+    expect(read).toMatchObject({ status: 200, body: { code: 0, data: { currentItem: { type: 'FORM_SECTION' } } } })
+    const state = read.body.data, item = state.currentItem
+    const formPayload = { submissionId: randomUUID(), attemptEpoch: state.attemptEpoch, definitionHash: item.definitionHash, contextSnapshotHash: state.contextSnapshotHash,
+      answers: item.answers.map((question: { formItemId: string }) => ({ formItemId: question.formItemId, value: 'high' })) }
+    const formFinalPath = `${attemptPath}/form-sections/${item.formSectionId}/submit`
+    expect(await request(formFinalPath, 'POST', formPayload), 'canonical expert form FINAL').toMatchObject({ status: 200, body: { code: 0 } })
+    expect(await request(formFinalPath, 'POST', formPayload), 'same sealed form replay').toMatchObject({ status: 200, body: { code: 0, data: { replayed: true } } })
+    expect(await request(attemptPath)).toMatchObject({ status: 200, body: { code: 0, data: { status: 'COMPLETED' } } })
     const notes = `/api/huiteacher/organizations/${school.id}/evaluation-events/${event.id}/field-notes`
     const privateNote = await request(notes, 'POST', { kind: 'PRIVATE_REFLECTION', content: '仅专家本人可见的合成反思。' })
     expect(privateNote).toMatchObject({ status: 200, body: { code: 0 } })
     const note = await request(notes, 'POST', { kind: 'FORMAL_FEEDBACK', content: '基于课堂观察的合成反馈。' })
     expect(note).toMatchObject({ status: 200, body: { code: 0 } })
     const finalPath = `/api/huiteacher/field-notes/${note.body.data.id}/submit`
-    const payload = { expectedRevision: note.body.data.revision, fieldFormId: draft.id, answers: { q1: 'high' } }
+    const payload = { expectedRevision: note.body.data.revision, assessmentAttemptId: attemptId }
     expect(await request(finalPath, 'POST', payload)).toMatchObject({ status: 200, body: { code: 0 } })
-    expect((await request(finalPath, 'POST', payload)).status).toBe(409)
+    expect(await request(finalPath, 'POST', payload)).toMatchObject({ status: 200, body: { code: 0, data: { replayed: true } } })
+    expect((await request(finalPath, 'POST', { ...payload, assessmentAttemptId: randomUUID() })).status).toBe(409)
     const evidence = await prisma.huiteacherFieldFormEvidence.findUniqueOrThrow({ where: { recordId: note.body.data.id } })
+    expect(evidence.attemptId).toBe(attemptId)
     expect(evidence.answersCipher).not.toContain('high')
     const formal = await readFormalHuiteacherObservations({ ...scope, eventId: event.id })
     expect(formal.list.map(row => row.id)).toContain(note.body.data.id)
