@@ -1,0 +1,7 @@
+# Bring the existing transaction correction forward before PR428 merge
+
+The confirmed lock/persist bug is already present in the first Teacher consumer. The three-file production correction from PR431 is therefore applied before qualifying PR428. The existing artifact helper is byte-for-byte the reviewed cf43248e version: caller tx performs insert/reuse, stored integrity checks and audit together. The shared generation entry forwards tx. Teacher passes the same lock-owning tx to its three disclosure comparison queries and artifact generation, then reads only after commit. Its existing full-completion callback remains beforeCompute at this stage; PR429's contributor-aware beforePersist change remains a separate slice.
+
+The retained PR431 PostgreSQL counterexample and test are unchanged. They exercise the identical artifact helper and existing lock with real Prisma expiry, P2028, zero Artifact/audit rows and subsequent lock reacquisition. They remain original observations at the original source; no new PG execution, FINAL, scoring or native journey is claimed here. The outer callback wiring is statically reviewed against this backport and covered by the current candidate type check. No migration, production action, timeout increase, privacy rule removal or new engine.
+
+The former PR431 source files will be re-evaluated against this exact parent in their natural stacked merge; no duplicate independent persist path is retained. Remote candidates are unchanged while PR423 target mutation is rejected.

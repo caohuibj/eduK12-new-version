@@ -1,0 +1,885 @@
+﻿2026-10-30T15:41:46.4816559Z Current runner version: '2.338.0'
+2026-10-30T15:41:46.4844029Z ##[group]Runner Image Provisioner
+2026-10-30T15:41:46.4844882Z Hosted Compute Agent
+2026-10-30T15:41:46.4845610Z Version: 20261021.618
+2026-10-30T15:41:46.4846269Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-30T15:41:46.4847186Z Build Date: 2026-10-21T00:45:21Z
+2026-10-30T15:41:46.4847904Z Worker ID: {4314caa3-60a1-4c5b-b2e4-7f864f28afcc}
+2026-10-30T15:41:46.4848632Z Region: eastus
+2026-10-30T15:41:46.4849255Z Cloud: Azure
+2026-10-30T15:41:46.4850290Z ##[endgroup]
+2026-10-30T15:41:46.4853033Z ##[group]Operating System
+2026-10-30T15:41:46.4853741Z Ubuntu
+2026-10-30T15:41:46.4854328Z 24.04.5
+2026-10-30T15:41:46.4854916Z LTS
+2026-10-30T15:41:46.4855450Z ##[endgroup]
+2026-10-30T15:41:46.4856125Z ##[group]Runner Image
+2026-10-30T15:41:46.4856750Z Image: ubuntu-24.04
+2026-10-30T15:41:46.4857341Z Version: 20261025.353.1
+2026-10-30T15:41:46.4858659Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-30T15:41:46.4860784Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+2026-10-30T15:41:46.4861820Z ##[endgroup]
+2026-10-30T15:41:46.4862924Z ##[group]GITHUB_TOKEN Permissions
+2026-10-30T15:41:46.4865276Z Contents: read
+2026-10-30T15:41:46.4865948Z Metadata: read
+2026-10-30T15:41:46.4866615Z ##[endgroup]
+2026-10-30T15:41:46.4868735Z Secret source: Actions
+2026-10-30T15:41:46.4870597Z Cache mode: write
+2026-10-30T15:41:46.4871678Z Prepare workflow directory
+2026-10-30T15:41:46.5290480Z Prepare all required actions
+2026-10-30T15:41:46.5339837Z Getting action download info
+2026-10-30T15:41:46.7579638Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-30T15:41:46.9294369Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-30T15:41:47.0284268Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-30T15:41:47.2726658Z Uses: caohuibj/eduK12-new-version/.github/workflows/ci-frontend-build.yml@refs/pull/420/merge (35f6efdded0adb4f7e67ca177153ed9f9e9eaa22)
+2026-10-30T15:41:47.2731721Z ##[group] Inputs
+2026-10-30T15:41:47.2732300Z   runner_labels: ["ubuntu-24.04"]
+2026-10-30T15:41:47.2733243Z   performance_smoke: false
+2026-10-30T15:41:47.2733823Z   ui_runner_labels: ["ubuntu-24.04"]
+2026-10-30T15:41:47.2734369Z   ui_lab: true
+2026-10-30T15:41:47.2734814Z ##[endgroup]
+2026-10-30T15:41:47.2735438Z Complete job name: frontend artifacts / release consumers early / build
+2026-10-30T15:41:47.3649366Z ##[group]Run actions/checkout@v4
+2026-10-30T15:41:47.3650966Z with:
+2026-10-30T15:41:47.3651455Z   repository: caohuibj/eduK12-new-version
+2026-10-30T15:41:47.3655502Z   token: ***
+2026-10-30T15:41:47.3655940Z   ssh-strict: true
+2026-10-30T15:41:47.3656436Z   ssh-user: git
+2026-10-30T15:41:47.3656875Z   persist-credentials: true
+2026-10-30T15:41:47.3657362Z   clean: true
+2026-10-30T15:41:47.3657834Z   sparse-checkout-cone-mode: true
+2026-10-30T15:41:47.3658380Z   fetch-depth: 1
+2026-10-30T15:41:47.3658800Z   fetch-tags: false
+2026-10-30T15:41:47.3659245Z   show-progress: true
+2026-10-30T15:41:47.3660050Z   lfs: false
+2026-10-30T15:41:47.3660480Z   submodules: false
+2026-10-30T15:41:47.3660938Z   set-safe-directory: true
+2026-10-30T15:41:47.3661452Z   allow-unsafe-pr-checkout: false
+2026-10-30T15:41:47.3662276Z env:
+2026-10-30T15:41:47.3662772Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:41:47.3663472Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:41:47.3664095Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:41:47.3664700Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:41:47.3665247Z   TZ: UTC
+2026-10-30T15:41:47.3665666Z ##[endgroup]
+2026-10-30T15:41:47.6817953Z Syncing repository: caohuibj/eduK12-new-version
+2026-10-30T15:41:47.6820896Z ##[group]Getting Git version info
+2026-10-30T15:41:47.6822250Z Working directory is '/home/runner/work/eduK12-new-version/eduK12-new-version'
+2026-10-30T15:41:47.6824135Z [command]/usr/bin/git version
+2026-10-30T15:41:47.6936757Z git version 2.56.0
+2026-10-30T15:41:47.6962784Z ##[endgroup]
+2026-10-30T15:41:47.6979023Z Temporarily overriding HOME='/home/runner/work/_temp/083106ab-6b68-4d14-9ab0-d31d9fb1847b' before making global git config changes
+2026-10-30T15:41:47.6981907Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-30T15:41:47.6986119Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version
+2026-10-30T15:41:47.7044091Z Deleting the contents of '/home/runner/work/eduK12-new-version/eduK12-new-version'
+2026-10-30T15:41:47.7047955Z ##[group]Initializing the repository
+2026-10-30T15:41:47.7054079Z [command]/usr/bin/git init /home/runner/work/eduK12-new-version/eduK12-new-version
+2026-10-30T15:41:47.7187131Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-30T15:41:47.7188850Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-30T15:41:47.7190598Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-30T15:41:47.7191438Z hint: call:
+2026-10-30T15:41:47.7191875Z hint:
+2026-10-30T15:41:47.7192442Z hint: 	git config --global init.defaultBranch <name>
+2026-10-30T15:41:47.7193108Z hint:
+2026-10-30T15:41:47.7193733Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-30T15:41:47.7194760Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-30T15:41:47.7195581Z hint:
+2026-10-30T15:41:47.7196024Z hint: 	git branch -m <name>
+2026-10-30T15:41:47.7196537Z hint:
+2026-10-30T15:41:47.7197219Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-30T15:41:47.7212771Z Initialized empty Git repository in /home/runner/work/eduK12-new-version/eduK12-new-version/.git/
+2026-10-30T15:41:47.7225753Z [command]/usr/bin/git remote add origin https://github.com/caohuibj/eduK12-new-version
+2026-10-30T15:41:47.7280837Z ##[endgroup]
+2026-10-30T15:41:47.7281962Z ##[group]Disabling automatic garbage collection
+2026-10-30T15:41:47.7284645Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-30T15:41:47.7321346Z ##[endgroup]
+2026-10-30T15:41:47.7322437Z ##[group]Setting up auth
+2026-10-30T15:41:47.7329763Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T15:41:47.7373819Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T15:41:47.7821951Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T15:41:47.7878908Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T15:41:47.8142954Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T15:41:47.8193158Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T15:41:47.8465358Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-30T15:41:47.8518085Z ##[endgroup]
+2026-10-30T15:41:47.8519957Z ##[group]Fetching the repository
+2026-10-30T15:41:47.8534076Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +35f6efdded0adb4f7e67ca177153ed9f9e9eaa22:refs/remotes/pull/420/merge
+2026-10-30T15:41:51.9821804Z From https://github.com/caohuibj/eduK12-new-version
+2026-10-30T15:41:51.9823487Z  * [new ref]         35f6efdded0adb4f7e67ca177153ed9f9e9eaa22 -> pull/420/merge
+2026-10-30T15:41:51.9827044Z ##[endgroup]
+2026-10-30T15:41:51.9828404Z ##[group]Determining the checkout info
+2026-10-30T15:41:51.9830870Z ##[endgroup]
+2026-10-30T15:41:51.9835609Z [command]/usr/bin/git sparse-checkout disable
+2026-10-30T15:41:51.9906559Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-30T15:41:51.9948961Z ##[group]Checking out the ref
+2026-10-30T15:41:51.9953020Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/420/merge
+2026-10-30T15:41:53.0141493Z Updating files:  98% (10817/10960)
+2026-10-30T15:41:53.0287231Z Updating files:  99% (10851/10960)
+2026-10-30T15:41:53.0288190Z Updating files: 100% (10960/10960)
+2026-10-30T15:41:53.0289208Z Updating files: 100% (10960/10960), done.
+2026-10-30T15:41:53.0410588Z Note: switching to 'refs/remotes/pull/420/merge'.
+2026-10-30T15:41:53.0411028Z 
+2026-10-30T15:41:53.0411304Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-30T15:41:53.0412155Z changes and commit them, and you can discard any commits you make in this
+2026-10-30T15:41:53.0413123Z state without impacting any branches by switching back to a branch.
+2026-10-30T15:41:53.0413775Z 
+2026-10-30T15:41:53.0414183Z If you want to create a new branch to retain commits you create, you may
+2026-10-30T15:41:53.0415121Z do so (now or later) by using -c with the switch command. Example:
+2026-10-30T15:41:53.0415600Z 
+2026-10-30T15:41:53.0415854Z   git switch -c <new-branch-name>
+2026-10-30T15:41:53.0416293Z 
+2026-10-30T15:41:53.0416570Z Or undo this operation with:
+2026-10-30T15:41:53.0416903Z 
+2026-10-30T15:41:53.0417081Z   git switch -
+2026-10-30T15:41:53.0417339Z 
+2026-10-30T15:41:53.0417763Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-30T15:41:53.0418384Z 
+2026-10-30T15:41:53.0419015Z HEAD is now at 35f6efd Merge b2f9d9755b425d981483acdcb48170874464133f into f6740969b31f1154e3ffc1a23dd2406bd06a3634
+2026-10-30T15:41:53.0472207Z ##[endgroup]
+2026-10-30T15:41:53.0538508Z [command]/usr/bin/git log -1 --format=%H
+2026-10-30T15:41:53.0578448Z 35f6efdded0adb4f7e67ca177153ed9f9e9eaa22
+2026-10-30T15:41:53.0877182Z ##[group]Run actions/setup-node@v4
+2026-10-30T15:41:53.0877516Z with:
+2026-10-30T15:41:53.0877729Z   node-version: 24.21.0
+2026-10-30T15:41:53.0877957Z   always-auth: false
+2026-10-30T15:41:53.0878171Z   check-latest: false
+2026-10-30T15:41:53.0881112Z   token: ***
+2026-10-30T15:41:53.0881336Z env:
+2026-10-30T15:41:53.0881581Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:41:53.0881927Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:41:53.0882221Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:41:53.0882517Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:41:53.0882792Z   TZ: UTC
+2026-10-30T15:41:53.0882975Z ##[endgroup]
+2026-10-30T15:41:53.2441081Z Attempting to download 24.21.0...
+2026-10-30T15:41:53.2602900Z (node:2318) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-30T15:41:53.2604426Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-30T15:41:53.8848426Z Acquiring 24.21.0 - x64 from https://github.com/actions/node-versions/releases/download/24.21.0-34304089047/node-24.21.0-linux-x64.tar.gz
+2026-10-30T15:41:54.3424903Z Extracting ...
+2026-10-30T15:41:54.3568844Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/40a82d95-529b-408d-8e62-9c3273a27620 -f /home/runner/work/_temp/ae9a74e0-18f6-42e4-bb9f-99ed6ea6c6be
+2026-10-30T15:41:55.5925945Z Adding to the cache ...
+2026-10-30T15:41:57.4166181Z ##[group]Environment details
+2026-10-30T15:41:57.6677532Z node: v24.21.0
+2026-10-30T15:41:57.6677962Z npm: 11.19.0
+2026-10-30T15:41:57.6678557Z yarn: 1.22.22
+2026-10-30T15:41:57.6679294Z ##[endgroup]
+2026-10-30T15:41:57.6904021Z ##[group]Run node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend
+2026-10-30T15:41:57.6904731Z [36;1mnode "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend[0m
+2026-10-30T15:41:57.6930876Z shell: /usr/bin/bash -e {0}
+2026-10-30T15:41:57.6931157Z env:
+2026-10-30T15:41:57.6931700Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:41:57.6932065Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:41:57.6932383Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:41:57.6932680Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:41:57.6932962Z   TZ: UTC
+2026-10-30T15:41:57.6933156Z ##[endgroup]
+2026-10-30T15:41:57.7295642Z {"environment":"github-hosted","os":"linux","freeBytes":91067060224,"memoryBytes":16760340480,"light":false,"frontend":true,"control":false,"runner":"GitHub Actions 1000012042","cpus":"X64"}
+2026-10-30T15:41:57.7363422Z ##[group]Run npm ci
+2026-10-30T15:41:57.7363709Z [36;1mnpm ci[0m
+2026-10-30T15:41:57.7384911Z shell: /usr/bin/bash -e {0}
+2026-10-30T15:41:57.7385191Z env:
+2026-10-30T15:41:57.7385450Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:41:57.7385807Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:41:57.7386107Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:41:57.7386415Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:41:57.7386685Z   TZ: UTC
+2026-10-30T15:41:57.7386869Z ##[endgroup]
+2026-10-30T15:41:59.2552418Z npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+2026-10-30T15:42:08.9420948Z 
+2026-10-30T15:42:08.9421923Z added 395 packages, and audited 396 packages in 11s
+2026-10-30T15:42:08.9422484Z 
+2026-10-30T15:42:08.9422883Z 81 packages are looking for funding
+2026-10-30T15:42:08.9423640Z   run `npm fund` for details
+2026-10-30T15:42:08.9512996Z 
+2026-10-30T15:42:08.9514060Z 5 moderate severity vulnerabilities
+2026-10-30T15:42:08.9514465Z 
+2026-10-30T15:42:08.9514849Z To address issues that do not require attention, run:
+2026-10-30T15:42:08.9515404Z   npm audit fix
+2026-10-30T15:42:08.9515605Z 
+2026-10-30T15:42:08.9515954Z To address all issues (including breaking changes), run:
+2026-10-30T15:42:08.9516529Z   npm audit fix --force
+2026-10-30T15:42:08.9516752Z 
+2026-10-30T15:42:08.9516958Z Run `npm audit` for details.
+2026-10-30T15:42:08.9525767Z npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+2026-10-30T15:42:08.9527150Z npm warn install-scripts   esbuild@0.25.12 (postinstall: node install.js)
+2026-10-30T15:42:08.9528030Z npm warn install-scripts
+2026-10-30T15:42:08.9529341Z npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+2026-10-30T15:42:09.0347174Z ##[group]Run npm run build
+2026-10-30T15:42:09.0347495Z [36;1mnpm run build[0m
+2026-10-30T15:42:09.0347876Z [36;1mnode "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write frontend[0m
+2026-10-30T15:42:09.0369172Z shell: /usr/bin/bash -e {0}
+2026-10-30T15:42:09.0369638Z env:
+2026-10-30T15:42:09.0369907Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:42:09.0370272Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:42:09.0370580Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:42:09.0370882Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:42:09.0371190Z   TZ: UTC
+2026-10-30T15:42:09.0371381Z ##[endgroup]
+2026-10-30T15:42:09.1389497Z 
+2026-10-30T15:42:09.1390364Z > frontend@0.0.0 build
+2026-10-30T15:42:09.1390979Z > vite build
+2026-10-30T15:42:09.1391248Z 
+2026-10-30T15:42:09.3455316Z [36mvite v6.4.4 [32mbuilding for production...[36m[39m
+2026-10-30T15:42:09.5150806Z transforming...
+2026-10-30T15:42:27.1740293Z [32m✓[39m 6355 modules transformed.
+2026-10-30T15:42:28.5532033Z rendering chunks...
+2026-10-30T15:42:31.2580509Z computing gzip size...
+2026-10-30T15:42:32.0754675Z [2mdist/[22m[32mindex.html                                               [39m[1m[2m    0.63 kB[22m[1m[22m[2m │ gzip:   0.37 kB[22m
+2026-10-30T15:42:32.0756603Z [2mdist/[22m[2massets/[22m[32mschool-home-wordmark-BO8jmBb-.svg                 [39m[1m[2m   19.00 kB[22m[1m[22m[2m │ gzip:   5.49 kB[22m
+2026-10-30T15:42:32.0758754Z [2mdist/[22m[2massets/[22m[32mteacher-home-wordmark-CaR56Unw.svg                [39m[1m[2m   19.23 kB[22m[1m[22m[2m │ gzip:   5.59 kB[22m
+2026-10-30T15:42:32.0761569Z [2mdist/[22m[2massets/[22m[32mhuischool-a1-emblem-BNEzhrHA.svg                  [39m[1m[2m   23.73 kB[22m[1m[22m[2m │ gzip:   8.58 kB[22m
+2026-10-30T15:42:32.0763662Z [2mdist/[22m[2massets/[22m[32mhuischool-a1-emblem-dark-ClWHGvL8.svg             [39m[1m[2m   23.73 kB[22m[1m[22m[2m │ gzip:   8.59 kB[22m
+2026-10-30T15:42:32.0765815Z [2mdist/[22m[2massets/[22m[32mtraining-logo-nWDnbkt0.svg                        [39m[1m[2m   26.88 kB[22m[1m[22m[2m │ gzip:   8.80 kB[22m
+2026-10-30T15:42:32.0767892Z [2mdist/[22m[2massets/[22m[32mtraining-logo-dark-D6bRoe4t.svg                   [39m[1m[2m   26.88 kB[22m[1m[22m[2m │ gzip:   8.78 kB[22m
+2026-10-30T15:42:32.0770093Z [2mdist/[22m[2massets/[22m[32msheet-04-CO0eAOUW.avif                            [39m[1m[2m   98.74 kB[22m[1m[22m
+2026-10-30T15:42:32.0771918Z [2mdist/[22m[2massets/[22m[32msheet-03-C5dUNgDJ.avif                            [39m[1m[2m  101.92 kB[22m[1m[22m
+2026-10-30T15:42:32.0773688Z [2mdist/[22m[2massets/[22m[32msheet-05-Y2ofx4UQ.avif                            [39m[1m[2m  106.61 kB[22m[1m[22m
+2026-10-30T15:42:32.0775394Z [2mdist/[22m[2massets/[22m[32msheet-02-BTGLJI9z.avif                            [39m[1m[2m  110.84 kB[22m[1m[22m
+2026-10-30T15:42:32.0777090Z [2mdist/[22m[2massets/[22m[32msheet-01-BGwkLkW2.avif                            [39m[1m[2m  157.90 kB[22m[1m[22m
+2026-10-30T15:42:32.0778891Z [2mdist/[22m[2massets/[22m[32mtraining-moonlit-landscape-D27opcue.webp          [39m[1m[2m  162.72 kB[22m[1m[22m
+2026-10-30T15:42:32.0781181Z [2mdist/[22m[2massets/[22m[32msheet-05-DemlNPB7.webp                            [39m[1m[2m  165.91 kB[22m[1m[22m
+2026-10-30T15:42:32.0782953Z [2mdist/[22m[2massets/[22m[32mtraining-landscape-v2-Cse4yhq7.webp               [39m[1m[2m  174.89 kB[22m[1m[22m
+2026-10-30T15:42:32.0784781Z [2mdist/[22m[2massets/[22m[32msheet-02-aSO7qL_q.webp                            [39m[1m[2m  179.65 kB[22m[1m[22m
+2026-10-30T15:42:32.0786650Z [2mdist/[22m[2massets/[22m[32mhuischool-campus-moonlight-C0wSiT9A.webp          [39m[1m[2m  258.15 kB[22m[1m[22m
+2026-10-30T15:42:32.0788534Z [2mdist/[22m[2massets/[22m[32mhuischool-campus-sunlight-D3Yo_Q2B.webp           [39m[1m[2m  262.94 kB[22m[1m[22m
+2026-10-30T15:42:32.0791372Z [2mdist/[22m[2massets/[22m[32msheet-01-CRd3WIc5.webp                            [39m[1m[2m  336.55 kB[22m[1m[22m
+2026-10-30T15:42:32.0793242Z [2mdist/[22m[2massets/[22m[32msheet-04-C0sM0BMi.webp                            [39m[1m[2m  402.59 kB[22m[1m[22m
+2026-10-30T15:42:32.0794938Z [2mdist/[22m[2massets/[22m[32msheet-03-zOdI74rv.webp                            [39m[1m[2m  433.13 kB[22m[1m[22m
+2026-10-30T15:42:32.0796627Z [2mdist/[22m[2massets/[22m[32mpdf.worker.min-B_fnEKel.mjs                       [39m[1m[2m1,239.05 kB[22m[1m[22m
+2026-10-30T15:42:32.0798432Z [2mdist/[22m[2massets/[22m[32msheet-05-Kd6NgXkk.png                             [39m[1m[2m2,368.78 kB[22m[1m[22m
+2026-10-30T15:42:32.0800359Z [2mdist/[22m[2massets/[22m[32msheet-02-D1Vk__Au.png                             [39m[1m[2m2,525.43 kB[22m[1m[22m
+2026-10-30T15:42:32.0802095Z [2mdist/[22m[2massets/[22m[32msheet-01-C8sHgmuz.png                             [39m[1m[2m2,578.77 kB[22m[1m[22m
+2026-10-30T15:42:32.0803793Z [2mdist/[22m[2massets/[22m[32msheet-03-BZU7tmVB.png                             [39m[1m[2m2,752.88 kB[22m[1m[22m
+2026-10-30T15:42:32.0805550Z [2mdist/[22m[2massets/[22m[32msheet-04-BV4b_l_Q.png                             [39m[1m[2m2,802.58 kB[22m[1m[22m
+2026-10-30T15:42:32.0807594Z [2mdist/[22m[2massets/[22m[35mMatrixTask-CcFQPQ0f.css                           [39m[1m[2m    0.13 kB[22m[1m[22m[2m │ gzip:   0.13 kB[22m
+2026-10-30T15:42:32.0810911Z [2mdist/[22m[2massets/[22m[35mFormalReferenceStudio-DXTdVIYY.css                [39m[1m[2m    0.40 kB[22m[1m[22m[2m │ gzip:   0.22 kB[22m
+2026-10-30T15:42:32.0813481Z [2mdist/[22m[2massets/[22m[35mEducationAssessmentResourcePicker-Cew1NiDf.css    [39m[1m[2m    0.49 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+2026-10-30T15:42:32.0815675Z [2mdist/[22m[2massets/[22m[35mConditionEditor-B0-KNfq6.css                      [39m[1m[2m    0.91 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2026-10-30T15:42:32.0817771Z [2mdist/[22m[2massets/[22m[35mProductThemeControl-lELuWh9q.css                  [39m[1m[2m    1.02 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+2026-10-30T15:42:32.0820105Z [2mdist/[22m[2massets/[22m[35mSchoolMark-CcA7i-Iq.css                           [39m[1m[2m    1.12 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2026-10-30T15:42:32.0822299Z [2mdist/[22m[2massets/[22m[35meducationAssessmentFeedbackAdapter-DqsvUUdR.css   [39m[1m[2m    1.15 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+2026-10-30T15:42:32.0824530Z [2mdist/[22m[2massets/[22m[35mAssignmentList-CdiYpkz5.css                       [39m[1m[2m    1.35 kB[22m[1m[22m[2m │ gzip:   0.51 kB[22m
+2026-10-30T15:42:32.0826731Z [2mdist/[22m[2massets/[22m[35mApprovedScaleAxes-r0uweICl.css                    [39m[1m[2m    1.35 kB[22m[1m[22m[2m │ gzip:   0.50 kB[22m
+2026-10-30T15:42:32.0829099Z [2mdist/[22m[2massets/[22m[35mtraining-form-surface-BhEY1h6v.css                [39m[1m[2m    1.73 kB[22m[1m[22m[2m │ gzip:   0.55 kB[22m
+2026-10-30T15:42:32.0833860Z [2mdist/[22m[2massets/[22m[35mBundleProducts-rcnGr2PM.css                       [39m[1m[2m    1.95 kB[22m[1m[22m[2m │ gzip:   0.60 kB[22m
+2026-10-30T15:42:32.0836019Z [2mdist/[22m[2massets/[22m[35mEducationPrivateVersionChooser-BTOMKSU8.css       [39m[1m[2m    2.05 kB[22m[1m[22m[2m │ gzip:   0.66 kB[22m
+2026-10-30T15:42:32.0838078Z [2mdist/[22m[2massets/[22m[35mtask-group-report-B6-8vMO1.css                    [39m[1m[2m    2.34 kB[22m[1m[22m[2m │ gzip:   0.80 kB[22m
+2026-10-30T15:42:32.0840415Z [2mdist/[22m[2massets/[22m[35meducation-entry-layout-CpJy3zDV.css               [39m[1m[2m    2.37 kB[22m[1m[22m[2m │ gzip:   0.61 kB[22m
+2026-10-30T15:42:32.0842480Z [2mdist/[22m[2massets/[22m[35mCatalogClassificationTags-DVUe7Fca.css            [39m[1m[2m    2.77 kB[22m[1m[22m[2m │ gzip:   0.86 kB[22m
+2026-10-30T15:42:32.0844837Z [2mdist/[22m[2massets/[22m[35mEducationProductGovernance-BLTg7S5E.css           [39m[1m[2m    2.79 kB[22m[1m[22m[2m │ gzip:   0.97 kB[22m
+2026-10-30T15:42:32.0846177Z [2mdist/[22m[2massets/[22m[35mOrganizationProductRoutes-DCRSNJSp.css            [39m[1m[2m    2.97 kB[22m[1m[22m[2m │ gzip:   0.87 kB[22m
+2026-10-30T15:42:32.0847290Z [2mdist/[22m[2massets/[22m[35mCheckinList-DZoNxvoh.css                          [39m[1m[2m    3.01 kB[22m[1m[22m[2m │ gzip:   0.81 kB[22m
+2026-10-30T15:42:32.0848395Z [2mdist/[22m[2massets/[22m[35museCatalogQuery-CGdd3G7T.css                      [39m[1m[2m    3.37 kB[22m[1m[22m[2m │ gzip:   0.97 kB[22m
+2026-10-30T15:42:32.0849854Z [2mdist/[22m[2massets/[22m[35mAssessmentMaterialDisplay-B3_-Rx-i.css            [39m[1m[2m    3.89 kB[22m[1m[22m[2m │ gzip:   0.94 kB[22m
+2026-10-30T15:42:32.0851905Z [2mdist/[22m[2massets/[22m[35mSurveyImageField-CdVbhkUi.css                     [39m[1m[2m    4.05 kB[22m[1m[22m[2m │ gzip:   1.10 kB[22m
+2026-10-30T15:42:32.0854089Z [2mdist/[22m[2massets/[22m[35mCognitiveTaskPresentation-UBH7vRj1.css            [39m[1m[2m    5.30 kB[22m[1m[22m[2m │ gzip:   1.53 kB[22m
+2026-10-30T15:42:32.0856232Z [2mdist/[22m[2massets/[22m[35mAssessmentToolPicker-XzmgzfhO.css                 [39m[1m[2m    5.35 kB[22m[1m[22m[2m │ gzip:   1.44 kB[22m
+2026-10-30T15:42:32.0858200Z [2mdist/[22m[2massets/[22m[35mSurveyAdminShell-L23LTT7x.css                     [39m[1m[2m    5.36 kB[22m[1m[22m[2m │ gzip:   1.53 kB[22m
+2026-10-30T15:42:32.0860909Z [2mdist/[22m[2massets/[22m[35mtraining-media-dialogs-DIRNBSbp.css               [39m[1m[2m    6.18 kB[22m[1m[22m[2m │ gzip:   1.12 kB[22m
+2026-10-30T15:42:32.0862590Z [2mdist/[22m[2massets/[22m[35mCognitiveRunner-DNoKZRd3.css                      [39m[1m[2m    6.31 kB[22m[1m[22m[2m │ gzip:   1.54 kB[22m
+2026-10-30T15:42:32.0863796Z [2mdist/[22m[2massets/[22m[35mEducationPrivateToolStudio-DrGLQGG-.css           [39m[1m[2m    6.85 kB[22m[1m[22m[2m │ gzip:   1.51 kB[22m
+2026-10-30T15:42:32.0864970Z [2mdist/[22m[2massets/[22m[35meducation-admin-shell-XB4z7b0T.css                [39m[1m[2m    6.86 kB[22m[1m[22m[2m │ gzip:   1.76 kB[22m
+2026-10-30T15:42:32.0866113Z [2mdist/[22m[2massets/[22m[35mSurveyAppearance-C7j5YiIH.css                     [39m[1m[2m    6.93 kB[22m[1m[22m[2m │ gzip:   1.77 kB[22m
+2026-10-30T15:42:32.0867202Z [2mdist/[22m[2massets/[22m[35mTrainingLibrary-DE7cdA_X.css                      [39m[1m[2m    7.19 kB[22m[1m[22m[2m │ gzip:   1.24 kB[22m
+2026-10-30T15:42:32.0868303Z [2mdist/[22m[2massets/[22m[35mProductButton-CSdvJMrA.css                        [39m[1m[2m    7.88 kB[22m[1m[22m[2m │ gzip:   1.97 kB[22m
+2026-10-30T15:42:32.0869779Z [2mdist/[22m[2massets/[22m[35msurvey-composition-studio-C0ojCb0x.css            [39m[1m[2m    7.89 kB[22m[1m[22m[2m │ gzip:   1.56 kB[22m
+2026-10-30T15:42:32.0871804Z [2mdist/[22m[2massets/[22m[35mTrainingCourseSettings-Dms43tIX.css               [39m[1m[2m    7.93 kB[22m[1m[22m[2m │ gzip:   1.52 kB[22m
+2026-10-30T15:42:32.0873004Z [2mdist/[22m[2massets/[22m[35mTrainingCourseAnalysis-B1VjCDVt.css               [39m[1m[2m    7.96 kB[22m[1m[22m[2m │ gzip:   1.85 kB[22m
+2026-10-30T15:42:32.0874124Z [2mdist/[22m[2massets/[22m[35madmin-training-DWV9dGjE.css                       [39m[1m[2m    8.55 kB[22m[1m[22m[2m │ gzip:   2.11 kB[22m
+2026-10-30T15:42:32.0875212Z [2mdist/[22m[2massets/[22m[35mTrainingCourseCode-BP9xHhS_.css                   [39m[1m[2m    9.04 kB[22m[1m[22m[2m │ gzip:   1.65 kB[22m
+2026-10-30T15:42:32.0876323Z [2mdist/[22m[2massets/[22m[35mtraining-admin-auth-C_ifnE_q.css                  [39m[1m[2m    9.21 kB[22m[1m[22m[2m │ gzip:   2.34 kB[22m
+2026-10-30T15:42:32.0877650Z [2mdist/[22m[2massets/[22m[35mAdminLogin-kRLGdvWK.css                           [39m[1m[2m    9.24 kB[22m[1m[22m[2m │ gzip:   2.09 kB[22m
+2026-10-30T15:42:32.0878817Z [2mdist/[22m[2massets/[22m[35mTrainingLearnerCourse-EZRIw4ga.css                [39m[1m[2m   10.88 kB[22m[1m[22m[2m │ gzip:   1.41 kB[22m
+2026-10-30T15:42:32.0880807Z [2mdist/[22m[2massets/[22m[35mTrainingTrainerCourse-C86iDira.css                [39m[1m[2m   11.86 kB[22m[1m[22m[2m │ gzip:   1.59 kB[22m
+2026-10-30T15:42:32.0883071Z [2mdist/[22m[2massets/[22m[35mTrainingCourseAssessments-DXG1DCZ5.css            [39m[1m[2m   12.35 kB[22m[1m[22m[2m │ gzip:   2.09 kB[22m
+2026-10-30T15:42:32.0885102Z [2mdist/[22m[2massets/[22m[35mSurveyBrand-CzGZEkwd.css                          [39m[1m[2m   12.89 kB[22m[1m[22m[2m │ gzip:   3.10 kB[22m
+2026-10-30T15:42:32.0917576Z [2mdist/[22m[2massets/[22m[35mreport-ui-BJQ-FC7T.css                            [39m[1m[2m   13.33 kB[22m[1m[22m[2m │ gzip:   3.01 kB[22m
+2026-10-30T15:42:32.0919758Z [2mdist/[22m[2massets/[22m[35mCompositeAssessmentResults-CUiSKVvD.css           [39m[1m[2m   13.50 kB[22m[1m[22m[2m │ gzip:   2.28 kB[22m
+2026-10-30T15:42:32.0921735Z [2mdist/[22m[2massets/[22m[35mResearchScaleEditor-NG5mqfD0.css                  [39m[1m[2m   13.73 kB[22m[1m[22m[2m │ gzip:   2.45 kB[22m
+2026-10-30T15:42:32.0923638Z [2mdist/[22m[2massets/[22m[35mSchoolPersonnelDirectory-B5poee7-.css             [39m[1m[2m   14.05 kB[22m[1m[22m[2m │ gzip:   2.77 kB[22m
+2026-10-30T15:42:32.0925510Z [2mdist/[22m[2massets/[22m[35mSurveyWaveStudio-DHs-l4gZ.css                     [39m[1m[2m   15.75 kB[22m[1m[22m[2m │ gzip:   2.63 kB[22m
+2026-10-30T15:42:32.0927791Z [2mdist/[22m[2massets/[22m[35mAssessmentWorkbench-CmP0Ah4h.css                  [39m[1m[2m   15.90 kB[22m[1m[22m[2m │ gzip:   2.31 kB[22m
+2026-10-30T15:42:32.0929961Z [2mdist/[22m[2massets/[22m[35mtraining-workspace-cards-COzZhh-b.css             [39m[1m[2m   16.45 kB[22m[1m[22m[2m │ gzip:   2.33 kB[22m
+2026-10-30T15:42:32.0932062Z [2mdist/[22m[2massets/[22m[35mDeferredAssessmentDataExport-Cea8ukY7.css         [39m[1m[2m   16.58 kB[22m[1m[22m[2m │ gzip:   2.66 kB[22m
+2026-10-30T15:42:32.0934031Z [2mdist/[22m[2massets/[22m[35mPublicDeliveryManager-BWdOGefc.css                [39m[1m[2m   16.91 kB[22m[1m[22m[2m │ gzip:   2.34 kB[22m
+2026-10-30T15:42:32.0936000Z [2mdist/[22m[2massets/[22m[35mSchoolCompositeRunner-BdX_Pd0p.css                [39m[1m[2m   17.36 kB[22m[1m[22m[2m │ gzip:   2.52 kB[22m
+2026-10-30T15:42:32.0937972Z [2mdist/[22m[2massets/[22m[35mSchoolPersonnelImport-SE1YIb47.css                [39m[1m[2m   18.42 kB[22m[1m[22m[2m │ gzip:   3.37 kB[22m
+2026-10-30T15:42:32.0940217Z [2mdist/[22m[2massets/[22m[35mattachmentUpdate-CDdbvZ7u.css                     [39m[1m[2m   19.12 kB[22m[1m[22m[2m │ gzip:   2.80 kB[22m
+2026-10-30T15:42:32.0942140Z [2mdist/[22m[2massets/[22m[35mSchoolActivityManager-lsADvXU2.css                [39m[1m[2m   20.61 kB[22m[1m[22m[2m │ gzip:   2.89 kB[22m
+2026-10-30T15:42:32.0944076Z [2mdist/[22m[2massets/[22m[35mtraining-portal-refresh-DbTaAAZU.css              [39m[1m[2m   20.64 kB[22m[1m[22m[2m │ gzip:   3.65 kB[22m
+2026-10-30T15:42:32.0946029Z [2mdist/[22m[2massets/[22m[35mSurveyMaterialLibrary-ZaodWRmS.css                [39m[1m[2m   20.91 kB[22m[1m[22m[2m │ gzip:   3.73 kB[22m
+2026-10-30T15:42:32.0947949Z [2mdist/[22m[2massets/[22m[35mResearchFormEditor-C24I2AKZ.css                   [39m[1m[2m   22.21 kB[22m[1m[22m[2m │ gzip:   3.86 kB[22m
+2026-10-30T15:42:32.0950098Z [2mdist/[22m[2massets/[22m[35mcognitive-report-audiences-CR0dEEDW.css           [39m[1m[2m   22.53 kB[22m[1m[22m[2m │ gzip:   4.10 kB[22m
+2026-10-30T15:42:32.0952156Z [2mdist/[22m[2massets/[22m[35msurvey-participant-Be5qZXqZ.css                   [39m[1m[2m   22.84 kB[22m[1m[22m[2m │ gzip:   4.91 kB[22m
+2026-10-30T15:42:32.0954341Z [2mdist/[22m[2massets/[22m[35mScaleLibraryGovernance-B_yAanGt.css               [39m[1m[2m   24.99 kB[22m[1m[22m[2m │ gzip:   4.41 kB[22m
+2026-10-30T15:42:32.0956364Z [2mdist/[22m[2massets/[22m[35mSurveyToolLibrary-DhW20Hwo.css                    [39m[1m[2m   27.34 kB[22m[1m[22m[2m │ gzip:   4.63 kB[22m
+2026-10-30T15:42:32.0958276Z [2mdist/[22m[2massets/[22m[35mTrainingTrainerHome-BZ_Rzhyh.css                  [39m[1m[2m   27.35 kB[22m[1m[22m[2m │ gzip:   3.30 kB[22m
+2026-10-30T15:42:32.0960370Z [2mdist/[22m[2massets/[22m[35msurvey-admin-B5ESqBlL.css                         [39m[1m[2m   28.46 kB[22m[1m[22m[2m │ gzip:   4.91 kB[22m
+2026-10-30T15:42:32.0962285Z [2mdist/[22m[2massets/[22m[35mSurveyEntryPanel-DT7vVWQ-.css                     [39m[1m[2m   28.67 kB[22m[1m[22m[2m │ gzip:   5.25 kB[22m
+2026-10-30T15:42:32.0964170Z [2mdist/[22m[2massets/[22m[35mScaleEdit-Bo3TIrG7.css                            [39m[1m[2m   29.36 kB[22m[1m[22m[2m │ gzip:   3.13 kB[22m
+2026-10-30T15:42:32.0966082Z [2mdist/[22m[2massets/[22m[35mSurveyPublicApp-BUaAwE3x.css                      [39m[1m[2m   31.23 kB[22m[1m[22m[2m │ gzip:   5.19 kB[22m
+2026-10-30T15:42:32.0968037Z [2mdist/[22m[2massets/[22m[35mTrainingLearnerHome-DTq0mELR.css                  [39m[1m[2m   34.37 kB[22m[1m[22m[2m │ gzip:   4.29 kB[22m
+2026-10-30T15:42:32.0970216Z [2mdist/[22m[2massets/[22m[35mSurveySectionHeader-nQSCcYYG.css                  [39m[1m[2m   38.32 kB[22m[1m[22m[2m │ gzip:   5.41 kB[22m
+2026-10-30T15:42:32.0972095Z [2mdist/[22m[2massets/[22m[35mSurveyApp-klBqdmlV.css                            [39m[1m[2m   39.33 kB[22m[1m[22m[2m │ gzip:   6.51 kB[22m
+2026-10-30T15:42:32.0974253Z [2mdist/[22m[2massets/[22m[35msurvey-workspace-polish-D6RH9D6F.css              [39m[1m[2m   39.40 kB[22m[1m[22m[2m │ gzip:   5.72 kB[22m
+2026-10-30T15:42:32.0976032Z [2mdist/[22m[2massets/[22m[35mindex-d1Ay7q8Z.css                                [39m[1m[2m   56.84 kB[22m[1m[22m[2m │ gzip:  10.71 kB[22m
+2026-10-30T15:42:32.0977950Z [2mdist/[22m[2massets/[22m[35mQuestionnaireProducts-ClHCoGgK.css                [39m[1m[2m   65.52 kB[22m[1m[22m[2m │ gzip:   8.99 kB[22m
+2026-10-30T15:42:32.0980109Z [2mdist/[22m[2massets/[22m[35mHuiteacherApp-ClGL_1jI.css                        [39m[1m[2m   66.09 kB[22m[1m[22m[2m │ gzip:  11.54 kB[22m
+2026-10-30T15:42:32.0982063Z [2mdist/[22m[2massets/[22m[35mtraining-admin-workspace-CXsco89t.css             [39m[1m[2m   74.64 kB[22m[1m[22m[2m │ gzip:  10.32 kB[22m
+2026-10-30T15:42:32.0983987Z [2mdist/[22m[2massets/[22m[35mSchoolApp-CxHg8BQI.css                            [39m[1m[2m  236.92 kB[22m[1m[22m[2m │ gzip:  31.36 kB[22m
+2026-10-30T15:42:32.0985814Z [2mdist/[22m[2massets/[22m[35mApp-BJUYgD4R.css                                  [39m[1m[2m  339.28 kB[22m[1m[22m[2m │ gzip:  49.38 kB[22m
+2026-10-30T15:42:32.0987620Z [2mdist/[22m[2massets/[22m[36mpractice-DeiR9N_E.js                              [39m[1m[2m    0.05 kB[22m[1m[22m[2m │ gzip:   0.07 kB[22m
+2026-10-30T15:42:32.0989576Z [2mdist/[22m[2massets/[22m[36mindex-DzD9urfg.js                                 [39m[1m[2m    0.06 kB[22m[1m[22m[2m │ gzip:   0.08 kB[22m
+2026-10-30T15:42:32.0991432Z [2mdist/[22m[2massets/[22m[36mmeasurement-publication-BJkBG6oj.js               [39m[1m[2m    0.17 kB[22m[1m[22m[2m │ gzip:   0.15 kB[22m
+2026-10-30T15:42:32.0993263Z [2mdist/[22m[2massets/[22m[36mSystemAdminHome-Bs-chaZu.js                       [39m[1m[2m    0.18 kB[22m[1m[22m[2m │ gzip:   0.17 kB[22m
+2026-10-30T15:42:32.0995116Z [2mdist/[22m[2massets/[22m[36massessmentTaskPresentation-CgUhURVl.js            [39m[1m[2m    0.19 kB[22m[1m[22m[2m │ gzip:   0.19 kB[22m
+2026-10-30T15:42:32.0996946Z [2mdist/[22m[2massets/[22m[36mcheckpointTypes-CE0Ib90y.js                       [39m[1m[2m    0.19 kB[22m[1m[22m[2m │ gzip:   0.17 kB[22m
+2026-10-30T15:42:32.0999024Z [2mdist/[22m[2massets/[22m[36mrecovery-credential-DTG-RQ8c.js                   [39m[1m[2m    0.19 kB[22m[1m[22m[2m │ gzip:   0.16 kB[22m
+2026-10-30T15:42:32.1000577Z [2mdist/[22m[2massets/[22m[36mresponse-timing-NEHx8NlB.js                       [39m[1m[2m    0.20 kB[22m[1m[22m[2m │ gzip:   0.15 kB[22m
+2026-10-30T15:42:32.1001664Z [2mdist/[22m[2massets/[22m[36mActionBar-4Z8-JVG-.js                             [39m[1m[2m    0.21 kB[22m[1m[22m[2m │ gzip:   0.18 kB[22m
+2026-10-30T15:42:32.1002721Z [2mdist/[22m[2massets/[22m[36musePageSignal-C1Gepplf.js                         [39m[1m[2m    0.24 kB[22m[1m[22m[2m │ gzip:   0.19 kB[22m
+2026-10-30T15:42:32.1003823Z [2mdist/[22m[2massets/[22m[36msurveyManagement-CGlecpin.js                      [39m[1m[2m    0.26 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+2026-10-30T15:42:32.1004930Z [2mdist/[22m[2massets/[22m[36museRunnerSaveState-Bj5UljRl.js                    [39m[1m[2m    0.26 kB[22m[1m[22m[2m │ gzip:   0.22 kB[22m
+2026-10-30T15:42:32.1006026Z [2mdist/[22m[2massets/[22m[36massessmentContextHref-CSbcFeuz.js                 [39m[1m[2m    0.27 kB[22m[1m[22m[2m │ gzip:   0.22 kB[22m
+2026-10-30T15:42:32.1007108Z [2mdist/[22m[2massets/[22m[36mProductButton-CtcB2c72.js                         [39m[1m[2m    0.27 kB[22m[1m[22m[2m │ gzip:   0.22 kB[22m
+2026-10-30T15:42:32.1008155Z [2mdist/[22m[2massets/[22m[36mdeferredPage-ZVxWDYx5.js                          [39m[1m[2m    0.30 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2026-10-30T15:42:32.1009191Z [2mdist/[22m[2massets/[22m[36mcheck-CTp9M1Dq.js                                 [39m[1m[2m    0.30 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+2026-10-30T15:42:32.1010882Z [2mdist/[22m[2massets/[22m[36mchevron-up-CL9uH5fT.js                            [39m[1m[2m    0.31 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+2026-10-30T15:42:32.1011951Z [2mdist/[22m[2massets/[22m[36mchevron-right-BvArG9jT.js                         [39m[1m[2m    0.31 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+2026-10-30T15:42:32.1013006Z [2mdist/[22m[2massets/[22m[36mchevron-left-BAsdlAsh.js                          [39m[1m[2m    0.31 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2026-10-30T15:42:32.1014072Z [2mdist/[22m[2massets/[22m[36mloader-circle-CgrY1pQL.js                         [39m[1m[2m    0.32 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2026-10-30T15:42:32.1015132Z [2mdist/[22m[2massets/[22m[36mrightsPresentation-Duxcq8vM.js                    [39m[1m[2m    0.32 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1016185Z [2mdist/[22m[2massets/[22m[36msquare-eMCQ9hR5.js                                [39m[1m[2m    0.33 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2026-10-30T15:42:32.1017176Z [2mdist/[22m[2massets/[22m[36mplus-BBIe_A62.js                                  [39m[1m[2m    0.34 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2026-10-30T15:42:32.1018194Z [2mdist/[22m[2massets/[22m[36mx-DO2XElNo.js                                     [39m[1m[2m    0.34 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2026-10-30T15:42:32.1019215Z [2mdist/[22m[2massets/[22m[36marrow-up-CRybA8vX.js                              [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2026-10-30T15:42:32.1020628Z [2mdist/[22m[2massets/[22m[36mclock-CLoSJqcu.js                                 [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2026-10-30T15:42:32.1021661Z [2mdist/[22m[2massets/[22m[36marrow-right-663blTzO.js                           [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2026-10-30T15:42:32.1022705Z [2mdist/[22m[2massets/[22m[36marrow-down-Cow7Xlys.js                            [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2026-10-30T15:42:32.1023786Z [2mdist/[22m[2massets/[22m[36mTrainingMaterials-CPKkCAd1.js                     [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2026-10-30T15:42:32.1025039Z [2mdist/[22m[2massets/[22m[36marrow-up-right-DOmeNLWR.js                        [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2026-10-30T15:42:32.1026147Z [2mdist/[22m[2massets/[22m[36msearch-CECaFcPC.js                                [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2026-10-30T15:42:32.1027186Z [2mdist/[22m[2massets/[22m[36mcircle-check-Cwz6wSu4.js                          [39m[1m[2m    0.36 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2026-10-30T15:42:32.1028226Z [2mdist/[22m[2massets/[22m[36mcheck-check-CMwfwHmA.js                           [39m[1m[2m    0.36 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2026-10-30T15:42:32.1029281Z [2mdist/[22m[2massets/[22m[36muser-round-BueCFy3G.js                            [39m[1m[2m    0.36 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2026-10-30T15:42:32.1030601Z [2mdist/[22m[2massets/[22m[36mcircle-check-big-BmqiqB7U.js                      [39m[1m[2m    0.37 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2026-10-30T15:42:32.1031706Z [2mdist/[22m[2massets/[22m[36mTrainingResourceActions-DC0CM1c_.js               [39m[1m[2m    0.37 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2026-10-30T15:42:32.1032777Z [2mdist/[22m[2massets/[22m[36mplay-fQ2jUvGp.js                                  [39m[1m[2m    0.37 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2026-10-30T15:42:32.1033791Z [2mdist/[22m[2massets/[22m[36muser-CAl5k8-P.js                                  [39m[1m[2m    0.38 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2026-10-30T15:42:32.1034809Z [2mdist/[22m[2massets/[22m[36minfo-4oywJAQ-.js                                  [39m[1m[2m    0.38 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2026-10-30T15:42:32.1035974Z [2mdist/[22m[2massets/[22m[36mlock-gEBUerTl.js                                  [39m[1m[2m    0.39 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-10-30T15:42:32.1037003Z [2mdist/[22m[2massets/[22m[36mcircle-x-DjoxP3Kw.js                              [39m[1m[2m    0.39 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2026-10-30T15:42:32.1038074Z [2mdist/[22m[2massets/[22m[36mresolveCoursePrefill-CjXVJYtd.js                  [39m[1m[2m    0.39 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-30T15:42:32.1039123Z [2mdist/[22m[2massets/[22m[36mpause-C6vqMh6A.js                                 [39m[1m[2m    0.40 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2026-10-30T15:42:32.1040406Z [2mdist/[22m[2massets/[22m[36mupload-CJWux-el.js                                [39m[1m[2m    0.41 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-10-30T15:42:32.1041432Z [2mdist/[22m[2massets/[22m[36mcopy-dkFHSOyN.js                                  [39m[1m[2m    0.42 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1042453Z [2mdist/[22m[2massets/[22m[36mdownload-CvRCzE-T.js                              [39m[1m[2m    0.42 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-10-30T15:42:32.1043556Z [2mdist/[22m[2massets/[22m[36mtraining-participation-link-D9SaThRF.js           [39m[1m[2m    0.42 kB[22m[1m[22m[2m │ gzip:   0.23 kB[22m
+2026-10-30T15:42:32.1044667Z [2mdist/[22m[2massets/[22m[36mmessage-square-CT65vOb8.js                        [39m[1m[2m    0.42 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-30T15:42:32.1045705Z [2mdist/[22m[2massets/[22m[36mhistory-_e5K4y_J.js                               [39m[1m[2m    0.42 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-30T15:42:32.1046760Z [2mdist/[22m[2massets/[22m[36mCognitiveFocusStage-B7Lt5QGT.js                   [39m[1m[2m    0.43 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1047838Z [2mdist/[22m[2massets/[22m[36musers-round-C7mZ9OG1.js                           [39m[1m[2m    0.43 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1048862Z [2mdist/[22m[2massets/[22m[36mvideo-sG2qiBPf.js                                 [39m[1m[2m    0.43 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-30T15:42:32.1050562Z [2mdist/[22m[2massets/[22m[36mroute-DPAYcrtD.js                                 [39m[1m[2m    0.43 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-30T15:42:32.1051631Z [2mdist/[22m[2massets/[22m[36mcircle-alert-W1mhHl5d.js                          [39m[1m[2m    0.43 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-10-30T15:42:32.1052669Z [2mdist/[22m[2massets/[22m[36mfunnel-DL86B7X4.js                                [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1053688Z [2mdist/[22m[2massets/[22m[36meye-CdI0gh9i.js                                   [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-30T15:42:32.1054744Z [2mdist/[22m[2massets/[22m[36mexternal-link-BJ6mvC_b.js                         [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-30T15:42:32.1055790Z [2mdist/[22m[2massets/[22m[36marchive-CrYMcxL1.js                               [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1056826Z [2mdist/[22m[2massets/[22m[36mlock-keyhole-BoilBIJf.js                          [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-30T15:42:32.1057862Z [2mdist/[22m[2massets/[22m[36mlink-CntyN11X.js                                  [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-10-30T15:42:32.1058887Z [2mdist/[22m[2massets/[22m[36mcalendar-BLJb0Dz6.js                              [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-30T15:42:32.1060388Z [2mdist/[22m[2massets/[22m[36mkey-DNN2XuBS.js                                   [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1061387Z [2mdist/[22m[2massets/[22m[36mimage-S5NrHUGL.js                                 [39m[1m[2m    0.45 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-30T15:42:32.1062415Z [2mdist/[22m[2massets/[22m[36mlist-checks-BwSZALMZ.js                           [39m[1m[2m    0.46 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-10-30T15:42:32.1063457Z [2mdist/[22m[2massets/[22m[36mpencil-B3xK46Zl.js                                [39m[1m[2m    0.46 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-30T15:42:32.1064486Z [2mdist/[22m[2massets/[22m[36mpen-line-CFmT-d7z.js                              [39m[1m[2m    0.46 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+2026-10-30T15:42:32.1065503Z [2mdist/[22m[2massets/[22m[36mprng-D4TmOqaD.js                                  [39m[1m[2m    0.46 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-30T15:42:32.1066523Z [2mdist/[22m[2massets/[22m[36mbook-open-BHCutWEj.js                             [39m[1m[2m    0.46 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1067588Z [2mdist/[22m[2massets/[22m[36msession-ledger-nXD8DOYS.js                        [39m[1m[2m    0.46 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2026-10-30T15:42:32.1068651Z [2mdist/[22m[2massets/[22m[36museLoginReturn-B4OY-2aP.js                        [39m[1m[2m    0.47 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+2026-10-30T15:42:32.1069961Z [2mdist/[22m[2massets/[22m[36msend-BRATJz5G.js                                  [39m[1m[2m    0.47 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+2026-10-30T15:42:32.1071013Z [2mdist/[22m[2massets/[22m[36mfolder-open-Mpsb9-rT.js                           [39m[1m[2m    0.48 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-30T15:42:32.1072066Z [2mdist/[22m[2massets/[22m[36mPageHeader-Q6HUzR5V.js                            [39m[1m[2m    0.48 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2026-10-30T15:42:32.1073133Z [2mdist/[22m[2massets/[22m[36mclipboard-check-DO3JMz7S.js                       [39m[1m[2m    0.48 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+2026-10-30T15:42:32.1074327Z [2mdist/[22m[2massets/[22m[36mlist-DGV2-pI_.js                                  [39m[1m[2m    0.49 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-10-30T15:42:32.1075395Z [2mdist/[22m[2massets/[22m[36museRunnerPreparation-VxANWaWX.js                  [39m[1m[2m    0.49 kB[22m[1m[22m[2m │ gzip:   0.37 kB[22m
+2026-10-30T15:42:32.1076470Z [2mdist/[22m[2massets/[22m[36mzoom-in-CmK9aFgZ.js                               [39m[1m[2m    0.49 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1077487Z [2mdist/[22m[2massets/[22m[36musers-uJJStLEX.js                                 [39m[1m[2m    0.49 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-30T15:42:32.1078522Z [2mdist/[22m[2massets/[22m[36muser-plus-BJc6Rhtn.js                             [39m[1m[2m    0.49 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+2026-10-30T15:42:32.1079887Z [2mdist/[22m[2massets/[22m[36mshield-check-B-6N5NCI.js                          [39m[1m[2m    0.50 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2026-10-30T15:42:32.1080982Z [2mdist/[22m[2massets/[22m[36msquare-pen-i_oTrE07.js                            [39m[1m[2m    0.50 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+2026-10-30T15:42:32.1082026Z [2mdist/[22m[2massets/[22m[36mrefresh-cw-mdZpk60R.js                            [39m[1m[2m    0.51 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-30T15:42:32.1083121Z [2mdist/[22m[2massets/[22m[36mAssessmentImageGateContent-CVGC1D5R.js            [39m[1m[2m    0.51 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+2026-10-30T15:42:32.1084193Z [2mdist/[22m[2massets/[22m[36msave-BBsn5mMo.js                                  [39m[1m[2m    0.51 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-30T15:42:32.1085372Z [2mdist/[22m[2massets/[22m[36mtrash-2-ck3D4DTI.js                               [39m[1m[2m    0.51 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-10-30T15:42:32.1086392Z [2mdist/[22m[2massets/[22m[36mcamera-CM6VJfxv.js                                [39m[1m[2m    0.52 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2026-10-30T15:42:32.1087444Z [2mdist/[22m[2massets/[22m[36mmessage-square-text-C_Svn72o.js                   [39m[1m[2m    0.53 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2026-10-30T15:42:32.1088509Z [2mdist/[22m[2massets/[22m[36mlist-ordered-R9jB0UGY.js                          [39m[1m[2m    0.54 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+2026-10-30T15:42:32.1089803Z [2mdist/[22m[2massets/[22m[36mgrip-vertical-Ds8bbFSo.js                         [39m[1m[2m    0.55 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-30T15:42:32.1091039Z [2mdist/[22m[2massets/[22m[36mimages-CF0Am4F_.js                                [39m[1m[2m    0.55 kB[22m[1m[22m[2m │ gzip:   0.39 kB[22m
+2026-10-30T15:42:32.1092174Z [2mdist/[22m[2massets/[22m[36mchart-no-axes-combined-Y2A46G8F.js                [39m[1m[2m    0.56 kB[22m[1m[22m[2m │ gzip:   0.37 kB[22m
+2026-10-30T15:42:32.1093314Z [2mdist/[22m[2massets/[22m[36mfile-text-WnRu6tg4.js                             [39m[1m[2m    0.57 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2026-10-30T15:42:32.1094423Z [2mdist/[22m[2massets/[22m[36mapiErrorMessage-CTY58dgc.js                       [39m[1m[2m    0.58 kB[22m[1m[22m[2m │ gzip:   0.41 kB[22m
+2026-10-30T15:42:32.1095568Z [2mdist/[22m[2massets/[22m[36mLoginRecoveryNotice-D_eoNNnv.js                   [39m[1m[2m    0.58 kB[22m[1m[22m[2m │ gzip:   0.47 kB[22m
+2026-10-30T15:42:32.1096700Z [2mdist/[22m[2massets/[22m[36mfile-play-CVmxi5Bq.js                             [39m[1m[2m    0.59 kB[22m[1m[22m[2m │ gzip:   0.39 kB[22m
+2026-10-30T15:42:32.1097823Z [2mdist/[22m[2massets/[22m[36mclipboard-list-CT2jZlmg.js                        [39m[1m[2m    0.60 kB[22m[1m[22m[2m │ gzip:   0.37 kB[22m
+2026-10-30T15:42:32.1098969Z [2mdist/[22m[2massets/[22m[36mSurveyMaterialPicker-C1ZAon47.js                  [39m[1m[2m    0.60 kB[22m[1m[22m[2m │ gzip:   0.49 kB[22m
+2026-10-30T15:42:32.1100600Z [2mdist/[22m[2massets/[22m[36mlayers-Da9tqrkF.js                                [39m[1m[2m    0.61 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+2026-10-30T15:42:32.1101777Z [2mdist/[22m[2massets/[22m[36msliders-horizontal-Bx0vm0EW.js                    [39m[1m[2m    0.61 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+2026-10-30T15:42:32.1102892Z [2mdist/[22m[2massets/[22m[36meye-off-OVspUpP0.js                               [39m[1m[2m    0.61 kB[22m[1m[22m[2m │ gzip:   0.39 kB[22m
+2026-10-30T15:42:32.1104017Z [2mdist/[22m[2massets/[22m[36museLatestRequest-BMExnoAc.js                      [39m[1m[2m    0.62 kB[22m[1m[22m[2m │ gzip:   0.39 kB[22m
+2026-10-30T15:42:32.1105158Z [2mdist/[22m[2massets/[22m[36mform-visibility-DWnADqY8.js                       [39m[1m[2m    0.63 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-30T15:42:32.1106301Z [2mdist/[22m[2massets/[22m[36mkeyboard-Cz2-VDke.js                              [39m[1m[2m    0.64 kB[22m[1m[22m[2m │ gzip:   0.37 kB[22m
+2026-10-30T15:42:32.1107405Z [2mdist/[22m[2massets/[22m[36mparentAccounts-B3_3-EwP.js                        [39m[1m[2m    0.64 kB[22m[1m[22m[2m │ gzip:   0.40 kB[22m
+2026-10-30T15:42:32.1108541Z [2mdist/[22m[2massets/[22m[36mheart-handshake-LCaRk3JB.js                       [39m[1m[2m    0.64 kB[22m[1m[22m[2m │ gzip:   0.41 kB[22m
+2026-10-30T15:42:32.1109835Z [2mdist/[22m[2massets/[22m[36mcompletionRetry-z9jthbVU.js                       [39m[1m[2m    0.64 kB[22m[1m[22m[2m │ gzip:   0.44 kB[22m
+2026-10-30T15:42:32.1111003Z [2mdist/[22m[2massets/[22m[36mbuilder.types-QEWBrg2F.js                         [39m[1m[2m    0.65 kB[22m[1m[22m[2m │ gzip:   0.41 kB[22m
+2026-10-30T15:42:32.1112471Z [2mdist/[22m[2massets/[22m[36mdeferred-researcher-component-CtQdpFuu.js         [39m[1m[2m    0.67 kB[22m[1m[22m[2m │ gzip:   0.49 kB[22m
+2026-10-30T15:42:32.1113707Z [2mdist/[22m[2massets/[22m[36msettings-BZeAampD.js                              [39m[1m[2m    0.67 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2026-10-30T15:42:32.1114836Z [2mdist/[22m[2massets/[22m[36mcalendar-days-jLD9bW0F.js                         [39m[1m[2m    0.68 kB[22m[1m[22m[2m │ gzip:   0.37 kB[22m
+2026-10-30T15:42:32.1115938Z [2mdist/[22m[2massets/[22m[36msparkles-sZtM3Ttj.js                              [39m[1m[2m    0.68 kB[22m[1m[22m[2m │ gzip:   0.39 kB[22m
+2026-10-30T15:42:32.1117010Z [2mdist/[22m[2massets/[22m[36mTeacherBrand-CSyORcZU.js                          [39m[1m[2m    0.68 kB[22m[1m[22m[2m │ gzip:   0.42 kB[22m
+2026-10-30T15:42:32.1118129Z [2mdist/[22m[2massets/[22m[36mAssessmentImageGate-DZHiOwwy.js                   [39m[1m[2m    0.68 kB[22m[1m[22m[2m │ gzip:   0.41 kB[22m
+2026-10-30T15:42:32.1119289Z [2mdist/[22m[2massets/[22m[36mdeferred-media-RprYhQMy.js                        [39m[1m[2m    0.69 kB[22m[1m[22m[2m │ gzip:   0.50 kB[22m
+2026-10-30T15:42:32.1120597Z [2mdist/[22m[2massets/[22m[36mparticipation-link-CnLAbyD5.js                    [39m[1m[2m    0.69 kB[22m[1m[22m[2m │ gzip:   0.43 kB[22m
+2026-10-30T15:42:32.1121785Z [2mdist/[22m[2massets/[22m[36mvideo-capability-client-CsOiwj59.js               [39m[1m[2m    0.69 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+2026-10-30T15:42:32.1122968Z [2mdist/[22m[2massets/[22m[36mcontext-DH9TJPZn.js                               [39m[1m[2m    0.75 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+2026-10-30T15:42:32.1124168Z [2mdist/[22m[2massets/[22m[36morganizationInvitations-C-aRHfyH.js               [39m[1m[2m    0.75 kB[22m[1m[22m[2m │ gzip:   0.38 kB[22m
+2026-10-30T15:42:32.1125334Z [2mdist/[22m[2massets/[22m[36mbrain-C_idQxW4.js                                 [39m[1m[2m    0.76 kB[22m[1m[22m[2m │ gzip:   0.42 kB[22m
+2026-10-30T15:42:32.1126481Z [2mdist/[22m[2massets/[22m[36mExactToolVersions-RjAvVWEp.js                     [39m[1m[2m    0.76 kB[22m[1m[22m[2m │ gzip:   0.51 kB[22m
+2026-10-30T15:42:32.1127756Z [2mdist/[22m[2massets/[22m[36mParentFeature-C579pzH_.js                         [39m[1m[2m    0.77 kB[22m[1m[22m[2m │ gzip:   0.52 kB[22m
+2026-10-30T15:42:32.1128876Z [2mdist/[22m[2massets/[22m[36museFormBulkDraft-DP7yyPjP.js                      [39m[1m[2m    0.78 kB[22m[1m[22m[2m │ gzip:   0.47 kB[22m
+2026-10-30T15:42:32.1130272Z [2mdist/[22m[2massets/[22m[36mSurveyMaterialDisplay-DC25CYqw.js                 [39m[1m[2m    0.80 kB[22m[1m[22m[2m │ gzip:   0.50 kB[22m
+2026-10-30T15:42:32.1131482Z [2mdist/[22m[2massets/[22m[36mTrainingAuthRedirect-B-9IW68d.js                  [39m[1m[2m    0.82 kB[22m[1m[22m[2m │ gzip:   0.47 kB[22m
+2026-10-30T15:42:32.1132578Z [2mdist/[22m[2massets/[22m[36muser-x-CuyKnK4m.js                                [39m[1m[2m    0.82 kB[22m[1m[22m[2m │ gzip:   0.43 kB[22m
+2026-10-30T15:42:32.1133655Z [2mdist/[22m[2massets/[22m[36mqr-code-DzFF7KCo.js                               [39m[1m[2m    0.83 kB[22m[1m[22m[2m │ gzip:   0.42 kB[22m
+2026-10-30T15:42:32.1134756Z [2mdist/[22m[2massets/[22m[36mdateTime-BxJuPiG3.js                              [39m[1m[2m    0.84 kB[22m[1m[22m[2m │ gzip:   0.49 kB[22m
+2026-10-30T15:42:32.1135847Z [2mdist/[22m[2massets/[22m[36mProductStatus-CCLsVZLm.js                         [39m[1m[2m    0.85 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+2026-10-30T15:42:32.1136977Z [2mdist/[22m[2massets/[22m[36mRetryableLazy-DqBTlC51.js                         [39m[1m[2m    0.85 kB[22m[1m[22m[2m │ gzip:   0.54 kB[22m
+2026-10-30T15:42:32.1138080Z [2mdist/[22m[2massets/[22m[36mTagBadge-BK_16bqW.js                              [39m[1m[2m    0.85 kB[22m[1m[22m[2m │ gzip:   0.47 kB[22m
+2026-10-30T15:42:32.1139302Z [2mdist/[22m[2massets/[22m[36mSchoolMark-Ce_llsTz.js                            [39m[1m[2m    0.86 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+2026-10-30T15:42:32.1140605Z [2mdist/[22m[2massets/[22m[36mtraining-portal-refresh-DQf87aYi.js               [39m[1m[2m    0.87 kB[22m[1m[22m[2m │ gzip:   0.48 kB[22m
+2026-10-30T15:42:32.1141789Z [2mdist/[22m[2massets/[22m[36midempotency-VqeoeI56.js                           [39m[1m[2m    0.91 kB[22m[1m[22m[2m │ gzip:   0.48 kB[22m
+2026-10-30T15:42:32.1142948Z [2mdist/[22m[2massets/[22m[36mTrainingCourseCode-D1sYjplH.js                    [39m[1m[2m    0.91 kB[22m[1m[22m[2m │ gzip:   0.60 kB[22m
+2026-10-30T15:42:32.1144027Z [2mdist/[22m[2massets/[22m[36manswerLabels-B8rcLsq0.js                          [39m[1m[2m    0.91 kB[22m[1m[22m[2m │ gzip:   0.55 kB[22m
+2026-10-30T15:42:32.1145147Z [2mdist/[22m[2massets/[22m[36mrequired-video-completion-zGCnAAFE.js             [39m[1m[2m    0.93 kB[22m[1m[22m[2m │ gzip:   0.57 kB[22m
+2026-10-30T15:42:32.1146357Z [2mdist/[22m[2massets/[22m[36museSessionResource-D7Q25wte.js                    [39m[1m[2m    0.95 kB[22m[1m[22m[2m │ gzip:   0.53 kB[22m
+2026-10-30T15:42:32.1147537Z [2mdist/[22m[2massets/[22m[36mtool-library-api-C8Z5YAcU.js                      [39m[1m[2m    0.97 kB[22m[1m[22m[2m │ gzip:   0.70 kB[22m
+2026-10-30T15:42:32.1148695Z [2mdist/[22m[2massets/[22m[36mcatalogDiscovery-Dbb-xHPA.js                      [39m[1m[2m    0.99 kB[22m[1m[22m[2m │ gzip:   0.60 kB[22m
+2026-10-30T15:42:32.1150012Z [2mdist/[22m[2massets/[22m[36mquestionnaireResume-BFNWMh-c.js                   [39m[1m[2m    1.00 kB[22m[1m[22m[2m │ gzip:   0.41 kB[22m
+2026-10-30T15:42:32.1151200Z [2mdist/[22m[2massets/[22m[36mManagementDialog-PWn-axcI.js                      [39m[1m[2m    1.05 kB[22m[1m[22m[2m │ gzip:   0.55 kB[22m
+2026-10-30T15:42:32.1152391Z [2mdist/[22m[2massets/[22m[36mParentReportView-CZjtSOFi.js                      [39m[1m[2m    1.06 kB[22m[1m[22m[2m │ gzip:   0.62 kB[22m
+2026-10-30T15:42:32.1153586Z [2mdist/[22m[2massets/[22m[36mTrainingContactPage-DD_jtYki.js                   [39m[1m[2m    1.07 kB[22m[1m[22m[2m │ gzip:   0.59 kB[22m
+2026-10-30T15:42:32.1154985Z [2mdist/[22m[2massets/[22m[36museCursorList-C7BzBYHQ.js                         [39m[1m[2m    1.12 kB[22m[1m[22m[2m │ gzip:   0.66 kB[22m
+2026-10-30T15:42:32.1156185Z [2mdist/[22m[2massets/[22m[36museScaleAutoAdvance-CO2PptM1.js                   [39m[1m[2m    1.13 kB[22m[1m[22m[2m │ gzip:   0.55 kB[22m
+2026-10-30T15:42:32.1157375Z [2mdist/[22m[2massets/[22m[36mTrainingMaterialPicker-CjCnyx6_.js                [39m[1m[2m    1.13 kB[22m[1m[22m[2m │ gzip:   0.72 kB[22m
+2026-10-30T15:42:32.1158547Z [2mdist/[22m[2massets/[22m[36mScaleEditDefinition-o1g_q_70.js                   [39m[1m[2m    1.16 kB[22m[1m[22m[2m │ gzip:   0.62 kB[22m
+2026-10-30T15:42:32.1159873Z [2mdist/[22m[2massets/[22m[36mTrainingCardDescription-DDT4rM4N.js               [39m[1m[2m    1.18 kB[22m[1m[22m[2m │ gzip:   0.64 kB[22m
+2026-10-30T15:42:32.1161109Z [2mdist/[22m[2massets/[22m[36mTrainingPersonalChanges-DWES83RR.js               [39m[1m[2m    1.21 kB[22m[1m[22m[2m │ gzip:   0.76 kB[22m
+2026-10-30T15:42:32.1162280Z [2mdist/[22m[2massets/[22m[36mFakeTask-De0zRYFz.js                              [39m[1m[2m    1.22 kB[22m[1m[22m[2m │ gzip:   0.76 kB[22m
+2026-10-30T15:42:32.1163421Z [2mdist/[22m[2massets/[22m[36mreceipt-recovery-Ci-Eu2lI.js                      [39m[1m[2m    1.29 kB[22m[1m[22m[2m │ gzip:   0.80 kB[22m
+2026-10-30T15:42:32.1164599Z [2mdist/[22m[2massets/[22m[36mLocalDateTimeInput-DpMpo9Vu.js                    [39m[1m[2m    1.30 kB[22m[1m[22m[2m │ gzip:   0.75 kB[22m
+2026-10-30T15:42:32.1165961Z [2mdist/[22m[2massets/[22m[36mrawScoreFeedback-BhRRsO3Z.js                      [39m[1m[2m    1.34 kB[22m[1m[22m[2m │ gzip:   0.78 kB[22m
+2026-10-30T15:42:32.1167117Z [2mdist/[22m[2massets/[22m[36mmaterialGrants-DTa_js8N.js                        [39m[1m[2m    1.37 kB[22m[1m[22m[2m │ gzip:   0.75 kB[22m
+2026-10-30T15:42:32.1168289Z [2mdist/[22m[2massets/[22m[36mchild-route-context-CQZoqJHU.js                   [39m[1m[2m    1.42 kB[22m[1m[22m[2m │ gzip:   0.69 kB[22m
+2026-10-30T15:42:32.1169544Z [2mdist/[22m[2massets/[22m[36mDiscoveryCard-CusCTYiB.js                         [39m[1m[2m    1.45 kB[22m[1m[22m[2m │ gzip:   0.66 kB[22m
+2026-10-30T15:42:32.1170727Z [2mdist/[22m[2massets/[22m[36mtask-timing-diagnostics-DKDxi2wc.js               [39m[1m[2m    1.49 kB[22m[1m[22m[2m │ gzip:   0.58 kB[22m
+2026-10-30T15:42:32.1171899Z [2mdist/[22m[2massets/[22m[36mOnlineAnswerField-A_0t5ytE.js                     [39m[1m[2m    1.51 kB[22m[1m[22m[2m │ gzip:   0.78 kB[22m
+2026-10-30T15:42:32.1173087Z [2mdist/[22m[2massets/[22m[36museStaffFeedback-Bv9U9zj1.js                      [39m[1m[2m    1.53 kB[22m[1m[22m[2m │ gzip:   0.76 kB[22m
+2026-10-30T15:42:32.1174258Z [2mdist/[22m[2massets/[22m[36mAssessmentImagePresentation-D9VxqkTV.js           [39m[1m[2m    1.56 kB[22m[1m[22m[2m │ gzip:   0.72 kB[22m
+2026-10-30T15:42:32.1175418Z [2mdist/[22m[2massets/[22m[36msun-CY2gsBr8.js                                   [39m[1m[2m    1.57 kB[22m[1m[22m[2m │ gzip:   0.57 kB[22m
+2026-10-30T15:42:32.1176548Z [2mdist/[22m[2massets/[22m[36mSurveySectionHeader-CGWNwvgL.js                   [39m[1m[2m    1.58 kB[22m[1m[22m[2m │ gzip:   0.81 kB[22m
+2026-10-30T15:42:32.1177716Z [2mdist/[22m[2massets/[22m[36museEditorGuard-CODalgQZ.js                        [39m[1m[2m    1.61 kB[22m[1m[22m[2m │ gzip:   0.94 kB[22m
+2026-10-30T15:42:32.1178872Z [2mdist/[22m[2massets/[22m[36mEducationAdminShell-CyOLsNSk.js                   [39m[1m[2m    1.66 kB[22m[1m[22m[2m │ gzip:   0.87 kB[22m
+2026-10-30T15:42:32.1180199Z [2mdist/[22m[2massets/[22m[36museScaleLibrarySubmission-BAxlZftT.js             [39m[1m[2m    1.67 kB[22m[1m[22m[2m │ gzip:   1.02 kB[22m
+2026-10-30T15:42:32.1181491Z [2mdist/[22m[2massets/[22m[36moptions-BGvnxXK1.js                               [39m[1m[2m    1.67 kB[22m[1m[22m[2m │ gzip:   0.89 kB[22m
+2026-10-30T15:42:32.1182648Z [2mdist/[22m[2massets/[22m[36msurveyGovernance-OjSI1Krb.js                      [39m[1m[2m    1.72 kB[22m[1m[22m[2m │ gzip:   1.20 kB[22m
+2026-10-30T15:42:32.1183824Z [2mdist/[22m[2massets/[22m[36museAssessmentImageAssets-MFTAiPao.js              [39m[1m[2m    1.73 kB[22m[1m[22m[2m │ gzip:   0.85 kB[22m
+2026-10-30T15:42:32.1184998Z [2mdist/[22m[2massets/[22m[36mReportShell-CPCsMNfP.js                           [39m[1m[2m    1.73 kB[22m[1m[22m[2m │ gzip:   0.76 kB[22m
+2026-10-30T15:42:32.1186171Z [2mdist/[22m[2massets/[22m[36mauthoring-import-template-BUgP_h6s.js             [39m[1m[2m    1.73 kB[22m[1m[22m[2m │ gzip:   0.97 kB[22m
+2026-10-30T15:42:32.1187327Z [2mdist/[22m[2massets/[22m[36mmediaUtils-DcVDHCm8.js                            [39m[1m[2m    1.74 kB[22m[1m[22m[2m │ gzip:   0.88 kB[22m
+2026-10-30T15:42:32.1188492Z [2mdist/[22m[2massets/[22m[36mTypedFormExportActions-DrjpGP3p.js                [39m[1m[2m    1.75 kB[22m[1m[22m[2m │ gzip:   1.16 kB[22m
+2026-10-30T15:42:32.1189795Z [2mdist/[22m[2massets/[22m[36musePageEditorGuard-O0YIR95B.js                    [39m[1m[2m    1.79 kB[22m[1m[22m[2m │ gzip:   1.01 kB[22m
+2026-10-30T15:42:32.1190980Z [2mdist/[22m[2massets/[22m[36mGonogoInstructions-CEC-kGBQ.js                    [39m[1m[2m    1.80 kB[22m[1m[22m[2m │ gzip:   0.89 kB[22m
+2026-10-30T15:42:32.1192164Z [2mdist/[22m[2massets/[22m[36mProductPasswordChange-DRoKFi5c.js                 [39m[1m[2m    1.81 kB[22m[1m[22m[2m │ gzip:   0.96 kB[22m
+2026-10-30T15:42:32.1193575Z [2mdist/[22m[2massets/[22m[36mResearchCognitivePreview-D5_rqhi4.js              [39m[1m[2m    1.83 kB[22m[1m[22m[2m │ gzip:   1.16 kB[22m
+2026-10-30T15:42:32.1194772Z [2mdist/[22m[2massets/[22m[36mpublicCapabilityClient-D1q00dMA.js                [39m[1m[2m    1.87 kB[22m[1m[22m[2m │ gzip:   1.03 kB[22m
+2026-10-30T15:42:32.1195982Z [2mdist/[22m[2massets/[22m[36mAssessmentMaterialDisplay-DgGKagey.js             [39m[1m[2m    1.93 kB[22m[1m[22m[2m │ gzip:   1.07 kB[22m
+2026-10-30T15:42:32.1197191Z [2mdist/[22m[2massets/[22m[36mScaleLibraryMediaPreview-B6X_oInt.js              [39m[1m[2m    1.95 kB[22m[1m[22m[2m │ gzip:   1.10 kB[22m
+2026-10-30T15:42:32.1198402Z [2mdist/[22m[2massets/[22m[36mEducationRosterManagement-D7s4iAyg.js             [39m[1m[2m    1.96 kB[22m[1m[22m[2m │ gzip:   1.13 kB[22m
+2026-10-30T15:42:32.1199706Z [2mdist/[22m[2massets/[22m[36mflow.client-CD4zNBOs.js                           [39m[1m[2m    1.99 kB[22m[1m[22m[2m │ gzip:   0.99 kB[22m
+2026-10-30T15:42:32.1200876Z [2mdist/[22m[2massets/[22m[36mTemporaryPasswordHandoff-CwMzM3M2.js              [39m[1m[2m    2.03 kB[22m[1m[22m[2m │ gzip:   1.21 kB[22m
+2026-10-30T15:42:32.1202090Z [2mdist/[22m[2massets/[22m[36mFormTemplatePicker-CV2uN3cL.js                    [39m[1m[2m    2.06 kB[22m[1m[22m[2m │ gzip:   1.26 kB[22m
+2026-10-30T15:42:32.1203505Z [2mdist/[22m[2massets/[22m[36mCompositionOutline-BhrwSHJf.js                    [39m[1m[2m    2.06 kB[22m[1m[22m[2m │ gzip:   0.95 kB[22m
+2026-10-30T15:42:32.1204782Z [2mdist/[22m[2massets/[22m[36mparents-BdamBCH9.js                               [39m[1m[2m    2.09 kB[22m[1m[22m[2m │ gzip:   0.81 kB[22m
+2026-10-30T15:42:32.1205891Z [2mdist/[22m[2massets/[22m[36mAdminEntrances-DlerqDtp.js                        [39m[1m[2m    2.10 kB[22m[1m[22m[2m │ gzip:   1.24 kB[22m
+2026-10-30T15:42:32.1207038Z [2mdist/[22m[2massets/[22m[36mParentHome-BM5K6LZW.js                            [39m[1m[2m    2.16 kB[22m[1m[22m[2m │ gzip:   1.13 kB[22m
+2026-10-30T15:42:32.1208221Z [2mdist/[22m[2massets/[22m[36mSurveyCatalogScaleMediaContent-DY4b6gTA.js        [39m[1m[2m    2.18 kB[22m[1m[22m[2m │ gzip:   1.26 kB[22m
+2026-10-30T15:42:32.1209791Z [2mdist/[22m[2massets/[22m[36mCatalogClassificationTags-CEMqpnuI.js             [39m[1m[2m    2.19 kB[22m[1m[22m[2m │ gzip:   1.14 kB[22m
+2026-10-30T15:42:32.1211058Z [2mdist/[22m[2massets/[22m[36msurvey-cognitive-retention-vbfVU4K5.js            [39m[1m[2m    2.30 kB[22m[1m[22m[2m │ gzip:   1.13 kB[22m
+2026-10-30T15:42:32.1212281Z [2mdist/[22m[2massets/[22m[36mParentChildrenPage-vgUEei-j.js                    [39m[1m[2m    2.34 kB[22m[1m[22m[2m │ gzip:   1.27 kB[22m
+2026-10-30T15:42:32.1213456Z [2mdist/[22m[2massets/[22m[36mApprovedScaleAxes-D574ZKvN.js                     [39m[1m[2m    2.44 kB[22m[1m[22m[2m │ gzip:   1.33 kB[22m
+2026-10-30T15:42:32.1214656Z [2mdist/[22m[2massets/[22m[36mscaleDefinitionEditorModel-C8VXA012.js            [39m[1m[2m    2.45 kB[22m[1m[22m[2m │ gzip:   1.15 kB[22m
+2026-10-30T15:42:32.1215827Z [2mdist/[22m[2massets/[22m[36mScalePlayer-D2wP6oBv.js                           [39m[1m[2m    2.48 kB[22m[1m[22m[2m │ gzip:   1.26 kB[22m
+2026-10-30T15:42:32.1216975Z [2mdist/[22m[2massets/[22m[36mCognitiveSessionEntry-CdX5nJi3.js                 [39m[1m[2m    2.50 kB[22m[1m[22m[2m │ gzip:   1.45 kB[22m
+2026-10-30T15:42:32.1218127Z [2mdist/[22m[2massets/[22m[36mModalSurface--7MY8Wde.js                          [39m[1m[2m    2.54 kB[22m[1m[22m[2m │ gzip:   1.22 kB[22m
+2026-10-30T15:42:32.1219255Z [2mdist/[22m[2massets/[22m[36mexportJobs-Ca_Lvm_4.js                            [39m[1m[2m    2.56 kB[22m[1m[22m[2m │ gzip:   1.35 kB[22m
+2026-10-30T15:42:32.1220523Z [2mdist/[22m[2massets/[22m[36mSurveyAppearance-H_CZCUuZ.js                      [39m[1m[2m    2.57 kB[22m[1m[22m[2m │ gzip:   1.27 kB[22m
+2026-10-30T15:42:32.1221836Z [2mdist/[22m[2massets/[22m[36mDeleteOutlined-BeU0USqn.js                        [39m[1m[2m    2.57 kB[22m[1m[22m[2m │ gzip:   1.09 kB[22m
+2026-10-30T15:42:32.1222994Z [2mdist/[22m[2massets/[22m[36mcreateLucideIcon-Bf-sjFCM.js                      [39m[1m[2m    2.58 kB[22m[1m[22m[2m │ gzip:   0.81 kB[22m
+2026-10-30T15:42:32.1224195Z [2mdist/[22m[2massets/[22m[36msurvey-workspace-polish-DZK3pPdJ.js               [39m[1m[2m    2.61 kB[22m[1m[22m[2m │ gzip:   1.28 kB[22m
+2026-10-30T15:42:32.1225371Z [2mdist/[22m[2massets/[22m[36mStudentCheckins-9UTPgY6a.js                       [39m[1m[2m    2.61 kB[22m[1m[22m[2m │ gzip:   1.37 kB[22m
+2026-10-30T15:42:32.1226593Z [2mdist/[22m[2massets/[22m[36massessmentRuntime.client-Zc1XcFBH.js              [39m[1m[2m    2.62 kB[22m[1m[22m[2m │ gzip:   1.20 kB[22m
+2026-10-30T15:42:32.1227778Z [2mdist/[22m[2massets/[22m[36mClassroomQRCode-B-n_Ct68.js                       [39m[1m[2m    2.64 kB[22m[1m[22m[2m │ gzip:   1.36 kB[22m
+2026-10-30T15:42:32.1228937Z [2mdist/[22m[2massets/[22m[36mProductThemeControl-BWIAiBAB.js                   [39m[1m[2m    2.68 kB[22m[1m[22m[2m │ gzip:   1.36 kB[22m
+2026-10-30T15:42:32.1230261Z [2mdist/[22m[2massets/[22m[36mParentProfile-UGw_sRXJ.js                         [39m[1m[2m    2.71 kB[22m[1m[22m[2m │ gzip:   1.38 kB[22m
+2026-10-30T15:42:32.1231421Z [2mdist/[22m[2massets/[22m[36mschool-collection-Ck_4R3av.js                     [39m[1m[2m    2.78 kB[22m[1m[22m[2m │ gzip:   1.26 kB[22m
+2026-10-30T15:42:32.1232637Z [2mdist/[22m[2massets/[22m[36mCognitiveTaskPresentation-Dko2KV3t.js             [39m[1m[2m    2.79 kB[22m[1m[22m[2m │ gzip:   0.91 kB[22m
+2026-10-30T15:42:32.1233799Z [2mdist/[22m[2massets/[22m[36mreadiness-CA7SeYHK.js                             [39m[1m[2m    2.80 kB[22m[1m[22m[2m │ gzip:   1.23 kB[22m
+2026-10-30T15:42:32.1234996Z [2mdist/[22m[2massets/[22m[36mHuiteacherStudentTasks-BPF3MtEg.js                [39m[1m[2m    2.82 kB[22m[1m[22m[2m │ gzip:   1.52 kB[22m
+2026-10-30T15:42:32.1236173Z [2mdist/[22m[2massets/[22m[36mCognitiveHome-jQthajZV.js                         [39m[1m[2m    2.87 kB[22m[1m[22m[2m │ gzip:   1.49 kB[22m
+2026-10-30T15:42:32.1237488Z [2mdist/[22m[2massets/[22m[36mStudentScales-CJYht7EI.js                         [39m[1m[2m    2.88 kB[22m[1m[22m[2m │ gzip:   1.46 kB[22m
+2026-10-30T15:42:32.1238686Z [2mdist/[22m[2massets/[22m[36mPersonalChangesReport-BWl7Z7Bs.js                 [39m[1m[2m    2.89 kB[22m[1m[22m[2m │ gzip:   1.54 kB[22m
+2026-10-30T15:42:32.1239982Z [2mdist/[22m[2massets/[22m[36mStudentAssignments-ByO64PcZ.js                    [39m[1m[2m    2.93 kB[22m[1m[22m[2m │ gzip:   1.50 kB[22m
+2026-10-30T15:42:32.1241145Z [2mdist/[22m[2massets/[22m[36manonymousStudy-tN1tIgzH.js                        [39m[1m[2m    2.96 kB[22m[1m[22m[2m │ gzip:   0.83 kB[22m
+2026-10-30T15:42:32.1242305Z [2mdist/[22m[2massets/[22m[36mSurveyAdminShell-Bn0hZ486.js                      [39m[1m[2m    2.97 kB[22m[1m[22m[2m │ gzip:   1.37 kB[22m
+2026-10-30T15:42:32.1243464Z [2mdist/[22m[2massets/[22m[36mClassroomEdit-uN-35mU3.js                         [39m[1m[2m    3.01 kB[22m[1m[22m[2m │ gzip:   1.34 kB[22m
+2026-10-30T15:42:32.1244604Z [2mdist/[22m[2massets/[22m[36mTrainingLogin-DgZ2KrfI.js                         [39m[1m[2m    3.03 kB[22m[1m[22m[2m │ gzip:   1.56 kB[22m
+2026-10-30T15:42:32.1245740Z [2mdist/[22m[2massets/[22m[36mParentLogin-CtogCCag.js                           [39m[1m[2m    3.04 kB[22m[1m[22m[2m │ gzip:   1.57 kB[22m
+2026-10-30T15:42:32.1246895Z [2mdist/[22m[2massets/[22m[36mTrainingAdminShell-QuKWSHcT.js                    [39m[1m[2m    3.07 kB[22m[1m[22m[2m │ gzip:   1.46 kB[22m
+2026-10-30T15:42:32.1248063Z [2mdist/[22m[2massets/[22m[36mTrainingRegister-CMwKpigX.js                      [39m[1m[2m    3.09 kB[22m[1m[22m[2m │ gzip:   1.74 kB[22m
+2026-10-30T15:42:32.1249525Z [2mdist/[22m[2massets/[22m[36mParentChildPage-CjzcH3zi.js                       [39m[1m[2m    3.10 kB[22m[1m[22m[2m │ gzip:   1.60 kB[22m
+2026-10-30T15:42:32.1250676Z [2mdist/[22m[2massets/[22m[36mOrganizationInvitationPage--Hl4MeZf.js            [39m[1m[2m    3.13 kB[22m[1m[22m[2m │ gzip:   1.69 kB[22m
+2026-10-30T15:42:32.1251796Z [2mdist/[22m[2massets/[22m[36mSurveyBrand-CWYHMARa.js                           [39m[1m[2m    3.19 kB[22m[1m[22m[2m │ gzip:   1.40 kB[22m
+2026-10-30T15:42:32.1252880Z [2mdist/[22m[2massets/[22m[36mParentChildReportPage-DuMgH69E.js                 [39m[1m[2m    3.22 kB[22m[1m[22m[2m │ gzip:   1.70 kB[22m
+2026-10-30T15:42:32.1254053Z [2mdist/[22m[2massets/[22m[36mGonogoTask-CfddUjy_.js                            [39m[1m[2m    3.23 kB[22m[1m[22m[2m │ gzip:   1.57 kB[22m
+2026-10-30T15:42:32.1255227Z [2mdist/[22m[2massets/[22m[36mTeacherAccountLogin-BuU6huv5.js                   [39m[1m[2m    3.24 kB[22m[1m[22m[2m │ gzip:   1.58 kB[22m
+2026-10-30T15:42:32.1256454Z [2mdist/[22m[2massets/[22m[36meducationStandardConfigurations-ChyoOASd.js       [39m[1m[2m    3.24 kB[22m[1m[22m[2m │ gzip:   1.28 kB[22m
+2026-10-30T15:42:32.1257659Z [2mdist/[22m[2massets/[22m[36mtraversal-B-tb21LO.js                             [39m[1m[2m    3.24 kB[22m[1m[22m[2m │ gzip:   1.39 kB[22m
+2026-10-30T15:42:32.1258839Z [2mdist/[22m[2massets/[22m[36mScaleFormVideoGateContent-BQ167O7i.js             [39m[1m[2m    3.25 kB[22m[1m[22m[2m │ gzip:   1.52 kB[22m
+2026-10-30T15:42:32.1260214Z [2mdist/[22m[2massets/[22m[36mSurveyCognitiveDeviceGate-SNPT_J8B.js             [39m[1m[2m    3.28 kB[22m[1m[22m[2m │ gzip:   1.96 kB[22m
+2026-10-30T15:42:32.1261388Z [2mdist/[22m[2massets/[22m[36mMoreActions-D_54Vydk.js                           [39m[1m[2m    3.29 kB[22m[1m[22m[2m │ gzip:   1.48 kB[22m
+2026-10-30T15:42:32.1262548Z [2mdist/[22m[2massets/[22m[36mAssessmentImageField-C2zh5Oiy.js                  [39m[1m[2m    3.29 kB[22m[1m[22m[2m │ gzip:   1.69 kB[22m
+2026-10-30T15:42:32.1263698Z [2mdist/[22m[2massets/[22m[36mitem-timing-CddqTfVY.js                           [39m[1m[2m    3.35 kB[22m[1m[22m[2m │ gzip:   1.21 kB[22m
+2026-10-30T15:42:32.1264969Z [2mdist/[22m[2massets/[22m[36mStudentLogin-DZyIxKwE.js                          [39m[1m[2m    3.35 kB[22m[1m[22m[2m │ gzip:   1.67 kB[22m
+2026-10-30T15:42:32.1266148Z [2mdist/[22m[2massets/[22m[36mgonogo.registry-CngXCaLt.js                       [39m[1m[2m    3.37 kB[22m[1m[22m[2m │ gzip:   1.74 kB[22m
+2026-10-30T15:42:32.1267299Z [2mdist/[22m[2massets/[22m[36mSituationalHome-DfdGhG3b.js                       [39m[1m[2m    3.37 kB[22m[1m[22m[2m │ gzip:   1.87 kB[22m
+2026-10-30T15:42:32.1268420Z [2mdist/[22m[2massets/[22m[36mapi-CaKwo8nO.js                                   [39m[1m[2m    3.41 kB[22m[1m[22m[2m │ gzip:   1.10 kB[22m
+2026-10-30T15:42:32.1269722Z [2mdist/[22m[2massets/[22m[36mDeferredAssessmentDataExport-DwcZvZ8x.js          [39m[1m[2m    3.43 kB[22m[1m[22m[2m │ gzip:   1.82 kB[22m
+2026-10-30T15:42:32.1270962Z [2mdist/[22m[2massets/[22m[36mReportPrimitives-CPP-ynhk.js                      [39m[1m[2m    3.47 kB[22m[1m[22m[2m │ gzip:   1.20 kB[22m
+2026-10-30T15:42:32.1272113Z [2mdist/[22m[2massets/[22m[36mClassroomCreate-BZan4RM2.js                       [39m[1m[2m    3.52 kB[22m[1m[22m[2m │ gzip:   1.70 kB[22m
+2026-10-30T15:42:32.1273276Z [2mdist/[22m[2massets/[22m[36mQuestionnaireResult-D1RBMHFX.js                   [39m[1m[2m    3.54 kB[22m[1m[22m[2m │ gzip:   1.78 kB[22m
+2026-10-30T15:42:32.1274459Z [2mdist/[22m[2massets/[22m[36mTrainingReportStudio-DI6vFl22.js                  [39m[1m[2m    3.57 kB[22m[1m[22m[2m │ gzip:   1.90 kB[22m
+2026-10-30T15:42:32.1275796Z [2mdist/[22m[2massets/[22m[36mMatrixTask-DHgKsnOV.js                            [39m[1m[2m    3.62 kB[22m[1m[22m[2m │ gzip:   1.99 kB[22m
+2026-10-30T15:42:32.1276942Z [2mdist/[22m[2massets/[22m[36mStudentCourseLogin-DZyhzYxs.js                    [39m[1m[2m    3.63 kB[22m[1m[22m[2m │ gzip:   1.92 kB[22m
+2026-10-30T15:42:32.1278107Z [2mdist/[22m[2massets/[22m[36museMergedMask-D1lgEP-s.js                         [39m[1m[2m    3.64 kB[22m[1m[22m[2m │ gzip:   1.80 kB[22m
+2026-10-30T15:42:32.1279759Z [2mdist/[22m[2massets/[22m[36mGeneralQuestionnaireCreate-CnNY3vLv.js            [39m[1m[2m    3.65 kB[22m[1m[22m[2m │ gzip:   1.74 kB[22m
+2026-10-30T15:42:32.1281058Z [2mdist/[22m[2massets/[22m[36mtraining-admin-auth-BF9sdKJU.js                   [39m[1m[2m    3.69 kB[22m[1m[22m[2m │ gzip:   1.56 kB[22m
+2026-10-30T15:42:32.1282245Z [2mdist/[22m[2massets/[22m[36mSurveyPersonalLink-J59qsXEi.js                    [39m[1m[2m    3.72 kB[22m[1m[22m[2m │ gzip:   1.66 kB[22m
+2026-10-30T15:42:32.1283448Z [2mdist/[22m[2massets/[22m[36mlongitudinalVisualization-KJ4N9ZZp.js             [39m[1m[2m    3.85 kB[22m[1m[22m[2m │ gzip:   1.27 kB[22m
+2026-10-30T15:42:32.1284635Z [2mdist/[22m[2massets/[22m[36mTeacherLogin-vyxMR6mW.js                          [39m[1m[2m    3.86 kB[22m[1m[22m[2m │ gzip:   1.96 kB[22m
+2026-10-30T15:42:32.1285804Z [2mdist/[22m[2massets/[22m[36mSituationalHistory-e3IGP-QI.js                    [39m[1m[2m    3.87 kB[22m[1m[22m[2m │ gzip:   2.08 kB[22m
+2026-10-30T15:42:32.1286966Z [2mdist/[22m[2massets/[22m[36mStudentQuestionnaires-phTqCKMH.js                 [39m[1m[2m    3.89 kB[22m[1m[22m[2m │ gzip:   1.97 kB[22m
+2026-10-30T15:42:32.1288142Z [2mdist/[22m[2massets/[22m[36mConditionEditor-B663Blip.js                       [39m[1m[2m    3.89 kB[22m[1m[22m[2m │ gzip:   1.57 kB[22m
+2026-10-30T15:42:32.1289311Z [2mdist/[22m[2massets/[22m[36mscaleLibraryGovernance-Bqp_F6p5.js                [39m[1m[2m    3.90 kB[22m[1m[22m[2m │ gzip:   1.64 kB[22m
+2026-10-30T15:42:32.1290595Z [2mdist/[22m[2massets/[22m[36mCognitiveHistory-14y7tVzL.js                      [39m[1m[2m    3.90 kB[22m[1m[22m[2m │ gzip:   2.02 kB[22m
+2026-10-30T15:42:32.1291916Z [2mdist/[22m[2massets/[22m[36mEducationApplicabilityFields-C9j2mCAX.js          [39m[1m[2m    3.94 kB[22m[1m[22m[2m │ gzip:   1.86 kB[22m
+2026-10-30T15:42:32.1293160Z [2mdist/[22m[2massets/[22m[36mClassroomJoin-DijfwJdf.js                         [39m[1m[2m    4.03 kB[22m[1m[22m[2m │ gzip:   1.57 kB[22m
+2026-10-30T15:42:32.1294277Z [2mdist/[22m[2massets/[22m[36mPortal-D7pKE6lg.js                                [39m[1m[2m    4.07 kB[22m[1m[22m[2m │ gzip:   1.80 kB[22m
+2026-10-30T15:42:32.1295433Z [2mdist/[22m[2massets/[22m[36mAssessmentToolPicker-7CGp9NO9.js                  [39m[1m[2m    4.10 kB[22m[1m[22m[2m │ gzip:   1.79 kB[22m
+2026-10-30T15:42:32.1296572Z [2mdist/[22m[2massets/[22m[36mCptTask-CKapWtw4.js                               [39m[1m[2m    4.10 kB[22m[1m[22m[2m │ gzip:   2.04 kB[22m
+2026-10-30T15:42:32.1297730Z [2mdist/[22m[2massets/[22m[36mTrainingContentReports-aY4h1hV2.js                [39m[1m[2m    4.11 kB[22m[1m[22m[2m │ gzip:   1.91 kB[22m
+2026-10-30T15:42:32.1298935Z [2mdist/[22m[2massets/[22m[36museCatalogQuery-a4DG_iet.js                       [39m[1m[2m    4.15 kB[22m[1m[22m[2m │ gzip:   1.88 kB[22m
+2026-10-30T15:42:32.1300221Z [2mdist/[22m[2massets/[22m[36mParentConsentPage-5aNG_uKE.js                     [39m[1m[2m    4.16 kB[22m[1m[22m[2m │ gzip:   2.17 kB[22m
+2026-10-30T15:42:32.1301402Z [2mdist/[22m[2massets/[22m[36mMaterialGrantModal-DO7UF32v.js                    [39m[1m[2m    4.17 kB[22m[1m[22m[2m │ gzip:   1.94 kB[22m
+2026-10-30T15:42:32.1302538Z [2mdist/[22m[2massets/[22m[36mScaleResult-yXmtrWke.js                           [39m[1m[2m    4.23 kB[22m[1m[22m[2m │ gzip:   1.97 kB[22m
+2026-10-30T15:42:32.1303898Z [2mdist/[22m[2massets/[22m[36mEducationPrivateVersionChooser-DNsgxjwB.js        [39m[1m[2m    4.29 kB[22m[1m[22m[2m │ gzip:   1.92 kB[22m
+2026-10-30T15:42:32.1305118Z [2mdist/[22m[2massets/[22m[36mClassroomEnter-BsQJIy8o.js                        [39m[1m[2m    4.29 kB[22m[1m[22m[2m │ gzip:   1.74 kB[22m
+2026-10-30T15:42:32.1306287Z [2mdist/[22m[2massets/[22m[36mResearchCatalog-CJdT2Ehm.js                       [39m[1m[2m    4.35 kB[22m[1m[22m[2m │ gzip:   2.11 kB[22m
+2026-10-30T15:42:32.1307459Z [2mdist/[22m[2massets/[22m[36mResearchPackageCatalog-bX2-qHlM.js                [39m[1m[2m    4.41 kB[22m[1m[22m[2m │ gzip:   2.20 kB[22m
+2026-10-30T15:42:32.1308649Z [2mdist/[22m[2massets/[22m[36mBundleProfileSummary-BwHQPlWg.js                  [39m[1m[2m    4.44 kB[22m[1m[22m[2m │ gzip:   1.97 kB[22m
+2026-10-30T15:42:32.1309975Z [2mdist/[22m[2massets/[22m[36mReversallearningTask-f-ZKhZ67.js                  [39m[1m[2m    4.45 kB[22m[1m[22m[2m │ gzip:   2.22 kB[22m
+2026-10-30T15:42:32.1311155Z [2mdist/[22m[2massets/[22m[36mGonogoFrameTask-DUZdUULc.js                       [39m[1m[2m    4.48 kB[22m[1m[22m[2m │ gzip:   1.97 kB[22m
+2026-10-30T15:42:32.1312351Z [2mdist/[22m[2massets/[22m[36mEducationPersonalTracking-BPGAl9nx.js             [39m[1m[2m    4.50 kB[22m[1m[22m[2m │ gzip:   2.05 kB[22m
+2026-10-30T15:42:32.1313547Z [2mdist/[22m[2massets/[22m[36mMentalrotationTask-iqOCRpmm.js                    [39m[1m[2m    4.50 kB[22m[1m[22m[2m │ gzip:   2.27 kB[22m
+2026-10-30T15:42:32.1314734Z [2mdist/[22m[2massets/[22m[36mPublicQuestionnaireResult-DWML0FWV.js             [39m[1m[2m    4.54 kB[22m[1m[22m[2m │ gzip:   2.07 kB[22m
+2026-10-30T15:42:32.1315953Z [2mdist/[22m[2massets/[22m[36mTrainingTeacherManagement-C8ZzG_7S.js             [39m[1m[2m    4.55 kB[22m[1m[22m[2m │ gzip:   2.24 kB[22m
+2026-10-30T15:42:32.1317125Z [2mdist/[22m[2massets/[22m[36mReportTrendChart-C9ob93iy.js                      [39m[1m[2m    4.59 kB[22m[1m[22m[2m │ gzip:   2.18 kB[22m
+2026-10-30T15:42:32.1318289Z [2mdist/[22m[2massets/[22m[36mPublicQuestionnaire-DGmBnTGw.js                   [39m[1m[2m    4.65 kB[22m[1m[22m[2m │ gzip:   2.20 kB[22m
+2026-10-30T15:42:32.1319783Z [2mdist/[22m[2massets/[22m[36mFlankerTask-BhCuJuow.js                           [39m[1m[2m    4.66 kB[22m[1m[22m[2m │ gzip:   2.30 kB[22m
+2026-10-30T15:42:32.1320991Z [2mdist/[22m[2massets/[22m[36mcognitive-report-audiences-6CP_xzoY.js            [39m[1m[2m    4.69 kB[22m[1m[22m[2m │ gzip:   2.00 kB[22m
+2026-10-30T15:42:32.1322159Z [2mdist/[22m[2massets/[22m[36mBartTask-plrHA79J.js                              [39m[1m[2m    4.70 kB[22m[1m[22m[2m │ gzip:   2.21 kB[22m
+2026-10-30T15:42:32.1323305Z [2mdist/[22m[2massets/[22m[36mSchoolPeerConsent-Ctr1Z30-.js                     [39m[1m[2m    4.74 kB[22m[1m[22m[2m │ gzip:   2.07 kB[22m
+2026-10-30T15:42:32.1324482Z [2mdist/[22m[2massets/[22m[36mAssessmentTemplates-CSH1QlNr.js                   [39m[1m[2m    4.82 kB[22m[1m[22m[2m │ gzip:   2.55 kB[22m
+2026-10-30T15:42:32.1325652Z [2mdist/[22m[2massets/[22m[36mTaskGroupReport-DUdzJbXi.js                       [39m[1m[2m    4.84 kB[22m[1m[22m[2m │ gzip:   2.24 kB[22m
+2026-10-30T15:42:32.1326869Z [2mdist/[22m[2massets/[22m[36mRawScoreFeedbackFields-Bx5BeMql.js                [39m[1m[2m    4.92 kB[22m[1m[22m[2m │ gzip:   2.19 kB[22m
+2026-10-30T15:42:32.1328029Z [2mdist/[22m[2massets/[22m[36mCorsiTask-2OgJamuz.js                             [39m[1m[2m    4.93 kB[22m[1m[22m[2m │ gzip:   2.32 kB[22m
+2026-10-30T15:42:32.1329167Z [2mdist/[22m[2massets/[22m[36mCardsortTask-B7gQSVs0.js                          [39m[1m[2m    5.20 kB[22m[1m[22m[2m │ gzip:   2.51 kB[22m
+2026-10-30T15:42:32.1330430Z [2mdist/[22m[2massets/[22m[36mCptFrameTask-DpBZikSN.js                          [39m[1m[2m    5.22 kB[22m[1m[22m[2m │ gzip:   2.47 kB[22m
+2026-10-30T15:42:32.1331796Z [2mdist/[22m[2massets/[22m[36mSchoolProtectedReportStudio-pENIPbqD.js           [39m[1m[2m    5.28 kB[22m[1m[22m[2m │ gzip:   2.73 kB[22m
+2026-10-30T15:42:32.1333066Z [2mdist/[22m[2massets/[22m[36mTrainingCheckpointPanel-BERnE1EF.js               [39m[1m[2m    5.29 kB[22m[1m[22m[2m │ gzip:   2.42 kB[22m
+2026-10-30T15:42:32.1334280Z [2mdist/[22m[2massets/[22m[36mCognitiveAssignmentEntry-B61vdepw.js              [39m[1m[2m    5.32 kB[22m[1m[22m[2m │ gzip:   2.55 kB[22m
+2026-10-30T15:42:32.1335513Z [2mdist/[22m[2massets/[22m[36mEducationPrivateFormEditor-XGzYWNte.js            [39m[1m[2m    5.42 kB[22m[1m[22m[2m │ gzip:   2.24 kB[22m
+2026-10-30T15:42:32.1336733Z [2mdist/[22m[2massets/[22m[36mSurveySituationalUnit-DS8oIPOd.js                 [39m[1m[2m    5.51 kB[22m[1m[22m[2m │ gzip:   2.66 kB[22m
+2026-10-30T15:42:32.1337932Z [2mdist/[22m[2massets/[22m[36mSchoolGroupLongitudinal-CwMOklr6.js               [39m[1m[2m    5.52 kB[22m[1m[22m[2m │ gzip:   2.91 kB[22m
+2026-10-30T15:42:32.1339128Z [2mdist/[22m[2massets/[22m[36mTrailmakingTask-B7lO3yJD.js                       [39m[1m[2m    5.54 kB[22m[1m[22m[2m │ gzip:   2.79 kB[22m
+2026-10-30T15:42:32.1340498Z [2mdist/[22m[2massets/[22m[36mAssessmentMaterialPicker-HyPLQi2S.js              [39m[1m[2m    5.55 kB[22m[1m[22m[2m │ gzip:   2.19 kB[22m
+2026-10-30T15:42:32.1341672Z [2mdist/[22m[2massets/[22m[36mTowerTask-ClU_hyHA.js                             [39m[1m[2m    5.56 kB[22m[1m[22m[2m │ gzip:   2.63 kB[22m
+2026-10-30T15:42:32.1342790Z [2mdist/[22m[2massets/[22m[36mReactionTask-VnHGiEbV.js                          [39m[1m[2m    5.57 kB[22m[1m[22m[2m │ gzip:   2.35 kB[22m
+2026-10-30T15:42:32.1343940Z [2mdist/[22m[2massets/[22m[36mParticipationCode-eNeAJP9g.js                     [39m[1m[2m    5.59 kB[22m[1m[22m[2m │ gzip:   2.12 kB[22m
+2026-10-30T15:42:32.1345128Z [2mdist/[22m[2massets/[22m[36mSurveyStudyPreview-CtUjK8_4.js                    [39m[1m[2m    5.59 kB[22m[1m[22m[2m │ gzip:   2.65 kB[22m
+2026-10-30T15:42:32.1346309Z [2mdist/[22m[2massets/[22m[36mAdminTrainingWorkspace-COawzYqY.js                [39m[1m[2m    5.65 kB[22m[1m[22m[2m │ gzip:   2.68 kB[22m
+2026-10-30T15:42:32.1347653Z [2mdist/[22m[2massets/[22m[36mLexicaldecisionTask-3-bXXttu.js                   [39m[1m[2m    5.66 kB[22m[1m[22m[2m │ gzip:   2.47 kB[22m
+2026-10-30T15:42:32.1348851Z [2mdist/[22m[2massets/[22m[36mDigitbackwardTask-BCeAc8WY.js                     [39m[1m[2m    5.67 kB[22m[1m[22m[2m │ gzip:   2.53 kB[22m
+2026-10-30T15:42:32.1350433Z [2mdist/[22m[2massets/[22m[36mEducationPackageLibrary-DOX8VkBV.js               [39m[1m[2m    5.73 kB[22m[1m[22m[2m │ gzip:   2.45 kB[22m
+2026-10-30T15:42:32.1351631Z [2mdist/[22m[2massets/[22m[36mTrainingPortal-CyCXqFaj.js                        [39m[1m[2m    5.74 kB[22m[1m[22m[2m │ gzip:   2.16 kB[22m
+2026-10-30T15:42:32.1352788Z [2mdist/[22m[2massets/[22m[36mSchoolGroupReports--sEVCrGH.js                    [39m[1m[2m    5.87 kB[22m[1m[22m[2m │ gzip:   2.40 kB[22m
+2026-10-30T15:42:32.1353995Z [2mdist/[22m[2massets/[22m[36mTrainingCourseAssessments-xmq2luTm.js             [39m[1m[2m    5.87 kB[22m[1m[22m[2m │ gzip:   2.65 kB[22m
+2026-10-30T15:42:32.1355214Z [2mdist/[22m[2massets/[22m[36mAssessmentManagement-BEL47mln.js                  [39m[1m[2m    5.94 kB[22m[1m[22m[2m │ gzip:   2.89 kB[22m
+2026-10-30T15:42:32.1356391Z [2mdist/[22m[2massets/[22m[36mAssessmentDataExport-Bk1Dq5sG.js                  [39m[1m[2m    5.94 kB[22m[1m[22m[2m │ gzip:   2.96 kB[22m
+2026-10-30T15:42:32.1357584Z [2mdist/[22m[2massets/[22m[36mParentToolPoliciesPage-C-K1auiy.js                [39m[1m[2m    5.97 kB[22m[1m[22m[2m │ gzip:   2.83 kB[22m
+2026-10-30T15:42:32.1358774Z [2mdist/[22m[2massets/[22m[36mlearnerNavigation-CRE5b0sw.js                     [39m[1m[2m    6.00 kB[22m[1m[22m[2m │ gzip:   2.38 kB[22m
+2026-10-30T15:42:32.1360397Z [2mdist/[22m[2massets/[22m[36mPublicCognitiveAssignment-DW7_z4NZ.js             [39m[1m[2m    6.11 kB[22m[1m[22m[2m │ gzip:   3.03 kB[22m
+2026-10-30T15:42:32.1361565Z [2mdist/[22m[2massets/[22m[36mSstTask-BKBkyndl.js                               [39m[1m[2m    6.12 kB[22m[1m[22m[2m │ gzip:   2.57 kB[22m
+2026-10-30T15:42:32.1362673Z [2mdist/[22m[2massets/[22m[36mTaskswitchTask-B2yiqWMf.js                        [39m[1m[2m    6.19 kB[22m[1m[22m[2m │ gzip:   2.60 kB[22m
+2026-10-30T15:42:32.1363841Z [2mdist/[22m[2massets/[22m[36mHuiteacherFormStudio-3950eJiv.js                  [39m[1m[2m    6.20 kB[22m[1m[22m[2m │ gzip:   2.80 kB[22m
+2026-10-30T15:42:32.1365004Z [2mdist/[22m[2massets/[22m[36mStroopTask-CeaWllOo.js                            [39m[1m[2m    6.26 kB[22m[1m[22m[2m │ gzip:   2.68 kB[22m
+2026-10-30T15:42:32.1366200Z [2mdist/[22m[2massets/[22m[36mSchoolIndividualLongitudinalStudio-BH8tIFKJ.js    [39m[1m[2m    6.30 kB[22m[1m[22m[2m │ gzip:   3.11 kB[22m
+2026-10-30T15:42:32.1367452Z [2mdist/[22m[2massets/[22m[36mfinalDraftCapacityRetry-CL3vdPnQ.js               [39m[1m[2m    6.31 kB[22m[1m[22m[2m │ gzip:   2.38 kB[22m
+2026-10-30T15:42:32.1368625Z [2mdist/[22m[2massets/[22m[36mNbackTask-DOneFSGO.js                             [39m[1m[2m    6.49 kB[22m[1m[22m[2m │ gzip:   2.61 kB[22m
+2026-10-30T15:42:32.1369930Z [2mdist/[22m[2massets/[22m[36mEmotionrecognitionTask-Cyzo0F1J.js                [39m[1m[2m    6.50 kB[22m[1m[22m[2m │ gzip:   3.05 kB[22m
+2026-10-30T15:42:32.1371067Z [2mdist/[22m[2massets/[22m[36mGeneralQuestionnaireList-1E578Glt.js              [39m[1m[2m    6.50 kB[22m[1m[22m[2m │ gzip:   2.74 kB[22m
+2026-10-30T15:42:32.1372235Z [2mdist/[22m[2massets/[22m[36mParentLinksPage-DPL25ls7.js                       [39m[1m[2m    6.50 kB[22m[1m[22m[2m │ gzip:   2.98 kB[22m
+2026-10-30T15:42:32.1373411Z [2mdist/[22m[2massets/[22m[36mPairedassociateTask--yB6toJ0.js                   [39m[1m[2m    6.53 kB[22m[1m[22m[2m │ gzip:   2.78 kB[22m
+2026-10-30T15:42:32.1374596Z [2mdist/[22m[2massets/[22m[36mTrainingFeaturePage-l1Ismuwe.js                   [39m[1m[2m    6.60 kB[22m[1m[22m[2m │ gzip:   2.15 kB[22m
+2026-10-30T15:42:32.1375971Z [2mdist/[22m[2massets/[22m[36mTrainingCourseSettings-KasewBOt.js                [39m[1m[2m    6.61 kB[22m[1m[22m[2m │ gzip:   2.53 kB[22m
+2026-10-30T15:42:32.1377185Z [2mdist/[22m[2massets/[22m[36mSurveyCompositionEditor-CpFZEnaI.js               [39m[1m[2m    6.63 kB[22m[1m[22m[2m │ gzip:   2.93 kB[22m
+2026-10-30T15:42:32.1378355Z [2mdist/[22m[2massets/[22m[36mLegacyArchive-CybjI-SL.js                         [39m[1m[2m    6.66 kB[22m[1m[22m[2m │ gzip:   2.77 kB[22m
+2026-10-30T15:42:32.1379705Z [2mdist/[22m[2massets/[22m[36mPatterncompareTask-UXPfdJzx.js                    [39m[1m[2m    6.68 kB[22m[1m[22m[2m │ gzip:   3.04 kB[22m
+2026-10-30T15:42:32.1380940Z [2mdist/[22m[2massets/[22m[36mHuiteacherClassRelationships-DCf8kTHH.js          [39m[1m[2m    6.73 kB[22m[1m[22m[2m │ gzip:   2.31 kB[22m
+2026-10-30T15:42:32.1382166Z [2mdist/[22m[2massets/[22m[36mPicturesequenceTask-B1sWyOcP.js                   [39m[1m[2m    6.74 kB[22m[1m[22m[2m │ gzip:   3.11 kB[22m
+2026-10-30T15:42:32.1383349Z [2mdist/[22m[2massets/[22m[36mReactionFrameTask-DP8Ida6v.js                     [39m[1m[2m    6.74 kB[22m[1m[22m[2m │ gzip:   2.82 kB[22m
+2026-10-30T15:42:32.1384095Z [33m
+2026-10-30T15:42:32.1384525Z (!) Some chunks are larger than 500 kB after minification. Consider:
+2026-10-30T15:42:32.1385049Z - Using dynamic import() to code-split the application
+2026-10-30T15:42:32.1385941Z - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+2026-10-30T15:42:32.1387087Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+2026-10-30T15:42:32.1388142Z [2mdist/[22m[2massets/[22m[36mParentAccountsPage-M4NUfxpe.js                    [39m[1m[2m    6.75 kB[22m[1m[22m[2m │ gzip:   3.04 kB[22m
+2026-10-30T15:42:32.1389318Z [2mdist/[22m[2massets/[22m[36mpr13Stimuli-BhmXFCBt.js                           [39m[1m[2m    6.89 kB[22m[1m[22m[2m │ gzip:   3.27 kB[22m
+2026-10-30T15:42:32.1390600Z [2mdist/[22m[2massets/[22m[36mfeatureContent-C7BL88hj.js                        [39m[1m[2m    6.93 kB[22m[1m[22m[2m │ gzip:   2.94 kB[22m
+2026-10-30T15:42:32.1391791Z [2mdist/[22m[2massets/[22m[36mSituationalReportCard-D60WdG8W.js                 [39m[1m[2m    6.98 kB[22m[1m[22m[2m │ gzip:   2.86 kB[22m
+2026-10-30T15:42:32.1392988Z [2mdist/[22m[2massets/[22m[36mHuiteacherConsensus-C855Q_--.js                   [39m[1m[2m    6.99 kB[22m[1m[22m[2m │ gzip:   2.86 kB[22m
+2026-10-30T15:42:32.1394171Z [2mdist/[22m[2massets/[22m[36mMediaRenderer-Dm9xNK7x.js                         [39m[1m[2m    7.00 kB[22m[1m[22m[2m │ gzip:   2.41 kB[22m
+2026-10-30T15:42:32.1395344Z [2mdist/[22m[2massets/[22m[36mdevice-input-provenance-C7Qx_aWg.js               [39m[1m[2m    7.28 kB[22m[1m[22m[2m │ gzip:   2.71 kB[22m
+2026-10-30T15:42:32.1396560Z [2mdist/[22m[2massets/[22m[36mProfessionalFormAnswer-DgVLgEHw.js                [39m[1m[2m    7.31 kB[22m[1m[22m[2m │ gzip:   2.62 kB[22m
+2026-10-30T15:42:32.1397783Z [2mdist/[22m[2massets/[22m[36mMemoryTask-BOEOfUfF.js                            [39m[1m[2m    7.59 kB[22m[1m[22m[2m │ gzip:   3.10 kB[22m
+2026-10-30T15:42:32.1398954Z [2mdist/[22m[2massets/[22m[36mParticipationSettings-CeoHrDrl.js                 [39m[1m[2m    7.64 kB[22m[1m[22m[2m │ gzip:   3.32 kB[22m
+2026-10-30T15:42:32.1400317Z [2mdist/[22m[2massets/[22m[36mCognitiveSingleTaskReportCard-oD1vbXff.js         [39m[1m[2m    7.67 kB[22m[1m[22m[2m │ gzip:   3.33 kB[22m
+2026-10-30T15:42:32.1401561Z [2mdist/[22m[2massets/[22m[36mSchoolParentTasks-5Zt66GF-.js                     [39m[1m[2m    7.75 kB[22m[1m[22m[2m │ gzip:   3.62 kB[22m
+2026-10-30T15:42:32.1402766Z [2mdist/[22m[2massets/[22m[36mEducationProductGovernance-DNUft-ZM.js            [39m[1m[2m    7.76 kB[22m[1m[22m[2m │ gzip:   3.37 kB[22m
+2026-10-30T15:42:32.1404062Z [2mdist/[22m[2massets/[22m[36mapi-BwzgHkMa.js                                   [39m[1m[2m    7.80 kB[22m[1m[22m[2m │ gzip:   1.89 kB[22m
+2026-10-30T15:42:32.1405224Z [2mdist/[22m[2massets/[22m[36mSchoolParentPortal-CG1NEuP3.js                    [39m[1m[2m    7.86 kB[22m[1m[22m[2m │ gzip:   2.98 kB[22m
+2026-10-30T15:42:32.1406400Z [2mdist/[22m[2massets/[22m[36mFormSectionManager-GXU8U8B1.js                    [39m[1m[2m    7.96 kB[22m[1m[22m[2m │ gzip:   2.82 kB[22m
+2026-10-30T15:42:32.1407560Z [2mdist/[22m[2massets/[22m[36mSurveyImageField-Cg5DMIfK.js                      [39m[1m[2m    7.96 kB[22m[1m[22m[2m │ gzip:   3.34 kB[22m
+2026-10-30T15:42:32.1408745Z [2mdist/[22m[2massets/[22m[36mHuiteacherMyFormTasks-D_T1fX-u.js                 [39m[1m[2m    7.98 kB[22m[1m[22m[2m │ gzip:   3.63 kB[22m
+2026-10-30T15:42:32.1410007Z [2mdist/[22m[2massets/[22m[36mWordlistTask-DjrSFNSP.js                          [39m[1m[2m    8.10 kB[22m[1m[22m[2m │ gzip:   3.24 kB[22m
+2026-10-30T15:42:32.1411083Z [2mdist/[22m[2massets/[22m[36mTeacherRegister-CJJDh69C.js                       [39m[1m[2m    8.22 kB[22m[1m[22m[2m │ gzip:   2.93 kB[22m
+2026-10-30T15:42:32.1412167Z [2mdist/[22m[2massets/[22m[36mSchoolRelationships-CcQZNUS-.js                   [39m[1m[2m    8.30 kB[22m[1m[22m[2m │ gzip:   3.25 kB[22m
+2026-10-30T15:42:32.1413341Z [2mdist/[22m[2massets/[22m[36mClassroomQuestionEdit-D9jSEPAx.js                 [39m[1m[2m    8.39 kB[22m[1m[22m[2m │ gzip:   2.99 kB[22m
+2026-10-30T15:42:32.1414744Z [2mdist/[22m[2massets/[22m[36mStudentRegister-D3CTdYC3.js                       [39m[1m[2m    8.43 kB[22m[1m[22m[2m │ gzip:   3.09 kB[22m
+2026-10-30T15:42:32.1415911Z [2mdist/[22m[2massets/[22m[36mSituationalResult-ufzGQSKk.js                     [39m[1m[2m    8.46 kB[22m[1m[22m[2m │ gzip:   3.69 kB[22m
+2026-10-30T15:42:32.1417059Z [2mdist/[22m[2massets/[22m[36mClassroomList-qTR_Q0Md.js                         [39m[1m[2m    8.65 kB[22m[1m[22m[2m │ gzip:   3.21 kB[22m
+2026-10-30T15:42:32.1418184Z [2mdist/[22m[2massets/[22m[36mSchoolRecovery-BPB_ANQX.js                        [39m[1m[2m    8.71 kB[22m[1m[22m[2m │ gzip:   3.25 kB[22m
+2026-10-30T15:42:32.1419347Z [2mdist/[22m[2massets/[22m[36mTrainingTrainerCourse-D1061I9A.js                 [39m[1m[2m    8.86 kB[22m[1m[22m[2m │ gzip:   3.63 kB[22m
+2026-10-30T15:42:32.1420745Z [2mdist/[22m[2massets/[22m[36meducationAssessmentFeedbackAdapter-DbWR7jAL.js    [39m[1m[2m    8.88 kB[22m[1m[22m[2m │ gzip:   3.48 kB[22m
+2026-10-30T15:42:32.1421960Z [2mdist/[22m[2massets/[22m[36mSchoolTeacherTasks-BsTAgWTS.js                    [39m[1m[2m    8.91 kB[22m[1m[22m[2m │ gzip:   4.02 kB[22m
+2026-10-30T15:42:32.1423151Z [2mdist/[22m[2massets/[22m[36mBundleAuthoring-GQxKIlxV.js                       [39m[1m[2m    9.00 kB[22m[1m[22m[2m │ gzip:   3.91 kB[22m
+2026-10-30T15:42:32.1424339Z [2mdist/[22m[2massets/[22m[36mTeacherCourseDetail-D-ARb16t.js                   [39m[1m[2m    9.27 kB[22m[1m[22m[2m │ gzip:   2.89 kB[22m
+2026-10-30T15:42:32.1425521Z [2mdist/[22m[2massets/[22m[36mCognitiveResult-CEhNyrN5.js                       [39m[1m[2m    9.35 kB[22m[1m[22m[2m │ gzip:   3.85 kB[22m
+2026-10-30T15:42:32.1426723Z [2mdist/[22m[2massets/[22m[36mMaterialGrants-DtxN7FSd.js                        [39m[1m[2m    9.41 kB[22m[1m[22m[2m │ gzip:   3.74 kB[22m
+2026-10-30T15:42:32.1427886Z [2mdist/[22m[2massets/[22m[36mHuiteacherPersonalSelf-6f-DhF-a.js                [39m[1m[2m    9.51 kB[22m[1m[22m[2m │ gzip:   3.93 kB[22m
+2026-10-30T15:42:32.1429080Z [2mdist/[22m[2massets/[22m[36mSurveyCognitiveUnit-DlaWnIwH.js                   [39m[1m[2m    9.65 kB[22m[1m[22m[2m │ gzip:   4.26 kB[22m
+2026-10-30T15:42:32.1430554Z [2mdist/[22m[2massets/[22m[36mClassroomAnswer-A0S-WY52.js                       [39m[1m[2m    9.67 kB[22m[1m[22m[2m │ gzip:   3.37 kB[22m
+2026-10-30T15:42:32.1431716Z [2mdist/[22m[2massets/[22m[36mTeacherProfile-EpASdSiT.js                        [39m[1m[2m    9.73 kB[22m[1m[22m[2m │ gzip:   3.12 kB[22m
+2026-10-30T15:42:32.1432885Z [2mdist/[22m[2massets/[22m[36mAdminKeyEnrollment-US7r_RDr.js                    [39m[1m[2m    9.78 kB[22m[1m[22m[2m │ gzip:   4.16 kB[22m
+2026-10-30T15:42:32.1434058Z [2mdist/[22m[2massets/[22m[36mAssessmentVideoPlayer-CAgUa-5H.js                 [39m[1m[2m    9.82 kB[22m[1m[22m[2m │ gzip:   3.77 kB[22m
+2026-10-30T15:42:32.1435239Z [2mdist/[22m[2massets/[22m[36mAdminLogin-DsUZnrIs.js                            [39m[1m[2m    9.89 kB[22m[1m[22m[2m │ gzip:   4.00 kB[22m
+2026-10-30T15:42:32.1436389Z [2mdist/[22m[2massets/[22m[36mflushLifecycle-Cgeq28hB.js                        [39m[1m[2m   10.02 kB[22m[1m[22m[2m │ gzip:   3.30 kB[22m
+2026-10-30T15:42:32.1437555Z [2mdist/[22m[2massets/[22m[36mSurveySystemAdmin-DjDlkHcY.js                     [39m[1m[2m   10.11 kB[22m[1m[22m[2m │ gzip:   3.98 kB[22m
+2026-10-30T15:42:32.1438747Z [2mdist/[22m[2massets/[22m[36museLocalDraftSaveQueue-CUFVybO5.js                [39m[1m[2m   10.45 kB[22m[1m[22m[2m │ gzip:   4.04 kB[22m
+2026-10-30T15:42:32.1440026Z [2mdist/[22m[2massets/[22m[36mprng-B-ABQ3Q4.js                                  [39m[1m[2m   10.70 kB[22m[1m[22m[2m │ gzip:   4.35 kB[22m
+2026-10-30T15:42:32.1441132Z [2mdist/[22m[2massets/[22m[36mStudentHome-FIRMLS0d.js                           [39m[1m[2m   10.72 kB[22m[1m[22m[2m │ gzip:   4.30 kB[22m
+2026-10-30T15:42:32.1442481Z [2mdist/[22m[2massets/[22m[36mCognitiveAssignmentList-DxTmXccy.js               [39m[1m[2m   10.88 kB[22m[1m[22m[2m │ gzip:   4.22 kB[22m
+2026-10-30T15:42:32.1443664Z [2mdist/[22m[2massets/[22m[36mResearchPreview-C_Zq7Okw.js                       [39m[1m[2m   10.97 kB[22m[1m[22m[2m │ gzip:   4.17 kB[22m
+2026-10-30T15:42:32.1444843Z [2mdist/[22m[2massets/[22m[36mBasicFormConstraints-C_lMy7EW.js                  [39m[1m[2m   11.09 kB[22m[1m[22m[2m │ gzip:   4.36 kB[22m
+2026-10-30T15:42:32.1446228Z [2mdist/[22m[2massets/[22m[36mDocumentLibrary-DOTHR8xa.js                       [39m[1m[2m   11.30 kB[22m[1m[22m[2m │ gzip:   4.63 kB[22m
+2026-10-30T15:42:32.1447396Z [2mdist/[22m[2massets/[22m[36mCourseStudents-CRzsU7xL.js                        [39m[1m[2m   11.61 kB[22m[1m[22m[2m │ gzip:   4.16 kB[22m
+2026-10-30T15:42:32.1448599Z [2mdist/[22m[2massets/[22m[36mSurveyScaleLibrarySubmission-BYL4bWn8.js          [39m[1m[2m   11.65 kB[22m[1m[22m[2m │ gzip:   4.87 kB[22m
+2026-10-30T15:42:32.1449946Z [2mdist/[22m[2massets/[22m[36mSurveyStoredReportReader-Z7AB3nB7.js              [39m[1m[2m   11.69 kB[22m[1m[22m[2m │ gzip:   4.69 kB[22m
+2026-10-30T15:42:32.1451201Z [2mdist/[22m[2massets/[22m[36mEducationCognitiveConfigurations-pgFhnm7C.js      [39m[1m[2m   11.90 kB[22m[1m[22m[2m │ gzip:   4.56 kB[22m
+2026-10-30T15:42:32.1452433Z [2mdist/[22m[2massets/[22m[36mScaleUnitReportCard-Cn8XXyuX.js                   [39m[1m[2m   12.06 kB[22m[1m[22m[2m │ gzip:   4.43 kB[22m
+2026-10-30T15:42:32.1453591Z [2mdist/[22m[2massets/[22m[36mTeacherCodeList-D0PxY0PP.js                       [39m[1m[2m   12.20 kB[22m[1m[22m[2m │ gzip:   4.19 kB[22m
+2026-10-30T15:42:32.1454791Z [2mdist/[22m[2massets/[22m[36mCompositeAssessmentResults-BFf3o7bR.js            [39m[1m[2m   12.32 kB[22m[1m[22m[2m │ gzip:   4.61 kB[22m
+2026-10-30T15:42:32.1456052Z [2mdist/[22m[2massets/[22m[36mTrainingCognitiveProfileGrants-CiblGfUx.js        [39m[1m[2m   12.32 kB[22m[1m[22m[2m │ gzip:   4.95 kB[22m
+2026-10-30T15:42:32.1457262Z [2mdist/[22m[2massets/[22m[36mImageLibrary-D934XKAi.js                          [39m[1m[2m   12.43 kB[22m[1m[22m[2m │ gzip:   4.75 kB[22m
+2026-10-30T15:42:32.1458530Z [2mdist/[22m[2massets/[22m[36mdraft-EEYkI5cJ.js                                 [39m[1m[2m   12.48 kB[22m[1m[22m[2m │ gzip:   5.61 kB[22m
+2026-10-30T15:42:32.1459863Z [2mdist/[22m[2massets/[22m[36meducation-entry-layout-Vq0tQiDF.js                [39m[1m[2m   13.03 kB[22m[1m[22m[2m │ gzip:   5.48 kB[22m
+2026-10-30T15:42:32.1461096Z [2mdist/[22m[2massets/[22m[36mEducationStandardConfigurations-D4sudOGa.js       [39m[1m[2m   13.35 kB[22m[1m[22m[2m │ gzip:   5.10 kB[22m
+2026-10-30T15:42:32.1462297Z [2mdist/[22m[2massets/[22m[36mTaskForm-CDXrZ51N.js                              [39m[1m[2m   13.38 kB[22m[1m[22m[2m │ gzip:   5.19 kB[22m
+2026-10-30T15:42:32.1463467Z [2mdist/[22m[2massets/[22m[36mTrainingContentSelection-CmIQjzDo.js              [39m[1m[2m   13.56 kB[22m[1m[22m[2m │ gzip:   5.58 kB[22m
+2026-10-30T15:42:32.1464651Z [2mdist/[22m[2massets/[22m[36mAssignmentSubmit-DqspFy7L.js                      [39m[1m[2m   13.82 kB[22m[1m[22m[2m │ gzip:   5.06 kB[22m
+2026-10-30T15:42:32.1465835Z [2mdist/[22m[2massets/[22m[36mTrainingAdminResources-BJIH9Gks.js                [39m[1m[2m   13.97 kB[22m[1m[22m[2m │ gzip:   5.23 kB[22m
+2026-10-30T15:42:32.1467013Z [2mdist/[22m[2massets/[22m[36mSjtTextEditor-C7TzDHt2.js                         [39m[1m[2m   13.99 kB[22m[1m[22m[2m │ gzip:   4.09 kB[22m
+2026-10-30T15:42:32.1468177Z [2mdist/[22m[2massets/[22m[36mAssessmentWorkbench-Th80EQGU.js                   [39m[1m[2m   14.14 kB[22m[1m[22m[2m │ gzip:   5.29 kB[22m
+2026-10-30T15:42:32.1469503Z [2mdist/[22m[2massets/[22m[36mReportingContent-CRWKFPp4.js                      [39m[1m[2m   14.32 kB[22m[1m[22m[2m │ gzip:   5.02 kB[22m
+2026-10-30T15:42:32.1470877Z [2mdist/[22m[2massets/[22m[36mHuiteacherMyAssessmentTasks-CcxjwImm.js           [39m[1m[2m   14.49 kB[22m[1m[22m[2m │ gzip:   5.91 kB[22m
+2026-10-30T15:42:32.1472102Z [2mdist/[22m[2massets/[22m[36mattachmentUpdate-l8eV6qP4.js                      [39m[1m[2m   14.62 kB[22m[1m[22m[2m │ gzip:   5.78 kB[22m
+2026-10-30T15:42:32.1473260Z [2mdist/[22m[2massets/[22m[36mTrainingTrainerHome-CXSoRgHZ.js                   [39m[1m[2m   14.69 kB[22m[1m[22m[2m │ gzip:   5.18 kB[22m
+2026-10-30T15:42:32.1474435Z [2mdist/[22m[2massets/[22m[36mBundleProducts-BUs5y9O_.js                        [39m[1m[2m   14.72 kB[22m[1m[22m[2m │ gzip:   6.05 kB[22m
+2026-10-30T15:42:32.1475591Z [2mdist/[22m[2massets/[22m[36mQuestionnaireList-ZcmXrN3c.js                     [39m[1m[2m   15.08 kB[22m[1m[22m[2m │ gzip:   4.94 kB[22m
+2026-10-30T15:42:32.1476749Z [2mdist/[22m[2massets/[22m[36mCourseDetail-C4bUTTEY.js                          [39m[1m[2m   15.17 kB[22m[1m[22m[2m │ gzip:   4.21 kB[22m
+2026-10-30T15:42:32.1477921Z [2mdist/[22m[2massets/[22m[36mTrainingLearnerCourse-DulbtX6d.js                 [39m[1m[2m   15.17 kB[22m[1m[22m[2m │ gzip:   5.25 kB[22m
+2026-10-30T15:42:32.1479099Z [2mdist/[22m[2massets/[22m[36mStudentProfile-DqnTDYdB.js                        [39m[1m[2m   15.22 kB[22m[1m[22m[2m │ gzip:   4.13 kB[22m
+2026-10-30T15:42:32.1480413Z [2mdist/[22m[2massets/[22m[36mStudentManagement-CUf3qvyA.js                     [39m[1m[2m   15.25 kB[22m[1m[22m[2m │ gzip:   4.64 kB[22m
+2026-10-30T15:42:32.1481601Z [2mdist/[22m[2massets/[22m[36mSchoolCompositeRunner-COPYKuUm.js                 [39m[1m[2m   15.38 kB[22m[1m[22m[2m │ gzip:   6.07 kB[22m
+2026-10-30T15:42:32.1482802Z [2mdist/[22m[2massets/[22m[36mFormalReferenceStudio-DriBWwhk.js                 [39m[1m[2m   15.72 kB[22m[1m[22m[2m │ gzip:   5.96 kB[22m
+2026-10-30T15:42:32.1483995Z [2mdist/[22m[2massets/[22m[36mSurveyToolLibrary-DmsRbQ-0.js                     [39m[1m[2m   15.78 kB[22m[1m[22m[2m │ gzip:   5.96 kB[22m
+2026-10-30T15:42:32.1485182Z [2mdist/[22m[2massets/[22m[36mSurveyMaterialLibrary-C0DfnGC3.js                 [39m[1m[2m   15.87 kB[22m[1m[22m[2m │ gzip:   5.91 kB[22m
+2026-10-30T15:42:32.1486533Z [2mdist/[22m[2massets/[22m[36mTrainingLearnerHome-38nc-miY.js                   [39m[1m[2m   15.89 kB[22m[1m[22m[2m │ gzip:   5.44 kB[22m
+2026-10-30T15:42:32.1487764Z [2mdist/[22m[2massets/[22m[36mCompositeAssessmentList-CQi0fODN.js               [39m[1m[2m   16.25 kB[22m[1m[22m[2m │ gzip:   5.27 kB[22m
+2026-10-30T15:42:32.1488973Z [2mdist/[22m[2massets/[22m[36mMediaSelector-DcYVP8V1.js                         [39m[1m[2m   16.28 kB[22m[1m[22m[2m │ gzip:   4.89 kB[22m
+2026-10-30T15:42:32.1490212Z [2mdist/[22m[2massets/[22m[36mCheckinSubmit-DrJ0T9aV.js                         [39m[1m[2m   16.34 kB[22m[1m[22m[2m │ gzip:   5.77 kB[22m
+2026-10-30T15:42:32.1491318Z [2mdist/[22m[2massets/[22m[36mClassroomControl-G2qNaUAk.js                      [39m[1m[2m   16.39 kB[22m[1m[22m[2m │ gzip:   5.83 kB[22m
+2026-10-30T15:42:32.1492429Z [2mdist/[22m[2massets/[22m[36mindex-COWafZKd.js                                 [39m[1m[2m   16.71 kB[22m[1m[22m[2m │ gzip:   6.29 kB[22m
+2026-10-30T15:42:32.1493654Z [2mdist/[22m[2massets/[22m[36mEducationAssessmentResourcePicker-xYq3mPUu.js     [39m[1m[2m   17.23 kB[22m[1m[22m[2m │ gzip:   6.38 kB[22m
+2026-10-30T15:42:32.1494923Z [2mdist/[22m[2massets/[22m[36mFinalQuestionnaireAssessment-DbI8uqM3.js          [39m[1m[2m   17.66 kB[22m[1m[22m[2m │ gzip:   6.36 kB[22m
+2026-10-30T15:42:32.1496124Z [2mdist/[22m[2massets/[22m[36mTrainingLibrary-oOnxCxoa.js                       [39m[1m[2m   17.67 kB[22m[1m[22m[2m │ gzip:   6.36 kB[22m
+2026-10-30T15:42:32.1497295Z [2mdist/[22m[2massets/[22m[36mAnonymousStudyPage-DxaDLHrm.js                    [39m[1m[2m   17.77 kB[22m[1m[22m[2m │ gzip:   6.39 kB[22m
+2026-10-30T15:42:32.1498648Z [2mdist/[22m[2massets/[22m[36mSchoolStudentTasks-CstFUyL8.js                    [39m[1m[2m   17.79 kB[22m[1m[22m[2m │ gzip:   7.28 kB[22m
+2026-10-30T15:42:32.1499978Z [2mdist/[22m[2massets/[22m[36mTrainingAdminCourses-CTNP0Wyy.js                  [39m[1m[2m   18.13 kB[22m[1m[22m[2m │ gzip:   5.87 kB[22m
+2026-10-30T15:42:32.1501216Z [2mdist/[22m[2massets/[22m[36mPublicQuestionnaireAssessment-CD8WzHA9.js         [39m[1m[2m   18.63 kB[22m[1m[22m[2m │ gzip:   5.66 kB[22m
+2026-10-30T15:42:32.1502438Z [2mdist/[22m[2massets/[22m[36mCognitiveAssignmentEdit-CZlavBut.js               [39m[1m[2m   19.00 kB[22m[1m[22m[2m │ gzip:   7.41 kB[22m
+2026-10-30T15:42:32.1503689Z [2mdist/[22m[2massets/[22m[36mEducationAssessmentRegistrationPanel-C9fRUXt3.js  [39m[1m[2m   19.02 kB[22m[1m[22m[2m │ gzip:   7.06 kB[22m
+2026-10-30T15:42:32.1504940Z [2mdist/[22m[2massets/[22m[36mRelationalTasksPage-1IS2Y89_.js                   [39m[1m[2m   19.10 kB[22m[1m[22m[2m │ gzip:   5.56 kB[22m
+2026-10-30T15:42:32.1506080Z [2mdist/[22m[2massets/[22m[36mUserList-IVB2PIKI.js                              [39m[1m[2m   19.20 kB[22m[1m[22m[2m │ gzip:   6.11 kB[22m
+2026-10-30T15:42:32.1507382Z [2mdist/[22m[2massets/[22m[36mScaleAssessment-Yx9igs5n.js                       [39m[1m[2m   19.51 kB[22m[1m[22m[2m │ gzip:   7.93 kB[22m
+2026-10-30T15:42:32.1508610Z [2mdist/[22m[2massets/[22m[36mQuestionnaireAssessment-C2ZKYte0.js               [39m[1m[2m   19.63 kB[22m[1m[22m[2m │ gzip:   5.73 kB[22m
+2026-10-30T15:42:32.1510019Z [2mdist/[22m[2massets/[22m[36mCompositeAssessmentEdit-2CiYGf3h.js               [39m[1m[2m   19.80 kB[22m[1m[22m[2m │ gzip:   6.96 kB[22m
+2026-10-30T15:42:32.1511255Z [2mdist/[22m[2massets/[22m[36mSurveyToolTemplateEditor-pGPaUqOW.js              [39m[1m[2m   19.86 kB[22m[1m[22m[2m │ gzip:   7.48 kB[22m
+2026-10-30T15:42:32.1512463Z [2mdist/[22m[2massets/[22m[36mCourseList-emckPykZ.js                            [39m[1m[2m   19.94 kB[22m[1m[22m[2m │ gzip:   6.77 kB[22m
+2026-10-30T15:42:32.1513570Z [2mdist/[22m[2massets/[22m[36mScaleList-DDx371v-.js                             [39m[1m[2m   20.07 kB[22m[1m[22m[2m │ gzip:   6.81 kB[22m
+2026-10-30T15:42:32.1514802Z [2mdist/[22m[2massets/[22m[36mTrainingStandardConfigurationGrants-Bq6BzLqf.js   [39m[1m[2m   20.10 kB[22m[1m[22m[2m │ gzip:   7.34 kB[22m
+2026-10-30T15:42:32.1516024Z [2mdist/[22m[2massets/[22m[36mQuestionnaireEdit-Db4GSomA.js                     [39m[1m[2m   20.30 kB[22m[1m[22m[2m │ gzip:   6.06 kB[22m
+2026-10-30T15:42:32.1517185Z [2mdist/[22m[2massets/[22m[36mfinalDraftStore-Dm59dNEG.js                       [39m[1m[2m   20.31 kB[22m[1m[22m[2m │ gzip:   5.88 kB[22m
+2026-10-30T15:42:32.1518374Z [2mdist/[22m[2massets/[22m[36mGeneralQuestionnaireEdit-CwtaDQqH.js              [39m[1m[2m   20.47 kB[22m[1m[22m[2m │ gzip:   6.73 kB[22m
+2026-10-30T15:42:32.1519928Z [2mdist/[22m[2massets/[22m[36mHuiteacherFieldWorkspace-DPEJRGJJ.js              [39m[1m[2m   20.56 kB[22m[1m[22m[2m │ gzip:   7.65 kB[22m
+2026-10-30T15:42:32.1521128Z [2mdist/[22m[2massets/[22m[36mSchoolReports-CYWXNCNr.js                         [39m[1m[2m   21.76 kB[22m[1m[22m[2m │ gzip:   7.41 kB[22m
+2026-10-30T15:42:32.1522288Z [2mdist/[22m[2massets/[22m[36mSurveyEntryPanel-CJ6gzlY8.js                      [39m[1m[2m   22.00 kB[22m[1m[22m[2m │ gzip:   8.13 kB[22m
+2026-10-30T15:42:32.1523432Z [2mdist/[22m[2massets/[22m[36mVideoLibrary-C6LpfW56.js                          [39m[1m[2m   23.04 kB[22m[1m[22m[2m │ gzip:   7.56 kB[22m
+2026-10-30T15:42:32.1524626Z [2mdist/[22m[2massets/[22m[36mCognitiveV2ReportCard-RwiuX5s5.js                 [39m[1m[2m   23.45 kB[22m[1m[22m[2m │ gzip:   7.48 kB[22m
+2026-10-30T15:42:32.1525828Z [2mdist/[22m[2massets/[22m[36mSurveyReportStudio-CQBTXJNY.js                    [39m[1m[2m   24.71 kB[22m[1m[22m[2m │ gzip:   8.57 kB[22m
+2026-10-30T15:42:32.1527055Z [2mdist/[22m[2massets/[22m[36mScaleDefinitionEditor-Cf6qgz5U.js                 [39m[1m[2m   25.67 kB[22m[1m[22m[2m │ gzip:   8.67 kB[22m
+2026-10-30T15:42:32.1528233Z [2mdist/[22m[2massets/[22m[36mScaleLibrary-BxJAiIND.js                          [39m[1m[2m   25.74 kB[22m[1m[22m[2m │ gzip:   8.29 kB[22m
+2026-10-30T15:42:32.1529573Z [2mdist/[22m[2massets/[22m[36mEducationCompositionStudio-Dk2_psZs.js            [39m[1m[2m   26.30 kB[22m[1m[22m[2m │ gzip:   9.33 kB[22m
+2026-10-30T15:42:32.1530669Z [2mdist/[22m[2massets/[22m[36mregistry-CmIiGP5m.js                              [39m[1m[2m   26.37 kB[22m[1m[22m[2m │ gzip:   6.20 kB[22m
+2026-10-30T15:42:32.1531759Z [2mdist/[22m[2massets/[22m[36mHuiteacherAssessmentTasks-DIkzGQFr.js             [39m[1m[2m   27.37 kB[22m[1m[22m[2m │ gzip:   9.00 kB[22m
+2026-10-30T15:42:32.1532967Z [2mdist/[22m[2massets/[22m[36mResearchFormEditor-DqyGd2ZE.js                    [39m[1m[2m   28.31 kB[22m[1m[22m[2m │ gzip:   9.21 kB[22m
+2026-10-30T15:42:32.1534169Z [2mdist/[22m[2massets/[22m[36mResearchScaleEditor-CxmeLLLm.js                   [39m[1m[2m   28.75 kB[22m[1m[22m[2m │ gzip:   8.63 kB[22m
+2026-10-30T15:42:32.1535459Z [2mdist/[22m[2massets/[22m[36msanitize-CCII_XrQ.js                              [39m[1m[2m   30.78 kB[22m[1m[22m[2m │ gzip:  11.83 kB[22m
+2026-10-30T15:42:32.1536580Z [2mdist/[22m[2massets/[22m[36mAddon-DslYeN6p.js                                 [39m[1m[2m   31.79 kB[22m[1m[22m[2m │ gzip:   9.23 kB[22m
+2026-10-30T15:42:32.1537713Z [2mdist/[22m[2massets/[22m[36mFinalCompositeAssessment-C_lvAntF.js              [39m[1m[2m   33.63 kB[22m[1m[22m[2m │ gzip:  11.58 kB[22m
+2026-10-30T15:42:32.1538947Z [2mdist/[22m[2massets/[22m[36mSchoolActivityManager-DZkPdDpc.js                 [39m[1m[2m   33.95 kB[22m[1m[22m[2m │ gzip:  11.41 kB[22m
+2026-10-30T15:42:32.1540260Z [2mdist/[22m[2massets/[22m[36mCheckinList-B5VZ322o.js                           [39m[1m[2m   33.97 kB[22m[1m[22m[2m │ gzip:  10.63 kB[22m
+2026-10-30T15:42:32.1541408Z [2mdist/[22m[2massets/[22m[36mScaleEdit-C1rGJ64S.js                             [39m[1m[2m   34.88 kB[22m[1m[22m[2m │ gzip:  12.40 kB[22m
+2026-10-30T15:42:32.1542561Z [2mdist/[22m[2massets/[22m[36mPublicDeliveryManager-4KK5rqXn.js                 [39m[1m[2m   35.32 kB[22m[1m[22m[2m │ gzip:  11.48 kB[22m
+2026-10-30T15:42:32.1543702Z [2mdist/[22m[2massets/[22m[36mCompositeAssessmentPage-DlRgq35Q.js               [39m[1m[2m   36.10 kB[22m[1m[22m[2m │ gzip:  13.01 kB[22m
+2026-10-30T15:42:32.1544948Z [2mdist/[22m[2massets/[22m[36mHuiteacherEvaluationStudio-CS-hKaV8.js            [39m[1m[2m   37.51 kB[22m[1m[22m[2m │ gzip:  12.59 kB[22m
+2026-10-30T15:42:32.1546399Z [2mdist/[22m[2massets/[22m[36mSchoolPersonnelImport-CnSPdMVP.js                 [39m[1m[2m   37.73 kB[22m[1m[22m[2m │ gzip:  13.09 kB[22m
+2026-10-30T15:42:32.1547578Z [2mdist/[22m[2massets/[22m[36mSjtAuthoring-Dwn7l_CA.js                          [39m[1m[2m   37.88 kB[22m[1m[22m[2m │ gzip:  12.24 kB[22m
+2026-10-30T15:42:32.1548768Z [2mdist/[22m[2massets/[22m[36mSchoolPersonnelDirectory-Bq7rw6jw.js              [39m[1m[2m   38.19 kB[22m[1m[22m[2m │ gzip:  12.82 kB[22m
+2026-10-30T15:42:32.1550105Z [2mdist/[22m[2massets/[22m[36mSituationalRunner-Dx9w0XlB.js                     [39m[1m[2m   38.34 kB[22m[1m[22m[2m │ gzip:  13.64 kB[22m
+2026-10-30T15:42:32.1551277Z [2mdist/[22m[2massets/[22m[36mCognitiveRunner-CDmVQ-Vl.js                       [39m[1m[2m   39.98 kB[22m[1m[22m[2m │ gzip:  13.06 kB[22m
+2026-10-30T15:42:32.1552445Z [2mdist/[22m[2massets/[22m[36mAdminPermissions-C53K3Zzp.js                      [39m[1m[2m   42.04 kB[22m[1m[22m[2m │ gzip:  13.06 kB[22m
+2026-10-30T15:42:32.1553629Z [2mdist/[22m[2massets/[22m[36mAssignmentList-DnpkInyv.js                        [39m[1m[2m   42.07 kB[22m[1m[22m[2m │ gzip:  12.34 kB[22m
+2026-10-30T15:42:32.1554804Z [2mdist/[22m[2massets/[22m[36mTrainingCourseAnalysis-BDJPvhzI.js                [39m[1m[2m   42.52 kB[22m[1m[22m[2m │ gzip:  14.54 kB[22m
+2026-10-30T15:42:32.1556020Z [2mdist/[22m[2massets/[22m[36museClassroomSocket-BKXWPVqm.js                    [39m[1m[2m   44.59 kB[22m[1m[22m[2m │ gzip:  14.16 kB[22m
+2026-10-30T15:42:32.1557188Z [2mdist/[22m[2massets/[22m[36mCompositeReportPage-D4eJfaPg.js                   [39m[1m[2m   47.13 kB[22m[1m[22m[2m │ gzip:  16.02 kB[22m
+2026-10-30T15:42:32.1558368Z [2mdist/[22m[2massets/[22m[36mHuiteacherApp-IEEGUkB0.js                         [39m[1m[2m   47.26 kB[22m[1m[22m[2m │ gzip:  15.29 kB[22m
+2026-10-30T15:42:32.1559668Z [2mdist/[22m[2massets/[22m[36mSurveyBuilder-CwjxA72o.js                         [39m[1m[2m   47.82 kB[22m[1m[22m[2m │ gzip:  16.16 kB[22m
+2026-10-30T15:42:32.1560866Z [2mdist/[22m[2massets/[22m[36mSurveyResearchersAdmin-Ds4fTpCW.js                [39m[1m[2m   52.05 kB[22m[1m[22m[2m │ gzip:  16.31 kB[22m
+2026-10-30T15:42:32.1562268Z [2mdist/[22m[2massets/[22m[36mSurveyApp-BocNDrHv.js                             [39m[1m[2m   55.18 kB[22m[1m[22m[2m │ gzip:  17.61 kB[22m
+2026-10-30T15:42:32.1563424Z [2mdist/[22m[2massets/[22m[36mclient-DLEYkVg8.js                                [39m[1m[2m   56.98 kB[22m[1m[22m[2m │ gzip:  21.53 kB[22m
+2026-10-30T15:42:32.1564585Z [2mdist/[22m[2massets/[22m[36mEducationPrivateToolStudio-BldC1sXO.js            [39m[1m[2m   60.72 kB[22m[1m[22m[2m │ gzip:  20.35 kB[22m
+2026-10-30T15:42:32.1565787Z [2mdist/[22m[2massets/[22m[36mSurveyAnalyticsWorkspace-Mb-gNa02.js              [39m[1m[2m   62.55 kB[22m[1m[22m[2m │ gzip:  21.25 kB[22m
+2026-10-30T15:42:32.1566961Z [2mdist/[22m[2massets/[22m[36mSchoolApp-C7Mp86gP.js                             [39m[1m[2m   79.17 kB[22m[1m[22m[2m │ gzip:  24.26 kB[22m
+2026-10-30T15:42:32.1568119Z [2mdist/[22m[2massets/[22m[36mSurveyPublicApp-D5UIKaMe.js                       [39m[1m[2m   79.23 kB[22m[1m[22m[2m │ gzip:  25.60 kB[22m
+2026-10-30T15:42:32.1569291Z [2mdist/[22m[2massets/[22m[36mPublicCheckin-q94xRJ-2.js                         [39m[1m[2m   87.62 kB[22m[1m[22m[2m │ gzip:  30.11 kB[22m
+2026-10-30T15:42:32.1570549Z [2mdist/[22m[2massets/[22m[36mchunk-BV7QT456-Clcp7euc.js                        [39m[1m[2m   97.35 kB[22m[1m[22m[2m │ gzip:  32.86 kB[22m
+2026-10-30T15:42:32.1571714Z [2mdist/[22m[2massets/[22m[36mSurveyWaveStudio-Ce91GIF8.js                      [39m[1m[2m  101.91 kB[22m[1m[22m[2m │ gzip:  32.31 kB[22m
+2026-10-30T15:42:32.1572882Z [2mdist/[22m[2massets/[22m[36mScaleLibraryGovernance-Cio5v74K.js                [39m[1m[2m  105.90 kB[22m[1m[22m[2m │ gzip:  30.82 kB[22m
+2026-10-30T15:42:32.1574194Z [2mdist/[22m[2massets/[22m[36mApp-L_0BqvO9.js                                   [39m[1m[2m  133.03 kB[22m[1m[22m[2m │ gzip:  39.52 kB[22m
+2026-10-30T15:42:32.1575362Z [2mdist/[22m[2massets/[22m[36mQuestionnaireProducts-Bsc4kwD1.js                 [39m[1m[2m  140.54 kB[22m[1m[22m[2m │ gzip:  44.95 kB[22m
+2026-10-30T15:42:32.1576559Z [2mdist/[22m[2massets/[22m[36mOrganizationProductRoutes-qbYEM_FE.js             [39m[1m[2m  150.17 kB[22m[1m[22m[2m │ gzip:  40.94 kB[22m
+2026-10-30T15:42:32.1577723Z [2mdist/[22m[2massets/[22m[36mindex-NHU-IL60.js                                 [39m[1m[2m  151.15 kB[22m[1m[22m[2m │ gzip:  49.59 kB[22m
+2026-10-30T15:42:32.1578815Z [2mdist/[22m[2massets/[22m[36mindex-BWZu2Jhu.js                                 [39m[1m[2m  197.72 kB[22m[1m[22m[2m │ gzip:  63.44 kB[22m
+2026-10-30T15:42:32.1580028Z [2mdist/[22m[2massets/[22m[36mindex-Czo0Sqe4.js                                 [39m[1m[2m  217.30 kB[22m[1m[22m[2m │ gzip:  75.70 kB[22m
+2026-10-30T15:42:32.1581171Z [2mdist/[22m[2massets/[22m[36mCheckinTokenManager-D_4pkzsO.js                   [39m[1m[2m  277.32 kB[22m[1m[22m[2m │ gzip:  73.09 kB[22m
+2026-10-30T15:42:32.1582311Z [2mdist/[22m[2massets/[22m[36mPdfViewer-CxnXSlwY.js                             [39m[1m[2m  452.73 kB[22m[1m[22m[2m │ gzip: 134.53 kB[22m
+2026-10-30T15:42:32.1583445Z [2mdist/[22m[2massets/[22m[36minstallSVGRenderer-BS0639wF.js                    [39m[1m[2m  467.69 kB[22m[1m[22m[2m │ gzip: 160.27 kB[22m
+2026-10-30T15:42:32.1584623Z [2mdist/[22m[2massets/[22m[36mSecureVideoPlayer-BWtdddhb.js                     [39m[1m[33m  526.12 kB[39m[22m[2m │ gzip: 163.18 kB[22m
+2026-10-30T15:42:32.1585776Z [2mdist/[22m[2massets/[22m[36mBigScreen-BWFUKIRq.js                             [39m[1m[33m  603.70 kB[39m[22m[2m │ gzip: 197.49 kB[22m
+2026-10-30T15:42:32.1586447Z [32m✓ built in 22.69s[39m
+2026-10-30T15:42:32.4406937Z write: frontend build bound to 35f6efdded0adb4f7e67ca177153ed9f9e9eaa22 / run 41082809728
+2026-10-30T15:42:32.4587795Z ##[group]Run actions/upload-artifact@v4
+2026-10-30T15:42:32.4588110Z with:
+2026-10-30T15:42:32.4588401Z   name: frontend-dist-35f6efdded0adb4f7e67ca177153ed9f9e9eaa22
+2026-10-30T15:42:32.4588770Z   path: server-version/frontend/dist
+2026-10-30T15:42:32.4589037Z   retention-days: 1
+2026-10-30T15:42:32.4589255Z   if-no-files-found: error
+2026-10-30T15:42:32.4589799Z   compression-level: 6
+2026-10-30T15:42:32.4590024Z   overwrite: false
+2026-10-30T15:42:32.4590239Z   include-hidden-files: false
+2026-10-30T15:42:32.4590470Z env:
+2026-10-30T15:42:32.4590708Z   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+2026-10-30T15:42:32.4591038Z   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+2026-10-30T15:42:32.4591326Z   VITE_COGNITIVE_MODULE_ENABLED: true
+2026-10-30T15:42:32.4591616Z   NODE_OPTIONS: --max-old-space-size=3072
+2026-10-30T15:42:32.4591886Z   TZ: UTC
+2026-10-30T15:42:32.4592080Z ##[endgroup]
+2026-10-30T15:42:32.6400815Z (node:2453) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-30T15:42:32.6401872Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-30T15:42:32.7880620Z With the provided path, there will be 825 files uploaded
+2026-10-30T15:42:32.7900355Z Artifact name is valid!
+2026-10-30T15:42:32.7900918Z Root directory input is valid!
+2026-10-30T15:42:33.0074167Z Beginning upload of artifact content to blob storage
+2026-10-30T15:42:33.7034125Z (node:2453) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-30T15:42:33.8833511Z Uploaded bytes 8388608
+2026-10-30T15:42:34.1329747Z Uploaded bytes 16777216
+2026-10-30T15:42:34.4428774Z Uploaded bytes 22221030
+2026-10-30T15:42:34.4898784Z Finished uploading artifact content to blob storage!
+2026-10-30T15:42:34.4903055Z SHA256 digest of uploaded artifact zip is 6886190f308bd1c7d5bfe0ca4b944f26aeee3e8e73cafbef7a5b2740df6ff19a
+2026-10-30T15:42:34.4905466Z Finalizing artifact upload
+2026-10-30T15:42:34.9276530Z Artifact frontend-dist-35f6efdded0adb4f7e67ca177153ed9f9e9eaa22.zip successfully finalized. Artifact ID 12989314904
+2026-10-30T15:42:34.9278128Z Artifact frontend-dist-35f6efdded0adb4f7e67ca177153ed9f9e9eaa22 has been successfully uploaded! Final size is 22221030 bytes. Artifact ID is 12989314904
+2026-10-30T15:42:34.9287042Z Artifact download URL: https://github.com/caohuibj/eduK12-new-version/actions/runs/41082809728/artifacts/12989314904
+2026-10-30T15:42:34.9618633Z Post job cleanup.
+2026-10-30T15:42:35.0992858Z (node:2465) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-30T15:42:35.0993930Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-30T15:42:35.1201447Z Post job cleanup.
+2026-10-30T15:42:35.2266213Z [command]/usr/bin/git version
+2026-10-30T15:42:35.2315211Z git version 2.56.0
+2026-10-30T15:42:35.2364361Z Temporarily overriding HOME='/home/runner/work/_temp/51202ab8-980a-4f92-b6b6-9750461cb937' before making global git config changes
+2026-10-30T15:42:35.2366151Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-30T15:42:35.2371477Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eduK12-new-version/eduK12-new-version
+2026-10-30T15:42:35.2434048Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-30T15:42:35.2483707Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-30T15:42:35.2813237Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-30T15:42:35.2854005Z http.https://github.com/.extraheader
+2026-10-30T15:42:35.2870664Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-30T15:42:35.2929559Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-30T15:42:35.3281341Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-30T15:42:35.3325499Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-30T15:42:35.3834012Z Cleaning up orphan processes
+2026-10-30T15:42:35.4343530Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

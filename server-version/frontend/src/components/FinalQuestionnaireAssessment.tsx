@@ -369,7 +369,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   }
 
   const submitSection = async () => {
-    if (!currentSection || !currentKey || !meta || submitting) return
+    if (!currentSection || !currentKey || !meta || meta.status === 'COMPLETED' || submitting) return
     if (!(await flushOrShowError())) return
     const missing = currentSection.items.filter((item) => item.required && isEmpty(formValues[item.id]))
     if (missing.length > 0) {
@@ -377,6 +377,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       setError(`还有 ${missing.length} 个必填字段未完成`)
       return
     }
+    let accepted = false
     try {
       setSubmitting(true)
       setError(null)
@@ -417,10 +418,16 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
           return next
         },
       })
+      accepted = true
+      setMeta({ ...meta, status: 'COMPLETED' })
       await finalDraftStore.setStatus(currentKey, 'COMPLETED')
       await finalDraftStore.delete(currentKey)
       await onReload()
     } catch (cause) {
+      if (accepted) {
+        setError('服务器已确认保存。后续页面暂时未能加载，可重新读取进度或报告；无需再次交卷。')
+        return
+      }
       if (cause instanceof QuestionnaireRequiredVideoCompletionError) {
         const nextIndex = currentSection.items.findIndex((item) => item.id === cause.itemKey)
         if (nextIndex >= 0) setSectionIndex(nextIndex)
@@ -432,7 +439,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   }
 
   const submitScale = async () => {
-    if (!currentScale || !currentKey || !meta || submitting) return
+    if (!currentScale || !currentKey || !meta || meta.status === 'COMPLETED' || submitting) return
     if (!(await flushOrShowError())) return
     const missing = currentScale.definition.items.filter((item) => item.required && scaleValues[item.itemCode] === undefined)
     if (missing.length > 0) {
@@ -440,6 +447,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       setError(`还有 ${missing.length} 道必答题未作答`)
       return
     }
+    let accepted = false
     try {
       setSubmitting(true)
       setError(null)
@@ -486,10 +494,16 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
           return next
         },
       })
+      accepted = true
+      setMeta({ ...meta, status: 'COMPLETED' })
       await finalDraftStore.setStatus(currentKey, 'COMPLETED')
       await finalDraftStore.delete(currentKey)
       await onReload()
     } catch (cause) {
+      if (accepted) {
+        setError('服务器已确认保存。后续页面暂时未能加载，可重新读取进度或报告；无需再次交卷。')
+        return
+      }
       if (cause instanceof QuestionnaireRequiredVideoCompletionError) {
         const nextIndex = currentScale.definition.items.findIndex((item) => item.itemCode === cause.itemKey)
         if (nextIndex >= 0) setScaleIndex(nextIndex)
@@ -504,15 +518,15 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   const title = data.questionnaire?.name || '问卷测评'
   const completedUnitCount = contentUnits.filter((unit) => unit.completed).length
   const totalUnitCount = Math.max(contentUnits.length, data.totalItems, 1)
-  const submissionStatus = submitting
+  const submissionStatus = meta?.status === 'COMPLETED'
+    ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
+    : submitting
     ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
     : meta?.status === 'SUBMITTING'
       ? { state: 'reconciling' as const, message: '当前单元已有封存提交，正在等待服务器终态确认。' }
       : meta?.status === 'RETRY_PENDING'
         ? { state: 'pending' as const, message: meta.errorMessage || '提交状态尚未确认；答案保持锁定，后续只重放同一份封存内容。' }
-        : meta?.status === 'COMPLETED'
-          ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
-          : { state: 'ready' as const }
+        : { state: 'ready' as const }
   const recoveryState = requiresRestart || meta?.status === 'CONFLICT'
     ? { state: 'blocked' as const, message: '本地草稿已保留。当前测评版本已变化，需要重启后继续。' }
     : { state: 'none' as const }
@@ -556,6 +570,15 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       )}
     >
       {error ? <p role="alert" className="mb-4 text-sm text-red-700">{error}</p> : null}
+      {meta?.status === 'COMPLETED' ? (
+        <button type="button" disabled={submitting} className="btn-secondary mb-4 min-h-11" onClick={async () => {
+          setSubmitting(true)
+          setError(null)
+          try { await onReload() }
+          catch { setError('服务器已确认保存。后续页面暂时未能加载，可重新读取进度或报告；无需再次交卷。') }
+          finally { setSubmitting(false) }
+        }}>重新读取进度</button>
+      ) : null}
       {requiresRestart && onRestart ? (
         <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           <span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span>
@@ -574,7 +597,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             const item = currentSection.items[sectionIndex]
             if (!item) return currentSection.contextSection
               ? <p role="alert" className="text-amber-800">历史背景信息区段缺少字段。请联系教师发布修复版本后重新开始，已提交记录会保留。</p>
-              : <div className="space-y-3"><p className="text-gray-600">此历史区段没有字段。确认后会提交空区段记录并继续。</p><button type="button" className="btn-primary" disabled={submitting || requiresRestart} onClick={() => void submitSection()}>{submitting ? '正在提交…' : '确认并继续'}</button></div>
+              : <div className="space-y-3"><p className="text-gray-600">此历史区段没有字段。确认后会提交空区段记录并继续。</p><button type="button" className="btn-primary" disabled={submitting || requiresRestart || meta?.status === 'COMPLETED'} onClick={() => void submitSection()}>{submitting ? '正在提交…' : '确认并继续'}</button></div>
             const value = formValues[item.id]
             const options = parseOptions(item.options)
             const imageItems = assessmentOptionImageItems(options)
@@ -601,7 +624,8 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                     }}
                     options={options}
                     value={value}
-                    disabled={draftLocked || requiresRestart}
+                    answerDisabled={draftLocked || requiresRestart}
+                    submitDisabled={requiresRestart || meta?.status === 'COMPLETED'}
                     position={sectionIndex + 1}
                     total={currentSection.items.length}
                     onChange={(nextValue) => { if (nextValue === null || typeof nextValue === 'string' || Array.isArray(nextValue)) saveFormValue(item.id, nextValue) }}
@@ -650,7 +674,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                     item={item}
                     value={scaleValues[item.itemCode]}
                     answerDisabled={draftLocked}
-                    submitDisabled={requiresRestart}
+                    submitDisabled={requiresRestart || meta?.status === 'COMPLETED'}
                     position={scaleIndex + 1}
                     total={currentScale.definition.items.length}
                     onChange={(nextValue) => saveScaleValue(item.itemCode, nextValue)}

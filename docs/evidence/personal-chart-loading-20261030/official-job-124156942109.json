@@ -1,0 +1,132 @@
+{
+  "id": 124156942109,
+  "run_id": 41082809728,
+  "workflow_name": "CI",
+  "head_branch": "perf/dot-personal-report-chart-loading-20261030",
+  "run_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs/41082809728",
+  "run_attempt": 1,
+  "node_id": "CR_kwDOT8OOO88AAAAc6FSXHQ",
+  "head_sha": "b2f9d9755b425d981483acdcb48170874464133f",
+  "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/jobs/124156942109",
+  "html_url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/41082809728/job/124156942109",
+  "status": "completed",
+  "conclusion": "cancelled",
+  "created_at": "2026-10-30T15:41:43Z",
+  "started_at": "2026-10-30T15:41:45Z",
+  "completed_at": "2026-10-30T15:42:37Z",
+  "name": "frontend artifacts / release consumers early / build",
+  "steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 1,
+      "started_at": "2026-10-30T15:41:46Z",
+      "completed_at": "2026-10-30T15:41:47Z"
+    },
+    {
+      "name": "Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 2,
+      "started_at": "2026-10-30T15:41:47Z",
+      "completed_at": "2026-10-30T15:41:53Z"
+    },
+    {
+      "name": "Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 3,
+      "started_at": "2026-10-30T15:41:53Z",
+      "completed_at": "2026-10-30T15:41:57Z"
+    },
+    {
+      "name": "Run node \"$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs\" --frontend",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 4,
+      "started_at": "2026-10-30T15:41:57Z",
+      "completed_at": "2026-10-30T15:41:57Z"
+    },
+    {
+      "name": "Run npm ci",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 5,
+      "started_at": "2026-10-30T15:41:57Z",
+      "completed_at": "2026-10-30T15:42:09Z"
+    },
+    {
+      "name": "build production frontend",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 6,
+      "started_at": "2026-10-30T15:42:09Z",
+      "completed_at": "2026-10-30T15:42:32Z"
+    },
+    {
+      "name": "install pinned affected-entry browser tools",
+      "status": "completed",
+      "conclusion": "skipped",
+      "number": 7,
+      "started_at": "2026-10-30T15:42:32Z",
+      "completed_at": "2026-10-30T15:42:32Z"
+    },
+    {
+      "name": "rendered product entries and on-demand ScaleList paging",
+      "status": "completed",
+      "conclusion": "skipped",
+      "number": 8,
+      "started_at": "2026-10-30T15:42:32Z",
+      "completed_at": "2026-10-30T15:42:32Z"
+    },
+    {
+      "name": "Run actions/upload-artifact@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 9,
+      "started_at": "2026-10-30T15:42:32Z",
+      "completed_at": "2026-10-30T15:42:34Z"
+    },
+    {
+      "name": "clean Mac dependencies and outputs after artifact upload",
+      "status": "completed",
+      "conclusion": "skipped",
+      "number": 10,
+      "started_at": "2026-10-30T15:42:34Z",
+      "completed_at": "2026-10-30T15:42:34Z"
+    },
+    {
+      "name": "Post Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 19,
+      "started_at": "2026-10-30T15:42:34Z",
+      "completed_at": "2026-10-30T15:42:35Z"
+    },
+    {
+      "name": "Post Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 20,
+      "started_at": "2026-10-30T15:42:35Z",
+      "completed_at": "2026-10-30T15:42:35Z"
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 21,
+      "started_at": "2026-10-30T15:42:35Z",
+      "completed_at": "2026-10-30T15:42:35Z"
+    }
+  ],
+  "check_run_url": "https://api.github.com/repos/caohuibj/eduK12-new-version/check-runs/124156942109",
+  "labels": [
+    "ubuntu-24.04"
+  ],
+  "runner_id": 1000012042,
+  "runner_name": "GitHub Actions 1000012042",
+  "runner_group_id": 0,
+  "runner_group_name": "GitHub Actions"
+}
