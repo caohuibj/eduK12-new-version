@@ -24,6 +24,26 @@ import { executionEntries as task21 } from '../tasks/bart/package'
 import { executionEntries as task22 } from '../tasks/wordlist/package'
 import { executionEntries as task23 } from '../tasks/lexicaldecision/package'
 import { executionEntries as task24 } from '../tasks/emotionrecognition/package'
+import { executionEntries as task25 } from '../tasks/numberline/package'
+import { executionEntries as task26 } from '../tasks/arithverify/package'
+import { executionEntries as task27 } from '../tasks/sizecongruity/package'
+import { executionEntries as task28 } from '../tasks/delaydiscount/package'
+import { executionEntries as task29 } from '../tasks/gamblingdeck/package'
+import { executionEntries as task30 } from '../tasks/symbolmatch/package'
+import { executionEntries as task31 } from '../tasks/runningspan/package'
+import { executionEntries as task32 } from '../tasks/sentencecheck/package'
+import { executionEntries as task33 } from '../tasks/seqlearn/package'
+import { executionEntries as task34 } from '../tasks/timecopy/package'
+import { executionEntries as task35 } from '../tasks/letternumseries/package'
+import { executionEntries as task36 } from '../tasks/semanticfluency/package'
+import { executionEntries as task37 } from '../tasks/cancellation/package'
+import { executionEntries as task38 } from '../tasks/trustgame/package'
+import { executionEntries as task39 } from '../tasks/ufov/package'
+import { executionEntries as task40 } from '../tasks/pursuitrotor/package'
+import { executionEntries as task41 } from '../tasks/visualwm/package'
+import { executionEntries as task42 } from '../tasks/maze/package'
+import { executionEntries as task43 } from '../tasks/auditoryrt/package'
+import { executionEntries as task44 } from '../tasks/auditorynback/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -53,5 +73,25 @@ export const cognitiveExecutionEntries = [
   task22[0],
   task23[0],
   task24[0],
+  task25[0],
+  task26[0],
+  task27[0],
+  task28[0],
+  task29[0],
+  task30[0],
+  task31[0],
+  task32[0],
+  task33[0],
+  task34[0],
+  task35[0],
+  task36[0],
+  task37[0],
+  task38[0],
+  task39[0],
+  task40[0],
+  task41[0],
+  task42[0],
+  task43[0],
+  task44[0],
   task21[1],
 ]

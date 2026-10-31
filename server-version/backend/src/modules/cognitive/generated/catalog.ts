@@ -23,6 +23,26 @@ import { catalog as task20 } from '../tasks/bart/governance'
 import { catalog as task21 } from '../tasks/wordlist/governance'
 import { catalog as task22 } from '../tasks/lexicaldecision/governance'
 import { catalog as task23 } from '../tasks/emotionrecognition/governance'
+import { catalog as task24 } from '../tasks/numberline/governance'
+import { catalog as task25 } from '../tasks/arithverify/governance'
+import { catalog as task26 } from '../tasks/sizecongruity/governance'
+import { catalog as task27 } from '../tasks/delaydiscount/governance'
+import { catalog as task28 } from '../tasks/gamblingdeck/governance'
+import { catalog as task29 } from '../tasks/symbolmatch/governance'
+import { catalog as task30 } from '../tasks/runningspan/governance'
+import { catalog as task31 } from '../tasks/sentencecheck/governance'
+import { catalog as task32 } from '../tasks/seqlearn/governance'
+import { catalog as task33 } from '../tasks/timecopy/governance'
+import { catalog as task34 } from '../tasks/letternumseries/governance'
+import { catalog as task35 } from '../tasks/semanticfluency/governance'
+import { catalog as task36 } from '../tasks/cancellation/governance'
+import { catalog as task37 } from '../tasks/trustgame/governance'
+import { catalog as task38 } from '../tasks/ufov/governance'
+import { catalog as task39 } from '../tasks/pursuitrotor/governance'
+import { catalog as task40 } from '../tasks/visualwm/governance'
+import { catalog as task41 } from '../tasks/maze/governance'
+import { catalog as task42 } from '../tasks/auditoryrt/governance'
+import { catalog as task43 } from '../tasks/auditorynback/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -48,4 +68,24 @@ export const cognitiveCatalog = {
   'wordlist': task21,
   'lexicaldecision': task22,
   'emotionrecognition': task23,
+  'numberline': task24,
+  'arithverify': task25,
+  'sizecongruity': task26,
+  'delaydiscount': task27,
+  'gamblingdeck': task28,
+  'symbolmatch': task29,
+  'runningspan': task30,
+  'sentencecheck': task31,
+  'seqlearn': task32,
+  'timecopy': task33,
+  'letternumseries': task34,
+  'semanticfluency': task35,
+  'cancellation': task36,
+  'trustgame': task37,
+  'ufov': task38,
+  'pursuitrotor': task39,
+  'visualwm': task40,
+  'maze': task41,
+  'auditoryrt': task42,
+  'auditorynback': task43,
 }

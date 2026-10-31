@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "symbolmatch",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreSymbolmatchV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "symbolDigitMap": [
+            [
+              "●",
+              1
+            ],
+            [
+              "■",
+              2
+            ],
+            [
+              "▲",
+              3
+            ],
+            [
+              "◆",
+              4
+            ],
+            [
+              "★",
+              5
+            ]
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 250,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "symbol": "●",
+              "response": 1,
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "symbol": "★",
+              "response": 5,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "symbol": "■",
+              "response": 3,
+              "rtMs": 600,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "symbol": "▲",
+              "response": 3,
+              "rtMs": 350,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 75,
+        "metrics": {
+          "accuracy": 0.75,
+          "medianRtMs": 400,
+          "errorCount": 1,
+          "timeoutCount": 0,
+          "validRtCount": 3
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "symbolDigitMap": [
+            [
+              "●",
+              1
+            ],
+            [
+              "■",
+              2
+            ],
+            [
+              "▲",
+              3
+            ],
+            [
+              "◆",
+              4
+            ],
+            [
+              "★",
+              5
+            ]
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 250,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "symbolmatch v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "symbolDigitMap": [
+            [
+              "●",
+              1
+            ],
+            [
+              "■",
+              2
+            ],
+            [
+              "▲",
+              3
+            ],
+            [
+              "◆",
+              4
+            ],
+            [
+              "★",
+              5
+            ]
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 250,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "symbol": "●",
+              "response": 1,
+              "rtMs": 400,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "symbolmatch v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

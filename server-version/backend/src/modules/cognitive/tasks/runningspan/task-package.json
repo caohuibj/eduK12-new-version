@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "runningspan",
+  "order": 106,
+  "identities": [
+    {
+      "testType": "runningspan",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 106
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "runningspan",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/runningspan/runningspan.registry.ts",
+      "export": "runningspanRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      106
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/runningspan/__tests__/RunningspanTask.test.tsx",
+      "src/modules/cognitive/tasks/runningspan/__tests__/prng.test.ts"
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "numberline",
+  "order": 100,
+  "identities": [
+    {
+      "testType": "numberline",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 100
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "numberline",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/numberline/numberline.registry.ts",
+      "export": "numberlineRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      100
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/numberline/__tests__/NumberlineTask.test.tsx",
+      "src/modules/cognitive/tasks/numberline/__tests__/prng.test.ts"
+    ]
+  }
+}

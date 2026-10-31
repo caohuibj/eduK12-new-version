@@ -143,6 +143,106 @@
       "scoringVersion": "1.0.0"
     },
     {
+      "testType": "numberline",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "arithverify",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "sizecongruity",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "delaydiscount",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "gamblingdeck",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "symbolmatch",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "runningspan",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "sentencecheck",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "seqlearn",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "timecopy",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "letternumseries",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "semanticfluency",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "cancellation",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "trustgame",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "ufov",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "pursuitrotor",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "visualwm",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "maze",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.1"
+    },
+    {
+      "testType": "auditoryrt",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "auditorynback",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
       "testType": "bart",
       "engineVersion": "1.0.0",
       "scoringVersion": "1.1.0"
@@ -248,6 +348,86 @@
     {
       "testType": "emotionrecognition",
       "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "numberline",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "arithverify",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "sizecongruity",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "delaydiscount",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "gamblingdeck",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "symbolmatch",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "runningspan",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "sentencecheck",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "seqlearn",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "timecopy",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "letternumseries",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "semanticfluency",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "cancellation",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "trustgame",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "ufov",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "pursuitrotor",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "visualwm",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "maze",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "auditoryrt",
+      "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "auditorynback",
+      "engineVersion": "1.0.1"
     }
   ]
 }
