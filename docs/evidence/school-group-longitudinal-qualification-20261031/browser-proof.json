@@ -1,0 +1,25 @@
+{
+  "command": [
+    "SCHOOL_GROUP_BROWSER_MODE=longitudinal",
+    "node",
+    "server-version/e2e/school-group-report-browser.cjs",
+    "/workspace/longitudinal-checkpoints/school-longitudinal-browser-20261031"
+  ],
+  "exitCode": 0,
+  "layer": "actual Chromium + SchoolApp, synthetic authentication and HTTP responses",
+  "inputCapture": "retrospective immediately after execution; no original signed receipt claimed",
+  "browserSourceGitBlob": "2dd966863c709113e909a793a14b7b6191ef215d",
+  "backendTree": "ac8f35d74b18cff4166c8f71b5d4d2eda1a3ca10",
+  "frontendTree": "5eb7393e6c4c6c352b09d73605e109f54efdc538",
+  "originalParent": "4dc60a52f0da52e2c9131bf926717556b106898e",
+  "outputs": {
+    "docs/evidence/school-group-longitudinal-qualification-20261031/README.md": "406e356c03a79367486e11e60b193f89a437a7698eaa6c8d894ac7e71707bf8e",
+    "docs/evidence/school-group-longitudinal-qualification-20261031/browser.json": "bae30f7f4989265ab2a0902050e83c3098f3397883958830254921bd4f9813b5",
+    "docs/evidence/school-group-longitudinal-qualification-20261031/school-longitudinal-history-390.png": "24ffb20ccc158fb653b9eb450a4a1d08e620f2c600f1d59eb1645fea3c5d684d",
+    "docs/evidence/school-group-longitudinal-qualification-20261031/browser.log": "1102a470cf7459807adf3f7dfa26ec83a4a0f73471044872124780bb751bdc05"
+  },
+  "testsReplayed": [],
+  "finalsReplayed": 0,
+  "formalCI": false,
+  "deployed": false
+}

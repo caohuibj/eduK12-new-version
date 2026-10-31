@@ -86,6 +86,7 @@ export const buildReportingArtifact = (input: {
   const overallPresent = input.cohort.eligibleN >= definition.minimumCohortN && input.batch.resolved.length >= contributorFloor
   const metrics: ReportingSafeProjectionV1['metrics'] = {}
   const metricMetadata: Record<string, { unit: string | null; minimumN: number }> = {}
+  const metricContributorExecutionIds:Record<string,string[]>={}
   for (const rule of definition.metricRules) {
     if (input.leaf) {
       const units = new Set(input.batch.resolved.flatMap(result => result.metrics
@@ -94,6 +95,7 @@ export const buildReportingArtifact = (input: {
       metricMetadata[rule.metricId] = { unit: [...units][0] ?? null, minimumN: Math.max(rule.minimumMetricN, resourceFloor) }
     }
     const values: number[] = []
+    const contributingExecutionIds:string[]=[]
     for (const result of input.batch.resolved) {
       const candidates = result.metrics.filter((metric) => metric.key === rule.sourceMetricKey)
       if (candidates.length > 1) reportingFail('AMBIGUOUS_OBSERVATION', `metric ${rule.sourceMetricKey} is ambiguous`, 409)
@@ -103,7 +105,7 @@ export const buildReportingArtifact = (input: {
         if (!metric.metricQuality || !rule.acceptedMetricQuality.includes(metric.metricQuality)) continue
       }
       const numeric = finiteReportingNumber(metric.value)
-      if (numeric !== null) values.push(numeric)
+      if (numeric !== null){values.push(numeric);contributingExecutionIds.push(result.executionId)}
     }
     const validN = values.length
     const missingN = input.cohort.eligibleN - validN
@@ -112,6 +114,7 @@ export const buildReportingArtifact = (input: {
       metrics[rule.metricId] = { state: 'suppressed' }
       continue
     }
+    if(input.leaf&&validN!==input.batch.resolved.length)metricContributorExecutionIds[rule.metricId]=contributingExecutionIds
     metrics[rule.metricId] = {
       state: 'present', validN, missingN,
       aggregations: reportingAggregations({ values, aggregations: rule.aggregations, distributionCellFloor: metricFloor }),
@@ -144,6 +147,7 @@ export const buildReportingArtifact = (input: {
   })
   const payload: ReportingGroupArtifactPayload = {
     ...(input.leaf ? { schemaVersion: 2 as const, source: { runId: input.cohort.sourceRunId, trackId: input.cohort.sourceTrackId, leaf: input.leaf }, metricMetadata,
+      ...(Object.keys(metricContributorExecutionIds).length?{metricContributorExecutionIds}:{}),
       descriptionVersion: 'group-descriptive-v1' as const, ...(input.presentation ? { presentation: input.presentation } : {}) }
       : { schemaVersion: 1 as const, source: { runId: input.cohort.sourceRunId, trackId: input.cohort.sourceTrackId } }),
     artifactId: input.artifactId,

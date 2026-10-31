@@ -25,6 +25,8 @@ import {readEducationLibrarySourceUses} from './library-source.catalog'
 import {readLockedEducationLibraryUses,type LockedEducationLibraryUses} from './library-source.use'
 import {assertAssessmentAssetReferencesReady} from '../assessment-media/assessment-asset'
 import {selectedSourceBindingsFromBlocks} from './selected-source-binding'
+import {parseSchoolPrivateGroupSelection} from './school-private-group-selection'
+import {schoolPrivateScaleGroupChoice} from './school-private-group-source'
 
 export type CompositionLeaf={provider:'LIBRARY_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;library:EducationLibraryLeaf}|{provider:'STANDARD_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;standard:EducationStandardLeaf}|({provider:'PRIVATE_VERSION';version:EducationPrivateToolVersion}&(
  {kind:'SCALE';definition:ScaleDefinitionV2}|{kind:'FORM';form:ReturnType<typeof compilePrivateFormRuntime>}))|
@@ -157,6 +159,14 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
   return n+(leaf.kind!=='FORM'?1:leaf.form.sections.reduce((sum,page)=>sum+page.items.length,0))
  },0)
  if(count>1000)privateToolFail('PRIVATE_COMPOSITION_RUNTIME_TOO_LARGE',400)
+ if(definition.groupReporting){
+  const sources=definition.blocks.flatMap(block=>{
+   const leaf=leaves.get(compositionLeafKey(block.source))!
+   const choice=leaf.provider==='PRIVATE_VERSION'&&leaf.kind==='SCALE'?schoolPrivateScaleGroupChoice(leaf.version,leaf.definition):null
+   return choice?[{...choice,blockId:block.blockId}]:[]
+  })
+  parseSchoolPrivateGroupSelection(definition.groupReporting,{entry:c.entry,administration:definition.administration,sources})
+ }
  const deadlines=[...[...publicUse.values()].map(use=>use.expiresAt),...[...libraryUses.values()].map(use=>use.expiresAt).filter((date):date is Date=>date instanceof Date)]
  return {definition,leaves,...(deadlines.length?{publicUseExpiresAt:new Date(Math.min(...deadlines.map(date=>date.getTime())))}:{})}
 }

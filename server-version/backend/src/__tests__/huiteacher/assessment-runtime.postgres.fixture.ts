@@ -13,7 +13,7 @@ import {readEducationAssessmentDeliveryIdentity} from '../../modules/education-t
 import {issueAdminContentRoot} from '../../modules/measurement-content/admin-authority.service'
 import * as producer from '../../modules/education-tools/assessment-resource.service'
 import {resolveCompositeSituationalItems} from '../../modules/composite/composite.service'
-import {ensureStaticSjtRegistryMapping,publishStaticSjtMeasurement} from '../../modules/situational/static-measurement-release'
+import {ensureStaticSjtRegistryMapping,publishStaticSjtMeasurement,readStaticSjtMeasurementForStart} from '../../modules/situational/static-measurement-release'
 import {SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE as sjt} from '../../modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1'
 import {createHuiteacherTarget,createHuiteacherEvent,createHuiteacherEventRunDraft,transitionHuiteacherEvent} from '../../modules/huiteacher/evaluation.service'
 import {addTeacherRunTrack,publishTeacherRun} from '../../modules/huiteacher/run.service'
@@ -59,12 +59,15 @@ export async function teacherRuntimePgFixture(owner:PrismaClient,family:'BUNDLE'
  return {otherExecutionId:otherExecution?.id,respondent,other,manager,issuer,reviewer,organizationId:org.id,eventId:event.id,runId:run.runId,executionId:execution.id,...delivery}
 }
 
-export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'TEACHER'|'SCHOOL',org:{id:string},issuer:User,reviewer:User,family:'BUNDLE'|'COGNITIVE'|'SITUATIONAL',consentRequired=false,withReports=false,feedbackPolicy:TrainingFeedbackPolicy={schemaVersion:1,mode:'IMMEDIATE'},formOnly=false,completionOnly=false){
- const resourceId=randomUUID(),resourceKey=`education-assessment:${product}:${org.id}:${resourceId}`
- const source=await owner.compositeAssessment.create({data:{code:'pr363-source-'+randomUUID(),name:'Synthetic actual source',createdBy:issuer.id,
+export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'TEACHER'|'SCHOOL',org:{id:string},issuer:User,reviewer:User,family:'BUNDLE'|'COGNITIVE'|'SITUATIONAL',consentRequired=false,withReports=false,feedbackPolicy:TrainingFeedbackPolicy={schemaVersion:1,mode:'IMMEDIATE'},formOnly=false,completionOnly=false,groupMode=false,retainedSourceId?:string){
+ const retained=retainedSourceId?(await owner.assessmentManagementEvent.findFirst({where:{actorId:issuer.id,action:'EDUCATION_ASSESSMENT_PREPARED',metadata:{path:['sourceCompositeId'],equals:retainedSourceId}},orderBy:{createdAt:'desc'}}))?.metadata as any:undefined
+ const resourceId=retained?.resourceId??randomUUID(),resourceKey=`education-assessment:${product}:${org.id}:${resourceId}`
+ const source=retainedSourceId?await owner.compositeAssessment.findUniqueOrThrow({where:{id:retainedSourceId}}):await owner.compositeAssessment.create({data:{code:'pr363-source-'+randomUUID(),name:'Synthetic actual source',createdBy:issuer.id,
   status:'PUBLISHED',publishedAt:new Date(),publicEnabled:false,copyable:false}})
+ if(source.createdBy!==issuer.id||source.status!=='PUBLISHED')throw Error('Retained synthetic source changed')
  const runtime=source
- if(family!=='SITUATIONAL'&&!formOnly){
+ if(!retained){
+ if(family!=='SITUATIONAL'&&!formOnly&&!await owner.compositeAssessmentItem.count({where:{compositeAssessmentId:runtime.id,type:'COGNITIVE'}})){
   const config=await owner.cognitiveTestConfig.create({data:{testType:'reaction',configVersion:'pr363-'+randomUUID(),name:'Synthetic reaction runtime parameters',status:'PUBLISHED',
    engineVersion:'1.0.0',scoringVersion:'1.1.0',accessPolicy:'OPEN',publishedAt:new Date(),config:{totalTrials:5,foreperiodMinMs:700,foreperiodMaxMs:1500,timeoutMs:2000,readyDurationMs:1000,
     report:{reportVersion:'1.1.0',referenceMode:'none'}}}})
@@ -77,12 +80,13 @@ export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'T
  if(family!=='COGNITIVE'&&!formOnly){
   await owner.$transaction(async tx=>{
    const mapping=await ensureStaticSjtRegistryMapping(tx,{instrumentKey:sjt.key,instrumentVersion:sjt.instrumentVersion})
-   await publishStaticSjtMeasurement(tx,{actorId:reviewer.id,mappingId:mapping.id,deployment:{locale:'zh-CN',territory:'synthetic-disposable-test'}})
+   if(groupMode&&mapping.measurement_release_id)await readStaticSjtMeasurementForStart(tx,{instrumentKey:sjt.key,instrumentVersion:sjt.instrumentVersion},'PUBLISH')
+   else await publishStaticSjtMeasurement(tx,{actorId:reviewer.id,mappingId:mapping.id,deployment:{locale:'zh-CN',territory:'synthetic-disposable-test'}})
   })
   await owner.compositeAssessmentItem.create({data:{compositeAssessmentId:runtime.id,type:'SITUATIONAL',position:family==='BUNDLE'?1:0,required:true,
    situationalInstrumentKey:sjt.key,situationalInstrumentVersion:sjt.instrumentVersion}})
  }
- if(family==='BUNDLE'){
+ if(family==='BUNDLE'&&!groupMode){
   const section=await owner.compositeFormSection.create({data:{compositeAssessmentId:runtime.id,title:'Synthetic optional note',position:2}})
   await owner.compositeAssessmentItem.create({data:{compositeAssessmentId:runtime.id,type:'FORM',position:2,required:true,formSectionId:section.id,formSectionPosition:0,
    formType:'SHORT_TEXT',formLabel:'Synthetic note',formDefinition:formQuestionSchema.parse({itemKey:'synthetic_note',type:'SHORT_TEXT',prompt:'Synthetic note',required:true,options:[],rows:[],maxLength:100})}})
@@ -90,16 +94,18 @@ export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'T
  const loaded=await owner.compositeAssessment.findUniqueOrThrow({where:{id:runtime.id},include:{items:{include:{scale:true,cognitiveAssignment:{include:{config:true}}}},formSections:{include:{items:true}}}})
  const prepared=await owner.$transaction(async tx=>prepareTrainingContentSnapshot(tx,loaded,await resolveCompositeSituationalItems(loaded.items,tx,true)))
  await owner.compositeAssessment.update({where:{id:source.id},data:{trainingContentSnapshot:prepared.snapshot,trainingContentSnapshotHash:prepared.snapshotHash}})
+ }
  const proof={tokenVersion:0,adminSessionId:'synthetic-strong-admin-proof',adminVerifiedAt:Date.now()/1000}
- const resourceIds=[source.id,...prepared.snapshot.units.map(unit=>unit.measurement.releaseId)]
- const distribution=await issueAdminContentRoot(issuer.id,proof,{requestId:randomUUID(),expectedVersion:0,
+ const frozenSource=await owner.compositeAssessment.findUniqueOrThrow({where:{id:source.id}})
+ const resourceIds=[source.id,...(frozenSource.trainingContentSnapshot as any).units.map((unit:any)=>unit.measurement.releaseId)]
+ const distribution=retained?{grantId:retained.distribution.grants[0].grantId}:await issueAdminContentRoot(issuer.id,proof,{requestId:randomUUID(),expectedVersion:0,
   reason:'Explicit target redistribution of synthetic disposable test content only',grant:{subjectId:issuer.id,
    scope:{product,scopeKind:'ORGANIZATION',scopeId:org.id,resourceKind:'material',resourceKeys:resourceIds},
    capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,
    validFrom:new Date(Date.now()-60_000).toISOString(),expiresAt:new Date(Date.now()+3600_000).toISOString()}})
  const context=(actor:typeof issuer)=>({product,organizationId:org.id,principal:{userId:actor.id,username:actor.username,
   role:'ADMIN' as const,accountDomain:actor.accountDomain,platformRole:'SYSTEM_ADMIN' as const,mustChangePassword:false,...proof}})
- const licenses=resourceIds.map(resourceId=>({resourceId,grantId:distribution.grantId}))
+ const licenses:Array<{resourceId:string;grantId:string}>=retained?retained.distribution.grants.map(({resourceId,grantId}:any)=>({resourceId,grantId})):resourceIds.map(resourceId=>({resourceId,grantId:distribution.grantId}))
  const preparation=await producer.prepareEducationAssessment(context(issuer),{resourceId,sourceCompositeId:source.id,title:'Synthetic '+family+' Teacher delivery',family,licenses})
  const reports:Array<{itemId:string;releaseId:string}>=[],metricKeys:string[]=[]
  if(withReports)for(const unit of preparation.units){
@@ -116,14 +122,27 @@ export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'T
     delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60_000).toISOString(),expiresAt:new Date(Date.now()+3600_000).toISOString()}})
   licenses.push({resourceId:report.releaseId,grantId:grant.grantId});reports.push({itemId:unit.itemId,releaseId:report.releaseId})
  }
- const disclosure={...testDisclosure(),...(consentRequired?{policyKey:'observer_private_respondent_v1'}:{})}
+ let disclosure={...testDisclosure(),...(consentRequired?{policyKey:'observer_private_respondent_v1'}:{})}
  if(completionOnly)disclosure.audiences.RESPONDENT={mode:'COMPLETION_ONLY',metricKeys:[],longitudinalMetricKeys:[]}
  if(withReports)disclosure.audiences.RESPONDENT={mode:'INDIVIDUAL_SUMMARY',metricKeys:[...new Set(metricKeys)],longitudinalMetricKeys:[]}
+ const groupUnits:Array<{itemId:string;disclosure:ReturnType<typeof testDisclosure>}>=[],groupParentKeys:string[]=[]
+ if(groupMode){
+  for(const unit of preparation.units){
+   const measurement=await owner.$transaction(tx=>getContentRelease(tx,unit.measurement.releaseId))
+   if(!measurement||measurement.layer!=='MEASUREMENT')throw Error('Actual native C required')
+   const keys=measurement.content.metrics.map(m=>m.metricKey),leaf=testDisclosure(10)
+   groupParentKeys.push(...keys);leaf.policyKey='EDUCATION_SELF_GROUP_V2'
+   leaf.audiences.ORGANIZATION={mode:'AGGREGATE_ONLY',metricKeys:keys.slice(0,1),longitudinalMetricKeys:[]}
+   groupUnits.push({itemId:unit.itemId,disclosure:leaf})
+  }
+  disclosure={...testDisclosure(10),policyKey:'EDUCATION_SELF_GROUP_V2'}
+  disclosure.audiences.ORGANIZATION={mode:'AGGREGATE_ONLY',metricKeys:[...new Set(groupParentKeys)],longitudinalMetricKeys:[]}
+ }
  const registered=await producer.registerEducationAssessment(context(issuer),resourceId,{expectedPreparationHash:preparation.preparationHash,
-  disclosure,references:{schemaVersion:1,units:[]},reports,licenses,...(feedbackPolicy?{feedbackPolicy}:{})})
+  disclosure,references:{schemaVersion:1,units:[]},reports,licenses,...(feedbackPolicy?{feedbackPolicy}:{}),...(groupMode?{analysisMode:'COHORT_AGGREGATE',groupUnits}:{})})
  const reviewed=await producer.transitionEducationAssessment(context(reviewer),resourceId,'REVIEW',{expectedEntryHash:registered.entryHash,reason:'Independent synthetic runtime fixture review'})
  await producer.transitionEducationAssessment(context(reviewer),resourceId,'PUBLISH',{expectedEntryHash:reviewed.entryHash,reason:'Publish synthetic runtime fixture only'})
- const identity=await owner.$transaction(tx=>readEducationAssessmentDeliveryIdentity(tx,{resourceKey,version:'1.0.0',purpose:'NEW_USE'}))
+ const identity=await owner.$transaction(tx=>readEducationAssessmentDeliveryIdentity(tx,{resourceKey,version:groupMode?'2.0.0':'1.0.0',purpose:'NEW_USE'}))
  const entry=identity.entry,origin=identity.origin
  return {resourceId,resourceKey,entry,origin,distribution,proof,runtimeId:preparation.runtimeCompositeId,reports}
 }

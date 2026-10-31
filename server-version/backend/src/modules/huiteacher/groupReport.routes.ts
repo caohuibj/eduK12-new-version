@@ -51,7 +51,8 @@ const versionKeys=z.object({organizationId:uuid,eventId:uuid,formId:uuid}).stric
 const versionRoute=(action:'index'|'read'|'generate')=>asyncHandler(async(req,res)=>{
  try{
   const scope={...versionKeys.parse({organizationId:req.params.organizationId,eventId:req.params.eventId,formId:req.params.formId}),actorUserId:req.user!.userId}
-  const result=action==='index'?await listTeacherFormGroupVersions(scope):action==='read'
+  const paging=action==='index'?z.object({beforeAt:z.string().datetime({offset:true}).optional(),beforeId:uuid.optional()}).strict().refine(v=>Boolean(v.beforeAt)===Boolean(v.beforeId)).parse(req.query):null
+  const result=action==='index'?await listTeacherFormGroupVersions(scope,paging!.beforeAt?{releasedAt:paging!.beforeAt,versionId:paging!.beforeId!}:undefined):action==='read'
    ?await readTeacherFormGroupVersion({...scope,versionId:uuid.parse(req.params.versionId)})
    :await generateTeacherFormGroupVersion({...scope,...z.object({selection:educationGroupSelectionSchema.default({kind:'ALL'})}).strict().parse(req.body)})
   return success(res,result)
@@ -77,7 +78,8 @@ const numericBase='/organizations/:organizationId/evaluation-events/:eventId/num
 const numeric=(action:'index'|'read'|'generate')=>asyncHandler(async(req,res)=>{
  try{
   const scope={organizationId:uuid.parse(req.params.organizationId),eventId:uuid.parse(req.params.eventId),actorUserId:req.user!.userId}
-  const result=action==='index'?await listTeacherNumericGroups(scope):action==='read'
+  const paging=action==='index'?z.object({configure:z.enum(['true','false']).default('false'),beforeAt:z.string().datetime({offset:true}).optional(),beforeId:uuid.optional()}).strict().refine(v=>Boolean(v.beforeAt)===Boolean(v.beforeId)).parse(req.query):null
+  const result=action==='index'?await listTeacherNumericGroups(scope,{configure:paging!.configure==='true',before:paging!.beforeAt?{generatedAt:paging!.beforeAt,artifactId:paging!.beforeId!}:undefined}):action==='read'
    ?await readTeacherNumericGroup({...scope,artifactId:uuid.parse(req.params.artifactId)})
    :await generateTeacherNumericGroup({...scope,...z.object({trackId:uuid,leaf:reportingLeafSourceSchema,specId:uuid,selection:educationGroupSelectionSchema.default({kind:'ALL'})}).strict().parse(req.body)})
   return success(res,result)

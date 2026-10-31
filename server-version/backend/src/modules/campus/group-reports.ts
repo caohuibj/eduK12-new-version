@@ -5,6 +5,7 @@ import { resolveOrganizationAccessContext, contextHasCapability } from '../organ
 import { listOrganizationReportingSources, listPublishedReportingSpecs } from '../reporting/discovery'
 import { getPublishedReportingSpec } from '../reporting/spec'
 import { readReportingCohort } from '../reporting/cohort'
+import {loadSchoolPrivateGroupDisclosure,schoolPrivateGroupLeafDisclosure} from '../education-tools/school-private-group-leaf'
 import { readReportingArtifactRecord } from '../reporting/artifact'
 import { listAuthoritativeRunLeafSources } from '../reporting/resultSource'
 import { educationGroupSelector, educationGroupPresentation, listEducationGroupSelections, type EducationGroupSelection } from '../reporting/education-group-selection'
@@ -170,7 +171,9 @@ export async function assertCampusLeafGroupDifferencing(input:{
   organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN?:number
 }):Promise<void>{
   const current=input.cohort.members.map(member=>member.userId)
-  const leafContract=await reportingLeafDisclosureContract(input.leaf)
+  const schoolSource=input.leaf.instrumentKey.startsWith('education-private-scale:')?await prisma.$transaction(tx=>loadSchoolPrivateGroupDisclosure(tx,{
+    organizationId:input.organizationId,runId:input.cohort.sourceRunId,trackId:input.cohort.sourceTrackId})):null
+  const leafContract=schoolSource?schoolPrivateGroupLeafDisclosure(schoolSource,input.leaf).contract:await reportingLeafDisclosureContract(input.leaf)
   const minimumN=Math.max(input.minimumN??CAMPUS_GROUP_MIN_N,leafContract.minimumRespondents??0)
   const rows=await prisma.$queryRaw<Array<{priorN:number;shared:number;minimumN:number}>>(Prisma.sql`
     WITH current_members AS (SELECT value AS user_id FROM jsonb_array_elements_text(${JSON.stringify(current)}::jsonb)),
@@ -316,6 +319,13 @@ async function reviewedSpec(specId:string){
   return spec
 }
 
+export async function listCampusGroupReportSources(actor:AuthenticatedPrincipal,organizationId:string,page=1){
+  const principal=await requireCampusGroupManager(actor,organizationId)
+  const result=await listOrganizationReportingSources({principal,organizationId,page,pageSize:100,analysisKind:'GROUP'})
+  return {sources:result.list.map(s=>({runId:s.runId,trackId:s.trackId,name:s.runName,
+    resource:{family:s.resource.family,key:s.resource.key,version:s.resource.version}})),nextSourcePage:result.nextPage}
+}
+
 export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,organizationId:string){
   const principal=await requireCampusGroupManager(actor,organizationId)
   const [specs,sources,artifacts]=await Promise.all([
@@ -342,7 +352,7 @@ export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,
   })),sources:sourceList.map(s=>({
     runId:s.runId,trackId:s.trackId,name:s.runName,
     resource:{family:s.resource.family,key:s.resource.key,version:s.resource.version},
-  })),artifacts,truncated:!!sources.truncated||specs.total>50}
+  })),artifacts,nextSourcePage:sources.nextPage,truncated:!!sources.truncated||specs.total>50}
 }
 
 export async function listCampusGroupReportTools(input:{actor:AuthenticatedPrincipal;organizationId:string;runId:string;trackId:string}){

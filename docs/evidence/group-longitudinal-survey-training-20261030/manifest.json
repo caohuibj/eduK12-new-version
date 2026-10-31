@@ -1,0 +1,134 @@
+{
+  "scope": "Survey/Training first group longitudinal slice; independent published-wave populations",
+  "dependencyOrder": [
+    "PR421 Cognitive quota correction",
+    "this group-longitudinal candidate"
+  ],
+  "mainIntegrated": "9f135a2ce45f0223d39b48ea8797310a81a63970",
+  "quotaParent": "5a547d0c32ea7908f9708827d335af38ab637b27",
+  "localIntegrationParent": "1a525a59bd3f3f59e97d095e199579336155c073",
+  "sourceInputHashesCapturedAfterExecution": {
+    "server-version/backend/src/__tests__/survey/group-report.test.ts": "513f79acd7a67c6db23decd2c4fd9177f7d11f1c9228f971547640136e82795f",
+    "server-version/backend/src/controllers/trainingAnalysisController.ts": "f02a522a10e40666a88b5503d5614628a3328dc3c7f1a735f377e28547d1d599",
+    "server-version/backend/src/modules/reporting/task-artifact.ts": "d1418506b97df4784c8f8bb0d577462095488c69222b220396b845c9b5738a35",
+    "server-version/backend/src/modules/survey/analytics.routes.ts": "4f0cf59521f372c51d18847ae300c2cedf9bc99b0ddaf441aa91a13cc184a631",
+    "server-version/backend/src/modules/survey/analytics.source.ts": "7dd9635489b20cdf413841bca2eb4794fe5ac0166c40b3be0b78ad531336cc1d",
+    "server-version/backend/src/modules/survey/group-report.service.ts": "bbaccaf669c655a03a52e27ecbf97c624ebaa21f0897d9280efee76c2d6a61f7",
+    "server-version/backend/src/modules/training-analysis/group-report.service.ts": "100e6cbb1698699ab7ada5a8a54021daa4d7d4a404a063b7da54993f4e4e039b",
+    "server-version/backend/src/routes/courses.ts": "913d7ea7cfe510cb54f2a5b639f74fd7219831acf11f1b725b8f8b5ac2e13894",
+    "server-version/frontend/src/survey/SurveyGroupReports.tsx": "82f48eaa03c4b05ebb63ef2479b16959c40e5463b3a1c60c836d9448ddefcff2",
+    "server-version/frontend/src/training/TrainingGroupReports.tsx": "72a6465ede095092096a00470539ad836960a8ef09f2760ec956135d2e1e0669",
+    "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql": "b1f5159aeb583008d26ae86e3647ef8d6731fe6bc5bbe205c6171ddb3ae218f9",
+    "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts": "409531af6d909f9e73726b316603000b0cdd7654586972fd247f22cad48da345",
+    "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts": "3802f09fa9703a2351544b047349985638be1d2cab0ebf974ee0d240de20bab4",
+    "server-version/backend/src/modules/reporting/group-longitudinal.ts": "85de2d13ccdd53c671710bb963a8637eedf1f5d175087fc4b5637a7ec0464139",
+    "server-version/backend/src/modules/survey/group-longitudinal.service.ts": "4be6e23b0d180c56ed72cc0699fd5a4e039b88cf0037bfc743c672910fc0f8d3",
+    "server-version/backend/src/modules/training-analysis/group-longitudinal.service.ts": "dad78df13e948e7fed3770e7f6033eacb9156d128ee244d0e6f47219b91a41e8",
+    "server-version/e2e/group-longitudinal-visual.cjs": "68b43dc4a1569c80fe9cb4b7f12c754da4d0fd9d2f13bc96d9bfe52003a9e1a8",
+    "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.test.tsx": "a6cbe81f0bd727d34dd13f0a92a247f143e3c4cd8ac3ca84f889e8c854a44252",
+    "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx": "d7f608abcfb869c001ca9f21f3b45cfdd6e907709d67c873e3b2106c823809a5",
+    "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx": "d43a5e2e8a4010c3beec5d184f8ddaa13f01bb31684cf5b8f9c3bfe1d248c14f",
+    "server-version/frontend/src/modules/reporting/group-longitudinal-ui.css": "b69e6987982f1e9c6a659a1ec10d90ce53ec6727c077dd9d15d7a6d8ada514ad"
+  },
+  "checks": {
+    "backendTypes": {
+      "command": "tsc --noEmit --pretty false",
+      "exitCode": 0
+    },
+    "frontendAppTypes": {
+      "command": "tsc -p tsconfig.app.json --noEmit --pretty false",
+      "exitCode": 0
+    },
+    "frontendCognitiveTypes": {
+      "command": "tsc -p tsconfig.cognitive.json --noEmit --pretty false",
+      "exitCode": 0
+    },
+    "frontendLint": {
+      "scope": "five changed TSX files; presentation import/class continuation",
+      "exitCode": 0
+    }
+  },
+  "invocations": [
+    {
+      "file": "contracts-first.json",
+      "success": false,
+      "passed": 15,
+      "failed": 3,
+      "skipped": 0
+    },
+    {
+      "file": "contracts-continuation.json",
+      "success": false,
+      "passed": 2,
+      "failed": 1,
+      "skipped": 8
+    },
+    {
+      "file": "survey-contract-continuation.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 1
+    },
+    {
+      "file": "survey-published-scope.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 2
+    },
+    {
+      "file": "survey-current-leaf.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 9
+    },
+    {
+      "file": "frontend-panel-first.json",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "distinctPassedCases": 22,
+  "caseOriginalReport": {
+    "frozen leaf group longitudinal assembly reuses disclosed wave statistics isolates same-named leaf totals and keeps raw comparison when only P/R provenance changes": "contracts-first.json",
+    "frozen leaf group longitudinal assembly reuses disclosed wave statistics preserves null and zero, signed baseline change, and breaks adjacency through missing rounds": "contracts-first.json",
+    "frozen leaf group longitudinal assembly reuses disclosed wave statistics retains disclosure suppression and never turns hidden counts or means into zero": "contracts-first.json",
+    "frozen leaf group longitudinal assembly reuses disclosed wave statistics requires actual Cognitive protocol and consistent units; category codes stay categorical": "contracts-first.json",
+    "Training policy over common group math keeps the existing five-person floor, hides small complements and choice cells in the public projection": "contracts-first.json",
+    "Training policy over common group math selects latest completed parents independently of an unfinished redo and does not link anonymous codes": "contracts-first.json",
+    "Training policy over common group math expands matrix rows using frozen keys and excludes free text": "contracts-first.json",
+    "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated": "contracts-first.json",
+    "Survey task group artifacts selects cognitive before metric extraction, so repeated total keys remain isolated": "contracts-first.json",
+    "Survey task group artifacts selects sjt before metric extraction, so repeated total keys remain isolated": "contracts-first.json",
+    "Survey task group artifacts adapts only real Form numbers and choice frequencies; excludes text and keeps missing null": "contracts-first.json",
+    "Survey task group artifacts generates one frozen snapshot and does not request raw cognitive trials": "contracts-first.json",
+    "Survey task group artifacts rejects changed sample eligibility and cross-project authority before disclosing stored aggregate": "contracts-first.json",
+    "Survey task group artifacts rejects incompatible measurement identities instead of pooling them": "contracts-first.json",
+    "Survey task group artifacts pages a wide Form within 25k projected rows, skips text before projection and counts all 6000 FINALs beyond 30 pages": "contracts-first.json",
+    "published plan group longitudinal generation and immutable read, real HTTP/PG Training uses each published wave population, preserves the version and rejects other managers/participants": "contracts-continuation.json",
+    "Survey task group artifacts catalog and saved reads never load/decrypt participant sources; read checks original pointers and authority": "contracts-continuation.json",
+    "published plan group longitudinal generation and immutable read, real HTTP/PG Survey reuses frozen leaf facts, stores separate versions, and enforces current manager/inclusion scope": "survey-contract-continuation.json",
+    "published plan group longitudinal generation and immutable read, real HTTP/PG excludes a frozen but unopened Survey draft wave from the published plan catalog": "survey-published-scope.json",
+    "Survey task group artifacts resolves the current leaf by stable metric ID and retains a null newest parent without reviving its older value": "survey-current-leaf.json",
+    "group longitudinal manager panel scope generates explicitly and clears a stored report on a failed permission read": "frontend-panel-first.json",
+    "group longitudinal manager panel scope ignores a late response after switching to another source": "frontend-panel-first.json"
+  },
+  "database": {
+    "isolated": "loopback eduk12_test",
+    "baseStoreMigration": "20261030160000_reporting_task_artifacts",
+    "newMigration": "20261030200000_group_longitudinal_artifact_kind",
+    "firstApplyFailure": "reporting_task_artifacts missing in local test DB; then applied base store and new migration atomically",
+    "formalDumpRestoreExecuted": false
+  },
+  "browser": {
+    "initial": "real Survey manager component + HTTP/PG, synthetic two-wave Scale, explicit generate/read and SVG",
+    "presentationContinuation": "retained synthetic aggregate only; 390px page stays390, table scrolls; no backend/FINAL replay"
+  },
+  "productionAccessed": false,
+  "formalCIClaimed": false,
+  "signature": "none; developer local evidence for independent review"
+}

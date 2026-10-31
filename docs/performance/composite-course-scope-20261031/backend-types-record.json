@@ -1,0 +1,18 @@
+{
+  "kind": "RETROSPECTIVE_DESCRIPTOR_OF_RETAINED_LOCAL_EXIT",
+  "component": "backend",
+  "componentTree": "7ec84d552addd9e54ac5a593f2859757893c42ac",
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "originalShellCommand": "./node_modules/.bin/tsc --noEmit",
+  "exitCode": 0,
+  "node": "v24.22.1",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceAssociationBasis": "Descriptor prepared after execution from the retained shell exit file/log and unchanged backend tracked tree. Not a contemporaneous signed receipt. The shell command used the local tsc executable symlink, normalized to its node entrypoint.",
+  "originalExitFile": "docs/performance/composite-course-scope-20261031/backend-types.exit",
+  "originalExitSHA256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "componentTreeAssociation": "Backend production and test bytes did not change between compiler invocation and reviewed product ffe2c30; backend compiler excludes tests."
+}

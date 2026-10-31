@@ -1,0 +1,80 @@
+✔ runtime refresh preserves source, tags and build arguments without mutating Compose input (2.809514ms)
+✔ missing refresh, whole-image cache bypass, wrong tags or publishing cannot pass resolved validation (5.849215ms)
+✔ UI route cannot secretly build backend; full route cannot omit a production target (0.524471ms)
+✔ Debian mirror applies to both API and worker and cannot disappear from the resolved build (0.639433ms)
+✔ CI image script forces only local Docker export for printed and executed builds (0.727496ms)
+✔ quota backend-only images retain API/worker runtime scanning without a frontend target (0.791653ms)
+✔ Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities (6.300264ms)
+✔ onboarding scope binds exact source, modes, reviewed controls and the supported PR only (1.999803ms)
+✔ original reports retain filtered rows and cannot substitute empty, failed or altered case outcomes (1.80449ms)
+✔ stable gate still requires admission and SAST success and rejects Draft or missing outcomes (3.535068ms)
+✔ report planner observation admits both actual product checks without inventing a speed threshold (0.840356ms)
+✔ shared planner branch reuses bounded admission with a distinct exact source namespace (1.570207ms)
+✔ partial original failure preserves failed rows and requires a passed continuation (0.640105ms)
+✔ component type receipts bind the selected frontend tree and exact compiler command (0.39175ms)
+✔ first-feedback scope permits only reviewed mixed components and scans both source families (1.643286ms)
+✔ PR374 binds its own mixed source and keeps browser qualification inside the required admission job (1.806643ms)
+✔ PR374 reviewed HTTP source refuses an unreviewed original index (1.248802ms)
+✔ observer follow-up admits only its HTTP test, scoped CSS and evidence; browser qualification stays required (3.095885ms)
+✔ observer display retry keeps failed report and narrows execution without weakening contrast (0.199811ms)
+✔ START planner scope and original diagnostic reject unrelated runtime or invented outcomes (2.49521ms)
+✔ PR378 keeps frontend-only scope, exact npm type receipt and compiled loading consumers mandatory (2.255168ms)
+✔ PR380 admits only its frontend delta and requires one compiled postlogin consumer (1.481283ms)
+✔ PR381 binds the two frontend files, exact evidence and unchanged backend without a platform fallback (2.661351ms)
+✖ PR381 reads recorded command exits and exact source without inferring success from empty logs (3.792125ms)
+✔ PR381 keeps one compiled GET-only editor and live sandbox verification before the sole build (1.354612ms)
+✔ PR393 selects only its appended exact backend candidate and preserves old route boundaries (2.032012ms)
+✔ PR393 admits the original 7 plus 7, retains skipped rows and cannot select superseded or withheld cases (14.504988ms)
+✔ PR393 keeps only missing backend types, changed SAST and the existing mandatory gate (2.388119ms)
+✔ PR395 exact frontend scope refuses drift and preserves the stable required checks (1.787504ms)
+✔ PR395 admits only the original disjoint 21-case union and explicit failed School continuation (3.363128ms)
+✔ PR395 missing browser consumers run without rebuilding, replaying application tests or starting a backend (1.144675ms)
+✔ PR395 browser interception treats only the actual API prefix as business traffic (0.188003ms)
+✔ PR395 SAST continuation requires the exact official successful scan despite parent failure (1.876989ms)
+✔ group-report qualification uses the existing exact family and rejects scope or identity drift (2.021717ms)
+✔ group-report qualification keeps admission and SAST mandatory and rejects Draft or incomplete outcomes (1.259118ms)
+✔ group-report qualification reuses native evidence only for identical baseline and candidate Prisma inputs (0.549689ms)
+✔ Training group qualification binds the existing shared family and requires admission plus SAST (1.362964ms)
+✔ School group qualification keeps the fixed exact route and validates original School observations (0.910052ms)
+✔ Teacher Form reader qualification stays frontend-only and reuses the original product browser observation (0.765243ms)
+✔ Teacher subgroup qualification keeps native versions and retained stage observations on the fixed route (0.9091ms)
+✔ Training Bundle leaf formal route admits disclosed native proof without replay or frontend changes (0.89549ms)
+✔ PR420 chart loading stays on exact frontend-only admission and rejects drift without unrelated jobs (2.169019ms)
+✔ PR420 official reuse accepts only the fixed successful steps and preserves cancelled qualification (5.663815ms)
+✔ Training standalone Cognitive formal route accepts its four original cases without frontend or fixture replay (0.784852ms)
+✔ quota candidate requires exact source and backend image success without selecting frontend or a native migration (1.437536ms)
+ℹ tests 45
+ℹ suites 0
+ℹ pass 44
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 221.812664
+
+✖ failing tests:
+
+test at .github/scripts/onboarding-controls.test.mjs:184:1
+✖ PR381 reads recorded command exits and exact source without inferring success from empty logs (3.792125ms)
+  AssertionError [ERR_ASSERTION]: Original task input drift: server-version/backend/prisma/schema.prisma
+  + actual - expected
+  
+  + 'f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc'
+  - '3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515'
+  
+      at verifyPr381CommandRecords (file:///workspace/eduK12-training-cognitive-wave-quota/.github/scripts/onboarding-checks.mjs:103:12)
+      at verify (file:///workspace/eduK12-training-cognitive-wave-quota/.github/scripts/onboarding-controls.test.mjs:189:76)
+      at TestContext.<anonymous> (file:///workspace/eduK12-training-cognitive-wave-quota/.github/scripts/onboarding-controls.test.mjs:190:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc',
+    expected: '3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

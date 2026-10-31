@@ -1,0 +1,4 @@
+Supersedes the unexecuted backend-only image proposal in plan.txt.
+Reuse original 2 real quota row PostgreSQL contracts with original failures preserved. New Teacher/library-only trigger migrations were reviewed; quota schema and locked runtime/test inputs are unchanged.
+Existing onboarding admission executes the missing combined backend compiler once; bounded CodeQL runs alongside it. Scope and stable aggregate authenticate exact source/base/control binding. No image workflow modification, frontend build, migration replay or FINAL replay is selected for this source-only quota patch. No scan threshold or baseline image policy is altered.
+Estimated selected CI 3-6 minutes after final main alignment; no formal run yet.

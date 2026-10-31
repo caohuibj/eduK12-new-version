@@ -1,0 +1,24 @@
+{
+  "base": "6ad5082ed2f1c6a39d8828d91cbc093bf2e4e680",
+  "sourcePublicationProof": "aa840084f97af4259275e4ba1192d4b42556a2f2",
+  "newDistinctPassedCases": 1,
+  "layer": "real PostgreSQL and real native services; no source registry mock",
+  "reusedExistingPublication": true,
+  "newParentsCompleted": 1,
+  "newFinalSlots": 3,
+  "standaloneTwentyFinalsReplayed": false,
+  "typesReplayed": false,
+  "newApplicationCodeChanges": 0,
+  "notProved": [
+    "ordinary composition T2/trend",
+    "new group aggregate artifact",
+    "real browser or HTTP auth boundary",
+    "formal migration/restore/image/SAST eligibility"
+  ],
+  "reporterSuccess": true,
+  "sha256": {
+    "composition-delta-first.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "composition-delta-first.json": "ed8865674360df7790d2837c8e0a8ff594fb3fb8181e6a97f38b4416b7270341",
+    "composition-delta-first.log": "9460bfbd0c5986342a9af28b2b351de69618d99780d9572eab0c9329e2840379"
+  }
+}

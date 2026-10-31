@@ -1,4 +1,5 @@
 import {lockOwnedDraftLibraryUses} from './library-source.use'
+import {readSchoolPrivateGroupChoices} from './school-private-group-source'
 import {educationPublicScaleDisplay} from './public-source.scale-display'
 import {readEducationLibrarySourceSummaries} from './library-source.catalog'
 import {readEducationPublicSourceHeaders,educationPublicRequiredContextKeys} from './public-source.headers'
@@ -89,6 +90,7 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   const ids=[...new Set(definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION').map(block=>block.source.versionId))]
   const references=ids.length?await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...scope(c),kind:{in:['SCALE','FORM']}},
    select:{id:true,toolId:true,kind:true,title:true,sourceRevision:true,contentHash:true}}):[]
+  const groupChoices=await readSchoolPrivateGroupChoices(tx,c,references.filter(ref=>ref.kind==='SCALE').map(ref=>ref.id))
   const publicSources=definition.blocks.map(block=>educationBlockPublicSource(block.source)).filter((source):source is NonNullable<typeof source>=>source!==null)
   const publicKey=educationPublicSourceKey
   // A mutable draft may contain an as-yet unverified reference. It cannot be
@@ -98,7 +100,7 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   const visibleSources=publicSources.filter(source=>allowed.has(publicKey(source)))
   const publicHeaders=await readEducationPublicSourceHeaders(tx,visibleSources)
   const libraryHeaders=await readEducationLibrarySourceSummaries(tx,c,definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source),definition.administration.responseMode,definition.administration.responseMode==='EXPERT_REPORT'?definition.administration.targetKind:undefined)
-  return {...tool,references:[...references.map(ref=>({...ref,sourceProvider:'PRIVATE_VERSION' as const})),
+  return {...tool,references:[...references.map(ref=>({...ref,sourceProvider:'PRIVATE_VERSION' as const,...(groupChoices.has(ref.id)?{groupChoice:groupChoices.get(ref.id)}:{})})),
    ...[...publicHeaders.values()].map(header=>({id:header.id,kind:header.kind==='FORM'?'FORM' as const:header.kind==='STANDARD_SCALE'?'SCALE' as const:header.kind==='COGNITIVE_CONFIG'?'COGNITIVE' as const:'SJT' as const,title:header.title,contentHash:header.hash,version:header.versions.content,versions:header.versions,requiredContextKeys:educationPublicRequiredContextKeys(header),referenceContextKeys:header.referenceContextKeys,
     sourceProvider:header.kind==='FORM'?'PUBLIC_FORM' as const:header.kind})),
    ...libraryHeaders.map(header=>({id:header.sourceId,kind:header.kind,title:header.title,contentHash:header.contentHash,version:header.versions.content,versions:header.versions,sourceProvider:'LIBRARY_SCALE' as const}))],...boundary}
@@ -228,14 +230,15 @@ export async function listPrivateToolVersions(c:PrivateToolContext,id:string,cur
   // The database tuple preserves microsecond cursor order without JS Date.
   const rows=tool.kind==='COMPOSITION'?(await tx.$queryRaw<Array<{id:string;sourceRevision:number;title:string;contentHash:string;createdAt:Date;administration:unknown}>>(Prisma.sql`
    SELECT v.id,v.source_revision AS "sourceRevision",v.title,v.content_hash AS "contentHash",v.created_at AS "createdAt",
-    v.definition->'administration' AS administration FROM education_private_tool_versions v
+    v.definition->'administration' AS administration,v.definition->'groupReporting' AS "groupReporting" FROM education_private_tool_versions v
    WHERE v.tool_id=${id} AND v.entry=${c.entry} AND v.organization_id=${c.organizationId} AND v.owner_user_id=${c.principal.userId}
     AND (${cursor??null}::text IS NULL OR (v.created_at,v.id)<(SELECT created_at,id FROM education_private_tool_versions WHERE id=${cursor??null}))
    ORDER BY v.created_at DESC,v.id DESC LIMIT 51`)).map(row=>({...row,administration:privateCompositionAdministrationSchema.parse(row.administration)})):
    await tx.educationPrivateToolVersion.findMany({where:{toolId:id,...scope(c)},
    orderBy:[{createdAt:'desc'},{id:'desc'}],...(cursor?{cursor:{id:cursor},skip:1}:{}),take:51,
    select:{id:true,sourceRevision:true,title:true,contentHash:true,createdAt:true}})
-  return {list:rows.slice(0,50),nextCursor:rows.length>50?rows[49].id:null,...boundary}
+  const groupChoices=await readSchoolPrivateGroupChoices(tx,c,tool.kind==='SCALE'?rows.slice(0,50).map(row=>row.id):[])
+  return {list:rows.slice(0,50).map(row=>({...row,...(groupChoices.has(row.id)?{groupChoice:groupChoices.get(row.id)}:{})})),nextCursor:rows.length>50?rows[49].id:null,...boundary}
  })
 }
 export async function readPrivateToolVersion(c:PrivateToolContext,id:string,versionId:string){
@@ -260,7 +263,8 @@ export async function listPrivateScaleRuntimeCandidates(c:PrivateToolContext,cur
   const rows=await tx.educationPrivateToolVersion.findMany({where,orderBy:[{createdAt:'desc'},{id:'desc'}],
    ...(cursor?{cursor:{id:cursor},skip:1}:{}),take:51,
    select:{id:true,toolId:true,title:true,sourceRevision:true,contentHash:true,createdAt:true}})
-  return {list:rows.slice(0,50).map(({id,...row})=>({...row,versionId:id})),nextCursor:rows.length>50?rows[49].id:null,...boundary}
+  const groupChoices=await readSchoolPrivateGroupChoices(tx,c,rows.slice(0,50).map(row=>row.id))
+  return {list:rows.slice(0,50).map(({id,...row})=>({...row,versionId:id,...(groupChoices.has(id)?{groupChoice:groupChoices.get(id)}:{})})),nextCursor:rows.length>50?rows[49].id:null,...boundary}
  })
 }
 

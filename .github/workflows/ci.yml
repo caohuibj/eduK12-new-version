@@ -402,11 +402,12 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: fetch the immutable reviewed personal tracking source
-        if: github.event_name == 'pull_request' && contains(fromJSON('["feat/personal-longitudinal-survey-20261030","feat/personal-longitudinal-training-20261030","feat/personal-longitudinal-education-20261030","feat/personal-longitudinal-school-20261030"]'), github.event.pull_request.head.ref)
+        if: github.event_name == 'pull_request' && contains(fromJSON('["feat/personal-longitudinal-survey-20261030","feat/personal-longitudinal-training-20261030","feat/personal-longitudinal-education-20261030","feat/personal-longitudinal-school-20261030","feat/group-longitudinal-survey-training-20261030","feat/school-group-longitudinal-complete-20261031"]'), github.event.pull_request.head.ref)
         run: |
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';import {execFileSync} from 'node:child_process';
-          const b=JSON.parse(readFileSync('.github/scripts/personal-tracking-ready.json'));
+          const group=['feat/group-longitudinal-survey-training-20261030','feat/school-group-longitudinal-complete-20261031'].includes(process.env.GITHUB_HEAD_REF);
+          const b=group?JSON.parse(readFileSync('.github/scripts/group-longitudinal-ready.json')).candidates[process.env.GITHUB_HEAD_REF]:JSON.parse(readFileSync('.github/scripts/personal-tracking-ready.json'));
           const refs=[b.reviewedCandidate,b.originalSource,b.backendAuditReuse?.sourceHead,b.frontendAuditReuse?.sourceHead,b.qualificationReuse?.sourceHead,...Object.values(b.files).map(v=>v.originalBase)].filter(Boolean);
           execFileSync('git',['fetch','--no-tags','--depth=1','origin',...new Set(refs)],{stdio:'inherit'});
           JS
@@ -417,7 +418,7 @@ jobs:
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
       - name: fetch the actual group report merge base
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'feat/group-report-snapshots-20261030'
+        if: github.event_name == 'pull_request' && contains(fromJSON('["feat/group-report-snapshots-20261030","feat/group-longitudinal-survey-training-20261030"]'), github.event.pull_request.head.ref)
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
@@ -618,6 +619,7 @@ jobs:
           import {appendFileSync} from 'node:fs';
           import {changedEntries,classifyChanges} from './.github/scripts/content-scope.mjs';
           import {trainingFollowupPlan} from './.github/scripts/training-followup-scope.mjs';
+          import {personalTrackingReadyPlan} from './.github/scripts/personal-tracking-ready.mjs';
           import {onboardingPlan} from './.github/scripts/onboarding-scope.mjs';
           import {groupReportDraftPlan,groupReportDiffBase} from './.github/scripts/group-report-draft.mjs';
           import {execFileSync} from 'node:child_process';
@@ -626,9 +628,10 @@ jobs:
           const entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(actualBase);
           const docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;
           const followup=process.env.CI_EVENT==='pull_request' && trainingFollowupPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-          const onboarding=onboardingPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-          const groupDraft=onboarding?null:groupReportDraftPlan(entries,actualBase,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-          const lightweight=process.env.CI_FORCE_FULL!=='true' && (Boolean(onboarding)||Boolean(groupDraft)||docs||toolingOnly(entries)||Boolean(followup)||entries.some(e=>['.github/scripts/survey-governance-bindings.json','.github/scripts/training-polish-bindings.json','.github/scripts/survey-review-bindings.json','.github/scripts/training-admin-integration-bindings.json','.github/scripts/training-entry-bindings.json','.github/scripts/participant-capacity-bindings.json','.github/scripts/survey-assessment-bindings.json','.github/scripts/training-assessment-bindings.json','.github/scripts/school-teacher-visual-bindings.json','.github/scripts/participant-access-bindings.json','.github/scripts/training-manual-ui-bindings.json','.github/scripts/training-appearance-bindings.json','.github/scripts/shared-authoring-bindings.json','.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-self-bindings.json','.github/scripts/school-teacher-native-bindings.json','.github/scripts/school-teacher-package-bindings.json'].includes(e.file)));
+          const personal=personalTrackingReadyPlan(entries,actualBase,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event:process.env.CI_EVENT,branch:process.env.CI_HEAD_REF,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'});
+          const onboarding=personal?null:onboardingPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+          const groupDraft=personal||onboarding?null:groupReportDraftPlan(entries,actualBase,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+          const lightweight=process.env.CI_FORCE_FULL!=='true' && (Boolean(personal)||Boolean(onboarding)||Boolean(groupDraft)||docs||toolingOnly(entries)||Boolean(followup)||entries.some(e=>['.github/scripts/survey-governance-bindings.json','.github/scripts/training-polish-bindings.json','.github/scripts/survey-review-bindings.json','.github/scripts/training-admin-integration-bindings.json','.github/scripts/training-entry-bindings.json','.github/scripts/participant-capacity-bindings.json','.github/scripts/survey-assessment-bindings.json','.github/scripts/training-assessment-bindings.json','.github/scripts/school-teacher-visual-bindings.json','.github/scripts/participant-access-bindings.json','.github/scripts/training-manual-ui-bindings.json','.github/scripts/training-appearance-bindings.json','.github/scripts/shared-authoring-bindings.json','.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-self-bindings.json','.github/scripts/school-teacher-native-bindings.json','.github/scripts/school-teacher-package-bindings.json'].includes(e.file)));
           appendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);
           JS
       - name: install pinned release classification tools
@@ -1449,7 +1452,7 @@ jobs:
           JS
       - name: select exact Task1 changed application and control SAST inputs
         id: task1-codeql-config
-        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404,408,414,415,418,419,420,422,423,424,426,432,434,428]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
+        if: needs.scope.outputs.application_route == 'onboarding-structure' && contains(fromJSON('["task1","choice-page",404,408,414,415,418,419,420,421,422,423,424,426,432,434,437,439,442,428,429,430,438,443]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
         env:
           CI: 'true'
           PLAN: ${{ needs.scope.outputs.onboarding_plan }}
@@ -2534,8 +2537,8 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 24.21.0
-    - name: prepare only missing PR393 backend compiler dependencies
-      if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 393
+    - name: prepare only missing backend compiler dependencies
+      if: contains(fromJSON('[393,421]'), fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr)
       working-directory: server-version/backend
       env:
         NPM_CONFIG_REGISTRY: https://registry.npmjs.org

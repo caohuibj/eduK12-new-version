@@ -1,0 +1,15 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts > School GROUP ordinary composition / published-source delta only > completes the existing one-person Scale/Form/Scale parent and keeps same-key block rights separate
+{"kind":"school-composition-group-delta","runId":"fed88858-ae3e-482e-aad9-cef00f0986c9","parentId":"612be8b2-5f64-4811-8a8c-9d96c39c611d","reusedRealPublication":true,"completedParents":1,"completedSlots":3,"slots":["SCALE","FORM_SECTION","SCALE"],"ownAllowedScaleReady":true,"unscoredFormCompletionOnly":true,"sameNamedHiddenScaleWithheld":true,"groupAllowedLeaves":1,"groupUnderNRejected":true,"groupArtifactGenerated":false,"trackingT2OrTrendProved":false,"sourceOrRegistryMock":false}
+
+ ✓ src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts (1 test) 1333ms
+     ✓ completes the existing one-person Scale/Form/Scale parent and keeps same-key block rights separate  1278ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  00:12:46
+   Duration  10.14s (transform 6.50s, setup 0ms, import 8.67s, tests 1.33s, environment 0ms)
+
+JSON report written to /workspace/longitudinal-checkpoints/group-longitudinal-school/composition-delta-first.json

@@ -1,0 +1,49 @@
+{
+  "authorization": "2026-10-31 00:11 exact four-item approval; this thread owns item1 PNG and item4 Hui append",
+  "operations": [
+    {
+      "action": "github_create_blob",
+      "repository": "caohuibj/eduK12-new-version",
+      "path": "docs/evidence/group-longitudinal-survey-training-20261030/presentation-report-390.png",
+      "intendedBranch": "feat/group-longitudinal-survey-training-20261030",
+      "before": "GET blob404; known not executed",
+      "status": "success",
+      "sha": "4a72ac143bfd6c6f12ea72905a802774d448d779"
+    },
+    {
+      "action": "notion_notion_update_page insert_content end",
+      "page": "409190e0cc30814ebe2fc3cbe10c1704",
+      "linkId": "link_6a76f4dd02d08191994e341ce3194fd0",
+      "payload": "prepared 6ad5082e engineering and validation record",
+      "before": "existing page fetched; exact 6ad entry absent",
+      "status": "success",
+      "intermediate": "API400 INVALID_ARGUMENT requires content; request af459028-929f-4936-a086-8cb5fd0e3fd9, no write; same approved append succeeded after argument correction"
+    },
+    {
+      "action": "github_create_tree",
+      "repository": "caohuibj/eduK12-new-version",
+      "localEquivalent": "1a525a59bd3f3f59e97d095e199579336155c073",
+      "baseTree": "4d04e08c4ac0d3540d0186741a71eaab88ffe5cc",
+      "expectedTree": "25c88d883581e1304ff023a97a729a636e816109",
+      "intendedBranch": "feat/group-longitudinal-survey-training-20261030",
+      "status": "denied-known-not-executed",
+      "reason": "Approval reviewer did not recognize authorization for quota source/evidence tree payload; only exact image/doc/Draft/Notion items recognized.",
+      "retried": false,
+      "pendingApprovalCard": false,
+      "branchOrPrCreated": false,
+      "entries": [
+        "docs/evidence/training-cognitive-wave-quota-20261030/README.md",
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-after-fixture.json",
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-diagnostic.json",
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-final.json",
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-first.json",
+        "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts",
+        "server-version/backend/src/modules/cognitive/attempt-quota.ts",
+        "server-version/backend/src/modules/composite/composite.service.ts"
+      ]
+    }
+  ],
+  "formalCiStarted": false,
+  "merged": false,
+  "deployed": false
+}

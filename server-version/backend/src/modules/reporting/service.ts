@@ -14,7 +14,7 @@ import { resolveAuthoritativeRunResults } from './resultSource'
 import { getPublishedReportingSpec } from './spec'
 import { assertReportingSubgroupsPrivacy } from './subgroupPrivacy'
 import {governedArtifactMetrics,narrowGovernedProjection} from './governedDisclosure'
-import { reportingFail, type ReportingArtifactRecord, type ReportingCohortSelectorInputV2, type ReportingGroupArtifactRecord, type ReportingLeafSourceV2, type ReportingCohortSnapshotRecord } from './types'
+import { reportingFail, type ReportingArtifactRecord, type ReportingCohortSelectorInputV2, type ReportingGroupArtifactRecord, type ReportingLeafSourceV2, type ReportingCohortSnapshotRecord, type ReportingGroupArtifactPayload } from './types'
 
 const publicArtifact = async (artifact: ReportingArtifactRecord, principal: ReportingPrincipal) => {
   await assertFixedPopulationArtifactDisclosure({ principal, artifact })
@@ -37,6 +37,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
   leaf?: ReportingLeafSourceV2
   presentation?: { sourceLabel: string; populationLabel: string }
   beforeCompute?: (cohort: ReportingCohortSnapshotRecord) => Promise<void>
+  beforePersist?: (input:{cohort:ReportingCohortSnapshotRecord;payload:ReportingGroupArtifactPayload}) => Promise<void>
   tx?: Prisma.TransactionClient
 }): Promise<Awaited<ReturnType<typeof publicArtifact>>> => {
   await assertOrganizationGroupReportGenerateAccess({
@@ -73,6 +74,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
     leaf: input.leaf,
     presentation: input.presentation,
   })
+  await input.beforePersist?.({cohort,payload:built.payload})
   await assertFixedPopulationArtifactDisclosure({
     principal: input.principal,
     artifact: {

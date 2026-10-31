@@ -1,0 +1,80 @@
+{
+  "base": "a71b366a4e0e7e6b8cc6ecfa4b6532a88f954633",
+  "branch": "feat/group-report-history-pagination-20261031",
+  "newDistinctCases": 1,
+  "layer": "actual isolated PostgreSQL pointer reads and original Training course/task authority",
+  "success": true,
+  "passedCases": 1,
+  "failedCases": 0,
+  "observations": {
+    "targetPointers": 26,
+    "pages": [
+      25,
+      1
+    ],
+    "sameTimeIdTieBreak": true,
+    "microsecondInputNotRounded": true,
+    "existingTableTimestampPrecision": 3,
+    "oldTaskOutsideRecent100Accessible": true,
+    "taskMenuNextPage": true,
+    "crossSourceAndPlanIsolation": true,
+    "wrongActorRejected": true,
+    "payloadDecryptions": 0,
+    "newFinals": 0,
+    "groupGenerations": 0
+  },
+  "checks": {
+    "backendTypes": 0,
+    "frontendAppTypes": 0,
+    "frontendLint": 0,
+    "frontendLintWarnings": 3,
+    "finalTwoModuleSemanticIncrement": 0
+  },
+  "notExecuted": [
+    "old15/22/37 acceptance cases",
+    "previous twenty FINALs",
+    "full backend/frontend unit suites",
+    "browser lifecycle",
+    "Cognitive type suite",
+    "formal CI",
+    "migration/restore",
+    "image/SAST",
+    "external upload",
+    "Notion write",
+    "merge",
+    "deployment"
+  ],
+  "sourceBlobs": {
+    "server-version/backend/src/__tests__/campus/group-longitudinal-plan.test.ts": "60fa12ca0557b1ccafb6bd3fc71d7bca07c39022",
+    "server-version/backend/src/__tests__/survey/group-report.test.ts": "1d8f755ce0f8a93485c55d3c358b8406dd6ae9ac",
+    "server-version/backend/src/controllers/trainingAnalysisController.ts": "007c092654f62fdded7cf319b35403ed95fe54d2",
+    "server-version/backend/src/modules/campus/group-longitudinal-plan.routes.ts": "ed534e3f95f28b3990e2edccc64c09964c270649",
+    "server-version/backend/src/modules/campus/group-longitudinal-plan.service.ts": "c0379396c2b1566ef205fd46f99b969f664cc61f",
+    "server-version/backend/src/modules/reporting/task-artifact.ts": "71b7d3ad6f3664d89ced78b92b881e152f552620",
+    "server-version/backend/src/modules/survey/analytics.routes.ts": "2e4a4e738c2ea513f1bd9ad38097a84642590fea",
+    "server-version/backend/src/modules/survey/group-longitudinal.service.ts": "e7e45d3a0c8acec5c85fd5acc33b34cd11aefc0c",
+    "server-version/backend/src/modules/survey/group-report.service.ts": "325ede31285685fd9d71bbc6f9e7fe513e77b878",
+    "server-version/backend/src/modules/training-analysis/group-longitudinal.service.ts": "2b59cc47d34ec3fcd01aaa57ed0999f480e1bc0b",
+    "server-version/backend/src/modules/training-analysis/group-report.service.ts": "c4d8e4d30f391c1ff40239d13d9068456d18168e",
+    "server-version/backend/src/modules/training-analysis/source.ts": "367aa1251366dce381d16ae03ec5d21d97a2867d",
+    "server-version/backend/src/routes/courses.ts": "49f1d8cee0f21849feb83b34b5d7aaaa22b2078e",
+    "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx": "ae7f8d5cc18e7b63a3173eef8997f651691a541a",
+    "server-version/frontend/src/survey/SurveyGroupReports.tsx": "044240f8683e445ed00a4c2f65227771bf6d4e8d",
+    "server-version/frontend/src/training/TrainingGroupReports.tsx": "aedb5dda7b42c253f488c7ba8e1c7be45ae45ffc",
+    "server-version/backend/src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts": "4d8f61412dbf29e285317bb720827a8c982bae19",
+    "server-version/frontend/src/modules/reporting/group-history.ts": "4d8d86b3d6e02df75d8e42b2d4c066fdd4d5fd16"
+  },
+  "evidenceSha256": {
+    "history-page-first.log": "4b6d944cce9ead5a003f299873f2639d1d383272ec79f53243611e73a89dcc7a",
+    "history-backend-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "history-backend-types.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "history-frontend-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "history-frontend-lint.log": "d6b16a5cd7f0cd189480941973bfd33419ac8a2c2b811fecee085165b8e29608",
+    "history-backend-increment.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "history-page-first.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "history-frontend-types.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "history-backend-increment.log": "5788f65fe40e3949e7c07c44953697aeef77228dd15f6518949c1e0db8634b51",
+    "history-page-first.json": "d8589e185e57d7387e1db1bdf42e0d5907db8eb953a8b5ef1595c5f545bb399e",
+    "history-frontend-lint.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  }
+}

@@ -6,6 +6,8 @@ import {compileEducationApplicability} from '../scale-library-governance/educati
 import {expertCompositionAdministrationSchema,expertTargetKindSchema,isExpertComposition} from './expert-observation.contract'
 import {educationCognitiveSourceSchema,educationSjtSourceSchema} from './native-source.contracts'
 import {selectedConfigurationPointerSchema} from '../assessment-authorization/standard-configuration-binding'
+import {schoolPrivateGroupSelectionSchema} from './school-private-group-selection'
+import {schoolPrivateGroupDisclosureSchema} from './school-private-group-source'
 
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 // P1 consumes immutable author-private leaves. Public/native providers are added
@@ -29,6 +31,7 @@ export const educationCompositionAdministrationForEntry=(entry:'SCHOOL'|'TEACHER
  privateCompositionAdministrationSchema.parse({population:entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode,...(targetKind!==undefined?{targetKind}:{})})
 export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.union([z.literal(1),z.literal(2)]),adapterVersion:z.enum(['1.0.0','2.0.0']),
  administration:privateCompositionAdministrationSchema,
+ groupReporting:schoolPrivateGroupSelectionSchema.optional(),
  contextFields:z.array(z.object({contextKey:assessmentContextKeySchema,formType:z.enum(['year_month','single_choice','fill_blank']),formLabel:z.string().min(1).max(240),formOptions:z.array(z.object({value:z.string().min(1).max(240),label:z.string().min(1).max(240)}).strict()).max(50)}).strict()).min(1).max(5).optional(),
  instruction:z.string().max(16000),blocks:z.array(z.object({blockId:id,instruction:z.string().max(16000),longitudinal:z.boolean().optional(),
   source:privateCompositionSourceSchema}).strict()).max(50),
@@ -41,6 +44,13 @@ export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.union(
  if(value.contextFields&&new Set(value.contextFields.map(field=>field.contextKey)).size!==value.contextFields.length)ctx.addIssue({code:'custom',path:['contextFields'],message:'背景字段不能重复'})
  if(new Set(value.blocks.map(block=>block.blockId)).size!==value.blocks.length)
   ctx.addIssue({code:'custom',path:['blocks'],message:'问卷工具块身份不能重复'})
+ if(value.groupReporting){
+  if(value.administration.population!=='STUDENT'||value.administration.responseMode!=='SELF')ctx.addIssue({code:'custom',message:'本群体投放只适用于明确的学生本人新版本'})
+  for(const selected of value.groupReporting.leaves){const block=value.blocks.find(block=>block.blockId===selected.blockId)
+   if(!block||block.source.kind==='FORM'||block.source.versionId!==selected.versionId||block.source.contentHash!==selected.contentHash)
+    ctx.addIssue({code:'custom',message:'群体选择必须绑定当前问卷的固定叶工具，不能借用同名指标'})
+  }
+ }
 })
 export type PrivateCompositionDefinition=z.infer<typeof privateCompositionDefinitionSchema>
 
@@ -98,7 +108,8 @@ export const privateCompositionSelectionSchema=z.object({versionId:id,contentHas
 /** Frozen task anchor. Native scores are scoped to a block, never pooled into
  * an invented cross-tool score or widened by a same-named score in another unit. */
 export const educationCompositionPolicyBindingSchema=z.object({origin:educationCompositionOriginSchema,manifestHash:hash,
- unitReports:z.array(z.object({blockId:id,versionId:id,contentHash:hash,respondent:resultAudiencePolicySchema,subject:resultAudiencePolicySchema.optional()}).strict()).max(50),
+ unitReports:z.array(z.object({blockId:id,versionId:id,contentHash:hash,respondent:resultAudiencePolicySchema,subject:resultAudiencePolicySchema.optional(),
+  groupDisclosure:schoolPrivateGroupDisclosureSchema.optional()}).strict()).max(50),
 }).strict()
 export type EducationCompositionPolicyBinding=z.infer<typeof educationCompositionPolicyBindingSchema>
 export const educationCompositionRuntimeAnchorSchema=educationCompositionPolicyBindingSchema.pick({origin:true,manifestHash:true})

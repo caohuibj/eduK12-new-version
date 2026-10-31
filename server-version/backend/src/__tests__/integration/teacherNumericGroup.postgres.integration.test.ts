@@ -13,7 +13,7 @@ import {finalizeCompositeAttemptIfReady} from '../../modules/composite/composite
 import {closeTeacherRun} from '../../modules/huiteacher/run.service'
 import {transitionHuiteacherEvent} from '../../modules/huiteacher/evaluation.service'
 import {descriptiveReportingDefinition} from '../../modules/reporting/content.controller'
-import {createPlatformReportingSpec,reviewPlatformReportingSpec,publishPlatformReportingSpec} from '../../modules/reporting/spec'
+import {createPlatformReportingSpec,reviewPlatformReportingSpec,publishPlatformReportingSpec,getPublishedReportingSpec} from '../../modules/reporting/spec'
 import {listTeacherNumericGroups,generateTeacherNumericGroup,readTeacherNumericGroup,assertTeacherNumericDisclosure} from '../../modules/huiteacher/numericGroupReport.service'
 import {generateOrganizationGroupAnalysis} from '../../modules/reporting/service'
 import {setReportingPayloadMaterializationObserverForTests} from '../../modules/reporting/resultSource'
@@ -39,7 +39,7 @@ suite('Teacher fixed Scale leaves / retained real population',()=>{
   if(run.status!=='CLOSED')await closeTeacherRun(f.scope)
   const event=await db.huiteacherEvaluationEvent.findUniqueOrThrow({where:{id:f.scope.eventId}})
   if(event.status!=='CLOSED')await transitionHuiteacherEvent({...f.scope,action:'CLOSE',expectedVersion:event.version})
-  let index=await listTeacherNumericGroups(f.scope)
+  let index=await listTeacherNumericGroups(f.scope,{configure:true})
   const choice=index.sources[0];expect(choice).toBeTruthy();expect(choice.tools).toHaveLength(1)
   const [resource]=await db.$queryRaw<Array<{entry:any;definition_hash:string}>>`SELECT entry,definition_hash FROM registered_assessment_resources WHERE id=${f.groupId}`
   const [oldSpec]=await db.$queryRaw<Array<{id:string}>>`SELECT id FROM reporting_analysis_specs WHERE spec_key LIKE ${'teacher-numeric-'+kind+'-%'} AND status='PUBLISHED' ORDER BY created_at DESC,id DESC LIMIT 1`
@@ -64,7 +64,9 @@ suite('Teacher fixed Scale leaves / retained real population',()=>{
   const a=await readReportingArtifactRecord(proof.artifactId)
   if(a.analysisKind!=='GROUP'||a.artifactPayload.schemaVersion!==2)throw Error('retained V2 GROUP artifact required')
   const cohort=await readReportingCohort(a.cohortSnapshotId!)
-  const compared=await assertTeacherNumericDisclosure({organizationId:f.scope.organizationId,cohort,leaf:a.artifactPayload.source.leaf,minimumN:10})
+  const spec=await getPublishedReportingSpec(a.specId)
+  if(spec.definition.analysisKind!=='GROUP')throw Error('GROUP spec required')
+  const compared=await assertTeacherNumericDisclosure({organizationId:f.scope.organizationId,cohort,leaf:a.artifactPayload.source.leaf,minimumN:10,payload:a.artifactPayload,metricRules:spec.definition.metricRules})
   expect(compared!.comparedArtifacts).toBeGreaterThanOrEqual(2)
   expect(compared!.measurementHash).toMatch(/^[a-f0-9]{64}$/)
   await writeFile('/tmp/teacher-numeric-group-consumer/comparable-C-proof.json',JSON.stringify({passed:true,onlyExistingMetadataRead:true,comparedArtifacts:compared!.comparedArtifacts,measurementHash:compared!.measurementHash,noFinalReplay:true},null,2))

@@ -7,6 +7,7 @@ import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
 import {validateResultDisclosureContract} from '../assessment-policy/result-disclosure'
 import {resolveHistoricalRelationalEntry} from '../assessment-run/registeredResources'
 import {reportingFail,type ReportingLeafSourceV2} from '../reporting/types'
+import {teacherNativeGroupTrack,teacherNativeLeafContract} from './nativeGroupSource'
 const hidden=():never=>reportingFail('REPORT_NOT_FOUND','Teacher group report unavailable',404)
 type Source={organizationId:string;runId:string;trackId:string}
 
@@ -40,6 +41,7 @@ export async function teacherScaleLeafContract(source:Source,leaf:ReportingLeafS
   FROM assessment_run_tracks t JOIN huiteacher_evaluation_run_links l ON l.run_id=t.run_id AND l.organization_id=t.organization_id
   WHERE t.organization_id=${source.organizationId} AND t.run_id=${source.runId} AND t.id=${source.trackId}`)
  if(!track)return null
+ if(teacherNativeGroupTrack(track))return teacherNativeLeafContract(source,track,leaf,db)
  if(track.family!=='SCALE'||leaf.unitType!=='SCALE'||!track.key.endsWith(':GROUP')
   ||!['teacher-scale:','library-scale:'].some(prefix=>track.key.startsWith(prefix)))return null
  if(canonicalHash(track.policy)!==track.hash)hidden()

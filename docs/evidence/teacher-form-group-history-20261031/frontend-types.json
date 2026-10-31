@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "sourceTree": "cc25e67b0c5c88b7fc0d8c6bf332d05b52e506c6",
+  "component": "frontend",
+  "componentTree": "5b898e9ebb44e512ac74faaad486291fecd2862e",
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.app.json",
+    "--noEmit"
+  ],
+  "node": "v24.21.0",
+  "startedAt": "2026-10-31T03:07:56.535803+00:00",
+  "finishedAt": "2026-10-31T03:08:35.874913+00:00",
+  "exitCode": 0,
+  "inputsStable": true,
+  "inputFiles": 1930,
+  "inputManifestSHA256": "50bbccc4c5aeefc36e9c2415c7bb5e9add21861250827a4c0ed1553d6544e061",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "originalSigned": false
+}

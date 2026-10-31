@@ -475,6 +475,8 @@ export interface ReportingGroupArtifactPayloadV2 extends Omit<ReportingGroupArti
   schemaVersion: 2
   source: ReportingGroupArtifactPayloadV1['source'] & { leaf: ReportingLeafSourceV2 }
   metricMetadata: Record<string, { unit: string | null; minimumN: number }>
+  /** Internal frozen references only when a metric uses a subset of resolved inputs. */
+  metricContributorExecutionIds?: Record<string, string[]>
   descriptionVersion: 'group-descriptive-v1'
   presentation?: { sourceLabel: string; populationLabel: string }
 }

@@ -10,6 +10,8 @@ import {privateScaleVariant} from './private-tool.runtime-origin'
 import {privateToolFail} from './private-tool.contracts'
 import {privateRunTrackInput,privateFormRunTrackInput,privateCompositionRunTrackInput,assertPrivateRunSelection,assertPrivateAdministrationSelection} from './private-tool.run-contract'
 import {privateCompositionAdministrationSchema} from './private-tool.composition-contracts'
+import {schoolPrivateGroupSelectionSchema} from './school-private-group-selection'
+import {SELF_GROUP_POLICY_KEY} from '../assessment-policy/self-group-contract'
 
 /** Fixed-version attachment to an EXISTING draft only. No activity/event,
  * approval, publication, participant or report entitlement is created. */
@@ -25,12 +27,14 @@ export async function addPrivateCompositionRunTrack(input:PrivateRunAttachmentCo
   // Only the immutable owned administration header chooses the resource key.
   // Current author/workflow/U/CAS remain the repository's one locked write
   // boundary. No request can substitute a response mode.
-  const [version]=await tx.$queryRaw<Array<{administration:unknown}>>(Prisma.sql`
-   SELECT definition->'administration' AS administration FROM education_private_tool_versions
+  const [version]=await tx.$queryRaw<Array<{administration:unknown;groupReporting?:unknown}>>(Prisma.sql`
+   SELECT definition->'administration' AS administration,definition->'groupReporting' AS "groupReporting" FROM education_private_tool_versions
    WHERE id=${selected.privateComposition.versionId} AND content_hash=${selected.privateComposition.contentHash}
     AND kind='COMPOSITION' AND entry=${product} AND organization_id=${input.organizationId} AND owner_user_id=${input.actorUserId}`)
   if(!version)privateToolFail('PRIVATE_COMPOSITION_SOURCE_NOT_FOUND',404)
   const administration=privateCompositionAdministrationSchema.parse(version.administration),variant=privateScaleVariant(product,administration)
+  const groupReporting=version.groupReporting==null?null:schoolPrivateGroupSelectionSchema.parse(version.groupReporting)
+  if(groupReporting&&(product!=='SCHOOL'||variant.variantKey!=='STUDENT:SELF'))privateToolFail('SCHOOL_PRIVATE_GROUP_SELECTION_INVALID')
   assertPrivateAdministrationSelection(variant.responseMode,selected)
   return addAssessmentRunTrackDraft({...input,tx,expectedVersion:selected.expectedVersion,expectedRunId:input.runId,
    educationWorkflow:{product,id:input.parent.id},privateComposition:selected.privateComposition,
@@ -38,8 +42,8 @@ export async function addPrivateCompositionRunTrack(input:PrivateRunAttachmentCo
    subjectSelector:selected.subjectSelector,respondentSelector:selected.respondentSelector,
    requestedPolicy:{subjectRoles:[variant.subjectRole],respondentRoles:[variant.respondentRole],
     relationshipKinds:variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),perspectives:[variant.perspective],
-    analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:variant.responseMode==='SELF'?'EDUCATION_PRIVATE_COMPOSITION_V1':'observer_private_respondent_v1',
-    minimumRespondents:null,...(selected.targetPolicy?{targetPolicy:selected.targetPolicy}:{})}})
+    analysisMode:groupReporting?'COHORT_AGGREGATE':'INDIVIDUAL_ONLY',visibilityPolicyKey:groupReporting?SELF_GROUP_POLICY_KEY:variant.responseMode==='SELF'?'EDUCATION_PRIVATE_COMPOSITION_V1':'observer_private_respondent_v1',
+    minimumRespondents:groupReporting?groupReporting.minimumRespondents:null,...(selected.targetPolicy?{targetPolicy:selected.targetPolicy}:{})}})
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }
 async function addPrivateToolRunTrack(input:PrivateRunAttachmentContext,raw:unknown,kind:'SCALE'|'FORM'){

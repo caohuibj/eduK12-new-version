@@ -762,17 +762,28 @@ export function trainingGroupSnapshotHash(row: any) {
     canonicalDigest: row.canonicalDigest ?? (row.canonicalResultEncrypted ? createHash('md5').update(row.canonicalResultEncrypted).digest('hex') : null), collectionDigest: row.collectionDigest ?? (row.collectionFactsEncrypted ? createHash('md5').update(row.collectionFactsEncrypted).digest('hex') : null), completedAt: iso(row.completedAt)})
 }
 
-export async function listTrainingGroupTasks(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string) {
-  await assertTrainingGroupAccess(tx, actor, courseId)
-  const [composite,cognitive,scales]=await Promise.all([
-    tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId, true), publishedAt: {not: null}}, select: {id: true, name: true}, orderBy: {publishedAt: 'desc'}, take: 100}),
+/** Task history authorizes the actual fixed task, independently of this menu. */
+export async function listTrainingGroupTasksPage(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,beforeTaskId?:string){
+ await assertTrainingGroupAccess(tx,actor,courseId,beforeTaskId)
+ const rows=await tx.compositeAssessment.findMany({where:{...authorizedTaskWhere(actor,courseId,true),publishedAt:{not:null}},
+  select:{id:true,name:true},orderBy:[{publishedAt:'desc'},{id:'desc'}],take:101,
+  ...(beforeTaskId?{cursor:{id:beforeTaskId},skip:1}:{})})
+ const [cognitive,scales]=beforeTaskId?[[],[]]:await Promise.all([
     tx.cognitiveAssignment.findMany({where:{courseId,listedStandalone:true,status:{in:['PUBLISHED','ARCHIVED']},publishedAt:{not:null},resolvedConfigHash:{not:null},resolvedReportSnapshotEncrypted:{not:null},courseSnapshot:{path:['id'],equals:courseId},...(actor.role===UserRole.ADMIN?{}:{createdBy:actor.userId})},select:{id:true,title:true,status:true},orderBy:[{publishedAt:'desc'},{id:'desc'}],take:100}),
     tx.$queryRaw<Array<{id:string;name:string}>>`SELECT DISTINCT s.id,s.name FROM assessments a JOIN assessment_episodes e ON e.id=a.episode_id JOIN scales s ON s.id=a.scale_id
       WHERE ${standaloneScaleCourseWhere(courseId)} ORDER BY s.id LIMIT 100`,
-  ])
-  return [...composite,...cognitive.map(row=>({id:trainingCognitiveGroupTaskKey(row.id),name:row.title+' · 独立认知'+(row.status==='ARCHIVED'?'（已归档，只读）':'')})),
-    ...scales.map(row=>({id:trainingScaleGroupTaskKey(row.id),name:row.name+' · 独立量表'}))]
+ ])
+ const tasks=[...rows.slice(0,100),...cognitive.map(row=>({id:trainingCognitiveGroupTaskKey(row.id),name:row.title+' · 独立认知'+(row.status==='ARCHIVED'?'（已归档，只读）':'')})),...scales.map(row=>({id:trainingScaleGroupTaskKey(row.id),name:row.name+' · 独立量表'}))]
+ return {tasks,nextTaskId:rows.length>100?rows[99].id:null}
 }
+export async function listTrainingGroupTasks(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string){return (await listTrainingGroupTasksPage(tx,actor,courseId)).tasks}
+/** Scope every wave by the original course/task authority, without a recent menu cutoff. */
+export async function listTrainingGroupPlanTasks(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,baselineId:string){
+ await assertTrainingGroupAccess(tx,actor,courseId,baselineId)
+ return tx.compositeAssessment.findMany({where:{...authorizedTaskWhere(actor,courseId,true),personalTrackingBaselineId:baselineId,status:{in:['PUBLISHED','ARCHIVED']}},
+  orderBy:[{personalTrackingOrdinal:'asc'},{id:'asc'}],take:101,select:{id:true,name:true,personalTrackingOrdinal:true,personalTracking:true}})
+}
+
 
 async function standaloneCognitiveGroupHeader(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string,historical=false){
   await authority(tx,actor,courseId,'SHARE')
@@ -939,4 +950,12 @@ export async function readTrainingStandaloneScaleGroupArtifact(tx:Prisma.Transac
   const hashes=new Map(rows.map(row=>[row.id,standaloneScaleHeaderHash(row)]))
   if(hashes.size!==bindings.rows.length||bindings.rows.some(row=>hashes.get(row.id)!==row.hash))invalid('原独立量表来源或冻结结果已变化，请生成更新版报告')
   return artifact
+}
+
+/** Menu limits are not authority. Stored-history pointers use the same actual
+ * source-specific course/owner boundary as each original artifact reader. */
+export async function assertTrainingGroupTaskHistoryAccess(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string){
+ if(trainingScaleGroupId(taskId)!==null){await standaloneScaleGroupAuthority(tx,actor,courseId,taskId);return}
+ if(trainingCognitiveGroupAssignmentId(taskId)!==null){await standaloneCognitiveGroupHeader(tx,actor,courseId,taskId,true);return}
+ await assertTrainingGroupAccess(tx,actor,courseId,taskId)
 }
