@@ -1,0 +1,4 @@
+src/modules/education-tools/school-private-group-leaf.ts(83,4): error TS2322: Type '{ [k: string]: string | undefined; }' is not assignable to type 'Record<string, string>'.
+  'string' index signatures are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.

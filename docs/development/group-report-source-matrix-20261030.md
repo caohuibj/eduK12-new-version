@@ -15,6 +15,12 @@
 | Teacher SELF Scale | 新明确独立审阅发布的原创 `teacher-scale:<uuid>:GROUP` 和库 Scale 新 GROUP 版本；原 C / FINAL 与已批准本人摘要不变 | 原正向原件覆盖原创与库两类各 N10；复用组织 Artifact 与现有统计。旧 INDIVIDUAL_ONLY / ORGANIZATION NONE 仍不得转为群体。部分样本、实际贡献者保护及指针分页见 9dedd85 切片。 |
 | Teacher SELF Cognitive / SJT / Bundle 数值叶 | 新明确发布的 `education-assessment:TEACHER:...` 2.0.0 SELF GROUP，冻结父→slot→C，逐叶 groupDisclosure，再用正式 canonical 指标 | 本切片薄接线使用已保存的10人、20个新 Cognitive/SJT 叶 FINAL 正向续验原件；保存读取不物化原始结果。旧1.0.0个人来源仍拒绝。验证父来源是现有普通混合组合，不冒称 Bundle 产品 Profile 分析或所有原生工具验收。 |
 
+## Teacher 普通私有组合收口
+
+Form完整历史已由#438合并，#443提供纵向内部部分指标选项及目录首读GET重试。新普通组合切片只在明确新SELF GROUP版本中支持作者自有原创Scale、经原授权/许可的Cognitive/SJT叶，逐块冻结组织聚合上限、真实C/slot/单位，并保留原本人反馈。真实PG原件覆盖10个原创Scale父结果，N10/mean1/SD0，保存读取canonical0；原生Cognitive/SJT新增为固定源/单位/选择的薄适配边界，不冒称重新完成全部协议实测。
+
+普通组合的LIBRARY_SCALE/STANDARD_SCALE引用尚未携带精确的独立批准GROUP政策版本指针，不能从material.use或本人摘要权限推导聚合权；当前不提供其群体选择。已有独立Teacher库Scale GROUP消费不受影响。普通组合Form仍是完成回执，不新增评分；用户已明确将Teacher原生NUMBER/SLIDER Form纵向排除本轮。具体原件和单点检查理由见 `docs/evidence/teacher-private-composition-group-20261031/`。
+
 ## 当前独立认知接线
 
 - 在现有 Training 单次群体任务清单添加命名空间 `cognitive-assignment:<id>`，不伪造 CompositeAssessment / parent，不新增表或 schema。
