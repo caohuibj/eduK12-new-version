@@ -145,3 +145,22 @@ Node v24.21.0：依赖路由 12 PASS、工具接纳 2 PASS；随后只扩充原 
 修复将本片路径选择移到既有 CodeQL job 的一个配置 step，使用原输出优先序，表达式变为 20,949 字符；旧分支及扫描断言不删改。只补验现有 workflow 选择用例 1 PASS、YAML 和 diff 检查，不重复业务验证，也不新增长度门禁。
 下轮只核工具候选 scope/release-tools 与稳定 gate；Ready 后按原要求 CodeQL，#464 的 audit/types/build/image 仍由其自己的正常前端路线承担。
 同一 Hui 错误清单 `404d2763-5a38-8186-ac80-de3593da05a5` 再读仍为 NOT_FOUND，回写尚未完成；以上为可复制的脱敏回写条目，未声称已写入、未换账号/通道。原失败与后续运行各保留原 head/run 身份。
+
+## 后端模块后续片：先解除外层前端误分类
+
+观察基线 `5e9562ca970a77393805af4f50a83fa1b1b0fd1e`，源码观察点 `564d1589653fdf68f2de1d0720dc6a3afe99f9e6`。现有分类缺少纯后端产品模块类别，导致它们默认 platform 并开启所有 acceptance。本片增加 backend 类别，复用现有任务，不加新 workflow、包/PR 白名单、签名或手工开关。
+精确条件：完整 raw diff 均为普通 A/M 100644，至少一个后端产品模块 TS/JSON，其余只能是该后端测试或非生产证据。共享 API/DTO、schema、依赖、CI/Compose、身份、公共测评运行时及评分/编译契约不适用；工程证据中的 Python/SQL 历史复现材料只作非生产伴随文件，不执行、不视为 PG 成功。content-only 差异优先保留原内容路线。
+
+Draft 仅保留原 pr-light-backend；Ready 仍要求原 backend、backend-regression、Docker、CodeQL。独立 FE、frontend-build、browser、backend-browser-build、miniprogram、maintenance、media、UI、Ops/perf acceptance 不再选中，CodeQL 选择 backend/src。force-full/混合/未知范围和所有选中 job 的真实失败仍沿用原规则。
+本片不是后端定向验收的终态：backend 内部科学/200 并发、regression 的全套回归/跨树前端依赖、Docker 的前端镜像构建仍保留。避免为了本轮分类改写三个执行器；后续可逐个拆除，不冒称本片只执行相关测试或已消除所有 FE/性能工作。
+实际检查发现 #456 的 as-run-probe.py 依赖固定 /tmp 输入和原 Docker 容器名，不能原样移入 CI；没有把历史原件转成新 PG 成功。本片没有移除原后端验证，#456 的特定游标 PG 合格证据仍须独立核实，不能因新类别自动取得。
+
+只读完整差异：#456 `024ffa4a87540769e9d384238a8d48feffafd010`（13 文件）与 #462 `2b04c98b49375cc684a587412ff234bd02639111`（71 文件）符合 backend；#453 `4c7563cb37cd348cb47396e8a9955e3cca62689e`（31 文件、跨 FE/BE）及 #457 `320e88a15c425d1335383004d0016790a562f4f7`（47 文件、schema/admin）不符合，不硬缩范围。PR 号只出现在观察记录，不参与执行分类。
+Node v24.21.0：三个新增分类/汇总/调度用例 PASS，补一个真实 Git CLI 用例 PASS；六个受影响既有 FE/依赖/拒绝用例 PASS。YAML、diff 检查通过，CodeQL 表达式仍 20,949 字符，未增长。未执行四条业务分支的 audit、业务/PG 测试、应用构建或生产操作。本片独立 Draft，暂不合并，不干扰依赖与问卷修复收口。
+
+## 前端代码与版本锁组合：独立紧急分类片
+
+观察基线 `28b8cbe4be407cce063e5584b905cadbaecb9498`，源码观察点 `714c6ec0d6af71c7f22a8c91a14f816d07144b0f`。复用现有 dependencies 场景及 dependencies_frontend_only 标记，不改 workflow 或汇总选择。将全量普通 A/M 差异分为前端 manifest/lock 与现有前端源码/测试/非生产说明；manifest/lock 子集仍由原 dependencyScope 验证版本型变化，scripts/engines 等拒绝规则不变。
+同目录、模块内测试仅在此完整前端组合路线接纳，不扩展 frontend_affected 或测试专用轻量路线。Ready/Draft 均选择 scope、frontend-build、frontend、docker、codeql；原完整前端安装/audit/types/tests/build/image scan/SAST 保留，未变后台/数据库/media 不选。生产共享 API/测评运行时代码沿用 frontendFile 排除；命中特殊 media/app-shell 等既有验收的生产改动仍回原范围，不能混锁后省掉相关检查。
+Node24.21.0 四个定向分类/命令选择用例 PASS；随后只对增补的相关验收反例补验原组合一例，1 PASS。真实 Git fixture 覆盖 School 产品源、同目录测试及认知模块测试，结果 dependencies_frontend_only=true、frontend_affected=false；混入 BE、根依赖、CI、共享前端 API、测评 runtime、媒体生产文件及脚本变更均拒绝该组合范围。未运行 D 的 audit 或任何前端业务基线。
+母线提供的本地整合 head `2f70bdf630385fdc92ecba24d8ce5a8d1367162b` 尚未公开，本线没有读取该 Git 对象、组合提交或关闭原 PR；规则覆盖所述“1 lock＋1 School 产品源＋25 现有测试”形态，公开后仍按实际完整差异进行正常 CI。Docker backend-only 已独立公开 #469，不与本片捆绑，也不取消现有运行。

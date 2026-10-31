@@ -56,7 +56,7 @@ import { posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { mediaPlan } from './ci-media-plan.mjs';
 import { dependencyScope, frontendDependencyFilesOnly } from './dependency-scope.mjs';
-import { plan as applicationPlan, toolingOnly, engineeringEvidenceFile } from '../../server-version/scripts/release/policy.mjs';
+import { plan as applicationPlan, toolingOnly, engineeringEvidenceFile, backendTestFile } from '../../server-version/scripts/release/policy.mjs';
 
 // Keep route refusal independent of the candidate verifier. The official
 // source CLI consumes this module while awaiting metadata; importing it back
@@ -177,6 +177,21 @@ export function frontendTestOnly(files) {
   return files.some(frontendTestFile) && files.every(file=>frontendTestFile(file)||engineeringEvidenceFile(file));
 }
 
+// Compose the existing version-only dependency check with frontend source/test
+// admission. This selects the full frontend lane, never frontend_affected.
+export function frontendDependencyScope(entries,{base,head='HEAD'}) {
+  const manifests=new Set(['server-version/frontend/package.json','server-version/frontend/package-lock.json']);
+  const dependencyEntries=entries.filter(({file})=>manifests.has(file));
+  if(!dependencyEntries.length||!entries.every(({file,status,oldMode,newMode})=>
+    typeof file==='string'&&!/[\\\x00-\x1f\x7f]/.test(file)&&file.split('/').every(p=>p&&p!=='.'&&p!=='..')
+    &&newMode==='100644'&&((status==='A'&&oldMode==='000000')||(status==='M'&&oldMode==='100644'))
+    &&(manifests.has(file)||frontendFile(file)||engineeringEvidenceFile(file)
+      ||file.startsWith(frontendSrc)&&/\.(?:test|spec)\.tsx?$/.test(file))))return false;
+  const production=entries.map(({file})=>file).filter(file=>frontendFile(file)&&!/\.(?:test|spec)\.tsx?$/.test(file));
+  if(Object.entries(acceptanceFor(production)).some(([id,selected])=>id!=='canonical_visual'&&selected))return false;
+  return dependencyScope(dependencyEntries,{base,head});
+}
+
 // Local product pages use dependency-related unit tests. Shared shells, API,
 // scientific runtimes and explicit media/Ops acceptance retain their own lanes.
 export function frontendAffected(files) {
@@ -184,6 +199,23 @@ export function frontendAffected(files) {
     && files.every(file=>engineeringEvidenceFile(file)||(frontendFile(file)
       && /^server-version\/frontend\/src\/pages\/(?:student|teacher)\/[a-zA-Z0-9_./-]+\.tsx?$/.test(file)))
     && !Object.entries(acceptanceFor(files)).some(([id,selected])=>id!=='canonical_visual'&&selected);
+}
+
+// Product modules can retain backend qualification without unrelated frontend
+// acceptance. Shared runtimes, identity, API/DTO and scoring contracts stay out.
+export function backendModuleFile(file) {
+  if(typeof file!=='string'||/[\\\x00-\x1f\x7f]/.test(file)||file.split('/').some(p=>!p||p==='.'||p==='..'))return false;
+  if(!file.startsWith(modules)||!/\.(?:ts|json)$/.test(file))return false;
+  if(/^server-version\/backend\/src\/modules\/(?:assessment-[^/]+|reporting|cognitive|situational|auth|authorization|identity|session)\//.test(file))return false;
+  if(/\/(?:runtime|scorers|algorithms|reference-data)\//.test(file))return false;
+  return !/(?:^|[./-])(?:auth|authorization|identity|session|routes?|controllers?|middleware|schemas?|contracts?|types|dto|api|scoring|scorer|compiler|finalizer|runtime)(?:[./-]|$)/i.test(file.slice(modules.length));
+}
+export function backendModuleFilesOnly(files) {
+  const evidence=file=>engineeringEvidenceFile(file)
+    || /^docs\/scale-intake\/[a-zA-Z0-9_./-]+\.md$/.test(file)
+    || /^docs\/evidence\/[a-zA-Z0-9_./-]+(?:\.py|\.sql\.gz|\/SHA256SUMS)$/.test(file);
+  const safe=file=>typeof file==='string'&&!/[\\\x00-\x1f\x7f]/.test(file)&&file.split('/').every(p=>p&&p!=='.'&&p!=='..');
+  return files.some(backendModuleFile)&&files.every(file=>safe(file)&&(backendModuleFile(file)||backendTestFile(file)||evidence(file)));
 }
 
 export function acceptanceFor(files) {
@@ -289,6 +321,7 @@ export function classifyChanges(entries, forceFull = false, readers = {}) {
     presentation: !forceFull && result.presentation && regularChanges,
     frontend: !forceFull && result.frontend && regularChanges,
     frontend_affected: !forceFull && result.frontend && regularChanges && frontendAffected(entries.map(entry=>entry.file)),
+    backend_modules: !forceFull && regularChanges && backendModuleFilesOnly(entries.map(entry=>entry.file)),
     frontend_test: !forceFull && frontendTestOnly(entries.map(entry => entry.file)) && regularChanges,
   };
 }
@@ -297,7 +330,7 @@ export function classifyChanges(entries, forceFull = false, readers = {}) {
 export function platformReasons(entries, forceFull = false) {
   if (forceFull) return [{reason:'explicit-full-request'}];
   const selected = classifyChanges(entries);
-  if (['maintenance','documentation','content','presentation','frontend'].some(key => selected[key])) return [];
+  if (['maintenance','documentation','content','presentation','frontend','backend_modules'].some(key => selected[key])) return [];
   if (!entries.length) return [{reason:'no-changes-classified'}];
   const reasons = [];
   for (const entry of entries) {
@@ -466,9 +499,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     console.log(JSON.stringify({kind:'cognitive-intake-refusal',base,...refused}));
     throw Error('UNSUPPORTED_COGNITIVE_INTAKE:'+refused.reason+': explicit affected route required; no platform fallback');
   }
-  const dependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+  const basicDependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
     && dependencyScope(entries, {base});
-  const frontendDependencies = dependencies && frontendDependencyFilesOnly(entries);
+  const mixedFrontendDependencies = !basicDependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+    && frontendDependencyScope(entries,{base});
+  const dependencies = basicDependencies || mixedFrontendDependencies;
+  const frontendDependencies = mixedFrontendDependencies || basicDependencies && frontendDependencyFilesOnly(entries);
+  const backendModules = result.backend_modules && !result.content && !result.frontend && !result.presentation && !result.documentation;
   const surveySelection = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && surveyWaveSelectionScope(entries);
   requireSurveyWaveSelectionScope(process.env.CI_SURVEY_SELECTION_REQUIRED === 'true', surveySelection, event, process.env.CI_FORCE_FULL);
   const performance = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
@@ -497,12 +534,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const surveyMac = event !== 'workflow_dispatch'
     ? surveyMacPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   if(surveyMac && process.env.CI_FORCE_FULL==='true') throw new Error('Exact Survey Mac candidate cannot run unrelated full acceptance');
-  const scenario = surveySelection ? 'survey-wave-selection' : performance ? 'frontend-performance' : trainingFunctional || adminFunctional ? 'platform' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  const scenario = surveySelection ? 'survey-wave-selection' : performance ? 'frontend-performance' : trainingFunctional || adminFunctional ? 'platform' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : backendModules ? 'backend' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // Local pages are covered by related tests and one frontend build. The broad
   // student/** visual inventory does not require every platform browser fixture.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = result.cognitive_intake_light || surveySelection || performance || affectedFrontend || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = result.cognitive_intake_light || surveySelection || performance || affectedFrontend || backendModules || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   // Preserve every platform functional/security/build/recovery check. Only the
@@ -512,7 +549,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
   const frontendBuild = Boolean(surveyCandidate) || Boolean(assessment) || Boolean(efficiency) || dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
-  const codeql = surveySelection || Boolean(surveyMac) || Boolean(reviewedCandidate) || Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || scenario === 'platform' || frontend
+  const codeql = surveySelection || Boolean(surveyMac) || Boolean(reviewedCandidate) || Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
   const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   const output = { personal_tracking_draft:personalTrackingDraftScope(entries,{event,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'}), admin_permissions_functional_only:Boolean(adminFunctional), admin_permissions_functional_plan:JSON.stringify(adminFunctional), training_functional_only:Boolean(trainingFunctional), run_performance_tests:!(trainingFunctional || adminFunctional), training_functional_plan:JSON.stringify(trainingFunctional), survey_mac_ui_plan:JSON.stringify(surveyMac), reviewed_candidate_plan:JSON.stringify(reviewedCandidate), survey_candidate_plan:JSON.stringify(surveyCandidate), shared_asset_storage_plan:JSON.stringify(sharedStorage), assessment_capacity_plan:JSON.stringify(assessment), teacher_survey_plan:JSON.stringify(review), access_efficiency_plan:JSON.stringify(efficiency), backend_security_efficiency_plan:JSON.stringify(backendRepair), teacher_home_plan:JSON.stringify(teacher), survey_home_plan:JSON.stringify(survey), homepage_copy_plan:JSON.stringify(copy), application_route:trainingFunctional || adminFunctional ? 'legacy' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
