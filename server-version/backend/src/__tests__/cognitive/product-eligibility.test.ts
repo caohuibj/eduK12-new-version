@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { config as appConfig } from '../../config'
 import { UserRole } from '@prisma/client'
-const mock = vi.hoisted(() => ({ config: vi.fn(), course: vi.fn(), list: vi.fn(), write: vi.fn() }))
+const mock = vi.hoisted(() => ({ config: vi.fn(), course: vi.fn(), list: vi.fn(), write: vi.fn(), query: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: {
+  $queryRaw: mock.query,
   course: { findUnique: mock.course }, cognitiveTestConfig: { findUnique: mock.config, findMany: mock.list, updateMany: mock.write },
   cognitiveAssignment: { create: mock.write },
 } }))
@@ -13,8 +14,25 @@ import { listCognitiveTestsCatalog } from '../../modules/cognitive/catalog.servi
 import { createCognitiveSessionConfigSnapshot, createUnifiedCognitiveSessionConfigSnapshot } from '../../modules/cognitive/session.service'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 import { COGNITIVE_SEEDS } from '../../../prisma/seeds/cognitive'
+import { TRAINING_COGNITIVE_USE_ACTION, TRAINING_COGNITIVE_USE_SCOPE } from '../../modules/assessment-authorization/training-cognitive-profile-use'
+type ProfileDirectoryRow = { configId: string; choices: Array<{ id: string; metadata: unknown; available: boolean }> }
+let profileRows: ProfileDirectoryRow[] = []
 const fake = { id: 'fake-published', testType: 'fake', status: 'PUBLISHED', engineVersion: '1.0.0', scoringVersion: '1.0.0', configVersion: '1.0.0', config: {} }
-beforeEach(() => { appConfig.cognitiveModuleEnabled = true; vi.clearAllMocks(); vi.stubEnv('NODE_ENV', 'production'); mock.config.mockResolvedValue(fake); mock.course.mockResolvedValue({ id: 'course', creatorId: 'teacher' }) })
+beforeEach(() => {
+  appConfig.cognitiveModuleEnabled = true; vi.clearAllMocks(); vi.stubEnv('NODE_ENV', 'production')
+  mock.config.mockResolvedValue(fake); mock.course.mockResolvedValue({ id: 'course', creatorId: 'teacher' })
+  profileRows = [] // No exact-profile history unless this test explicitly supplies it.
+  mock.query.mockImplementation((strings: TemplateStringsArray, ...values: unknown[]) => {
+    const sql = Array.isArray(strings) ? strings.join('').replace(/\s+/g, ' ').trim() : ''
+    if (!sql.startsWith('WITH configs AS ( SELECT DISTINCT resource_id FROM assessment_management_events WHERE action=')
+      || !sql.includes('SELECT configs.resource_id AS "configId"') || !sql.includes('jsonb_agg(h)')
+      || !sql.includes('JOIN content_capability_grants g ON g.id=e.id') || !sql.endsWith('AS choices FROM configs')
+      || values.length !== 6 || values[0] !== TRAINING_COGNITIVE_USE_ACTION || values[2] !== TRAINING_COGNITIVE_USE_ACTION
+      || typeof values[1] !== 'string' || values[3] !== values[1] || values[4] !== values[1] || values[5] !== TRAINING_COGNITIVE_USE_SCOPE)
+      throw new Error('Unexpected product-eligibility SQL')
+    return Promise.resolve(profileRows)
+  })
+})
 afterEach(() => vi.unstubAllEnvs())
 describe('framework fixture production exclusion', () => {
   it('cannot be opened by the fixture flag outside NODE_ENV=test', () => {
@@ -73,5 +91,18 @@ describe('server cognitive capability gates only new products', () => {
     mock.list.mockResolvedValue([{ ...fake, testType: 'reaction', engineVersion: 'missing-version', config: { private: 'do-not-leak' } }])
     await expect(listPublishedConfigs('admin', UserRole.ADMIN)).rejects.toThrow('认知资源目录配置不可用')
     try { await listPublishedConfigs('admin', UserRole.ADMIN) } catch (error) { expect(String(error)).not.toContain('do-not-leak') }
+  })
+  it('keeps invalid fixed-profile metadata unavailable without hiding a valid published config', async () => {
+    const seed = COGNITIVE_SEEDS.find(seed => seed.testType === 'reaction' && seed.scoringVersion === '1.1.0')
+    expect(seed).toBeDefined()
+    mock.list.mockResolvedValue([{ ...seed, id: 'reaction-config', status: 'PUBLISHED', accessPolicy: 'OPEN' }])
+    profileRows = [{ configId: 'reaction-config', choices: [{ id: '00000000-0000-4000-8000-000000000001',
+      metadata: { private: 'do-not-leak-profile' }, available: true }] }]
+    const result = await listPublishedConfigs('admin', UserRole.ADMIN)
+    expect(mock.query).toHaveBeenCalledTimes(1)
+    expect(result).toMatchObject([{ id: 'reaction-config', authorizationMode: 'PRECISE', available: false,
+      fixedProfile: null, configurationName: null, selectedBinding: null }])
+    expect(result[0].unavailableReason).toBeTruthy()
+    expect(JSON.stringify(result)).not.toContain('do-not-leak-profile')
   })
 })

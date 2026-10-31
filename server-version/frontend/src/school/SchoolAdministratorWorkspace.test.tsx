@@ -130,12 +130,18 @@ it('keeps administrator page navigation and explanation toggles GET-only',async(
    if(pages)fireEvent.click(within(pages).getByRole('link',{name:parent??page}))
    else expect(page).toBe('活动管理')
    if(parent)fireEvent.click(screen.getByRole('link',{name:page}))
-   const toggle=await screen.findByRole('button',{name:help})
-   expect(toggle).toHaveAttribute('aria-expanded','false')
-   fireEvent.click(toggle)
-   expect(screen.getByRole('note',{name:help})).toBeInTheDocument()
-   fireEvent.scroll(document)
-   expect(screen.queryByRole('note')).not.toBeInTheDocument()
+   if(page==='群体报告'||page==='群体纵向分析'){
+    await screen.findByRole('heading',{name:page==='群体报告'?'学校群体报告':'学校群体纵向报告'})
+    expect(screen.getByText(/选择本任务的正式叶工具和人群/)).toBeVisible()
+    expect(screen.getByText(/仅供当前获授权的心理教师和学校管理者使用/)).toBeVisible()
+   }else{
+    const toggle=await screen.findByRole('button',{name:help})
+    expect(toggle).toHaveAttribute('aria-expanded','false')
+    fireEvent.click(toggle)
+    expect(screen.getByRole('note',{name:help})).toBeInTheDocument()
+    fireEvent.scroll(document)
+    expect(screen.queryByRole('note')).not.toBeInTheDocument()
+   }
    expect(window.location.search).toBe('?organizationId=school&classUnitId=class')
   }
   expect(view.container.querySelector('.hs-report-panel')).not.toBeNull()

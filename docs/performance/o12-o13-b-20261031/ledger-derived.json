@@ -1,0 +1,1837 @@
+{
+  "schemaVersion": 1,
+  "kind": "derived_from_retained_originals_not_new_measurement",
+  "sourceHashes": {
+    "legacy-r2.json": "0c53721af1bbc8d8dea57c6191b0e7f4df7bd51c41ebd31b53383777a1ddf598",
+    "shared-compact-r2.json": "913ab27a46eca157b97dc1d80d9284746664479c61668054b26dbae21dff07f8",
+    "comparison-r2.json": "e16e21a40abe65433e6677c103c9f0d2dd71fad3792da147d3642b9846b28b5a"
+  },
+  "modes": [
+    {
+      "mode": "legacy",
+      "flags": {
+        "ASSESSMENT_COMPACT_FACTS_ENABLED": "false",
+        "ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED": "false",
+        "ASSESSMENT_SHARED_CONTROL_ENABLED": "false"
+      },
+      "snapshots": [
+        {
+          "label": "published-before-start",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 106496,
+              "relationBytes": 114688
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 24576,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 57344,
+              "relationBytes": 65536
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 81920,
+              "relationBytes": 90112
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 49152,
+              "indexesBytes": 90112,
+              "relationBytes": 139264
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 131072,
+              "relationBytes": 196608
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 376832,
+            "indexesBytes": 1204224,
+            "relationBytes": 1581056
+          }
+        },
+        {
+          "label": "first-real-start",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 1,
+              "tableBytes": 65536,
+              "indexesBytes": 204800,
+              "relationBytes": 270336
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 24576,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 57344,
+              "relationBytes": 65536
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 163840,
+              "relationBytes": 196608
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 49152,
+              "indexesBytes": 98304,
+              "relationBytes": 147456
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 131072,
+              "relationBytes": 196608
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 458752,
+            "indexesBytes": 1392640,
+            "relationBytes": 1851392
+          }
+        },
+        {
+          "label": "first-accepted-final",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 1,
+              "tableBytes": 73728,
+              "indexesBytes": 204800,
+              "relationBytes": 278528
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 24576,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 114688,
+              "relationBytes": 147456
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 163840,
+              "relationBytes": 196608
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 49152,
+              "indexesBytes": 98304,
+              "relationBytes": 147456
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 131072,
+              "relationBytes": 196608
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 491520,
+            "indexesBytes": 1449984,
+            "relationBytes": 1941504
+          }
+        },
+        {
+          "label": "readable-report-1",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 1,
+              "tableBytes": 73728,
+              "indexesBytes": 204800,
+              "relationBytes": 278528
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 24576,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 114688,
+              "relationBytes": 147456
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 163840,
+              "relationBytes": 196608
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 49152,
+              "indexesBytes": 98304,
+              "relationBytes": 147456
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 131072,
+              "relationBytes": 196608
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 491520,
+            "indexesBytes": 1449984,
+            "relationBytes": 1941504
+          }
+        },
+        {
+          "label": "readable-report-10",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 10,
+              "tableBytes": 262144,
+              "indexesBytes": 204800,
+              "relationBytes": 466944
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 24576,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 10,
+              "tableBytes": 90112,
+              "indexesBytes": 114688,
+              "relationBytes": 204800
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 10,
+              "tableBytes": 139264,
+              "indexesBytes": 163840,
+              "relationBytes": 303104
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 98304,
+              "relationBytes": 155648
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 73728,
+              "indexesBytes": 147456,
+              "relationBytes": 221184
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 860160,
+            "indexesBytes": 1466368,
+            "relationBytes": 2326528
+          }
+        },
+        {
+          "label": "readable-report-30",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 30,
+              "tableBytes": 622592,
+              "indexesBytes": 204800,
+              "relationBytes": 827392
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 24576,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 30,
+              "tableBytes": 204800,
+              "indexesBytes": 114688,
+              "relationBytes": 319488
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 30,
+              "tableBytes": 286720,
+              "indexesBytes": 163840,
+              "relationBytes": 450560
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 98304,
+              "relationBytes": 163840
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 73728,
+              "indexesBytes": 155648,
+              "relationBytes": 229376
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 1490944,
+            "indexesBytes": 1474560,
+            "relationBytes": 2965504
+          }
+        }
+      ]
+    },
+    {
+      "mode": "shared-compact",
+      "flags": {
+        "ASSESSMENT_COMPACT_FACTS_ENABLED": "true",
+        "ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED": "true",
+        "ASSESSMENT_SHARED_CONTROL_ENABLED": "true"
+      },
+      "snapshots": [
+        {
+          "label": "published-before-start",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 106496,
+              "relationBytes": 114688
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 24576,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 57344,
+              "relationBytes": 65536
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 8192,
+              "relationBytes": 16384
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 81920,
+              "relationBytes": 90112
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 49152,
+              "indexesBytes": 90112,
+              "relationBytes": 139264
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 131072,
+              "relationBytes": 196608
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 376832,
+            "indexesBytes": 1204224,
+            "relationBytes": 1581056
+          }
+        },
+        {
+          "label": "first-real-start",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 204800,
+              "relationBytes": 221184
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 24576,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 57344,
+              "relationBytes": 65536
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 16384,
+              "relationBytes": 49152
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 16384,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 163840,
+              "relationBytes": 180224
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 49152,
+              "indexesBytes": 98304,
+              "relationBytes": 147456
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 131072,
+              "relationBytes": 196608
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 425984,
+            "indexesBytes": 1409024,
+            "relationBytes": 1835008
+          }
+        },
+        {
+          "label": "first-accepted-final",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 204800,
+              "relationBytes": 221184
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 114688,
+              "relationBytes": 131072
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 16384,
+              "relationBytes": 49152
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 6,
+              "tableBytes": 16384,
+              "indexesBytes": 16384,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 65536,
+              "relationBytes": 81920
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 163840,
+              "relationBytes": 196608
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 49152,
+              "indexesBytes": 98304,
+              "relationBytes": 147456
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 131072,
+              "relationBytes": 196608
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 466944,
+            "indexesBytes": 1523712,
+            "relationBytes": 1990656
+          }
+        },
+        {
+          "label": "readable-report-1",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 204800,
+              "relationBytes": 221184
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 114688,
+              "relationBytes": 131072
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 16384,
+              "relationBytes": 49152
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 6,
+              "tableBytes": 16384,
+              "indexesBytes": 16384,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 65536,
+              "relationBytes": 81920
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 163840,
+              "relationBytes": 196608
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 49152,
+              "indexesBytes": 98304,
+              "relationBytes": 147456
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 131072,
+              "relationBytes": 196608
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 466944,
+            "indexesBytes": 1523712,
+            "relationBytes": 1990656
+          }
+        },
+        {
+          "label": "readable-report-10",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 10,
+              "tableBytes": 49152,
+              "indexesBytes": 204800,
+              "relationBytes": 253952
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 10,
+              "tableBytes": 57344,
+              "indexesBytes": 49152,
+              "relationBytes": 106496
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 10,
+              "tableBytes": 16384,
+              "indexesBytes": 114688,
+              "relationBytes": 131072
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 16384,
+              "relationBytes": 49152
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 6,
+              "tableBytes": 16384,
+              "indexesBytes": 16384,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 10,
+              "tableBytes": 16384,
+              "indexesBytes": 65536,
+              "relationBytes": 81920
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 10,
+              "tableBytes": 147456,
+              "indexesBytes": 163840,
+              "relationBytes": 311296
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 98304,
+              "relationBytes": 155648
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 73728,
+              "indexesBytes": 147456,
+              "relationBytes": 221184
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 671744,
+            "indexesBytes": 1540096,
+            "relationBytes": 2211840
+          }
+        },
+        {
+          "label": "readable-report-30",
+          "tables": [
+            {
+              "table": "assessments",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 204800,
+              "relationBytes": 270336
+            },
+            {
+              "table": "assessment_result_facts",
+              "rows": 30,
+              "tableBytes": 98304,
+              "indexesBytes": 49152,
+              "relationBytes": 147456
+            },
+            {
+              "table": "assessment_unit_snapshots",
+              "rows": 30,
+              "tableBytes": 49152,
+              "indexesBytes": 114688,
+              "relationBytes": 163840
+            },
+            {
+              "table": "assessment_runtime_artifacts",
+              "rows": 1,
+              "tableBytes": 32768,
+              "indexesBytes": 16384,
+              "relationBytes": 49152
+            },
+            {
+              "table": "assessment_public_templates",
+              "rows": 6,
+              "tableBytes": 16384,
+              "indexesBytes": 16384,
+              "relationBytes": 32768
+            },
+            {
+              "table": "assessment_frozen_bindings",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 65536,
+              "relationBytes": 122880
+            },
+            {
+              "table": "composite_assessment_attempts",
+              "rows": 30,
+              "tableBytes": 262144,
+              "indexesBytes": 163840,
+              "relationBytes": 425984
+            },
+            {
+              "table": "composite_assessments",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 155648,
+              "relationBytes": 172032
+            },
+            {
+              "table": "composite_assessment_items",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 98304,
+              "relationBytes": 114688
+            },
+            {
+              "table": "composite_report_jobs",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "assessment_run_executions",
+              "rows": 30,
+              "tableBytes": 65536,
+              "indexesBytes": 98304,
+              "relationBytes": 163840
+            },
+            {
+              "table": "assessment_run_tracks",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 65536,
+              "relationBytes": 98304
+            },
+            {
+              "table": "assessment_run_actor_snapshots",
+              "rows": 30,
+              "tableBytes": 57344,
+              "indexesBytes": 73728,
+              "relationBytes": 131072
+            },
+            {
+              "table": "relational_assessment_assignments",
+              "rows": 30,
+              "tableBytes": 73728,
+              "indexesBytes": 155648,
+              "relationBytes": 229376
+            },
+            {
+              "table": "assessment_attempt_consents",
+              "rows": 0,
+              "tableBytes": 8192,
+              "indexesBytes": 32768,
+              "relationBytes": 40960
+            },
+            {
+              "table": "scales",
+              "rows": 2,
+              "tableBytes": 32768,
+              "indexesBytes": 106496,
+              "relationBytes": 139264
+            },
+            {
+              "table": "measurement_content_releases",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            },
+            {
+              "table": "scale_library_entries",
+              "rows": 1,
+              "tableBytes": 16384,
+              "indexesBytes": 49152,
+              "relationBytes": 65536
+            }
+          ],
+          "totals": {
+            "tableBytes": 925696,
+            "indexesBytes": 1548288,
+            "relationBytes": 2473984
+          }
+        }
+      ]
+    }
+  ],
+  "unknown": [
+    "production flags and database size",
+    "heap free space/dead tuple/TOAST component breakdown",
+    "current production disk and pool utilization",
+    "backup compressed/encrypted bytes and actual retained versions",
+    "WAL archival/retention/replication physical occupancy",
+    "billing rates/discounts/region and retention duration"
+  ],
+  "checkpointDeltaCompactMinusLegacy": [
+    {
+      "label": "published-before-start",
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "label": "first-real-start",
+      "tableBytes": -32768,
+      "indexesBytes": 16384,
+      "relationBytes": -16384
+    },
+    {
+      "label": "first-accepted-final",
+      "tableBytes": -24576,
+      "indexesBytes": 73728,
+      "relationBytes": 49152
+    },
+    {
+      "label": "readable-report-1",
+      "tableBytes": -24576,
+      "indexesBytes": 73728,
+      "relationBytes": 49152
+    },
+    {
+      "label": "readable-report-10",
+      "tableBytes": -188416,
+      "indexesBytes": 73728,
+      "relationBytes": -114688
+    },
+    {
+      "label": "readable-report-30",
+      "tableBytes": -565248,
+      "indexesBytes": 73728,
+      "relationBytes": -491520
+    }
+  ],
+  "finalPerTableDelta": [
+    {
+      "table": "assessments",
+      "rows": 0,
+      "tableBytes": -557056,
+      "indexesBytes": 0,
+      "relationBytes": -557056
+    },
+    {
+      "table": "assessment_result_facts",
+      "rows": 30,
+      "tableBytes": 90112,
+      "indexesBytes": 24576,
+      "relationBytes": 114688
+    },
+    {
+      "table": "assessment_unit_snapshots",
+      "rows": 0,
+      "tableBytes": -155648,
+      "indexesBytes": 0,
+      "relationBytes": -155648
+    },
+    {
+      "table": "assessment_runtime_artifacts",
+      "rows": 1,
+      "tableBytes": 24576,
+      "indexesBytes": 8192,
+      "relationBytes": 32768
+    },
+    {
+      "table": "assessment_public_templates",
+      "rows": 6,
+      "tableBytes": 8192,
+      "indexesBytes": 8192,
+      "relationBytes": 16384
+    },
+    {
+      "table": "assessment_frozen_bindings",
+      "rows": 30,
+      "tableBytes": 49152,
+      "indexesBytes": 32768,
+      "relationBytes": 81920
+    },
+    {
+      "table": "composite_assessment_attempts",
+      "rows": 0,
+      "tableBytes": -24576,
+      "indexesBytes": 0,
+      "relationBytes": -24576
+    },
+    {
+      "table": "composite_assessments",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "composite_assessment_items",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "composite_report_jobs",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "assessment_run_executions",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "assessment_run_tracks",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "assessment_run_actor_snapshots",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "relational_assessment_assignments",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "assessment_attempt_consents",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "scales",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "measurement_content_releases",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    },
+    {
+      "table": "scale_library_entries",
+      "rows": 0,
+      "tableBytes": 0,
+      "indexesBytes": 0,
+      "relationBytes": 0
+    }
+  ]
+}

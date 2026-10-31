@@ -6,6 +6,7 @@ import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { CollectionQuestionnaireResponse } from '../../modules/reporting/types'
 import { ReportSection } from '../../modules/reporting/ReportPrimitives'
+import { apiErrorMessage } from '../../utils/apiErrorMessage'
 
 const formatTime = (ms: number) => {
   const minutes = Math.floor(ms / 60000)
@@ -19,6 +20,8 @@ const QuestionnaireResult: React.FC = () => {
   const navigate = learner.navigate
   const [loading, setLoading] = useState(true)
   const [result, setResult] = useState<CollectionQuestionnaireResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [readRevision, setReadRevision] = useState(0)
 
   const loadReportImage = useCallback(async (assetId: string) => {
     if (!assessmentId) throw new Error('缺少报告标识')
@@ -31,19 +34,22 @@ const QuestionnaireResult: React.FC = () => {
     let cancelled = false
     setLoading(true)
     setResult(null)
+    setError(null)
     const fetchResult = async () => {
       try {
         const response = await apiClient.get<CollectionQuestionnaireResponse>(`/questionnaires/assessments/${assessmentId}/report`)
-        if (!cancelled && response.code === 0 && response.data) setResult(response.data)
+        if (cancelled) return
+        if (response.code !== 0 || !response.data) throw new Error(response.message || '报告暂时无法读取，请稍后重试。')
+        setResult(response.data)
       } catch (err) {
-        console.error('获取报告失败', err)
+        if (!cancelled) setError(apiErrorMessage(err, '报告读取失败，请稍后重试。'))
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
     void fetchResult()
     return () => { cancelled = true }
-  }, [assessmentId])
+  }, [assessmentId, readRevision])
 
   if (loading) {
     return (
@@ -60,8 +66,11 @@ const QuestionnaireResult: React.FC = () => {
       <ReportShell
         title="聚合问卷报告"
         description="无法读取当前结果记录。"
-        status={{ kind: 'error', title: '报告不存在或暂时无法读取' }}
-        actions={<button type="button" onClick={() => navigate('/student/questionnaires')} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回问卷列表'}</button>}
+        status={{ kind: 'error', title: '报告不存在或暂时无法读取', description: error }}
+        actions={<>
+          <button type="button" onClick={() => setReadRevision(value => value + 1)} className="hui-button hui-button--primary">重试读取报告</button>
+          <button type="button" onClick={() => navigate('/student/questionnaires')} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回问卷列表'}</button>
+        </>}
       />
     )
   }

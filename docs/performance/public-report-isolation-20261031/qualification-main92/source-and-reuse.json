@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "base": "92e398025fb6fbefe1b051520cf5507295173859",
+  "previous447Head": "97edc2d6185386e757448f10de05fce6e6c46492",
+  "old32CandidatesAndRootPreserved": true,
+  "reusedOriginal447Cases": 10,
+  "originalFilteredCases": 2,
+  "originalLintReused": true,
+  "recordedInputSHA256": {
+    "server-version/frontend/src/pages/public/PublicQuestionnaireResult.tsx": "e75d807fcf71b663a5e572e52e245219bca301978955e356878cdd1ee3c58127",
+    "server-version/frontend/src/pages/public/__tests__/PublicQuestionnaireResult.race.test.tsx": "2228c8fe2a65ddbbedf954ada833f6c36678a2e242ac10f8dc6734a80bdc66a3",
+    "server-version/frontend/src/modules/reporting/__tests__/QuestionnaireResult.test.tsx": "e53755510b21d4b5fcdda7dc783f1eaed9ff0c11bc9117d96f31bfc2236a0428",
+    "server-version/frontend/src/api/publicCapabilityClient.ts": "a9dee09e8dc48849a2cbd93be2092be929b8f25a27172a77ad649059c5e63c34",
+    "server-version/frontend/src/utils/questionnaireResume.ts": "eec19f1cda2ccfb00d5249e4f1cae4e43e10ec9e22fb1cacaf3e98d473d18c53",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+  },
+  "inputMatches": {
+    "server-version/frontend/src/pages/public/PublicQuestionnaireResult.tsx": true,
+    "server-version/frontend/src/pages/public/__tests__/PublicQuestionnaireResult.race.test.tsx": true,
+    "server-version/frontend/src/modules/reporting/__tests__/QuestionnaireResult.test.tsx": true,
+    "server-version/frontend/src/api/publicCapabilityClient.ts": true,
+    "server-version/frontend/src/utils/questionnaireResume.ts": true,
+    "server-version/frontend/package-lock.json": true,
+    "server-version/frontend/tsconfig.app.json": true,
+    "server-version/frontend/vitest.config.ts": true,
+    "server-version/frontend/src/test/setup.ts": true
+  },
+  "purePublicCaseReuse": "Seven race and two missing-public-input cases retain the same actual public page, capability client/resume helper and selected test/setup/lock/config inputs.",
+  "mixedDTOCaseReuse": "The tenth shared DTO case imports the authenticated QuestionnaireResult updated by445. Its normal valid GET and report rendering/DTO branch remain unchanged; only error/retry state changed.445 independently passed the same exact mixed DTO case on its new authenticated source. Retain447 original observation once; no claim that all transitive modules or whole component are byte-identical, no double-count or new business replay.",
+  "supporting445Observation": {
+    "path": "docs/performance/report-read-recovery-20261031/candidate.json",
+    "sha256": "3abbdc39de05abada63e5a3d1937975c7b10eba1fd23dc30db043c0fe85a3c4e",
+    "fullName": "Questionnaire Scale report UI matrix renders the shared DTO without aggregate/overall semantics in authenticated and public pages",
+    "status": "passed",
+    "admittedAsAdditional447Case": false
+  },
+  "main445FrontendDelta": [
+    "server-version/frontend/src/pages/student/QuestionnaireResult.tsx",
+    "server-version/frontend/src/pages/student/ScaleResult.tsx",
+    "server-version/frontend/src/pages/student/__tests__/ReportReadRecovery.test.tsx"
+  ],
+  "currentTypes": "qualification-main92/frontend-types.json and log: one actual Node24.21 app compiler on combined445+449+447, historical194/25 records unchanged.",
+  "workflowSemanticCheck": {
+    "baseExit": 0,
+    "candidateExit": 0,
+    "diagnosticsIdentical": true,
+    "tool": {
+      "release": "v1.7.12",
+      "officialURL": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz",
+      "archiveSHA256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "binarySHA256": "c872d6db8c6bf83a8eaa704fc93999f027d55dffbc63b8a6abdccb47df5f4cd4",
+      "version": "1.7.12\ninstalled by downloading from release page\nbuilt with go1.26.1 compiler for linux/amd64",
+      "scope": "Existing repository-pinned official workflow semantic tool only, not application or CI activation."
+    },
+    "shellcheckInvoked": false,
+    "pyflakesInvoked": false,
+    "scope": "Actual existing official actionlint semantic check, not YAML parsing or CI activation."
+  },
+  "CIActivated": false,
+  "decision": "DISABLED_PENDING_INDEPENDENT_DOT_REVIEW"
+}

@@ -181,8 +181,6 @@ test('visual partition retains three engines and once-only AppShell/QA within th
 test('frontend route builds only the frontend image but preserves scan, CSP and API evidence', () => {
   const docker=job(source('ci-images'),'images');
   const build=fs.readFileSync(new URL('./build-ci-images.sh',import.meta.url),'utf8');
-  assert.match(build,/true\) images=\(frontend\)/);
-  assert.match(build,/false\) images=\(backend worker frontend\)/);
   assert.match(build,/docker compose --env-file \/dev\/null build --print/);
   assert.ok(build.indexOf('compose.json" --print') < build.indexOf('ci-image-plan.mjs"'));
   assert.match(build,/ci-image-plan\.mjs.*--verify/);

@@ -1,0 +1,15 @@
+{
+  "scope": "Synthetic same HTTP fixture serialization; not production measurements or SQL count",
+  "fixtureSha256": "2571671e20a5dea42b1a23f01c5b2be6d52802acf31b1aaf870c446888837b5d",
+  "before": {
+    "rawBytes": 11669,
+    "gzipBodyBytes": 1197
+  },
+  "after": {
+    "rawBytes": 11631,
+    "gzipBodyBytes": 1084
+  },
+  "fieldRows": 41,
+  "units": 3,
+  "note": "Units metadata remains alongside sections in both variants; combined response does not repeat full fields or add definition payloads."
+}

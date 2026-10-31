@@ -20,7 +20,7 @@ describe('Teacher shared education account recovery',()=>{
     render(<HuiteacherApp/>)
     await screen.findByRole('heading',{name:'首次登录 · 修改教育账号密码'})
     expect(calls.filter(c=>c.url.includes('/organizations/'))).toHaveLength(0)
-    fireEvent.change(screen.getByLabelText('当前密码'),{target:{value:'CurrentPass123'}})
+    fireEvent.change(await screen.findByLabelText('当前密码'),{target:{value:'CurrentPass123'}})
     fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'NewPass456'}})
     fireEvent.click(screen.getByRole('button',{name:'确认修改密码'}))
     await waitFor(()=>expect(calls.find(c=>c.url.endsWith('/auth/change-password'))?.body)
