@@ -45,3 +45,27 @@ describe('content order management', () => {
     await waitFor(() => expect(screen.queryByText('量表')).not.toBeInTheDocument())
   })
 })
+
+it.each(['/general-questionnaires/q', '/questionnaires/q'])('loads all mixed units once and submits their full order at %s', async basePath => {
+  const mixed = [
+    { id: 'second-scale', type: 'scale', label: 'Second scale', position: 3, contextSection: false },
+    { id: 'context', type: 'form-section', label: '背景信息', position: 0, itemCount: 1, contextSection: true },
+    { id: 'first-scale', type: 'scale', label: 'First scale', position: 1, contextSection: false },
+    { id: 'second-section', type: 'form-section', label: 'Second section', position: 2, itemCount: 0, contextSection: false },
+  ]
+  get.mockResolvedValue({ code: 0, data: { list: [section], units: mixed } })
+  render(<FormSectionManager basePath={basePath} />)
+  await screen.findByText('First scale')
+  expect(get).toHaveBeenCalledExactlyOnceWith(`${basePath}/form-sections?include=units`)
+  const rows = Array.from(screen.getByText('First scale').closest('ol')!.children)
+  expect(rows.map(row => row.textContent)).toEqual([
+    expect.stringContaining('背景信息'), expect.stringContaining('First scale'), expect.stringContaining('Second section'), expect.stringContaining('Second scale'),
+  ])
+  await userEvent.click(rows[1].querySelectorAll('button')[1])
+  await waitFor(() => expect(post).toHaveBeenCalledWith(`${basePath}/content/reorder`, { units: [
+    { type: 'form-section', id: 'context', position: 0 },
+    { type: 'form-section', id: 'second-section', position: 1 },
+    { type: 'scale', id: 'first-scale', position: 2 },
+    { type: 'scale', id: 'second-scale', position: 3 },
+  ] }))
+})

@@ -36,6 +36,10 @@ export function recipe(check,base,head) {
  const commands=check==='release-tools'&&adapterOnly(base,head)?[['node','--test','.github/scripts/local-validation.integration.test.mjs']]:structuredClone(recipes[check]);
  if(check==='release-tools') {
   const files=git('diff','--name-only','--no-renames',base,head).split('\n');
+  if(files.some(f=>f==='.github/scripts/onboarding-scope.mjs'||f==='.github/scripts/onboarding-controls.test.mjs')) {
+   commands.push(['node','--test','--test-name-pattern=^(onboarding (accepts unchanged main controls|still rejects changed control bytes|needs before snapshots|scope binds exact source)|stable gate still requires admission|Task1 scope refuses incomplete inventories)',
+    '.github/scripts/onboarding-controls.test.mjs','.github/scripts/task1-onboarding-controls.test.mjs']);
+  }
   if(cognitiveIntakeToolingChanged(files)) {
    commands.push(['node','--test','.github/scripts/cognitive-intake-scope.test.mjs','.github/scripts/cognitive-intake-check.test.mjs','server-version/scripts/cognitive/onboarding-selection.test.cjs']);
   }

@@ -84,6 +84,8 @@ export function classify(changes,read){
 const selectedCognitiveControlFiles=new Set(cognitiveIntakeToolingInputs.filter(file=>file.startsWith('server-version/backend/')));
 const selectedScaleControlFiles=new Set(['server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts']);
 const releaseToolFiles=new Set([
+ '.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs',
+ 'docs/development/ci-gate-cleanup-20261031.md',
  ".github/scripts/school-teacher-native.mjs", ".github/scripts/school-teacher-native.test.mjs",
  "docs/performance/codeql-analysis-20261030.md",
  ...cognitiveIntakeToolingInputs,
