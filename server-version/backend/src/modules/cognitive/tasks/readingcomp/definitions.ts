@@ -3,6 +3,7 @@ import { metric } from '../../task-primitives'
 
 export const readingcompRegistryMeta = {
   ...legacy,
+  recommendedForCreate: true,
   randomizationAlgorithmVersion: 'readingcomp-sequence-v1.1.0',
   profileDefinitionVersion: '1.1.0',
   profiles: {

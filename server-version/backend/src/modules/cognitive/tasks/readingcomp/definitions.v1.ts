@@ -51,5 +51,5 @@ export const readingcompRegistryMeta = {
     practicalTips: ['先通读短文，再看问题，回到原文找答案。', '排除明显不对的选项，在剩余选项中比较。'],
     disclaimer: '结果只描述本次阅读理解的表现，不是语言能力、智力或年龄常模判断。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: true,
+  recommendedForCreate: false,
 }

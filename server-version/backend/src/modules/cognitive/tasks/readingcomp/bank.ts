@@ -495,7 +495,7 @@ export const READINGCOMP_BANK: ReadingcompItem[] = [
     "options": [
       "让修复痕迹永远无法追踪",
       "销毁旧照片节省空间",
-      "展示清晰度与原始资料的可核查性",
+      "展示修复结果与原始资料的可核查性",
       "证明修复版本就是原始拍摄内容"
     ],
     "answer": 2,

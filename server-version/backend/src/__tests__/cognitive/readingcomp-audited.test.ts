@@ -11,6 +11,13 @@ const config = { totalTrials: 4, stimulusSetVersion: 'readingcomp-zh-v1.1.0', fi
 const trials = () => bank.slice(0, 4).map((item, trialIndex) => ({ trialIndex, payload: { itemId: item.id, responseIndex: item.answer as number | null, rtMs: 500 as number | null, interrupted: false } }))
 
 describe('readingcomp audited scoring contract', () => {
+  it('recommends only the audited identity for new creation while retaining legacy scoring', () => {
+    expect(executionEntries[0].recommendedForCreate).toBe(false)
+    expect(executionEntries[1].recommendedForCreate).toBe(true)
+    expect(executionEntries[0].engineVersion).toBe('1.0.0')
+    expect(executionEntries[0].score).toBe(legacyScore)
+  })
+
   it('preserves frozen legacy fixtures and separates execution/report identities', () => {
     for (const entry of fixture.cases) {
       if ('expectedError' in entry) expect(() => legacyScore(entry.input as never)).toThrow(entry.expectedError)
@@ -51,6 +58,14 @@ describe('readingcomp audited scoring contract', () => {
     expect(schema.safeParse({ ...config, stimulusSetVersion: 'readingcomp-zh-v1.0.0' }).success).toBe(false)
     expect(schema.safeParse({ ...config, report: { reportVersion: '1.0.0', referenceMode: 'simulated' } }).success).toBe(false)
     expect(schema.safeParse({ ...config, validRtFloorMs: 15000 }).success).toBe(false)
+  })
+  it('keeps rc2-35 correct answer within the stated restoration evidence', () => {
+    const item = bank.find(candidate => candidate.id === 'rc2-35')!
+    expect(item.options[item.answer]).toBe('展示修复结果与原始资料的可核查性')
+    expect(item.passage).toContain('另存修复副本')
+    expect(item.passage).toContain('保留原件')
+    expect(item.passage).toContain('记录改动位置')
+    expect(item.options[item.answer]).not.toContain('清晰度')
   })
   it('has editorial explanations and no copied analogy report text', () => {
     for (const item of bank) { expect(item.explanation.length).toBeGreaterThan(8); expect(new Set(item.options).size).toBe(4) }
