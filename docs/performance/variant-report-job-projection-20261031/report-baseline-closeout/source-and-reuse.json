@@ -1,0 +1,26 @@
+{
+  "base": "a58a16dcdd3998e5262e89a677ff716b8a15b6e7",
+  "product": "2738fdf9a440101016d8b4b9541288916125402a",
+  "backend": "b1db0d6e6ff86ca1a23e02b8138347de178b07fa",
+  "frontend": "6a16f663bd2f59897acbe91546eea3291ffa1bf2",
+  "originalInputSHA256": {
+    "server-version/backend/src/modules/composite/composite.service.ts": "01818702bf4039ce89a27115f195b875d974bedd6483fb4bcb8e163f52be88d3",
+    "server-version/backend/src/__tests__/composite/training-variant-export.test.ts": "647d46ed2c0dd12d8c5e1a3ba1660839b84062aaee3368e5d1045e0c8d18e24d",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/package.json": "eb9818ccb8e7797f201d86d20752aa23bb3c13685d4660ec395f4f905a28f87a",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc"
+  },
+  "retainedBusinessSource": "64fa9e53aa2da3b4077ff22a5edec5f16252e467",
+  "retainedDistinctBusinessCases": 3,
+  "PGReplayed": false,
+  "actualCompilerProducer": "fb535587ccca4c505079b208f36dc2b6b5008b2d",
+  "actualFinalCompilerExit": 0,
+  "actualFinalCompilerSeconds": 36.329,
+  "actualTypeReceiptSHA256": "63c5ce7d594d08b70dc7194603f4e71880241ad306c68a87c362b6ecf38ad99f",
+  "old34AndRootPreserved": true,
+  "controlBeforePolicy": "only actually changed controls plus bindings marker;inheritsC461unchangedcontrols rule",
+  "retainedControlExecution": "3b8404e56fd6972041bb8c48825b322cee93003c plus recorded prepared control working-tree files;one realPASS,not rerun",
+  "newRuntimePermissionOrHistoryChanges": false,
+  "formalCI": "NOTRUN"
+}

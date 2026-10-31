@@ -1,5 +1,6 @@
 import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import React, { useEffect, useState } from 'react'
+import { apiErrorMessage } from '../../utils/apiErrorMessage'
 import { useParams } from 'react-router-dom'
 import apiClient from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
@@ -100,6 +101,7 @@ const ScaleResult: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [readRevision, setReadRevision] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -118,7 +120,7 @@ const ScaleResult: React.FC = () => {
       } catch (err) {
         if (!cancelled) {
           setAssessment(null)
-          setError((err as { message?: string }).message || '报告读取失败')
+          setError(apiErrorMessage(err, '报告读取失败，请稍后重试。'))
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -127,7 +129,7 @@ const ScaleResult: React.FC = () => {
 
     void fetchResult()
     return () => { cancelled = true }
-  }, [assessmentId])
+  }, [assessmentId, readRevision])
 
   if (loading) {
     return <div className="flex items-center justify-center h-64 text-gray-500">加载报告中...</div>
@@ -139,7 +141,10 @@ const ScaleResult: React.FC = () => {
         title="量表报告"
         description="无法读取当前结果记录。"
         status={{ kind: 'error', title: '报告暂时无法打开', description: error || '测评结果不存在或不可访问' }}
-        actions={<button type="button" onClick={() => navigate('/my-assessments')} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回量表列表'}</button>}
+        actions={<>
+          <button type="button" onClick={() => setReadRevision(value => value + 1)} className="hui-button hui-button--primary">重试读取报告</button>
+          <button type="button" onClick={() => navigate('/my-assessments')} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回量表列表'}</button>
+        </>}
       />
     )
   }

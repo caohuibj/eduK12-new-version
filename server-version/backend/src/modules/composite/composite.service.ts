@@ -6142,7 +6142,8 @@ export async function getTrainingVariantReportsForTeacher(userId:string,role:Use
   const rows=await prisma.compositeAssessmentAttempt.findMany({where:{compositeAssessmentId:compositeId,status:'COMPLETED',...(after?{id:{gt:after}}:{}),...(visibility?{AND:[visibility]}:{})},orderBy:{id:'asc'},take:101,
     include:{scaleAssessments:{include:{scale:true}},cognitiveSessions:true,situationalAttempts:true,formAnswers:true,formSectionAttempts:true}})
   const page=rows.slice(0,100),plans=await loadSituationalExportSlotSets(page)
-  const jobs=await prisma.compositeReportJob.findMany({where:{attemptId:{in:page.map(a=>a.id)}}})
+  const jobs=await prisma.compositeReportJob.findMany({where:{attemptId:{in:page.map(a=>a.id)}},
+    select:{attemptId:true,attemptEpoch:true,status:true,slotSetHash:true,contextHash:true,aggregateInputHash:true,reportEncrypted:true}})
   const byAttempt=new Map(jobs.map(j=>[`${j.attemptId}:${j.attemptEpoch}`,j]))
   const selected=[]
   for(const row of page){

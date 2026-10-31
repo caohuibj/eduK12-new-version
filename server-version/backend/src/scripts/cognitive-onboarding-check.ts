@@ -44,7 +44,31 @@ async function main() {
   })
   let packages: any[] = []
   packages = manifests.discover()
-  selection = selectOnboarding(args, packages)
+  try {
+    selection = selectOnboarding(args, packages)
+  } catch (error) {
+    // Batch errors keep the atomic failure envelope in the outer handler.
+    // Legacy callers still receive one schema-v1 decision, without running
+    // manifest generation, acceptance or any validation after a bad selection.
+    if (args.some(arg => arg === '--tasks' || arg === '--tasks-json')) throw error
+    const positional = args.filter((arg, index) => !arg.startsWith('-') && args[index - 1] !== '--base')
+    const task = positional.length === 1 ? positional[0] : args.includes('--all') ? '--all' : 'UNKNOWN'
+    const code = /^COG_[A-Z0-9_]+/.exec((error as Error).message)?.[0] ?? 'COG_SELECTION_INVALID'
+    const blockers: CognitiveBlockerV1[] = []
+    if (positional.length === 1 && !packages.some(p => p.task === task))
+      blockers.push(add('COG_TASK_NOT_FOUND', 'IDENTITY', 'Supply one discovered task directory name.'))
+    if (code !== 'COG_SELECTION_INVALID_TASKS' || !blockers.length)
+      blockers.push(add(code, code.startsWith('COG_COMPATIBILITY_') ? 'COMPATIBILITY' : 'IDENTITY',
+        code === 'COG_COMPATIBILITY_BASE_REQUIRED'
+          ? 'Content-only checks require --base <full commit SHA>.' : (error as Error).message))
+    const decision = composeCognitiveOnboardingDecision({
+      identity: { testType: task, engineVersion: 'UNKNOWN', scoringVersion: 'UNKNOWN' },
+      technicalBlockers: blockers, pilotPublishBlockers: [],
+      scientific: { declaredMaturity: 'PILOT', maxEligibleMaturity: 'PILOT', blockersToNextTier: [] },
+    })
+    process.stdout.write(args.includes('--json') ? serializeCognitiveOnboardingDecision(decision) : formatCognitiveOnboardingDecision(decision))
+    throw error
+  }
   const { json, selected: selectedPackages, frontendSuites } = selection
   try {
     manifests.generate({ check: true })

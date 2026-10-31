@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/student/__tests__/ReportReadRecovery.test.tsx",
+    "--maxWorkers=1",
+    "--testNamePattern=offers explicit read recovery",
+    "--reporter=json",
+    "--outputFile=/workspace/dot-cloud-report-recovery-20261031/docs/performance/report-read-recovery-20261031/baseline.json"
+  ],
+  "startedAt": "2026-10-31T09:43:48.329998+00:00",
+  "endedAt": "2026-10-31T09:43:51.872001+00:00",
+  "seconds": 3.542011334000108,
+  "exitCode": 1,
+  "gitHead": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+  "inputs": {
+    "server-version/frontend/src/pages/student/QuestionnaireResult.tsx": "afcbbad4f21b69a3321ff186a5a2004be55b2dcca5002b3e7c0527a0652fcf04",
+    "server-version/frontend/src/pages/student/ScaleResult.tsx": "8bc0b6dd39922cc9603b4655eedbd701195052041f19dc135cc2e83fbc6bf051",
+    "server-version/frontend/src/pages/student/__tests__/ReportReadRecovery.test.tsx": "958bb136b7b7c8b4bc776070aee45c25ede4e17ca352ace04bf2b74cb6fa2635",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+    "server-version/frontend/src/utils/apiErrorMessage.ts": "10b443021c2b85317b7086e6c3d551f979c43beaccf1be8736685d542b3754d8",
+    "server-version/frontend/src/training/learnerNavigation.ts": "8ab3f44b7329e0488127a29028f7ab7aade3b0b0c74b4f3c1174cb56f4cf30ba",
+    "server-version/frontend/src/modules/reporting/ReportShell.tsx": "7c57e9351bed158457138298ec9a6656ebc8540ed3c5e0b38bc1dc84ed5f63cb"
+  },
+  "priorSetupFailure": "Initial shell used ../../../docs instead of absolute output location; redirection failed before Vitest executed, no assertion result from that command."
+}

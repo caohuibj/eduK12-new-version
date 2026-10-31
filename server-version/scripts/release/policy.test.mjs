@@ -28,9 +28,17 @@ test('selected route is exact success, not a job count; login keeps SAST boundar
 });
 
 test('tooling-only C never implies application builds or data recovery; mixed files/modes are rejected',()=>{
- const files=[regular('server-version/scripts/release/executor.py'),regular('.github/workflows/ci.yml')];assert.equal(toolingOnly(files),true);
- for(const extra of [regular(css),regular('server-version/backend/prisma/schema.prisma'),regular('server-version/scripts/release/unknown.py'),{...files[0],status:'D',newMode:'000000'},{...files[0],newMode:'100755'}])assert.equal(toolingOnly([...files,extra]),false);
+ const files=['server-version/scripts/release/executor.py','.github/workflows/ci.yml','.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs','.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs','docs/development/ci-gate-cleanup-20261031.md'].map(regular);assert.equal(toolingOnly(files),true);
+ for(const extra of [regular(css),regular('server-version/backend/prisma/schema.prisma'),regular('server-version/scripts/release/unknown.py'),regular('.github/scripts/onboarding-bindings.json'),regular('.github/scripts/onboarding-new-check.mjs'),{...files[0],status:'D',newMode:'000000'},{...files[0],newMode:'100755'},{...files[0],newMode:'120000'}])assert.equal(toolingOnly([...files,extra]),false);
  const needs={scope:{result:'success',outputs:{scenario:'release-tooling'}}};assert.deepEqual(requiredChecks(needs,true),['scope','release-tools']);assert.deepEqual(requiredChecks(needs,false),['scope','release-tools','codeql']);
+});
+test('registered development tools retain changed backend tests without admitting runtime source',()=>{
+ const cli='server-version/backend/src/scripts/cognitive-onboarding-check.ts';
+ const files=[cli,'server-version/backend/src/__tests__/cognitive/assignment-api.test.ts','server-version/backend/src/__tests__/cognitive/product-eligibility.test.ts','docs/evidence/cli/checks.json.gz'].map(regular);
+ assert.equal(toolingOnly(files),true);
+ assert.equal(toolingOnly(files.slice(1)),false,'tests alone do not claim a registered tool consumer');
+ for(const file of ['server-version/backend/src/modules/cognitive/service.ts','server-version/backend/prisma/schema.prisma','docs/evidence/cli/run.ts','server-version/backend/src/__tests__/../runtime.test.ts'])assert.equal(toolingOnly([...files,regular(file)]),false,file);
+ for(const newMode of ['120000','100755','000000'])assert.equal(toolingOnly([...files,{...regular(cli),newMode}]),false);
 });
 
 

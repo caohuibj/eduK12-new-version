@@ -1,0 +1,35 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.app.json",
+    "--noEmit"
+  ],
+  "runtimeExecutable": "/opt/codex/cua_node/bin/node",
+  "node": "v24.21.0",
+  "startedAt": "2026-10-31T14:28:21.782093+00:00",
+  "endedAt": "2026-10-31T14:29:08.224463+00:00",
+  "seconds": 46.442370032000326,
+  "exitCode": 0,
+  "componentTree": "9a545fadae5b6d2f7a6177d7b521e12f70e54348",
+  "base": "25cad994ec20b32b53ed8735c732143376536da0",
+  "originalPublicProduct": "03a9cea29c634a36ce6a113c1d13facc693b908c",
+  "before": {
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc",
+    "server-version/frontend/node_modules/typescript/lib/tsc.js": "08e6b5db2bd9ee78fc577ec6dd6bfeca3bc42eaee5c7b582fafc289883f7613d"
+  },
+  "after": {
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc",
+    "server-version/frontend/node_modules/typescript/lib/tsc.js": "08e6b5db2bd9ee78fc577ec6dd6bfeca3bc42eaee5c7b582fafc289883f7613d"
+  },
+  "inputsUnchanged": true,
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "scope": "One actual compiler on main444 plus unchanged447 product; no application tests, Cognitive types, backend compile, CI, FINAL or DB. Selected dependency inputs only, not complete installed-byte attestation."
+}
