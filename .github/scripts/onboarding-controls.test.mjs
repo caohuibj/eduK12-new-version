@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
+import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs,allowedSourcePath} from './onboarding-scope.mjs';
 import {verifyQuestionnaire442Evidence,verifySchool439Evidence,verifyTrainingStandaloneCognitiveObservation,verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,decodeOriginal,verifyCloudComponentTypeReceipt,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
@@ -85,6 +85,27 @@ test('component type receipts bind the selected frontend tree and exact compiler
  assert.throws(()=>verifyTypeReceipt(receipt,review,()=>Buffer.from(''),h('2')));
  assert.throws(()=>verifyTypeReceipt(receipt,{...review,component:'backend'},()=>Buffer.from(''),h('3')));
  assert.throws(()=>verifyTypeReceipt({...receipt,exitCode:2},review,()=>Buffer.from(''),h('3')));
+});
+test('PR449 retains its eight original cases, unchanged input hashes and real compiler argv while disabled',async()=>{
+ const {createHash}=await import('node:crypto');const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+ const cfg=JSON.parse(readFileSync('.github/scripts/onboarding-bindings.json')).candidates['449'];
+ const review=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['449'];
+ assert.equal(typeof cfg.enabled,'boolean');assert.equal(cfg.pr,449);assert.equal(review.product,cfg.product);
+ assert.throws(()=>onboardingPlan([],cfg.base,head,()=>{throw Error('No Git read before activation');},{CI_HEAD_REF:BRANCHES[449],CI_PR_NUMBER:'449'},{...cfg,enabled:false}),/pending independent activation/);
+ assert.equal(allowedSourcePath('server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx','449'),true);
+ assert.equal(allowedSourcePath('server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts','449'),false);
+ const original=review.reports[0],bytes=readFileSync(original.path);assert.equal(digest(bytes),original.sha256);
+ assert.equal(verifyOriginalReport(JSON.parse(bytes),original).length,8);
+ const proof=JSON.parse(readFileSync(review.reuseProof.path));assert.equal(digest(readFileSync(review.reuseProof.path)),review.reuseProof.sha256);
+ assert.equal(Object.keys(proof.originalScopeSHA256).length,73);
+ for(const [path,sha]of Object.entries(proof.originalScopeSHA256))assert.equal(digest(readFileSync(path)),sha);
+ assert.equal(digest(readFileSync(review.originalLint.path)),review.originalLint.sha256);assert.equal(readFileSync(review.originalLint.exitPath,'utf8').trim(),'0');
+ const types=review.types[0],receipt=JSON.parse(readFileSync(types.path));assert.equal(digest(readFileSync(types.path)),types.sha256);
+ assert.equal(verifyTypeReceipt(receipt,types,readFileSync,cfg.components.frontend).component,'frontend');
+ assert.throws(()=>verifyTypeReceipt({...receipt,argv:['node','node_modules/.bin/tsc','--emitDeclarationOnly','-p','tsconfig.app.json']},types,readFileSync,cfg.components.frontend));
+ assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+ const workflow=readFileSync('.github/workflows/ci.yml','utf8').split('- name: select exact Task1 changed application and control SAST inputs')[1].split('- name: authenticate original PR395')[0];
+ assert(JSON.parse(workflow.match(/fromJSON\('([^']+)'\)/)[1]).includes(449));
 });
 test('first-feedback scope permits only reviewed mixed components and scans both source families',()=>{
  const f=fixture(),path='server-version/frontend/src/survey/SurveyPublicApp.tsx',b={...f.b,pr:372,source:{[path]:{before:null,after:blob}}};
