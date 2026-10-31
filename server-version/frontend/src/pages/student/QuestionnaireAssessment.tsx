@@ -545,13 +545,25 @@ const QuestionnaireAssessment: React.FC = () => {
     }
   }
 
+  // Bind the callback when rendered: a FINAL POST may invoke it after leaving.
+  const reloadSource = data && { request: openingRequest.current, attemptId: data.questionnaireAssessment.id }
   const reloadFinalAttempt = async () => {
-    if (!data) return
-    const response = await runWithCompletionRetry(() => apiClient.get<QuestionnaireAssessmentData>(
-      `/questionnaires/assessments/${data.questionnaireAssessment.id}`,
-    ))
-    if (response.code !== 0 || !response.data) throw new Error(response.message || '获取问卷状态失败')
-    setData(response.data)
+    if (!reloadSource) return
+    const current = () => reloadSource.request === openingRequest.current
+    if (!current()) return
+    try {
+      const response = await runWithCompletionRetry(() => {
+        if (!current()) throw new Error('问卷页面已切换')
+        return apiClient.get<QuestionnaireAssessmentData>(`/questionnaires/assessments/${reloadSource.attemptId}`)
+      })
+      if (!current()) return
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '获取问卷状态失败')
+      if (response.data.questionnaireAssessment.id !== reloadSource.attemptId) throw new Error('问卷状态来源不一致')
+      setData(response.data)
+    } catch (error) {
+      // A departed runner must not reinterpret an accepted FINAL as a failure.
+      if (current()) throw error
+    }
   }
 
   const restartLegacyAttempt = async () => {

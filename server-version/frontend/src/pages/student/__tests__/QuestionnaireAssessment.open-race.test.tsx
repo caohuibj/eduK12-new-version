@@ -3,10 +3,15 @@ import { MemoryRouter, Route, Routes, useNavigate, useParams } from 'react-route
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import QuestionnaireAssessment from '../QuestionnaireAssessment'
 
-const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), patch: vi.fn(), register: vi.fn(), flush: vi.fn() }))
+const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), patch: vi.fn(), register: vi.fn(), flush: vi.fn(),
+  reloads: new Map<string, () => Promise<void>>(), rendered: new Map<string, any>() }))
 vi.mock('../../../api/client', () => ({ default: mocks }))
 vi.mock('../../../components/FinalQuestionnaireAssessment', () => ({
-  default: ({ data }: any) => <div>作答入口 {data.questionnaireAssessment.id}</div>,
+  default: ({ data, onReload }: any) => {
+    mocks.reloads.set(data.questionnaireAssessment.id, onReload)
+    mocks.rendered.set(data.questionnaireAssessment.id, data)
+    return <div>作答入口 {data.questionnaireAssessment.id}</div>
+  },
 }))
 vi.mock('../../../services/persistence/checkpointScheduler', () => ({
   checkpointScheduler: { register: mocks.register, flush: mocks.flush, flushAll: vi.fn().mockResolvedValue(undefined) },
@@ -45,6 +50,7 @@ function Page() {
 }
 beforeEach(() => {
   vi.clearAllMocks()
+  mocks.reloads.clear(); mocks.rendered.clear()
   mocks.get.mockReset().mockResolvedValue({ code: 0, data: { list: [] } })
   mocks.post.mockReset().mockImplementation((path: string) => {
     if (path === '/questionnaires/a/assessments') return Promise.resolve(opened('attempt-a'))
@@ -54,6 +60,42 @@ beforeEach(() => {
   mocks.flush.mockResolvedValue(undefined)
 })
 afterEach(() => vi.useRealTimers())
+
+it('keeps same-source reload but ignores both an in-flight old reload and an old callback invoked after navigation', async () => {
+  const pending = deferred()
+  let reads = 0
+  mocks.get.mockImplementation((path: string) => {
+    if (path === '/questionnaires/assessments/attempt-a') {
+      reads += 1
+      return reads === 2 ? pending.promise : Promise.resolve({ code: 0, data: {
+        ...opened('attempt-a').data,
+        questionnaireAssessment: { ...opened('attempt-a').data.questionnaireAssessment, progress: 25 },
+      } })
+    }
+    return Promise.resolve({ code: 0, data: { list: [] } })
+  })
+  render(<Page />)
+  await screen.findByText('作答入口 attempt-a')
+  const reloadA = mocks.reloads.get('attempt-a')!
+  await act(async () => { await reloadA() })
+  expect(mocks.rendered.get('attempt-a').questionnaireAssessment.progress).toBe(25)
+  expect(reads).toBe(1)
+
+  let oldReload!: Promise<void>
+  await act(async () => { oldReload = reloadA() })
+  expect(reads).toBe(2)
+  // A real FINAL runner retains this callback while awaiting its POST. Only
+  // emulate that callback timing here; do not submit a FINAL or real answers.
+  const oldWrite = deferred()
+  const lateCallback = oldWrite.promise.then(() => reloadA())
+  fireEvent.click(screen.getByRole('button', { name: '切换问卷 B' }))
+  await screen.findByText('作答入口 attempt-b')
+  await act(async () => { pending.resolve(opened('attempt-a')); await oldReload })
+  expect.soft(screen.queryByText('作答入口 attempt-b')).not.toBeNull()
+  await act(async () => { oldWrite.resolve(undefined); await lateCallback })
+  expect.soft(reads).toBe(2)
+  expect.soft(screen.queryByText('作答入口 attempt-b')).not.toBeNull()
+})
 
 it.each([false, true])('ignores obsolete availability after switching questionnaire (completed=%s)', async completed => {
   const pending = deferred()

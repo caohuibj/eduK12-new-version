@@ -55,3 +55,21 @@ checkpoint 和 FINAL 协议；不删除持久化草稿，不取消已经发出�
 使用预装 TypeScript 5.6.3、Vitest 4.1.11、React 18.3.1、Router 7.18.3，没有 npm ci。
 Node v24.19.0 低于仓库 engines 的 >=24.21.0；本地成功不冒称受支持 Node 的正式 CI
 资格。没有全套测试、构建、后端、Cognitive types、服务器验收或其他 PR 的重复验证。
+
+## #451 独审补充：FINAL 后重读的源绑定
+
+独审确认 opening 链已保护，但 reloadFinalAttempt 原先在 GET 后直接 setData。
+真实 FinalQuestionnaireAssessment 的区段/量表保存成功及人工重读都会调用 onReload：
+A 的 GET 在途切 B 会回填 A；A 保存等待结束后才调用保留的旧 onReload，也会新发 A GET。
+这是相邻遗漏，不把它说成 opening 补丁引入的新回归。
+
+修复在渲染时捕获 openingRequest 和 attemptId，旧回调在执行前不能借用 B 的当前代次。
+GET/容量重试前及 GET 返回后均核代次，响应还必须属于原 attempt；旧读取错误静默结束，
+当前来源错误仍抛给原通道。已发出的合法 FINAL 不取消，原持久化确认与草稿完成协议不变。
+
+仅新增1条合成回调用例：先核同源重读真实更新进度，再核旧 GET 迟到和旧回调在切页后调用。
+初次1 failed / 11 skipped，三处断言同时显示错页及多出第三次 A GET；定点修后1 passed /
+11 skipped，exit0。没有真实 FINAL、答案或用户数据，旧16例没有重复执行或改写环境身份。
+这次使用已有 Node24.21.0；变化两文件 lint exit0（仍1条原 warning），最终 app types
+exit0、约46秒，记录输入前后相同。前述 Node24.19 的16例仍保留原验证边界，不能因新的
+类型检查成功而说它们已在新运行时重跑。原红/绿 reporter 和类型原件仍仅保留本地。
