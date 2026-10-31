@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ccfq18_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "1046ac8e8d2bd8e679cf212c403c7520e3485b6030f97b0de19f8a6a85f6412d",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "cognitive_control_over_emotion",
+          "appraisal_and_coping_flexibility"
+        ],
+        "scoreOrder": [
+          "cognitive_control_over_emotion",
+          "appraisal_and_coping_flexibility"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "cognitive_control_over_emotion",
+            "headline": "压力来了，能否把注意力带回来",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这组题关注的是：遇到压力时，你通常觉得自己能否把注意力从困扰的想法和感受中带回来，并稳住接下来要做的事。九题按原计分方向调整后的平均分在1到7之间；分数越高，只表示你更认同自己有这样的调节空间，不是客观能力或心理健康等级。比如，事情出了差错后，有时我们还能听清别人说什么，有时却会一直被刚才的画面拉走。这些体验也会随疲劳、事情的难度和身边的支持而变化。中文工作译稿尚未验证，没有高、中、低分界，也不与别人排名。这里不是要求你消除、压住或否定正常情绪。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一件最近让你分心的小事：当时最牵动你的是什么？什么环境、休息或支持让你更容易回到手头的事情？不必为了问卷分数评价自己。"
+              },
+              {
+                "category": "strategy",
+                "text": "下次被担心的念头拉走时，可以先停一停，承认“我现在有些难受”，再选一件眼前能做的小事。让情绪存在，和继续行动可以同时发生；不需要强迫自己把情绪赶走。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "appraisal_and_coping_flexibility",
+            "headline": "遇到难题，给自己多留一种办法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这组题关注的是：面对有压力的事情时，你通常会不会换几个角度理解，并考虑不止一种应对办法。九题的平均分在1到7之间；分数越高，表示你更认同自己会这样思考，而不是证明你总能作出正确决定。比如，收到一条简短回复时，除了“对方不愿理我”，也可以想到“对方正在忙”；接下来既可以等一等，也可以找合适的时间问清楚。情境紧急时先行动同样可能合适，并不是考虑得越多越好。这份中文工作译稿尚未验证，结果用于自我观察，没有临床分界或人群排名，也不是ACT心理灵活性总分。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一个不太棘手的日常难题，问问自己：“除了最先想到的解释，还可能是什么？”留意哪些事实已经知道，哪些只是猜测。"
+              },
+              {
+                "category": "strategy",
+                "text": "试着写下两种可能的解释和两种可做的行动，再结合时间、资源和安全条件选一小步。如果一时想不到其他办法，可以找信任的人一起梳理；不需要逼自己给所有困难找积极解释。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本包为平台中文工作译稿，专家译审、认知访谈和中文目标人群验证均未完成；英语原研究证据不是本中文版本的效度证明。",
+          "用于18岁及以上成人压力情境的研究候选与自我观察，不外推儿童、中小学生或临床群体。applicability声明年龄至少216个月，缺龄不推定符合；此内容包本身不执行注册或部署，真实入口须另行集成验收。",
+          "一般/通常的压力情境，没有最近两周等固定回忆窗口；不是症状筛查、诊断、治疗效果证明或客观认知能力测验。",
+          "只报告两个九题均分1–7，不输出总分、临床阈值、高低等级、常模或百分位。原文回归图±1SD仅作统计对比，不是个人分档。",
+          "原文未建立个人缺失值算法。平台采用各维度九题完整才计算、不插补或折算；任一维度缺题时整体无效且不输出解释，另一完整维度的数值可能保留。",
+          "原文仅核实1 strongly disagree与7 strongly agree；两端中文为工作翻译，中间2–6仅显示数字，不冒充原版完整文字锚点。",
+          "指导语和共有压力情境引导句依据项目中文工作译稿，通过独立instruction字段提供；该译稿仍待专家审校、认知访谈和本地验证，真实入口的呈现以实际系统状态为准。",
+          "通俗解释及日常反思建议是平台原创说明，不是原作者干预方案，不要求压抑或消除正常情绪；CBT相关但非某一疗法专属，不等同ACT心理灵活性。"
+        ],
+        "disclaimer": "仅用于成人研究候选与自我观察；中文工作译稿未经验证，不用于心理诊断或治疗效果判定。两个分量表是自述体验，不是完整ACT心理灵活性。报告解释和建议由平台原创，不是原作者临床方案。© 2018 Gabrys, Tabri, Anisman and Matheson. Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219 原英文最终18题及指导语依据Table 1与正文；CC BY 4.0：https://creativecommons.org/licenses/by/4.0/ 本平台于2026-10-25制作中文工作译稿、数字呈现及原创通俗反馈，均非原作者审定或背书；中文译稿未经验证。改动为英文转中文、只翻译已知两端选项、增加平台报告，不改变原18题顺序和计分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted drafting self-check (not human expert approval)",
+            "reviewedAt": "2026-10-25T22:02:00Z",
+            "basis": "仅核对原文、计分、许可说明及通俗报告边界的AI编辑自查；不代表专家译审、科学审批或本地验证。student是现有schema自答报告技术槽位，不代表K12适用。"
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "cognitive_control_over_emotion",
+          "appraisal_and_coping_flexibility"
+        ],
+        "scoreOrder": [
+          "cognitive_control_over_emotion",
+          "appraisal_and_coping_flexibility"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "cognitive_control_over_emotion",
+            "headline": "带走一句话：脑内广播很响时，先找回一点选择声道的空间",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "压力有时像脑内广播，不停重播一句批评或一段担心。这组九题均分1–7，数字越大，表示更认同自己通常能从这些想法和情绪中带回注意、保有调节空间，不是天生更会控制情绪。\n\n例如，广播还在，你却能暂时听清眼前的人在问什么。如果这样的时刻属于你，可以看看什么在帮忙；如果很难接回声道，也先看看是不是太累、负担太多或缺少支持。不是非得把广播彻底关掉才有下一步，也不必靠把感受压下去证明自己。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回看一次脑内“重播”：它在说什么，眼前又需要你注意什么？找一个曾让声道变清楚的条件，没找到也可以如实记下。"
+              },
+              {
+                "category": "strategy",
+                "text": "若愿意，先说一句“这条广播又来了”，再把注意接到一个眼前问题；需要时暂停或找支持，不要求单人静音全部情绪。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "appraisal_and_coping_flexibility",
+            "headline": "多一个镜头，不等于给困难加一层美颜",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这组九题均分1–7，数字越大，表示更认同自己在压力中会看不同角度、考虑不止一种办法，不是“凡事都能想开”的认证。\n\n比如，一条简短回复可以有多种解释，但哪种更接近事实，还要看背景。如果你愿意换镜头，可以多看一个角度；若现实确实不合理，也不用加一层“其实都是好事”的滤镜。办法也一样：多一个选择是为了更贴合处境，不是把思考清单写得越长越好。两个分量表各自看，不拼成一个总成绩。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给一件不太棘手的事写三行：看得见的事实、第一种解释、另一个可能；把镜头与事实分清。"
+              },
+              {
+                "category": "strategy",
+                "text": "再列两种可行回应，看看成本、时间、安全和意愿，选一个适合当前条件的；需要时找人一起想，不硬找积极意义。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是用于18岁以上成人自我观察的中文工作译稿，尚未验证，无高低分界或诊断结论；只呈现两个自述均分，漏答不当最低分。"
+        ],
+        "disclaimer": "仅用于成人研究候选与自我观察；中文工作译稿未经验证，不用于心理诊断或治疗效果判定。两个分量表是自述体验，不是完整ACT心理灵活性。报告解释和建议由平台原创，不是原作者临床方案。© 2018 Gabrys, Tabri, Anisman and Matheson. Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219 原英文最终18题及指导语依据Table 1与正文；CC BY 4.0：https://creativecommons.org/licenses/by/4.0/ 本平台于2026-10-25制作中文工作译稿、数字呈现及原创通俗反馈，均非原作者审定或背书；中文译稿未经验证。改动为英文转中文、只翻译已知两端选项、增加平台报告，不改变原18题顺序和计分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial self-review; not human or author approval",
+            "reviewedAt": "2026-10-29T16:33:46Z",
+            "basis": "本次仅审读新R文字、分数方向与当前源合同一致性；无计分／报告运行测试，不代表专家译审、人工批准或心理测量验证。保留原成人自答受众，student技术槽位不扩大为K12适用。"
+          }
+        }
+      }
+    }
+  ]
+}

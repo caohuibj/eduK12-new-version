@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "brcs4_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "b9298f5b505c0246e341e8370bddb5f79a562e869ca021360fb55da87d93d80f",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "resilient_coping"
+        ],
+        "scoreOrder": [
+          "resilient_coping"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "resilient_coping",
+            "headline": "面对困难时的应对做法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份回答整理的是你通常怎样面对困难：会不会尝试不同办法、怎样看待自己的反应，以及能否在损失之后寻找可做的事。现实中的压力大小、可用资源和身边的支持，都会影响这些做法能否用得上。有时先休息或向人求助，也是在照顾自己。可以选一件最近遇到的小困难，回想已经尝试过什么，再找一个自己承受得起的下一步。不必强迫自己立刻从困难中找到好处，也不用凭一次回答判断自己够不够坚强。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一件困难：哪些部分你能稍作改变，哪些部分需要时间、资源或他人的帮助？"
+              },
+              {
+                "category": "strategy",
+                "text": "把能做的部分写成一个很小的动作，例如先收集一条信息、尝试另一种办法，或联系一个能商量的人。"
+              },
+              {
+                "category": "support",
+                "text": "如果事情太重，可以先找可靠的人一起分担；不需要独自承担所有损失，也不必急着要求自己积极起来。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份回答反映你当下对通常做法的看法，也会受到处境和可用支持的影响。",
+          "不能凭结果判断一个人是否坚强、是否患有心理疾病，或能否承受未来压力。",
+          "中文为独立研究工作稿，尚未完成译审和本地验证，不适合人与人之间排名。",
+          "没有回答的题目不会补成最低分；题目不完整时，本次结果不作解释。"
+        ],
+        "disclaimer": "供成年人回顾面对困难时的应对做法，不用于诊断、选拔或排名。中文为独立研究工作稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source and plain-language editorial check; human expert review PENDING",
+            "reviewedAt": "2026-10-26T05:57:02.846539Z",
+            "basis": "2016作者共同发表CC BY 4.0附录Table 6英文4题；五点1–5形式按2016正文原版说明及2017正文独立编排，仅标端点，中间为数字；不是2016四点改编版的直接译本。；无常模、经验分档、诊断阈值或作者认可声明。"
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "resilient_coping"
+        ],
+        "scoreOrder": [
+          "resilient_coping"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "resilient_coping",
+            "headline": "应对不是硬扛，工具箱里也可以有暂停键",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：先找能动的一小格，不必马上变坚强。\n\n把应对想成一个工具箱：有时需要换办法，有时需要补资源，有时需要先停一下。这四题只汇总你对这些应对做法的通常自我描述，总分4–20；数值越大，表示整体更认可这些做法，不是“抗压冠军”的分数。\n\n假设一项计划临时泡汤，“再努力一点”未必是唯一工具。查一下能否改期、重新分工、请人一起想办法，或者先让自己缓一缓，都可能是可考虑的下一步。工具能不能用，要看眼前处境，不是看你够不够乐观。\n\n如果某种做法一直帮得上忙，就把它留在手边；如果你只是在咬牙撑住，也可以检查是不是少了信息、时间或帮手。“暂停键”不是放弃按钮，求助也不是工具箱空了。这些是通用比喻和可选方法，不是按你的得分分出的应对类型。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先找一格能动的：把眼前困难画成三栏——我能动一点、需要帮手、眼下先放着。只从第一栏挑一件小事，不包办整张清单。"
+              },
+              {
+                "category": "strategy",
+                "text": "换件工具试一次：如果原办法行不通，试着换一个切口，例如先问清信息，而不是继续加时间硬做。之后看看这个切口有没有用，没用就调整。"
+              },
+              {
+                "category": "support",
+                "text": "把暂停键也放进计划：给自己留一段能休息的空隙，或约一个人讨论具体困难。不把“马上振作起来”当作完成条件。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文为尚未完成译审和本地验证的研究工作稿，没有可用的中文分档或人群排名。四题需完整作答，漏答保留缺失，不补成0或最低分。"
+        ],
+        "disclaimer": "供成年人回顾面对困难时的应对做法，不用于诊断、选拔或排名。中文为独立研究工作稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T15:16:56Z",
+            "basis": "本次只读审阅brcs4_zh_cn_research C1.0.0真实source、已有证据及新1.2.0报告文字：核得分范围/方向、真实时窗、固定解释与条件式例子、可选行动、单一短限制、缺失边界；保留原受众权限和来源许可。不继承旧审核日期，不声称作者批准、中文验证或新计分/PG/CI测试通过。"
+          }
+        }
+      }
+    }
+  ]
+}

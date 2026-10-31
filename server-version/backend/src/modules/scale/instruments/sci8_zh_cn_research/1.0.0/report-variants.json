@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "sci8_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "f1b65d64a6ab33fc7e4b3a1b2848ab23ff39b50b87f8a7b8d07cdb420098c6f9",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "sleep_condition"
+        ],
+        "scoreOrder": [
+          "sleep_condition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "sleep_condition",
+            "headline": "最近，睡眠怎样影响了你？",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这些回答把过去一个月的入睡、夜间醒来、睡眠感受和白天生活放在一起看。分数越高，表示这次回答呈现的睡眠状况相对更好；它不是对作息自律的评分，也不能确定你是否有失眠障碍。比如，有人躺下很久才睡着，有人夜里醒后难再入睡，也有人主要感到白天精力不足。把最困扰自己的部分说清楚，比追求一个漂亮分数更有帮助；即使分数较高，真实的不舒服仍值得被认真对待。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "过去一个月，最难受的是入睡、夜里醒来，还是白天受影响？有没有相对轻松的一晚，当时有什么不同？"
+              },
+              {
+                "category": "support",
+                "text": "可以简单记录几天的睡眠和白天感受。若困扰持续或明显影响生活、安全，可带着记录与专业人员讨论，不必等分数越过某条线。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文为独立工作译稿，尚待人工审校和本地验证，仅供成人非商业研究。",
+          "原研究的参考分界或统计分组另有来源档案，本报告不把它们直接用于这份中文译稿，不作诊断、排名或风险分档。",
+          "8题都需完整有效回答才提供完整报告；漏答不补零、不猜测，不承诺保留部分维度反馈。",
+          "结果只是本次回答的记录，不代表永久状态；不用于选拔、学生筛选或教师考核。"
+        ],
+        "disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。 Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183. https://bmjopen.bmj.com/content/4/3/e004183 https://creativecommons.org/licenses/by-nc/4.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业研究；不用于心理诊断。 SCI版权归Sleepio Limited；按CC BY-NC 4.0使用。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T15:59:00Z",
+            "basis": "AI editorial check only; everyday adult language, no automatic external bands, clear NC and working translation. Not human expert/clinical validation."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "sleep_condition"
+        ],
+        "scoreOrder": [
+          "sleep_condition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "sleep_condition",
+            "headline": "别给自己再加一场“睡眠考试”",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：这份数字是线索，不是今晚必须考好的成绩。\n\n先把方向看对\n\n八题0–4分相加，总分0–32；越大表示这次整体睡眠描述较好，不是失眠更重。前七题回顾过去一个月的夜间睡眠与白天影响，第八题还问问题持续多久。它不统计睡眠小时，也不会发一张自律合格证；当前中文稿没有高低等级线。\n\n同一个总数，可能藏着不同的夜晚\n\n假设一个人很难入睡，另一个人主要是夜里醒后不好再睡，第三个人更在意白天没精神。总数不会替你把原因和最难受的环节排出来，例子也不是系统已查明你的情况。说清“哪里难、怎样影响生活”，比追一个漂亮数字更具体。\n\n已有合适的安排可以继续保留；如果仍然难受，也不用因为分数看起来不小，就觉得自己没资格求助。休息机会、工作与照护责任、环境或身体状况，都可能需要一起了解，不是只靠催自己“赶快睡”。\n\n下面三个入口，选一个能减轻负担的即可，不要求你把睡眠管理得更用力。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给一晚留几笔，不做夜间计时员：愿意时简记睡眠的大致情况、白天受影响的地方和当时条件。别为了记录反复看钟；如果记录让你更紧绷，可以先停下，直接说自己的困扰。"
+              },
+              {
+                "category": "environment",
+                "text": "先松开一个现实的结：看能否减少一项不必要的打扰，或商量一个更可行的责任安排。它是观察条件的尝试，不是保证立刻睡好，也不要求把照护或工作限制都自己解决。"
+              },
+              {
+                "category": "support",
+                "text": "把最困扰的一段带去讨论：持续影响生活或安全时，可与合适专业人员商量。这个分数不替你下诊断、排除问题或决定治疗调整；不用先“考得够差”才寻求支持。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "独立中文工作稿尚未验证，仅供成人非商业研究；不作诊断、风险分档或人群排名。"
+        ],
+        "disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。 Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183. https://bmjopen.bmj.com/content/4/3/e004183 https://creativecommons.org/licenses/by-nc/4.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。 仅非商业研究；不用于心理诊断。 SCI版权归Sleepio Limited；按CC BY-NC 4.0使用。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:06:07Z",
+            "basis": "本次AI文字自审对应sci8_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}
