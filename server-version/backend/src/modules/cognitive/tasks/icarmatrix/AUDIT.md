@@ -7,6 +7,9 @@ of #441 is not part of the four-task change.
 
 ## Decision
 
+Participant-facing name: **项目矩阵推理试测版（七题范围）**. This is the
+project pilot, not an age-adapted ICAR standard test.
+
 Recommend **engine 2.1.0 / scoring 1.1.0 / config 2.1.0 / report 1.1.0**, using
 `matgen-reviewed-v1.0.0`, a seven-item 3×3 pilot subset of the existing procedural
 matRiks bank. Experience/standard/research use 4/6/7 distinct formal items,

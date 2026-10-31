@@ -124,7 +124,7 @@ export const IcarmatrixV21Task: React.FC<CognitiveTaskProps> = ({ taskContext, t
     setFormalFeedback(null); setSelected(null); setSubPhase('fixation'); setPhase('formal')
   }, [])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="图形矩阵推理 · 七题试测版" description={<p>每张图按行、按列都在按规律变化，右下角缺了一块。请找出规律，从选项中挑出缺失的图形。</p>} hint={<><p>本次共 {totalTrials} 题，每题限时 {Math.round(timeoutMs / 1000)} 秒。先仔细找规律，再点击选项；练习不计入成绩。此为本项目七题试测范围，不是原版 ICAR 全套测验。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="项目矩阵推理试测版（七题范围）" description={<p>每张图按行、按列都在按规律变化，右下角缺了一块。请找出规律，从选项中挑出缺失的图形。</p>} hint={<><p>本次共 {totalTrials} 题，每题限时 {Math.round(timeoutMs / 1000)} 秒。先仔细找规律，再点击选项；练习不计入成绩。此为本项目七题试测范围，不是原版 ICAR 全套测验。</p></>} onAction={startPractice} />
 
   const cellSize = 80
   const optionSize = 64

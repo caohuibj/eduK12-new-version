@@ -109,7 +109,7 @@ export const icarmatrixV2RegistryMeta = {
 /** Current recommendation. Old identities are retained for frozen sessions only. */
 export const icarmatrixV21RegistryMeta = {
   ...icarmatrixV2RegistryMeta,
-  name: '图形矩阵推理 · 七题试测版',
+  name: '项目矩阵推理试测版（七题范围）',
   randomizationAlgorithmVersion: 'matgen-reviewed-v1.0.0',
   profileDefinitionVersion: '2.1.0',
   profiles: {
@@ -128,7 +128,7 @@ export const icarmatrixV21RegistryMeta = {
   reportDefinitionVersion: '1.1.0',
   reportDefinition: {
     ...icarmatrixV2RegistryMeta.reportDefinition,
-    title: '图形矩阵推理 · 七题试测版',
+    title: '项目矩阵推理试测版（七题范围）',
     showProductIndex: false,
     primaryMetrics: ['accuracy', 'correctCount', 'answeredCount', 'timeoutCount'],
     secondaryMetrics: ['medianRtMs', 'validRtCount'],

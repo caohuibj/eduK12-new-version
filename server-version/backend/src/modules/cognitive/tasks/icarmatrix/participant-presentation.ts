@@ -308,7 +308,7 @@ const previous = participantPresentations[1]
 participantPresentations.push({
   ...previous,
   presentationVersion: '1.1.0', engineVersion: '2.1.0', scoringVersion: '1.1.0',
-  title: '图形矩阵推理 · 七题试测版',
+  title: '项目矩阵推理试测版（七题范围）',
   metrics: {
     ...previous.metrics,
     medianRtMs: { label: '有效作答中位用时', explanation: '排除低于用时下限及中断的已作答题；含正确和错误答案。用时长短不等于能力高低。' },

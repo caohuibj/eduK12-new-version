@@ -52,7 +52,7 @@ const IcarmatrixV21Task = deferredCognitiveRunner(() => import('./IcarmatrixV21T
 export const icarmatrixV21RegistryEntry: CognitiveFrontendRegistryEntry = {
   ...icarmatrixV2RegistryEntry,
   testType: 'icarmatrix', engineVersion: '2.1.0', scoringVersion: '1.1.0',
-  name: '图形矩阵推理 · 七题试测版',
+  name: '项目矩阵推理试测版（七题范围）',
   RunnerComponent: IcarmatrixV21Task, prepareRunner: IcarmatrixV21Task.prepare,
   metricDefinitions: [
     { key: 'accuracy', label: '总体正确率', displayType: 'percentage' },
@@ -63,7 +63,7 @@ export const icarmatrixV21RegistryEntry: CognitiveFrontendRegistryEntry = {
     { key: 'validRtCount', label: '有效用时题数', displayType: 'number' },
   ],
   reportDefinition: {
-    title: '本次图形矩阵推理表现', headlineMetric: 'accuracy', showProductIndex: false,
+    title: '项目矩阵推理试测表现', headlineMetric: 'accuracy', showProductIndex: false,
     summaryMetrics: ['correctCount', 'answeredCount', 'timeoutCount'],
     practicalTips: ['把形状、方向、填充分开观察，再用行列规律检查。', '可用拼图、折纸或图形游戏练习；用时长短不等于能力高低。'],
     disclaimer: '本项目七题试测范围，不是原版 ICAR 全套；无常模、IQ 或能力等级。',
