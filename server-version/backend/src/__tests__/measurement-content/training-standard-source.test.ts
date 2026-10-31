@@ -270,16 +270,16 @@ it('projects each approved C/P/R version label for the authorized Training picke
 })
 
 
-it('projects only validated frozen version labels into teacher summaries without current authority reads',async()=>{
+it('projects only validated frozen display metadata into teacher summaries without current authority reads',async()=>{
  const f=trainingSourceHarness(),source=await run(f),combination=source.reference.combination
  // Historical labels come from the validated frozen item, even after mutable
  // availability changes. The caller still owns normal container/data ACL.
  f.h.use=null;f.h.entryActive=false;f.h.row.state='WITHDRAWN';f.h.calls=[]
  const summary=trainingStandardCombinationSummary(source)
- expect(summary).toEqual({instrumentVersion:combination.instrumentVersion,axisVersions:{
+ expect(summary).toEqual({instrumentVersion:combination.instrumentVersion,configurationName:null,authorizationMode:'LEGACY',axisVersions:{
   CONTENT:combination.axes.CONTENT.version,PARAMETERS:combination.axes.PARAMETERS.version,REPORT:combination.axes.REPORT.version}})
  expect(summary.axisVersions).not.toBe(combination.axes)
- expect(Object.keys(summary).sort()).toEqual(['axisVersions','instrumentVersion'])
+ expect(Object.keys(summary).sort()).toEqual(['authorizationMode','axisVersions','configurationName','instrumentVersion'])
  expect(JSON.stringify(summary)).not.toMatch(/authority|issuer|grant|hash|releaseId|scaleId|ownerId|definition|snapshot/i)
  expect(f.h.calls).toEqual([]);expect(f.h.writes).toEqual([])
  const tampered=JSON.parse(JSON.stringify(source));tampered.reference.combination.axes.REPORT.version='later-report'

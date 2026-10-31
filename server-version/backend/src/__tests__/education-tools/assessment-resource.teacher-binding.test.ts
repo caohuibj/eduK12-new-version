@@ -10,14 +10,24 @@ import {addTeacherRunTrack} from '../../modules/huiteacher/run.service'
 const input={organizationId:'org',eventId:'event',actorUserId:'actor',expectedRunId:'run-original',expectedVersion:3,
  resource:{family:'COGNITIVE' as const,key:'education-assessment:TEACHER:org:resource',version:'1.0.0'},subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'},
  requestedPolicy:{subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:'approved',minimumRespondents:null}}
+const linkQuery=(runId='run-original')=>async(query:TemplateStringsArray,...values:unknown[])=>{
+ const sql=query.join('')
+ if(sql.includes('FROM "huiteacher_evaluation_run_links" link')&&sql.includes('JOIN "assessment_runs" run')
+  &&sql.includes('WHERE link."organization_id"=')&&sql.includes('LIMIT 1')){
+  expect(values).toEqual(['org','event'])
+  return [{runId,eventStatus:'DRAFT',runStatus:'DRAFT',runVersion:3}]
+ }
+ throw new Error('Unexpected Teacher event run binding query')
+}
 beforeEach(()=>{
  vi.clearAllMocks();m.member.mockResolvedValue({productAdmin:true});m.manager.mockResolvedValue(undefined);m.config.mockResolvedValue(null);m.add.mockResolvedValue({id:'track'})
- m.query.mockResolvedValue([{runId:'run-original',eventStatus:'DRAFT',runStatus:'DRAFT',runVersion:3}])
- m.resolve.mockResolvedValue({family:'COGNITIVE',subjectRoles:['TEACHER'],runtimeLaunchTarget:{kind:'COMPOSITE',ref:'runtime'}})
+ m.query.mockImplementation(linkQuery())
+ m.resolve.mockResolvedValue({family:'COGNITIVE',key:input.resource.key,version:input.resource.version,
+  subjectRoles:['TEACHER'],runtimeLaunchTarget:{kind:'COMPOSITE',ref:'runtime'}})
 })
 describe('Teacher event implicit run binding',()=>{
  it('refuses an event rebound to a different run even if its version is identical',async()=>{
-  m.query.mockResolvedValue([{runId:'run-replacement',eventStatus:'DRAFT',runStatus:'DRAFT',runVersion:3}])
+  m.query.mockImplementation(linkQuery('run-replacement'))
   await expect(addTeacherRunTrack(input)).rejects.toMatchObject({code:'HUITEACHER_RUN_BINDING_CHANGED',statusCode:409})
   expect(m.resolve).not.toHaveBeenCalled();expect(m.add).not.toHaveBeenCalled()
  })

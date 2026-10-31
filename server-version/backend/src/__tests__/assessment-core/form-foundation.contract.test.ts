@@ -76,6 +76,7 @@ describe('shared Form foundation immutable baseline oracle',()=>{
     const allowed=new Set(['zod','../assessment-media/assessment-image','../../assessment-runtime/canonical','../definition-primitives','./definition','./answers'])
     // Keep new shared pure modules explicit; no adapter/database/HTTP directory allowances.
     const moduleDependencies:Record<string,readonly string[]>={
+      'form/import-builder.ts':['./import-parser'],
       'form/definition.ts':['../../assessment-media/material'],
       'flow/training.ts':['../materials/definition','./compiler'],
       'materials/definition.ts':['../flow/compiler','../flow/definition'],

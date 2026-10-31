@@ -16,6 +16,7 @@ const { mockPrisma, getProtocolMock } = vi.hoisted(() => ({
     cognitiveAssignment: { findMany: vi.fn(), create: vi.fn(), findUnique: vi.fn() },
     course: { findUnique: vi.fn() },
     scale: { findUnique: vi.fn(), findMany: vi.fn() },
+    user: { findUnique: vi.fn() },
     materialGrant: { findUnique: vi.fn() },
     $transaction: vi.fn(),
     $queryRaw: vi.fn(),
@@ -145,6 +146,7 @@ beforeEach(() => {
     return await last.value
   }))
   mockPrisma.scale.findMany.mockResolvedValue([{id:'scale-1',status:'PUBLISHED',creatorId:'teacher-1'}])
+  mockPrisma.user.findUnique.mockResolvedValue({ accountDomain: 'TRAINING' })
   getProtocolMock.mockImplementation((key: string, version: string) =>
     key === protocol.key && version === protocol.version ? protocol : undefined,
   )
@@ -337,6 +339,7 @@ describe('Composite analysis protocol publish freeze', () => {
       items: [{ id:'item-scale',type: 'SCALE', scaleId:'scale-1', required: true, position:0, scale: { id: 'scale-1', code:'adexi_v1',status: 'PUBLISHED', creatorId:'teacher-1',instrumentClass:'STANDARD',instrumentVersion:'2.0.0',definition:ADEXI_V2_DEFINITION } }],
     }))
     await publishComposite('teacher-1', TEACHER, 'composite-1')
+    expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({ where: { id: 'teacher-1' }, select: { accountDomain: true } })
     expect(mockPrisma.compositeAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ analysisProtocolSnapshotEncrypted: null }),
     }))

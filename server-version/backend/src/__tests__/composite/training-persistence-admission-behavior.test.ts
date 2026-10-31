@@ -40,6 +40,7 @@ beforeEach(() => {
     items: [], formSections: [], trainingTimingPolicy: null,
     // Isolate persistence modes while retaining the integrated shared header.
     trainingFeedbackPolicy: null, trainingFeedbackPolicyHash: null,
+    personalTracking: null, personalTrackingBaselineId: null, personalTrackingOrdinal: null,
   }
   configure(true, false)
   db.$transaction.mockImplementation(async callback => callback(db))
@@ -98,6 +99,7 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
     expect(Object.keys(selected[0][0].select).sort()).toEqual([
       'status', 'publicEnabled', 'opensAt', 'expiresAt', 'trainingPersistencePolicy', 'trainingPersistencePolicyHash',
       'trainingFeedbackPolicy', 'trainingFeedbackPolicyHash', 'trainingContentSnapshot', 'trainingContentSnapshotHash',
+      'personalTracking', 'personalTrackingBaselineId', 'personalTrackingOrdinal',
     ].sort())
     if (!enabled) expect(db.$queryRaw.mock.calls.some(([query]) => query.join('').includes('FOR SHARE OF c,u'))).toBe(false)
     expect(state.order).toEqual(enabled

@@ -21,7 +21,7 @@ describe('Review: ordinary Teacher page isolates current source-use withdrawal',
  beforeEach(()=>vi.resetAllMocks())
  it('retains an entered questionnaire when another not-yet-entered source on the page loses U',async()=>{
   const entered=row(1,'STARTED'),withdrawn=row(2,'ASSIGNED')
-  const frozen=(key:string)=>({kind:'COMPOSITION',origin:{entry:'TEACHER'},compositeId:id(50),title:key===entered.resourceKey?'已入场问卷':'已撤回来源',units:[],identityOnly:true})
+  const frozen=(key:string)=>({kind:'COMPOSITION',origin:{entry:'TEACHER',variantKey:'TEACHER:SELF'},compositeId:id(50),title:key===entered.resourceKey?'已入场问卷':'已撤回来源',units:[],identityOnly:true})
   vi.mocked(readFrozenCompositionIdentity).mockImplementation(async(_tx,input)=>frozen(input.key) as Awaited<ReturnType<typeof readFrozenCompositionIdentity>>)
   vi.mocked(assertCompositionCollection).mockImplementation(async(_tx,_identity,purpose)=>{
    if(purpose==='NEW_START')throw new EducationPrivateToolError('PUBLIC_SOURCE_USE_REQUIRED',403)
@@ -38,7 +38,7 @@ describe('Review: ordinary Teacher page isolates current source-use withdrawal',
  })
  it('advances by the last scanned row when a known withdrawn source leaves an empty page',async()=>{
   const withdrawn=row(2,'ASSIGNED'),entered=row(1,'STARTED'),actor=id(60)
-  vi.mocked(readFrozenCompositionIdentity).mockResolvedValue({origin:{entry:'TEACHER'},compositeId:id(50),title:'Fixed',units:[]} as never)
+  vi.mocked(readFrozenCompositionIdentity).mockResolvedValue({origin:{entry:'TEACHER',variantKey:'TEACHER:SELF'},compositeId:id(50),title:'Fixed',units:[]} as never)
   vi.mocked(assertCompositionCollection).mockImplementation(async(_tx,_identity,purpose)=>{if(purpose==='NEW_START')throw new EducationPrivateToolError('LIBRARY_SOURCE_USE_REQUIRED',403)})
   const db={$queryRaw:vi.fn().mockResolvedValueOnce([withdrawn,entered]).mockResolvedValueOnce([entered])} as unknown as Prisma.TransactionClient
   const access=createTeacherAssessmentAccess(db,{readIdentity:vi.fn(),assertUse:vi.fn()})
@@ -48,7 +48,7 @@ describe('Review: ordinary Teacher page isolates current source-use withdrawal',
   expect((await access.page(actor,{pageSize:1,cursor:first.nextCursor})).list.map(task=>task.executionId)).toEqual([entered.executionId])
  })
  it('propagates an unknown 403 instead of treating it as ordinary source withdrawal',async()=>{
-  vi.mocked(readFrozenCompositionIdentity).mockResolvedValue({origin:{entry:'TEACHER'},compositeId:id(50),title:'Fixed',units:[]} as never)
+  vi.mocked(readFrozenCompositionIdentity).mockResolvedValue({origin:{entry:'TEACHER',variantKey:'TEACHER:SELF'},compositeId:id(50),title:'Fixed',units:[]} as never)
   const error=new EducationPrivateToolError('SYNTHETIC_UNKNOWN_DENIAL',403)
   vi.mocked(assertCompositionCollection).mockRejectedValue(error)
   const db={$queryRaw:vi.fn().mockResolvedValue([row(1,'ASSIGNED')])} as unknown as Prisma.TransactionClient

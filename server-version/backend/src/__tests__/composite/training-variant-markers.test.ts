@@ -57,7 +57,9 @@ describe('Training variant marker projection contract', () => {
     expect(trainingVariantMarkerState(attempt, Object.create(definition))).toBe('UNKNOWN')
   })
   it('keeps both generated Prisma selectors on the complete marker shape', () => {
-    expect(Object.keys(TRAINING_VARIANT_DEFINITION_MARKER_SELECT)).toEqual(fields.filter(([owner]) => owner === 'definition').map(([, field]) => field))
+    // creationKey identifies the source definition; it is not a variant marker.
+    expect(TRAINING_VARIANT_DEFINITION_MARKER_SELECT).toEqual({ creationKey: true,
+      ...Object.fromEntries(fields.filter(([owner]) => owner === 'definition').map(([, field]) => [field, true])) })
     expect(TRAINING_VARIANT_PARENT_MARKER_SELECT).toEqual({ id: true,
       trainingContentBindingHash: true, trainingReferenceBindingHash: true,
       trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
