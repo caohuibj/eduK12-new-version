@@ -180,5 +180,5 @@ test('Teacher group uses the existing scoped route: Draft scope only, Ready exis
  assert.deepEqual(personalTrackingReadyPlan(entries,binding.base,head,{event:'pull_request',branch:binding.branch,draft:true}).required,['scope']);
  assert.throws(()=>personalTrackingReadyPlan([...entries,{file:'server-version/backend/src/modules/auth/unknown.ts',status:'A',oldMode:'000000',newMode:'100644'}],binding.base,head,{event:'pull_request',branch:binding.branch,draft:false}));
  assert.throws(()=>personalTrackingReadyPlan(entries,'0'.repeat(40),head,{event:'pull_request',branch:binding.branch,draft:false}));
- const evidence=await admitOriginalReports();assert.equal(evidence.caseCount,9);assert.equal(evidence.ciExecuted,false);
+ const evidence=await admitOriginalReports();assert.equal(evidence.caseCount,10);assert.equal(evidence.ciExecuted,false);
 });

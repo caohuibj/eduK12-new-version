@@ -71,9 +71,8 @@
     "HTTP mount and event API base agree; strict body does not accept internal partial-source options; shared UI retains old history when config changes."
   ],
   "confirmedRemaining": [
-    "Existing shared numeric producer rejects superset spec when a later source allows only a subset. Group owner interface required.",
-    "Private education-composition single-wave GROUP consumer remains Group-owned.",
-    "Native Form numeric release/plan is explicitly conditional in the approved closeout plan, not a missing JSX entry."
+    "Private education-composition single-wave GROUP source is still Group-owned and pending.",
+    "Final bounded official qualification and merge remain pending; Draft scope is not Ready qualification."
   ],
   "formalDraftCI": {
     "run": 41172913061,
@@ -126,5 +125,17 @@
     ],
     "formalCIActive": false,
     "reason": "Prepare current real base without changing frozen PR440 or replaying unaffected feature observations. Group owner delta still missing."
+  },
+  "partialMetricsIntegration": {
+    "groupMerge": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+    "ownerProducerHead": "5f72668a2e35192086184408c8ee744f87814bea",
+    "actualProducerBlob": "37f4b07c78a1888572c4b99ba7c73f65a954537f",
+    "ownChangedProductionPaths": [
+      "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts"
+    ],
+    "newFocusedCases": 1,
+    "previousCasesReexecuted": false,
+    "finalsReexecuted": false,
+    "report": "partial-adapter.json"
   }
 }

@@ -14,3 +14,9 @@ Base main `f5fa29314eb731f0479b90ae962b731da8e08d34`. All data is isolated synth
 Pending shared owner dependency: existing numeric generator rejects an entire spec if one source metric is outside a round's organization ceiling. A plan A/B with only A currently disclosed needs an internal partial-source option; B must remain null, default single report and all existing disclosure/transaction boundaries unchanged. No duplicate generator was added. Private education-composition single-wave consumer remains Group-owned. Native Form numeric plan is a separate explicitly pending scope decision.
 
 No old 22/37 cases, old 20 Cognitive/SJT FINALs, or all-tool matrix were rerun. No new statistical engine, account platform, table, scientific gate, Profile, paired analysis, or production change.
+
+## Partial-source integration after released Group #443
+
+The actual existing producer now accepts `generateTeacherNumericGroup(input,{allowPartialSourceMetrics:true})` from main `f941e745d1c4148bd2e692a1c6e75af847d93fa5`. Only the longitudinal call opts in; the default producer and HTTP remain unchanged. `partial-adapter.json` adds exactly one successful mock adapter boundary: same frozen A/B plan, T1 A/B and T2 A only, A values0/1 survive, B7/null with suppressed counts/deltas, exact internal option passed, old saved read does not rediscover. Five old cases were filtered, not replayed. Group's existing producer test/transaction proof and our previous20 FINALs are reused rather than rerun. This is ten distinct scoped local cases in total; it is not a new PG multi-metric journey.
+
+Private education-composition source consumption remains Group-owned and not yet delivered in mainf941; native Teacher Form numeric longitudinal is explicitly excluded this round. Formal Ready qualification remains pending the complete intended source integration.

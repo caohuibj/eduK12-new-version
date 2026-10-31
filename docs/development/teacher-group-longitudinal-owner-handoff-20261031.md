@@ -81,3 +81,7 @@ The user's later clarification explicitly excludes native Teacher numeric Form l
 ## Current-main preparation after DOT #439/#442
 
 Actual main `769141d5bc4954919b163a8d8d522530048fbfb6` was merged without conflicts into the independent preparation branch. All six #440 runtime source blobs and its TEACHER CHECK migration remain exact. Main changed School login and the student questionnaire retry, not Teacher/group report implementations. `static-review.json` records those identities. Do not rerun the nine local feature cases or twenty FINALs. The initial Draft scope success remains bound to b467/f5fa; it is not relabelled as current Ready qualification. Final base/source pins must include the Group owner delta once, then use the same original qualification route. No new feature PR is opened for preparation/docs.
+
+## Actual Group interface delivered and consumed
+
+Group #443 is merged as mainf941e745d1c4148bd2e692a1c6e75af847d93fa5 (producer head5f72668a2e35192086184408c8ee744f87814bea). The exact `allowPartialSourceMetrics` second argument is now used by this service. One new planned A/B→onlyA mock adapter boundary passes; the previous nine cases,20 FINALs and upstream producer proof were not repeated. Private education-composition source remains the only missing owner source delta; no native Form expansion is included. Keep final Ready qualification tied to that complete small source rather than prebuilding an incomplete backend.

@@ -22,5 +22,7 @@
   "selected-types-frontend.json": "771fc0bd761a306fb814caad834947746830ed9cae40a4f350ee5c03744e1bb6",
   "adapter-run2.json": "ab5494cdd7133879cfa8daf0bbb40ecc24be9174c8b81deb42f0413152ba7e0d",
   "ui-first.log": "a3be2fae870a977c8c61849e022092dbb617ce537189b509f11562922459c2db",
-  "adapter-first.json": "7cfe38648e284283a6d58653e80cd0ed73fbf2bc6192c9b7819d0d423359f6e5"
+  "adapter-first.json": "7cfe38648e284283a6d58653e80cd0ed73fbf2bc6192c9b7819d0d423359f6e5",
+  "partial-adapter.json": "ebcb148cb95a97b6233fd8dad9b7d783751114680455655cef7d0b58a075f155",
+  "partial-adapter.log": "8cd3d9fdc02d593515b21216c4aa27a29a9aa454ed7ea0a59b061437c0124f63"
 }

@@ -161,7 +161,7 @@ export async function generateTeacherGroupLongitudinal(input:TeacherNumericScope
   }
   // The single-wave service owns source authority, delay, effective N,
   // differential disclosure and the transaction/lock. No second group engine.
-  const safe=await generateTeacherNumericGroup({...input,eventId:source.wave.eventId,trackId:source.trackId,leaf:source.leaf,selection:bindings.selection})
+  const safe=await generateTeacherNumericGroup({...input,eventId:source.wave.eventId,trackId:source.trackId,leaf:source.leaf,selection:bindings.selection},{allowPartialSourceMetrics:true})
   const stored=await readReportingArtifactRecord(safe.artifactId)
   if(stored.organizationId!==input.organizationId||stored.analysisKind!=='GROUP'||stored.artifactPayload.schemaVersion!==2
    ||stored.artifactPayload.source.runId!==source.wave.id||stored.artifactPayload.source.trackId!==source.trackId

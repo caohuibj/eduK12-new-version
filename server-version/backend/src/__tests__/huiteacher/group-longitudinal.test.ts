@@ -63,3 +63,21 @@ it('uses the existing Scale points/score raw-unit names only after the same froz
  mocks.discover.mockImplementation(async(input:any)=>[{leaf:data.leafs[data.ids.indexOf(input.runId)],metrics:[{key:'support',unit:'milliseconds'}]}])
  await expect(generateTeacherGroupLongitudinal(command())).rejects.toMatchObject({statusCode:409})
 })
+
+it('uses the internal partial-source producer and keeps B null when only A is disclosed in the second planned wave',async()=>{
+ const first=data.plan.metrics[0],second={...first,id:randomUUID(),scoreKey:'load',label:'工作负担'}
+ data.plan.metrics.push(second)
+ data.waves.forEach((wave,i)=>wave.tracking.bindings.push({...wave.tracking.bindings[0],metricId:second.id,scoreKey:'load'}))
+ mocks.spec.mockResolvedValue({definition:{analysisKind:'GROUP',metricRules:[{metricId:'reported-support',sourceMetricKey:'support'},{metricId:'reported-load',sourceMetricKey:'load'}]}})
+ data.reports[0].projection.metrics.push({...data.reports[0].projection.metrics[0],key:'reported-load',label:'工作负担',mean:7})
+ mocks.discover.mockImplementation(async(input:any)=>{const i=data.ids.indexOf(input.runId);return[{leaf:data.leafs[i],metrics:i===0?[{key:'support',unit:'score'},{key:'load',unit:'score'}]:[{key:'support',unit:'score'}]}]})
+ const report=await generateTeacherGroupLongitudinal({...command(),throughWaveId:data.ids[1]})
+ expect(mocks.generate).toHaveBeenCalledTimes(2)
+ for(const args of mocks.generate.mock.calls)expect(args[1]).toEqual({allowPartialSourceMetrics:true})
+ const [a,b]=report.projection.metrics
+ expect(a.points.map(p=>p.mean)).toEqual([0,1]);expect(a.points[1].adjacentDelta).toBe(1)
+ expect(b.points.map(p=>p.mean)).toEqual([7,null]);expect(b.points[1]).toMatchObject({state:'suppressed',validN:null,missingN:null,adjacentDelta:null,baselineDelta:null})
+ const discoveries=mocks.discover.mock.calls.length
+ expect(await readTeacherGroupLongitudinal({...scope(),artifactId:'saved'})).toEqual(report)
+ expect(mocks.discover).toHaveBeenCalledTimes(discoveries);expect(mocks.read).toHaveBeenCalledTimes(2)
+})
