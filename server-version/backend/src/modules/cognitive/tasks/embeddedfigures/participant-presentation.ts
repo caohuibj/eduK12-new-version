@@ -198,7 +198,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       },
       "medianRtMs": {
         "label": "找对时的典型用时",
-        "explanation": "只取时限内且达到有效反应下限的正确选择；不足两次时不解释典型用时。"
+        "explanation": "只取时限内且达到有效反应下限的正确选择；不足两次时不解释典型用时。中断题仍可能计入，用时包含中断时段，未扣除其影响。"
       },
       "errorCount": {
         "label": "错误次数"
@@ -322,7 +322,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "confounders": [
           "包含目标保持、视觉查找和首次选择因素；没有测得单一稳定能力。",
           "自编几何未完成题目难度和信效度标定；重复体验有练习效应。",
-          "屏幕尺寸、指针操作、中断及超时会影响本次结果。"
+          "屏幕尺寸、指针操作及超时会影响本次结果；中断仅作标记，未从典型用时中排除该题或扣除中断时段。"
         ],
         "metricNotes": {
           "accuracy": {
