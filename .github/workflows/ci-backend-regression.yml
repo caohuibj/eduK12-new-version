@@ -55,6 +55,20 @@ jobs:
       TRAINING_MATERIAL_ISOLATED_DB: '1'
       # Outbox fixtures require this exact disposable job DB; full suites run serially.
       REPORT_OUTBOX_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      # These suites create synthetic data, roll back, or only read
+      # within this job's disposable PostgreSQL service.
+      SCHOOL_PLAN_GROUP_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      TRAINING_QUOTA_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      TEACHER_RUNTIME_QUERY_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR363_AUTHORITY_LOCKS_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PERSONAL_TRACKING_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      TRAINING_PERSONAL_TRACKING_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      GROUP_REPORT_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      TRAINING_GROUP_REPORT_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      GROUP_LONGITUDINAL_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SCHOOL_GROUP_SOURCE_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      TASK_GROUP_HISTORY_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR363_FEEDBACK_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       UPLOAD_DIR: /tmp/eduk12-ci-uploads
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef

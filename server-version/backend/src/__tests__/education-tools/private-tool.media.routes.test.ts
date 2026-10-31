@@ -53,6 +53,7 @@ vi.mock('../../modules/campus/relationships.service', () => ({
   endCampusCounselorClient: vi.fn(), assignCampusStaffClass: vi.fn(), endCampusStaffClass: vi.fn(),
 }))
 vi.mock('../../modules/huiteacher/authority', () => ({
+  requireTeacherAdminSession: (_req:unknown,_res:unknown,next:()=>void)=>next(),
   requireTeacherProductAdmin: vi.fn(), requireRecentTeacherMfa: vi.fn(), requireTeacherProductMember: vi.fn(),
 }))
 
