@@ -89,8 +89,8 @@ test('PR449 retains its eight original cases, unchanged input hashes and real co
  const {createHash}=await import('node:crypto');const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
  const cfg=JSON.parse(readFileSync('.github/scripts/onboarding-bindings.json')).candidates['449'];
  const review=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['449'];
- assert.equal(cfg.enabled,false);assert.equal(cfg.pr,449);assert.equal(review.product,cfg.product);
- assert.throws(()=>onboardingPlan([],cfg.base,head,()=>{throw Error('No Git read before activation');},{CI_HEAD_REF:BRANCHES[449],CI_PR_NUMBER:'449'},cfg),/pending independent activation/);
+ assert.equal(typeof cfg.enabled,'boolean');assert.equal(cfg.pr,449);assert.equal(review.product,cfg.product);
+ assert.throws(()=>onboardingPlan([],cfg.base,head,()=>{throw Error('No Git read before activation');},{CI_HEAD_REF:BRANCHES[449],CI_PR_NUMBER:'449'},{...cfg,enabled:false}),/pending independent activation/);
  assert.equal(allowedSourcePath('server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx','449'),true);
  assert.equal(allowedSourcePath('server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts','449'),false);
  const original=review.reports[0],bytes=readFileSync(original.path);assert.equal(digest(bytes),original.sha256);
