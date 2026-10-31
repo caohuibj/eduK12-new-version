@@ -1,0 +1,118 @@
+{
+  "recordType": "scale-intake-instrument",
+  "key": "fs8_en",
+  "name": "Flourishing Scale original English 8-item",
+  "locale": "en",
+  "sources": [
+    {
+      "url": "https://eddiener.com/flourishing-scale-fs/",
+      "kind": "official_source"
+    },
+    {
+      "url": "https://eddiener.com/scales/",
+      "kind": "author_rights"
+    }
+  ],
+  "inputHash": null,
+  "deduplication": {
+    "status": "VERIFIED_NEW_ENGLISH_SOURCE",
+    "existingIdentity": null,
+    "conflict": null
+  },
+  "versions": {
+    "measurement": {
+      "version": null,
+      "hash": null,
+      "scoringVersion": null
+    },
+    "parameters": {
+      "policy": "none",
+      "version": null,
+      "hash": null,
+      "basis": "No local validated reference",
+      "references": []
+    },
+    "report": {
+      "version": null,
+      "hash": null
+    },
+    "localizationVersion": "1.0.0",
+    "instructionVersion": null,
+    "catalogVersion": 1
+  },
+  "audit": {
+    "measurementAndScoring": "SOURCE_ONLY",
+    "parameters": "NONE_NOT_INSTALLED",
+    "report": "SOURCE_PLAN_NOT_RUNTIME",
+    "issues": [
+      "Author copyright non-commercial",
+      "No public item redistribution clearance",
+      "No K12/Chinese validation or actual scorer"
+    ],
+    "changes": [
+      "Provenance and separate source key",
+      "Scoring hints only, not executable",
+      "Rights and report limitations"
+    ],
+    "evidence": [
+      "https://eddiener.com/flourishing-scale-fs/",
+      "https://eddiener.com/scales/"
+    ]
+  },
+  "tags": {
+    "domain": "WELL_BEING",
+    "population": "ADULT_CANDIDATE",
+    "language": "en",
+    "intendedUse": "NONCOMMERCIAL_RESEARCH",
+    "administrable": false
+  },
+  "notes": {
+    "commercialUse": "NON_COMMERCIAL_ONLY",
+    "authorizationNeeded": "YES_FOR_COMMERCIAL_OR_FULL_ITEM_PUBLICATION",
+    "rightsEvidence": [
+      "https://eddiener.com/flourishing-scale-fs/",
+      "https://eddiener.com/scales/"
+    ],
+    "translationRelationship": "Original English only",
+    "researchStatus": "SOURCE_ONLY",
+    "contactNeeded": "YES_FOR_RIGHTS_EXPANSION"
+  },
+  "delivery": {
+    "git": {
+      "branch": "feat/scale-intake-cumulative-20261030",
+      "commit": null,
+      "pushReadback": "PENDING",
+      "mergeStatus": "OPEN_UNMERGED"
+    },
+    "environment": null,
+    "loadedCodeSha": null,
+    "installStatus": "NOT_RUN",
+    "scaleId": null,
+    "measurementReleaseId": null,
+    "deploymentRevision": null,
+    "runtimePolicyHash": null,
+    "publicationProofHash": null,
+    "publicationStatus": "NOT_RUN",
+    "visibility": "UNKNOWN",
+    "productScope": [],
+    "actualVersionReadback": null,
+    "allocationStatus": "NOT_RUN",
+    "readbackAt": null
+  },
+  "notion": {
+    "pageId": "400d2763-5a38-816f-bfec-cb5042d380ee",
+    "status": "PENDING",
+    "readbackAt": null
+  },
+  "blockedBy": [
+    "LICENSING_BEYOND_NONCOMMERCIAL_NOT_CLEARED",
+    "NO_EXECUTABLE_OR_REAL_CONSUMER"
+  ],
+  "nextAction": "Continue separate C/P/R audit and lawful implementation; do not merge cumulative PR",
+  "artifact": {
+    "instrumentVersion": "1.0.0",
+    "sourcePath": "server-version/backend/src/modules/scale/instruments/fs8_en/1.0.0/source.json",
+    "sourceHash": null
+  },
+  "operationReceipts": []
+}

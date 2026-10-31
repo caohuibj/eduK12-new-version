@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "swls5_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Satisfaction With Life Scale original English 5-item",
+      "abbreviation": "SWLS5_EN",
+      "instrumentFamily": "Satisfaction With Life Scale original English 5-item"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "Wellbeing self-report source only; not a diagnostic or K12-equivalent instrument.",
+      "constructOverlapTags": [
+        "swls5_en",
+        "source:eddiener",
+        "locale:en",
+        "population:adult_candidate",
+        "response:self",
+        "availability:catalog_only",
+        "rights:noncommercial_only",
+        "scoring:uninstalled",
+        "P:none",
+        "R:not_runtime"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Conservative adult project scope only; China K12 psychometric validity and language equivalence not established."
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Global life satisfaction, no fixed recent-week window",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Catalog only: original copyrighted question wording and response anchors not distributed in public Git.",
+        "Five 1–7 items; author source total 5–35. No validated China K12 norms or diagnostic cutoff.",
+        "Author only permits attributed non-commercial research use; unrestricted commercial deployment/public item reproduction not established.",
+        "No electronic administration or missing-data handling executed; time is an estimate."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Non-commercial research candidate source, not validated local executable."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Original English source metadata: https://eddiener.com/satisfaction-with-life-scale-swls/; no original questionnaire copied into Git.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Translations require their own rights/validity records. No China K12 evidence."
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Satisfaction With Life Scale original English 5-item",
+      "citation": "Ed Diener and colleagues: https://eddiener.com/satisfaction-with-life-scale-swls/",
+      "url": "https://eddiener.com/satisfaction-with-life-scale-swls/",
+      "publicationYear": 1985
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "Life satisfaction"
+      ],
+      "limitations": [
+        "Five 1–7 items; author source total 5–35. No validated China K12 norms or diagnostic cutoff.",
+        "No executable C, score plugin, parameters P or runtime report R; no original item body in Git.",
+        "Non-commercial academic research use only with credit; public full-text redistribution and commercial scope unconfirmed.",
+        "No target Chinese teacher/student norms, missing policy or validation; not diagnostic."
+      ],
+      "disclaimer": "CATALOG_ONLY bibliographic source, not administered, scored, or published."
+    },
+    "blockers": [
+      "NONCOMMERCIAL_AUTHOR_RIGHTS",
+      "PUBLIC_QUESTION_ITEMS_REDISTRIBUTION_NOT_CLEARED",
+      "TARGET_K12_VALIDITY_MISSING",
+      "EXECUTABLE_C_S_P_R_NOT_INSTALLED"
+    ]
+  }
+}
