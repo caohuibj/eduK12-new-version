@@ -49,7 +49,7 @@ export const cogestRegistryMetaV11 = {
     primaryMetrics: ['accuracy', 'medianRtMs'],
     secondaryMetrics: ['errorCount', 'timeoutCount', 'validRtCount'],
     practicalTips: ['结合日常经验判断现实数量的合理量级。', '检查估计是否明显偏大或偏小；不作同龄人排名。'],
-    disclaimer: '结果只描述本次认知估算的表现，不是语言能力、智力或年龄常模判断。',
+    disclaimer: '结果只描述本次数量级估算表现；一般知识、生活经验和文化背景会影响选择，不是临床、智商、年龄常模或客观能力排名。',
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: false,
 }

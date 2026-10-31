@@ -348,7 +348,7 @@ export const COGEST_BANK: CogestItem[] = [
   {
     "id": "ce11-r11",
     "band": 2,
-    "stem": "一个成人室内排球绕球面一整圈的长度，哪个区间最合理？",
+    "stem": "一个成人室内排球沿球面最大圆周绕一整圈的长度，哪个区间最合理？",
     "options": [
       "150–200 厘米",
       "2–5 厘米",
@@ -356,7 +356,7 @@ export const COGEST_BANK: CogestItem[] = [
       "60–70 厘米"
     ],
     "answer": 3,
-    "explanation": "NIST排球周长示例约66厘米；题目问周长，不是直径。",
+    "explanation": "NIST排球周长示例约66厘米；题目问周长，不是直径。“一整圈”明确为最大圆周，排除任意小圆。",
     "unit": "厘米",
     "referenceValue": 66,
     "optionIntervals": [
@@ -382,70 +382,70 @@ export const COGEST_BANK: CogestItem[] = [
   {
     "id": "ce11-r12",
     "band": 2,
-    "stem": "沿地球赤道绕地球一整圈的距离，哪个区间最合理？",
+    "stem": "一台常见立式双门家用冰箱，冷藏和冷冻室合计的可用容量，哪个区间最合理？（非迷你冰箱、非商用冷柜）",
     "options": [
-      "40–80 千米",
-      "400–800 千米",
-      "30000–50000 千米",
-      "300000–500000 千米"
+      "1–10 升",
+      "100–800 升",
+      "2000–5000 升",
+      "20000–50000 升"
     ],
-    "answer": 2,
-    "explanation": "NASA列地球赤道周长约40030千米；不用背精确数字。",
-    "unit": "千米",
-    "referenceValue": 40030.2,
+    "answer": 1,
+    "explanation": "海尔双门家用冰箱示例净容量475升。题面不提供箱体尺寸，需按日常冰箱尺度判断百升级；不把单一型号当产品分布。",
+    "unit": "升",
+    "referenceValue": 475,
     "optionIntervals": [
       [
-        40,
-        80
+        1,
+        10
       ],
       [
-        400,
+        100,
         800
       ],
       [
-        30000,
-        50000
+        2000,
+        5000
       ],
       [
-        300000,
-        500000
+        20000,
+        50000
       ]
     ],
-    "sourceUrl": "https://science.nasa.gov/moon/by-the-numbers/"
+    "sourceUrl": "https://www.haier.com/in/refrigerators/haier-475l-2-star-graphite-black-top-mount-frost-free-refrigerator-hrf-5252pgk-n.shtml"
   },
   {
     "id": "ce11-r13",
     "band": 2,
-    "stem": "地球中心到月球中心的平均距离，哪个区间最合理？",
+    "stem": "供四至六名成年人日常用餐的普通长方形餐桌，桌面的面积最接近哪个区间？（不把椅子或周围通道算入）",
     "options": [
-      "3000–5000 千米",
-      "300000–500000 千米",
-      "3e+06–5e+06 千米",
-      "300–500 千米"
+      "0.1–0.3 平方米",
+      "0.5–3 平方米",
+      "10–30 平方米",
+      "0.01–0.05 平方米"
     ],
     "answer": 1,
-    "explanation": "NASA列平均轨道距离384400千米；只区分数量级，轨道距离随位置变化。",
-    "unit": "千米",
-    "referenceValue": 384400,
+    "explanation": "IKEA四至六人桌面示例160×90厘米约1.44平方米；同页150–180厘米长的中型餐桌提供尺度参照。题面不给尺寸，需要自行估计现实桌面大小。",
+    "unit": "平方米",
+    "referenceValue": 1.44,
     "optionIntervals": [
       [
-        3000,
-        5000
+        0.1,
+        0.3
       ],
       [
-        300000,
-        500000
+        0.5,
+        3
       ],
       [
-        3000000,
-        5000000
+        10,
+        30
       ],
       [
-        300,
-        500
+        0.01,
+        0.05
       ]
     ],
-    "sourceUrl": "https://science.nasa.gov/moon/by-the-numbers/"
+    "sourceUrl": "https://www.ikea.com/se/en/rooms/dining/how-to/your-guide-to-choosing-the-perfect-dining-table-pxmuEeoQuGpjiwXh0U6yTPxN/"
   },
   {
     "id": "ce11-r14",
@@ -518,7 +518,7 @@ export const COGEST_BANK: CogestItem[] = [
   {
     "id": "ce11-r16",
     "band": 3,
-    "stem": "日常常见的小瓶滴眼液包装瓶，标称容量的数量级最接近哪个区间？",
+    "stem": "日常常见的可多次开启使用的小瓶滴眼液包装瓶（非一次性单剂量小支），标称容量的数量级最接近哪个区间？",
     "options": [
       "0.1–1 毫升",
       "5–30 毫升",
@@ -526,7 +526,7 @@ export const COGEST_BANK: CogestItem[] = [
       "1000–3000 毫升"
     ],
     "answer": 1,
-    "explanation": "NIST小滴眼液瓶示例15毫升；问容器规格，不涉及剂量或用药建议。",
+    "explanation": "NIST小滴眼液瓶示例15毫升；问容器规格，不涉及剂量或用药建议。排除一次性单剂量包装；不把0.4毫升单剂量规格判成错误的多剂量瓶。",
     "unit": "毫升",
     "referenceValue": 15,
     "optionIntervals": [
@@ -620,7 +620,7 @@ export const COGEST_BANK: CogestItem[] = [
   {
     "id": "ce11-r19",
     "band": 3,
-    "stem": "一块用于十一人制比赛的成人足球场，场内地面的面积最接近哪个区间？",
+    "stem": "一块用于成人国际十一人制比赛的足球场，场内地面的面积最接近哪个区间？",
     "options": [
       "50000–100000 平方米",
       "50–100 平方米",
@@ -628,7 +628,7 @@ export const COGEST_BANK: CogestItem[] = [
       "5000–10000 平方米"
     ],
     "answer": 3,
-    "explanation": "FIFA推荐105×68米，审计面积7140平方米；题目不要求熟记标准尺寸。",
+    "explanation": "IFAB国际比赛长100–110米、宽64–75米，面积6400–8250平方米；普通非国际比赛场地不适用本题。",
     "unit": "平方米",
     "referenceValue": 7140,
     "optionIntervals": [
@@ -649,41 +649,41 @@ export const COGEST_BANK: CogestItem[] = [
         10000
       ]
     ],
-    "sourceUrl": "https://inside.fifa.com/innovation/stadium-guidelines/technical-guidelines/stadiums-guidelines/pitch-dimensions-and-surrounding-areas"
+    "sourceUrl": "https://theifab.com/laws/latest/the-field-of-play/"
   },
   {
     "id": "ce11-r20",
     "band": 3,
-    "stem": "从一次新月到下一次新月，大致经过的时间最接近哪个区间？",
+    "stem": "家中厨房水龙头正常供水并完全打开，向一个空的10升水桶接满水，所需时间最接近哪个区间？（非滴水、无断水或故障）",
     "options": [
-      "0.5–2 天",
-      "5–10 天",
-      "25–35 天",
-      "100–200 天"
+      "0.01–0.05 分钟",
+      "1–5 分钟",
+      "20–60 分钟",
+      "200–600 分钟"
     ],
-    "answer": 2,
-    "explanation": "NASA说明从地球观察的月相循环约29天；有天文知识成分，不能解释为纯估算能力。",
-    "unit": "天",
-    "referenceValue": 29,
+    "answer": 1,
+    "explanation": "EPA厨房龙头资料给出1.5–2.2美制加仑/分钟的产品流量参照，约5.7–8.3升/分钟；审计计算接10升约1.2–1.8分钟。题面不告诉流量，依生活经验估计；水压低或节流状态不适用。",
+    "unit": "分钟",
+    "referenceValue": 1.5,
     "optionIntervals": [
       [
-        0.5,
-        2
+        0.01,
+        0.05
       ],
       [
-        5,
-        10
+        1,
+        5
       ],
       [
-        25,
-        35
+        20,
+        60
       ],
       [
-        100,
-        200
+        200,
+        600
       ]
     ],
-    "sourceUrl": "https://science.nasa.gov/moon/facts/"
+    "sourceUrl": "https://nepis.epa.gov/Exe/ZyPURL.cgi?Dockey=P10180T6.TXT"
   }
 ]
 

@@ -22,6 +22,6 @@ export const cogestRegistryEntryV11: CognitiveFrontendRegistryEntry = {
     summaryMetrics: ['medianRtMs', 'errorCount'],
     indexLabel: '本次合理量级选中率',
     practicalTips: ['结合日常经验判断数量级。', '检查估计是否明显偏大或偏小，不作能力或同龄人排名。'],
-    disclaimer: '结果反映本次任务表现，不代表诊断或正式能力评估。',
+    disclaimer: '仅描述本次数量级估算选择；受一般知识、生活经验和文化背景影响，不提供临床、智商或常模判断。',
   },
 }
