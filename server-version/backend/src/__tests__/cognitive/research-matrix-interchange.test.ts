@@ -23,7 +23,7 @@ const datasetFor = (id: string, userId: string) => {
     id, userId, anonymousCode: null, attemptNo: 1, testType: 'icarmatrix',
     engineVersion: '2.0.0', scoringVersion: '1.0.0',
     configVersion: '1.0.0-adolescent', stimulusSetVersion: 'matgen-bank-v1.0.0',
-    matrixType: '3x3' as const, randomSeed: seed, validRtFloorMs: 500, trials,
+    matrixType: '3x3' as const, plannedTotalTrials: 2, randomSeed: seed, validRtFloorMs: 500, trials,
   }
 }
 
@@ -47,6 +47,17 @@ describe('icarmatrix real-trial to IRT response-matrix interchange', () => {
     expect(() => buildMatrixResponseInterchange({ ...source, rows: source.rows.map((r) => ({ ...r, payload: { ...r.payload, bankItemId: 'tampered' } })) }, options)).toThrow(/seed\/item/)
     const repeated = buildResearchTrialDataset([datasetFor('s1', 'student-1'), datasetFor('s2', 'student-1')])
     expect(() => buildMatrixResponseInterchange(repeated, options)).toThrow(/Repeated participant/)
+  })
+
+  it('rejects a completed session whose frozen planned trial count exceeds stored rows', () => {
+    const source = buildResearchTrialDataset([datasetFor('s1', 'student-1')])
+    const truncated = {
+      ...source, rows: source.rows.map((row) => ({ ...row, plannedTotalTrials: 3 })),
+    }
+    expect(() => buildMatrixResponseInterchange(truncated, options)).toThrow(/Incomplete frozen trial count/)
+    expect(() => buildMatrixResponseInterchange({
+      ...source, rows: source.rows.map((row) => ({ ...row, plannedTotalTrials: null })),
+    }, options)).toThrow(/Incomplete frozen trial count/)
   })
 
   it('keeps exclusion policy explicit and never treats a rapid guess as correct', () => {

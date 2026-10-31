@@ -61,11 +61,16 @@ export const buildMatrixResponseInterchange = (
     const ordered = [...trialRows].sort((a, b) => a.trialIndex - b.trialIndex)
     const first = ordered[0]
     if (!first.randomSeed || !first.participantId) throw new Error(`Missing frozen seed or participant identity for ${sessionId}`)
+    if (!Number.isInteger(first.plannedTotalTrials) || first.plannedTotalTrials === null ||
+        first.plannedTotalTrials < 1 || ordered.length !== first.plannedTotalTrials) {
+      throw new Error(`Incomplete frozen trial count for ${sessionId}: planned ${first.plannedTotalTrials}, exported ${ordered.length}`)
+    }
     if (participants.has(first.participantId)) throw new Error('Repeated participant across sessions: select one assessment/wave before IRT fitting')
     participants.add(first.participantId)
     if (ordered.some((row, index) =>
       row.trialIndex !== index || row.randomSeed !== first.randomSeed ||
-      row.participantId !== first.participantId || row.attemptNo !== first.attemptNo
+      row.participantId !== first.participantId || row.attemptNo !== first.attemptNo ||
+      row.plannedTotalTrials !== first.plannedTotalTrials
     )) throw new Error(`Incomplete, duplicate or inconsistent trial history for ${sessionId}`)
     const plan = generateIcarmatrixV2Plan(first.randomSeed, ordered.length, options.matrixType)
     const answers: Array<0 | 1 | null> = Array(itemIds.length).fill(null)
@@ -81,6 +86,9 @@ export const buildMatrixResponseInterchange = (
       if (selectedOption !== null && (!Number.isInteger(selectedOption) ||
           typeof selectedOption !== 'number' || selectedOption < 0 || selectedOption >= 6)) {
         throw new Error(`Invalid response index in session ${sessionId}`)
+      }
+      if (!['complete', 'timeout', 'rapid_guess', 'interrupted'].includes(row.trialQuality)) {
+        throw new Error(`Unknown trial quality classification in session ${sessionId}`)
       }
       if (row.trialQuality !== 'complete') {
         exclusions[row.trialQuality] += 1

@@ -81,10 +81,10 @@ describe('trial quality classification (roadmap v2.0 PR4)', () => {
     expect(extractValidRtFloorMs({})).toBeNull()
     expect(extractValidRtFloorMs({ validRtFloorMs: -1 })).toBeNull()
     expect(extractValidRtFloorMs(null)).toBeNull()
-    expect(extractFrozenResearchBankFacts({ stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3' }))
-      .toEqual({ stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3' })
+    expect(extractFrozenResearchBankFacts({ stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3', totalTrials: 8 }))
+      .toEqual({ stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3', plannedTotalTrials: 8 })
     expect(extractFrozenResearchBankFacts(null))
-      .toEqual({ stimulusSetVersion: null, matrixType: null })
+      .toEqual({ stimulusSetVersion: null, matrixType: null, plannedTotalTrials: null })
   })
 })
 
@@ -94,7 +94,7 @@ describe('research trial dataset builder (roadmap v2.0 PR4)', () => {
       {
         id: 'session-1', userId: 'student-1', anonymousCode: null, attemptNo: 1,
         testType: 'icarmatrix', engineVersion: '2.0.0', scoringVersion: '1.0.0',
-        configVersion: '1.0.0-adolescent', stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3', randomSeed: 'seed-1', validRtFloorMs: 500,
+        configVersion: '1.0.0-adolescent', stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3', plannedTotalTrials: 2, randomSeed: 'seed-1', validRtFloorMs: 500,
         trials: [
           { trialIndex: 1, payload: { trialIndex: 1, responseIndex: null, rtMs: null, interrupted: false } },
           { trialIndex: 0, payload: { trialIndex: 0, responseIndex: 2, rtMs: 4200, interrupted: false } },
@@ -108,7 +108,7 @@ describe('research trial dataset builder (roadmap v2.0 PR4)', () => {
     expect(dataset.qualitySummary).toMatchObject({ rowCount: 2, completeCount: 1, timeoutCount: 1, completeRate: 0.5, timeoutRate: 0.5 })
     expect(dataset.rows[0]).toMatchObject({
       randomSeed: 'seed-1', trialQuality: 'complete',
-      stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3',
+      stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3', plannedTotalTrials: 2,
     })
     expect(dataset.rows[0].participantId).toMatch(/^U[a-f0-9]{32}$/)
   })
@@ -144,7 +144,8 @@ describe('assignment-scoped trial dataset export (roadmap v2.0 PR4)', () => {
     })
     expect(dataset.rows[0].payload).toMatchObject({ bankItemId: 'matgen-std-rotate-rotate-006' })
     expect(dataset.rows[2].trialQuality).toBe('rapid_guess')
-    expect(dataset.rows[0]).toMatchObject({ stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3' })
+    expect(dataset.rows[0]).toMatchObject({ stimulusSetVersion: 'matgen-bank-v1.0.0', matrixType: '3x3', plannedTotalTrials: 8 })
+    await expect(getCognitiveResearchTrialDataset('assignment-1', { previewLimit: 1 })).rejects.toThrow(/previewLimit/)
     const query = mockPrisma.cognitiveSession.findMany.mock.calls[0][0]
     expect(query.include).toHaveProperty('trials')
     expect(query.include).toHaveProperty('rawSubmissions')

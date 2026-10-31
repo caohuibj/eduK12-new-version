@@ -728,8 +728,13 @@ export const getCognitiveResearchTrialDataset = async (
   assignmentId: string,
   options: CognitiveExportOptions = {},
 ): Promise<ResearchTrialDataset> => {
-  const assignment = await getAssignment(assignmentId)
-  const sessions = await getSessions(assignmentId, 'full', options.dateRange, options.previewLimit)
+  // A preview loads session headers only. Never label an empty header-only result as
+  // a complete real-origin item dataset for psychometric calibration.
+  if (options.previewLimit !== undefined) {
+    throw new Error('Research trial calibration datasets require full item-level export; previewLimit is not supported')
+  }
+  await getAssignment(assignmentId)
+  const sessions = await getSessions(assignmentId, 'full', options.dateRange)
   const decoded = sessions.map(decodeSession)
   return buildResearchTrialDataset(
     decoded.map((session, index) => {

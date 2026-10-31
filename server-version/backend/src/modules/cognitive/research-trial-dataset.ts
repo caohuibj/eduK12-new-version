@@ -25,6 +25,7 @@ export interface ResearchTrialRow {
   configVersion: string
   stimulusSetVersion: string | null
   matrixType: '2x2' | '3x3' | null
+  plannedTotalTrials: number | null
   attemptNo: number
   randomSeed: string
   trialIndex: number
@@ -66,6 +67,7 @@ export interface ResearchTrialSessionInput {
   configVersion: string
   stimulusSetVersion?: string | null
   matrixType?: '2x2' | '3x3' | null
+  plannedTotalTrials?: number | null
   randomSeed: string
   /** 有效 RT 下限来自该会话解密的 frozen config snapshot；缺失时 null（不判 rapid_guess）。 */
   validRtFloorMs: number | null
@@ -132,14 +134,17 @@ export const summarizeTrialQuality = (rows: ResearchTrialRow[]): ResearchTrialQu
 export const extractFrozenResearchBankFacts = (snapshot: unknown): {
   stimulusSetVersion: string | null
   matrixType: '2x2' | '3x3' | null
+  plannedTotalTrials: number | null
 } => {
   if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) {
-    return { stimulusSetVersion: null, matrixType: null }
+    return { stimulusSetVersion: null, matrixType: null, plannedTotalTrials: null }
   }
   const frozen = snapshot as Record<string, unknown>
   return {
     stimulusSetVersion: typeof frozen.stimulusSetVersion === 'string' ? frozen.stimulusSetVersion : null,
     matrixType: frozen.matrixType === '2x2' || frozen.matrixType === '3x3' ? frozen.matrixType : null,
+    plannedTotalTrials: typeof frozen.totalTrials === 'number' &&
+      Number.isInteger(frozen.totalTrials) && frozen.totalTrials > 0 ? frozen.totalTrials : null,
   }
 }
 
@@ -170,6 +175,7 @@ export const buildResearchTrialDataset = (
         configVersion: session.configVersion,
         stimulusSetVersion: session.stimulusSetVersion ?? null,
         matrixType: session.matrixType ?? null,
+        plannedTotalTrials: session.plannedTotalTrials ?? null,
         attemptNo: session.attemptNo,
         randomSeed: session.randomSeed,
         trialIndex: trial.trialIndex,
