@@ -1,6 +1,6 @@
 import apiClient from './client'
 export type ContentStatus = 'DRAFT' | 'REVIEWED' | 'PUBLISHED' | 'RETIRED'
-export type DescriptiveKind = 'INDIVIDUAL_LONGITUDINAL' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'
+export type DescriptiveKind = 'GROUP' | 'INDIVIDUAL_LONGITUDINAL' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'
 export interface RegisteredResource {
   id: string; status: ContentStatus; scale_id: string; resource_key: string; resource_version: string; created_by_user_id?: string
   entry: { libraryOrigin?:{adapterVersion:string;variantKey:string;product:'SCHOOL'|'TEACHER'};cohortAnalysisPolicy?:{metricKeys:string[]};applicability: { analysisMode: string; subjectRoles?:string[];minimumRespondents?:number|null }; title: string; description: string; resultDisclosure: { audiences: { SUBJECT: { metricKeys: string[] } } } }

@@ -1,3 +1,5 @@
+import {listTeacherNumericGroups,generateTeacherNumericGroup,readTeacherNumericGroup} from './numericGroupReport.service'
+import {reportingLeafSourceSchema} from '../reporting/education-group-selection'
 import {educationGroupSelectionSchema} from '../reporting/education-group-selection'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
@@ -71,4 +73,22 @@ router.get(base,authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,handler(false))
 router.post(base+'/release',authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,handler(true))
+const numericBase='/organizations/:organizationId/evaluation-events/:eventId/numeric-group-reports'
+const numeric=(action:'index'|'read'|'generate')=>asyncHandler(async(req,res)=>{
+ try{
+  const scope={organizationId:uuid.parse(req.params.organizationId),eventId:uuid.parse(req.params.eventId),actorUserId:req.user!.userId}
+  const result=action==='index'?await listTeacherNumericGroups(scope):action==='read'
+   ?await readTeacherNumericGroup({...scope,artifactId:uuid.parse(req.params.artifactId)})
+   :await generateTeacherNumericGroup({...scope,...z.object({trackId:uuid,leaf:reportingLeafSourceSchema,specId:uuid,selection:educationGroupSelectionSchema.default({kind:'ALL'})}).strict().parse(req.body)})
+  return success(res,result)
+ }catch(e){
+  if(e instanceof ZodError)return res.status(400).json({code:'HUITEACHER_REPORT_ARGUMENT_INVALID',message:'群体报告参数无效',data:null})
+  const known=e as {code?:string;statusCode?:number;message?:string}
+  if(typeof known.statusCode==='number')return res.status(known.statusCode).json({code:known.code??'HUITEACHER_REPORT_DENIED',message:known.message??'群体报告条件不满足',data:null})
+  throw e
+ }
+})
+router.get(numericBase,authenticateHuiteacher,requireTeacherProductAdmin,numeric('index'))
+router.get(numericBase+'/:artifactId',authenticateHuiteacher,requireTeacherProductAdmin,numeric('read'))
+router.post(numericBase,authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,numeric('generate'))
 export default router

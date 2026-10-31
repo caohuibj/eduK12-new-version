@@ -1,3 +1,4 @@
+import {TeacherNumericGroupReports} from './TeacherNumericGroupReports'
 import {TeacherFormGroupVersions} from './TeacherFormGroupVersions'
 import {TeacherFormGroupReport,type TeacherFormGroupProjection} from './TeacherFormGroupReport'
 import {TeacherTrackingPublish,TeacherTrackingNext} from './TeacherPersonalTracking'
@@ -485,6 +486,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
           <button onClick={()=>closeRun(event)} disabled={working||event.status!=='OPEN'}>关闭评价任务</button>
           <button onClick={()=>cancelRun(event)} disabled={working||event.status!=='OPEN'}>取消评价任务</button>
         </>}
+        {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherNumericGroupReports key={event.id+':numeric:'+actorKey} api={api} endpoint={base+'/evaluation-events/'+event.id+'/numeric-group-reports'}/>}
         {event.status==='CLOSED'&&runMap[event.id].status==='CLOSED'&&
           <div className="ht-inline">
             <label className="ht-field"><span>报告对应 Form</span><select
