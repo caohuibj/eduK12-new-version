@@ -8296,6 +8296,123 @@
           "after": "5ff5f1ec445a9b9ba8bda640d28bca77ac474fd6"
         }
       }
+    },
+    "447": {
+      "schemaVersion": 1,
+      "pr": 447,
+      "enabled": false,
+      "base": "25cad994ec20b32b53ed8735c732143376536da0",
+      "product": "7292af17b3a7fa8251f100b2068a7c6e85fe1c2d",
+      "controlCheckpoint": "ddf16272fc276987be38e33e2b80857f523e7757",
+      "components": {
+        "backend": "aabc532ab1fbb807da0fc194eaeed2a5f9c54134",
+        "frontend": "9a545fadae5b6d2f7a6177d7b521e12f70e54348"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "da9aa232c0f00cf4bc9c695f5d2759c0c3481d1f",
+        ".github/scripts/onboarding-checks.mjs": "a3633b1aac4e5271d7dd85d17ef0df67ae7bbf76",
+        ".github/scripts/onboarding-controls.test.mjs": "71dfb39422a69cc6f4243aa649d7bec3bd017c57",
+        ".github/scripts/onboarding-evidence.json": "dfb65bd925af2dd38fb4836a22fe479e0e519d14",
+        ".github/scripts/onboarding-scope.mjs": "948528dfe5b30d6b4b026e4fb37b4b1ffe07aaa4",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "f320cfd7a084636b4ef759bf439cdf11fee18e13"
+      },
+      "source": {
+        "docs/performance/public-report-isolation-20261031/README.md": {
+          "before": null,
+          "after": "dfff3ef4761d4e3d0d8130e7a90b50e33b65644e"
+        },
+        "docs/performance/public-report-isolation-20261031/baseline-execution.json": {
+          "before": null,
+          "after": "6d6c45cb3dc43df8b0f5d0167754f3bf111ee005"
+        },
+        "docs/performance/public-report-isolation-20261031/baseline.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/public-report-isolation-20261031/baseline.json": {
+          "before": null,
+          "after": "1d97d2f25a1612f4d1313104bc289b4c9b21ae2d"
+        },
+        "docs/performance/public-report-isolation-20261031/baseline.log": {
+          "before": null,
+          "after": "c760e29e3ba42f28d5da93e956a799212df06697"
+        },
+        "docs/performance/public-report-isolation-20261031/candidate-execution.json": {
+          "before": null,
+          "after": "ab0e7859e1931094a731ceef6402f5048572b514"
+        },
+        "docs/performance/public-report-isolation-20261031/candidate.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/public-report-isolation-20261031/candidate.json": {
+          "before": null,
+          "after": "899feec8f4cc450dc9d320e2f7dfc26cddfc835b"
+        },
+        "docs/performance/public-report-isolation-20261031/candidate.log": {
+          "before": null,
+          "after": "d6838431a133a528093a50f0860c8f18df4c48ef"
+        },
+        "docs/performance/public-report-isolation-20261031/changed-lint-execution.json": {
+          "before": null,
+          "after": "c09deaf5fb431be265eb6efba445722a0e69a74c"
+        },
+        "docs/performance/public-report-isolation-20261031/changed-lint.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/public-report-isolation-20261031/changed-lint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/public-report-isolation-20261031/environment-reuse.json": {
+          "before": null,
+          "after": "67b0e3c05afd809b9d174cedc240cb7eebe8b381"
+        },
+        "docs/performance/public-report-isolation-20261031/frontend-types-execution.json": {
+          "before": null,
+          "after": "3090607dce077d7089453df2ce323a31f3901412"
+        },
+        "docs/performance/public-report-isolation-20261031/frontend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/public-report-isolation-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/public-report-isolation-20261031/qualification/README.md": {
+          "before": null,
+          "after": "4844c7a6516260770e630ea46c4d59f7c91f0fba"
+        },
+        "docs/performance/public-report-isolation-20261031/qualification/frontend-types.json": {
+          "before": null,
+          "after": "d0d02e11e762204fc8a189e5181bb1e9718f48cc"
+        },
+        "docs/performance/public-report-isolation-20261031/qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "server-version/frontend/src/pages/public/PublicQuestionnaireResult.tsx": {
+          "before": "9d901ecde0267d4b81dae3fcae074fa6cde71e95",
+          "after": "8d20301ab54e8b405cade3ab13b7256bef42534a"
+        },
+        "server-version/frontend/src/pages/public/__tests__/PublicQuestionnaireResult.race.test.tsx": {
+          "before": null,
+          "after": "cfe4aac4bec8595ab0b16dfb9118f92a1f68e531"
+        }
+      }
     }
   }
 }
