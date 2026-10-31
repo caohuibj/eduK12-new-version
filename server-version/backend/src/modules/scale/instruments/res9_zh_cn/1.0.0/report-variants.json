@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "res9_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "22ea0b5aca530238904b11c06200837a75e2f16b1bbd1c2ec8bee93afc492a6b",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "resilience_total"
+        ],
+        "scoreOrder": [
+          "resilience_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "resilience_total",
+            "headline": "面对困难时对自己的看法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷关注你通常遇到困难时，怎样看待自己的应对能力，例如适应变化、继续做事，以及相信自己。总分只是这次自我描述的汇总，分数越高，表示你对这些描述越同意；它不是在给你贴“坚强”或“软弱”的标签，也不能预测你遇到某件事后一定会怎样。生活处境、疲惫程度和能得到的支持，都可能影响回答。本版本没有经过验证的高低分界，不给出等级或排名。比起追求某个数字，更有用的是看看哪些具体经历支持你的回答，以及现在还需要哪些帮助。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一个困难：当时你做了哪件有帮助的小事？有没有题目没提到、却对你很重要的支持或处境？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以写下一项你已经做到的事，再选一个负担较小的下一步，例如把任务拆小，或向可信赖的人提出一个具体的帮助请求。不需要用分数证明自己。"
+              },
+              {
+                "category": "support",
+                "text": "需要帮助不表示软弱。如果困扰持续影响生活，可以与可信赖的人或合适的专业人员讨论；是否寻求支持不必由这份分数决定。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文源研究为484名中国成人的便利样本，女性、年轻、高教育和汉族参与者居多；不是全国常模，不证明中小学生、临床筛查或所有成人情境都适用。",
+          "只计算中文版支持的单一总分，不沿用英文/荷兰文的两个分量表；不以分数预测个人创伤结局或判断是否需要治疗。",
+          "没有本中文版已验证的诊断阈值、高中低分档、百分位、可靠变化界值或最小重要差异；分数变化本身不等于改善或恶化。",
+          "9题完整作答才计分，不填补、不按比例推算；这是平台保守缺失处理，不是作者已验证的漏答规则。",
+          "中文题干逐字保留自2022 Table 2；中文响应标签与独立指导语是平台工作翻译，数字呈现及新增反馈尚待审查，不能称为原作者逐字验证的完整施测页。",
+          "仅限非商业使用；代码仓库MIT许可证不覆盖本量表题文。"
+        ],
+        "disclaimer": "仅供成人非商业研究与非诊断自我了解。源中文题干已有成人研究，本平台选项翻译、数字呈现与反馈仍待审核；不用于诊断、治疗决策、选拔、学校排名或证明个人坚强程度。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source and editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T22:00:00Z",
+            "basis": "AI content check against published Table 2 XML and independent research handoff; no human scientific approval, platform psychometric validation or runtime verification claimed."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "resilience_total"
+        ],
+        "scoreOrder": [
+          "resilience_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "resilience_total",
+            "headline": "先看看自己的支点，不急着领“坚强证”",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：需要帮手，不会把已有的支点清零。\n\n把面对困难想成寻找支点，而不是参加谁最能扛的比赛。九题只汇总你对适应、坚持、相信自己等通常应对资源的看法，得到0–36分；数值越大，表示整体更认可这些自述，不是发一张永远不会倒的保证书。\n\n假设原来的生活节奏被打乱。支点可能是你以前处理变化的经验，也可能是有人一起商量、一个能休息的安排。后面这些外部条件值得考虑，但并没有被问卷完整测量。若你仍然难受，却找到一点支持，不必因为没有马上恢复就把这一点也抹掉。\n\n如果有能继续用的经验，就把它留下；如果现在需要更多帮助，也不是支点作废了。这个比喻只供回顾，不是系统从总分算出了你的资源清单，更不要求你把每次困难都变成一次成长证明。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "认一认已有支点：回想一次变化里你实际做过的回应，连同当时得到的帮助一起记下。不要只留下“我应该扛住”这一句空白要求。"
+              },
+              {
+                "category": "support",
+                "text": "给缺的位置找一个支撑：若需要被倾听、有人协助安排或得到适当专业支持，可以说清需要哪一种，而不是等自己足够坚强才开口。"
+              },
+              {
+                "category": "strategy",
+                "text": "允许今天先稳住：根据当下负担，选择休息、调整节奏或维护一项基本需要。看做法是否适合眼前生活，不拿分数当必须恢复多快的倒计时。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "源中文题目已有成人研究，但本平台呈现与反馈仍在完善，不提供等级或排名。九题需答完整才计算；真实0分与漏答未计算不是一回事。"
+        ],
+        "disclaimer": "仅供成人非商业研究与非诊断自我了解。源中文题干已有成人研究，本平台选项翻译、数字呈现与反馈仍待审核；不用于诊断、治疗决策、选拔、学校排名或证明个人坚强程度。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T15:38:18Z",
+            "basis": "本次只读审阅res9_zh_cn C1.0.0当前source、固定既有材料及新R1.2.0文字，核分组/原方向/时窗/缺失0与null、固定例子和构念适配行动；不改受众权限，不继承旧审核日期，不声称新中文验证、作者批准或新schema/scorer/PG/CI通过。"
+          }
+        }
+      }
+    }
+  ]
+}

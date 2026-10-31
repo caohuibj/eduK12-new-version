@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "sas_sv10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "a2002ffcd10631cad94b10023cf8c0aa50aed5759617576f5d243e8f58cf5522",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "phone_use_difficulties"
+        ],
+        "scoreOrder": [
+          "phone_use_difficulties"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "phone_use_difficulties",
+            "headline": "手机使用与生活节奏",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "手机可以帮我们联系朋友、查资料，也可能悄悄挤占原本想做的事。分数越高，表示这次回答呈现的手机使用相关困扰越多；它不能判断你是否成瘾，也不是在评价你够不够自律。比如，原本只想看一眼消息，却停留得比计划更久，可能让学习、休息或与人相处受到影响。比起一个标签，更值得留意的是这些具体片段：什么让你拿起手机，又有哪些时刻你希望把注意力留给别的事。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回看自己比较认同的几句话：是在等待消息时反复查看，还是原本只想看一眼却停不下来？如果是在躲开无聊、压力或孤单，此刻除了手机，你还需要什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个想拿回注意力的小片段，例如写作业前十分钟。试着集中查看不紧急的通知，或把手机放远一点；把它当成小实验，不要求一次完美。"
+              },
+              {
+                "category": "support",
+                "text": "若手机使用持续影响睡眠、学习、人际关系，或让你很难受，可以和信任的家人、老师或专业人员讨论。帮助的目标是改善生活，不是责备。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是独立中文工作译稿，仍待人工审校、认知访谈和本地验证；当前仅限八年级研究。",
+          "原韩国初二研究的男/女参考分界仅作外部档案，本报告不按性别自动套用，不诊断成瘾或给学生贴好坏标签。",
+          "10题都有效回答才提供完整结果，缺失不补零、不插补；这是产品保守策略，不冒称原作者个体缺失算法。",
+          "原Twitter/Facebook例子可能不符合所有人的使用情境；未擅自替换，不把不熟悉这些平台当成没有困扰。",
+          "不用于纪律处分、选拔、学生排名或未经同意通知家长；不把本报告当治疗效果证明。"
+        ],
+        "disclaimer": "这份中文内容是研究工作稿，用来帮助你观察手机与生活的关系，不是诊断，也不能凭一次回答判断你是否“成瘾”。 ©2013 Kwon et al. Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558. https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558；CC Attribution（当前链接 https://creativecommons.org/licenses/by/4.0/）。本中文翻译与数字排版/反馈为独立改编，无原作者背书；不声称2013原文印有4.0版本号。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:04:30Z",
+            "basis": "AI editorial check: adolescent-readable neutral digital-life reflection, no addiction diagnosis/sex thresholds/discipline judgment; not expert translation or psychometric approval."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "phone_use_difficulties"
+        ],
+        "scoreOrder": [
+          "phone_use_difficulties"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "phone_use_difficulties",
+            "headline": "带走一句话：手机可以在生活里，注意力也可以有自己的位置",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这十题是观察手机与生活关系的起点，不是一张自律成绩单。它用1–6同意程度合成10–60总分：数字越大，表示更认同相关使用困扰，不是使用时长，更不是给你贴“成瘾”或不自律的标签。原题没有固定一周、一个月的回顾窗。\n\n有时只想查个资料，却跟着一条消息走了很远；等回过神，原本想做的事还在等。如果这个片段像你，可以先看看哪条岔路最容易带走注意，而不是宣布手机从此必须离开生活。联系家人、学习和朋友交流，也可以继续有位置。\n\n如果想换一种节奏，可以为一段在意的时间做个小安排，再看是否适合自己，不要求一次完美。需要帮助时，和可信任的成人一起商量，比用一个标签责备自己更有用；这份结果不是处分的依据，也不要求把所有线上生活一笔删掉。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回看一次顺着消息走远的片段：原本来做什么、后来被什么留下、最想把哪件事的时间留住？只记自己需要的部分，不公开私人消息。"
+              },
+              {
+                "category": "strategy",
+                "text": "为一段自己想专心的时间选一个小安排，例如集中看不紧急通知或设一个愿意接受的结束提醒；必要联系和学习用途不必一起关掉，试后可以调整。"
+              },
+              {
+                "category": "support",
+                "text": "如果学习、休息、关系持续受影响或自己很难受，找信任的家人、老师或专业人员一起想支持；目标是让生活更合适，而不是责备某个人。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文工作稿尚未验证，当前限八年级研究；不是诊断、纪律处分或擅自通知家长的依据，漏答不当最低分。题目中的社交平台例子未必贴合每个人，不能因此推断没有困扰。"
+        ],
+        "disclaimer": "这份中文内容是研究工作稿，用来帮助你观察手机与生活的关系，不是诊断，也不能凭一次回答判断你是否“成瘾”。 ©2013 Kwon et al. Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558. https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558；CC Attribution（当前链接 https://creativecommons.org/licenses/by/4.0/）。本中文翻译与数字排版/反馈为独立改编，无原作者背书；不声称2013原文印有4.0版本号。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial self-review; not human or author approval",
+            "reviewedAt": "2026-10-29T16:58:29Z",
+            "basis": "本次仅审读新R文字与当前源的构念、窗口、分数方向及适龄受众；不运行计分／报告测试，不构成人工译审、作者批准或心理测量验证。保留原自答受众及权限，不扩大适用范围。"
+          }
+        }
+      }
+    }
+  ]
+}

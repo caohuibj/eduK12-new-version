@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "cfsr12_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "334c59b2a74834d776a4fe9dde8c3be9851413245e1ee584fe9dbbf649fa2e2b",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.2",
+        "primaryScoreKeys": [
+          "abandonment",
+          "recoping",
+          "metacoping"
+        ],
+        "scoreOrder": [
+          "abandonment",
+          "recoping",
+          "metacoping"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "abandonment",
+            "headline": "停止无效的应对办法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "压力下，我们有时会反复使用同一个办法，即使它已经不太管用。这组回答关注你能否察觉这种情况，并停下来换个做法。就像钥匙打不开门时，可以试试另一把，换的是办法，并不等于放弃想做成的事情。现实中的时间、精力和支持也会影响选择。你可以回想最近一次卡住的经历：继续重复原来的办法，究竟是在帮忙，还是让自己更累了？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次事情没按计划发展：你有没有发现某个办法越来越不管用？是什么迹象让你察觉到的？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以先问自己“继续做同一件事有帮助吗？”如果没有，再选择一个负担较小的调整，不要求立刻放弃正在努力的目标。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "recoping",
+            "headline": "在受阻时尝试其他办法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "原来的办法没有带来变化时，能想到另一条路，有时会让人多一点选择。这组回答关注你会不会寻找和尝试别的应对办法。换办法不一定要大刀阔斧，也可以只是把一件事拆小、换个时间做，或找人一起想想。疲惫和现实限制都可能让变通变难，不必因此责备自己。可以先想一个负担较小的调整，再观察它是否更适合眼前的情况。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近遇到的一个难题，还有哪些没试过的做法？有没有一种办法需要别人提供信息或帮助才能实行？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次遇到卡住的事情时，可以先写出两个可选择的小步骤，评估各自所需的时间与支持，再选一个适合当下条件的。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "metacoping",
+            "headline": "觉察应对办法是否奏效",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "我们常常需要回头看一眼，才知道自己刚才做的事情有没有帮助。这组回答关注你是否会留意应对的效果，以及自己究竟想改善什么。它更像给行动留一个回看点，而不是要求你每次都立刻找到正确答案。有些改变需要时间，也有些难题需要外界支持。你可以为最近的一项行动想一个看得见的小目标，过些时候再看看，哪些地方有变化、哪些地方还需要帮助。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你通常怎样知道自己采取的做法是否有效？有没有一些短期看不出变化、需要更长时间观察的事情？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以给一项应对行动设一个可观察的小目标，过一段时间回看，而不是只看自己当时有没有紧张或难过。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对自己习惯或看法的描述，不能代替对实际生活情况的了解。",
+          "中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。",
+          "不能单凭这份结果判断疾病、能力或一个人的价值。",
+          "没有回答的题目不会自动算成最低分；信息不足时，相关结果会提示无法解释。"
+        ],
+        "disclaimer": "用于成年人的自我了解与日常反思，不是考试，也不能用于诊断。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source/translation and report preparation; NOT human expert approval",
+            "reviewedAt": "2026-10-26T04:05:36.044Z",
+            "basis": "AI-assisted plain-language editorial pass, preserving content/scoring/reference policy. No claim of human expert approval; evidence and implementation versions remain separately recorded."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "abandonment",
+          "recoping",
+          "metacoping"
+        ],
+        "scoreOrder": [
+          "abandonment",
+          "recoping",
+          "metacoping"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "abandonment",
+            "headline": "别在同一条失效的路上无限绕圈",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：停下旧办法，不等于把目的地也删掉。\n\n这一组0–12分，数值越大表示更认可能停用无效办法的通常描述。比如解释越多越吵时，可以先不继续追加消息，而不是非要把这条路走到自己耗尽。\n\n不过，路是否真的不通，需要具体迹象；问卷不是现场路况台。若能停，可以给旧办法一个暂停；若暂时有现实限制，也不必因此认定自己缺少变通。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "看看绕圈的证据：原办法有没有让事情更接近目标，还是反复增加同一种代价？不只按已投入多少决定。"
+              },
+              {
+                "category": "strategy",
+                "text": "能停时先停这一段：保留目标，给方式留调整空间，不用同时给自己写失败结论。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "recoping",
+            "headline": "多看一条可走的路，不必逢弯就换道",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：有替代选项，比强迫自己随时有答案更实在。\n\n这一组0–12分，数值越大表示更认可寻找并使用其他应对方式；不是换得越快越好。沟通换个时机、补一条信息，可能是选项，但要看精力、支持和安全条件。\n\n若眼前没有合适路口，可以先找资源或等条件变化，不必为了分数硬想一个新招。这幅地图只是比喻，并没有测出你真实可用的路。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给新路标上条件：一个备选办法需要谁配合、什么信息或什么空间？把这些条件也算进选择。"
+              },
+              {
+                "category": "support",
+                "text": "找一位合适的人一起看路：讨论一个可实行的选项，而不是只听一句“你换个想法就好了”。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "metacoping",
+            "headline": "走了之后，也看看有没有更接近目的地",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：动过，不等于奏效；没立刻轻松，也不等于白做。\n\n这一组0–12分，数值越大表示更认可辨认目标与回看效果的自述。若目标是说清分工，路标就是责任是否明确，而不只是自己今天有没有紧张。\n\n有些路段需要时间，也有些问题需要外界支持。这个分数不能替你确认现实成效；可以留一个回看点，不必一路实时给自己打分。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先认目的地：用一句具体话说清希望哪一处改变，不把“我应该立刻感觉好”当作唯一路标。"
+              },
+              {
+                "category": "strategy",
+                "text": "到回看点再决定：看看实际情况，保留有用的、调整不合适的，缺资源时找支持，不必非黑即白。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文工作版本仍在完善，现有用途限20岁及以上成人，不提供人群分档或排名。三组分别计算；12题答完整才给整份解释，真实0与漏答不是一回事。"
+        ],
+        "disclaimer": "用于成年人的自我了解与日常反思，不是考试，也不能用于诊断。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T16:04:01Z",
+            "basis": "本次只读审阅cfsr12_zh_cn_research C1.0.1精确source、既有固定方法证据及新R1.2.0文字，核情境/构念/组别方向/时窗/人群、0与null、固定例子及可选行动；不继承旧日期，不声称作者批准、平台科学验证或新schema/scorer/PG/CI通过。"
+          }
+        }
+      }
+    }
+  ]
+}
