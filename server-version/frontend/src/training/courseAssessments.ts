@@ -49,7 +49,7 @@ async function attempt<T>(label: string, task: () => Promise<T>, fallback: T): P
 }
 
 async function availableComposites(courseId: string): Promise<Composite[]> {
-  const response = await apiClient.get<{ list: Composite[] }>('/composite-assessments/available')
+  const response = await apiClient.get<{ list: Composite[] }>('/composite-assessments/available', { params: { courseId } })
   if (response.code !== 0) throw new Error(response.message || '组合测评暂不可用')
   const available = response.data?.list ?? []
   const delivered = new Set<string>()
