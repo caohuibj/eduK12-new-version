@@ -17075,6 +17075,86 @@
           "log": "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/frontend-types.log"
         }
       ]
+    },
+    "448": {
+      "schemaVersion": 1,
+      "product": "aa1666a82f8a528577626904a6a80b600b7c60f6",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "Reviewed unsigned case originals plus fresh compiler receipts on exact preceding optimization products",
+        "limitations": [
+          "One current existing permission contract PASS/6filtered; no database or ACL apply by that invocation.",
+          "Original B real isolated R1/R2 files and hashes remain primary source-visibility/native permission evidence; original inherited backend dependency mismatch remains disclosed, not reclassified as complete installed-environment proof.",
+          "Fresh current backend types use isolated lock-patched current-schema dependency copy, no production grant or new full platform/schema/lifecycle replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "existing-runtime-permission-contract",
+          "path": "docs/performance/o12-o13-b-20261031/report-baseline-closeout/policy-contract.json",
+          "sha256": "54cbd3d91c246e445f101879c775739974a3b2108032ed4ac0d746cb107414b6",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 6
+          },
+          "cases": [
+            {
+              "fullName": "measurement-version exact runtime table policy source contract classifies Training participation raw-SQL tables and retains their immutable guards",
+              "status": "skipped"
+            },
+            {
+              "fullName": "measurement-version exact runtime table policy source contract classifies only named migrated measurement tables as the existing writable category",
+              "status": "skipped"
+            },
+            {
+              "fullName": "measurement-version exact runtime table policy source contract does not leave a current Prisma model unmapped, including new immutable artifacts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "measurement-version exact runtime table policy source contract keeps every explicit UPDATE/DELETE guard and its current rejection function",
+              "status": "skipped"
+            },
+            {
+              "fullName": "measurement-version exact runtime table policy source contract accepts the explicit writable catalog shape but rejects an unknown table even with full CRUD",
+              "status": "skipped"
+            },
+            {
+              "fullName": "measurement-version exact runtime table policy source contract does not weaken migration-ledger, operator, ownership or missing-write rejection",
+              "status": "passed"
+            },
+            {
+              "fullName": "measurement-version exact runtime table policy source contract retains exact opt-in ACL reconciliation and denies future tables/default authority",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "measurement-version exact runtime table policy source contract does not weaken migration-ledger, operator, ownership or missing-write rejection"
+          ],
+          "originalSourceAssociation": "aa1666a82f8a528577626904a6a80b600b7c60f6",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "sourceAssociationBasis": "Actual unsigned execution source23b4cd640321a0cb530ae494595948e6fb0bf92b is preserved in originalExecutionSourceAssociation and original receipt. Delivered aa1666a82f8a528577626904a6a80b600b7c60f6 associates the same complete backend component tree and every recorded consumed policy/SQL/test/schema/lock/config hash; it is a later Git association, not execution signing.",
+          "deltaRationale": "One existing affected permission/rejection source contract was executed once, with six other cases filtered. It is not the missing SQL-owned-table red/green proof. Original B actual isolated R1 UNCLASSIFIED_RUNTIME_TABLE and R2 policy/runtime/native schema/immutable/ledger/schema rejection records remain separately reviewed primary defect evidence and are not replayed or claimed as Vitest/HTTP assertions.",
+          "originalExecutionSourceAssociation": "23b4cd640321a0cb530ae494595948e6fb0bf92b",
+          "reviewedSourceDelta": []
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/o12-o13-b-20261031/report-baseline-closeout/backend-types.json",
+          "sha256": "110801ca7949530f25f95c939f5d6aeae3e3f33a32558a0a9c3287e42a4ac604",
+          "component": "backend",
+          "componentTree": "4dfcd69abc6d086f68463e71488ad88dad61e1e7",
+          "exitField": "exitCode",
+          "log": "docs/performance/o12-o13-b-20261031/report-baseline-closeout/backend-types.log"
+        }
+      ]
     }
   }
 }

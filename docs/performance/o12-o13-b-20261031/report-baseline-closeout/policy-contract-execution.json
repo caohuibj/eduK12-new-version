@@ -1,0 +1,40 @@
+{
+  "kind": "recorded-local-execution",
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/measurement-content/runtime-table-policy.test.ts",
+    "--testNamePattern=does not weaken migration-ledger",
+    "--maxWorkers=1",
+    "--reporter=json",
+    "--outputFile=/workspace/dot-cloud-pr448-closeout-20261031/docs/performance/o12-o13-b-20261031/report-baseline-closeout/policy-contract.json"
+  ],
+  "sourceAssociation": "23b4cd640321a0cb530ae494595948e6fb0bf92b",
+  "startedAt": "2026-10-31T12:05:08.055898+00:00",
+  "completedAt": "2026-10-31T12:05:08.738879+00:00",
+  "seconds": 0.6829858719993354,
+  "exitCode": 0,
+  "before": {
+    "server-version/backend/scripts/runtime-table-policy.json": "2d56d8105b09976f1affebff78f58a43fa8fadc825107021808bb1e67c5f0a4f",
+    "server-version/backend/scripts/runtime-role-contract.mjs": "f252be0d53b63a22495e5b0894cfd394fac79ab9c1bacfd23f16d890db2cfd81",
+    "server-version/backend/scripts/runtime-role-defaults.sql": "074b528ae8077fd2df073143ba4bb55c981f409e4a12eb35ba3abdf1d955c30b",
+    "server-version/backend/src/__tests__/measurement-content/runtime-table-policy.test.ts": "c1cf22ddfba72fead05ab18089948019c518fc62c0a9567c68c72c8927c00ba5",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+  },
+  "after": {
+    "server-version/backend/scripts/runtime-table-policy.json": "2d56d8105b09976f1affebff78f58a43fa8fadc825107021808bb1e67c5f0a4f",
+    "server-version/backend/scripts/runtime-role-contract.mjs": "f252be0d53b63a22495e5b0894cfd394fac79ab9c1bacfd23f16d890db2cfd81",
+    "server-version/backend/scripts/runtime-role-defaults.sql": "074b528ae8077fd2df073143ba4bb55c981f409e4a12eb35ba3abdf1d955c30b",
+    "server-version/backend/src/__tests__/measurement-content/runtime-table-policy.test.ts": "c1cf22ddfba72fead05ab18089948019c518fc62c0a9567c68c72c8927c00ba5",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+  },
+  "migrationsTree": "3d1f6bfb595b1ba0d09288e97ef1f61c53ef88c8",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "scope": "One existing source-only catalog/ledger/operator/missing-write permission contract. No database or ACL apply. Original B actual isolated R1/R2 proof is primary evidence for missing reporting_task_artifacts classification and remains separate."
+}
