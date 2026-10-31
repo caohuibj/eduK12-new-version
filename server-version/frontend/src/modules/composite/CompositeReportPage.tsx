@@ -48,7 +48,7 @@ type LegacyCompositeModule = Record<string, unknown> & {
   displayValue?: string | null
 }
 
-const CompositeReportPage: React.FC = () => {
+const CompositeReportContent: React.FC = () => {
   const epoch = useRef(0)
   const { id, attemptId } = useParams<{ id?: string; attemptId?: string }>()
   const learner = useTrainingLearnerNavigation()
@@ -441,6 +441,11 @@ const CompositeReportPage: React.FC = () => {
       ))}
     </ReportShell>
   )
+}
+
+const CompositeReportPage: React.FC = () => {
+  const { pathname } = useLocation()
+  return <CompositeReportContent key={pathname} />
 }
 
 export default CompositeReportPage
