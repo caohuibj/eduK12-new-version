@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "icarmatrix",
+    "engineVersion": "2.1.0",
+    "scoringVersion": "1.1.0"
+  },
+  "provenance": "Synthetic observations; independently asserted in icarmatrix-v21.test.ts. No participant data.",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "matrixType": "3x3",
+          "stimulusSetVersion": "matgen-reviewed-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 30000,
+          "validRtFloorMs": 500,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "bankItemId": "matgen-std-rotate-rotate-006",
+              "responseIndex": 2,
+              "rtMs": 1500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "bankItemId": "matgen-std-identity-rotate-008",
+              "responseIndex": 5,
+              "rtMs": 1500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "bankItemId": "matgen-std-shade-rotate-009",
+              "responseIndex": 2,
+              "rtMs": 1500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialIndex": 3,
+              "bankItemId": "matgen-std-identity-shape-003",
+              "responseIndex": 2,
+              "rtMs": 1500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "correctCount": 4,
+          "timeoutCount": 0,
+          "answeredCount": 4,
+          "medianRtMs": 1500,
+          "validRtCount": 4,
+          "accuracyByRuleTag": {
+            "rotate": 1,
+            "identity": 1,
+            "shade": 1,
+            "shape": 1
+          }
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "interrupted": false,
+          "excessiveTimeouts": false,
+          "rapidGuessing": false
+        },
+        "showProductIndex": false
+      }
+    },
+    {
+      "name": "null-valid-zero-fast-interrupted",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "matrixType": "3x3",
+          "stimulusSetVersion": "matgen-reviewed-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 30000,
+          "validRtFloorMs": 500,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "bankItemId": "matgen-std-rotate-rotate-006",
+              "responseIndex": 0,
+              "rtMs": 1500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "bankItemId": "matgen-std-identity-rotate-008",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "bankItemId": "matgen-std-shade-rotate-009",
+              "responseIndex": 2,
+              "rtMs": 200,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialIndex": 3,
+              "bankItemId": "matgen-std-identity-shape-003",
+              "responseIndex": 2,
+              "rtMs": 1500,
+              "interrupted": true
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 50,
+        "metrics": {
+          "accuracy": 0.5,
+          "correctCount": 2,
+          "timeoutCount": 1,
+          "answeredCount": 3,
+          "medianRtMs": 1500,
+          "validRtCount": 1,
+          "accuracyByRuleTag": {
+            "rotate": 0.3333333333333333,
+            "identity": 0.5,
+            "shade": 1,
+            "shape": 1
+          }
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "interrupted": true,
+          "excessiveTimeouts": false,
+          "rapidGuessing": false
+        },
+        "showProductIndex": false
+      }
+    },
+    {
+      "name": "all-timeout",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "matrixType": "3x3",
+          "stimulusSetVersion": "matgen-reviewed-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 30000,
+          "validRtFloorMs": 500,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "bankItemId": "matgen-std-rotate-rotate-006",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "bankItemId": "matgen-std-identity-rotate-008",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "bankItemId": "matgen-std-shade-rotate-009",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialIndex": 3,
+              "bankItemId": "matgen-std-identity-shape-003",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "metrics": {
+          "accuracy": 0,
+          "correctCount": 0,
+          "timeoutCount": 4,
+          "answeredCount": 0,
+          "medianRtMs": null,
+          "validRtCount": 0,
+          "accuracyByRuleTag": {
+            "rotate": 0,
+            "identity": 0,
+            "shade": 0,
+            "shape": 0
+          }
+        },
+        "qualityFlags": {
+          "interpretable": false,
+          "interrupted": false,
+          "excessiveTimeouts": true,
+          "rapidGuessing": false
+        },
+        "showProductIndex": false
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "matrixType": "3x3",
+          "stimulusSetVersion": "matgen-reviewed-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 30000,
+          "validRtFloorMs": 500,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed",
+        "trials": []
+      },
+      "expectedError": "reviewed icarmatrix requires exactly the planned trials"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "matrixType": "3x3",
+          "stimulusSetVersion": "matgen-reviewed-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 30000,
+          "validRtFloorMs": 500,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "bankItemId": "matgen-std-rotate-rotate-006",
+              "responseIndex": 2,
+              "rtMs": 1500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "reviewed icarmatrix requires exactly the planned trials"
+    }
+  ]
+}

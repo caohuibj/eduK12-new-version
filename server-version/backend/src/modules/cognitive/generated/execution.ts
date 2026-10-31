@@ -36,14 +36,15 @@ import { executionEntries as task33 } from '../tasks/seqlearn/package'
 import { executionEntries as task34 } from '../tasks/timecopy/package'
 import { executionEntries as task35 } from '../tasks/letternumseries/package'
 import { executionEntries as task36 } from '../tasks/semanticfluency/package'
-import { executionEntries as task37 } from '../tasks/cancellation/package'
-import { executionEntries as task38 } from '../tasks/trustgame/package'
-import { executionEntries as task39 } from '../tasks/ufov/package'
-import { executionEntries as task40 } from '../tasks/pursuitrotor/package'
-import { executionEntries as task41 } from '../tasks/visualwm/package'
-import { executionEntries as task42 } from '../tasks/maze/package'
-import { executionEntries as task43 } from '../tasks/auditoryrt/package'
-import { executionEntries as task44 } from '../tasks/auditorynback/package'
+import { executionEntries as task37 } from '../tasks/icarmatrix/package'
+import { executionEntries as task38 } from '../tasks/cancellation/package'
+import { executionEntries as task39 } from '../tasks/trustgame/package'
+import { executionEntries as task40 } from '../tasks/ufov/package'
+import { executionEntries as task41 } from '../tasks/pursuitrotor/package'
+import { executionEntries as task42 } from '../tasks/visualwm/package'
+import { executionEntries as task43 } from '../tasks/maze/package'
+import { executionEntries as task44 } from '../tasks/auditoryrt/package'
+import { executionEntries as task45 } from '../tasks/auditorynback/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -93,5 +94,8 @@ export const cognitiveExecutionEntries = [
   task42[0],
   task43[0],
   task44[0],
+  task45[0],
+  task37[1],
+  task37[2],
   task21[1],
 ]

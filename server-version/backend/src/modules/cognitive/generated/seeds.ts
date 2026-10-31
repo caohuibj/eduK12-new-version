@@ -36,14 +36,15 @@ import { seeds as task33 } from '../tasks/seqlearn/seeds'
 import { seeds as task34 } from '../tasks/timecopy/seeds'
 import { seeds as task35 } from '../tasks/letternumseries/seeds'
 import { seeds as task36 } from '../tasks/semanticfluency/seeds'
-import { seeds as task37 } from '../tasks/cancellation/seeds'
-import { seeds as task38 } from '../tasks/trustgame/seeds'
-import { seeds as task39 } from '../tasks/ufov/seeds'
-import { seeds as task40 } from '../tasks/pursuitrotor/seeds'
-import { seeds as task41 } from '../tasks/visualwm/seeds'
-import { seeds as task42 } from '../tasks/maze/seeds'
-import { seeds as task43 } from '../tasks/auditoryrt/seeds'
-import { seeds as task44 } from '../tasks/auditorynback/seeds'
+import { seeds as task37 } from '../tasks/icarmatrix/seeds'
+import { seeds as task38 } from '../tasks/cancellation/seeds'
+import { seeds as task39 } from '../tasks/trustgame/seeds'
+import { seeds as task40 } from '../tasks/ufov/seeds'
+import { seeds as task41 } from '../tasks/pursuitrotor/seeds'
+import { seeds as task42 } from '../tasks/visualwm/seeds'
+import { seeds as task43 } from '../tasks/maze/seeds'
+import { seeds as task44 } from '../tasks/auditoryrt/seeds'
+import { seeds as task45 } from '../tasks/auditorynback/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -93,5 +94,10 @@ export const cognitiveSeeds = [
   task42[0],
   task43[0],
   task44[0],
+  task45[0],
+  task37[1],
+  task37[2],
+  task37[3],
+  task37[4],
   task21[1],
 ]

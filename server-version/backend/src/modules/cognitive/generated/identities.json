@@ -203,6 +203,11 @@
       "scoringVersion": "1.0.0"
     },
     {
+      "testType": "icarmatrix",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
       "testType": "cancellation",
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.0"
@@ -241,6 +246,16 @@
       "testType": "auditorynback",
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "icarmatrix",
+      "engineVersion": "2.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "icarmatrix",
+      "engineVersion": "2.1.0",
+      "scoringVersion": "1.1.0"
     },
     {
       "testType": "bart",
@@ -396,6 +411,18 @@
     {
       "testType": "semanticfluency",
       "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "icarmatrix",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "icarmatrix",
+      "engineVersion": "2.0.0"
+    },
+    {
+      "testType": "icarmatrix",
+      "engineVersion": "2.1.0"
     },
     {
       "testType": "cancellation",
