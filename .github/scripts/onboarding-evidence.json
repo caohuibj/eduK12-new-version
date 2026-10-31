@@ -17195,7 +17195,7 @@
     },
     "447": {
       "schemaVersion": 1,
-      "product": "7292af17b3a7fa8251f100b2068a7c6e85fe1c2d",
+      "product": "75ef6d7ff2aeee98abf4758f75cb6acbb40642f5",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -17208,7 +17208,8 @@
           "All explicitly hashed candidate/lint inputs equal current bytes. Unrelated main frontend deltas are listed below and outside the public result import closure; whole app compiler actually refreshed once on Node24.21.0.",
           "Original PR447 environment-reuse.json references PR445 inventory only. No445 application receipt or product is admitted; original frontend follow-redirects1.16.1 lock match and sibling backend1.16.1 versus1.16.2 limit remain historical disclosures.",
           "Fresh compiler uses existing official Node24.21.0 and installed dependencies; selected lock/compiler hashes are not a complete installed-byte attestation. Backend equals current main and is not compiled or executed.",
-          "React/jsdom synthetic fetch/capability fixtures are not live server authorization, native browser, SQL/load/capacity, FINAL, database, build/image, CI or deployment qualification."
+          "React/jsdom synthetic fetch/capability fixtures are not live server authorization, native browser, SQL/load/capacity, FINAL, database, build/image, CI or deployment qualification.",
+          "Main449 integration preserves all31 prior candidate/root records. Ten original447 cases and lint reused by unchanged imported closure; fresh frontend app types Node24.21 exit0 on combined45d5194b tree. Actual official actionlint1.7.12 baseline/current both exit0; shellcheck/pyflakes not invoked."
         ]
       },
       "reports": [
@@ -17231,9 +17232,12 @@
             "server-version/frontend/src/components/education-tools/EducationCompositionTeacherGroup.test.tsx",
             "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx",
             "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/huiteacher/DotCrossPrUi.review.test.tsx",
             "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+            "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx",
             "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.test.tsx",
             "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx",
+            "server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx",
             "server-version/frontend/src/modules/cognitive/__tests__/api.test.ts",
             "server-version/frontend/src/modules/cognitive/api.ts",
             "server-version/frontend/src/training/courseAssessments.test.ts",
@@ -17296,17 +17300,17 @@
             }
           ],
           "sourceAssociationBasis": "candidate-execution.json retains actual argv/time/exit0 and source/test/config/lock hashes on original basef941e745. The published03a9cea tree is the later immutable equal-product comparison anchor, not a signed execution head. All its nine recorded input hashes match current product.",
-          "deltaRationale": "The17 listed frontend changes belong to main form manager, composition/School/teacher Group/Long paths, Cognitive course API tests and Training loader. Public result, actual capability client/resume/error helper, report DTO/cards/primitives, product UI, existing selected consumer, test setup and frontend package/lock/config are unchanged. None of those changed entry modules is imported by selected public-result cases; preserve10 original passes/2filtered without replay. Whole-component compiler updated separately."
+          "deltaRationale": "The20 listed frontend changes belong to main form manager, composition/School/teacher Group/Long paths, Cognitive course API tests and Training loader. Public result, actual capability client/resume/error helper, report DTO/cards/primitives, product UI, existing selected consumer, test setup and frontend package/lock/config are unchanged. None of those changed entry modules is imported by selected public-result cases; preserve10 original passes/2filtered without replay. Whole-component compiler updated separately. Integrated449 adds only TeacherFormGroupVersions, TeacherNumericGroupReports and its fixture, outside all selected public-result imports. No application replay; current app compiler refreshed on combined main194."
         }
       ],
       "types": [
         {
-          "path": "docs/performance/public-report-isolation-20261031/qualification/frontend-types.json",
-          "sha256": "a9feebe25ba65158afa32a0dfdf3cb88d5c0c2b479a4bde188d049f65c64327b",
+          "path": "docs/performance/public-report-isolation-20261031/qualification-main194/frontend-types.json",
+          "sha256": "970e91dbfceec71c5f75b5d5b5065f0e80545aa0952b76b3632f8b0ade1480be",
           "component": "frontend",
-          "componentTree": "9a545fadae5b6d2f7a6177d7b521e12f70e54348",
+          "componentTree": "45d5194b6fdb69af9f8dddd89c7231aea4c7eeaf",
           "exitField": "exitCode",
-          "log": "docs/performance/public-report-isolation-20261031/qualification/frontend-types.log"
+          "log": "docs/performance/public-report-isolation-20261031/qualification-main194/frontend-types.log"
         }
       ],
       "originalExecutionAssociation": {
@@ -17330,6 +17334,10 @@
           "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
         },
         "limits": "Static scoped reviewer association; generic admission freezes original blobs/case identities and reviewed delta. Old app type receipt remains historical, not current proof."
+      },
+      "currentAlignmentProof": {
+        "path": "docs/performance/public-report-isolation-20261031/qualification-main194/source-and-reuse.json",
+        "sha256": "860b971dc82b1a5e8800af7e52530a075e2d6bbd0d7c6dfda6aaf91a25f338d1"
       }
     }
   }
