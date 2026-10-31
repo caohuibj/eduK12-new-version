@@ -17078,7 +17078,7 @@
     },
     "449": {
       "schemaVersion": 1,
-      "product": "de3b0204a525ebd929282cd78624d23977ed0266",
+      "product": "4edc87f8f0c58d6d754f9428b12ff09c1c57e206",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -17088,13 +17088,13 @@
         "frontend": "109c8f913f4458247495cb8e9a77d1d63b3cf9b8"
       },
       "environment": {
-        "node": "original cases v24.21.0; current app types v24.19.0",
+        "node": "original cases and current app types v24.21.0, same official Node binary SHA256",
         "limitations": [
           "8 original React/jsdom cases use mocked API; not live server authorization or browser evidence.",
           "All73 original recorded source/lock/config hashes remain identical after main integration. Original frontend component and current frontend component differ only in reviewed unrelated files.",
           "Original passing report, lint exit0/warnings, parent3 failing counterexamples and missing-backend-dependency types failure are retained without replay.",
-          "Current types are unsigned local execution; exact real .bin argv/order is retained, not a fabricated canonical command or original timing.",
-          "No entire node_modules integrity attestation, CI, FINAL, database, build or deployment claim."
+          "No entire node_modules integrity attestation, CI, FINAL, database, build or deployment claim.",
+          "The original v24.19.0 type receipt remains unchanged but is engine-ineligible. The same frozen frontend component was compiled once with the official checksum-verified Nodev24.21.0; actual canonical argv and pre/post input hashes are retained."
         ]
       },
       "reports": [
@@ -17163,12 +17163,12 @@
       ],
       "types": [
         {
-          "path": "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types.json",
-          "sha256": "168590d5318cb92885adbc1343c151337a7fee7d58254b81e34e4f8ce4651ca0",
+          "path": "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types-node24.21.json",
+          "sha256": "422a9690fb1ba29a72fae847a34f6bed4fc3a9d6a82aec94a80897efda171f22",
           "component": "frontend",
           "componentTree": "109c8f913f4458247495cb8e9a77d1d63b3cf9b8",
           "exitField": "exitCode",
-          "log": "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types.log"
+          "log": "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types-node24.21.log"
         }
       ],
       "originalLint": {
@@ -17180,6 +17180,17 @@
       "reuseProof": {
         "path": "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/source-and-reuse.json",
         "sha256": "0223fa3bb2ed1c6a7476a42bde93952fdee8e1d25f793aa22749717949325753"
+      },
+      "engineContinuation": {
+        "oldReceipt": "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types.json",
+        "oldNode": "v24.19.0",
+        "oldCompilerExitCode": 0,
+        "oldEngineQualified": false,
+        "originalBytesRetained": true,
+        "newNode": "v24.21.0",
+        "newTypeReceipt": "docs/performance/teacher-group-ui-recovery-20261031/qualification-main25/frontend-types-node24.21.json",
+        "originalEightCasesRerun": false,
+        "originalLintRerun": false
       }
     }
   }
