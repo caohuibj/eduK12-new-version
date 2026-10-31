@@ -12963,6 +12963,290 @@
           "log": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/frontend-types.log"
         }
       ]
+    },
+    "429": {
+      "schemaVersion": 1,
+      "product": "d1b0faf080def9fd5ec9c1fda5ab2dc05111eedd",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Seven distinct admitted cases; the earlier unit metric case is retained in its raw report but only its unchanged delay case is selected, using the later strengthened alias case once.",
+          "N11 missing-complement suppression and N20/valid10/missing10 are retained continuations from10 genuine FINALs plus deliberately seeded incomplete boundary members; not a new20-person publication flow.",
+          "Pointer mock and component cases are not full browser/DB journeys; actual directory/snapshot PG read has canonical0. Current exact types cover the transaction correction; oldFINALs, whole browser, scoring and migration not replayed."
+        ]
+      },
+      "reports": [
+        {
+          "id": "actual-delay",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/unit.json",
+          "sha256": "1b793a73168bd664ab351258a7a0f0fa9fe77afe88be51e87665ae255fce1f60",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/service.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "rejects an unimplemented native family before generic leaf resolution, despite an explicit GROUP parent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "only honors the actual aggregate contract delay rather than inventing a universal close requirement",
+              "status": "passed"
+            },
+            {
+              "fullName": "freezes only per-metric contributor subsets and rejects a one-person swap despite unchanged overall N",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "only honors the actual aggregate contract delay rather than inventing a universal close requirement"
+          ]
+        },
+        {
+          "id": "contributor-alias",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/alias-unit.json",
+          "sha256": "e6ac252ad82104227c1bb9b41d89391eea8d4a30af8606bb3f08ac3863a0a9bf",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/service.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 3
+          },
+          "cases": [
+            {
+              "fullName": "rejects an unimplemented native family before generic leaf resolution, despite an explicit GROUP parent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "only honors the actual aggregate contract delay rather than inventing a universal close requirement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "freezes only per-metric contributor subsets and rejects a one-person swap despite unchanged overall N",
+              "status": "passed"
+            },
+            {
+              "fullName": "seeks26 same-time version pointers with the full timestamp and id, without selecting saved report payloads",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "pointer-seek",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/paging-unit.json",
+          "sha256": "80486c21bf74d1ddb92bdcaf67447d9e845aafd2b43a326802b080964f0bd362",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/service.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 3
+          },
+          "cases": [
+            {
+              "fullName": "rejects an unimplemented native family before generic leaf resolution, despite an explicit GROUP parent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "only honors the actual aggregate contract delay rather than inventing a universal close requirement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "freezes only per-metric contributor subsets and rejects a one-person swap despite unchanged overall N",
+              "status": "skipped"
+            },
+            {
+              "fullName": "seeks26 same-time version pointers with the full timestamp and id, without selecting saved report payloads",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "partial-native",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/postgres-partial-success.json",
+          "sha256": "382f8965130a2178d091e6c7b6ea07f35be1bb6b743591a22bb6013b62738cd5",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/service.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Teacher partial numeric population / existing real FINAL continuation preserves N10 real FINALs, withholds a small missing complement and discloses N10 of20 without requiring complete participation",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "pointer-native",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/postgres.json",
+          "sha256": "42b17236c01bb777f9cb39f6cfb0693a3cff0b97340da013a25605c167647838",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/service.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "Teacher partial numeric population / existing real FINAL continuation preserves N10 real FINALs, withholds a small missing complement and discloses N10 of20 without requiring complete participation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher partial numeric population / existing real FINAL continuation reads only authorized version pointers and the saved partial Artifact when reopening the report",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "alias-native",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/comparable-alias-postgres.json",
+          "sha256": "fe9fd4ab7a985315e2bb1c0566c0377a4fbc52b71ab509051e01ccb1d176375f",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/service.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population generates and reads sufficient-N original GROUP without resubmitting its completed participant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population generates and reads sufficient-N library GROUP without resubmitting its completed participant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population matches existing original and library disclosures by immutable C rather than their different parent keys",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "pointer-ui",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/pointer-ui.json",
+          "sha256": "879827609a53d40052a5983e16349a610143815582bdab08c7c9c41cae9d646f",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "opens saved pointers first, seeks older versions and loads calculation configuration only on explicit request",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/backend-types.json",
+          "sha256": "4601f1e83a3ba217e67b17ebdbc9ae02a1a1e3d2a48f5c8dd2f01f1f63b729e7",
+          "component": "backend",
+          "componentTree": "b94bb0efbbc2e5fd32a0755571fd28368dce159c",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/frontend-types.json",
+          "sha256": "93c9e22a4fde959fc0fb7139eaf1db84fcaefab102867be9764760ff6800856a",
+          "component": "frontend",
+          "componentTree": "a53564bc774639ea9211bd6924a3fadad321c171",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/frontend-types.log"
+        }
+      ]
     }
   }
 }
