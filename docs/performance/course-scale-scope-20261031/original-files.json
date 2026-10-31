@@ -1,0 +1,62 @@
+[
+  {
+    "path": "docs/performance/course-scale-scope-20261031/backend-baseline.json.gz",
+    "gzipSHA256": "24226412e9c974f5da1c8706694371bc1679b1b29f2be748899bd7a4ce8a7426",
+    "originalSHA256": "cb5e4e6b6470639f39d62959c4cee946fc470e1c2ced25d489f44e0da9a5ffb4",
+    "originalBytes": 2448
+  },
+  {
+    "path": "docs/performance/course-scale-scope-20261031/backend-baseline.log.gz",
+    "gzipSHA256": "d64c436d86502512733added47329b41bb093cc9b34856f79037adae007935cf",
+    "originalSHA256": "4a057dc884280c29af20f1ee1e77d1d44c629dbbcb751fcf925f4957e766a1a7",
+    "originalBytes": 78
+  },
+  {
+    "path": "docs/performance/course-scale-scope-20261031/backend-baseline.ndjson.gz",
+    "gzipSHA256": "7c9c1c45d3ffbfaffa431255a36e0b36c8e8ab511877da77dfe5c8558bd0b937",
+    "originalSHA256": "0330578793f581e5f2a9c4ff0dd28d021414ee428359e8e075ef3c46007feecf",
+    "originalBytes": 25261
+  },
+  {
+    "path": "docs/performance/course-scale-scope-20261031/frontend-baseline.json.gz",
+    "gzipSHA256": "78a4f64fd31bf07d04d157aec160da9a823c4117f38f6e19b101e861619a9dac",
+    "originalSHA256": "daa21c2e4902c3fa58fa7c5ca3ab4d3eded0561aadc0ec650978e609e7e6b409",
+    "originalBytes": 6712
+  },
+  {
+    "path": "docs/performance/course-scale-scope-20261031/frontend-baseline.log.gz",
+    "gzipSHA256": "7ff278c124ac185122f92d9f8e102e5d4520fdceb2396393be06035b92cf12b4",
+    "originalSHA256": "5a3721c42c5c97a0ad3185eb2b8270dfeb432ca2193a1b19146589a5d9503e22",
+    "originalBytes": 79
+  },
+  {
+    "path": "docs/performance/course-scale-scope-20261031/backend-candidate.json.gz",
+    "gzipSHA256": "1cf87b3792cc111dae38336f7b7df1c3a1ee60d112e4fce2859a3504e36dddde",
+    "originalSHA256": "5d7604518e83ac93e36e9bb850d90c2356c7c7ea724afbceb4f5aa05000af7c9",
+    "originalBytes": 1551
+  },
+  {
+    "path": "docs/performance/course-scale-scope-20261031/backend-candidate.log.gz",
+    "gzipSHA256": "3a0bb9ca19d158497c182ab4acc43d1e8f63a12717c9dee8e4a2819fad3727ec",
+    "originalSHA256": "1de76a6a8cd154f987f02c940fc46fcaf318c3d84772d627367452a226fe39f9",
+    "originalBytes": 79
+  },
+  {
+    "path": "docs/performance/course-scale-scope-20261031/backend-candidate.ndjson.gz",
+    "gzipSHA256": "5021973bdcaa4c415fc957da82b4f0726b74dee71e1e4dfe32443b405c63b23a",
+    "originalSHA256": "063ebb648f729223f0aa59f52cfb1d51757a0d414427af45d668b8be76981f38",
+    "originalBytes": 8878
+  },
+  {
+    "path": "docs/performance/course-scale-scope-20261031/frontend-candidate.json.gz",
+    "gzipSHA256": "4a56ab101fe4c66795ed2a52977137d50e6786f15fe025ce982073fb33ddc751",
+    "originalSHA256": "26a4295a31d2c35e9630a1d03cc1c9e3d670eb6fe491c68d63439e7c68feb001",
+    "originalBytes": 5086
+  },
+  {
+    "path": "docs/performance/course-scale-scope-20261031/frontend-candidate.log.gz",
+    "gzipSHA256": "c3583066b1d400f55728bea6b54874aaf60e55fc3f187800dad0601c8dae50a9",
+    "originalSHA256": "65a6b2c10c0fb4cf933b2cf532a97bb4517ef70bdbb35d268e4f5d782f5fdd7c",
+    "originalBytes": 80
+  }
+]

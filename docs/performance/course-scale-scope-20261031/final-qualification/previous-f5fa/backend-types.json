@@ -1,0 +1,44 @@
+{
+  "kind": "RECORDED_LOCAL_EXECUTION_UNSIGNED",
+  "component": "backend",
+  "componentTree": "26c3cc03ea013c7947fed322dac51ef6ef88bc6c",
+  "head": "5b0fce018b993e2221b530b17991e4a00473908e",
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "workingDirectory": "/workspace/scratch/5a77e8bdc1ae/dot-course-scale-435/server-version/backend",
+  "node": "v24.22.1",
+  "startedAt": "2026-10-31T05:04:25.058797+00:00",
+  "endedAt": "2026-10-31T05:05:09.249943+00:00",
+  "elapsedSeconds": 44.191144230000646,
+  "exitCode": 0,
+  "before": {
+    "server-version/backend/package.json": "eb9818ccb8e7797f201d86d20752aa23bb3c13685d4660ec395f4f905a28f87a",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/node_modules/typescript/package.json": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+    "server-version/backend/node_modules/typescript/lib/tsc.js": "2cffde0b8c6760dfb0b5b0382bbb7e00ba6a8b2d981b9205b256a700a481d983",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc",
+    "server-version/backend/node_modules/.prisma/client/schema.prisma": "6b32c4d0cd4127ec7c0df8f9b002d11bafa15381abbb57ae683a6191edc69498",
+    "server-version/backend/node_modules/.prisma/client/index.d.ts": "5d080b94f4556a0d93de84f1992172371ceda80949547ecc4308106f45bac73d",
+    "server-version/backend/node_modules/follow-redirects/package.json": "04ad04efe80b8a05d7dc20a2b30831a93f22dfe358948eca019f003b71f90026"
+  },
+  "after": {
+    "server-version/backend/package.json": "eb9818ccb8e7797f201d86d20752aa23bb3c13685d4660ec395f4f905a28f87a",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/node_modules/typescript/package.json": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+    "server-version/backend/node_modules/typescript/lib/tsc.js": "2cffde0b8c6760dfb0b5b0382bbb7e00ba6a8b2d981b9205b256a700a481d983",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc",
+    "server-version/backend/node_modules/.prisma/client/schema.prisma": "6b32c4d0cd4127ec7c0df8f9b002d11bafa15381abbb57ae683a6191edc69498",
+    "server-version/backend/node_modules/.prisma/client/index.d.ts": "5d080b94f4556a0d93de84f1992172371ceda80949547ecc4308106f45bac73d",
+    "server-version/backend/node_modules/follow-redirects/package.json": "04ad04efe80b8a05d7dc20a2b30831a93f22dfe358948eca019f003b71f90026"
+  },
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "limits": [
+    "Copied official locked dependencies from local cache; installed package versions compared, follow-redirects updated with lock SHA512 verification. Not full node_modules byte attestation.",
+    "Backend tests excluded; frontend app type project only; no build or business replay."
+  ]
+}

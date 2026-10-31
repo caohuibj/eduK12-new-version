@@ -7,7 +7,7 @@ import type { TaskGroupProjection } from './group-summary'
 import type {GroupLongitudinalProjection} from './group-longitudinal'
 
 type Db = Prisma.TransactionClient
-export type TaskArtifactSource = { product: 'SURVEY' | 'TRAINING' | 'SCHOOL'; containerId: string; taskId: string }
+export type TaskArtifactSource = { product: 'SURVEY' | 'TRAINING' | 'SCHOOL' | 'TEACHER'; containerId: string; taskId: string }
 export interface TaskGroupArtifact {
   artifactId: string
   generatedAt: string

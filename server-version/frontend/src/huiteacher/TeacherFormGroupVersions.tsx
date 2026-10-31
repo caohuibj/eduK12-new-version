@@ -8,29 +8,31 @@ export function TeacherFormGroupVersions({api,endpoint,onReport}:{api:Api;endpoi
  const [index,setIndex]=useState<Index|null>(null),[dimension,setDimension]=useState('ALL'),[ids,setIds]=useState<string[]>([])
  const [version,setVersion]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('')
  const [directoryError,setDirectoryError]=useState('')
+ const [retryTarget,setRetryTarget]=useState<string|null>(null),[retryRevision,setRetryRevision]=useState(0)
  const request=useRef(0),deliver=useRef(onReport);deliver.current=onReport
  useEffect(()=>{
-  const token=++request.current;setIndex(null);setVersion('');setDimension('ALL');setIds([]);setError('');setDirectoryError('');setBusy(true);deliver.current(null)
+  const token=++request.current;let selectedId='';setIndex(null);setVersion('');setDimension('ALL');setIds([]);setError('');setDirectoryError('');setRetryTarget(null);setBusy(true);deliver.current(null)
   void api<Index>(endpoint+'/versions').then(async result=>{
    if(token!==request.current)return
    setIndex(result)
    if(result.versions[0]){
     const id=result.versions[0].versionId
+    selectedId=id;setVersion(id)
     const report=await api<TeacherFormGroupProjection>(endpoint+'/versions/'+id)
     if(token===request.current){setVersion(id);deliver.current(report)}
    }
-  }).catch(e=>{if(token===request.current)setError(e instanceof Error?e.message:'报告目录暂不可读取')})
+  }).catch(e=>{if(token===request.current){setError(e instanceof Error?e.message:'报告目录暂不可读取');setRetryTarget(selectedId)}})
    .finally(()=>{if(token===request.current)setBusy(false)})
   return()=>{request.current++}
- },[api,endpoint])
+ },[api,endpoint,retryRevision])
  async function read(id:string){
-  const token=++request.current;setBusy(true);setError('')
+  const token=++request.current;setBusy(true);setError('');setRetryTarget(null)
   try{const report=await api<TeacherFormGroupProjection>(endpoint+'/versions/'+id);if(token===request.current){setVersion(id);deliver.current(report)}}
-  catch(e){if(token===request.current)setError(e instanceof Error?e.message:'该版本暂不可读取')}
+  catch(e){if(token===request.current){setError(e instanceof Error?e.message:'该版本暂不可读取');setRetryTarget(id)}}
   finally{if(token===request.current)setBusy(false)}
  }
  async function generate(){
-  const token=++request.current;setBusy(true);setError('');setDirectoryError('')
+  const token=++request.current;setBusy(true);setError('');setDirectoryError('');setRetryTarget(null)
   const selection=dimension==='ALL'?{kind:'ALL'}:{kind:dimension==='CLASSES'?'CLASSES':'LABELS',ids}
   try{
    const report=await api<TeacherFormGroupProjection>(endpoint+'/versions','POST',{selection})
@@ -52,7 +54,7 @@ export function TeacherFormGroupVersions({api,endpoint,onReport}:{api:Api;endpoi
  }
  async function older(){
   if(!index?.nextCursor)return
-  const token=++request.current;setBusy(true);setError('')
+  const token=++request.current;setBusy(true);setError('');setRetryTarget(null)
   try{
    const query=new URLSearchParams({beforeAt:index.nextCursor.releasedAt,beforeId:index.nextCursor.versionId})
    const result=await api<Index>(endpoint+'/versions?'+query)
@@ -64,6 +66,7 @@ export function TeacherFormGroupVersions({api,endpoint,onReport}:{api:Api;endpoi
  const options=index?.groups.options.filter(row=>dimension==='CLASSES'?row.kind==='CLASSES':row.kind==='LABELS'&&row.dimensionId===dimension)??[]
  return <section aria-label="教师群体报告版本与人群">
   {error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在处理群体报告…</p>}
+  {error&&retryTarget!==null&&<button type="button" disabled={busy} onClick={()=>retryTarget?void read(retryTarget):setRetryRevision(value=>value+1)}>重试读取{retryTarget?'该版本报告':'版本目录'}</button>}
   {directoryError&&<p role="alert">报告已生成，版本目录刷新失败：{directoryError} <button type="button" disabled={busy} onClick={()=>void retryDirectory()}>重试读取版本目录</button></p>}
   {index&&<>
    {index.versions.length>0&&<label className="ht-field"><span>已生成版本</span><select disabled={busy} value={version} onChange={e=>void read(e.target.value)}>

@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
+import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs,allowedSourcePath} from './onboarding-scope.mjs';
 import {verifyQuestionnaire442Evidence,verifySchool439Evidence,verifyTrainingStandaloneCognitiveObservation,verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,decodeOriginal,verifyCloudComponentTypeReceipt,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
@@ -84,6 +84,27 @@ test('component type receipts bind the selected frontend tree and exact compiler
  assert.throws(()=>verifyTypeReceipt(receipt,review,()=>Buffer.from(''),h('2')));
  assert.throws(()=>verifyTypeReceipt(receipt,{...review,component:'backend'},()=>Buffer.from(''),h('3')));
  assert.throws(()=>verifyTypeReceipt({...receipt,exitCode:2},review,()=>Buffer.from(''),h('3')));
+});
+test('PR449 retains its eight original cases, unchanged input hashes and real compiler argv while disabled',async()=>{
+ const {createHash}=await import('node:crypto');const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+ const cfg=JSON.parse(readFileSync('.github/scripts/onboarding-bindings.json')).candidates['449'];
+ const review=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['449'];
+ assert.equal(typeof cfg.enabled,'boolean');assert.equal(cfg.pr,449);assert.equal(review.product,cfg.product);
+ assert.throws(()=>onboardingPlan([],cfg.base,head,()=>{throw Error('No Git read before activation');},{CI_HEAD_REF:BRANCHES[449],CI_PR_NUMBER:'449'},{...cfg,enabled:false}),/pending independent activation/);
+ assert.equal(allowedSourcePath('server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx','449'),true);
+ assert.equal(allowedSourcePath('server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts','449'),false);
+ const original=review.reports[0],bytes=readFileSync(original.path);assert.equal(digest(bytes),original.sha256);
+ assert.equal(verifyOriginalReport(JSON.parse(bytes),original).length,8);
+ const proof=JSON.parse(readFileSync(review.reuseProof.path));assert.equal(digest(readFileSync(review.reuseProof.path)),review.reuseProof.sha256);
+ assert.equal(Object.keys(proof.originalScopeSHA256).length,73);
+ for(const [path,sha]of Object.entries(proof.originalScopeSHA256))assert.equal(digest(readFileSync(path)),sha);
+ assert.equal(digest(readFileSync(review.originalLint.path)),review.originalLint.sha256);assert.equal(readFileSync(review.originalLint.exitPath,'utf8').trim(),'0');
+ const types=review.types[0],receipt=JSON.parse(readFileSync(types.path));assert.equal(digest(readFileSync(types.path)),types.sha256);
+ assert.equal(verifyTypeReceipt(receipt,types,readFileSync,cfg.components.frontend).component,'frontend');
+ assert.throws(()=>verifyTypeReceipt({...receipt,argv:['node','node_modules/.bin/tsc','--emitDeclarationOnly','-p','tsconfig.app.json']},types,readFileSync,cfg.components.frontend));
+ assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+ const workflow=readFileSync('.github/workflows/ci.yml','utf8').split('- name: select exact Task1 changed application and control SAST inputs')[1].split('- name: authenticate original PR395')[0];
+ assert(JSON.parse(workflow.match(/fromJSON\('([^']+)'\)/)[1]).includes(449));
 });
 test('first-feedback scope permits only reviewed mixed components and scans both source families',()=>{
  const f=fixture(),path='server-version/frontend/src/survey/SurveyPublicApp.tsx',b={...f.b,pr:372,source:{[path]:{before:null,after:blob}}};
@@ -614,4 +635,31 @@ test('PR437 exact mixed scope and SAST reject unknown source and incorrect activ
  for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'440'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...patch},f.b));
  assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,f.env,{...f.b,enabled:false}));
  const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,f.read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+test('PR435 course Scale qualifier binds both consumers and rejects unknown scope',()=>{
+ const f=fixture(),paths=['server-version/backend/src/controllers/scaleController.ts','server-version/frontend/src/training/courseAssessments.ts'];
+ f.b.pr=435;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'435',CI_HEAD_REF:BRANCHES[435]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,435);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'436'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+test('PR436 course Cognitive qualifier binds both consumers and rejects unknown scope',()=>{
+ const f=fixture(),paths=['server-version/backend/src/modules/cognitive/cognitive.controller.ts','server-version/frontend/src/training/courseAssessments.ts'];
+ f.b.pr=436;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'436',CI_HEAD_REF:BRANCHES[436]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,436);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+test('PR444 exact qualifier preserves required component scope and rejects unknown paths',()=>{
+ const f=fixture(),paths=["server-version/backend/src/controllers/generalQuestionnaireController.ts", "server-version/frontend/src/components/FormSectionManager.tsx"];
+ f.b.pr=444;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'444',CI_HEAD_REF:BRANCHES[444]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,444);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.filter(path=>/\.(?:[cm]?js|tsx?)$/.test(path)).sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
 });

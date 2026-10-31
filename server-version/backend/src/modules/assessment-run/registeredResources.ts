@@ -239,7 +239,7 @@ export async function resolveHistoricalRelationalEntry(ref: { resourceKind: stri
     return source.entry
   }
   if(ref.resourceKey.startsWith('private-scale:SCHOOL:')&&ref.resourceVersion==='2.0.0'
-    ||ref.resourceKey.startsWith('education-composition:SCHOOL:')){
+    ||ref.resourceKey.startsWith('education-composition:SCHOOL:')||ref.resourceKey.startsWith('education-composition:TEACHER:')){
     const {resolveSchoolPrivateGroupHistory}=await import('../education-tools/school-private-group-history')
     const school=await resolveSchoolPrivateGroupHistory(db,ref)
     if(school)return school

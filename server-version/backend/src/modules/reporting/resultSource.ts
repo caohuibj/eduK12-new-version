@@ -236,7 +236,7 @@ const prepareTrackInTransaction = async (
     reportingFail('REPORT_NOT_FOUND','reporting resource not found',404)
   const schoolGroupSource=first.frozenResourcePolicy?.resultDisclosure
     &&(first.frozenResourcePolicy.resultDisclosure as {policyKey?:string}).policyKey==='EDUCATION_SELF_GROUP_V2'
-    &&(first.resourceKey.startsWith('private-scale:SCHOOL:')||first.resourceKey.startsWith('education-composition:SCHOOL:'))
+    &&(first.resourceKey.startsWith('private-scale:SCHOOL:')||first.resourceKey.startsWith('education-composition:SCHOOL:')||first.resourceKey.startsWith('education-composition:TEACHER:'))
     ?await loadSchoolPrivateGroupDisclosure(tx,input)??reportingFail('REPORT_NOT_FOUND','reporting resource not found',404):null
   if (!['BUNDLE', 'SCALE', 'COGNITIVE', 'SITUATIONAL'].includes(first.resourceFamily)) {
     reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'resource family has no enabled authoritative reporting adapter', 409)
