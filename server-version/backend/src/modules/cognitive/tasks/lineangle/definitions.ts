@@ -58,5 +58,5 @@ export const lineangleRegistryMetaV2 = {
   ...lineangleRegistryMeta,
   randomizationAlgorithmVersion: 'lineangle-axis-sequence-v2.0.0',
   profileDefinitionVersion: '2.0.0', metricDefinitionVersion: '2.0.0', reportDefinitionVersion: '2.0.0',
-  reportDefinition: { ...lineangleRegistryMeta.reportDefinition, practicalTips: ['线段没有箭头，反向但平行仍是同一方向。', '先确定倾斜朝向，再比较与目标的夹角；与自己的正确率和用时一起读。'], disclaimer: '本次无向线段匹配正确率和用时，不是能力指数、诊断或已验证常模；不能与1.0.0直接比较。' },
+  reportDefinition: { ...lineangleRegistryMeta.reportDefinition, showProductIndex: false, practicalTips: ['线段没有箭头，反向但平行仍是同一方向。', '先确定倾斜朝向，再比较与目标的夹角；与自己的正确率和用时一起读。'], disclaimer: '本次无向线段匹配正确率和用时，不是能力指数、诊断或已验证常模；不能与1.0.0直接比较。' },
 }

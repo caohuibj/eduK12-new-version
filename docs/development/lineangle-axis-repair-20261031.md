@@ -15,3 +15,5 @@ Node24.21.0，已有依赖环境：原生成3、旧组件4、旧后端schema/sco
 未跑全项目types/onboarding/CI：477尚未有lineangle公共类型、中央注册及生成输出，必须由集成者补接后一次验证；不能据本次Vitest类型擦除宣称整体类型成功。没有安装、发布、数据库、真实用户数据或生产操作。新布局仅使用现有组件/样式，没有新平台、门禁或哈希框架。
 
 来源边界：[PAR 的 Benton 页面](https://www.parinc.com/products/BENTON)描述商业标准JLO及其手册/刺激。本任务是项目自开发平行匹配，未复制商业题本，不能借用其常模、信效度或诊断用途。
+
+四项集成补充：接入缺失的共享前端 LineangleConfig/LineangleTrialPayload 类型；v2 两端报告显式设 showProductIndex=false，避免已有兼容展示默认生成0–100产品指数。旧v1报告定义、scorer和fixture不改。中央manifest待四项到齐后统一生成。
