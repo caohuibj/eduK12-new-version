@@ -17,9 +17,9 @@
 
 ## Teacher 普通私有组合收口
 
-Form完整历史已由#438合并，#443提供纵向内部部分指标选项及目录首读GET重试。新普通组合切片只在明确新SELF GROUP版本中支持作者自有原创Scale、经原授权/许可的Cognitive/SJT叶，逐块冻结组织聚合上限、真实C/slot/单位，并保留原本人反馈。真实PG原件覆盖10个原创Scale父结果，N10/mean1/SD0，保存读取canonical0；原生Cognitive/SJT新增为固定源/单位/选择的薄适配边界，不冒称重新完成全部协议实测。
+Form完整历史已由#438合并，#443提供纵向内部部分指标选项及目录首读GET重试。新普通组合切片只在明确新SELF GROUP版本中支持作者自有原创Scale、已独立批准GROUP的库Scale、经原授权/许可的Cognitive/SJT叶，逐块冻结组织聚合上限、真实C/slot/单位，并保留原本人反馈。真实PG原件覆盖10个原创Scale父结果，N10/mean1/SD0，保存读取canonical0；原生Cognitive/SJT新增为固定源/单位/选择的薄适配边界，不冒称重新完成全部协议实测。
 
-普通组合的LIBRARY_SCALE/STANDARD_SCALE引用尚未携带精确的独立批准GROUP政策版本指针，不能从material.use或本人摘要权限推导聚合权；当前不提供其群体选择。已有独立Teacher库Scale GROUP消费不受影响。普通组合Form仍是完成回执，不新增评分；用户已明确将Teacher原生NUMBER/SLIDER Form纵向排除本轮。具体原件和单点检查理由见 `docs/evidence/teacher-private-composition-group-20261031/`。
+普通组合LIBRARY_SCALE在既有逐块JSON保存独立批准GROUP的resourceKey/resourceVersion/entryHash，发布/历史分别复用原库reader的NEW_USE/HISTORY，不另建表或审批流程。material.use或本人摘要不授予GROUP；没有对应批准的STANDARD_SCALE仍不提供群体选择。已有独立Teacher库Scale GROUP消费不受影响。普通组合Form仍是完成回执，不新增评分；用户已明确将Teacher原生NUMBER/SLIDER Form纵向排除本轮。具体原件和单点检查理由见 `docs/evidence/teacher-private-composition-group-20261031/`。
 
 ## 当前独立认知接线
 
