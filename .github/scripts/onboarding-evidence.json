@@ -2712,8 +2712,8 @@
           ],
           "historicalTestDifference": {
             "path": "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
-            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'普通问卷'})).toBeEnabled())",
-            "afterAwait": "await waitFor(()=>expect(screen.queryByText('正在读取或保存，请稍候…')).not.toBeInTheDocument())",
+            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'\u666e\u901a\u95ee\u5377'})).toBeEnabled())",
+            "afterAwait": "await waitFor(()=>expect(screen.queryByText('\u6b63\u5728\u8bfb\u53d6\u6216\u4fdd\u5b58\uff0c\u8bf7\u7a0d\u5019\u2026')).not.toBeInTheDocument())",
             "affectsSelectedCases": false,
             "failedCaseQualifiedBy": "school-recheck"
           }
@@ -3226,7 +3226,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "task group leaf statistics keeps zero, signed values and per-metric missing denominators, using existing statistics",
@@ -3253,11 +3253,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
@@ -3273,11 +3273,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
               "status": "passed"
             },
             {
@@ -3293,11 +3293,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
               "status": "passed"
             },
             {
@@ -4160,7 +4160,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -4600,7 +4600,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -5001,7 +5001,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -5232,7 +5232,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
@@ -5480,7 +5480,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "exact main task artifact migration and native backup upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows",
@@ -10039,7 +10039,7 @@
               "status": "passed"
             },
             {
-              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
+              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
               "status": "passed"
             },
             {
@@ -10053,7 +10053,7 @@
           ],
           "selectedCases": [
             "Reviewed nonempty reports register against the original independent C/P axes 'cfq7_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
-            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
+            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes 'bps9_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes rejects stale C/P bindings, reused R versions and empty report variants without changing the source"
           ],
@@ -13347,7 +13347,7 @@
           },
           "cases": [
             {
-              "fullName": "exposes normal resource and spec draft → review → publication with explicit scope",
+              "fullName": "exposes normal resource and spec draft \u2192 review \u2192 publication with explicit scope",
               "status": "skipped"
             },
             {
@@ -15679,6 +15679,415 @@
           "componentTree": "97b0f40bd6787dfed20097ec0519881c9afe42dd",
           "exitField": "exitCode",
           "log": "docs/evidence/teacher-private-composition-group-20261031/frontend-types.log"
+        }
+      ]
+    },
+    "435": {
+      "schemaVersion": 1,
+      "product": "6f70016bd93392990dff07833029c1361538e691",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "Retained original case reports; fresh exact-component compiler executions on completed Group/Long main baseline",
+        "limitations": [
+          "Three selected original backend cases retained (including unchanged failed baseline and successful continuations), plus one fresh affected combined Scale/Composite frontend loader case. Historical frontend original retained but not double-counted.",
+          "Controller Prisma and frontend API mocks only; not SQL latency or production load evidence.",
+          "Fresh local Node v24.21.0 types with isolated backend dependency copy, current generated Prisma, official lock-verified follow-redirects 1.16.2. Frontend installed 1.16.1 matches its own lock. No complete node_modules byte attestation."
+        ]
+      },
+      "reports": [
+        {
+          "id": "backend-baseline",
+          "path": "docs/performance/course-scale-scope-20261031/backend-baseline.json.gz",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 2,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "preserves the default catalog ordering, status and standalone attempt isolation",
+              "status": "passed"
+            },
+            {
+              "fullName": "returns identical course rows while narrowing the catalog and attempt query",
+              "status": "failed"
+            },
+            {
+              "fullName": "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses",
+              "status": "failed"
+            }
+          ],
+          "selectedCases": [
+            "preserves the default catalog ordering, status and standalone attempt isolation"
+          ],
+          "allowPartialFailure": true,
+          "failureContinuations": [
+            {
+              "caseName": "returns identical course rows while narrowing the catalog and attempt query",
+              "reportId": "backend-candidate"
+            },
+            {
+              "caseName": "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses",
+              "reportId": "backend-candidate"
+            }
+          ],
+          "sha256": "24226412e9c974f5da1c8706694371bc1679b1b29f2be748899bd7a4ce8a7426",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "cb5e4e6b6470639f39d62959c4cee946fc470e1c2ced25d489f44e0da9a5ffb4",
+          "originalSourceAssociation": "c63382d0eb6629c7bacbd853b8feb92e0257d46b",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/package-lock.json",
+            "server-version/backend/package.json",
+            "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql",
+            "server-version/backend/prisma/migrations/20261030210000_school_group_longitudinal_store/migration.sql",
+            "server-version/backend/prisma/migrations/20261030223000_school_private_group_source_identity/migration.sql",
+            "server-version/backend/prisma/migrations/20261031040000_teacher_group_longitudinal_store/migration.sql",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.routes.test.ts",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.test.ts",
+            "server-version/backend/src/__tests__/campus/group-reports.test.ts",
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/__tests__/campus/report.routes.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-leaf.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-selection.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-source.test.ts",
+            "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+            "server-version/backend/src/__tests__/huiteacher/group-longitudinal.routes.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/group-longitudinal.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-group.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-library-group.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupNative.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherFormGroupHistory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherGroupLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts",
+            "server-version/backend/src/__tests__/scale/available-course.test.ts",
+            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.test.ts",
+            "server-version/backend/src/controllers/scaleController.ts",
+            "server-version/backend/src/controllers/trainingAnalysisController.ts",
+            "server-version/backend/src/index.ts",
+            "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+            "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts",
+            "server-version/backend/src/modules/assessment-run/educationPrivateScaleContext.ts",
+            "server-version/backend/src/modules/assessment-run/educationPrivateScaleIdentitySql.ts",
+            "server-version/backend/src/modules/assessment-run/educationScaleExecutionSource.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts",
+            "server-version/backend/src/modules/campus/group-longitudinal-plan.routes.ts",
+            "server-version/backend/src/modules/campus/group-longitudinal-plan.service.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/campus/report.routes.ts",
+            "server-version/backend/src/modules/cognitive/attempt-quota.ts",
+            "server-version/backend/src/modules/composite/composite.controller.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.run-adapter.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-origin.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-resources.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-history.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-selection.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-source.ts",
+            "server-version/backend/src/modules/education-tools/teacher-composition-group-source.ts",
+            "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
+            "server-version/backend/src/modules/huiteacher/nativeGroupSource.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/education-ordinary-feedback.service.ts",
+            "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/engine.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/group-longitudinal.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/task-artifact.ts",
+            "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+            "server-version/backend/src/modules/reporting/types.ts",
+            "server-version/backend/src/modules/survey/analytics.routes.ts",
+            "server-version/backend/src/modules/survey/analytics.source.ts",
+            "server-version/backend/src/modules/survey/group-longitudinal.service.ts",
+            "server-version/backend/src/modules/survey/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-longitudinal.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts",
+            "server-version/backend/src/routes/courses.ts",
+            "server-version/backend/src/services/studentTasks.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous Git authentication.",
+          "deltaRationale": "The selected Scale available function, its mocks/fixture and course loader imports are unchanged from product b1fc5493. Baseline default-path case passed before the optional predicate existed; its request has no courseId, so the conditional path remains inactive. Original uncommitted test bytes and execution input hashes remain preserved. Main reporting/longitudinal/schema edits do not alter these controller Prisma-mocked or API-mocked invocations; follow-redirects patch updates an unused network transport (no live HTTP in these cases). Current complete-component compiler results are separate fresh executions, not reused historical types. Final main555f report merge review: complete Scale controller and fixture bytes equal the successful original association. Selected handler uses mocked database plus handler-local ordering/projection. All four recorded Scale/Composite loader, fixture, Composite API and frontend lock SHA256 match. Reporting additions are not called by these synthetic cases; no historical invocation is relabeled as current execution."
+        },
+        {
+          "id": "backend-candidate",
+          "path": "docs/performance/course-scale-scope-20261031/backend-candidate.json.gz",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "preserves the default catalog ordering, status and standalone attempt isolation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "returns identical course rows while narrowing the catalog and attempt query",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "returns identical course rows while narrowing the catalog and attempt query",
+            "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses"
+          ],
+          "sha256": "1cf87b3792cc111dae38336f7b7df1c3a1ee60d112e4fce2859a3504e36dddde",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "5d7604518e83ac93e36e9bb850d90c2356c7c7ea724afbceb4f5aa05000af7c9",
+          "originalSourceAssociation": "b1fc5493cf8a72dbe8a02f6f939cf42529624c35",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/package-lock.json",
+            "server-version/backend/package.json",
+            "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql",
+            "server-version/backend/prisma/migrations/20261030210000_school_group_longitudinal_store/migration.sql",
+            "server-version/backend/prisma/migrations/20261030223000_school_private_group_source_identity/migration.sql",
+            "server-version/backend/prisma/migrations/20261031040000_teacher_group_longitudinal_store/migration.sql",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.routes.test.ts",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.test.ts",
+            "server-version/backend/src/__tests__/campus/group-reports.test.ts",
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/__tests__/campus/report.routes.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-leaf.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-selection.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-source.test.ts",
+            "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+            "server-version/backend/src/__tests__/huiteacher/group-longitudinal.routes.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/group-longitudinal.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-group.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-library-group.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupNative.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherFormGroupHistory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherGroupLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts",
+            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.test.ts",
+            "server-version/backend/src/controllers/trainingAnalysisController.ts",
+            "server-version/backend/src/index.ts",
+            "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+            "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts",
+            "server-version/backend/src/modules/assessment-run/educationPrivateScaleContext.ts",
+            "server-version/backend/src/modules/assessment-run/educationPrivateScaleIdentitySql.ts",
+            "server-version/backend/src/modules/assessment-run/educationScaleExecutionSource.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts",
+            "server-version/backend/src/modules/campus/group-longitudinal-plan.routes.ts",
+            "server-version/backend/src/modules/campus/group-longitudinal-plan.service.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/campus/report.routes.ts",
+            "server-version/backend/src/modules/cognitive/attempt-quota.ts",
+            "server-version/backend/src/modules/composite/composite.controller.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.run-adapter.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-origin.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-resources.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-history.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-selection.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-source.ts",
+            "server-version/backend/src/modules/education-tools/teacher-composition-group-source.ts",
+            "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
+            "server-version/backend/src/modules/huiteacher/nativeGroupSource.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/education-ordinary-feedback.service.ts",
+            "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/engine.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/group-longitudinal.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/task-artifact.ts",
+            "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+            "server-version/backend/src/modules/reporting/types.ts",
+            "server-version/backend/src/modules/survey/analytics.routes.ts",
+            "server-version/backend/src/modules/survey/analytics.source.ts",
+            "server-version/backend/src/modules/survey/group-longitudinal.service.ts",
+            "server-version/backend/src/modules/survey/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-longitudinal.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts",
+            "server-version/backend/src/routes/courses.ts",
+            "server-version/backend/src/services/studentTasks.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous Git authentication.",
+          "deltaRationale": "The selected Scale available function, its mocks/fixture and course loader imports are unchanged from product b1fc5493. Baseline default-path case passed before the optional predicate existed; its request has no courseId, so the conditional path remains inactive. Original uncommitted test bytes and execution input hashes remain preserved. Main reporting/longitudinal/schema edits do not alter these controller Prisma-mocked or API-mocked invocations; follow-redirects patch updates an unused network transport (no live HTTP in these cases). Current complete-component compiler results are separate fresh executions, not reused historical types. Final main555f report merge review: complete Scale controller and fixture bytes equal the successful original association. Selected handler uses mocked database plus handler-local ordering/projection. All four recorded Scale/Composite loader, fixture, Composite API and frontend lock SHA256 match. Reporting additions are not called by these synthetic cases; no historical invocation is relabeled as current execution."
+        },
+        {
+          "id": "frontend-current-combined-loader",
+          "path": "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader.json",
+          "sha256": "32eaf3ccbae666ee5457837d4938beaaf40b82269108684c094d5aa2b5433e6c",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 13
+          },
+          "cases": [
+            {
+              "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+              "status": "passed"
+            },
+            {
+              "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging"
+          ],
+          "originalSourceAssociation": "236a865da0abaf961f7b4bf3d817dfe897eeb9a0",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionTeacherGroup.test.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+            "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx"
+          ],
+          "sourceAssociationBasis": "Recorded fresh local execution after Scale and Composite loader auto-merge, exact committed source inputs. Equal full product tree at remote 236a865d. Local producer528269 and remote236a have recorded identical complete tree9ecf3693; all four recorded consumed input SHA256 match this candidate. Remote immutable tree is used for Git delta indexing only, not to authenticate historical execution.",
+          "deltaRationale": "Fresh single affected loader case verifies both courseId parameters; original reporter preserved separately without double-counting. Final main555f report merge review: complete Scale controller and fixture bytes equal the successful original association. Selected handler uses mocked database plus handler-local ordering/projection. All four recorded Scale/Composite loader, fixture, Composite API and frontend lock SHA256 match. Reporting additions are not called by these synthetic cases; no historical invocation is relabeled as current execution.",
+          "originalExecutionSourceAssociation": "528269c2a2f419bc7adb85ef0301340aa8b3b8f0"
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/course-scale-scope-20261031/report-baseline-closeout/backend-types.json",
+          "sha256": "377af309ae61e0de3ed38dcffa48e4b93fe59fcd94d9897b3694e6dd002fc8b9",
+          "component": "backend",
+          "componentTree": "5cbbc96236eb7787b0e31da27a2ed06ece2b2bf2",
+          "exitField": "exitCode",
+          "log": "docs/performance/course-scale-scope-20261031/report-baseline-closeout/backend-types.log"
+        },
+        {
+          "path": "docs/performance/course-scale-scope-20261031/report-baseline-closeout/frontend-types.json",
+          "sha256": "fa166e6c05c8da865ac5154957401f6010fc71de0db3173dc07aa2e01b4ee30e",
+          "component": "frontend",
+          "componentTree": "4c7fb5a4a8c25475052fae1b567affb42d09487c",
+          "exitField": "exitCode",
+          "log": "docs/performance/course-scale-scope-20261031/report-baseline-closeout/frontend-types.log"
         }
       ]
     }
