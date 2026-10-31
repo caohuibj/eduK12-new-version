@@ -100,7 +100,7 @@ it('opens numeric GROUP from the actual Teacher event and generates, switches an
   if(url.endsWith('/evaluation-events/event/run'))return reply({eventId:'event',runId:'run',status:'CLOSED',version:4,trackCount:1})
   if(url.endsWith('/run/tracking'))return reply({baselineId:null})
   if(url.endsWith('/numeric-group-reports')&&options?.method==='POST'){posted=true;expect(JSON.parse(options.body as string)).toEqual({trackId:'track',leaf,specId:'spec',selection:{kind:'ALL'}});return reply(fresh)}
-  if(url.endsWith('/numeric-group-reports'))return reply({sources:[{trackId:'track',title:'教师支持',minimumN:10,tools:[{leaf,metrics:[{key:'support'}]}],groups:{options:[],limitations:[]}}],specs:[{specId:'spec',title:'支持描述'}],versions:(posted?[fresh,old]:[old]).map(({artifactId,generatedAt})=>({artifactId,generatedAt})),canGenerate:true})
+  if(url.endsWith('/numeric-group-reports')||url.endsWith('/numeric-group-reports?configure=true'))return reply({sources:[{trackId:'track',title:'教师支持',minimumN:10,tools:[{leaf,metrics:[{key:'support'}]}],groups:{options:[],limitations:[]}}],specs:[{specId:'spec',title:'支持描述'}],versions:(posted?[fresh,old]:[old]).map(({artifactId,generatedAt})=>({artifactId,generatedAt})),canGenerate:true})
   if(url.endsWith('/numeric-group-reports/old'))return reply(old)
   if(url.endsWith('/numeric-group-reports/fresh'))return reply(fresh)
   return reply({list:[],nextCursor:null})
@@ -111,6 +111,7 @@ it('opens numeric GROUP from the actual Teacher event and generates, switches an
  fireEvent.click(await screen.findByRole('link',{name:'评价活动'}));fireEvent.click(await screen.findByRole('button',{name:'查看任务配置'}))
  fireEvent.click(await screen.findByRole('button',{name:'查看数值群体报告'}))
  await screen.findByRole('article',{name:'群体报告阅读'});expect(posted).toBe(false)
+ fireEvent.click(screen.getByRole('button',{name:'配置数值群报更新版'}));await screen.findByLabelText('已批准群体用途的工具')
  fireEvent.change(screen.getByLabelText('已批准群体用途的工具'),{target:{value:'track:scale:item:'+leaf.compiledRuntimeHash}})
  fireEvent.change(screen.getByLabelText('已发布单次群体方案'),{target:{value:'spec'}})
  fireEvent.click(screen.getByRole('button',{name:'生成数值群报更新版'}))
