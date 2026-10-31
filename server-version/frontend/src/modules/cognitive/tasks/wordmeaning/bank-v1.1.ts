@@ -146,7 +146,7 @@ export const WORDMEANING_BANK_V11: { id: string; band: number; word: string; opt
   {
     "id": "wm-14",
     "band": 2,
-    "word": "妥善",
+    "word": "妥善（妥善处理事情）",
     "options": [
       "匆忙应付",
       "稳妥完善地处理",
@@ -305,7 +305,7 @@ export const WORDMEANING_BANK_V11: { id: string; band: number; word: string; opt
       "歪斜不正",
       "局部突出",
       "杂乱堆积",
-      "均匀相称"
+      "各部分比例协调"
     ]
   },
   {
@@ -333,7 +333,7 @@ export const WORDMEANING_BANK_V11: { id: string; band: number; word: string; opt
   {
     "id": "wm-31",
     "band": 3,
-    "word": "悖论",
+    "word": "悖论（一般表达中的用法）",
     "options": [
       "显然正确的事实",
       "毫无逻辑的胡话",

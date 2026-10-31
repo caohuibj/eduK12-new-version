@@ -126,7 +126,7 @@ export const WORDANALOGY_BANK_V11: { id: string; band: number; stem: string; opt
     "band": 2,
     "stem": "灯 对于 光 相当于 炉子 对于 ____",
     "options": [
-      "火苗",
+      "炉门",
       "暖和",
       "煤炭",
       "热量"
@@ -168,12 +168,12 @@ export const WORDANALOGY_BANK_V11: { id: string; band: number; stem: string; opt
   {
     "id": "wa-16",
     "band": 3,
-    "stem": "花朵 对于 蜜蜂 相当于 血液 对于 ____",
+    "stem": "书页 对于 书本 相当于 车厢 对于 ____",
     "options": [
-      "蝴蝶",
-      "蜘蛛",
-      "蚂蚁",
-      "蚊子"
+      "车票",
+      "轨道",
+      "乘客",
+      "列车"
     ]
   },
   {
@@ -256,7 +256,7 @@ export const WORDANALOGY_BANK_V11: { id: string; band: number; stem: string; opt
   {
     "id": "wa-24",
     "band": 2,
-    "stem": "钥匙 对于 锁 相当于 密码 对于 ____",
+    "stem": "钥匙 对于 门 相当于 密码 对于 ____",
     "options": [
       "鼠标",
       "键盘",
@@ -333,11 +333,11 @@ export const WORDANALOGY_BANK_V11: { id: string; band: number; stem: string; opt
   {
     "id": "wa-31",
     "band": 3,
-    "stem": "里程碑 对于 旅程 相当于 坐标 对于 ____",
+    "stem": "温度计 对于 温度 相当于 天平 对于 ____",
     "options": [
       "地图",
-      "航行",
-      "位置",
+      "距离",
+      "质量",
       "方向"
     ]
   },
