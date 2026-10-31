@@ -6,11 +6,11 @@
       "slice": "group",
       "branch": "feat/group-longitudinal-survey-training-20261030",
       "base": "ec23e64d9c6c041226902d130b2a9f0a68f4434f",
-      "reviewedCandidate": "e10f075b456a332acda01d430143ab3535da84c1",
+      "reviewedCandidate": "dc6f41beda4f6abe72162de5731a861ae531a0e8",
       "originalSource": "e232fe68b8e162b6a6551af1cdfd46384f47fc9f",
       "originalReportPrefix": "docs/evidence/group-longitudinal-survey-training-20261030/",
       "originalCaseCount": 22,
-      "reviewBasis": "Original 22 distinct successful cases and all failed/filtered rows retained. Shared main Training native dispatch is preserved; longitudinal composite preparation and historical bindings retain original behavior. Backend compiled once by existing image producer; actual missing frontend qualification and native incremental schema/dump/restore run once in existing longitudinal job. No application/FINAL replay or new workflow.",
+      "reviewBasis": "Original 22 distinct successful cases and all failed/filtered rows retained. Shared main Training native dispatch is preserved; longitudinal composite preparation and historical bindings retain original behavior. Backend compiled once by existing image producer; actual missing frontend qualification and native incremental schema/dump/restore run once in existing longitudinal job. No application/FINAL replay or new workflow. The only application delta since official successful qualification is the approved follow-redirects1.16.1→1.16.2 override/locked artifact. All other package records, native schema/tools and frontend source remain exact. Reuse original successful native/frontend qualification; new backend audit/build/scans and changed control SAST remain required.",
       "reports": [
         {
           "id": "contracts-first",
@@ -359,11 +359,11 @@
         },
         ".github/scripts/personal-tracking-ready.mjs": {
           "before": "18746a447f27681b659e228eec2ad95708ad8373",
-          "after": "6aa2fa39bf466fb369d876a7fe163eb79abca9ed"
+          "after": "2b89e153c9067be86ea40d21afaea10e1cd17ce8"
         },
         ".github/scripts/personal-tracking-ready.test.mjs": {
           "before": "7af51c8684eec401735e895f0d3272b9e89483d7",
-          "after": "ff43d3e98d11f34942e87f1e3e28c778395f1090"
+          "after": "fd9bdfaeaea3a72aaacda2bca96aaf40b4b34976"
         },
         ".github/workflows/ci.yml": {
           "before": "c20618d7d34bbd189a44cebf6205f630016e2ac0",
@@ -441,6 +441,34 @@
           "before": null,
           "after": "ec107ae7238aee327279fe6c369453d9905ecb66"
         },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/README.md": {
+          "before": null,
+          "after": "868118a55fc2312cf6d8821d1336429bf2b69bea"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/original-qualification-job.json": {
+          "before": null,
+          "after": "9c6df49910094bb66bd85a8ebf66dd1c0790087a"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/redirect-compat.cjs": {
+          "before": null,
+          "after": "dea0ea3b3de7f33b880daaf1bd532ce85661d6bb"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/redirect-compat.json": {
+          "before": null,
+          "after": "ca70a19cc7e25def85eee5fc2755d4f95110a9a8"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/reuse-final.log": {
+          "before": null,
+          "after": "2c7d3b5071469f3239d62ea4b39df41ac8d46e9a"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/reuse-uncommitted-head.log": {
+          "before": null,
+          "after": "e194b29106e9a8c281633bdc834db54df98b711f"
+        },
+        "docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/source-proof.json": {
+          "before": null,
+          "after": "a93e9765f97e5034cc558c2e7f794a42515af79b"
+        },
         "docs/evidence/group-longitudinal-survey-training-20261030/qualification/plan.txt": {
           "before": null,
           "after": "d129afa7a5c83650eda71488973dc41af6297c54"
@@ -472,6 +500,14 @@
         "docs/evidence/group-longitudinal-survey-training-20261030/survey-published-scope.json": {
           "before": null,
           "after": "6306f8a479c8f563093f303ba0d20c96ac1ec73c"
+        },
+        "server-version/backend/package-lock.json": {
+          "before": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+          "after": "a9d8032f6511c4b1a12c31cc72e6a95aab79d491"
+        },
+        "server-version/backend/package.json": {
+          "before": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+          "after": "a92f9ed1cace1a8f609d952d41cd723b74e6f6fb"
         },
         "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql": {
           "before": null,
@@ -559,18 +595,10 @@
         }
       },
       "components": {
-        "backend": "fa82c0997d0229286a403a707bfb0a63cf114cb8",
+        "backend": "bf7795d3b3a9f44b8ef2f0353228120cc5d3529b",
         "frontend": "d25f54554d3f42109e01bf383ed4058aff057838"
       },
       "repository": "caohuibj/eduK12-new-version",
-      "backendAuditReuse": {
-        "runId": 41031885906,
-        "jobId": 123983441600,
-        "sourceHead": "571a14b73ef81148913f5ff1666e7e461f2f4b92",
-        "executionHead": "f482328ef680238b3916930adbb2d761cfd3c747",
-        "step": "install locked native migration tools and audit backend",
-        "maximumAgeHours": 24
-      },
       "frontendAuditReuse": {
         "sourceHead": "e34438dc35ac2f21b2ae48ec291e20c80d9903f8",
         "executionHead": "7ca965681cc92ff669d36d2495660ef263b6977a",
@@ -580,7 +608,17 @@
         "maximumAgeHours": 24
       },
       "originalLocalSource": "863ae60a19eb4021c754d7d786695d7ce62479ea",
-      "originalSourceTransportBasis": "Remote e232 source tree c6673022 matches original local863 tree exactly; original unsigned execution/metadata is not reissued as a remote run."
+      "originalSourceTransportBasis": "Remote e232 source tree c6673022 matches original local863 tree exactly; original unsigned execution/metadata is not reissued as a remote run.",
+      "qualificationReuse": {
+        "runId": 41167481038,
+        "jobId": 124438146565,
+        "sourceHead": "4e28e5a7cc8e83f3006b10f200ef2570548347d6",
+        "executionHead": "9001165b8ef30bd34a25b326acae08751e291267",
+        "serverVersionTree": "acf982ea2675599e1cfe228e5b3b95d0cc9c375b",
+        "maximumAgeHours": 24,
+        "nativeOnly": false,
+        "followRedirectsPatchOnly": true
+      }
     }
   }
 }
