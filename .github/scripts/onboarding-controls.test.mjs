@@ -489,7 +489,8 @@ test('Training standalone Cognitive formal route accepts its four original cases
 test('quota candidate requires exact source and backend image success without selecting frontend or a native migration',()=>{
  const f=fixture(),file='server-version/backend/src/modules/cognitive/attempt-quota.ts';
  f.b={...f.b,pr:421,source:{[file]:{before:null,after:blob}},controlBefore:Object.fromEntries([...CONTROLS,...QUOTA_CONTROLS].map(path=>[path,null]))};
- f.entries=[file,...CONTROLS,...QUOTA_CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.entries=[file,...CONTROLS,...QUOTA_CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:file==='.github/scripts/build-ci-images.sh'?'100755':'100644'}));
+ const priorRead=f.read;f.read=(cmd,a,...rest)=>cmd==='ls-tree'&&a!==base&&rest.at(-1)==='.github/scripts/build-ci-images.sh'?`100755 blob ${blob}\t${rest.at(-1)}`:priorRead(cmd,a,...rest);
  f.env={...f.env,CI_PR_NUMBER:'421',CI_HEAD_REF:BRANCHES['421']};
  const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b),outputs=Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)]));
  const needs={scope:{result:'success',outputs},'onboarding-structure':{result:'success'},codeql:{result:'success'}};

@@ -87,13 +87,14 @@ export function onboardingPlan(entries,base,head,read=git,env=process.env,b=bind
  const expected=[...Object.keys(b.source),...changedControls];assert.equal(new Set(expected).size,expected.length);
  assert.deepEqual(entries.map(e=>e.file).sort(),expected.sort(),'Complete change inventory drift');
  for(const e of entries){
-  assert.equal(e.newMode,'100644');const source=b.source[e.file],before=source?.before??b.controlBefore[e.file];
-  assert.equal(e.status,before?'M':'A');assert.equal(e.oldMode,before?'100644':'000000');
+  const mode=b.pr===421&&e.file==='.github/scripts/build-ci-images.sh'?'100755':'100644';
+  assert.equal(e.newMode,mode);const source=b.source[e.file],before=source?.before??b.controlBefore[e.file];
+  assert.equal(e.status,before?'M':'A');assert.equal(e.oldMode,before?mode:'000000');
   if(before)assert.equal(read('rev-parse',base+':'+e.file),before);
   if(source){assert(allowedSourcePath(e.file,String(b.pr)),'Source outside onboarding scope');sha(source.after);assert.equal(read('rev-parse',head+':'+e.file),source.after);}
   else if(e.file!==MARKER){
    let checkpoint;try{checkpoint=read('ls-tree',b.controlCheckpoint,'--',e.file);}catch{read('fetch','--no-tags','--depth=1','origin',b.controlCheckpoint);checkpoint=read('ls-tree',b.controlCheckpoint,'--',e.file);}
-   assert(checkpoint.startsWith('100644 blob '));assert.equal(read('ls-tree',head,'--',e.file),checkpoint,'Control checkpoint drift');
+   assert(checkpoint.startsWith(mode+' blob '));assert.equal(read('ls-tree',head,'--',e.file),checkpoint,'Control checkpoint drift');
   }
  }
  for(const path of controls.filter(path=>path!==MARKER&&!changedControls.includes(path)))assert.equal(read('ls-tree',head,'--',path),read('ls-tree',b.controlCheckpoint,'--',path));
