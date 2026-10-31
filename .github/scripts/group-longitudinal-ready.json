@@ -5,9 +5,9 @@
       "schemaVersion": 1,
       "slice": "group",
       "branch": "feat/group-longitudinal-survey-training-20261030",
-      "base": "e092be0d57a5a1df7519c23c8a5c2cf078b870c8",
-      "reviewedCandidate": "f4df8579da6c52193f194e049ebad0ba00e3f68b",
-      "originalSource": "863ae60a19eb4021c754d7d786695d7ce62479ea",
+      "base": "ec23e64d9c6c041226902d130b2a9f0a68f4434f",
+      "reviewedCandidate": "e10f075b456a332acda01d430143ab3535da84c1",
+      "originalSource": "e232fe68b8e162b6a6551af1cdfd46384f47fc9f",
       "originalReportPrefix": "docs/evidence/group-longitudinal-survey-training-20261030/",
       "originalCaseCount": 22,
       "reviewBasis": "Original 22 distinct successful cases and all failed/filtered rows retained. Shared main Training native dispatch is preserved; longitudinal composite preparation and historical bindings retain original behavior. Backend compiled once by existing image producer; actual missing frontend qualification and native incremental schema/dump/restore run once in existing longitudinal job. No application/FINAL replay or new workflow.",
@@ -359,15 +359,15 @@
         },
         ".github/scripts/personal-tracking-ready.mjs": {
           "before": "18746a447f27681b659e228eec2ad95708ad8373",
-          "after": "11f2678f36e28db7567d7a17a20b0f5b7ad423c0"
+          "after": "6aa2fa39bf466fb369d876a7fe163eb79abca9ed"
         },
         ".github/scripts/personal-tracking-ready.test.mjs": {
           "before": "7af51c8684eec401735e895f0d3272b9e89483d7",
           "after": "ff43d3e98d11f34942e87f1e3e28c778395f1090"
         },
         ".github/workflows/ci.yml": {
-          "before": "9787125036677b53161c78401afb22b959f2c198",
-          "after": "00f1bdc39a103a86f039f1f4583afef0b18e1369"
+          "before": "c20618d7d34bbd189a44cebf6205f630016e2ac0",
+          "after": "fde0303796433f0126bae4fc2ab457a3ad3361a3"
         },
         "docs/development/group-longitudinal-draft-route-20261031.md": {
           "before": null,
@@ -461,33 +461,9 @@
           "before": null,
           "after": "6306f8a479c8f563093f303ba0d20c96ac1ec73c"
         },
-        "docs/evidence/training-cognitive-wave-quota-20261030/README.md": {
-          "before": null,
-          "after": "dbbefa3833fe1056319ae99f2c46ae271ae23f46"
-        },
-        "docs/evidence/training-cognitive-wave-quota-20261030/pg-after-fixture.json": {
-          "before": null,
-          "after": "716ade2681c2259f617de522cd78789a467f1093"
-        },
-        "docs/evidence/training-cognitive-wave-quota-20261030/pg-diagnostic.json": {
-          "before": null,
-          "after": "98612abffb59b0f4f486dc0c1fab343b14692f33"
-        },
-        "docs/evidence/training-cognitive-wave-quota-20261030/pg-final.json": {
-          "before": null,
-          "after": "e8294186179c09d7f936f633a3769215d73c48a4"
-        },
-        "docs/evidence/training-cognitive-wave-quota-20261030/pg-first.json": {
-          "before": null,
-          "after": "f935f96048d504ca1f397f560bef46ba1ce0f8a9"
-        },
         "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql": {
           "before": null,
           "after": "59352ec4969131d728bc76589edc17ef28556579"
-        },
-        "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts": {
-          "before": null,
-          "after": "8447cbd6d099b676c187b180d6fbed946ecdc22c"
         },
         "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts": {
           "before": null,
@@ -504,14 +480,6 @@
         "server-version/backend/src/controllers/trainingAnalysisController.ts": {
           "before": "d05ffa6b7398bf494b9a2729681f133b3bad4093",
           "after": "9c1b934d3916c6882b975aebc87af9ddaf0a877f"
-        },
-        "server-version/backend/src/modules/cognitive/attempt-quota.ts": {
-          "before": "e4a5211bccaeba384633eab9980df2495ac262e4",
-          "after": "9f836b37730c29847b867cde17e3eb2e288a39ee"
-        },
-        "server-version/backend/src/modules/composite/composite.service.ts": {
-          "before": "9ca250db58d9dea364c082d55876655ea40d64d6",
-          "after": "d3c3655e9c328f9b78f648ab916e6294b3560927"
         },
         "server-version/backend/src/modules/reporting/group-longitudinal.ts": {
           "before": null,
@@ -579,7 +547,7 @@
         }
       },
       "components": {
-        "backend": "0019edb2f1b9873668606a61980d0d0271fc6205",
+        "backend": "fa82c0997d0229286a403a707bfb0a63cf114cb8",
         "frontend": "d25f54554d3f42109e01bf383ed4058aff057838"
       },
       "repository": "caohuibj/eduK12-new-version",
@@ -598,7 +566,9 @@
         "jobId": 124055865989,
         "step": "install frontend tools and audit locked inputs",
         "maximumAgeHours": 24
-      }
+      },
+      "originalLocalSource": "863ae60a19eb4021c754d7d786695d7ce62479ea",
+      "originalSourceTransportBasis": "Remote e232 source tree c6673022 matches original local863 tree exactly; original unsigned execution/metadata is not reissued as a remote run."
     }
   }
 }
