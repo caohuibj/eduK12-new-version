@@ -54,13 +54,16 @@ export const generateIcarmatrixV2Plan = (
 ): number[] => {
   const pool = bankIndicesByType(matrixType)
   if (pool.length === 0) throw new Error(`empty icarmatrix v2 bank pool for ${matrixType}`)
+  if (!Number.isInteger(totalTrials) || totalTrials < 1 || totalTrials > pool.length) {
+    throw new Error(`icarmatrix v2 needs 1..${pool.length} distinct ${matrixType} items; requested ${totalTrials}`)
+  }
   const random = mulberry32(xmur3(`${seed}:icarmatrix-v2:plan`)())
   const shuffled = [...pool]
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
     const swap = Math.floor(random() * (index + 1))
     ;[shuffled[index], shuffled[swap]] = [shuffled[swap], shuffled[index]]
   }
-  return Array.from({ length: totalTrials }, (_, index) => shuffled[index % shuffled.length])
+  return shuffled.slice(0, totalTrials)
 }
 
 /** 选项呈现顺序：从题库响应中确定性抽取 optionCount 个（必含正确项）并洗牌。
@@ -109,5 +112,6 @@ export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
   source: 'generated offline with matRiks (MIT) rule system; items are internal-authored derivatives',
   license: 'internal-generated',
   itemSetRole: 'form',
+  contentHash: 'git-sha1:449f11201500c132d8f68f17fd2151547d9221ec',
   ruleTags: ['shape', 'rotate', 'shade', 'size', 'identity'],
 })

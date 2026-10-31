@@ -70,14 +70,14 @@ export const icarmatrixV2RegistryMeta = {
     standard: {
       profile: 'standard' as const,
       estimatedMinutes: [4, 6],
-      configPatch: { totalTrials: 8 },
+      configPatch: { totalTrials: 6 },
       reportCaveats: ['结果描述本次图形矩阵推理的表现，正确率不换算 IQ、不与 Raven 等价。'],
     },
     research: {
       profile: 'research' as const,
       estimatedMinutes: [6, 9],
-      configPatch: { totalTrials: 12 },
-      reportCaveats: ['科研档增加试次以提高稳定性；难度与刺激（matrixType/题库）和标准档一致；仍不是年龄常模。'],
+      configPatch: { totalTrials: 8 },
+      reportCaveats: ['当前科研试测最多 8 道不重复题；题库不足以支持更长研究版，也未建立年龄常模。'],
     },
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',

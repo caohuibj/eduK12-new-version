@@ -6,7 +6,7 @@ export const icarmatrixV2TrialSchema = z
   .object({
     trialIndex: z.number().int().min(0),
     bankItemId: z.string().min(1),
-    responseIndex: z.number().int().min(0).nullable(),
+    responseIndex: z.number().int().min(0).max(5).nullable(),
     rtMs: z.number().min(0).nullable().transform((value) => (value == null ? null : Math.round(value))),
     interrupted: z.boolean(),
   })

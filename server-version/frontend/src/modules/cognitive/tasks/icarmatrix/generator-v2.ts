@@ -60,13 +60,16 @@ export const generateIcarmatrixV2Plan = (
 ): number[] => {
   const pool = bankIndicesByType(matrixType)
   if (pool.length === 0) throw new Error(`empty icarmatrix v2 bank pool for ${matrixType}`)
+  if (!Number.isInteger(totalTrials) || totalTrials < 1 || totalTrials > pool.length) {
+    throw new Error(`icarmatrix v2 needs 1..${pool.length} distinct ${matrixType} items; requested ${totalTrials}`)
+  }
   const random = mulberry32(xmur3(`${seed}:icarmatrix-v2:plan`)())
   const shuffled = [...pool]
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
     const swap = Math.floor(random() * (index + 1))
     ;[shuffled[index], shuffled[swap]] = [shuffled[swap], shuffled[index]]
   }
-  return Array.from({ length: totalTrials }, (_, index) => shuffled[index % shuffled.length])
+  return shuffled.slice(0, totalTrials)
 }
 
 export const icarmatrixV2OptionOrder = (

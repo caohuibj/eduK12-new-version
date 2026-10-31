@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import path from 'node:path'
 import { matrixBankFileSchema } from '../../modules/cognitive/banks/matrix-bank-schema'
 
@@ -12,6 +13,16 @@ const BANK_PATH = path.resolve('src/modules/cognitive/banks/bank-matgen.json')
 
 describe('matRiks generated matrix bank (roadmap v2.0 PR2)', () => {
   const bank = matrixBankFileSchema.parse(JSON.parse(readFileSync(BANK_PATH, 'utf8')))
+
+  it('pins the frozen bank and keeps the frontend/backend byte-identical', () => {
+    const backend = readFileSync(BANK_PATH)
+    const frontend = readFileSync(path.resolve('../frontend/src/modules/cognitive/tasks/icarmatrix/bank-matgen.json'))
+    expect(frontend.equals(backend)).toBe(true)
+    const gitBlobSha = createHash('sha1')
+      .update(`blob ${backend.length}`).update(Buffer.from([0])).update(backend).digest('hex')
+    // Regeneration requires a deliberate stimulusSetVersion and pinned hash change.
+    expect(gitBlobSha).toBe('449f11201500c132d8f68f17fd2151547d9221ec')
+  })
 
   it('passes schema validation with the committed provenance header', () => {
     expect(bank.schemaVersion).toBe(1)

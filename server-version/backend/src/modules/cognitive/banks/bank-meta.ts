@@ -39,6 +39,7 @@ export const cognitiveBankMetaSchema = z
     license: z.enum(COGNITIVE_BANK_LICENSE_VALUES),
     licenseNote: z.string().optional(),
     rightsEvidenceRef: z.string().min(1).optional(),
+    contentHash: z.string().regex(/^git-sha1:[a-f0-9]{40}$/).optional(),
     itemSetRole: z.enum(cognitiveBankItemSetRoleValues).default('form'),
     itemSize: z.number().int().positive().optional(),
     ruleTags: z.array(z.string().min(1)).optional(),
