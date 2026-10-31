@@ -1,0 +1,6 @@
+Retrospective plain-text excerpt of this task's actual tool result, not a signed run receipt.
+Command (repo root): node --test --test-name-pattern='PR442' .github/scripts/onboarding-controls.test.mjs > /tmp/o11-442-controls-first.tap 2>&1; echo controls_exit=$?; tail -30 /tmp/o11-442-controls-first.tap
+Tool result chunk 67933f, exit_code 0; stdout explicitly began controls_exit=0.
+Original reporter: 3 tests, 3 pass, 0 fail, 0 skipped. Original stdout copied as controls.tap.
+The name-pattern selected only the new PR442 controls. Application cases were not rerun.
+Earlier node --check onboarding-checks.mjs and onboarding-scope.mjs returned actual exit 0 (chunk 88d621).

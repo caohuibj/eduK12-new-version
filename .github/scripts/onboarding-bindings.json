@@ -6566,6 +6566,104 @@
         }
       },
       "activationNote": "Prepared exact scope; maintain Draft until independently reviewed final identity, then selected admission/changed-input SAST/gate only. No deployment."
+    },
+    "442": {
+      "schemaVersion": 1,
+      "pr": 442,
+      "enabled": true,
+      "base": "7a69762e898d1b1fe1c1aab2b51d2ce9db0d0d03",
+      "product": "1b458b80057eae441833d1556c3a699efe3a5f37",
+      "controlCheckpoint": "0990b4371f85bc65f9d15e8e3833fcf800666462",
+      "components": {
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3",
+        "frontend": "ed36c29b835587819a73a04fb3ef383291f05c15"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "65a2d9a82c2d626a102da556fd8b9286d66fb257",
+        ".github/scripts/onboarding-checks.mjs": "a2ab3b0ed00a47d8f6884dac45067f4ce62850a6",
+        ".github/scripts/onboarding-controls.test.mjs": "177f4bba1d267e68d88513e9197aae1e60bd150c",
+        ".github/scripts/onboarding-evidence.json": "24ac53d7f312486dff69ecbbc176f71453ad7843",
+        ".github/scripts/onboarding-scope.mjs": "535bbf99708ad7bd48275f064df3857045dd81e5",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "b1ff5bfc9e37eb12aae0c347dc3662db310b43fa"
+      },
+      "source": {
+        "docs/performance/questionnaire-open-retry-20261031/README.md": {
+          "before": null,
+          "after": "0d9b2c39f46ac3b983390f6df27953bca5b868f7"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/inputs.sha256": {
+          "before": null,
+          "after": "a031ef2c22dc8d8543829f3a8b41902c1bf1d71d"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-green-final.log": {
+          "before": null,
+          "after": "37be4010bcdfe9bb1bf4402ae96931fd1a178e82"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-lint.log": {
+          "before": null,
+          "after": "ce3cf09b393dfbe30637eaaa5c8bbf46aa851d6a"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-red.log": {
+          "before": null,
+          "after": "f773a4bb916338fea684e5f0dc3ee4ca6978b0c3"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types-deps.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types.log": {
+          "before": null,
+          "after": "ffb745a61ada50923c31ce560f5de8f9fa092195"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/PLAN.md": {
+          "before": null,
+          "after": "4c61938eff02c695a2aeb69d79090cfa6a0d5798"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/control-terminal-excerpt.txt": {
+          "before": null,
+          "after": "1cf3a965bb4b5e0de735f76fdd47b7cc33ea15f2"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/controls.tap": {
+          "before": null,
+          "after": "e8139855efbe2e0a2763ef82b86ddd937d6fbfea"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.json": {
+          "before": null,
+          "after": "a78b1aa44d9bca993c59afd562db1a8ddc61b3ba"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/reachable-inputs.sha256.gz": {
+          "before": null,
+          "after": "f28127cf6d1ba513db93455cb3b9f5e45336c1e6"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/types-terminal-excerpt.txt": {
+          "before": null,
+          "after": "09b5fd1ed0d10a322b5625ddc4b58f77c60d041e"
+        },
+        "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": {
+          "before": "30ff3ad018a5864d44c1f0a85e44e676830172f2",
+          "after": "20ccad43d3ceb14c70c537e3715ad8048370a342"
+        },
+        "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx": {
+          "before": "4e9c5b3f980015e2ea37412fa9d48e293d681fcc",
+          "after": "8b063dcf009d6071e0cfa5ccb955a8934d1d8476"
+        }
+      },
+      "activationNote": "Prepared precise frontend retry and text-original admission. Keep Draft until independent fixed-head review, then scoped admission/SAST/merge gate. No deployment."
     }
   }
 }

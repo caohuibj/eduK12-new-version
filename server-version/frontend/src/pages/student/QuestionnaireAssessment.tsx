@@ -102,6 +102,7 @@ const QuestionnaireAssessment: React.FC = () => {
   const navigate = learner.navigate
 
   const [loading, setLoading] = useState(true)
+  const [openingError, setOpeningError] = useState<string | null>(null)
   const [data, setData] = useState<QuestionnaireAssessmentData | null>(null)
   // 问卷的 currentIndex 表示整体内容位置；量表内部必须使用独立索引。
   const [scaleIndex, setScaleIndex] = useState(0)
@@ -210,6 +211,9 @@ const QuestionnaireAssessment: React.FC = () => {
   }, [scaleIndex])
 
   const startAssessment = async () => {
+    setLoading(true)
+    setOpeningError(null)
+    setRunnerError(null)
     try {
       // 先检查是否已经完成过该问卷
       const availableResponse = await apiClient.get<{ list: Array<{ id: string; completed: boolean; inProgress?: boolean; assessmentId: string | null }> }>('/questionnaires/available', { params: { questionnaireId } })
@@ -282,6 +286,7 @@ const QuestionnaireAssessment: React.FC = () => {
         }
       }
     } catch (err) {
+      setOpeningError(normalizeApiError(err).message)
       setRunnerError(normalizeApiError(err).message)
       console.error('开始问卷测评失败', err)
     } finally {
@@ -544,7 +549,10 @@ const QuestionnaireAssessment: React.FC = () => {
   if (!data) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">问卷不存在或未发布</p>
+        {openingError ? <>
+          <p role="alert" className="text-gray-500">{openingError}</p>
+          <button type="button" className="btn-secondary mt-4" onClick={() => void startAssessment()}>重试打开问卷</button>
+        </> : <p className="text-gray-500">问卷不存在或未发布</p>}
         {learner.enabled && <button type="button" className="btn-secondary mt-4" onClick={() => navigate(learner.backHref)}>{learner.backLabel}</button>}
       </div>
     )

@@ -14634,408 +14634,65 @@
       "reuseRationale": "Final review only removed run recoverSession; ordinary success, initial reads, non-session errors, legacy fallback and MFA branches unchanged. Wrong-password and step-up cases are final correction executions. Backend projection/helper unchanged after recorded checks. Test-only await/navigation improvements do not change retained cases.",
       "failureDisposition": "The wrong operation-401-must-logout assertion is withdrawn, not repaired or admitted. Other selected-report product failures have a selected passing continuation with the same name. Initial fixture-only reports remain archived but are not selected."
     },
-    "437": {
+    "442": {
       "schemaVersion": 1,
-      "product": "0bc4a1526751c75fde6103eb5790a3a99996224c",
+      "product": "1b458b80057eae441833d1556c3a699efe3a5f37",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
       "originalExecutionSigned": false,
+      "components": {
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3",
+        "frontend": "ed36c29b835587819a73a04fb3ef383291f05c15"
+      },
       "environment": {
-        "kind": "DOT local original reports and retained compiler shell exits",
+        "node": "v24.22.1",
         "limitations": [
-          "Synthetic Prisma/controller/task-feed observations, not SQL/browser/concurrency measurements.",
-          "Original failures and filtered cases preserved; eight disjoint selected passes across original invocations.",
-          "Aligned BE and FE direct compiler invocations each exit 0 on final component trees. Unsigned local records; historical preliminary qualification files retained as history, not current admission.",
-          "PR439 changed campus auth routes, SchoolApp and their own fixtures only; no Composite service/controller/studentTasks or Training loader imports those entry modules. Membership, shared Prisma schema, locks, configuration and test setup unchanged. No business case repeated."
+          "Original Vitest default reporter records only 5 passed summary, not per-case result identities or separately printed numeric exit. No JSON reporter is fabricated.",
+          "Prior logs and tool terminal excerpt are unsigned, retrospectively indexed. Input hashes are post-execution observations, not an atomic execution attestation.",
+          "The baseline 1 failed / 3 passed and missing-dependency types failure remain original; no full-suite, production, build, browser or deployment claim.",
+          "Fulfilled code404 fixture is not actual HTTP404 rejection; actual rejection displays its normalized error and manual retry."
         ]
       },
-      "reports": [
-        {
-          "id": "o09-backend-baseline",
-          "path": "docs/performance/composite-course-scope-20261031/backend-baseline.json",
-          "sha256": "5630fcae62cc243e6f7cf40756fc332fa9ba70390afab250e4e8d06cd9bd73a2",
-          "originalSourceAssociation": "f5fa29314eb731f0479b90ae962b731da8e08d34",
-          "sourceRoots": [
-            "server-version/backend"
-          ],
-          "reviewedSourceDelta": [
-            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
-            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
-            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
-            "server-version/backend/src/modules/campus/auth.routes.ts",
-            "server-version/backend/src/modules/composite/composite.controller.ts",
-            "server-version/backend/src/modules/composite/composite.service.ts",
-            "server-version/backend/src/services/studentTasks.ts"
-          ],
-          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
-          "deltaRationale": "Only the selected unchanged default/history behavior is reused from this baseline. The added course argument changes scoped calls; source and fixture delta explicitly listed. The archived frontend projection and task-feed pagination are unchanged; removing an extra assertion from an unselected test does not change this selected case. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree.",
-          "summary": {
-            "success": false,
-            "numPassedTests": 1,
-            "numFailedTests": 4,
-            "numPendingTests": 0
-          },
-          "cases": [
-            {
-              "fullName": "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback",
-              "status": "passed"
-            },
-            {
-              "fullName": "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
-              "status": "failed"
-            },
-            {
-              "fullName": "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
-              "status": "failed"
-            },
-            {
-              "fullName": "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
-              "status": "failed"
-            },
-            {
-              "fullName": "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read",
-              "status": "failed"
-            }
-          ],
-          "selectedCases": [
-            "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback"
-          ],
-          "allowPartialFailure": true,
-          "failureContinuations": [
-            {
-              "caseName": "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
-              "reportId": "o09-backend-candidate"
-            },
-            {
-              "caseName": "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
-              "reportId": "o09-backend-candidate"
-            },
-            {
-              "caseName": "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
-              "reportId": "o09-backend-candidate"
-            },
-            {
-              "caseName": "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read",
-              "reportId": "o09-backend-candidate"
-            }
-          ]
+      "originals": {
+        "baseline": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-red.log",
+          "sha256": "453a5369c4e754409a762453201a86b92b37e0f8d88ec01ff9fd6d9d11432e7a"
         },
-        {
-          "id": "o09-backend-candidate",
-          "path": "docs/performance/composite-course-scope-20261031/backend-candidate.json",
-          "sha256": "ce2016185f210158ca00d67695745a211de8516899280b0a7a0ede9f5494edab",
-          "originalSourceAssociation": "c41e0351fcfd5d4efaef01fd0134785ccab3ff4b",
-          "sourceRoots": [
-            "server-version/backend"
-          ],
-          "reviewedSourceDelta": [
-            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
-            "server-version/backend/src/modules/campus/auth.routes.ts"
-          ],
-          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
-          "deltaRationale": "Candidate source bytes equal published product; the frontend file only lost a duplicate new assertion in an unrelated unselected case after execution. Actual selected case, imports and shared setup remain unchanged. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree.",
-          "summary": {
-            "success": true,
-            "numPassedTests": 4,
-            "numFailedTests": 0,
-            "numPendingTests": 1
-          },
-          "cases": [
-            {
-              "fullName": "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback",
-              "status": "skipped"
-            },
-            {
-              "fullName": "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
-              "status": "passed"
-            },
-            {
-              "fullName": "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
-              "status": "passed"
-            },
-            {
-              "fullName": "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
-              "status": "passed"
-            },
-            {
-              "fullName": "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read",
-              "status": "passed"
-            }
-          ],
-          "selectedCases": [
-            "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
-            "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
-            "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
-            "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read"
-          ]
+        "passed": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-green-final.log",
+          "sha256": "f0e2b416d3359040ab86c75963ec2882a5fb76143be7eefbb4f3167a1b94c953"
         },
-        {
-          "id": "o09-task-default-candidate",
-          "path": "docs/performance/composite-course-scope-20261031/task-default-candidate.json",
-          "sha256": "90ce03f6bc0e4e65b6e0dc7fbd8d4481c3bc1fb270e6c5f8dc1244c756ccd29d",
-          "originalSourceAssociation": "c41e0351fcfd5d4efaef01fd0134785ccab3ff4b",
-          "sourceRoots": [
-            "server-version/backend"
-          ],
-          "reviewedSourceDelta": [
-            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
-            "server-version/backend/src/modules/campus/auth.routes.ts"
-          ],
-          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
-          "deltaRationale": "Candidate source bytes equal published product; the frontend file only lost a duplicate new assertion in an unrelated unselected case after execution. Actual selected case, imports and shared setup remain unchanged. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree.",
-          "summary": {
-            "success": true,
-            "numPassedTests": 1,
-            "numFailedTests": 0,
-            "numPendingTests": 11
-          },
-          "cases": [
-            {
-              "fullName": "student task aggregate uses the same actionable rule for the default list, count and pagination",
-              "status": "skipped"
-            },
-            {
-              "fullName": "student task aggregate filters a course-specific task feed by an actual enrolled relation, not caller-provided authority",
-              "status": "skipped"
-            },
-            {
-              "fullName": "student task aggregate limits membership to the current active student and excludes library/private/draft content in every batch",
-              "status": "passed"
-            },
-            {
-              "fullName": "student task aggregate keeps exact deadline equality open, distinguishes drafts, and preserves completed tasks after expiry",
-              "status": "skipped"
-            },
-            {
-              "fullName": "student task aggregate prioritizes a new active attempt over past completion and blocks expired resume links",
-              "status": "skipped"
-            },
-            {
-              "fullName": "student task aggregate deduplicates questionnaires delivered to several courses and paginates deterministically with global counts",
-              "status": "skipped"
-            },
-            {
-              "fullName": "student task aggregate keeps query count constant with 100 courses and returns no course tasks without membership",
-              "status": "skipped"
-            },
-            {
-              "fullName": "student task aggregate propagates read failures instead of returning a misleading empty aggregate",
-              "status": "skipped"
-            },
-            {
-              "fullName": "student task aggregate opens the latest completed questionnaire report without starting a retake",
-              "status": "skipped"
-            },
-            {
-              "fullName": "student task aggregate includes new questionnaires delivered to a member course and rejects unrelated composite contexts",
-              "status": "skipped"
-            },
-            {
-              "fullName": "C06 submitted versus task-satisfied keeps report links without reopening submission; historical satisfaction=false",
-              "status": "skipped"
-            },
-            {
-              "fullName": "C06 submitted versus task-satisfied keeps report links without reopening submission; historical satisfaction=true",
-              "status": "skipped"
-            }
-          ],
-          "selectedCases": [
-            "student task aggregate limits membership to the current active student and excludes library/private/draft content in every batch"
-          ]
+        "lint": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-lint.log",
+          "sha256": "93e413077110bcb7192d384de7453a10c34c3d7e3714158a857d17f195593c39"
         },
-        {
-          "id": "o09-frontend-before-edit",
-          "path": "docs/performance/composite-course-scope-20261031/frontend-before-edit.json",
-          "sha256": "15141342087e8a12d7c059b39075ee87dc1c135ccbe29df18e5f7a3998e49721",
-          "originalSourceAssociation": "f5fa29314eb731f0479b90ae962b731da8e08d34",
-          "sourceRoots": [
-            "server-version/frontend"
-          ],
-          "reviewedSourceDelta": [
-            "server-version/frontend/src/school/SchoolApp.tsx",
-            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx",
-            "server-version/frontend/src/training/courseAssessments.test.ts",
-            "server-version/frontend/src/training/courseAssessments.ts"
-          ],
-          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
-          "deltaRationale": "Only the selected unchanged default/history behavior is reused from this baseline. The added course argument changes scoped calls; source and fixture delta explicitly listed. The archived frontend projection and task-feed pagination are unchanged; removing an extra assertion from an unselected test does not change this selected case. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree.",
-          "summary": {
-            "success": false,
-            "numPassedTests": 1,
-            "numFailedTests": 1,
-            "numPendingTests": 12
-          },
-          "cases": [
-            {
-              "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
-              "status": "passed"
-            },
-            {
-              "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
-              "status": "failed"
-            },
-            {
-              "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
-              "status": "skipped"
-            },
-            {
-              "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
-              "status": "skipped"
-            },
-            {
-              "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
-              "status": "skipped"
-            },
-            {
-              "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
-              "status": "skipped"
-            },
-            {
-              "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
-              "status": "skipped"
-            }
-          ],
-          "selectedCases": [
-            "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed"
-          ],
-          "allowPartialFailure": true,
-          "failureContinuations": [
-            {
-              "caseName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
-              "reportId": "o09-frontend-candidate"
-            }
-          ]
+        "oldTypesTerminal": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/types-terminal-excerpt.txt",
+          "sha256": "5e8d634e61aab3651dd053f63ca7fee7d2a159a7b7ff7fd5da36caf3615ae16b"
         },
-        {
-          "id": "o09-frontend-candidate",
-          "path": "docs/performance/composite-course-scope-20261031/frontend-candidate.json",
-          "sha256": "632693886d04963fa9e5a47671aa735799e910216ca3886ce42fa97ec379a26d",
-          "originalSourceAssociation": "c41e0351fcfd5d4efaef01fd0134785ccab3ff4b",
-          "sourceRoots": [
-            "server-version/frontend"
-          ],
-          "reviewedSourceDelta": [
-            "server-version/frontend/src/school/SchoolApp.tsx",
-            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx"
-          ],
-          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
-          "deltaRationale": "Candidate source bytes equal published product; the frontend file only lost a duplicate new assertion in an unrelated unselected case after execution. Actual selected case, imports and shared setup remain unchanged. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree.",
-          "summary": {
-            "success": true,
-            "numPassedTests": 1,
-            "numFailedTests": 0,
-            "numPendingTests": 13
-          },
-          "cases": [
-            {
-              "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
-              "status": "passed"
-            },
-            {
-              "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
-              "status": "skipped"
-            },
-            {
-              "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
-              "status": "skipped"
-            },
-            {
-              "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
-              "status": "skipped"
-            },
-            {
-              "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
-              "status": "skipped"
-            },
-            {
-              "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
-              "status": "skipped"
-            },
-            {
-              "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
-              "status": "skipped"
-            }
-          ],
-          "selectedCases": [
-            "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging"
-          ]
+        "oldTypesLog": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types-deps.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "missingDependencyTypes": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types.log",
+          "sha256": "df58aaa5d57d20e37de01676178a17fb6f49594f95c1110a7c948ba5105e7ef5"
         }
-      ],
-      "types": [
-        {
-          "path": "docs/performance/composite-course-scope-20261031/backend-aligned-types-record.json",
-          "sha256": "809ac157c5db8f20863788eb13af40656195edbcee81c15546a29654778d6864",
-          "component": "backend",
-          "componentTree": "6971e3f4076f0a9e1f439e9c4e57d77f706d95c5",
-          "log": "docs/performance/composite-course-scope-20261031/backend-aligned-types.log",
-          "exitField": "exitCode"
-        },
-        {
-          "path": "docs/performance/composite-course-scope-20261031/frontend-aligned-types-record.json",
-          "sha256": "3c8362863caa7d2452d168181dd22707f605abedc50a20f6ddc856c56cc7e77b",
-          "component": "frontend",
-          "componentTree": "581670626f62a99158423c578168a3244bf6007e",
-          "log": "docs/performance/composite-course-scope-20261031/frontend-aligned-types.log",
-          "exitField": "exitCode"
-        }
-      ]
+      },
+      "sourceHashes": {
+        "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": "8d8de6f5eedf8d50d61b5f6e639d12344bfc45cef4a7ddd68a2fa101a15b9e91",
+        "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx": "c429713f54f5a31e3c814e05aa62ee17cf8bbb46be32a4de8bbac7bdcfc7ea08",
+        "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+      },
+      "types": {
+        "path": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.json",
+        "sha256": "40eef16d8b868ba2763c17d72559eafbab7205122b3f3d8d0d56042c5a5b69a9",
+        "log": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.log"
+      },
+      "sourceAssociationBasis": "Original five-pass execution bound by unchanged questionnaire source, test, lock and tsconfig hashes; summary only, no invented individual result identities.",
+      "reuseRationale": "439 changed School inputs but not questionnaire test loaded modules. Reuse original application tests; fresh recorded frontend app types covers the integrated whole component. Backend equals current main and is not recompiled."
     }
   }
 }
