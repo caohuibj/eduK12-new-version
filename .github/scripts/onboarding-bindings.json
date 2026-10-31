@@ -8438,21 +8438,21 @@
       "schemaVersion": 1,
       "pr": 447,
       "enabled": false,
-      "base": "25cad994ec20b32b53ed8735c732143376536da0",
-      "product": "7292af17b3a7fa8251f100b2068a7c6e85fe1c2d",
-      "controlCheckpoint": "ddf16272fc276987be38e33e2b80857f523e7757",
+      "base": "194bb91f9af4feb62d9ed384813e7abf0643c2e8",
+      "product": "75ef6d7ff2aeee98abf4758f75cb6acbb40642f5",
+      "controlCheckpoint": "7a34ec3f7852d69b329990dd4b6175b49e5e4b00",
       "components": {
         "backend": "aabc532ab1fbb807da0fc194eaeed2a5f9c54134",
-        "frontend": "9a545fadae5b6d2f7a6177d7b521e12f70e54348"
+        "frontend": "45d5194b6fdb69af9f8dddd89c7231aea4c7eeaf"
       },
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
         ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "da9aa232c0f00cf4bc9c695f5d2759c0c3481d1f",
-        ".github/scripts/onboarding-checks.mjs": "a3633b1aac4e5271d7dd85d17ef0df67ae7bbf76",
-        ".github/scripts/onboarding-controls.test.mjs": "71dfb39422a69cc6f4243aa649d7bec3bd017c57",
-        ".github/scripts/onboarding-evidence.json": "dfb65bd925af2dd38fb4836a22fe479e0e519d14",
-        ".github/scripts/onboarding-scope.mjs": "948528dfe5b30d6b4b026e4fb37b4b1ffe07aaa4",
+        ".github/scripts/onboarding-bindings.json": "2d413c192f69545be782ba0f76445f5b33e9c58d",
+        ".github/scripts/onboarding-checks.mjs": "ac2e7730b3c218f8baa1040374963ad68decec3f",
+        ".github/scripts/onboarding-controls.test.mjs": "89cf2580885db6e6d2b76fbdbb45da1e1f2a2d44",
+        ".github/scripts/onboarding-evidence.json": "6852b95d5241650630531decef2bb7c660e45585",
+        ".github/scripts/onboarding-scope.mjs": "93e8378a9b266427e141ca57ce880276170b2c92",
         ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
         ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
         ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
@@ -8462,7 +8462,7 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "f320cfd7a084636b4ef759bf439cdf11fee18e13"
+        ".github/workflows/ci.yml": "ac65636f91e312d266518ce26ec55a148986dba6"
       },
       "source": {
         "docs/performance/public-report-isolation-20261031/README.md": {
@@ -8528,6 +8528,18 @@
         "docs/performance/public-report-isolation-20261031/frontend-types.log": {
           "before": null,
           "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/public-report-isolation-20261031/qualification-main194/frontend-types.json": {
+          "before": null,
+          "after": "ec95e2fe5c574551b5220eac0fc2c532d6d24a47"
+        },
+        "docs/performance/public-report-isolation-20261031/qualification-main194/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/public-report-isolation-20261031/qualification-main194/source-and-reuse.json": {
+          "before": null,
+          "after": "97eb40acd3d99309e6a0f5dfa70146bb51aff723"
         },
         "docs/performance/public-report-isolation-20261031/qualification/README.md": {
           "before": null,
