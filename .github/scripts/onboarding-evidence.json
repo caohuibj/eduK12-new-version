@@ -14282,6 +14282,417 @@
       ],
       "types": [],
       "missingCheck": "CURRENT_COMBINED_BACKEND_TYPES"
+    },
+    "439": {
+      "schemaVersion": 1,
+      "product": "6d2d4dcc52a0d7ed6a6115ed795e2af445f5a21f",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "localReviewedHead": "f071b64c99d2d164627e94c1da5f8692c2b72b55",
+      "identicalFullTree": "525c48f69e4e9bbd8986dfa19c4169092ae81e45",
+      "components": {
+        "frontend": "429f3b43ee47d034c6b0eb65df86fe500ce9fb93",
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3"
+      },
+      "environment": {
+        "kind": "DOT-local unsigned original reports and recorded exits, reviewed retrospective Git association",
+        "limitations": [
+          "Synthetic fetch and mocked router dependencies; not real browser cookie, DB or production latency evidence.",
+          "Selected 14 distinct cases span separate executions; failed and skipped rows remain original. Withdrawn operation-401 logout assertion is not qualification.",
+          "Types were actually executed; records are unsigned and do not contain full contemporaneous dependency-byte attestations. Current main and both component trees remain unchanged from reviewed candidate.",
+          "Backend route tests ran with copied dependencies before follow-redirects update; they do not import it. Backend types followed verified lock-matching 1.16.2 and local Prisma generation."
+        ]
+      },
+      "reports": [
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-final.json.gz",
+          "sha256": "16b17faf212dc31828220dd3c130287ea840910fcb549663faeec433cb913b3e",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "5b21704f55918729ddaf0068773634d0e0a63dc4dc08ec4c371cfd4657f20a43",
+          "id": "frontend-final",
+          "summary": {
+            "success": true,
+            "numPassedTests": 9,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+            "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+            "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+            "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+            "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-non-session-final.json.gz",
+          "sha256": "6875e52abb2b9128f96b1e4fab08d3c4a9346bead44e7c49a430323075ba74f3",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "c3f9b70756f02d3eac2053b2983d71401a1d580dd3d1c9cc3bf605d334042812",
+          "id": "frontend-non-session-final",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 7
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+            "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+            "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-baseline-corrected.json.gz",
+          "sha256": "0cb86d69b7518fc88d2ef750597daf10ff2ae7fa3eed285639d47b24e9721191",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "15c6c5c54ccfde8dac8afaf5a6970aada3ec0615956e560e50a9c06cf3a34775",
+          "id": "frontend-baseline-corrected",
+          "summary": {
+            "success": false,
+            "numPassedTests": 4,
+            "numFailedTests": 4,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-review-candidate.json.gz",
+          "sha256": "45926e1b214ed87c530f379c9b5e6a432ce938200384a5bd72c0b69ec9989b3e",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "c332b8d8788e7a30ec55e8cfc310b53e92a826d83619d9ab0e361a75519ad83f",
+          "id": "frontend-review-candidate",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 9
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password form available after a wrong-password 401",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps the account page available after a wrong step-up code 401",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery keeps forced password form available after a wrong-password 401",
+            "School login safe projection and existing-request recovery keeps the account page available after a wrong step-up code 401"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/backend-baseline.json.gz",
+          "sha256": "2dcda877e05c4de27cec6413ccaaaf73ef441bd722e45b782f567529647725db",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "26fe5a40191dba8eefd35dbf3650e29ed24e4776d65cad4a9669e0a8235a811c",
+          "id": "backend-baseline",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 2,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=false",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=true",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/backend-candidate.json.gz",
+          "sha256": "f86095667e3a57573f2f1ccb8ec284c907fb2f9e7448ffc23e71401a6306cea8",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "8b328c575b436cdb841aec9848251c80e8b8bce8bfa970c3049e08148cc3c85f",
+          "id": "backend-candidate",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=false",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=true",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login projection matches me without private fields returns the same public identity with forced=false",
+            "School login projection matches me without private fields returns the same public identity with forced=true"
+          ]
+        }
+      ],
+      "expectedCases": [
+        "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity",
+        "School login projection matches me without private fields returns the same public identity with forced=false",
+        "School login projection matches me without private fields returns the same public identity with forced=true",
+        "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+        "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+        "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+        "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+        "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+        "School login safe projection and existing-request recovery keeps forced password form available after a wrong-password 401",
+        "School login safe projection and existing-request recovery keeps the account page available after a wrong step-up code 401",
+        "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+        "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+        "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+        "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag"
+      ],
+      "withdrawnCase": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+      "records": {
+        "initial": {
+          "path": "docs/performance/school-login-projection-20261031/execution-record.json",
+          "sha256": "389b1e48b5926f77a3b5ccdc7c25d4a6bf90227d3f05097fe18c074cab7dcc55"
+        },
+        "review": {
+          "path": "docs/performance/school-login-projection-20261031/review-execution-record.json",
+          "sha256": "b18153e8965c2eea33d859b4bd5b45645c4dc67239174e7a5998b6de1a08d51a"
+        }
+      },
+      "sourceAssociationBasis": "Actual reported executions on local working inputs subsequently committed; no invented contemporaneous head/signature. Remote product is full-tree identical to independently reviewed local head.",
+      "reuseRationale": "Final review only removed run recoverSession; ordinary success, initial reads, non-session errors, legacy fallback and MFA branches unchanged. Wrong-password and step-up cases are final correction executions. Backend projection/helper unchanged after recorded checks. Test-only await/navigation improvements do not change retained cases.",
+      "failureDisposition": "The wrong operation-401-must-logout assertion is withdrawn, not repaired or admitted. Other selected-report product failures have a selected passing continuation with the same name. Initial fixture-only reports remain archived but are not selected."
+    },
+    "442": {
+      "schemaVersion": 1,
+      "product": "1b458b80057eae441833d1556c3a699efe3a5f37",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "components": {
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3",
+        "frontend": "ed36c29b835587819a73a04fb3ef383291f05c15"
+      },
+      "environment": {
+        "node": "v24.22.1",
+        "limitations": [
+          "Original Vitest default reporter records only 5 passed summary, not per-case result identities or separately printed numeric exit. No JSON reporter is fabricated.",
+          "Prior logs and tool terminal excerpt are unsigned, retrospectively indexed. Input hashes are post-execution observations, not an atomic execution attestation.",
+          "The baseline 1 failed / 3 passed and missing-dependency types failure remain original; no full-suite, production, build, browser or deployment claim.",
+          "Fulfilled code404 fixture is not actual HTTP404 rejection; actual rejection displays its normalized error and manual retry."
+        ]
+      },
+      "originals": {
+        "baseline": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-red.log",
+          "sha256": "453a5369c4e754409a762453201a86b92b37e0f8d88ec01ff9fd6d9d11432e7a"
+        },
+        "passed": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-green-final.log",
+          "sha256": "f0e2b416d3359040ab86c75963ec2882a5fb76143be7eefbb4f3167a1b94c953"
+        },
+        "lint": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-lint.log",
+          "sha256": "93e413077110bcb7192d384de7453a10c34c3d7e3714158a857d17f195593c39"
+        },
+        "oldTypesTerminal": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/types-terminal-excerpt.txt",
+          "sha256": "5e8d634e61aab3651dd053f63ca7fee7d2a159a7b7ff7fd5da36caf3615ae16b"
+        },
+        "oldTypesLog": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types-deps.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "missingDependencyTypes": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types.log",
+          "sha256": "df58aaa5d57d20e37de01676178a17fb6f49594f95c1110a7c948ba5105e7ef5"
+        }
+      },
+      "sourceHashes": {
+        "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": "8d8de6f5eedf8d50d61b5f6e639d12344bfc45cef4a7ddd68a2fa101a15b9e91",
+        "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx": "c429713f54f5a31e3c814e05aa62ee17cf8bbb46be32a4de8bbac7bdcfc7ea08",
+        "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+      },
+      "types": {
+        "path": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.json",
+        "sha256": "40eef16d8b868ba2763c17d72559eafbab7205122b3f3d8d0d56042c5a5b69a9",
+        "log": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.log"
+      },
+      "sourceAssociationBasis": "Original five-pass execution bound by unchanged questionnaire source, test, lock and tsconfig hashes; summary only, no invented individual result identities.",
+      "reuseRationale": "439 changed School inputs but not questionnaire test loaded modules. Reuse original application tests; fresh recorded frontend app types covers the integrated whole component. Backend equals current main and is not recompiled."
     }
   }
 }

@@ -6436,6 +6436,234 @@
         }
       },
       "activationNote": "Reuse original two quota PostgreSQL cases; execute only missing current backend compiler in existing onboarding route and bounded CodeQL. No new image workflow or frontend/migration work."
+    },
+    "439": {
+      "schemaVersion": 1,
+      "pr": 439,
+      "enabled": true,
+      "base": "f5fa29314eb731f0479b90ae962b731da8e08d34",
+      "product": "6d2d4dcc52a0d7ed6a6115ed795e2af445f5a21f",
+      "controlCheckpoint": "1c6a56564f2f96a2641fba129c585ee6f49b5aa9",
+      "components": {
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3",
+        "frontend": "429f3b43ee47d034c6b0eb65df86fe500ce9fb93"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "635b9266d8a78578f4724852ffb3fda8b382c6f6",
+        ".github/scripts/onboarding-checks.mjs": "18ac0e0729f82660789f03242fd4376477fa3a74",
+        ".github/scripts/onboarding-controls.test.mjs": "bf9d8f4b58e64e244ca4ced2480a069eb9ef899d",
+        ".github/scripts/onboarding-evidence.json": "ad5cdf9e0616dff6891836a5dbeedac50641ebf4",
+        ".github/scripts/onboarding-scope.mjs": "84e181d90c669e50cba5df0017f44ce436d5348c",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "84d95686d025d1a6073472f00742e741a8cf1ad7"
+      },
+      "source": {
+        "docs/performance/school-login-projection-20261031/README.md": {
+          "before": null,
+          "after": "370e569975bfb7c619f250bdcccdad1becd3531d"
+        },
+        "docs/performance/school-login-projection-20261031/backend-baseline.json.gz": {
+          "before": null,
+          "after": "0883879fe9aeee83f268ed363ee4420c3b25543e"
+        },
+        "docs/performance/school-login-projection-20261031/backend-candidate.json.gz": {
+          "before": null,
+          "after": "2dc5caa48b2f237e241db68bf716d1a7d2e5e14a"
+        },
+        "docs/performance/school-login-projection-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/school-login-projection-20261031/execution-record.json": {
+          "before": null,
+          "after": "c9e8c2674ff60edc2371b712d770fd6bbc3c3957"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-baseline-corrected.json.gz": {
+          "before": null,
+          "after": "d67aa44f5fa0790b81612518194b5173dca133e5"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-baseline.json.gz": {
+          "before": null,
+          "after": "be9987d5d73acef4aedddbf874b233feb8ec124f"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-candidate.json.gz": {
+          "before": null,
+          "after": "5a980748796e91805267914ae590479242d993aa"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-final.json.gz": {
+          "before": null,
+          "after": "cf1034c8a0d26d194f06b6d0eaa04099e7d153ed"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-non-session-final.json.gz": {
+          "before": null,
+          "after": "5ae6c9d5f382794e15167034262fa94452b42bf6"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-review-baseline-corrected.json.gz": {
+          "before": null,
+          "after": "59c645dca09c989f6df52ab17c5f2b2049f7b526"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-review-baseline.json.gz": {
+          "before": null,
+          "after": "ab130709a2893f5dd697251a5c642729992c1d73"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-review-candidate.json.gz": {
+          "before": null,
+          "after": "f05058325ca0f9afd0c316addd67aa8e2d32b8cb"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-review-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/school-login-projection-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/school-login-projection-20261031/qualification/PLAN.md": {
+          "before": null,
+          "after": "10fdff505f06e0cebdf1891b1cf3e1802876ccb3"
+        },
+        "docs/performance/school-login-projection-20261031/qualification/control-execution.json": {
+          "before": null,
+          "after": "043371fd49f8aa32f474f3ada7d8bfffc36f45d9"
+        },
+        "docs/performance/school-login-projection-20261031/qualification/controls-first.tap": {
+          "before": null,
+          "after": "5b0c4bfa9325140016e4981b986328aa718cf706"
+        },
+        "docs/performance/school-login-projection-20261031/qualification/controls.tap": {
+          "before": null,
+          "after": "19419710abdeaac54c4e71ebd61f0c2a6d4b7342"
+        },
+        "docs/performance/school-login-projection-20261031/review-execution-record.json": {
+          "before": null,
+          "after": "be73b9593b5a267425b108b638c9caea394391f9"
+        },
+        "server-version/backend/src/__tests__/campus/login-projection.test.ts": {
+          "before": null,
+          "after": "e8d43303d3366b547812ce5c95f00dbe5c138d80"
+        },
+        "server-version/backend/src/modules/campus/auth.routes.ts": {
+          "before": "98e6ed558783901be2bcdb53fc92d82fbbf2c248",
+          "after": "8991eabc0557fc8e34f49f2e502ed4fe570d5274"
+        },
+        "server-version/frontend/src/school/SchoolApp.tsx": {
+          "before": "5745a7c2b01b3100409086a69925bf898f9d2897",
+          "after": "ffc1f327b600841568138d20b7eb0953f8a87983"
+        },
+        "server-version/frontend/src/school/SchoolLoginProjection.test.tsx": {
+          "before": null,
+          "after": "854b9e38fc58113667deb5a723b8d9866fc97536"
+        }
+      },
+      "activationNote": "Prepared exact scope; maintain Draft until independently reviewed final identity, then selected admission/changed-input SAST/gate only. No deployment."
+    },
+    "442": {
+      "schemaVersion": 1,
+      "pr": 442,
+      "enabled": true,
+      "base": "7a69762e898d1b1fe1c1aab2b51d2ce9db0d0d03",
+      "product": "1b458b80057eae441833d1556c3a699efe3a5f37",
+      "controlCheckpoint": "0990b4371f85bc65f9d15e8e3833fcf800666462",
+      "components": {
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3",
+        "frontend": "ed36c29b835587819a73a04fb3ef383291f05c15"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "65a2d9a82c2d626a102da556fd8b9286d66fb257",
+        ".github/scripts/onboarding-checks.mjs": "a2ab3b0ed00a47d8f6884dac45067f4ce62850a6",
+        ".github/scripts/onboarding-controls.test.mjs": "177f4bba1d267e68d88513e9197aae1e60bd150c",
+        ".github/scripts/onboarding-evidence.json": "24ac53d7f312486dff69ecbbc176f71453ad7843",
+        ".github/scripts/onboarding-scope.mjs": "535bbf99708ad7bd48275f064df3857045dd81e5",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "b1ff5bfc9e37eb12aae0c347dc3662db310b43fa"
+      },
+      "source": {
+        "docs/performance/questionnaire-open-retry-20261031/README.md": {
+          "before": null,
+          "after": "0d9b2c39f46ac3b983390f6df27953bca5b868f7"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/inputs.sha256": {
+          "before": null,
+          "after": "a031ef2c22dc8d8543829f3a8b41902c1bf1d71d"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-green-final.log": {
+          "before": null,
+          "after": "37be4010bcdfe9bb1bf4402ae96931fd1a178e82"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-lint.log": {
+          "before": null,
+          "after": "ce3cf09b393dfbe30637eaaa5c8bbf46aa851d6a"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-red.log": {
+          "before": null,
+          "after": "f773a4bb916338fea684e5f0dc3ee4ca6978b0c3"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types-deps.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types.log": {
+          "before": null,
+          "after": "ffb745a61ada50923c31ce560f5de8f9fa092195"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/PLAN.md": {
+          "before": null,
+          "after": "4c61938eff02c695a2aeb69d79090cfa6a0d5798"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/control-terminal-excerpt.txt": {
+          "before": null,
+          "after": "1cf3a965bb4b5e0de735f76fdd47b7cc33ea15f2"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/controls.tap": {
+          "before": null,
+          "after": "e8139855efbe2e0a2763ef82b86ddd937d6fbfea"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.json": {
+          "before": null,
+          "after": "a78b1aa44d9bca993c59afd562db1a8ddc61b3ba"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/reachable-inputs.sha256.gz": {
+          "before": null,
+          "after": "f28127cf6d1ba513db93455cb3b9f5e45336c1e6"
+        },
+        "docs/performance/questionnaire-open-retry-20261031/types-terminal-excerpt.txt": {
+          "before": null,
+          "after": "09b5fd1ed0d10a322b5625ddc4b58f77c60d041e"
+        },
+        "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": {
+          "before": "30ff3ad018a5864d44c1f0a85e44e676830172f2",
+          "after": "20ccad43d3ceb14c70c537e3715ad8048370a342"
+        },
+        "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx": {
+          "before": "4e9c5b3f980015e2ea37412fa9d48e293d681fcc",
+          "after": "8b063dcf009d6071e0cfa5ccb955a8934d1d8476"
+        }
+      },
+      "activationNote": "Prepared precise frontend retry and text-original admission. Keep Draft until independent fixed-head review, then scoped admission/SAST/merge gate. No deployment."
     }
   }
 }
