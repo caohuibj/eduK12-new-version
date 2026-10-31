@@ -172,3 +172,13 @@ test('group single patched HTTP dependency preserves native and frontend qualifi
  await assert.rejects(verifyOriginalQualification({qualificationReuse:proof},fetcher({...original,conclusion:'failure'})));
  await assert.rejects(verifyOriginalQualification({qualificationReuse:proof},fetcher({...original,steps:original.steps.filter(s=>s.name!=='real nonempty main upgrade and native dump restore')})));
 });
+
+test('Teacher group uses the existing scoped route: Draft scope only, Ready existing migration/images/SAST',async()=>{
+ if(binding.branch!=='feat/teacher-group-longitudinal-20261031')return;
+ const entries=changedEntries(binding.base,head),ready=personalTrackingReadyPlan(entries,binding.base,head,{event:'pull_request',branch:binding.branch,draft:false});
+ assert.deepEqual(ready.required,['scope','personal-tracking','docker','codeql']);
+ assert.deepEqual(personalTrackingReadyPlan(entries,binding.base,head,{event:'pull_request',branch:binding.branch,draft:true}).required,['scope']);
+ assert.throws(()=>personalTrackingReadyPlan([...entries,{file:'server-version/backend/src/modules/auth/unknown.ts',status:'A',oldMode:'000000',newMode:'100644'}],binding.base,head,{event:'pull_request',branch:binding.branch,draft:false}));
+ assert.throws(()=>personalTrackingReadyPlan(entries,'0'.repeat(40),head,{event:'pull_request',branch:binding.branch,draft:false}));
+ const evidence=await admitOriginalReports();assert.equal(evidence.caseCount,9);assert.equal(evidence.ciExecuted,false);
+});
