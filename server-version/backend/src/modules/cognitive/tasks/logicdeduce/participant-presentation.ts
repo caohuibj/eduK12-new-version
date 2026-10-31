@@ -171,6 +171,9 @@ if(audited.reportReading){
  audited.reportReading.version='2.0.0'
  audited.reportReading.withholdFlags=['legacyUninterpretable']
  audited.reportReading.summaryByProfile={experience:{template:'这次18题体验中，你答对的比例是 {accuracy}。短版只描述本次表现，不与其他人排名比较。',metricKeys:['accuracy']}}
+ audited.reportReading.popular!.frames=[{title:'读清条件',text:'确认题目给了哪些信息、要求什么。'}, {title:'逐步推导',text:'只用题内条件，区分一定成立与仅有可能。'}, {title:'核对选项',text:'按题目问题选择结论；条件不足时可以选择无法确定。'}]
+ audited.reportReading.popular!.metricHelp!.errorCount={label:'选错了几题',explanation:'已作出选择但答案不正确的正式题数；超时另计。'}
+ audited.reportReading.professional!.construct='多条件演绎推断'
  audited.reportReading.nextStep='先看本次答对比例，再看用时和超时。下次可练习理清条件；这份报告不提供能力排名。'
  audited.reportReading.professional!.procedure='冻结题池 logicdeduce-zh-v2.0.0：36道独立正式题，另有1道不入分练习；体验/标准/科研为18/30/36题，每题15秒。超时记录null，正确率包含已呈现的超时题；正确且未中断、300ms至时限内的反应进入用时统计。'
 }

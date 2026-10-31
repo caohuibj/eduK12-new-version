@@ -26,13 +26,16 @@ export const WordproblemTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   const interruptedRef = useRef(false)
   const onsetRef = useRef<number | null>(null)
   const submittingRef = useRef(false)
+  const firstSubmissionRef = useRef<WordproblemTrialPayload | null>(null)
+  const [retrySave, setRetrySave] = useState(false)
   const items = useMemo(() => buildWordproblemItems(taskContext.randomSeed, totalTrials,config.stimulusSetVersion), [taskContext.randomSeed, totalTrials,config.stimulusSetVersion])
   const currentTrial = items[trialIndex]
 
   useEffect(() => {
     if (phase !== 'formal' || !currentTrial) return
     setFormalFeedback(null); interruptedRef.current = false; setSubPhase('fixation')
-  }, [phase, trialIndex, currentTrial])
+    if (revised) { firstSubmissionRef.current = null; setRetrySave(false) }
+  }, [phase, trialIndex, currentTrial, revised])
 
   useEffect(() => {
     if ((phase !== 'formal' && phase !== 'practice') || subPhase !== 'fixation') return
@@ -41,22 +44,33 @@ export const WordproblemTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
     return () => window.clearTimeout(timer)
   }, [phase, subPhase, trialIndex, fixationMs])
 
-  const submitFormal = useCallback(async (responseIndex: number | null) => {
-    if (phase !== 'formal' || subPhase !== 'stimulus' || !currentTrial || submittingRef.current) return
+  const submitFormal = useCallback(async (responseIndex: number | null, retry = false) => {
+    if (phase !== 'formal' || (subPhase !== 'stimulus' && !(revised && retry && firstSubmissionRef.current)) || !currentTrial || submittingRef.current) return
     submittingRef.current = true
     const elapsed=onsetRef.current===null?null:Math.max(0,Math.round(performance.now()-onsetRef.current))
     if(revised&&elapsed!==null&&elapsed>=timeoutMs)responseIndex=null
-    const payload: WordproblemTrialPayload = {
+    const payload: WordproblemTrialPayload = (revised && firstSubmissionRef.current) || {
       itemId: currentTrial.itemId,
       responseIndex,
       rtMs: responseIndex === null ? null : elapsed,
       interrupted: interruptedRef.current,
     }
-    setFormalFeedback('已记录，下一题准备中'); setSubPhase('feedback')
+    if (revised) { firstSubmissionRef.current = payload; setRetrySave(false) }
+    setFormalFeedback(revised ? '正在保存作答…' : '已记录，下一题准备中'); setSubPhase('feedback')
     try {
-      const accepted = await onTrialComplete(payload)
-      if (accepted === false) { setFormalFeedback('提交失败，请重试当前试次'); setSubPhase('stimulus'); return }
-      if (trialIndex + 1 >= totalTrials) await onTaskComplete?.()
+      let accepted: boolean | void
+      try { accepted = await onTrialComplete(payload) }
+      catch (error) {
+        if (!revised) throw error
+        setFormalFeedback('提交未成功，请重试保存；将保留第一次选择和用时。'); setRetrySave(true); return
+      }
+      if (accepted === false) {
+        if (revised) { setFormalFeedback('提交未成功，请重试保存；将保留第一次选择和用时。'); setRetrySave(true) }
+        else { setFormalFeedback('提交失败，请重试当前试次'); setSubPhase('stimulus') }
+        return
+      }
+      if (revised) { firstSubmissionRef.current = null; setFormalFeedback('作答已保存') }
+      if (!revised && trialIndex + 1 >= totalTrials) await onTaskComplete?.()
     } finally { submittingRef.current = false }
   }, [phase, subPhase, currentTrial, onTrialComplete, trialIndex, totalTrials, onTaskComplete,revised,timeoutMs])
 
@@ -102,13 +116,14 @@ export const WordproblemTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
 
   const item = phase === 'practice' ? practiceItem : currentTrial
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="应用题推理" description={<p>每题是一道来自生活场景的数学应用题，请从四个选项中选出正确答案。</p>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。</p>{revised&&<p>只依据题内条件选择唯一答案，先保证准确。正式共 {totalTrials} 题，每题最多 {timeoutMs/1000} 秒；超时进入下一题。按满时限估算约需 {Math.ceil(totalTrials*(timeoutMs+600)/60000)+1} 分钟以内（含一次说明与练习，非实测时长）。</p>}</>} onAction={startPractice} />
+  if (revised && trialIndex >= totalTrials) return <div role="status" className="card p-6 text-center">正式作答已保存，请使用页面上的“完成测评”按钮确认提交。</div>
+  if (phase === 'instruction') return <CognitiveTaskIntro title="应用题推理" description={<p>每题是一道来自生活场景的数学应用题，请从四个选项中选出正确答案。</p>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。</p>{revised&&<p>只依据题内条件选择唯一答案，先保证准确。正式共 {totalTrials} 题，每题最多 {timeoutMs/1000} 秒；超时进入下一题。正式题若全部用满时限约需 {(totalTrials*(timeoutMs+600)/60000).toFixed(1)} 分钟，另计自行阅读说明和练习的时间（非实测时长）。</p>}</>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   const OptionButtons: React.FC<{ show: boolean }> = ({ show }) => show ? (
     <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto mt-5">
       {item!.options.map((option, index) => (
-        <button key={option} type="button" onPointerDown={() => (phase === 'practice' ? handlePracticeChoice(index) : void submitFormal(index))} className="btn-secondary min-h-12 text-left px-4">
+        <button key={option} type="button" onPointerDown={() => (phase === 'practice' ? handlePracticeChoice(index) : void submitFormal(index))} onClick={(event) => { if (revised && event.detail === 0) { if (phase === 'practice') handlePracticeChoice(index); else void submitFormal(index) } }} className="btn-secondary min-h-12 text-left px-4">
           <span className="text-gray-400 mr-2">{index + 1} ·</span>{option}
         </button>
       ))}
@@ -121,5 +136,5 @@ export const WordproblemTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="应用题推理正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-10">+</div>}{subPhase === 'stimulus' && <p className="text-xl font-semibold text-gray-800 pt-6">{currentTrial.stem}</p>}{subPhase === 'feedback' && <div className="h-28 pt-10 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<OptionButtons show={subPhase === 'stimulus'} /><p className="text-xs text-gray-400 mt-5">按键 1–4 或点击选项作答</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="应用题推理正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-10">+</div>}{subPhase === 'stimulus' && <p className="text-xl font-semibold text-gray-800 pt-6">{currentTrial.stem}</p>}{subPhase === 'feedback' && <div className="h-28 pt-10 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<OptionButtons show={subPhase === 'stimulus'} />{revised && retrySave && <button type="button" className="btn-primary" onClick={() => void submitFormal(null, true)}>重试保存</button>}<p className="text-xs text-gray-400 mt-5">按键 1–4 或点击选项作答</p></div></CognitiveFocusStage>
 }

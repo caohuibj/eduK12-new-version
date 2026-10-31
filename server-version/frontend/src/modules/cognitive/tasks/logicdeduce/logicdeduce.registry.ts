@@ -26,4 +26,8 @@ export const logicdeduceRegistryEntry: CognitiveFrontendRegistryEntry = {
   },
 }
 
-export const logicdeduceRegistryEntryV2: CognitiveFrontendRegistryEntry={...logicdeduceRegistryEntry,engineVersion:'2.0.0',scoringVersion:'2.0.0',reportDefinition:{...logicdeduceRegistryEntry.reportDefinition,indexLabel:'本次答对比例',disclaimer:'仅描述本次试点任务，不提供常模、排名、诊断或已验证的能力结论。'}}
+export const logicdeduceRegistryEntryV2: CognitiveFrontendRegistryEntry={...logicdeduceRegistryEntry, completionMode: 'manual',
+ readiness: { category: 'fixed-trial', inputs: ['keyboard','pointer','touch'], orientation: 'any',
+ globalKeyboardCapture: true, resumeDisposition: 'restart-required',
+ resumeReason: '练习及题内阶段未持久化，未封存的中断记录不能只按最大试次索引自动恢复。',
+ frozenMediaSlots: ['instruction','example','stimulus'] },engineVersion:'2.0.0',scoringVersion:'2.0.0',reportDefinition:{...logicdeduceRegistryEntry.reportDefinition,showProductIndex:false,indexLabel:'本次答对比例',disclaimer:'仅描述本次试点任务，不提供常模、排名、诊断或已验证的能力结论。'}}

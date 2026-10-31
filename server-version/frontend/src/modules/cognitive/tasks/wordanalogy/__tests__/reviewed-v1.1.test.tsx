@@ -27,11 +27,11 @@ describe('wordanalogy reviewed runner',()=>{
    fireEvent.click(screen.getByText('重新阅读说明并练习'));expect(screen.getByText('开始练习')).toBeTruthy()
    await formal();expect(screen.getByText('第 1 / 2 题')).toBeTruthy()
  })
- it('advances through the next real formal item and completes once',async()=>{
+ it('advances through the next real formal item and leaves completion to the parent',async()=>{
    const submit=vi.fn().mockResolvedValue(true),done=vi.fn().mockResolvedValue(undefined)
    function Host(){const [index,setIndex]=useState(0);return <Task taskContext={context} trialIndex={index} onTrialComplete={async p=>{await submit(p);setIndex(n=>n+1)}} onTaskComplete={done}/>}
-   render(<Host/>);await formal();pick(0);await act(async()=>{});await tick();pick(1);await act(async()=>{})
-   expect(submit).toHaveBeenCalledTimes(2);expect(submit.mock.calls[0][0].itemId).not.toBe(submit.mock.calls[1][0].itemId);expect(done).toHaveBeenCalledTimes(1)
+   render(<Host/>);await formal();pick(0);await act(async()=>{});await tick(599);pick(1);expect(submit).toHaveBeenCalledTimes(1);await tick(1);pick(1);await act(async()=>{})
+   expect(submit).toHaveBeenCalledTimes(2);expect(submit.mock.calls[0][0].itemId).not.toBe(submit.mock.calls[1][0].itemId);expect(done).not.toHaveBeenCalled()
  })
  it('records null timeout and ignores held-key repeats',async()=>{
    const submit=vi.fn().mockResolvedValue(true);render(<Task taskContext={context} trialIndex={0} onTrialComplete={submit}/>);await formal()

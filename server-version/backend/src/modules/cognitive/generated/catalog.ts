@@ -37,14 +37,17 @@ import { catalog as task34 } from '../tasks/letternumseries/governance'
 import { catalog as task35 } from '../tasks/wordanalogy/governance'
 import { catalog as task36 } from '../tasks/wordmeaning/governance'
 import { catalog as task37 } from '../tasks/semanticfluency/governance'
-import { catalog as task38 } from '../tasks/cancellation/governance'
-import { catalog as task39 } from '../tasks/trustgame/governance'
-import { catalog as task40 } from '../tasks/ufov/governance'
-import { catalog as task41 } from '../tasks/pursuitrotor/governance'
-import { catalog as task42 } from '../tasks/visualwm/governance'
-import { catalog as task43 } from '../tasks/maze/governance'
-import { catalog as task44 } from '../tasks/auditoryrt/governance'
-import { catalog as task45 } from '../tasks/auditorynback/governance'
+import { catalog as task38 } from '../tasks/wordproblem/governance'
+import { catalog as task39 } from '../tasks/cancellation/governance'
+import { catalog as task40 } from '../tasks/trustgame/governance'
+import { catalog as task41 } from '../tasks/ufov/governance'
+import { catalog as task42 } from '../tasks/logicdeduce/governance'
+import { catalog as task43 } from '../tasks/seriescomplete/governance'
+import { catalog as task44 } from '../tasks/pursuitrotor/governance'
+import { catalog as task45 } from '../tasks/visualwm/governance'
+import { catalog as task46 } from '../tasks/maze/governance'
+import { catalog as task47 } from '../tasks/auditoryrt/governance'
+import { catalog as task48 } from '../tasks/auditorynback/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -84,12 +87,15 @@ export const cognitiveCatalog = {
   'wordanalogy': task35,
   'wordmeaning': task36,
   'semanticfluency': task37,
-  'cancellation': task38,
-  'trustgame': task39,
-  'ufov': task40,
-  'pursuitrotor': task41,
-  'visualwm': task42,
-  'maze': task43,
-  'auditoryrt': task44,
-  'auditorynback': task45,
+  'wordproblem': task38,
+  'cancellation': task39,
+  'trustgame': task40,
+  'ufov': task41,
+  'logicdeduce': task42,
+  'seriescomplete': task43,
+  'pursuitrotor': task44,
+  'visualwm': task45,
+  'maze': task46,
+  'auditoryrt': task47,
+  'auditorynback': task48,
 }

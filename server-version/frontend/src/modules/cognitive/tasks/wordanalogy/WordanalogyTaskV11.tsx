@@ -9,14 +9,13 @@ type Phase = 'instruction' | 'practice' | 'formal'
 type Stage = 'fixation' | 'stimulus' | 'feedback'
 
 /** v1.1.0: independent practice and immutable first-response retry. */
-export function WordanalogyTaskV11({ taskContext, trialIndex, onTrialComplete, onTaskComplete }: CognitiveTaskProps) {
+export function WordanalogyTaskV11({ taskContext, trialIndex, onTrialComplete }: CognitiveTaskProps) {
   const config = taskContext.config as unknown as WordanalogyConfig
   const [phase, setPhase] = useState<Phase>('instruction')
   const [stage, setStage] = useState<Stage>('fixation')
   const [practiceChoice, setPracticeChoice] = useState<number | null>(null)
   const [message, setMessage] = useState('')
   const [retry, setRetry] = useState(false)
-  const [finishRetry, setFinishRetry] = useState(false)
   const onset = useRef<number | null>(null)
   const interrupted = useRef(false)
   const busy = useRef(false)
@@ -30,12 +29,12 @@ export function WordanalogyTaskV11({ taskContext, trialIndex, onTrialComplete, o
   useEffect(() => {
     if (phase !== 'formal') return
     firstResponse.current = null; busy.current = false; onset.current = null; interrupted.current = false
-    setStage('fixation'); setMessage(''); setRetry(false); setFinishRetry(false)
+    setStage('fixation'); setMessage(''); setRetry(false)
   }, [phase, trialIndex])
 
   useEffect(() => {
     if (phase === 'instruction' || stage !== 'fixation') return
-    const timer = window.setTimeout(() => { onset.current = performance.now(); setStage('stimulus') }, config.fixationMs)
+    const timer = window.setTimeout(() => { onset.current = performance.now(); setStage('stimulus') }, phase === 'practice' ? 400 : config.fixationMs + (trialIndex > 0 ? 200 : 0))
     return () => window.clearTimeout(timer)
   }, [phase, stage, trialIndex, config.fixationMs])
 
@@ -46,11 +45,6 @@ export function WordanalogyTaskV11({ taskContext, trialIndex, onTrialComplete, o
     return () => document.removeEventListener('visibilitychange', mark)
   }, [phase])
 
-  const finish = useCallback(async () => {
-    try { await onTaskComplete?.(); setFinishRetry(false) }
-    catch { setMessage('作答已保存，结束步骤未完成，请重试结束。'); setFinishRetry(true) }
-  }, [onTaskComplete])
-
   const saveFirstResponse = useCallback(async () => {
     if (busy.current || !firstResponse.current) return
     busy.current = true; setRetry(false); setMessage('已记录，下一题准备中'); setStage('feedback')
@@ -60,8 +54,7 @@ export function WordanalogyTaskV11({ taskContext, trialIndex, onTrialComplete, o
     finally { busy.current = false }
     if (!accepted) { setRetry(true); setMessage('提交未成功，请重试保存；将保留第一次选择和用时。'); return }
     firstResponse.current = null
-    if (trialIndex + 1 >= config.totalTrials) await finish()
-  }, [onTrialComplete, trialIndex, config.totalTrials, finish])
+  }, [onTrialComplete])
 
   const choose = useCallback((index: number | null) => {
     if (stage !== 'stimulus') return
@@ -92,6 +85,7 @@ export function WordanalogyTaskV11({ taskContext, trialIndex, onTrialComplete, o
   }, [choose])
 
   if (!sequence) return <div role="alert" className="card p-6">题目版本或题量与当前题库不匹配，测验尚未开始。请返回并联系管理员。</div>
+  if (trialIndex >= config.totalTrials) return <div role="status" className="card p-6 text-center">正式作答已保存，请使用页面上的“完成测评”按钮确认提交。</div>
   if (phase === 'instruction') return <CognitiveTaskIntro title="言语类比推理" description={<p>每题先读清前一对词的关系，再选择与后一对最匹配的选项。</p>} hint={<p>按数字键 1–4 或点击选项。先准确理解，再在每题 {config.timeoutMs / 1000} 秒内作答；超时会记为未作答。练习使用独立题目，不计分。正式共 {config.totalTrials} 题。</p>} onAction={() => { setPracticeChoice(null); setStage('fixation'); setPhase('practice') }} />
   const item = phase === 'practice' ? practice : current
   if (!item) return <div className="card p-6" role="status">本次题目已作答完毕，正在结束测验。</div>
@@ -103,7 +97,6 @@ export function WordanalogyTaskV11({ taskContext, trialIndex, onTrialComplete, o
     {phase === 'practice' && stage === 'feedback' && <><p role="status" className="py-5">{practiceChoice === practice.answer ? '正确。' : '这次没有选对。'}{practice.explanation}</p>{practiceChoice === practice.answer ? <button type="button" className="btn-primary" onClick={() => { setStage('fixation'); setPhase('formal') }}>开始正式测评</button> : <button type="button" className="btn-secondary" onClick={() => { setPhase('instruction'); setPracticeChoice(null) }}>重新阅读说明并练习</button>}</>}
     {phase === 'formal' && stage === 'feedback' && <p role="status" className="py-6">{message}</p>}
     {retry && <button type="button" className="btn-primary" onClick={() => void saveFirstResponse()}>重试保存</button>}
-    {finishRetry && <button type="button" className="btn-primary" onClick={() => void finish()}>重试结束</button>}
     {stage === 'stimulus' && <p className="mt-5 text-xs text-gray-500">按数字键 1–4 或点击选项</p>}
   </div></CognitiveFocusStage>
 }

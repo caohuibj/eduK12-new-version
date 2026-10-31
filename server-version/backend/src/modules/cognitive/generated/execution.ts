@@ -38,14 +38,17 @@ import { executionEntries as task35 } from '../tasks/letternumseries/package'
 import { executionEntries as task36 } from '../tasks/wordanalogy/package'
 import { executionEntries as task37 } from '../tasks/wordmeaning/package'
 import { executionEntries as task38 } from '../tasks/semanticfluency/package'
-import { executionEntries as task39 } from '../tasks/cancellation/package'
-import { executionEntries as task40 } from '../tasks/trustgame/package'
-import { executionEntries as task41 } from '../tasks/ufov/package'
-import { executionEntries as task42 } from '../tasks/pursuitrotor/package'
-import { executionEntries as task43 } from '../tasks/visualwm/package'
-import { executionEntries as task44 } from '../tasks/maze/package'
-import { executionEntries as task45 } from '../tasks/auditoryrt/package'
-import { executionEntries as task46 } from '../tasks/auditorynback/package'
+import { executionEntries as task39 } from '../tasks/wordproblem/package'
+import { executionEntries as task40 } from '../tasks/cancellation/package'
+import { executionEntries as task41 } from '../tasks/trustgame/package'
+import { executionEntries as task42 } from '../tasks/ufov/package'
+import { executionEntries as task43 } from '../tasks/logicdeduce/package'
+import { executionEntries as task44 } from '../tasks/seriescomplete/package'
+import { executionEntries as task45 } from '../tasks/pursuitrotor/package'
+import { executionEntries as task46 } from '../tasks/visualwm/package'
+import { executionEntries as task47 } from '../tasks/maze/package'
+import { executionEntries as task48 } from '../tasks/auditoryrt/package'
+import { executionEntries as task49 } from '../tasks/auditorynback/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -99,5 +102,11 @@ export const cognitiveExecutionEntries = [
   task44[0],
   task45[0],
   task46[0],
+  task47[0],
+  task48[0],
+  task49[0],
+  task39[1],
+  task43[1],
+  task44[1],
   task21[1],
 ]

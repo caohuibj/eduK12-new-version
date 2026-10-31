@@ -28,7 +28,12 @@ export const wordmeaningRegistryEntry: CognitiveFrontendRegistryEntry = {
 
 const ReviewedRunner = deferredCognitiveRunner(() => import('./WordmeaningTaskV11').then(module => module.WordmeaningTaskV11))
 export const wordmeaningRegistryEntryV11: CognitiveFrontendRegistryEntry = {
- ...wordmeaningRegistryEntry, engineVersion: '1.1.0', scoringVersion: '1.1.0',
+
+ ...wordmeaningRegistryEntry, completionMode: 'manual',
+ readiness: { category: 'fixed-trial', inputs: ['keyboard','pointer','touch'], orientation: 'any',
+ globalKeyboardCapture: true, resumeDisposition: 'restart-required',
+ resumeReason: '练习及题内阶段未持久化，未封存的中断记录不能只按最大试次索引自动恢复。',
+ frozenMediaSlots: ['instruction','example','stimulus'] }, engineVersion: '1.1.0', scoringVersion: '1.1.0',
  RunnerComponent: ReviewedRunner, prepareRunner: ReviewedRunner.prepare,
  reportDefinition: { ...wordmeaningRegistryEntry.reportDefinition, showProductIndex: false, practicalTips: ['把不熟悉的词放进句子，用自己的话解释。', '区分同义与仅仅相关的意思；报告只描述本次词义选择。'] },
 }

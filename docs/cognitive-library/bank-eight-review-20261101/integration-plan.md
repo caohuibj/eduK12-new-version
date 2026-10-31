@@ -7,3 +7,11 @@
 原题库的bank-meta依赖不在PR477，且主线安装链并不消费该PR441题库平台。本轮不接入其额外体系：题库保留只读来源附注，复用现有catalog的rightsProvenance与既有审核/发布链。若其他组仍引用该模块，由G1只做相同的局部类型/附注适配，不导入IRT或新发布门禁。
 
 管理员候选源在PR478直接来自generated seeds与registry推荐标记，不另加八项硬编码资格名单。新任务本身满足核心readiness才可安装DRAFT；安装不等同授权、发布或生产可用。其12项旧缺口说明会按已注册task ID过滤，不修改冻结PR478。本批尚未收齐前不将整批计为8项已完成。
+
+## 当前交接状态
+
+G1两项已修订并完成其定向核验。G2@649c9e84399186dfcc05d79fc1c35f4919f5a73d已取入，补齐实际恢复路径及套件登记；母线独立逐题复核已给有限GO，可纳入候选，仍非真实施测或最终发布验收。
+
+G3@8b1882ccad2708ec15e2c750a8cb8826ee4f9bd5仅取seriescomplete专属32文件，包含99150e51的报告修订；数列接线与fixture缺口已收口。cogest算术36题池已撤回，现20题现实估算候选仍HOLD、30/36协议缺10/16题，不取入本集成、不注册或推荐安装。G4尚未交接。现阶段为五项候选，不称八项完成，不创建最终PR，不安装、发布或激活CI。
+
+固定题数新entry复用manual完成模式；精确readiness声明随各任务已有registry进入generated projection，resolver只消费显式声明，继续保持restart-required。只增registry可选类型与现有readiness resolver两处公共接线，不改CognitiveRunner/controller，不新增平台或审批名单。实际宿主契约与宿主8个不同用例记录见host-integration-review.md。

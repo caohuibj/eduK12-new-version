@@ -25,7 +25,7 @@ describe('wordproblem audited V2',()=>{
   await formalStart()
   fireEvent.keyDown(window,{key:'1',repeat:true});expect(emit).not.toHaveBeenCalled()
   for(let i=0;i<36;i++){if(i>0){view.rerender(<Task taskContext={taskContext} trialIndex={i} onTrialComplete={emit} onTaskComplete={complete}/>);await tick(600)}await choose(0)}
-  expect(emit).toHaveBeenCalledTimes(36);expect(complete).toHaveBeenCalledTimes(1)
+  expect(emit).toHaveBeenCalledTimes(36);expect(complete).not.toHaveBeenCalled()
   const payloads=emit.mock.calls.map(([p])=>p);expect(new Set(payloads.map(p=>p.itemId)).size).toBe(36)
   expect(payloads.every(p=>p.responseIndex===0&&p.rtMs===0&&p.itemId!==practice.id)).toBe(true)
  })

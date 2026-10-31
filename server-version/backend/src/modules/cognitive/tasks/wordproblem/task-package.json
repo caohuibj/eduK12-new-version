@@ -67,7 +67,10 @@
   "acceptance": {
     "frontendSuites": [
       "src/modules/cognitive/tasks/wordproblem/__tests__/WordproblemTask.test.tsx",
-      "src/modules/cognitive/tasks/wordproblem/__tests__/prng.test.ts"
+      "src/modules/cognitive/tasks/wordproblem/__tests__/prng.test.ts",
+      "src/modules/cognitive/tasks/wordproblem/__tests__/audited-v2.test.tsx",
+      "src/modules/cognitive/tasks/wordproblem/__tests__/recovery-v2.test.tsx",
+      "src/modules/cognitive/__tests__/bank-intake-host.test.tsx"
     ]
   }
 }

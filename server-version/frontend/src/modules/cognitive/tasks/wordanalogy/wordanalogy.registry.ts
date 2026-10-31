@@ -28,7 +28,12 @@ export const wordanalogyRegistryEntry: CognitiveFrontendRegistryEntry = {
 
 const ReviewedRunner = deferredCognitiveRunner(() => import('./WordanalogyTaskV11').then(module => module.WordanalogyTaskV11))
 export const wordanalogyRegistryEntryV11: CognitiveFrontendRegistryEntry = {
- ...wordanalogyRegistryEntry, engineVersion: '1.1.0', scoringVersion: '1.1.0',
+
+ ...wordanalogyRegistryEntry, completionMode: 'manual',
+ readiness: { category: 'fixed-trial', inputs: ['keyboard','pointer','touch'], orientation: 'any',
+ globalKeyboardCapture: true, resumeDisposition: 'restart-required',
+ resumeReason: '练习及题内阶段未持久化，未封存的中断记录不能只按最大试次索引自动恢复。',
+ frozenMediaSlots: ['instruction','example','stimulus'] }, engineVersion: '1.1.0', scoringVersion: '1.1.0',
  RunnerComponent: ReviewedRunner, prepareRunner: ReviewedRunner.prepare,
  reportDefinition: { ...wordanalogyRegistryEntry.reportDefinition, showProductIndex: false },
 }

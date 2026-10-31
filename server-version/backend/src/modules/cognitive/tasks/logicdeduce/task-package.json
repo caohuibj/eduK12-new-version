@@ -67,7 +67,10 @@
   "acceptance": {
     "frontendSuites": [
       "src/modules/cognitive/tasks/logicdeduce/__tests__/LogicdeduceTask.test.tsx",
-      "src/modules/cognitive/tasks/logicdeduce/__tests__/prng.test.ts"
+      "src/modules/cognitive/tasks/logicdeduce/__tests__/prng.test.ts",
+      "src/modules/cognitive/tasks/logicdeduce/__tests__/audited-v2.test.tsx",
+      "src/modules/cognitive/tasks/logicdeduce/__tests__/recovery-v2.test.tsx",
+      "src/modules/cognitive/__tests__/bank-intake-host.test.tsx"
     ]
   }
 }
