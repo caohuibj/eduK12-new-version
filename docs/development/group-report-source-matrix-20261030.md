@@ -1,6 +1,6 @@
-# 四入口单次群体报告来源核对（main 9f135a2）
+# 四入口单次群体报告来源与交付边界
 
-这是现有报告升级的覆盖说明，不增加一套报告、计分或授权系统。基线核对为 main 9f135a2；后续 #423 已保存新独立 Scale 的课程 Episode，本子分支接其群报读取。Teacher 合同仍为只读方案，不修改 School 目录、纵向计划或 `composite.service.ts`。
+这是现有报告升级的覆盖说明，不增加一套报告、计分或授权系统。原基线核对为 main 9f135a2；后续 #423 保存新独立 Scale 的课程 Episode，#424 沿其群报读取。Teacher 新 GROUP 由 #426／#428／#429／#430 分片交付，具体正式检查及合并状态以各 PR 为准，不等同生产部署；School 目录、纵向计划和 `composite.service.ts` 不在本切片内。
 
 | 入口／来源 | 已有真实来源与当前覆盖 | 本轮处理／限制 |
 | --- | --- | --- |
@@ -12,8 +12,8 @@
 | Training 独立 Form | 当前课程 Form 已在普通问卷／组合 task 内，有父任务和冻结题目 | 不建立不存在的第二种独立 Form 任务模型。 |
 | School SELF 的 Scale / Cognitive / SJT 三类数值叶 | Run / Track 的冻结来源、组织／历史人群、具体叶 GROUP 披露合同；父／叶／spec 最低人数取最大值；当前子群为班级／标签 | Form 叶和年级选择尚未接通，不能将规划描述为当前能力。已有受权来源沿原适配读取，无合法 GROUP 合同的私有组合不列为可生成来源。DOT 处理目录分页，本切片不修改目录／routes；旧 V1 继续原兼容边界。 |
 | Teacher 成人自填 Form | 原 Form 群体服务、版本 Artifact、历史任教班级／标签人群；内部人口依据不进入公开结果 | #415 / #418 已进入 main，保持现有边界。学生评教、专家共识属于原独立业务，不混入 SELF。 |
-| Teacher SELF Scale | `teacher-scale:<uuid>:INDIVIDUAL` 的独立审阅发布合同；`analysisMode=INDIVIDUAL_ONLY`，ORGANIZATION audience `NONE` | **属于合同限制，不是遗漏一个 UI 入口**。当前不得将其个人结果转给组织群体报告。 |
-| Teacher SELF Cognitive / SJT / Bundle 叶 | `assertTeacherPersonalAssessmentPolicy` 明确 SELF / SELF_REPORT / INDIVIDUAL_ONLY，minimumRespondents=null，并受内容上限收窄 | 同属真实可见范围限制；个人纵向能力不等于群体披露许可。本轮未改。 |
+| Teacher SELF Scale | 新明确独立审阅发布的原创 `teacher-scale:<uuid>:GROUP` 和库 Scale 新 GROUP 版本；原 C / FINAL 与已批准本人摘要不变 | 原正向原件覆盖原创与库两类各 N10；复用组织 Artifact 与现有统计。旧 INDIVIDUAL_ONLY / ORGANIZATION NONE 仍不得转为群体。部分样本、实际贡献者保护及指针分页见 9dedd85 切片。 |
+| Teacher SELF Cognitive / SJT / Bundle 数值叶 | 新明确发布的 `education-assessment:TEACHER:...` 2.0.0 SELF GROUP，冻结父→slot→C，逐叶 groupDisclosure，再用正式 canonical 指标 | 本切片薄接线使用已保存的10人、20个新 Cognitive/SJT 叶 FINAL 正向续验原件；保存读取不物化原始结果。旧1.0.0个人来源仍拒绝。验证父来源是现有普通混合组合，不冒称 Bundle 产品 Profile 分析或所有原生工具验收。 |
 
 ## 当前独立认知接线
 
@@ -26,7 +26,7 @@
 
 ## 需先确认的最小后续方案
 
-**Teacher 非 Form GROUP 合同**：库 Scale 在首批既定工具范围内。新明确审阅发布的 GROUP 版本应使用同一 C / FINAL 事实，在各受众 resultDisclosure 内保留原已批准的本人摘要上限、只向组织披露群体，不把两者做成必须二选一。现有合同字段能表示，但 registry／个人 reader 有具体硬拦截，最小修订及发布角色见 `teacher-nonform-group-contract-proposal-20261030.md`。旧 INDIVIDUAL_ONLY / NONE 版本不变；方案待 DOT 确认，未实施权限变化。
+**Teacher 非 Form GROUP 合同**：原方案已获明确实施批准。共享合同／publisher／本人 reader 是 #426 后续的既有切片，Teacher 原创／库 Scale 消费与原生 Cognitive／SJT 是独立交付切片。沿用 COHORT_AGGREGATE 和各受众 resultDisclosure，不新增角色、权限体系或计分；旧 INDIVIDUAL_ONLY / NONE、observer 与通用 raw COHORT_ONLY 限制保留。具体当前原件见 `docs/evidence/teacher-numeric-group-consumer-20261031/`、`teacher-group-partial-population-20261031/` 和 `teacher-native-group-leaves-20261031/`。原方案文档保留历史身份，不把源码／合并结果说成已部署或把旧来源自动升级。
 
 **新的课程独立 Scale 投放**：#423 已在真实课程投放／成员验证后的新 start 中复用 `AssessmentEpisode.courseId`，恢复／重启／FINAL 保留该归属。本子分支只消费该标记的新 SELF 来源与正式冻结分数，接现有统计／Task Artifact；不改 #423 启动候选，不迁移或猜填旧 episode。
 

@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "actualPostgres": true,
+  "actualTeacherRuntimeHttp": true,
+  "assignments": 10,
+  "newNativeCanonicalLeaves": 20,
+  "completedParentsRetainedAtInvocation": 10,
+  "oldScaleFinalsUnchanged": true,
+  "closedEventRequired": false,
+  "leafCeilings": true,
+  "snapshotReadMaterializations": 0,
+  "artifacts": {
+    "COGNITIVE": "a2f710c8-89b3-4062-b36c-29d48efc7840",
+    "SITUATIONAL": "1a1cc974-8d6a-42b8-b02d-84d105cb1b65"
+  },
+  "productionAccessed": false
+}
