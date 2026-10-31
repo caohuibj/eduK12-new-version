@@ -48,7 +48,7 @@ const enterFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) => {
   render(<IcarmatrixV2Task taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} onTaskComplete={vi.fn().mockResolvedValue(undefined)} />)
   fireEvent.click(screen.getByText('开始练习'))
   await act(async () => { vi.advanceTimersByTime(300) })
-  fireEvent.click(screen.getAllByRole('button')[practiceCorrectDisplay()])
+  fireEvent.click(screen.getAllByRole('button', { name: /练习选项/ })[practiceCorrectDisplay()])
   await act(async () => { vi.advanceTimersByTime(0) })
   fireEvent.click(screen.getByText('开始正式测评'))
   await act(async () => {})
@@ -56,6 +56,18 @@ const enterFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) => {
 }
 
 describe('IcarmatrixV2Task', () => {
+  it('uses three choices per row on small screens and announces practice choices', async () => {
+    render(<IcarmatrixV2Task taskContext={context} trialIndex={0} onTrialComplete={vi.fn()} />)
+    fireEvent.click(screen.getByText('开始练习'))
+    await act(async () => { vi.advanceTimersByTime(300) })
+    const choices = screen.getAllByRole('button', { name: /练习选项/ })
+    expect(choices).toHaveLength(6)
+    expect(choices[0].closest('.grid')?.className).toContain('grid-cols-3 sm:grid-cols-6')
+    fireEvent.click(choices[practiceCorrectDisplay()])
+    expect(choices[practiceCorrectDisplay()].className).toContain('ring-2')
+    expect(choices.every((node) => (node as HTMLButtonElement).disabled)).toBe(true)
+  })
+
   it('never shares practice figures with scored-bank SVGs', () => {
     const realSvgs = new Set(ICARMATRIX_V2_BANK.flatMap((item) =>
       [...item.cells, ...item.responses.map((response) => response.svg)]))
@@ -89,14 +101,16 @@ describe('IcarmatrixV2Task', () => {
     render(<IcarmatrixV2Task taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} onTaskComplete={onTaskComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
     await act(async () => { vi.advanceTimersByTime(300) })
-    fireEvent.click(screen.getAllByRole('button')[practiceCorrectDisplay()])
+    fireEvent.click(screen.getAllByRole('button', { name: /练习选项/ })[practiceCorrectDisplay()])
     await act(async () => { vi.advanceTimersByTime(0) })
     fireEvent.click(screen.getByText('开始正式测评'))
     await act(async () => {})
     await act(async () => { vi.advanceTimersByTime(400) })
     const plan = generateIcarmatrixV2Plan('seed-1', 2, '3x3')
     const bankItem = ICARMATRIX_V2_BANK[plan[0]]
-    expect(screen.getAllByRole('button', { name: /选项/ })).toHaveLength(6)
+    const formalChoices = screen.getAllByRole('button', { name: /^选项/ })
+    expect(formalChoices).toHaveLength(6)
+    expect(formalChoices[0].closest('.grid')?.className).toContain('grid-cols-3 sm:grid-cols-6')
     const order = icarmatrixV2OptionOrder('seed-1', 0, bankItem.responses.length)
     const correctDisplay = order.indexOf(0)
     currentTime += 2500
