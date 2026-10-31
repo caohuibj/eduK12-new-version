@@ -187,6 +187,8 @@ export function frontendDependencyScope(entries,{base,head='HEAD'}) {
     &&newMode==='100644'&&((status==='A'&&oldMode==='000000')||(status==='M'&&oldMode==='100644'))
     &&(manifests.has(file)||frontendFile(file)||engineeringEvidenceFile(file)
       ||file.startsWith(frontendSrc)&&/\.(?:test|spec)\.tsx?$/.test(file))))return false;
+  const production=entries.map(({file})=>file).filter(file=>frontendFile(file)&&!/\.(?:test|spec)\.tsx?$/.test(file));
+  if(Object.entries(acceptanceFor(production)).some(([id,selected])=>id!=='canonical_visual'&&selected))return false;
   return dependencyScope(dependencyEntries,{base,head});
 }
 

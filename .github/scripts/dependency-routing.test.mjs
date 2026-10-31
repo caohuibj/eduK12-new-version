@@ -142,7 +142,7 @@ test('frontend version lock source and sibling tests use full frontend checks wi
   assert.equal(selected.scenario,'dependencies');assert.equal(selected.dependencies_frontend_only,true);assert.equal(selected.frontend_affected,false);
   const outputs=Object.fromEntries(Object.entries(selected).map(([key,value])=>[key,String(value)]));
   for(const draft of [true,false])assert.deepEqual(requiredChecks({scope:{outputs}},draft),['scope','frontend-build','frontend','docker','codeql']);
-  for(const file of ['server-version/backend/package-lock.json','server-version/backend/src/modules/campus/group-reports.ts','package-lock.json','.github/workflows/ci.yml',front+'src/api/client.ts',front+'src/modules/cognitive/runner.ts']){
+  for(const file of ['server-version/backend/package-lock.json','server-version/backend/src/modules/campus/group-reports.ts','package-lock.json','.github/workflows/ci.yml',front+'src/api/client.ts',front+'src/modules/cognitive/runner.ts',front+'src/pages/student/ScaleAssessment.tsx']){
     assert.equal(frontendDependencyScope([...entries,{file,status:'A',oldMode:'000000',newMode:'100644'}],{base}),false,file);
   }
   assert.equal(frontendDependencyScope([{...entries[0],newMode:'120000'},...entries.slice(1)],{base}),false);
