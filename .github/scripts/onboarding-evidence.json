@@ -13623,7 +13623,7 @@
     },
     "429": {
       "schemaVersion": 1,
-      "product": "d1b0faf080def9fd5ec9c1fda5ab2dc05111eedd",
+      "product": "1161b6bdddf0110230f089d671734c99c860eee5",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -13647,12 +13647,19 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
             "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
             "server-version/backend/src/modules/reporting/artifact.ts",
-            "server-version/backend/src/modules/reporting/service.ts"
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
-          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 2,
@@ -13687,12 +13694,19 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
             "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
             "server-version/backend/src/modules/reporting/artifact.ts",
-            "server-version/backend/src/modules/reporting/service.ts"
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
-          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13728,12 +13742,19 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
             "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
             "server-version/backend/src/modules/reporting/artifact.ts",
-            "server-version/backend/src/modules/reporting/service.ts"
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
-          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13769,12 +13790,19 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
             "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
             "server-version/backend/src/modules/reporting/artifact.ts",
-            "server-version/backend/src/modules/reporting/service.ts"
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
-          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13798,12 +13826,19 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
             "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
             "server-version/backend/src/modules/reporting/artifact.ts",
-            "server-version/backend/src/modules/reporting/service.ts"
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
-          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13831,12 +13866,19 @@
           ],
           "reviewedSourceDelta": [
             "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
             "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
             "server-version/backend/src/modules/reporting/artifact.ts",
-            "server-version/backend/src/modules/reporting/service.ts"
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
           ],
           "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
-          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13867,11 +13909,17 @@
             "server-version/frontend"
           ],
           "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
             "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
-            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx"
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx"
           ],
           "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
-          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
           "summary": {
             "success": true,
             "numPassedTests": 1,
@@ -13888,20 +13936,20 @@
       ],
       "types": [
         {
-          "path": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/backend-types.json",
-          "sha256": "4601f1e83a3ba217e67b17ebdbc9ae02a1a1e3d2a48f5c8dd2f01f1f63b729e7",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/backend-types.json",
+          "sha256": "ed305f10982ffc3544b486145fb4ce91c0f8e5b80a2cbd9812fcfc9ca63d52b2",
           "component": "backend",
-          "componentTree": "b94bb0efbbc2e5fd32a0755571fd28368dce159c",
+          "componentTree": "dca39d39720e4317600fd4e9cc34d2de18a05272",
           "exitField": "exitCode",
-          "log": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/backend-types.log"
+          "log": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/backend-types.log"
         },
         {
-          "path": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/frontend-types.json",
-          "sha256": "93c9e22a4fde959fc0fb7139eaf1db84fcaefab102867be9764760ff6800856a",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/frontend-types.json",
+          "sha256": "eb2220065b7d79264946e37e8f30a123cc5face85721362cf4bbcc70db94a033",
           "component": "frontend",
-          "componentTree": "a53564bc774639ea9211bd6924a3fadad321c171",
+          "componentTree": "5b108c22d6006abddcfcabd71ce2de67ed886828",
           "exitField": "exitCode",
-          "log": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/frontend-types.log"
+          "log": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/frontend-types.log"
         }
       ]
     }
