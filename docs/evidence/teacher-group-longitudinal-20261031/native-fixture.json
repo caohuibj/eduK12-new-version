@@ -1,0 +1,48 @@
+{
+  "scope": {
+    "organizationId": "7c5439dc-5fc7-465b-8e79-d1a97b7900a3",
+    "eventId": "18159d7b-4cb1-4c0f-b19c-45e5faea0b3a",
+    "actorUserId": "96895fe3-bee3-428c-9f3f-6521ae341f32"
+  },
+  "runId": "2345c68e-8e63-49d4-8fb1-d1bf7589ab99",
+  "users": [
+    "96895fe3-bee3-428c-9f3f-6521ae341f32",
+    "0ee83b21-8347-4f0c-b9b3-a5214dfe47b6",
+    "3c125bdd-c3c2-42ed-96e6-1e63bee97e6d",
+    "9bec3095-2ac0-422c-881f-02540ed7aba5",
+    "f31c915c-6618-4bef-92c6-fcb5db1959b8",
+    "93514585-2e98-428b-8dc5-c12bada76d0d",
+    "3f4573e8-047f-49dd-b834-8531fd85f1f8",
+    "6829cb32-5caa-4ab9-b02d-50e6798c68e2",
+    "2f593129-bbdc-46fa-97e9-dc1967b8e970",
+    "c5e90e76-5755-42ea-95c7-5bd9d9463726"
+  ],
+  "completed": [
+    "50b758c0-edd8-41c2-9ea3-13b13a7db038",
+    "5a2dad00-1e8a-4b31-957e-eb421c659de2",
+    "71b54bd3-a942-48f9-9c49-5a3febadcdf8",
+    "7bd5b0ab-a55f-4fd5-a12a-25c0d3317f63",
+    "91be751a-170a-4029-8c87-6bf04c9ec83c",
+    "abe69fc5-45f6-424c-91c7-3e26e30e2d50",
+    "b4d2bf57-a0aa-40db-bd57-3bbd7609a72f",
+    "bc157940-a70e-49b6-bbc0-a9ec7fe37f48",
+    "d9a05ffa-496a-4434-a20a-71c78e6697fb",
+    "fcaf5dd9-19af-46ed-b792-7ae055d1a8bd",
+    "0518cf4f-5453-436e-ada6-789d760bf6c5",
+    "09eb1320-259b-441c-8d55-bf8a7f65052b",
+    "11926bc1-886a-42a9-a27b-7cc43de74459",
+    "563311e0-e815-49ef-b732-93aa8bdce0a9",
+    "7ed7f4a6-adba-454e-b602-dd3935a98185",
+    "87f38893-7469-420c-95a7-b4d62a0f7d9c",
+    "91e48e3b-8615-4316-a455-4339734aa069",
+    "d7d97e63-9147-480d-88f3-9eec5393984d",
+    "e9a63f3b-2a54-4e27-98a4-e0a44bfbc347",
+    "f385b435-9400-4843-8be0-52c85d6ce40f"
+  ],
+  "next": {
+    "eventId": "d8058fdb-27a0-42f3-b00e-5d1b46ca243b",
+    "runId": "b41df354-120e-400d-9266-73d1d8aba6de",
+    "ordinal": 2
+  },
+  "specId": "948fa6a6-6892-46cd-a23d-204beeb86b76"
+}
