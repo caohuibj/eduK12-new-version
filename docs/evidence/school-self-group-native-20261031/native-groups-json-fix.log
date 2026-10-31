@@ -1,0 +1,15 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts > School same-FINAL GROUP snapshots / native checkpoint continuation > generates real single-wave and plan snapshots from the two native FINAL waves with current manager/leaf rights
+{"kind":"school-native-group-phase","organizationId":"43c3a668-0f7d-449d-aebe-11cb804bcd05","artifactId":"c946017c-c5a9-411b-a0fc-ea6588cc8179","oldArtifactRetained":"07ef2a47-fd44-4e1f-b26d-671d72e54a7d","singleArtifacts":["6fd36016-0496-4d92-8836-f29616179991","b8b3072f-8a76-4d68-9367-2023bffd11e3"],"actualExistingFinals":true,"sourceRegistryMock":false,"realSpecReview":true,"ownReportUnchanged":true,"storedReadCanonicalMaterializations":0,"privacyHiddenCountsRetained":true,"preReleaseDenied":true,"closedAtTimeOnlyFixture":true,"physicallyElapsed24Hours":false}
+
+ ✓ src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts (1 test) 628ms
+     ✓ generates real single-wave and plan snapshots from the two native FINAL waves with current manager/leaf rights  577ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  00:02:54
+   Duration  7.50s (transform 4.93s, setup 0ms, import 6.75s, tests 628ms, environment 0ms)
+
+JSON report written to /workspace/longitudinal-checkpoints/group-longitudinal-school/native-groups-json-fix.json

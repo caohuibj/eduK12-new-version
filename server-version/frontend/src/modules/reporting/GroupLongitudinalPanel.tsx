@@ -1,16 +1,17 @@
+import {groupHistoryQuery,mergeGroupHistory,type GroupHistoryCursor} from './group-history'
 import {useEffect,useRef,useState} from 'react'
 import {GroupLongitudinalReport,type GroupLongitudinalArtifact} from './GroupLongitudinalReport'
 
 type Pointer={artifactId:string;generatedAt:string}
-type Catalog={status:'CONFIGURED'|'NOT_CONFIGURED';planId?:string;tools:Array<{key:string;label:string;kind:string}>;waves:Array<{id:string;ordinal:number;title:string}>;artifacts:Pointer[]}
+type Catalog={status:'CONFIGURED'|'NOT_CONFIGURED';planId?:string;tools:Array<{key:string;label:string;kind:string}>;waves:Array<{id:string;ordinal:number;title:string}>;artifacts:Pointer[];nextCursor?:GroupHistoryCursor|null}
 type Request=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
 export function GroupLongitudinalPanel({base,request}:{base:string;request:Request}){
  const [catalog,setCatalog]=useState<Catalog|null>(null),[sourceKey,setSourceKey]=useState(''),[throughWaveId,setThroughWaveId]=useState('')
  const [artifact,setArtifact]=useState<GroupLongitudinalArtifact|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('')
  const epoch=useRef(0)
  useEffect(()=>{epoch.current++;setCatalog(null);setSourceKey('');setThroughWaveId('');setArtifact(null);setBusy(false);setError('');return()=>{epoch.current++}},[base])
- async function run(action:(current:()=>boolean)=>Promise<void>){
-  const id=++epoch.current,current=()=>id===epoch.current;setBusy(true);setError('');setArtifact(null)
+ async function run(action:(current:()=>boolean)=>Promise<void>,keepArtifact=false){
+  const id=++epoch.current,current=()=>id===epoch.current;setBusy(true);setError('');if(!keepArtifact)setArtifact(null)
   try{await action(current)}catch(cause){if(current())setError(cause instanceof Error?cause.message:'纵向群体报告操作失败')}
   finally{if(current())setBusy(false)}
  }
@@ -33,10 +34,14 @@ export function GroupLongitudinalPanel({base,request}:{base:string;request:Reque
    {catalog.waves.length<2&&<p>至少需要两个已发布波次；各指标缺失独立保留。</p>}
    <button type="button" className="btn-primary" disabled={busy||!sourceKey||catalog.waves.findIndex(w=>w.id===throughWaveId)<1} onClick={()=>void run(async current=>{
     const value=await request<GroupLongitudinalArtifact>(base,'POST',{planId:catalog.planId,sourceKey,throughWaveId})
-    if(current()){show(value);setCatalog(old=>old?{...old,artifacts:[{artifactId:value.artifactId,generatedAt:value.generatedAt},...old.artifacts].slice(0,25)}:old)}
+    if(current()){show(value);setCatalog(old=>old?{...old,artifacts:mergeGroupHistory([{artifactId:value.artifactId,generatedAt:value.generatedAt}],old.artifacts)}:old)}
    })}>生成更新版纵向报告</button>
    {catalog.artifacts.length>0&&<label>历史版本<select aria-label="纵向群体历史版本" disabled={busy} value={artifact?.artifactId??''} onChange={e=>{const id=e.target.value;if(id)void run(async current=>{const value=await request<GroupLongitudinalArtifact>(base+'/'+encodeURIComponent(id));if(current())show(value)})}}>
     <option value="">选择已生成版本</option>{catalog.artifacts.map(p=><option key={p.artifactId} value={p.artifactId}>{new Date(p.generatedAt).toLocaleString('zh-CN')} · {p.artifactId.slice(0,8)}</option>)}</select></label>}
+   {catalog.nextCursor&&<button type="button" disabled={busy} onClick={()=>void run(async current=>{
+    const next=await request<Pick<Catalog,'artifacts'|'nextCursor'>>(base+groupHistoryQuery(catalog.nextCursor!))
+    if(current())setCatalog(previous=>previous?{...previous,nextCursor:next.nextCursor,artifacts:mergeGroupHistory(previous.artifacts,next.artifacts)}:previous)
+   },true)}>加载更早的纵向版本</button>}
   </>}
   {artifact&&<GroupLongitudinalReport key={artifact.artifactId} artifact={artifact}/>}
  </section>

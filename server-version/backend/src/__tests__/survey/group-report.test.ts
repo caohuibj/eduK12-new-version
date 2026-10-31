@@ -9,7 +9,7 @@ vi.mock('../../config/database', () => ({ prisma: { $transaction: m.transaction 
 vi.mock('../../modules/survey/builder.service', () => ({ authorizedProject: m.authorize }))
 vi.mock('../../modules/survey/analytics.source', () => ({ loadSurveySource: m.source, loadSurveyItemDictionary: m.dictionary }))
 vi.mock('../../modules/reporting/task-artifact', () => ({ saveTaskGroupArtifact: m.save, readTaskGroupArtifact: m.read,
-  listTaskGroupArtifacts: m.list, publicTaskGroupArtifact: (value: unknown) => value }))
+  listTaskGroupArtifacts: m.list, listTaskGroupArtifactsPage:async(...args:unknown[])=>({artifacts:await m.list(...args),nextCursor:null}), publicTaskGroupArtifact: (value: unknown) => value }))
 import { prepareSurveyGroupReport, generateSurveyGroupReport, readSurveyGroupReport, surveyGroupCatalog, surveyGroupFacts } from '../../modules/survey/group-report.service'
 
 const scope = { actorUserId: 'owner', projectId: 'project', waveId: 'wave' }

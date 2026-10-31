@@ -1,0 +1,40 @@
+--- a/server-version/backend/src/modules/assessment-run/registeredResources.ts
++++ b/server-version/backend/src/modules/assessment-run/registeredResources.ts
+@@ -220,6 +220,12 @@
+     if(source.origin.family!==ref.resourceKind)return null
+     return source.entry
+   }
++  if(ref.resourceKey.startsWith('private-scale:SCHOOL:')&&ref.resourceVersion==='2.0.0'
++    ||ref.resourceKey.startsWith('education-composition:SCHOOL:')){
++    const {resolveSchoolPrivateGroupHistory}=await import('../education-tools/school-private-group-history')
++    const school=await resolveSchoolPrivateGroupHistory(db,ref)
++    if(school)return school
++  }
+   if(ref.resourceKey.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
+   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
+   if (staticEntry) return staticEntry
+--- a/server-version/backend/src/modules/reporting/governedDisclosure.ts
++++ b/server-version/backend/src/modules/reporting/governedDisclosure.ts
+@@ -18,7 +18,12 @@
+   return contract.audiences[audience].mode.includes('AGGREGATE')?contract:null
+ }
+
+-export async function reportingLeafDisclosureContract(leaf:ReportingLeafSourceV2){
++export async function reportingLeafDisclosureContract(leaf:ReportingLeafSourceV2,scope?:{organizationId:string;runId:string;trackId:string},db?:Prisma.TransactionClient){
++  if(scope&&leaf.instrumentKey.startsWith('education-private-scale:')){
++    const {loadSchoolPrivateGroupDisclosure,schoolPrivateGroupLeafDisclosure}=await import('../education-tools/school-private-group-leaf')
++    const school=await loadSchoolPrivateGroupDisclosure(db??prisma,scope)
++    if(school)return schoolPrivateGroupLeafDisclosure(school,leaf).contract
++  }
+   const entry=await resolveHistoricalRelationalEntry({resourceKind:leaf.unitType,
+     resourceKey:leaf.instrumentKey,resourceVersion:leaf.instrumentVersion})
+   if(!entry||entry.releaseStatus!=='PUBLISHED'||!entry.resultDisclosure)return hidden()
+@@ -93,7 +98,7 @@
+   }
+   if (artifact.analysisKind === 'GROUP' && artifact.artifactPayload.schemaVersion === 2) {
+     const leaf = artifact.artifactPayload.source.leaf
+-    const contract=await reportingLeafDisclosureContract(leaf)
++    const contract=await reportingLeafDisclosureContract(leaf,{organizationId:artifact.organizationId,runId:artifact.artifactPayload.source.runId,trackId:artifact.artifactPayload.source.trackId},db)
+     const rule = contract.audiences[audience]
+     if (!rule.mode.includes('AGGREGATE')) return hidden()
+     if (rule.mode === 'DELAYED_AGGREGATE' && tracks.some(track => !track.closedAt

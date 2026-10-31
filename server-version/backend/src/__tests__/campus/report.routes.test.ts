@@ -16,9 +16,11 @@ const state = vi.hoisted(() => ({
   participant: { list: vi.fn(), read: vi.fn() },
   professional: { list: vi.fn(), read: vi.fn() },
   respondentSummary: vi.fn(),
-  group: {catalog:vi.fn(),tools:vi.fn(),generate:vi.fn(),read:vi.fn()},
+  group: {catalog:vi.fn(),sources:vi.fn(),tools:vi.fn(),generate:vi.fn(),read:vi.fn()},
   protectedStudio: {catalog:vi.fn(),generate:vi.fn()},
   longitudinal: {catalog:vi.fn(),sources:vi.fn(),generate:vi.fn()},
+  groupManager:vi.fn(),
+  groupPlan:{catalog:vi.fn(),generate:vi.fn(),read:vi.fn()},
   groupLongitudinal: {catalog:vi.fn(),generate:vi.fn()},
 }))
 vi.mock('../../config', () => ({ config: state.config }))
@@ -31,8 +33,11 @@ vi.mock('../../modules/reporting/participantService', () => ({
 }))
 vi.mock('../../modules/reporting/respondentSummary', () => ({ readRespondentRunSummary: state.respondentSummary }))
 vi.mock('../../modules/campus/student-feedback', () => ({ readCampusStudentFeedback: state.respondentSummary }))
+vi.mock('../../modules/campus/group-longitudinal-plan.service',()=>({schoolPlanGroupCatalog:state.groupPlan.catalog,generateSchoolPlanGroup:state.groupPlan.generate,readSchoolPlanGroup:state.groupPlan.read}))
 vi.mock('../../modules/campus/group-reports',()=>({
+  requireCampusGroupManager:state.groupManager,
   listCampusGroupReportCatalog:state.group.catalog,
+  listCampusGroupReportSources:state.group.sources,
   listCampusGroupReportTools:state.group.tools,
   generateCampusGroupReport:state.group.generate,
   readCampusGroupReport:state.group.read,
@@ -95,6 +100,15 @@ async function request(path: string, method = 'GET', body?: unknown, headers: Re
 }
 
 describe('Huischool governed report HTTP surface', () => {
+  it('routes paged group sources with a validated page to the current School actor',async()=>{
+    state.group.sources.mockResolvedValue({sources:[],nextSourcePage:null})
+    const response=await request('/reports/groups/sources?organizationId='+CHILD+'&page=2','GET',undefined,{'x-school-role':'ADMIN'})
+    expect(response.status).toBe(200)
+    expect(state.group.sources).toHaveBeenCalledWith(expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),CHILD,2)
+    const invalid=await request('/reports/groups/sources?organizationId='+CHILD+'&page=0','GET',undefined,{'x-school-role':'ADMIN'})
+    expect(invalid.status).toBe(400)
+    expect(state.group.sources).toHaveBeenCalledTimes(1)
+  })
   beforeAll(async () => {
     const app = express()
     app.use(express.json())
@@ -461,17 +475,26 @@ describe('Huischool governed report HTTP surface', () => {
       expect.objectContaining({accountDomain:'SCHOOL'}),CHILD)
     expect(state.group.read).not.toHaveBeenCalled()
   })
-  it('accepts only whole-group source IDs on controlled longitudinal POST',async()=>{
+  it('rejects the legacy arbitrary-Run longitudinal POST after the current manager check',async()=>{
     const body={organizationId:CHILD,specId:ARTIFACT,
       analysisKind:'REPEATED_COHORT',
       sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:ARTIFACT}]}
     const response=await request('/reports/groups/longitudinal','POST',body,
       {'x-school-role':'ADMIN','x-recent-school-mfa':'true'})
+    expect(response.status).toBe(409)
+    expect(state.groupManager).toHaveBeenCalledWith(expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),CHILD)
+    expect(state.groupLongitudinal.generate).not.toHaveBeenCalled()
+  })
+
+  it('mounts the published-plan command under the existing School auth, MFA and CSRF surface',async()=>{
+    state.groupPlan.generate.mockResolvedValue({artifactId:ARTIFACT})
+    const body={planId:CHILD,sourceKey:'track:leaf',throughWaveId:LINK,specId:ARTIFACT}
+    const path='/reports/groups/plans/'+CHILD+'/'+LINK
+    expect((await request(path,'POST',body,{'x-school-role':'ADMIN'})).status).toBe(403)
+    const response=await request(path,'POST',body,{'x-school-role':'ADMIN','x-recent-school-mfa':'true'})
     expect(response.status).toBe(200)
-    expect((await response.json()).data).toMatchObject({kind:'SCHOOL_LONGITUDINAL',state:'WITHHELD'})
-    expect(state.groupLongitudinal.generate).toHaveBeenCalledWith({
-      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),...body,
-    })
+    expect(state.groupPlan.generate).toHaveBeenCalledWith({actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),organizationId:CHILD,runId:LINK,...body})
+    expect(state.groupLongitudinal.generate).not.toHaveBeenCalled()
   })
 
 })

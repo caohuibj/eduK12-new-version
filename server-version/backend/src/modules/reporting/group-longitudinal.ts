@@ -17,6 +17,8 @@ export interface GroupLongitudinalWave {
 }
 export interface GroupLongitudinalProjection {
  schemaVersion:1;kind:'GROUP_LONGITUDINAL';planId:string;sourceKey:string;title:string;generatedCutoff:string
+ /** Optional frozen labels for products with historical subgroup choices. */
+ wavePopulationLabels?:Record<string,string>
  populationMode:'INDEPENDENT_WAVES'
  metrics:Array<{id:string;label:string;unit:string;points:Array<{
   waveId:string;ordinal:number;label:string;observedFrom:string|null;observedUntil:string|null
@@ -47,7 +49,11 @@ export function projectGroupLongitudinal(input:{plan:PersonalTrackingPlan;metric
    const summary=wave.projection.metrics.find(m=>m.key===wave.metricKeys[metric.id])
    if(summary&&summary.type!=='NUMBER')throw new GroupLongitudinalError('类别编码不能作为连续分数比较')
    if(summary?.unit&&summary.unit!==metric.unit)throw new GroupLongitudinalError('追踪指标单位不一致')
-   const suppressed=summary?.state==='suppressed'||wave.projection.completedN===null
+   // A source can explicitly disclose a mean while withholding counts. Its
+   // already-safe metric state is the numeric ceiling; a hidden N must remain
+   // hidden without silently removing that independently authorized mean.
+   const suppressed=summary?.state==='suppressed'
+   const hiddenCounts=wave.projection.completedN===null
    const mean=suppressed?null:finite(summary?.mean),previous=points[index-1],baseline=points[0]
    if(metric.kind==='COGNITIVE'&&mean!==null){const protocol=wave.protocols?.[metric.id];if(!protocol)throw new GroupLongitudinalError('缺少认知实际协议依据');protocols.add(protocol);if(protocols.size>1)throw new GroupLongitudinalError('认知实际协议不一致，不能比较原始分数')}
    const population=wave.populationKeys,previousPopulation=waves[index-1]?.populationKeys
@@ -57,7 +63,7 @@ export function projectGroupLongitudinal(input:{plan:PersonalTrackingPlan;metric
     ||(index>0&&wave.ordinal!==waves[index-1].ordinal+1)
    points.push({waveId:wave.id,ordinal:wave.ordinal,label:wave.label,observedFrom:wave.observedFrom,observedUntil:wave.observedUntil,
     completedN:wave.projection.completedN,countUnit:wave.projection.countUnit,
-    validN:suppressed?null:summary?summary.validN:0,missingN:suppressed?null:summary?summary.missingN:wave.projection.completedN,
+    validN:suppressed||hiddenCounts?null:summary?summary.validN:0,missingN:suppressed||hiddenCounts?null:summary?summary.missingN:wave.projection.completedN,
     state:suppressed?'suppressed':mean===null?'missing':'present',mean,sdSample:mean===null?null:finite(summary?.sdSample),
     adjacentDelta:mean!==null&&previous?.mean!==null&&previous?.mean!==undefined&&previous.ordinal+1===wave.ordinal?finite(mean-previous.mean):null,
     baselineDelta:index>0&&mean!==null&&baseline?.mean!==null&&baseline?.mean!==undefined?finite(mean-baseline.mean):null,

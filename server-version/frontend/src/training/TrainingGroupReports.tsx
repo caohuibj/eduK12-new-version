@@ -1,3 +1,4 @@
+import {groupHistoryQuery,mergeGroupHistory,type GroupHistoryCursor} from '../modules/reporting/group-history'
 import {GroupLongitudinalPanel} from '../modules/reporting/GroupLongitudinalPanel'
 import './training-group-reports.css'
 import { useEffect, useRef, useState } from 'react'
@@ -5,7 +6,7 @@ import apiClient from '../api/client'
 import { TaskGroupReport, type TaskGroupArtifact } from '../modules/reporting/TaskGroupReport'
 
 type Pointer = {artifactId: string; taskId: string; generatedAt: string}
-type Index = {tasks: Array<{id: string; name: string}>; artifacts: Pointer[]}
+type Index = {tasks: Array<{id: string; name: string}>; artifacts: Pointer[];nextCursor?:GroupHistoryCursor|null;nextTaskId?:string|null;taskId?:string|null}
 type Tool = {key: string; kind: string; title: string; source: {taskId: string; publication: string; configDigest: string | null; variantKey: string | null; materialGroupKey?: string}}
 async function request<T>(path: string, body?: unknown): Promise<T> {
   const response = body === undefined ? await apiClient.get<T>(path) : await apiClient.post<T>(path, body)
@@ -37,12 +38,20 @@ export function TrainingGroupReports({courseId}: {courseId: string}) {
     <p>选择一次任务中的具体工具及其冻结版本，生成全部合格作答的统计快照。新作答需主动生成更新版。</p>
     <button type="button" disabled={busy} onClick={() => void run(async current => {
       const result = await request<Index>(base)
-      if (current()) {setIndex(result); setTaskId(result.tasks[0]?.id ?? ''); setTools([]); setSelectedTool('')}
+      result.artifacts=result.artifacts.map(pointer=>({...pointer,taskId:result.taskId??pointer.taskId??result.tasks[0]?.id??''}));
+      if (current()) {setIndex(result); setTaskId(result.taskId ?? result.tasks[0]?.id ?? ''); setTools([]); setSelectedTool('')}
       if (result.artifacts[0]) {const pointer = result.artifacts[0]; const report = await request<TaskGroupArtifact>(`${base}/${pointer.taskId}/${pointer.artifactId}`); if (current()) setArtifact(report)}
     })}>打开群体报告</button>
     {busy && <p role="status">正在读取或生成报告…</p>}{error && <p role="alert">{error}</p>}
-    {index && <><label>任务<select aria-label="群体报告任务" value={taskId} disabled={busy} onChange={event => {setTaskId(event.target.value); setTools([]); setSelectedTool('')}}>
+    {index && <><label>任务<select aria-label="群体报告任务" value={taskId} disabled={busy} onChange={event => {const selected=event.target.value;setTaskId(selected);setTools([]);setSelectedTool('');setArtifact(null);setIndex(previous=>previous?{...previous,artifacts:[],nextCursor:null}:previous);void run(async current=>{
+        const page=await request<{artifacts:Omit<Pointer,'taskId'>[];nextCursor:GroupHistoryCursor|null}>(base+'/history/'+encodeURIComponent(selected))
+        if(current())setIndex(previous=>previous?{...previous,nextCursor:page.nextCursor,artifacts:page.artifacts.map(pointer=>({...pointer,taskId:selected}))}:previous)
+      })}}>
       {index.tasks.map(task => <option key={task.id} value={task.id}>{task.name}</option>)}</select></label>
+      {index.nextTaskId&&<button type="button" disabled={busy} onClick={()=>void run(async current=>{
+        const page=await request<Index>(base+'?'+new URLSearchParams({beforeTaskId:index.nextTaskId!}))
+        if(current())setIndex(previous=>previous?{...previous,nextTaskId:page.nextTaskId,tasks:[...new Map([...previous.tasks,...page.tasks].map(task=>[task.id,task])).values()]}:previous)
+      })}>加载更早的任务</button>}
       <button type="button" disabled={busy || !taskId} onClick={() => void run(async current => {
         const result = await request<{tools: Tool[]}>(`${base}/sources/${encodeURIComponent(taskId)}`)
         if (current()) {setTools(result.tools); setSelectedTool(result.tools[0] ? toolKey(result.tools[0]) : '')}
@@ -59,6 +68,10 @@ export function TrainingGroupReports({courseId}: {courseId: string}) {
       {tools.length === 0 && <p>点击“选择工具与版本”载入所选任务的可统计叶工具；自由文本不自动汇总。</p>}
       {index.artifacts.length > 0 && <label>已生成版本<select aria-label="群体报告版本" disabled={busy} value={artifact?.artifactId ?? ''} onChange={event => {const pointer = index.artifacts.find(row => row.artifactId === event.target.value); if (pointer) void read(pointer)}}>
         <option value="">选择已生成版本</option>{index.artifacts.map(pointer => <option key={pointer.artifactId} value={pointer.artifactId}>{index.tasks.find(task => task.id === pointer.taskId)?.name} · {new Date(pointer.generatedAt).toLocaleString('zh-CN')} · {pointer.artifactId.slice(0,8)}</option>)}</select></label>}
+      {index.nextCursor&&taskId&&<button type="button" disabled={busy} onClick={()=>void run(async current=>{
+        const page=await request<{artifacts:Omit<Pointer,'taskId'>[];nextCursor:GroupHistoryCursor|null}>(base+'/history/'+encodeURIComponent(taskId)+groupHistoryQuery(index.nextCursor!))
+        if(current())setIndex(previous=>previous?{...previous,nextCursor:page.nextCursor,artifacts:mergeGroupHistory(previous.artifacts,page.artifacts.map(pointer=>({...pointer,taskId})))}:previous)
+      })}>加载更早的群体版本</button>}
     </>}
     {artifact && <TaskGroupReport key={artifact.artifactId} artifact={artifact} />}
   </section>{taskId&&<GroupLongitudinalPanel key={courseId+':'+taskId} base={`/courses/${encodeURIComponent(courseId)}/training-group-longitudinal/${encodeURIComponent(taskId)}`} request={longitudinalRequest}/>}</>

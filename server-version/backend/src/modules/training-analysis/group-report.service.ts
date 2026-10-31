@@ -3,9 +3,9 @@ import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { summarizeGroupMetrics, type GroupMetricDefinition, type GroupMetricSummary, type GroupToolKind, type TaskGroupProjection } from '../reporting/group-summary'
-import { listTaskGroupArtifactsForContainer, publicTaskGroupArtifact, readTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
+import { listTaskGroupArtifactsPage, type TaskArtifactCursor, publicTaskGroupArtifact, readTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
 import { TRAINING_ANALYSIS_MINIMUM_N } from './core'
-import { assertTrainingGroupAccess, listTrainingAnalysisSources, listTrainingGroupTasks, loadTrainingAnalysisSources, trainingGroupSnapshotHash, trainingParticipantIdentities, loadTrainingStandaloneCognitiveGroup, readTrainingStandaloneCognitiveGroupArtifact, trainingStandaloneCognitiveGroupTool, trainingStandaloneScaleGroupTools, loadTrainingStandaloneScaleGroup, readTrainingStandaloneScaleGroupArtifact, type TrainingAnalysisActor, type TrainingAnalysisManifestAttemptV1 } from './source'
+import { assertTrainingGroupAccess, listTrainingAnalysisSources, listTrainingGroupTasksPage, assertTrainingGroupTaskHistoryAccess, loadTrainingAnalysisSources, trainingGroupSnapshotHash, trainingParticipantIdentities, loadTrainingStandaloneCognitiveGroup, readTrainingStandaloneCognitiveGroupArtifact, trainingStandaloneCognitiveGroupTool, trainingStandaloneScaleGroupTools, loadTrainingStandaloneScaleGroup, readTrainingStandaloneScaleGroupArtifact, type TrainingAnalysisActor, type TrainingAnalysisManifestAttemptV1 } from './source'
 import { readTrainingAnalysisQuality, trainingResearchReason } from './service'
 import type { TrainingAnalysisRequestV1 } from './types'
 import { trainingCognitiveGroupAssignmentId, trainingScaleGroupId, type TrainingGroupSource } from './group-source'
@@ -30,13 +30,20 @@ export function trainingGroupDisclosure(metrics: GroupMetricSummary[], completed
   return {metrics: projection, completedN: completedN >= floor && projection.every(metric => metric.missingN !== null) ? completedN : null}
 }
 
-export async function listTrainingGroupReports(input: Scope) {
-  return prisma.$transaction(async tx => {
-    const tasks = await listTrainingGroupTasks(tx, input.actor, input.courseId)
-    const allowed = new Set(tasks.map(task => task.id))
-    const artifacts = (await listTaskGroupArtifactsForContainer(tx, 'TRAINING', input.courseId)).filter(row => allowed.has(row.taskId))
-    return {tasks, artifacts}
-  }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead})
+async function taskHistory(tx:Prisma.TransactionClient,input:Scope&{taskId:string;before?:TaskArtifactCursor}){
+ await assertTrainingGroupTaskHistoryAccess(tx,input.actor,input.courseId,input.taskId)
+ return listTaskGroupArtifactsPage(tx,sourceOf(input.courseId,input.taskId),input.before)
+}
+export async function trainingGroupHistory(input:Scope&{taskId:string;before?:TaskArtifactCursor}){
+ return prisma.$transaction(tx=>taskHistory(tx,input),{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
+}
+export async function listTrainingGroupReports(input:Scope&{beforeTaskId?:string}){
+ return prisma.$transaction(async tx=>{
+  const page=await listTrainingGroupTasksPage(tx,input.actor,input.courseId,input.beforeTaskId)
+  const taskId=page.tasks[0]?.id
+  const history=taskId?await taskHistory(tx,{...input,taskId}):{artifacts:[],nextCursor:null}
+  return {...page,taskId:taskId??null,...history,artifacts:history.artifacts.map(pointer=>({...pointer,taskId:taskId!}))}
+ },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
 export async function trainingGroupTools(input: Scope & {taskId: string}) {
   return prisma.$transaction(async tx => {
@@ -54,7 +61,6 @@ export async function trainingGroupTools(input: Scope & {taskId: string}) {
 }
 
 export type TrainingPreparedGroup={source:ReturnType<typeof sourceOf>;selector:unknown;sourceBindings:TrainingGroupBindings;projection:TaskGroupProjection;generatedBy:string;definitions:GroupMetricDefinition[];populationKeys:string[]|null}
-
 async function computeTrainingGroupReport(tx:Prisma.TransactionClient,input:Scope,selection:z.infer<typeof inputSchema>):Promise<TrainingPreparedGroup>{
 
     const catalog = await listTrainingAnalysisSources(tx, input.actor, input.courseId, {authorityLock: 'SHARE', taskId: selection.taskId, group: true, groupKey: selection.toolKey})
@@ -99,38 +105,14 @@ async function computeTrainingGroupReport(tx:Prisma.TransactionClient,input:Scop
     return {source:sourceOf(input.courseId,selection.taskId),selector:{kind:'ALL',...selection},sourceBindings:{parents:parents.map(({stableIdentity:_identity,...parent})=>parent),snapshots,sources,qualityHash,governanceHash:canonicalHash(governance)},projection,generatedBy:input.actor.userId,definitions:metricDefinitions,populationKeys:parents.every(p=>p.stableIdentity!==null)?parents.map(p=>p.stableIdentity!):null}
 }
 
+
 export async function prepareTrainingGroupReport(input:Scope&{selection:unknown}){
  const selection=inputSchema.parse(input.selection)
  return prisma.$transaction(tx=>computeTrainingGroupReport(tx,input,selection),{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,timeout:60000})
 }
-
-export type TrainingGroupBindings={parents:Array<Pick<TrainingGroupSource['parents'][number],'attemptId'|'attemptEpoch'>>;snapshots:TrainingGroupSource['snapshots'];sources:TrainingAnalysisManifestAttemptV1[];qualityHash:string;governanceHash:string}
-
-export async function assertTrainingGroupBindingsCurrent(tx:Prisma.TransactionClient,input:Scope&{taskId:string},bindings:TrainingGroupBindings){
-    const ids = bindings.parents.map(parent => parent.attemptId)
-    // Current source membership plus original immutable slot pointers, never raw
-    // result decryption or newest-FINAL discovery when reading an old version.
-    const parents = ids.length ? await tx.compositeAssessmentAttempt.findMany({where: {id: {in: ids}, compositeAssessmentId: input.taskId, deliveryCourseId: input.courseId, assignmentRef: null}, select: {id: true, userId: true, assignmentRef: true, subjectUserId: true}}) : []
-    if (parents.length !== ids.length) return stale()
-    if (ids.length) {
-      const governed = await tx.$queryRaw<Array<{id: string}>>`SELECT a.id FROM composite_assessment_attempts a JOIN assessment_run_executions e ON e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=a.id JOIN assessment_run_tracks t ON t.organization_id=e.organization_id AND t.run_id=e.run_id AND t.id=e.track_id WHERE a.id IN (${Prisma.join(ids)}) AND t.frozen_resource_policy ? 'resultDisclosure' LIMIT 1`
-      if (governed.length) return stale()
-    }
-    const snapshots = bindings.snapshots.length ? await tx.$queryRaw<Array<{compositeAttemptId: string; attemptEpoch: number; slotKey: string}>>`
-      SELECT composite_attempt_id AS "compositeAttemptId",attempt_epoch AS "attemptEpoch",slot_key AS "slotKey",terminal_state AS "terminalState",payload_kind AS "payloadKind",source_type AS "sourceType",source_attempt_id AS "sourceAttemptId",source_submission_id AS "sourceSubmissionId",source_definition_hash AS "sourceDefinitionHash",completed_at AS "completedAt",md5(canonical_result_encrypted) AS "canonicalDigest",md5(collection_facts_encrypted) AS "collectionDigest"
-      FROM assessment_unit_snapshots WHERE (composite_attempt_id,attempt_epoch,slot_key) IN (${Prisma.join(bindings.snapshots.map(row => Prisma.sql`(${row.attemptId},${row.attemptEpoch},${row.slotKey})`))})
-    ` : []
-    const hashes = new Map(snapshots.map(row => [`${row.compositeAttemptId}:${row.attemptEpoch}:${row.slotKey}`, trainingGroupSnapshotHash(row)]))
-    if (hashes.size !== bindings.snapshots.length || bindings.snapshots.some(row => hashes.get(`${row.attemptId}:${row.attemptEpoch}:${row.slotKey}`) !== row.hash)) return stale()
-    const {qualityHash} = await readTrainingAnalysisQuality(tx, input.courseId, bindings.sources)
-    const {researchGovernance} = await trainingParticipantIdentities(tx, input.actor, parents)
-    const governanceHash = canonicalHash(researchGovernance.map(({attemptEpoch: _epoch, ...row}) => row))
-    if (qualityHash !== bindings.qualityHash || governanceHash !== bindings.governanceHash) return stale()
-}
-
-export async function generateTrainingGroupReport(input: Scope & {selection: unknown}) {
-  const selection = inputSchema.parse(input.selection)
-  return prisma.$transaction(async tx => {
+export async function generateTrainingGroupReport(input:Scope&{selection:unknown}){
+ const selection=inputSchema.parse(input.selection)
+ return prisma.$transaction(async tx=>{
     if(trainingScaleGroupId(selection.taskId)!==null){
       if(selection.toolKey!==selection.taskId||selection.variantKey!==null||selection.materialGroupKey!==undefined)return fail(404,'独立量表工具或冻结来源不存在')
       const native=await loadTrainingStandaloneScaleGroup(tx,input.actor,input.courseId,selection.taskId,selection.configDigest,selection.publication)
@@ -159,7 +141,29 @@ export async function generateTrainingGroupReport(input: Scope & {selection: unk
       return saveTaskGroupArtifact(tx,{source:sourceOf(input.courseId,selection.taskId),selector:{kind:'ALL',...selection},sourceBindings:native.bindings,projection,generatedBy:input.actor.userId})
     }
     return saveTaskGroupArtifact(tx,await computeTrainingGroupReport(tx,input,selection))
-  }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 60000})
+  },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,timeout:60000})
+}
+export type TrainingGroupBindings={parents:Array<Pick<TrainingGroupSource['parents'][number],'attemptId'|'attemptEpoch'>>;snapshots:TrainingGroupSource['snapshots'];sources:TrainingAnalysisManifestAttemptV1[];qualityHash:string;governanceHash:string}
+export async function assertTrainingGroupBindingsCurrent(tx:Prisma.TransactionClient,input:Scope&{taskId:string},bindings:TrainingGroupBindings){
+    const ids = bindings.parents.map(parent => parent.attemptId)
+    // Current source membership plus original immutable slot pointers, never raw
+    // result decryption or newest-FINAL discovery when reading an old version.
+    const parents = ids.length ? await tx.compositeAssessmentAttempt.findMany({where: {id: {in: ids}, compositeAssessmentId: input.taskId, deliveryCourseId: input.courseId, assignmentRef: null}, select: {id: true, userId: true, assignmentRef: true, subjectUserId: true}}) : []
+    if (parents.length !== ids.length) return stale()
+    if (ids.length) {
+      const governed = await tx.$queryRaw<Array<{id: string}>>`SELECT a.id FROM composite_assessment_attempts a JOIN assessment_run_executions e ON e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=a.id JOIN assessment_run_tracks t ON t.organization_id=e.organization_id AND t.run_id=e.run_id AND t.id=e.track_id WHERE a.id IN (${Prisma.join(ids)}) AND t.frozen_resource_policy ? 'resultDisclosure' LIMIT 1`
+      if (governed.length) return stale()
+    }
+    const snapshots = bindings.snapshots.length ? await tx.$queryRaw<Array<{compositeAttemptId: string; attemptEpoch: number; slotKey: string}>>`
+      SELECT composite_attempt_id AS "compositeAttemptId",attempt_epoch AS "attemptEpoch",slot_key AS "slotKey",terminal_state AS "terminalState",payload_kind AS "payloadKind",source_type AS "sourceType",source_attempt_id AS "sourceAttemptId",source_submission_id AS "sourceSubmissionId",source_definition_hash AS "sourceDefinitionHash",completed_at AS "completedAt",md5(canonical_result_encrypted) AS "canonicalDigest",md5(collection_facts_encrypted) AS "collectionDigest"
+      FROM assessment_unit_snapshots WHERE (composite_attempt_id,attempt_epoch,slot_key) IN (${Prisma.join(bindings.snapshots.map(row => Prisma.sql`(${row.attemptId},${row.attemptEpoch},${row.slotKey})`))})
+    ` : []
+    const hashes = new Map(snapshots.map(row => [`${row.compositeAttemptId}:${row.attemptEpoch}:${row.slotKey}`, trainingGroupSnapshotHash(row)]))
+    if (hashes.size !== bindings.snapshots.length || bindings.snapshots.some(row => hashes.get(`${row.attemptId}:${row.attemptEpoch}:${row.slotKey}`) !== row.hash)) return stale()
+    const {qualityHash} = await readTrainingAnalysisQuality(tx, input.courseId, bindings.sources)
+    const {researchGovernance} = await trainingParticipantIdentities(tx, input.actor, parents)
+    const governanceHash = canonicalHash(researchGovernance.map(({attemptEpoch: _epoch, ...row}) => row))
+    if (qualityHash !== bindings.qualityHash || governanceHash !== bindings.governanceHash) return stale()
 }
 
 export async function readTrainingGroupReport(input: Scope & {taskId: string; artifactId: string}) {
@@ -174,6 +178,7 @@ export async function readTrainingGroupReport(input: Scope & {taskId: string; ar
       if(!artifact)return fail(404,'群体报告不存在')
       return publicTaskGroupArtifact(artifact)
     }
+
     await assertTrainingGroupAccess(tx, input.actor, input.courseId, input.taskId)
     const artifact = await readTaskGroupArtifact(tx, sourceOf(input.courseId, input.taskId), input.artifactId)
     if (!artifact) return fail(404, '群体报告不存在')

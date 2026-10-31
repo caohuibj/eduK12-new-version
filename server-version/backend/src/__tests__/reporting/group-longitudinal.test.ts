@@ -30,6 +30,13 @@ describe('frozen leaf group longitudinal assembly reuses disclosed wave statisti
   const hidden=wave(2,[10]);hidden.projection.completedN=null;hidden.projection.metrics[0]={...hidden.projection.metrics[0],state:'suppressed',validN:null,missingN:null,mean:null}
   expect(project([wave(1,[0]),hidden]).metrics[0].points[1]).toMatchObject({state:'suppressed',mean:null,validN:null,missingN:null,adjacentDelta:null,baselineDelta:null,populationChanged:null})
  })
+ it('keeps explicitly disclosed means when source privacy independently hides counts',()=>{
+  const waves=[wave(1,[1]),wave(2,[2])]
+  for(const current of waves){current.projection.completedN=null;current.projection.metrics[0]={...current.projection.metrics[0],state:'present'}}
+  const points=project(waves).metrics[0].points
+  expect(points.map(point=>point.mean)).toEqual([1,2])
+  expect(points[1]).toMatchObject({state:'present',completedN:null,validN:null,missingN:null,baselineDelta:1,populationChanged:null})
+ })
  it('requires actual Cognitive protocol and consistent units; category codes stay categorical',()=>{
   const cognitive={...metric,kind:'COGNITIVE' as const},first=wave(1,[0]),second=wave(2,[1])
   expect(()=>project([first,second],cognitive)).toThrow('实际协议')

@@ -19,8 +19,13 @@ export function reportingGroupContract(policy:Record<string,unknown>|null|undefi
   return contract.audiences[audience].mode.includes('AGGREGATE')?contract:null
 }
 
-export async function reportingLeafDisclosureContract(leaf:ReportingLeafSourceV2,source?:{organizationId:string;runId:string;trackId:string}){
-  if(source){const contract=await teacherScaleLeafContract(source,leaf);if(contract)return contract}
+export async function reportingLeafDisclosureContract(leaf:ReportingLeafSourceV2,scope?:{organizationId:string;runId:string;trackId:string},db?:Prisma.TransactionClient){
+  if(scope&&leaf.instrumentKey.startsWith('education-private-scale:')){
+    const {loadSchoolPrivateGroupDisclosure,schoolPrivateGroupLeafDisclosure}=await import('../education-tools/school-private-group-leaf')
+    const school=await loadSchoolPrivateGroupDisclosure(db??prisma,scope)
+    if(school)return schoolPrivateGroupLeafDisclosure(school,leaf).contract
+  }
+  if(scope){const contract=await teacherScaleLeafContract(scope,leaf);if(contract)return contract}
   const entry=await resolveHistoricalRelationalEntry({resourceKind:leaf.unitType,
     resourceKey:leaf.instrumentKey,resourceVersion:leaf.instrumentVersion})
   if(!entry||entry.releaseStatus!=='PUBLISHED'||!entry.resultDisclosure)return hidden()
@@ -96,7 +101,7 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
   }
   if (artifact.analysisKind === 'GROUP' && artifact.artifactPayload.schemaVersion === 2) {
     const leaf = artifact.artifactPayload.source.leaf
-    const contract=await reportingLeafDisclosureContract(leaf,{organizationId:artifact.organizationId,runId:directSource!.runId,trackId:directSource!.trackId})
+    const contract=await reportingLeafDisclosureContract(leaf,{organizationId:artifact.organizationId,runId:artifact.artifactPayload.source.runId,trackId:artifact.artifactPayload.source.trackId},db)
     const rule = contract.audiences[audience]
     if (!rule.mode.includes('AGGREGATE')) return hidden()
     if (rule.mode === 'DELAYED_AGGREGATE' && tracks.some(track => !track.closedAt

@@ -1,3 +1,4 @@
+import {taskArtifactBefore} from '../reporting/task-artifact'
 import {surveyGroupLongitudinalCatalog,generateSurveyGroupLongitudinal,readSurveyGroupLongitudinal} from './group-longitudinal.service'
 import {groupLongitudinalRequestSchema,GroupLongitudinalError} from '../reporting/group-longitudinal'
 import {readSurveyReferenceRequest,createSurveyReferenceCandidate,readSurveyReferenceCandidate,reviewSurveyReferenceCandidate,publishSurveyReferenceCandidate,
@@ -20,7 +21,7 @@ import { loadSurveyItemDictionary,loadSurveySource } from './analytics.source'
 import { describeWave } from './analytics.descriptive'
 import { describeSurveyFlowOperations } from './analytics.flow-operations'
 import { assertRecentSurveyMfa } from './analytics.export.service'
-import { surveyGroupCatalog, generateSurveyGroupReport, readSurveyGroupReport } from './group-report.service'
+import { surveyGroupCatalog, surveyGroupHistory, generateSurveyGroupReport, readSurveyGroupReport } from './group-report.service'
 
 
 export const surveyAnalyticsRouter=Router()
@@ -62,7 +63,7 @@ surveyAnalyticsRouter.post('/:pid/analytics/quality/attempts/:attemptId',wrap(re
     ...review.parse(req.body)})))
 
 const key=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
-surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/group-longitudinal',wrap(req=>surveyGroupLongitudinalCatalog({actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid)})))
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/group-longitudinal',wrap(req=>surveyGroupLongitudinalCatalog({actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),before:taskArtifactBefore(req.query)})))
 surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/group-longitudinal',wrap(req=>{
  assertRecentSurveyMfa(req)
  return generateSurveyGroupLongitudinal({actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),...groupLongitudinalRequestSchema.parse(req.body)})
@@ -71,6 +72,7 @@ surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/group-longitudinal/:artifa
 
 const groupReportScope=(req:Request)=>({actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid)})
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/group-reports',wrap(req=>surveyGroupCatalog(groupReportScope(req))))
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/group-reports/history',wrap(req=>surveyGroupHistory({...groupReportScope(req),before:taskArtifactBefore(req.query)})))
 surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/group-reports',wrap(req=>{
   assertRecentSurveyMfa(req)
   return generateSurveyGroupReport({...groupReportScope(req),...z.object({instrumentKey:key}).strict().parse(req.body)})

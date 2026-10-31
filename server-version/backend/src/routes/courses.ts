@@ -96,6 +96,7 @@ router.get('/:id/training-group-longitudinal/:taskId',authenticate,requireTeache
 router.post('/:id/training-group-longitudinal/:taskId',authenticate,requireTeacher,trainingAnalysisController.groupLongGenerate)
 router.get('/:id/training-group-longitudinal/:taskId/:artifactId',authenticate,requireTeacher,trainingAnalysisController.groupLongRead)
 router.get('/:id/training-group-reports', authenticate, requireTeacher, trainingAnalysisController.groupIndex)
+router.get('/:id/training-group-reports/history/:taskId',authenticate,requireTeacher,trainingAnalysisController.groupHistory)
 router.get('/:id/training-group-reports/sources/:taskId', authenticate, requireTeacher, trainingAnalysisController.groupTools)
 router.post('/:id/training-group-reports', authenticate, requireTeacher, trainingAnalysisController.groupGenerate)
 router.get('/:id/training-group-reports/:taskId/:artifactId', authenticate, requireTeacher, trainingAnalysisController.groupRead)

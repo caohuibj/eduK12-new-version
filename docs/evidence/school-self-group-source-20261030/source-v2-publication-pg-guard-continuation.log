@@ -1,0 +1,15 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts > School explicit group source / real publication only, not FINAL or group generation > keeps legacy private rights, publishes a new configured questionnaire and verifies actual frozen execution identity
+{"kind":"synthetic-publication-checkpoint","organizationId":"3bfb1802-d3df-418c-91e2-8484544d3c2e","runId":"fed88858-ae3e-482e-aad9-cef00f0986c9","trackId":"75d8e1ba-f39e-45c0-ba42-dba335307327","fixedVersionId":"4b1329fd-e74f-4d03-b3fe-052e18f90ff7","participantUserId":"c39a377f-6f09-4dde-89ed-587572122d08","publicationOnly":true,"canonicalFinalInserted":false,"groupReportGenerated":false}
+
+ ✓ src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts (1 test) 1307ms
+     ✓ keeps legacy private rights, publishes a new configured questionnaire and verifies actual frozen execution identity  1253ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  23:16:42
+   Duration  8.81s (transform 5.34s, setup 0ms, import 7.38s, tests 1.31s, environment 0ms)
+
+JSON report written to /workspace/longitudinal-checkpoints/group-longitudinal-school/source-v2-publication-pg-guard-continuation.json

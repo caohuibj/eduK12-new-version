@@ -1,0 +1,27 @@
+{
+  "transport": "Internal text/patch from DOT; no remote fetch or publication claimed",
+  "helper": {
+    "sourceCommit": "00f2b788b764ca5c92e6fcf0ebda442928259f11",
+    "path": "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+    "sha256": "931bfaeef7f5bb4fcfb5aa35e40938693e64357003dd0be354fc75dfedfd1110",
+    "gitBlob": "a60b80d6180266ea1131e904884aa8922ec86eaf"
+  },
+  "initialSharedCommit": "5b423f67c66569cc99ce45c66a5dac0034c9af66",
+  "fixCommits": [
+    "b309d761a358c1828897ca9faeb29fd31ebe325f",
+    "1743b8affd3d11752b83e7b29ec9d5b665cf5ac2"
+  ],
+  "afterBlobs": {
+    "server-version/backend/src/modules/assessment-relational/product-registry.ts": "295084487894c3500cc5b2eeaf1e09b0f02919e2",
+    "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": "bb5da7c2bc7f08b8ba4a484cd3b3fe86482012c2",
+    "server-version/backend/src/modules/reporting/respondentSummary.ts": "f59bc3c807c6b67957a63d1fbbf7bdc46e53833b",
+    "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts": "a2d19cce74cfe25c51fbc14e30c8ab414df28675",
+    "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": "f740348bbfca84bf15566cf6ff8796f7c0be2221",
+    "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts": "938343ca81c2f5f7ce46955c9b56b32c5050a876",
+    "server-version/backend/src/modules/bundle-product/education-adapter.ts": "03a13e1877193ddd1aca7ecfa9168d11f5079b87"
+  },
+  "application": "Internal patches checked with git apply --check then applied and hashed; F1 single-line delta applied and hashed",
+  "originalGroupTestsReplayed": false,
+  "originalGroupTypesReplayed": false,
+  "ownership": "Group; imported verbatim, not rewritten by School"
+}
