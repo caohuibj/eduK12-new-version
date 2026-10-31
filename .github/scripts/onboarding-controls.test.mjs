@@ -38,6 +38,39 @@ function fixture(){
  const read=(cmd,a,...rest)=>{if(cmd==='ls-tree')return a===base?'':`100644 blob ${blob}\t${rest.at(-1)}`;if(cmd==='rev-parse'){if(a.endsWith('^{tree}'))return tree;if(a.endsWith(':server-version/backend'))return h('2');if(a.endsWith(':server-version/frontend'))return h('3');return blob;}throw Error('Unexpected mocked Git command');};
  return {b,entries,env,read};
 }
+test('onboarding accepts unchanged main controls without reading an older candidate checkpoint',()=>{
+ const f=fixture(),checkpointReads=[];
+ const entries=f.entries.filter(e=>!CONTROLS.includes(e.file));
+ const read=(cmd,commit,...rest)=>{
+  if(cmd==='ls-tree'&&CONTROLS.includes(rest.at(-1))){
+   if(commit===f.b.controlCheckpoint)checkpointReads.push(rest.at(-1));
+   return `100644 blob ${commit===f.b.controlCheckpoint?h('4'):h('5')}\t${rest.at(-1)}`;
+  }
+  return f.read(cmd,commit,...rest);
+ };
+ assert.equal(onboardingPlan(entries,base,head,read,f.env,f.b).pr,366);
+ assert.deepEqual(checkpointReads,[],'Unchanged controls belong to the current main baseline');
+});
+test('onboarding still rejects changed control bytes that differ from the reviewed checkpoint',()=>{
+ const f=fixture(),path='.github/scripts/onboarding-checks.mjs';
+ const read=(cmd,commit,...rest)=>cmd==='ls-tree'&&commit===head&&rest.at(-1)===path
+  ?`100644 blob ${h('9')}\t${path}`:f.read(cmd,commit,...rest);
+ assert.throws(()=>onboardingPlan(f.entries,base,head,read,f.env,f.b),/Control checkpoint drift/);
+});
+test('onboarding needs before snapshots only for changed controls, not later additions to the shared list',()=>{
+ const f=fixture(),entries=f.entries.filter(e=>!CONTROLS.includes(e.file));
+ const read=(cmd,commit,...rest)=>cmd==='ls-tree'&&CONTROLS.includes(rest.at(-1))
+  ?`100644 blob ${blob}\t${rest.at(-1)}`:f.read(cmd,commit,...rest);
+ const candidate={...f.b,controlBefore:{}};
+ assert.equal(onboardingPlan(entries,base,head,read,f.env,candidate).pr,366);
+ assert.throws(()=>onboardingPlan(entries,base,head,read,f.env,{...candidate,controlBefore:{'unreviewed-control':null}}),/Unknown control path/);
+ // A modified control still needs its exact before blob; an absent entry must
+ // not let a real M change masquerade as a newly added control.
+ const path='.github/scripts/onboarding-checks.mjs',before=h('6');
+ const modifiedRead=(cmd,commit,...rest)=>cmd==='ls-tree'&&rest.at(-1)===path&&commit===base
+  ?`100644 blob ${before}\t${path}`:read(cmd,commit,...rest);
+ assert.throws(()=>onboardingPlan([...entries,{file:path,status:'M',oldMode:'100644',newMode:'100644'}],base,head,modifiedRead,f.env,candidate));
+});
 test('onboarding scope binds exact source, modes, reviewed controls and the supported PR only',()=>{
  const f=fixture();assert.equal(onboardingPlan(f.entries,base,head,f.read,f.env,f.b).pr,366);
  for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'365'},{CI_FORCE_FULL:'true'},{CI_PR_REPOSITORY:'other/repo'}])assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...patch},f.b));
